@@ -1,13 +1,20 @@
-import { Html, Head, Main, NextScript } from 'next/document'
+import { Html, Head, Main, NextScript } from "next/document";
 
-export default function Document() {
+export default function Document(): JSX.Element {
   return (
     <Html lang="en">
-      <Head />
+      <Head>
+        <link
+          href="https://fonts.googleapis.com/css?family=Material+Icons&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
       <body>
-        <Main />
+        <div id="layout">
+          <Main />
+        </div>
         <NextScript />
       </body>
     </Html>
-  )
+  );
 }
