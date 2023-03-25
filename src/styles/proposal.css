@@ -428,6 +428,7 @@ ul.project-details li {
 
 .action-buttons > div {
   width: 80%;
+  cursor: pointer;
 }
 
 #vote-progress {
