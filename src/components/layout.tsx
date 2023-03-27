@@ -9,7 +9,9 @@ function Layout({ children }: LayoutProps) {
   return (
     <div>
       <Navbar />
-      <main>{children}</main>
+      <main className="padded" id="content-root">
+        {children}
+      </main>
     </div>
   );
 }

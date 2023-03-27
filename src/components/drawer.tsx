@@ -10,7 +10,7 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
     {
       icon: "face",
       text: "Dashboard",
-      link: "",
+      link: "/dapp/dashboard",
     },
     {
       icon: "library_add",

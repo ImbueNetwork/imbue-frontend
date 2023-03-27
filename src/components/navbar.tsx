@@ -2,6 +2,7 @@ import { appLogo } from "@/assets/svgs";
 import Image from "next/image";
 import React, { useState } from "react";
 import Drawer from "./drawer";
+import FullScreenLoader from "./fullScreenLoader";
 
 function Navbar() {
   const [sideBarIsVisivle, setSideBarIsVisible] = useState<boolean>(false);
@@ -41,6 +42,7 @@ function Navbar() {
         id="modal"
       />
       <Drawer visible={sideBarIsVisivle} toggleVisibility={toggleSideBar} />
+      <FullScreenLoader />
     </>
   );
 }

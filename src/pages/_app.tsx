@@ -1,7 +1,10 @@
 import type { AppProps } from "next/app";
 import Layout from "@/components/layout";
 import "@/styles/globals.css";
+import "@/styles/common.css";
 import "@/styles/index.css";
+import "@/styles/proposal.css";
+import "@/styles/proposals.css";
 import "material-components-web/dist/material-components-web.min.css";
 
 export default function App({ Component, pageProps }: AppProps) {

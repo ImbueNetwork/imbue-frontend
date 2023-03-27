@@ -1,12 +1,8 @@
+import Proposals from '@/components/proposals'
 import React from 'react'
 
 function Dapp() {
-  return (
-    <div>
-
-        
-    </div>
-  )
+  return <Proposals/>
 }
 
 export default Dapp
