@@ -36,7 +36,6 @@
   --mdc-theme-error: var(--theme-error);
   --mdc-theme-background: var(--theme-background);
   --mdc-theme-surface: #0f0f0f;
-  
 
   --mdc-typography-font-family: var(--theme-font-family);
 
@@ -106,7 +105,6 @@
 body {
   margin: 0;
   padding: 0;
-
   background-color: #000;
   background-image: url("background.png");
   background-size: cover;
@@ -137,4 +135,14 @@ body {
 .mdc-dialog .mdc-dialog__title,
 .mdc-dialog__content {
   color: var(--mdc-text-field-ink-color) !important;
+}
+
+div#content-root {
+  width: 100%;
+}
+
+form {
+  display: block;
+  margin-top: 0em;
+  margin-block-end: 1em;
 }

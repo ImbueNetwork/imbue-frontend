@@ -5,7 +5,8 @@ import "@/styles/common.css";
 import "@/styles/index.css";
 import "@/styles/proposal.css";
 import "@/styles/proposals.css";
-import "material-components-web/dist/material-components-web.min.css";
+import "@/styles/proposals.css";
+import "@/styles/proposal-draft.css";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
