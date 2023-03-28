@@ -10,6 +10,7 @@ import styled from "@emotion/styled";
 
 type DropdownSelectProps = {
   error: boolean;
+  widthPercent?: number;
 };
 
 type SelectInputProps = {
@@ -111,6 +112,7 @@ const DropdownItems = (): JSX.Element => {
 
 const DropdownSelect = ({
   error = false,
+  widthPercent,
 }: DropdownSelectProps): JSX.Element => {
   const [age, setAge] = React.useState("");
   const [focused, setFocused] = useState(false);
@@ -121,7 +123,11 @@ const DropdownSelect = ({
   };
 
   return (
-    <FormControl variant="filled" className="text-input-container">
+    <FormControl
+      variant="filled"
+      style={{ width: widthPercent ? `${widthPercent}%` : "100%" }}
+      className="text-input-container"
+    >
       <InputLabel
         htmlFor="component-filled"
         id="demo-simple-select-filled-label"
