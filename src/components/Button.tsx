@@ -4,7 +4,7 @@ import { Button } from "@mui/material";
 import React from "react";
 
 type ButtonProps = {
-  customStyle?: React.CSSProperties;
+  customstyle?: React.CSSProperties;
 };
 
 type CustomButtonProps = {
@@ -26,9 +26,9 @@ const CustomButton = ({
 }: CustomButtonProps): JSX.Element => {
   const buttonDefaultStyle = buttonStyleBasedOnVariantPassed(variant);
 
-  const ButtonWrap = styled(Button)(({ customStyle }: ButtonProps) => ({
+  const ButtonWrap = styled(Button)(({ customstyle }: ButtonProps) => ({
     ...buttonDefaultStyle.style,
-    ...customStyle,
+    ...customstyle,
     ":hover": {
       ...hoverStyle,
     },
@@ -37,7 +37,7 @@ const CustomButton = ({
   return (
     <ButtonWrap
       variant={variant}
-      customStyle={btnWrapStyle}
+      customstyle={btnWrapStyle}
       disableRipple
       className="button-container"
       onClick={onClick}

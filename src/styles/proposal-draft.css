@@ -85,6 +85,18 @@
 
 .text-input-field-help {
   font-size: var(--mdc-typography-subtitle1-font-size, 0.7rem);
+  color: var(--mdc-text-field-ink-color);
+  font-family: var(
+    --mdc-typography-caption-font-family,
+    var(--mdc-typography-font-family, Roboto, sans-serif)
+  );
+  font-weight: var(--mdc-typography-caption-font-weight, 400);
+  padding-right: 16px;
+  letter-spacing: var(--mdc-typography-caption-letter-spacing, 0.0333333333em);
+  will-change: opacity;
+  transition: opacity 150ms 0ms cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-font-smoothing: antialiased;
+  display: block;
 }
 
 .text-input-field {
