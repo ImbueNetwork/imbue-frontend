@@ -13,6 +13,17 @@ const SpacedRow = styled.div`
   justify-content: space-between;
 `;
 
+const saveDraftStyle = {
+  btnWrap: {
+    marginTop: 16,
+    height: 64,
+    backgroundColor: "var(--theme-secondary)",
+  },
+  hoverStyle: {
+    backgroundColor: "var(--theme-secondary)",
+  },
+};
+
 const Draft = (): JSX.Element => {
   return (
     <div className="proposal-editor-continer">
@@ -112,14 +123,8 @@ const Draft = (): JSX.Element => {
             <CustomButton
               text="Save Draft Propsal"
               variant={Buttons.CONTAINED}
-              btnWrapStyle={{
-                marginTop: 16,
-                height: 64,
-                backgroundColor: "var(--theme-secondary)",
-              }}
-              hoverStyle={{
-                backgroundColor: "var(--theme-secondary)",
-              }}
+              btnWrapStyle={saveDraftStyle.btnWrap}
+              hoverStyle={saveDraftStyle.hoverStyle}
             />
           </fieldset>
         </form>
