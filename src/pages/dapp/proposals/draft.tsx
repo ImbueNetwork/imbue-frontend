@@ -5,12 +5,21 @@ import React from "react";
 import styled from "@emotion/styled";
 import CustomButton from "@/components/Button";
 import { Buttons } from "@/utils/helper";
+import { categories } from "@/constants/constants";
+import * as model from "@/model";
+import { useWindowSize } from "@/hooks";
 
 const SpacedRow = styled.div`
   display: flex;
   flex-direction: row;
-  align-items: baseline;
+  align-items: flex-start;
   justify-content: space-between;
+
+  @media screen and (max-width: 500px) {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
 `;
 
 const saveDraftStyle = {
@@ -24,7 +33,27 @@ const saveDraftStyle = {
   },
 };
 
+const CategoriesData = Object.entries(categories).map(
+  ([category, subcategies], index) => {
+    return {
+      label: category,
+      body: subcategies.join("; "),
+      value: `${category}  ${subcategies.join("; ")}`,
+    };
+  }
+);
+
+const CurrencyData = Object.keys(model.Currency)
+  .filter((v) => !isNaN(Number(v)))
+  .map((currency) => {
+    return {
+      label: model.Currency[currency as any],
+      value: model.Currency[currency as any],
+    };
+  });
+
 const Draft = (): JSX.Element => {
+  const size = useWindowSize();
   return (
     <div className="proposal-editor-continer">
       <header className="header-h1-text-container">
@@ -44,17 +73,17 @@ const Draft = (): JSX.Element => {
 
             <TextInput
               name="project_name"
-              placeholder="Project name"
+              placeholder="Project name*"
               message="The name of the project"
             />
             <TextInput
               name="website"
-              placeholder="Website"
+              placeholder="Website*"
               message="A website where contributors can find out more"
             />
             <TextInput
               name="logo"
-              placeholder="Logo"
+              placeholder="Logo*"
               message="A URL to an image file."
             />
           </fieldset>
@@ -64,12 +93,17 @@ const Draft = (): JSX.Element => {
               Describe what you&apos;ll be creating
             </legend>
 
-            <DropdownSelect error={false} />
+            <DropdownSelect
+              error={false}
+              data={CategoriesData}
+              placeholder="Category"
+              noOfItemsPerList={2}
+            />
 
             <TextArea
               name="project"
-              placeholder="Tell us about your project"
-              mt={7}
+              placeholder="Tell us about your project*"
+              mt={-16}
             />
           </fieldset>
 
@@ -79,15 +113,22 @@ const Draft = (): JSX.Element => {
             </legend>
 
             <SpacedRow>
-              <DropdownSelect widthPercent={35} error={false} />
+              <DropdownSelect
+                data={CurrencyData}
+                placeholder="Currency*"
+                widthPercent={size?.width < 500 ? 100 : 35}
+                error={false}
+                noOfItemsPerList={1}
+              />
               <TextInput
-                widthPercent={50}
+                widthPercent={size?.width < 500 ? 100 : 50}
                 name="funds"
-                placeholder="Funds Required"
+                placeholder="Funds Required*"
                 message="The total amount required for the project"
                 inputType="number"
                 value={7}
                 showSuffix
+                mt={size?.width < 500 ? -16 : 0}
               />
             </SpacedRow>
             <TextInput
@@ -104,12 +145,12 @@ const Draft = (): JSX.Element => {
 
             <TextInput
               name="milestone"
-              placeholder="What is your first milestone?"
+              placeholder="What is your first milestone?*"
               message="A short summary of a concrete deliverable."
             />
             <TextInput
               name="unlock"
-              placeholder="Percent to unlock?"
+              placeholder="Percent to unlock?*"
               message="The sum of all milestones must be 100%."
               showSuffix
               suffixText=""

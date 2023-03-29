@@ -25,7 +25,6 @@ export type DraftProposal = {
   category?: string | number;
 };
 
-
 export type Proposal = DraftProposal & {
   id: number;
   status: string;
@@ -41,3 +40,13 @@ export type ProposalItemProps = {
   imageSrc: string;
   name: string;
 };
+
+export type DropdownSelectData = {
+  value: any;
+  label: string;
+  body?: string;
+};
+export enum NumberOfItemsPerList {
+  ONE = 1,
+  TWO = 2,
+}

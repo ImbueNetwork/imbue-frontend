@@ -62,7 +62,7 @@ const TextArea = ({
               : "text-input-label"
           }
         >
-          {placeholder}*
+          {placeholder}
         </InputLabel>
         <Input
           id="component-filled"

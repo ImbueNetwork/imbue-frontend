@@ -87,7 +87,7 @@ const TextInput = ({
               : "text-input-label"
           }
         >
-          {placeholder}*
+          {placeholder}
         </InputLabel>
         <SpacedRow>
           <Input
@@ -108,6 +108,7 @@ const TextInput = ({
           {showSuffix && <span className="suffix">{suffixText}</span>}
         </SpacedRow>
       </FormControl>
+
       <FormHelperText
         className={error ? "text-input-field-error" : "text-input-field-help"}
       >

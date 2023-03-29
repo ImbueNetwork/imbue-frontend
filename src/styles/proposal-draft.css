@@ -1,7 +1,3 @@
-:root {
-  --theme-h1-size: 54px;
-}
-
 .proposal-editor-continer {
   display: flex;
   flex-direction: row;
@@ -16,7 +12,6 @@
 
 .imbu-proposals-draft-submission-form {
   flex-grow: 1;
-  /* width: 86%; */
 }
 
 .imbu-proposals-draft-submission-form #grant-submission-form {
@@ -29,6 +24,7 @@
   padding: 0 40px 0 0;
 }
 .header-h1-text-container .header-text {
+  --theme-h1-size: 54px;
   margin: 0;
   font-size: var(--theme-h1-size);
   font-weight: var(--theme-h1-weight);
@@ -113,6 +109,42 @@
   transition: opacity 150ms 0ms cubic-bezier(0.4, 0, 0.2, 1);
   -webkit-font-smoothing: antialiased;
   display: block;
+}
+
+.select-input-field {
+  color: var(--mdc-text-field-ink-color);
+  font-family: var(
+    --mdc-typography-caption-font-family,
+    var(--mdc-typography-font-family, Roboto, sans-serif)
+  );
+  font-size: var(--mdc-typography-subtitle1-font-size, 1rem);
+  font-weight: var(--mdc-typography-caption-font-weight, 400);
+  padding-right: 16px;
+  letter-spacing: var(--mdc-typography-caption-letter-spacing, 0.0333333333em);
+  will-change: opacity;
+  transition: opacity 150ms 0ms cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-font-smoothing: antialiased;
+  display: block;
+}
+.select-input-field input {
+  color: var(--mdc-text-field-ink-color);
+  font-family: var(
+    --mdc-typography-caption-font-family,
+    var(--mdc-typography-font-family, Roboto, sans-serif)
+  );
+  font-size: var(--mdc-typography-subtitle1-font-size, 1rem);
+  font-weight: var(--mdc-typography-caption-font-weight, 400);
+  padding-right: 16px;
+  letter-spacing: var(--mdc-typography-caption-letter-spacing, 0.0333333333em);
+  will-change: opacity;
+  transition: opacity 150ms 0ms cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-font-smoothing: antialiased;
+  display: block;
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0);
+  border: 0;
+  padding-left: 12px;
+  padding-bottom: 8px;
 }
 
 .text-area-input-field {
@@ -237,6 +269,9 @@ p.button-label {
 }
 
 @media screen and (max-width: 868px) {
+  fieldset {
+    padding: 0;
+  }
   .proposal-editor-continer {
     display: block;
   }
@@ -244,7 +279,7 @@ p.button-label {
     width: auto;
     max-width: unset;
   }
-  .header-h1-text-container h1 {
+  .header-h1-text-container .header-text {
     margin: 20px 0;
   }
 }
