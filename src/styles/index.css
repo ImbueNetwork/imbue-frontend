@@ -277,7 +277,7 @@ div#layout {
   height: 43px;
 }
 #main-content {
-  overflow: auto;
+  /* overflow: auto; */
   /* width: 100vw; */
   min-height: inherit;
 }
