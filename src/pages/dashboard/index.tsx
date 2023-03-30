@@ -27,7 +27,7 @@ function Dashboard({ query }: any) {
           <div>
             <Link
               href="/proposals"
-              className="primary-btn in-dark w-button underline"
+              className="primary-btn in-dark w-button"
               id="discover-projects"
             >
               Discover projects
