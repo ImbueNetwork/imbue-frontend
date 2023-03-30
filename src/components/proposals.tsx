@@ -1,4 +1,4 @@
-import { Proposal, ProposalItemProps } from "@/types/proposals";
+import { Proposal, ProposalItemProps } from "@/types/proposalsTypes";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import * as config from "../config";

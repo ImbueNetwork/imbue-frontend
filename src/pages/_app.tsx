@@ -6,6 +6,7 @@ import "@/styles/index.css";
 import "@/styles/proposal.css";
 import "@/styles/proposals.css";
 import "@/styles/proposal-draft.css";
+import "@/styles/new-brief.css";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
