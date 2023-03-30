@@ -1,15 +1,7 @@
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react'
+import Link from "next/link";
+import React from "react";
 
-function Dashboard({query}:any) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // useEffect(()=>{
-  //   if(!isAuthenticated){
-  //     router.push("/dapp/login?redirect=/dapp");
-  //   }
-  // },[isAuthenticated, router])
+function Dashboard({ query }: any) {
   return (
     <div>
       <h1>My Project</h1>
@@ -18,7 +10,7 @@ function Dashboard({query}:any) {
         <p>You haven&apos;t created a proposal yet</p>
         <div>
           <Link
-            href="/dapp/proposals/draft"
+            href="/proposals/draft"
             className="primary-btn in-dark w-button"
             id="create-a-proposal"
           >
@@ -34,7 +26,7 @@ function Dashboard({query}:any) {
           <h2>Coming Soon!</h2>
           <div>
             <Link
-              href="/dapp/proposals"
+              href="/proposals"
               className="primary-btn in-dark w-button"
               id="discover-projects"
             >
@@ -47,4 +39,4 @@ function Dashboard({query}:any) {
   );
 }
 
-export default Dashboard
+export default Dashboard;

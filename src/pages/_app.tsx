@@ -5,7 +5,6 @@ import "@/styles/common.css";
 import "@/styles/index.css";
 import "@/styles/proposal.css";
 import "@/styles/proposals.css";
-import "@/styles/proposals.css";
 import "@/styles/proposal-draft.css";
 
 export default function App({ Component, pageProps }: AppProps) {

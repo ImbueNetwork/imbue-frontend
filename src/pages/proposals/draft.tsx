@@ -3,7 +3,7 @@ import TextArea from "@/components/textArea";
 import TextInput from "@/components/textInput";
 import React from "react";
 import styled from "@emotion/styled";
-import CustomButton from "@/components/Button";
+import CustomButton from "@/components/customMaterialComponents/Button";
 import { Buttons } from "@/utils/helper";
 import { categories } from "@/constants/constants";
 import * as model from "@/model";

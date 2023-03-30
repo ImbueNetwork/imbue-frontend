@@ -1,8 +1,5 @@
-import Dapp from "./dapp";
-
+import Dashboard from "./dashboard";
 
 export default function Home() {
-
-  
-  return <Dapp/>;
+  return <Dashboard />;
 }
