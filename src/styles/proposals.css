@@ -66,10 +66,6 @@ ol.proposals-list li {
   }
 }
 
-/*:host {*/
-/*    display: block;*/
-/*}*/
-
 ol.proposals-list li {
   list-style: none;
 }
