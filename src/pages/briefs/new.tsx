@@ -55,7 +55,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
       <p className="field-name">Write a headline for your brief</p>
       <div className="name-panel-input-wrapper">
         <input
-          className="field-input"
+          className="brief-detail-field-input"
           data-testid="headline-input"
           placeholder="Enter the name of your project"
           name="headline"
@@ -170,7 +170,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
       <p className="field-name">Maximum project budget (USD)</p>
       <div className="budget-input-container">
         <input
-          className="field-input"
+          className="brief-detail-field-input"
           style={{ paddingLeft: "24px" }}
           type="number"
           value={budget || ""}
@@ -233,36 +233,37 @@ const NewBrief = (props: BriefProps): JSX.Element => {
   };
 
   const onReviewPost = async () => {
-    const user_id = (await utils.getCurrentUser()).id;
+    //TODO: implement api call
+    // const user_id = (await utils.getCurrentUser()).id;
 
-    const resp = await fetch(`${config.apiBase}/briefs/`, {
-      headers: postAPIHeaders,
-      method: "post",
-      body: JSON.stringify({
-        headline,
-        industries,
-        description,
-        scope_id: scopeId,
-        experience_id: expId,
-        duration_id: durationId,
-        skills,
-        budget,
-        user_id,
-      }),
-    });
+    // const resp = await fetch(`${config.apiBase}/briefs/`, {
+    //   headers: postAPIHeaders,
+    //   method: "post",
+    //   body: JSON.stringify({
+    //     headline,
+    //     industries,
+    //     description,
+    //     scope_id: scopeId,
+    //     experience_id: expId,
+    //     duration_id: durationId,
+    //     skills,
+    //     budget,
+    //     user_id,
+    //   }),
+    // });
 
-    if (resp.ok) {
-      // could be 200 or 201
-      // Brief API successfully invoked
-      console.log("Brief created successfully via Brief REST API");
-    } else {
-      console.log("Failed to submit the brief");
-    }
+    // if (resp.ok) {
+    //   // could be 200 or 201
+    //   // Brief API successfully invoked
+    //   console.log("Brief created successfully via Brief REST API");
+    // } else {
+    //   console.log("Failed to submit the brief");
+    // }
     setStep(step + 1);
   };
 
   return (
-    <div className="brief-details-container">
+    <div className="new-brief-details-container">
       <div className="left-panel">
         <ProgressBar
           titleArray={["Description", "Skills", "Scope", "Budget"]}

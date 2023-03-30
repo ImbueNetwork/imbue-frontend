@@ -150,7 +150,7 @@ const Briefs = (): JSX.Element => {
   }, []);
 
   const redirectToBrief = (id: string) => {
-    redirect(`briefs/${id}/`);
+    redirect(`/briefs/${id}/`);
   };
 
   // Here we have to get all the checked boxes and try and construct a query out of it...
