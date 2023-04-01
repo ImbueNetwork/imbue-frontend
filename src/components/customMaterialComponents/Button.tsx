@@ -42,7 +42,7 @@ const CustomButton = ({
       className="button-container"
       onClick={onClick}
     >
-      <p className="button-label" style={{ color: "#fff", ...textStyle }}>
+      <p className="button-label" style={{ ...textStyle }}>
         {text}
       </p>
     </ButtonWrap>

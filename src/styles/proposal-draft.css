@@ -249,6 +249,12 @@ span.suffix {
   right: 10px;
   bottom: 16px;
 }
+span.preffix {
+  position: absolute;
+  left: 10px;
+  bottom: 12px;
+  color: var(--mdc-text-field-label-ink-color);
+}
 
 .disabled-text {
   color: var(--mdc-text-field-disabled-ink-color);
@@ -266,6 +272,11 @@ p.button-label {
   cursor: pointer;
   border-radius: 3px;
   font-weight: normal;
+}
+
+.fund-h1 {
+  font-family: var(--theme-font-family);
+  font-size: 2em;
 }
 
 @media screen and (max-width: 868px) {

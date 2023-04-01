@@ -160,6 +160,7 @@ const Draft = (): JSX.Element => {
             <CustomButton
               text="Add Another Milestone"
               btnWrapStyle={{ height: 64, marginTop: 20 }}
+              textStyle={{ color: "white" }}
             />
             <CustomButton
               text="Save Draft Propsal"
