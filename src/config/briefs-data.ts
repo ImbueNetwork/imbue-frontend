@@ -30,7 +30,7 @@ export const stepData = [
     content: `This is how imbuers figure out who should apply to this brief! 
     The more experienced they are the bigger you should set your budget`,
     next: "Scope",
-    progress: 0.5,
+    progress: 1.5,
   },
   {
     heading: "Next, estimate the scope of your project.",
