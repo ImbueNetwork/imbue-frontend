@@ -7,8 +7,11 @@ const nextConfig = {
         protocol: "https",
         hostname: "avatars.githubusercontent.com",
       },
+      {
+        hostname: "99designs-blog.imgix.net",
+      },
     ],
   },
 };
 
-module.exports = nextConfig
+module.exports = nextConfig;

@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { signWeb3Challenge } from "@/utils/polkadot";
 import { SignerResult } from "@polkadot/api/types";
-import AccountChoice from "@/components/accountChoice";
-import { Dialogue } from "@/components/dialogue";
+import AccountChoice from "@/components/AccountChoice";
+import { Dialogue } from "@/components/Dialogue";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
