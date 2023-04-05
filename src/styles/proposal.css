@@ -364,9 +364,9 @@ ul.project-details li {
   color: var(--theme-secondary);
 }
 
-.active {
+/* .active {
   color: var(--theme-ink-color) !important;
-}
+} */
 
 .mdc-select {
   width: 50%;
