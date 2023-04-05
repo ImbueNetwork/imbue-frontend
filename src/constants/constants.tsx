@@ -159,3 +159,31 @@ export const categories = {
     "Utility Companies",
   ],
 };
+
+export const proposalsDummyData = [
+  {
+    name: "proposal one",
+    id: 3,
+    logo: "https://99designs-blog.imgix.net/blog/wp-content/uploads/2016/08/adidas.png?auto=format&q=60&fit=max&w=930",
+    description: "",
+    website: "",
+    milestones: [
+      {
+        name: "mile",
+        percentage_to_unlock: 40,
+        modified: "true",
+        milestone_index: 1,
+        is_approved: false,
+        project_id: 3,
+        created: "wdj",
+      },
+    ],
+    modified: "false",
+    required_funds: 234,
+    currency_id: 24435,
+    owner: "dfkjlms",
+    status: "incomplete",
+    user_id: 2345,
+    created: "ieknldf",
+  },
+];

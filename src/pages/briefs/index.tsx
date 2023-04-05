@@ -1,6 +1,6 @@
 import { redirect } from "@/utils";
 import React, { useEffect, useState } from "react";
-import BriefFilter from "@/components/briefFilter";
+import BriefFilter from "@/components/BriefFilter";
 import { Brief, BriefSqlFilter } from "@/model";
 import { callSearchBriefs, getAllBriefs } from "@/redux/services/briefService";
 import { BriefFilterOption } from "@/types/briefTypes";

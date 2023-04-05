@@ -9,7 +9,7 @@ import { IoMdWallet } from "react-icons/io";
 import { FaHandshake } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi";
 import TimeAgo from "javascript-time-ago";
-import { ChatBox } from "@/components/chat";
+import { ChatBox } from "@/components/Chat";
 import en from "javascript-time-ago/locale/en";
 
 TimeAgo.addLocale(en);
