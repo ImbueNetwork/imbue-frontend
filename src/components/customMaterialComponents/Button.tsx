@@ -28,7 +28,9 @@ const CustomButton = ({
 
   const ButtonWrap = styled(Button)(({ customstyle }: ButtonProps) => ({
     ...buttonDefaultStyle.style,
-    ...customstyle,
+    "&": {
+      ...customstyle,
+    },
     ":hover": {
       ...hoverStyle,
     },

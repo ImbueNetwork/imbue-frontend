@@ -1,5 +1,5 @@
-import CustomButton from "@/components/customMaterialComponents/Button";
-import TextInput from "@/components/customMaterialComponents/textInput";
+import CustomButton from "@/components/CustomMaterialComponents/Button";
+import TextInput from "@/components/CustomMaterialComponents/TextInput";
 import { Buttons } from "@/utils/helper";
 import React, { useState } from "react";
 
