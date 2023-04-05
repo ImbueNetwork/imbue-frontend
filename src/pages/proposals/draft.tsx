@@ -1,9 +1,9 @@
-import DropdownSelect from "@/components/customMaterialComponents/dropdownSelect";
-import TextArea from "@/components/customMaterialComponents/textArea";
-import TextInput from "@/components/customMaterialComponents/textInput";
+import DropdownSelect from "@/components/CustomMaterialComponents/DropdownSelect";
+import TextArea from "@/components/CustomMaterialComponents/TextArea";
+import TextInput from "@/components/CustomMaterialComponents/TextInput";
 import React from "react";
 import styled from "@emotion/styled";
-import CustomButton from "@/components/customMaterialComponents/Button";
+import CustomButton from "@/components/CustomMaterialComponents/Button";
 import { Buttons } from "@/utils/helper";
 import { categories } from "@/constants/constants";
 import * as model from "@/model";
@@ -55,9 +55,18 @@ const CurrencyData = Object.keys(model.Currency)
 const Draft = (): JSX.Element => {
   const size = useWindowSize();
   return (
-    <div className="proposal-editor-continer">
-      <header className="header-h1-text-container">
-        <h1 className="header-text">Bring your project to life</h1>
+    <div className="flex flex-row max-width-868px:block">
+      <header
+        className="
+      w-[40%] 
+      max-w-[400px] 
+      p-0 pb-[40px] 
+      max-width-868px:w-[auto] 
+      max-width-868px:max-w-[unset]"
+      >
+        <h1 className="text-[54px] m-0 font-normal my-[20px] mx-0">
+          Bring your project to life
+        </h1>
       </header>
       <div className="imbu-proposals-draft-submission-form">
         <form

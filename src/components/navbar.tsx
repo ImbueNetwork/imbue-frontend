@@ -2,8 +2,8 @@ import { appLogo } from "@/assets/svgs";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
-import Drawer from "./drawer";
-import FullScreenLoader from "./fullScreenLoader";
+import Drawer from "@/components/Drawer";
+import FullScreenLoader from "@/components/FullScreenLoader";
 
 const logoStyle = { height: "100%", width: "100%" };
 
@@ -20,12 +20,7 @@ function Navbar() {
           <h1 className="main-title">
             <Link href="/">
               <div id="logo">
-                <Image
-                  src={appLogo}
-                  alt={"app logo"}
-                  priority
-                  style={logoStyle}
-                />
+                <Image src={appLogo} alt={"app logo"} style={logoStyle} />
               </div>
             </Link>
           </h1>

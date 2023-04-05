@@ -18,6 +18,16 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
       link: "/proposals/draft",
     },
     {
+      icon: "group_add",
+      text: "Join The Freelancers",
+      link: "/freelancer",
+    },
+    {
+      icon: "work",
+      text: "Submit A Brief",
+      link: "/briefs/new",
+    },
+    {
       icon: "search",
       text: "Discover Proposals",
       link: "/proposals",
