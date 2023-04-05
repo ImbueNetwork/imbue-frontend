@@ -28,7 +28,9 @@ const CustomButton = ({
 
   const ButtonWrap = styled(Button)(({ customstyle }: ButtonProps) => ({
     ...buttonDefaultStyle.style,
-    ...customstyle,
+    "&": {
+      ...customstyle,
+    },
     ":hover": {
       ...hoverStyle,
     },
@@ -42,7 +44,7 @@ const CustomButton = ({
       className="button-container"
       onClick={onClick}
     >
-      <p className="button-label" style={{ color: "#fff", ...textStyle }}>
+      <p className="button-label" style={{ ...textStyle }}>
         {text}
       </p>
     </ButtonWrap>

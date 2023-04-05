@@ -17,8 +17,11 @@ type TextInputProps = {
   inputType?: string;
   value?: string | number;
   showSuffix?: boolean;
-  disabled?: boolean;
+  showPreffix?: boolean;
   suffixText?: string;
+  preffixText?: string;
+  disabled?: boolean;
+  onChangeText?: (val: string) => void | undefined;
 };
 
 type InputProps = {
@@ -57,6 +60,9 @@ const TextInput = ({
   disabled = false,
   showSuffix = false,
   suffixText = ".00",
+  onChangeText,
+  showPreffix,
+  preffixText,
 }: TextInputProps): JSX.Element => {
   const [focused, setFocused] = useState(false);
   return (
@@ -90,6 +96,9 @@ const TextInput = ({
           {placeholder}
         </InputLabel>
         <SpacedRow>
+          {showPreffix && focused && (
+            <span className="preffix">{preffixText}</span>
+          )}
           <Input
             id="component-filled"
             name={name}
@@ -100,9 +109,13 @@ const TextInput = ({
             value={value}
             type={inputType}
             disabled={disabled}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              onChangeText && onChangeText(e.target.value);
+            }}
             style={{
               width: "100%",
               paddingRight: showSuffix ? 50 : 0,
+              paddingLeft: showPreffix ? 50 : 0,
             }}
           />
           {showSuffix && <span className="suffix">{suffixText}</span>}

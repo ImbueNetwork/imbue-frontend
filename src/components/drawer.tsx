@@ -35,7 +35,7 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
     {
       icon: "money",
       text: "Transfer Funds",
-      link: "",
+      link: "/relay",
     },
     {
       icon: "logout",
