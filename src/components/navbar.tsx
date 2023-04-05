@@ -20,12 +20,7 @@ function Navbar() {
           <h1 className="main-title">
             <Link href="/">
               <div id="logo">
-                <Image
-                  src={appLogo}
-                  alt={"app logo"}
-                  priority
-                  style={logoStyle}
-                />
+                <Image src={appLogo} alt={"app logo"} style={logoStyle} />
               </div>
             </Link>
           </h1>

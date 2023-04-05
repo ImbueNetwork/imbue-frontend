@@ -30,7 +30,7 @@ function FullScreenLoader() {
       }}
       hidden={true}
     >
-      <Image src={appLoader} alt={"spinner"} priority style={spinnerStyle} />
+      <Image src={appLoader} alt={"spinner"} style={spinnerStyle} />
     </LoaderContainer>
   );
 }
