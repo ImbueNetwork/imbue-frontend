@@ -10,17 +10,17 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
     {
       icon: "face",
       text: "Dashboard",
-      link: "",
+      link: "/dashboard",
     },
     {
       icon: "library_add",
       text: "Create a Proposal",
-      link: "",
+      link: "/proposals/draft",
     },
     {
       icon: "search",
-      text: "Discover",
-      link: "",
+      text: "Discover Proposals",
+      link: "/proposals",
     },
     {
       icon: "money",

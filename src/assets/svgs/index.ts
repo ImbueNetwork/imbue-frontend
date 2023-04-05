@@ -1,3 +1,4 @@
 const appLogo = require("./logo.svg");
+const appLoader = require("./loader.svg");
 
-export { appLogo };
+export { appLogo, appLoader };

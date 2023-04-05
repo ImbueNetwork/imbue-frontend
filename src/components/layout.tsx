@@ -7,10 +7,12 @@ type LayoutProps = {
 
 function Layout({ children }: LayoutProps) {
   return (
-    <div>
+    <React.Fragment>
       <Navbar />
-      <main>{children}</main>
-    </div>
+      <main className="padded" id="main-content">
+        {children}
+      </main>
+    </React.Fragment>
   );
 }
 

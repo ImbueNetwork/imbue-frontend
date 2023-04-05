@@ -1,9 +1,3 @@
-body {
-  color: var(--main-text-color);
-  width: 100%;
-  font-family: var(--theme-font-family);
-}
-
 .hidden {
   display: none !important;
 }
@@ -209,7 +203,6 @@ div#layout {
   padding: var(--hq-layout-padding);
 }
 #header-wrapper {
-  width: 100%;
   position: relative;
   top: 0;
   background: rgba(0, 0, 0, 0);
@@ -274,13 +267,13 @@ div#layout {
 }
 #main-content {
   overflow: auto;
-  width: 100vw;
+  /* width: 100vw; */
   min-height: inherit;
 }
 .drawer {
   position: fixed;
   top: 0;
-  height: 100vh;
+  height: 100%;
   width: 80vw;
   overflow: auto;
   transition: transform 200ms cubic-bezier(1, 0, 0, 1);
@@ -361,14 +354,12 @@ div#layout {
     max-width: var(--hq-layout-max-screen);
   }
   #main-content {
-    display: flex;
     align-items: stretch;
   }
   slot[name="main"] {
     width: 1%;
     display: block;
     flex-grow: 1;
-    /* padding: 0 10px; */
   }
   /**
      * FIXME: if we ever want to use the left-drawer, we'll need to uncomment
