@@ -30,7 +30,7 @@ export const stepData = [
     content: `This is how imbuers figure out who should apply to this brief! 
     The more experienced they are the bigger you should set your budget`,
     next: "Scope",
-    progress: 0.5,
+    progress: 1.5,
   },
   {
     heading: "Next, estimate the scope of your project.",
@@ -151,4 +151,67 @@ export const suggestedSkills = [
   "Kusama",
   "React",
   "Typescript",
+];
+
+export const dumyBriefs = [
+  {
+    id: "1",
+    headline: "Amazing Frontend Developer NEEDED!!",
+    description:
+      "We need some absolute wizard to create an ultra dynamic thing with carosels",
+    scope_level: "Medium",
+    scope_id: 2,
+    duration: "3-6 months",
+    duration_id: 2,
+    budget: 1000,
+    created_by: "Dude Mckenzie",
+    experience_level: "Intermediate",
+    experience_id: 2,
+    created: new Date("2023-03-30T07:10:04.510Z"),
+    user_id: 1,
+    project_id: null,
+    number_of_briefs_submitted: 20,
+    skills: [
+      { id: 1, name: "substrate" },
+      { id: 2, name: "rust" },
+      { id: 6, name: "c++" },
+      { id: 7, name: "polkadot" },
+    ],
+    skill_ids: ["1", "2", "6", "7"],
+    industries: [
+      { id: 1, name: "substrate" },
+      { id: 2, name: "rust" },
+    ],
+    industry_ids: ["1", "2"],
+  },
+  {
+    id: "2",
+    headline: "Amazing C++ Developer",
+    description:
+      "We need some absolute wizard to create an ultra cool, mega thing with spinning balls",
+    scope_level: "Small",
+    scope_id: 1,
+    duration: "1 to 3 months",
+    duration_id: 1,
+    budget: 200,
+    created_by: "Mike Doomer",
+    experience_level: "Expert",
+    experience_id: 3,
+    created: new Date("2023-03-30T07:10:04.510Z"),
+    user_id: 2,
+    project_id: null,
+    number_of_briefs_submitted: 3,
+    skills: [
+      { id: 3, name: "react" },
+      { id: 4, name: "typescript" },
+      { id: 5, name: "javascript" },
+      { id: 8, name: "figma" },
+    ],
+    skill_ids: ["3", "4", "5", "8"],
+    industries: [
+      { id: 1, name: "substrate" },
+      { id: 2, name: "rust" },
+    ],
+    industry_ids: ["1", "2"],
+  },
 ];

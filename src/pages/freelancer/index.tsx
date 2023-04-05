@@ -9,7 +9,7 @@ import {
   suggestedLanguages,
 } from "@/config/freelancer-data";
 import { getDefaultFreelancer, User } from "@/model";
-import { TagsInput } from "../../components/tagsInput";
+import { TagsInput } from "../../components/TagsInput";
 import * as utils from "@/utils";
 import {
   createFreelancingProfile,

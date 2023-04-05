@@ -1,4 +1,4 @@
-import * as config from "../config";
+import * as config from "@/config";
 import { StreamChat } from "stream-chat";
 
 export type BadRoute =
@@ -45,11 +45,12 @@ export const validProjectId = (candidate: any) => {
 };
 
 export const getCurrentUser = async () => {
-  const resp = await fetch(`${config.apiBase}/user`);
-  if (resp.ok) {
-    return resp.json();
-  }
-  return null;
+  return config.dummyUser;
+  // const resp = await fetch(`${config.apiBase}/user`);
+  // if (resp.ok) {
+  //   return resp.json();
+  // }
+  // return null;
 };
 
 export const getProjectId = async () => {

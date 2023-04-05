@@ -51,7 +51,7 @@ export const TagsInput = ({
         ))}
         <input
           type="text"
-          className="new-tag-input"
+          className="new-tag-input text-black"
           data-testid="tag-input"
           value={input}
           onChange={(e) => setInput(e.target.value)}

@@ -192,3 +192,12 @@ export const categories = {
     "Utility Companies",
   ],
 };
+
+export const dummyUser = {
+  id: 3,
+  username: "web3dev",
+  getstream_token: "null",
+  display_name: "Web3 dev",
+  web3_address: "5GRHPcY3zEgJezesmYHQyuo7YouwXVjnDR8ZcX9CQuFJadaL",
+  web3Accounts: [],
+};

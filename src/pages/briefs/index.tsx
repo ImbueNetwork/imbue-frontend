@@ -1,6 +1,6 @@
 import { redirect } from "@/utils";
 import React, { useEffect, useState } from "react";
-import BriefFilter from "@/components/briefFilter";
+import BriefFilter from "@/components/BriefFilter";
 import { Brief, BriefSqlFilter } from "@/model";
 import { callSearchBriefs, getAllBriefs } from "@/redux/services/briefService";
 import { BriefFilterOption } from "@/types/briefTypes";
@@ -150,7 +150,7 @@ const Briefs = (): JSX.Element => {
   }, []);
 
   const redirectToBrief = (id: string) => {
-    redirect(`briefs/${id}/`);
+    redirect(`/briefs/${id}/`);
   };
 
   // Here we have to get all the checked boxes and try and construct a query out of it...
