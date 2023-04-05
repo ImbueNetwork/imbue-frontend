@@ -55,7 +55,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
       <p className="field-name">Write a headline for your brief</p>
       <div className="name-panel-input-wrapper">
         <input
-          className="brief-detail-field-input"
+          className="brief-detail-field-input text-black"
           data-testid="headline-input"
           placeholder="Enter the name of your project"
           name="headline"
@@ -96,6 +96,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
           value={description}
           name="description"
           maxLength={5000}
+          className="text-black"
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
             setDescription(e.target.value)
           }
@@ -170,7 +171,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
       <p className="field-name">Maximum project budget (USD)</p>
       <div className="budget-input-container">
         <input
-          className="brief-detail-field-input"
+          className="brief-detail-field-input text-black"
           style={{ paddingLeft: "24px" }}
           type="number"
           value={budget || ""}
