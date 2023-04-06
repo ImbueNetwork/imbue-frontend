@@ -270,7 +270,7 @@ const Briefs = (): JSX.Element => {
           </div>
           <input
             id="search-input"
-            className="search-input"
+            className="search-input px-[12px]"
             placeholder="Search"
           />
           <div className="search-result">
