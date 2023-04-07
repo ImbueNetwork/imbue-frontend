@@ -47,11 +47,13 @@ export function CustomChannelHeader(props: ChannelHeaderProps) {
     <div className="py-3 border-b border-b-white border-opacity-25">
       <div className="w-full flex gap-3 items-center ml-3">
         <div className="relative">
-          {/* <Image
-            src="/public/profile-image.png"
+          <Image
+            src="../assets/images/profile-image.png"
+            height={48}
+            width={48}
             className="w-12 h-12 rounded-full object-cover object-top"
-            alt=""
-          /> */}
+            alt="profileImage"
+          />
           {watcher_count && watcher_count >= 2 && (
             <div className="h-4 w-4 bg-green-500 rounded-full absolute bottom-0 right-0 border-2 border-black"></div>
           )}
