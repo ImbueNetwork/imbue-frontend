@@ -19,6 +19,8 @@
     "@types/react": "18.0.29",
     "@types/react-dom": "18.0.11",
     "eslint": "8.36.0",
+    "knex": "^0.95.15",
+    "pg": "^8.7.1",
     "eslint-config-next": "13.2.4",
     "javascript-time-ago": "^2.5.9",
     "material-components-web": "^14.0.0",
