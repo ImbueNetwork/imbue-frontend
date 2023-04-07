@@ -1,6 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  env: {
+    PORT: 8080,
+    IMBUE_NETWORK_WEBSOCK_ADDR: "wss://rococo.imbue.network",
+    RELAY_CHAIN_WEBSOCK_ADDR: "wss://rococo-rpc.polkadot.io",
+    DB_HOST: "localhost",
+    DB_PORT: "5432",
+    DB_NAME: "imbue",
+    DB_USER: "postgres",
+    DB_PASSWORD: "Password",
+    REACT_APP_GETSTREAM_API_KEY: "cvmy2kcxetnm",
+    REACT_APP_GETSTREAM_SECRET_KEY:
+      "ffs9wnxe5c8yp26hhkrz69erfun94k22z7vsz98pzsutqxf9rfg3gz6qd57q29sq",
+    GETSTREAM_API_KEY: "cvmy2kcxetnm",
+    GETSTREAM_SECRET_KEY:
+      "ffs9wnxe5c8yp26hhkrz69erfun94k22z7vsz98pzsutqxf9rfg3gz6qd57q29sq",
+  },
   images: {
     remotePatterns: [
       {
@@ -9,6 +25,10 @@ const nextConfig = {
       },
       {
         hostname: "99designs-blog.imgix.net",
+      },
+      {
+        protocol: "https",
+        hostname: "drupal.org",
       },
     ],
   },

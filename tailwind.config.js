@@ -19,6 +19,9 @@ module.exports = {
 
       colors: {
         "--theme-primary": "#b2ff0b",
+        "--theme-grey-dark": "#2c2c2c",
+        "--theme-light-white": "rgba(255, 255, 255, 0.25)",
+        primary: "#b2ff0b",
       },
       screens: {
         "max-width-1100px": { raw: "(max-width: 1100px)" },

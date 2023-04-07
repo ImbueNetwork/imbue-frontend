@@ -292,10 +292,13 @@ const Profile = (): JSX.Element => {
                 <div className="header-editable">
                   <h5>Skills</h5>
                 </div>
-                <div className="skills">
+                <div className="flex flex-wrap gap-[20px] mt-[24px]">
                   {/* TODO: Add Skills */}
                   {freelancer?.skills?.map?.((skill) => (
-                    <p className="skill text-base" key={skill?.id}>
+                    <p
+                      className="py-[12px] px-[24px] border border-solid border-white rounded-[8px] text-base"
+                      key={skill?.id}
+                    >
                       {skill.name}
                     </p>
                   ))}

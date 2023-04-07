@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Option } from "@/components/Option";
 import { ProgressBar } from "@/components/ProgressBar";
 import { TagsInput } from "@/components/TagsInput";
-import { TextArea } from "@/components/briefs/TextArea";
+import { TextArea } from "@/components/Briefs/TextArea";
 import * as utils from "@/utils";
 import {
   stepData,

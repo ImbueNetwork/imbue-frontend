@@ -42,6 +42,8 @@ export type Project = {
   brief_id?: string | number;
   total_cost_without_fee?: number;
   imbue_fee?: number;
+  created: Date;
+  modified?: Date;
 };
 
 export enum ProjectState {
@@ -102,11 +104,11 @@ export type Web3Account = {
 export type User = {
   id: number;
   display_name: string;
-  web3Accounts: Web3Account[];
+  web3Accounts?: Web3Account[];
   username: string;
   password?: string;
   getstream_token: string;
-  web3_address: string;
+  web3_address?: string;
 };
 
 export interface BasicTxResponse {
@@ -210,4 +212,31 @@ export type FreelancerSqlFilter = {
   services_range: Array<number>;
   languages_range: Array<number>;
   search_input: string;
+};
+export type ApplicationData = {
+  brief_id: number;
+  category: string;
+  chain_project_id: number;
+  create_block_number: number;
+  created: Date;
+  currency_id: number;
+  description: string;
+  freelancer: Freelancer;
+  id: string;
+  imbue_fee: string;
+  logo: string;
+  milestones: Milestone[];
+  modified: Date;
+  name: string;
+  owner: string;
+  required_funds: string;
+  status_id: number;
+  total_cost_without_fee: string;
+  user_id: number;
+  website: string;
+};
+export type ApplicationContainerProps = {
+  application: ApplicationData;
+  handleMessageBoxClick: (userId: number, freelander: Freelancer) => void;
+  redirectToApplication: (applicationId: string) => void;
 };
