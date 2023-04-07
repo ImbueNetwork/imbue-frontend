@@ -1,5 +1,8 @@
 import * as config from "@/config";
-import { dumyBriefs } from "@/config/briefs-data";
+import {
+  dummyDashboardBriefApplications,
+  dumyBriefs,
+} from "@/config/briefs-data";
 import { Brief, BriefSqlFilter } from "@/model";
 
 const getAPIHeaders = {
@@ -52,5 +55,37 @@ export const getBrief = async (briefId: number | string) => {
   //   return (await resp.json()) as Brief;
   // } else {
   //   throw new Error("Failed to get all briefs. status:" + resp.status);
+  // }
+};
+
+export const getUserBriefs = async (user_id: string | number) => {
+  return {};
+  // const resp = await fetch(`${config.apiBase}/users/${user_id}/briefs/`, {
+  //   headers: postAPIHeaders,
+  //   method: "get",
+  // });
+  // if (resp.ok) {
+  //   return await resp.json();
+  // } else {
+  //   throw new Error(
+  //     `Failed to get all briefs for user ${user_id}. status: ${resp.status}`
+  //   );
+  // }
+};
+
+export const getBriefApplications = async (brifId: string | number) => {
+  return [];
+  // return dummyDashboardBriefApplications;
+  // const resp = await fetch(`${config.apiBase}/briefs/${brifId}/applications`, {
+  //   headers: postAPIHeaders,
+  //   method: "get",
+  // });
+
+  // if (resp.ok) {
+  //   return await resp.json();
+  // } else {
+  //   throw new Error(
+  //     "Failed to get all brief applications. status:" + resp.status
+  //   );
   // }
 };
