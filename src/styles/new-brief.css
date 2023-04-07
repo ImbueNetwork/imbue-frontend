@@ -3,7 +3,6 @@ h1 {
   line-height: 1.1;
   color: var(--theme-title-color);
   margin: 0px;
-  padding: 16px 0px;
 }
 
 p {
@@ -13,7 +12,6 @@ p {
 
 .field-input {
   background-color: var(--theme-ink-color);
-  /* opacity: 0.11; */
   border: solid 1px black;
   border-radius: 8px;
   backdrop-filter: blur(8px);
