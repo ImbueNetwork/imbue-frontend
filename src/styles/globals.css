@@ -13,8 +13,11 @@ body {
   font-family: var(--theme-font-family);
 }
 
-.primary-btn {
-  margin: 0;
+h1,h2,h3{
+  font-weight: 700;
+}
+h3{
+  font-size: 20px;
 }
 
 .primary-btn:disabled {
