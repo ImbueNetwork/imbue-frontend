@@ -18,7 +18,6 @@ import "stream-chat-react/dist/css/v2/index.css";
 import { getStreamChat } from "../utils";
 import { Skeleton } from "@mui/material";
 import Image from "next/image";
-import profilePic from "../assets/images/profile-image.png"
 
 export type ChatProps = {
   user: User;
@@ -49,7 +48,7 @@ export function CustomChannelHeader(props: ChannelHeaderProps) {
       <div className="w-full flex gap-3 items-center ml-3">
         <div className="relative">
           <Image
-            src={profilePic}
+            src={require("@/assets/images/profile-image.png")}
             height={48}
             width={48}
             className="w-12 h-12 rounded-full object-cover object-top"
