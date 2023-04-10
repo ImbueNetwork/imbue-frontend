@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { FiEdit, FiPlusCircle } from "react-icons/fi";
-import MilestoneItem from "@/components/MilestoneItem";
 import { timeData } from "@/config/briefs-data";
 import * as config from "@/config";
 import {
@@ -56,7 +55,8 @@ const ApplicationPreview = (): JSX.Element => {
   const [freelancer, setFreelancer] = useState<Freelancer | any>();
 
   const router = useRouter();
-  const { briefId, applicationId }: any = router.query;
+  const { id, applicationId }: any = router.query;
+  const briefId = id;
 
   const [currencyId, setCurrencyId] = useState(application?.currency_id);
   const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
@@ -178,16 +178,22 @@ const ApplicationPreview = (): JSX.Element => {
     // }
   };
 
-  const imbueFeePercentage = 5;
-  const applicationMilestones = application?.milestones
+  const filteredApplication = application?.milestones
     ?.filter?.((m: any) => m?.amount !== undefined)
     ?.map?.((m: any) => {
       return { name: m?.name, amount: Number(m?.amount) };
     });
 
+  const imbueFeePercentage = 5;
+  const applicationMilestones = application ? filteredApplication : [];
+
   const [milestones, setMilestones] = useState<MilestoneItem[]>(
     applicationMilestones
   );
+
+  useEffect(() => {
+    setMilestones(applicationMilestones);
+  }, [application]);
 
   const currencies = Object.keys(Currency).filter(
     (key: any) => !isNaN(Number(Currency[key]))
@@ -253,6 +259,7 @@ const ApplicationPreview = (): JSX.Element => {
             <Image
               className="w-16 h-16 rounded-full object-cover"
               src={require("@/assets/images/profile-image.png")}
+              priority
               alt="profileImage"
             />
             <div className="">
@@ -268,7 +275,7 @@ const ApplicationPreview = (): JSX.Element => {
               <p className="text-xl primary-text">@{freelancer?.username}</p>
             </div>
             <button
-              className="Pending.Review-btn in-dark w-button rounded-full px-6 py-3 dark-button"
+              className="Pending.Review-btn in-dark  !rounded-full !px-6 !py-3 dark-button"
               onClick={() =>
                 handleMessageBoxClick(
                   application?.user_id,
@@ -286,7 +293,7 @@ const ApplicationPreview = (): JSX.Element => {
                     onClick={() => {
                       setOpenPopup(true);
                     }}
-                    className="Accepted-btn in-dark w-button rounded-full px-1 py-2 dark-button"
+                    className="Accepted-btn in-dark !rounded-full !px-1 !py-2 dark-button"
                   >
                     Hire
                   </button>
@@ -297,7 +304,7 @@ const ApplicationPreview = (): JSX.Element => {
                         ProjectStatus.ChangesRequested
                       );
                     }}
-                    className="Request-btn in-dark w-button rounded-full px-1 py-2 dark-button"
+                    className="Request-btn in-dark  !rounded-full !px-1 !py-2 dark-button"
                   >
                     Request Changes
                   </button>
@@ -308,7 +315,7 @@ const ApplicationPreview = (): JSX.Element => {
                         ProjectStatus.Rejected
                       );
                     }}
-                    className="Rejected-btn in-dark w-button rounded-full px-1 py-2 dark-button"
+                    className="Rejected-btn in-dark  !rounded-full !px-1 !py-2 dark-button"
                   >
                     Reject
                   </button>
@@ -317,7 +324,7 @@ const ApplicationPreview = (): JSX.Element => {
                 <button
                   className={`${
                     applicationStatusId[application?.status_id]
-                  }-btn in-dark w-button rounded-full px-6 py-3`}
+                  }-btn in-dark !rounded-full !px-6 !py-3`}
                 >
                   {applicationStatusId[application?.status_id]}
                 </button>
@@ -346,6 +353,7 @@ const ApplicationPreview = (): JSX.Element => {
           <Image
             className="w-16 h-16 rounded-full object-cover"
             src={require("@/assets/images/profile-image.png")}
+            priority
             alt="profileImage"
           />
           <div className="">
@@ -367,7 +375,7 @@ const ApplicationPreview = (): JSX.Element => {
             {application?.status_id === 4 ? (
               <button
                 onClick={() => brief?.project_id && startWork()}
-                className="Accepted-btn in-dark w-button rounded-full text-black px-6 py-3"
+                className="Accepted-btn in-dark rounded-full text-black px-6 py-3"
               >
                 Start Work
               </button>
@@ -375,7 +383,7 @@ const ApplicationPreview = (): JSX.Element => {
               <button
                 className={`${
                   applicationStatusId[application?.status_id]
-                }-btn in-dark w-button rounded-full px-6 py-3`}
+                }-btn in-dark rounded-full px-6 py-3`}
               >
                 {applicationStatusId[application?.status_id]}
               </button>
@@ -408,26 +416,28 @@ const ApplicationPreview = (): JSX.Element => {
       </Backdrop>
 
       {
-        <div className="section">
-          <h3 className="section-title">Job description</h3>
+        <div>
+          <h3 className="ml-[2rem] mb-[0.5rem] text-xl leading-[1.5] font-bold m-0 p-0  flex">
+            Job description
+          </h3>
           {brief && <BriefInsights brief={brief} />}
         </div>
       }
-      <div className="section">
-        <div className="container milestones">
-          <div className="milestone-header mx-14 -mb-3">
-            <h3 className="flex">
+      <div>
+        <div className="w-full flex flex-col gap-[20px] bg-[#2c2c2c] border border-solid border-white rounded-[20px] py-[20px] min-width-1280px:max-w-[1280px] ">
+          <div className="flex flex-row justify-between mx-14 -mb-3">
+            <h3 className="flex text-xl leading-[1.5] font-bold m-0 p-0">
               Milestones
               {!isEditingBio && isApplicationOwner && (
                 <div
-                  className="edit-icon"
+                  className="mt-[5px] ml-[10px]"
                   onClick={() => setIsEditingBio(true)}
                 >
                   <FiEdit />
                 </div>
               )}
             </h3>
-            <h3>
+            <h3 className="flex text-xl leading-[1.5] font-bold m-0 p-0">
               Client&apos;s budget: ${Number(brief?.budget).toLocaleString()}
             </h3>
           </div>
@@ -443,14 +453,16 @@ const ApplicationPreview = (): JSX.Element => {
                 ((100 * (amount ?? 0)) / totalCostWithoutFee)?.toFixed?.(0)
               );
               return (
-                <div className="milestone-row" key={index}>
-                  <div className="milestone-no">{index + 1}</div>
-                  <div className="input-wrappers">
-                    <div className="description-wrapper">
-                      <h3>Description</h3>
+                <div className="flex flex-row items-start w-full" key={index}>
+                  <div className="mr-[36px] text-sm">{index + 1}</div>
+                  <div className="flex flex-row justify-between w-full">
+                    <div className="w-[50%]">
+                      <h3 className="mb-[1.25rem] text-xl font-bold m-0 p-0">
+                        Description
+                      </h3>
                       {isEditingBio ? (
                         <textarea
-                          className="input-description"
+                          className="input-description bg-[#1a1a19] border border-solid border-white text-base leading-[20px] py-[10px] px-[20px]"
                           value={name}
                           disabled={!isEditingBio}
                           onChange={(e) =>
@@ -465,15 +477,19 @@ const ApplicationPreview = (): JSX.Element => {
                           }
                         />
                       ) : (
-                        <p>{milestones[index]?.name}</p>
+                        <p className="text-base text-[#ebeae2] m-0">
+                          {milestones[index]?.name}
+                        </p>
                       )}
                     </div>
-                    <div className="budget-wrapper">
-                      <h3>Amount</h3>
+                    <div className="flex flex-col w-[fit-content] items-end">
+                      <h3 className="mb-[1.25rem] text-xl font-bold m-0 p-0">
+                        Amount
+                      </h3>
                       {isEditingBio ? (
                         <input
                           type="number"
-                          className="input-budget"
+                          className="input-budget bg-[#1a1a19] border border-solid border-white text-base leading-[20px] rounded-[5px] py-[10px] px-[20px]"
                           disabled={!isEditingBio}
                           value={amount || ""}
                           onChange={(e) =>
@@ -488,12 +504,16 @@ const ApplicationPreview = (): JSX.Element => {
                           }
                         />
                       ) : (
-                        <p>{milestones[index]?.amount}</p>
+                        <p className="text-base text-[#ebeae2] m-0">
+                          {milestones[index]?.amount}
+                        </p>
                       )}
 
                       {totalCostWithoutFee !== 0 && isEditingBio && (
-                        <div className="progress-container">
-                          <div className="progress-value">{percent}%</div>
+                        <div className="flex flex-col items-end mt-[auto] gap-[8px] w-full">
+                          <div className="progress-value text-base">
+                            {percent}%
+                          </div>
                           <div className="progress-bar">
                             <div
                               className="progress"
@@ -521,12 +541,16 @@ const ApplicationPreview = (): JSX.Element => {
           )}
         </div>
       </div>
-      <div className="container">
+
+      <div className="container w-full bg-[#2c2c2c] border border-solid border-white rounded-[20px] py-[20px]">
         <p className="mx-14 mb-4 text-xl font-bold">Costs</p>
         <hr className="separator" />
-        <div className="budget-info mx-14 mt-7">
-          <div className="budget-description">
-            <h3>Total price of the project</h3>
+
+        <div className="flex flex-row items-center mb-[20px] mx-14 mt-7">
+          <div className="flex flex-col flex-grow">
+            <h3 className="text-xl font-bold m-0 p-0">
+              Total price of the project
+            </h3>
             <div className="text-inactive">
               This includes all milestones, and is the amount client will see
             </div>
@@ -535,29 +559,41 @@ const ApplicationPreview = (): JSX.Element => {
             ${Number(totalCostWithoutFee?.toFixed?.(2)).toLocaleString()}
           </div>
         </div>
-        <div className="budget-info mx-14">
-          <div className="budget-description">
-            <h3>Imbue Service Fee 5%</h3>
+
+        <div className="flex flex-row items-center mb-[20px] mx-14">
+          <div className="flex flex-col flex-grow">
+            <h3 className="text-xl font-bold m-0 p-0">Imbue Service Fee 5%</h3>
           </div>
           <div className="budget-value">
             ${Number(imbueFee?.toFixed?.(2))?.toLocaleString?.()}
           </div>
         </div>
-        <div className="budget-info mx-14">
-          <div className="budget-description">
-            <h3>Total</h3>
+
+        <div className="flex flex-row items-center mb-[20px] mx-14">
+          <div className="flex flex-col flex-grow">
+            <h3 className="text-xl font-bold m-0 p-0">Total</h3>
           </div>
           <div className="budget-value">
             ${Number(totalCost.toFixed(2))?.toLocaleString?.()}
           </div>
         </div>
       </div>
-      <div className="section">
-        <h3 className="section-title">Payment terms</h3>
-        <div className="container payment-details px-14">
+
+      <div>
+        <h3 className="ml-[2rem] mb-[0.5rem] text-xl font-bold m-0 p-0 flex">
+          Payment terms
+        </h3>
+        <div className="bg-[#2c2c2c] border border-solid border-[#fff] py-[20px] rounded-[20px] payment-details px-14">
           <div className="duration-selector">
-            <h3>How long will this project take?</h3>
-            <select name="duration" placeholder="Select a duration" required>
+            <h3 className="text-xl font-bold m-0 p-0">
+              How long will this project take?
+            </h3>
+            <select
+              className="bg-[#1a1a19] border border-solid border-[#fff] rounded-[5px] text-base px-[20px] py-[10px] mt-4"
+              name="duration"
+              placeholder="Select a duration"
+              required
+            >
               {durationOptions.map(({ label, value }, index) => (
                 <option value={value} key={index} className="duration-option">
                   {label}
@@ -566,11 +602,12 @@ const ApplicationPreview = (): JSX.Element => {
             </select>
           </div>
           <div className="payment-options">
-            <h3>Currency</h3>
+            <h3 className="text-xl font-bold m-0 p-0">Currency</h3>
             <div className="network-amount">
               <select
                 name="currencyId"
                 onChange={handleChange}
+                className="bg-[#1a1a19] border border-solid border-[#fff] rounded-[5px] text-base px-[20px] py-[10px] mt-4"
                 placeholder="Select a currency"
                 disabled={!isEditingBio}
                 defaultValue={Number(application?.currency_id)}
@@ -586,6 +623,7 @@ const ApplicationPreview = (): JSX.Element => {
           </div>
         </div>
       </div>
+
       <div className="buttons-container">
         <button
           className="primary-btn in-dark w-button"
@@ -610,30 +648,3 @@ const ApplicationPreview = (): JSX.Element => {
 };
 
 export default ApplicationPreview;
-
-// document.addEventListener("DOMContentLoaded", async (event) => {
-//     let paths = window.location.pathname.split("/");
-//     let briefId = paths.length >= 2 && parseInt(paths[paths.length - 4]);
-//     let applicationId = paths.length >= 2 && parseInt(paths[paths.length - 2]);
-
-//     if (briefId && applicationId) {
-//         const application = await fetchProject(applicationId);
-//         const freelancerUser = await fetchUser(Number(application.user_id));
-//         const freelancer = await getFreelancerProfile(freelancerUser.username);
-
-//         const brief: Brief = await getBrief(briefId);
-//         const user = await getCurrentUser();
-
-//         ReactDOMClient.createRoot(
-//             document.getElementById("application-preview")!
-//         ).render(
-//             <ApplicationPreview
-//                 brief={brief}
-//                 user={user}
-//                 application={application}
-//                 freelancer={freelancer!}
-//             />
-//         );
-//     }
-//     // TODO 404 page when brief of application is not found
-// });

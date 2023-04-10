@@ -293,3 +293,23 @@
 .Rejected-button {
   background-color: var(--theme-error);
 }
+
+.Accepted-btn {
+  background-color: var(--theme-primary);
+  color: #000;
+}
+
+.Rejected-btn {
+  background-color: var(--theme-error);
+  color: #000;
+}
+
+.Request-btn {
+  background-color: yellow;
+  color: #000;
+}
+
+.Pending.Review-btn {
+  background-color: var(--theme-grey-dark);
+  color: white;
+}

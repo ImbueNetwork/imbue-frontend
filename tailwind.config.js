@@ -28,6 +28,7 @@ module.exports = {
         "max-width-868px": { raw: "(max-width: 868px)" },
         "max-width-750px": { raw: "(max-width: 750px)" },
         "max-width-500px": { raw: "(max-width: 500px)" },
+        "min-width-1280px": { raw: "(min-width: 1280px)" },
       },
     },
   },

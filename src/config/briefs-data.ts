@@ -155,7 +155,7 @@ export const suggestedSkills = [
 
 export const dumyBriefs = [
   {
-    id: "1",
+    id: 1,
     headline: "Amazing Frontend Developer NEEDED!!",
     description:
       "We need some absolute wizard to create an ultra dynamic thing with carosels",
@@ -163,24 +163,42 @@ export const dumyBriefs = [
     scope_id: 2,
     duration: "3-6 months",
     duration_id: 2,
-    budget: 1000,
+    budget: "1000",
     created_by: "Dude Mckenzie",
     experience_level: "Intermediate",
     experience_id: 2,
-    created: new Date("2023-03-30T07:10:04.510Z"),
+    created: "2023-04-08T15:32:25.561Z",
     user_id: 1,
     project_id: null,
     number_of_briefs_submitted: 20,
     skills: [
-      { id: 1, name: "substrate" },
-      { id: 2, name: "rust" },
-      { id: 6, name: "c++" },
-      { id: 7, name: "polkadot" },
+      {
+        id: 1,
+        name: "substrate",
+      },
+      {
+        id: 2,
+        name: "rust",
+      },
+      {
+        id: 6,
+        name: "c++",
+      },
+      {
+        id: 7,
+        name: "polkadot",
+      },
     ],
     skill_ids: ["1", "2", "6", "7"],
     industries: [
-      { id: 1, name: "substrate" },
-      { id: 2, name: "rust" },
+      {
+        id: 1,
+        name: "substrate",
+      },
+      {
+        id: 2,
+        name: "rust",
+      },
     ],
     industry_ids: ["1", "2"],
   },

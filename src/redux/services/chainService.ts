@@ -11,7 +11,6 @@ import {
   RoundType,
   User,
 } from "@/model";
-import { web3FromSource } from "@polkadot/extension-dapp";
 import type { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import type { DispatchError } from "@polkadot/types/interfaces";
 import type { ITuple } from "@polkadot/types/types";
@@ -178,6 +177,7 @@ class ChainService {
     extrinsic: SubmittableExtrinsic<"promise">,
     eventName: String
   ): Promise<BasicTxResponse> {
+    const { web3FromSource } = await import("@polkadot/extension-dapp");
     const injector = await web3FromSource(account.meta.source);
     const transactionState: BasicTxResponse = {} as BasicTxResponse;
     try {
@@ -258,6 +258,7 @@ class ChainService {
     account: InjectedAccountWithMeta,
     extrinsic: SubmittableExtrinsic<"promise">
   ): Promise<BasicTxResponse> {
+    const { web3FromSource } = await import("@polkadot/extension-dapp");
     const injector = await web3FromSource(account.meta.source);
     const transactionState: BasicTxResponse = {} as BasicTxResponse;
     try {
@@ -334,7 +335,7 @@ class ChainService {
   }
 
   public async getProject(projectId: string | number) {
-    const project: Project = await utils.fetchProject(projectId);
+    const project: Project | any = await utils.fetchProject(projectId);
     return await this.convertToOnChainProject(project);
   }
 
