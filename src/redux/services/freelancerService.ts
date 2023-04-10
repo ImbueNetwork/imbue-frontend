@@ -1,7 +1,7 @@
 import { Freelancer, FreelancerSqlFilter, Project } from "@/model";
 import * as config from "@/config";
 import { postAPIHeaders, getAPIHeaders } from "@/config";
-import { dummyDashboardApplications } from "@/config/briefs-data";
+import { dummyFreelancerProfile } from "@/config/freelancer-data";
 
 export async function createFreelancingProfile(freelancer: any) {
   //TODO: make api call here
@@ -35,9 +35,10 @@ export const getAllFreelancers = async () => {
   //   }
 };
 
-export async function getFreelancerProfile(username: string) {
+export async function getFreelancerProfile(username: string | string[]) {
+  return dummyFreelancerProfile;
   //TODO: implement api call
-  return {} as Freelancer;
+  // return {} as Freelancer;
   //   const resp = await fetch(`${config.apiBase}/freelancers/${username}`, {
   //     headers: getAPIHeaders,
   //     method: "get",
