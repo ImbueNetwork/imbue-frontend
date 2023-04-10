@@ -1,4 +1,5 @@
 import * as config from "@/config";
+import { dummyApplicationProject } from "@/config/briefs-data";
 import { StreamChat } from "stream-chat";
 
 export type BadRoute =
@@ -64,13 +65,14 @@ export const getProjectId = async () => {
 };
 
 export const fetchProject = async (projectId: string | number | null) => {
-  const resp = await fetch(`${config.apiBase}/projects/${projectId}`, {
-    headers: config.getAPIHeaders,
-  });
-  if (resp.ok) {
-    const project = await resp.json();
-    return project;
-  }
+  return dummyApplicationProject;
+  // const resp = await fetch(`${config.apiBase}/projects/${projectId}`, {
+  //   headers: config.getAPIHeaders,
+  // });
+  // if (resp.ok) {
+  //   const project = await resp.json();
+  //   return project;
+  // }
 };
 
 export const fetchUserOrEmail = async (userOrEmail: string) => {
@@ -84,13 +86,14 @@ export const fetchUserOrEmail = async (userOrEmail: string) => {
 };
 
 export const fetchUser = async (id: number) => {
-  const resp = await fetch(`${config.apiBase}/users/byid/${id}`, {
-    headers: config.getAPIHeaders,
-  });
-  if (resp.ok) {
-    const user = await resp.json();
-    return user;
-  }
+  return config.dummyUser;
+  // const resp = await fetch(`${config.apiBase}/users/byid/${id}`, {
+  //   headers: config.getAPIHeaders,
+  // });
+  // if (resp.ok) {
+  //   const user = await resp.json();
+  //   return user;
+  // }
 };
 
 export const badRouteEvent = (type: BadRoute) =>

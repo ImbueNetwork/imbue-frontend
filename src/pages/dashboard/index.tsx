@@ -47,6 +47,7 @@ const Dashboard = ({}: DashboardProps): JSX.Element => {
     getstream_token:
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoibWlrZSJ9.oSxIRfDYQjN35KF0nx3tINBLh-mlnHKuqIWwxtU_Cnk",
     display_name: "mike",
+    web3Accounts: [],
   };
 
   const [client, setClient] = useState<StreamChat>();
@@ -228,7 +229,9 @@ export const MyFreelancerApplications = ({
   const router = useRouter();
   const redirectToApplication = (application: Project) => {
     //TODO: redirect
-    // redirect(`briefs/${application.brief_id}/applications/${application.id}/`);
+    router.push(
+      `/briefs/${application.brief_id}/applications/${application.id}/`
+    );
   };
 
   const redirectToDiscoverBriefs = () => {

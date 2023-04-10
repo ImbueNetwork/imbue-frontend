@@ -104,19 +104,19 @@ export type Web3Account = {
 export type User = {
   id: number;
   display_name: string;
-  web3Accounts?: Web3Account[];
+  web3Accounts: Web3Account[];
   username: string;
   password?: string;
   getstream_token: string;
   web3_address?: string;
 };
-
 export interface BasicTxResponse {
   errorMessage: string | null;
   callHash?: string;
   status?: boolean;
   transactionHash?: string;
   txError?: boolean;
+  eventData?: any;
 }
 
 export type Freelancer = {
