@@ -38,6 +38,31 @@ body {
   color: var(--mdc-text-field-ink-color) !important;
 }
 
+.mdc-dialog--open .mdc-dialog__container {
+  -webkit-transform: none;
+  transform: none;
+  opacity: 1;
+}
+
+.mdc-dialog .mdc-dialog__surface {
+  max-height: calc(100% - 32px);
+}
+
+@media (min-width: 592px) {
+  .mdc-dialog .mdc-dialog__surface {
+    max-width: 560px;
+  }
+}
+
+.mdc-dialog .mdc-dialog__surface {
+  min-width: 280px;
+}
+
+.mdc-dialog .mdc-dialog__surface {
+  border-radius: 4px;
+  border-radius: var(--mdc-shape-medium, 4px);
+}
+
 div#content-root {
   width: 100%;
 }
@@ -46,4 +71,12 @@ form {
   display: block;
   margin-top: 0em;
   margin-block-end: 1em;
+}
+
+.unset {
+  box-sizing: unset;
+}
+
+svg {
+  display: inline;
 }

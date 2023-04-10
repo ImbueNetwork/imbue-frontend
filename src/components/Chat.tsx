@@ -48,7 +48,7 @@ export function CustomChannelHeader(props: ChannelHeaderProps) {
       <div className="w-full flex gap-3 items-center ml-3">
         <div className="relative">
           <Image
-            src="../assets/images/profile-image.png"
+            src={require("@/assets/images/profile-image.png")}
             height={48}
             width={48}
             className="w-12 h-12 rounded-full object-cover object-top"

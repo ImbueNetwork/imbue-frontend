@@ -424,13 +424,13 @@ const ApplicationPreview = (): JSX.Element => {
         </div>
       }
       <div>
-        <div className="w-full flex flex-col gap-[20px] bg-[#2c2c2c] border border-solid border-white rounded-[20px] py-[20px] min-width-1280px:max-w-[1280px] ">
+        <div className="w-full flex flex-col gap-[20px] bg-[#2c2c2c] border border-solid border-white rounded-[20px] py-[20px] ">
           <div className="flex flex-row justify-between mx-14 -mb-3">
             <h3 className="flex text-xl leading-[1.5] font-bold m-0 p-0">
               Milestones
               {!isEditingBio && isApplicationOwner && (
                 <div
-                  className="mt-[5px] ml-[10px]"
+                  className="ml-[10px]"
                   onClick={() => setIsEditingBio(true)}
                 >
                   <FiEdit />
