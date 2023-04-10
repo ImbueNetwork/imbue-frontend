@@ -191,8 +191,8 @@ export const suggestedServices = [
   "NFT",
 ];
 
-export const dummyFreelancerProfile = {
-  id: 2,
+export const freelancerData = {
+  id: 1,
   freelanced_before:
     "I've freelanced before however, i may need some extra help.",
   freelancing_goal: "To make a little extra money on the side",
@@ -203,36 +203,32 @@ export const dummyFreelancerProfile = {
   twitter_link: "",
   telegram_link: "",
   discord_link: "",
-  title: "Senior react developer",
-  bio: "dackhbs uah oiahji m",
-  user_id: 6,
+  title: "Senior Frontend Developer",
+  bio: "The best life ever",
+  user_id: 5,
   username: "mike",
   display_name: "mike",
   web3_address: "5GRHPcY3zEgJezesmYHQyuo7YouwXVjnDR8ZcX9CQuFJadaL",
-  created: "2023-04-06T16:12:40.202Z",
+  created: "2023-04-08T15:38:29.157Z",
   skills: [
     {
-      id: 9,
-      name: "adobe photoshop",
-    },
-    {
-      id: 11,
-      name: "solidity",
+      id: 5,
+      name: "javascript",
     },
   ],
-  skill_ids: ["11", "9"],
+  skill_ids: ["5"],
   languages: [
     {
-      id: 4,
-      name: "spanish",
-    },
-    {
-      id: 5,
-      name: "arabic",
+      id: 8,
+      name: "english",
     },
   ],
-  language_ids: ["4", "5"],
+  language_ids: ["8"],
   services: [
+    {
+      id: 1,
+      name: "web development",
+    },
     {
       id: 2,
       name: "web design",
@@ -241,13 +237,16 @@ export const dummyFreelancerProfile = {
       id: 3,
       name: "mobile (android/ios)",
     },
+    {
+      id: 5,
+      name: "smart contracts",
+    },
   ],
-  service_ids: ["2", "3"],
-  clients: [],
-  client_ids: [],
+  service_ids: ["1", "2", "3", "5"],
+  clients: [null],
+  client_ids: [null],
   client_images: [],
-  client_image_ids: [],
-  rating: undefined,
-  num_ratings: 0,
-  profileImageUrl: "",
+  client_image_ids: [null],
+  rating: null,
+  num_ratings: "0",
 };
