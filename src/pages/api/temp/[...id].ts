@@ -10,7 +10,7 @@ export default async function userHandler(
   res: NextApiResponse
 ) {
   const { query, method } = req
-  const id = query.id
+  const id: any = query.id
   const name = query.name as string
 
   switch (method) {
@@ -48,7 +48,7 @@ export async function handleGet(routes: string[]) {
 
 export async function fetchBriefApplications(briefId: string) {
   let response
-  await db.transaction(async tx => {
+  await db.transaction(async (tx: any) => {
     try {
       const briefApplications = await models.fetchBriefApplications(briefId)(tx);
 
@@ -57,7 +57,7 @@ export async function fetchBriefApplications(briefId: string) {
         return briefApplications
       }
 
-      response = await Promise.all(briefApplications.map(async (application) => {
+      response = await Promise.all(briefApplications.map(async (application: any) => {
         return {
           ...application,
           freelancer: await fetchFreelancerDetailsByUserID(application.user_id)(tx),
@@ -78,7 +78,7 @@ export async function fetchBriefApplications(briefId: string) {
 
 export async function fetchBrief(briefId: string) {
   let response
-  await db.transaction(async tx => {
+  await db.transaction(async (tx: any) => {
     try {
       const brief = await models.fetchBrief(briefId)(tx);
 
@@ -121,7 +121,7 @@ export async function handlePost(routes: string[], req: NextApiRequest) {
 export async function createBrief(req: NextApiRequest) {
   const brief: Brief = req.body as Brief;
   let response
-  await db.transaction(async tx => {
+  await db.transaction(async (tx: any) => {
     try {
       const skill_ids = await upsertItems(brief.skills, "skills")(tx);
       const industry_ids = await upsertItems(brief.industries, "industries")(tx);
@@ -149,7 +149,7 @@ export async function createBrief(req: NextApiRequest) {
 export async function searchBriefs(req: NextApiRequest) {
   let response
   const data: BriefSqlFilter = req.body;
-  await db.transaction(async tx => {
+  await db.transaction(async (tx: any) => {
     try {
 
       const briefs: Array<Brief> = await models.searchBriefs(tx, data);
@@ -177,23 +177,27 @@ export async function searchBriefs(req: NextApiRequest) {
 
 export async function updateStatus(req: NextApiRequest) {
   const { query, method } = req
-  const id = query.id[0];
+  let response
+
+  if (!query?.id) return
+
+  const id = query?.id[0];
   const projectId = req.body.project_id;
   const status_id = req.body.status_id;
-  let response
+
   const data: BriefSqlFilter = req.body;
-  await db.transaction(async tx => {
+  await db.transaction(async (tx: any) => {
     try {
       let brief: Brief = await models.fetchBrief(id)(tx);
       if (!brief) {
-          return new Error(
-              "Brief does not exist."
-          );
+        return new Error(
+          "Brief does not exist."
+        );
       }
       let briefOwner = await fetchUser(brief.user_id)(tx) as User;
       let project = await fetchProject(projectId)(tx);
       if (!project) {
-          return project
+        return project
       }
       project.status_id = status_id;
       await updateProject(project.id!, project)(tx);

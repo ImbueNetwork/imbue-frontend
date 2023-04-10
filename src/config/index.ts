@@ -1,6 +1,6 @@
 export const appName = "Imbue Network";
 
-export const apiBase = "/api/v1";
+export const apiBase = "/api/";
 export const getAPIHeaders = {
   accept: "application/json",
 };
