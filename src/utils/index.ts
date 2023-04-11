@@ -87,14 +87,13 @@ export const fetchUserOrEmail = async (userOrEmail: string) => {
 };
 
 export const fetchUser = async (id: number) => {
-  return config.dummyUser;
-  // const resp = await fetch(`${config.apiBase}/users/byid/${id}`, {
-  //   headers: config.getAPIHeaders,
-  // });
-  // if (resp.ok) {
-  //   const user = await resp.json();
-  //   return user;
-  // }
+  const resp = await fetch(`${config.apiBase}/users/byid/${id}`, {
+    headers: config.getAPIHeaders,
+  });
+  if (resp.ok) {
+    const user = await resp.json();
+    return user;
+  }
 };
 
 export const badRouteEvent = (type: BadRoute) =>
@@ -115,9 +114,9 @@ export function validateForm(form: HTMLFormElement): boolean {
 }
 
 export const getStreamChat = async () => {
-  if (process.env.REACT_APP_GETSTREAM_API_KEY) {
-    return new StreamChat(process.env.REACT_APP_GETSTREAM_API_KEY);
-  }
+  const { imbueNetworkWebsockAddr, relayChainWebsockAddr, getstreamApiKey } =
+    await fetch(`${config.apiBase}/info`).then((resp) => resp.json());
+  return new StreamChat(getstreamApiKey);
 };
 
 function reportValidity(input: HTMLInputElement, submitting: boolean = false) {

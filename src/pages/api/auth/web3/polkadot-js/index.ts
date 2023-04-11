@@ -3,14 +3,9 @@ import { v4 as uuid } from "uuid";
 import nextConnect from 'next-connect'
 import db from "../../../db";
 import * as models from "../../../models";
-import { fetchWeb3AccountByAddress } from "../../../models";
-import { ensureParams, jwtOptions, verifyUserIdFromJwt } from "../../common";
+import { ensureParams, verifyUserIdFromJwt } from "../../common";
 import { decodeAddress, encodeAddress } from "@polkadot/keyring";
 import { hexToU8a, isHex } from '@polkadot/util';
-
-import jwt from 'jsonwebtoken';
-import config from "../../../config"
-import { serialize } from 'cookie';
 import next from 'next';
 
 
@@ -23,7 +18,7 @@ export default nextConnect()
         const existingUser = req.body.existing_user;
         const address = account.address.trim();
         if (existingUser) {
-            // verifyUserIdFromJwt(req, res, next, existingUser.id);
+            verifyUserIdFromJwt(req, res, next, existingUser.id);
             db.transaction(async tx => {
                 const challenge = uuid();
                 const [web3Account, isInsert] = await models.updateOrInsertUserWeb3Address(
@@ -41,8 +36,6 @@ export default nextConnect()
             } catch (e: any) {
                 res.status(400).end(`Invalid address param. ${(e as Error).message}`)
             }
-            // If no address can be found, create a `users` and then a
-            // `federated_credential`
             models.getOrCreateFederatedUser(
                 account.meta.source,
                 address,
