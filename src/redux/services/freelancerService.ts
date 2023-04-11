@@ -1,4 +1,4 @@
-import { Freelancer, FreelancerSqlFilter } from "@/model";
+import { Freelancer, FreelancerSqlFilter, Project } from "@/model";
 import { dummyDashboardApplications } from "@/config/briefs-data";
 import { freelancerData } from "@/config/freelancer-data";
 
@@ -100,8 +100,8 @@ export const callSearchFreelancers = async (filter: FreelancerSqlFilter) => {
 };
 
 export const getFreelancerApplications = async (userId: number) => {
-  return dummyDashboardApplications;
-  // return [] as Array<Project>;
+  // return dummyDashboardApplications;
+  return [] as Array<Project>;
   // const resp = await fetch(
   //   `${config.apiBase}/freelancers/${userId}/applications`,
   //   {

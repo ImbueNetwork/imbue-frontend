@@ -46,12 +46,12 @@ export const validProjectId = (candidate: any) => {
 };
 
 export const getCurrentUser = async () => {
-  return config.dummyUser;
-  // const resp = await fetch(`${config.apiBase}/user`);
-  // if (resp.ok) {
-  //   return resp.json();
-  // }
-  // return null;
+  // return config.dummyUser;
+  const resp = await fetch(`${config.apiBase}/user`);
+  if (resp.ok) {
+    return resp.json();
+  }
+  return null;
 };
 
 export const getProjectId = async () => {

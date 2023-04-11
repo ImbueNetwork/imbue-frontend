@@ -12,7 +12,7 @@ import {
   Window,
 } from "stream-chat-react";
 import "stream-chat-react/dist/css/v2/index.css";
-import { fetchUser, getStreamChat } from "@/utils";
+import { fetchUser, getCurrentUser, getStreamChat } from "@/utils";
 import BottomNavigationAction from "@mui/material/BottomNavigationAction";
 import BottomNavigation from "@mui/material/BottomNavigation";
 import { StyledEngineProvider } from "@mui/material/styles";
@@ -34,21 +34,24 @@ const timeAgo = new TimeAgo("en-US");
 
 export type DashboardProps = {
   user: User;
+  isAuthenticated: boolean;
 };
 
 type FreelancerApplicationsType = {
   myApplications: any;
 };
 
-const Dashboard = ({}: DashboardProps): JSX.Element => {
-  const user = {
-    id: 6,
-    username: "mike",
-    getstream_token:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoibWlrZSJ9.oSxIRfDYQjN35KF0nx3tINBLh-mlnHKuqIWwxtU_Cnk",
-    display_name: "mike",
-    web3Accounts: [],
-  };
+const Dashboard = ({ user, isAuthenticated }: DashboardProps): JSX.Element => {
+  // const user = {
+  //   id: 6,
+  //   username: "mike",
+  //   getstream_token:
+  //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoibWlrZSJ9.oSxIRfDYQjN35KF0nx3tINBLh-mlnHKuqIWwxtU_Cnk",
+  //   display_name: "mike",
+  //   web3Accounts: [],
+  // };
+
+  // const [user, setUser] = useState<User | undefined>(undefined);
 
   const [client, setClient] = useState<StreamChat>();
   const filters = { members: { $in: [user?.username] } };
@@ -63,14 +66,25 @@ const Dashboard = ({}: DashboardProps): JSX.Element => {
   const [myApplications, setMyApplications] = useState<Project[]>([]);
 
   const setup = async () => {
-    const myApplicationsResponse = await getFreelancerApplications(user?.id);
-    setMyApplications(myApplicationsResponse);
-    setBriefs(await getUserBriefs(user?.id));
+    if (user) {
+      const myApplicationsResponse = await getFreelancerApplications(user?.id);
+      setMyApplications(myApplicationsResponse);
+      setBriefs(await getUserBriefs(user?.id));
+    }
   };
 
   const getApplications = async (id: string | number) => {
     setBriefApplications(await getBriefApplications(id));
   };
+
+  // useEffect(() => {
+  //   getUserProfile();
+  // }, []);
+
+  // const getUserProfile = async () => {
+  //   const userResponse: User = await getCurrentUser();
+  //   console.log({ userResponse });
+  // };
 
   useEffect(() => {
     setup();
@@ -78,7 +92,7 @@ const Dashboard = ({}: DashboardProps): JSX.Element => {
     if (briefId) {
       getApplications(briefId);
     }
-  }, [briefId]);
+  }, [briefId, user]);
 
   const handleMessageBoxClick = async (
     user_id: number,
@@ -107,7 +121,7 @@ const Dashboard = ({}: DashboardProps): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    if (client) {
+    if (client && user) {
       client.connectUser(
         {
           id: user.username,
@@ -276,6 +290,21 @@ export const MyFreelancerApplications = ({
       ))}
     </div>
   );
+};
+
+Dashboard.getInitialProps = async () => {
+  const userResponse = await getCurrentUser();
+
+  console.log({ userResponse });
+
+  if (!userResponse) {
+    return {
+      isAuthenticated: false,
+      user: undefined,
+    };
+  }
+
+  return { isAuthenticated: true, user: userResponse };
 };
 
 export default Dashboard;
