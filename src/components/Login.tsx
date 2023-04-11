@@ -80,7 +80,7 @@ async function authorise(
   signature: SignerResult,
   account: InjectedAccountWithMeta
 ) {
-  const resp = await fetch(`/auth/web3/${account.meta.source}/callback`, {
+  const resp = await fetch(`/api/auth/web3/${account.meta.source}/callback`, {
     headers: postAPIHeaders,
     method: "post",
     body: JSON.stringify({

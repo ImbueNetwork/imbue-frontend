@@ -14,44 +14,43 @@ const postAPIHeaders = {
 };
 
 export async function getAccountAndSign(account: InjectedAccountWithMeta) {
-  return { signature: {}, user: {} };
-  // const existingUser = await getCurrentUser();
-  // const resp = await fetch(`/auth/web3/${account.meta.source}/`, {
-  //     headers: postAPIHeaders,
-  //     method: "post",
-  //     body: JSON.stringify({ account, existing_user: existingUser }),
-  // });
+  const existingUser = await getCurrentUser();
+  const resp = await fetch(`/api/auth/web3/${account.meta.source}/`, {
+      headers: postAPIHeaders,
+      method: "post",
+      body: JSON.stringify({ account, existing_user: existingUser }),
+  });
 
-  // if (resp.ok) {
-  //     // could be 200 or 201
-  //     const { user, web3Account } = await resp.json();
-  //     const signature = await signWeb3Challenge(account, web3Account.challenge);
+  if (resp.ok) {
+      // could be 200 or 201
+      const { user, web3Account } = await resp.json();
+      const signature = await signWeb3Challenge(account, web3Account.challenge);
 
-  //     if (signature) {
-  //         return { signature, user };
-  //     } else {
-  //         // TODO: UX for no way to sign challenge?
-  //     }
-  // }
+      if (signature) {
+          return { signature, user };
+      } else {
+          // TODO: UX for no way to sign challenge?
+      }
+  }
 }
 
 export async function authorise(
   signature: SignerResult,
   account: InjectedAccountWithMeta
 ) {
-  // const resp = await fetch(`/auth/web3/${account.meta.source}/callback`, {
-  //     headers: postAPIHeaders,
-  //     method: "post",
-  //     body: JSON.stringify({
-  //         signature: signature.signature,
-  //         address: account.address,
-  //     }),
-  // });
-  // if (resp.ok) {
-  //     // setShowMessageBox(false)
-  // } else {
-  //     // TODO: UX for 401
-  // }
+  const resp = await fetch(`/api/auth/web3/${account.meta.source}/callback`, {
+      headers: postAPIHeaders,
+      method: "post",
+      body: JSON.stringify({
+          signature: signature.signature,
+          address: account.address,
+      }),
+  });
+  if (resp.ok) {
+      // setShowMessageBox(false)
+  } else {
+      // TODO: UX for 401
+  }
 }
 
 export const selectAccount = async (account: InjectedAccountWithMeta) => {

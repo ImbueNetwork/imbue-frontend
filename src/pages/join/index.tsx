@@ -59,18 +59,18 @@ const Join = (): JSX.Element => {
       password: hashedPassword,
     };
 
-    // const resp = await fetch(`/auth/imbue/register`, {
-    //   headers: postAPIHeaders,
-    //   method: "post",
-    //   body: JSON.stringify(body),
-    // });
+    const resp = await fetch(`/api/auth/register`, {
+      headers: postAPIHeaders,
+      method: "post",
+      body: JSON.stringify(body),
+    });
 
-    // if (resp.ok) {
-    //   await utils.redirectBack();
-    // } else {
-    //   const error = await resp.json();
-    //   setError(error);
-    // }
+    if (resp.ok) {
+      await utils.redirectBack();
+    } else {
+      const error = await resp.json();
+      setError(error);
+    }
   };
 
   return (

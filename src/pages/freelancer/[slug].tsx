@@ -27,8 +27,8 @@ export type ProfileProps = {
 
 const Profile = (): JSX.Element => {
   const router = useRouter();
-  const slug = router.query.slug;
-  const [freelancer, setFreelancer] = useState<Freelancer | undefined>();
+  const slug = router.query.slug as string;
+  const [freelancer, setFreelancer] = useState<any | undefined>();
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [browsingUser, setBrowsingUser] = useState<User | null>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
@@ -235,7 +235,7 @@ const Profile = (): JSX.Element => {
             </>
           ) : (
             <div className="bio">
-              {freelancer?.bio?.split?.("\n")?.map?.((line, index) => (
+              {freelancer?.bio?.split?.("\n")?.map?.((line: any, index: number) => (
                 <p className="leading-[1.2] text-base" key={index}>
                   {line}
                 </p>
@@ -294,7 +294,7 @@ const Profile = (): JSX.Element => {
                 </div>
                 <div className="flex flex-wrap gap-[20px] mt-[24px]">
                   {/* TODO: Add Skills */}
-                  {freelancer?.skills?.map?.((skill) => (
+                  {freelancer?.skills?.map?.((skill: any) => (
                     <p
                       className="py-[12px] px-[24px] border border-solid border-white rounded-[8px] text-base"
                       key={skill?.id}
