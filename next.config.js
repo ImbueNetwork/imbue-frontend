@@ -10,8 +10,10 @@ const nextConfig = {
     // DB_NAME: "imbue",
     // DB_USER: "imbue",
     // DB_PASSWORD: "imbue",
+    REACT_APP_GETSTREAM_API_KEY: process.env.REACT_APP_GETSTREAM_API_KEY,
+    REACT_APP_GETSTREAM_SECRET_KEY: process.env.REACT_APP_GETSTREAM_SECRET_KEY,
     GETSTREAM_API_KEY: process.env.GETSTREAM_API_KEY,
-    GETSTREAM_SECRET_KEY:process.env.GETSTREAM_SECRET_KEY,
+    GETSTREAM_SECRET_KEY: process.env.GETSTREAM_SECRET_KEY,
   },
   images: {
     remotePatterns: [
