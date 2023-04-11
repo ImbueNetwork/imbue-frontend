@@ -33,10 +33,13 @@ export const callSearchBriefs = async (filter: BriefSqlFilter) => {
 export const getAllBriefs = async () => {
   // return dumyBriefs as Array<Brief>;
   //:TODO implement api for getting briefs
-  const resp = await fetch(`${config.apiBase}/briefs/`, {
-    headers: postAPIHeaders,
-    method: "get",
-  });
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}/briefs/`),
+    {
+      headers: postAPIHeaders,
+      method: "get",
+    }
+  );
 
   if (resp.ok) {
     return (await resp.json()) as Array<Brief>;
