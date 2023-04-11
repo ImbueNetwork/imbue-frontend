@@ -46,8 +46,9 @@ export const validProjectId = (candidate: any) => {
 };
 
 export const getCurrentUser = async () => {
-  // return config.dummyUser;
-  const resp = await fetch(`${config.apiBase}/user`);
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}info/user`)
+  );
   if (resp.ok) {
     return resp.json();
   }
@@ -125,3 +126,9 @@ function reportValidity(input: HTMLInputElement, submitting: boolean = false) {
   }
   input.reportValidity();
 }
+
+export const checkEnvironment = () => {
+  let base_url = "http://localhost:3000";
+
+  return base_url;
+};

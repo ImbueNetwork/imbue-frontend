@@ -4,6 +4,7 @@ import {
   dumyBriefs,
 } from "@/config/briefs-data";
 import { Brief, BriefSqlFilter, ProjectStatus } from "@/model";
+import { checkEnvironment } from "@/utils";
 
 const getAPIHeaders = {
   accept: "application/json",
@@ -18,30 +19,30 @@ export const callSearchBriefs = async (filter: BriefSqlFilter) => {
   // return [] as Array<Brief>;
   //:TODO implement api for callSearchBriefs
   const resp = await fetch(`${config.apiBase}/briefs/search`, {
-      headers: postAPIHeaders,
-      method: "post",
-      body: JSON.stringify(filter),
+    headers: postAPIHeaders,
+    method: "post",
+    body: JSON.stringify(filter),
   });
   if (resp.ok) {
-      return await resp.json() as Array<Brief>
+    return (await resp.json()) as Array<Brief>;
   } else {
-      throw new Error('Failed to search briefs. status:' + resp.status);
+    throw new Error("Failed to search briefs. status:" + resp.status);
   }
 };
 
 export const getAllBriefs = async () => {
   // return dumyBriefs as Array<Brief>;
   //:TODO implement api for getting briefs
-    const resp = await fetch(`${config.apiBase}/briefs/`, {
-      headers: postAPIHeaders,
-      method: "get",
-    });
+  const resp = await fetch(`${config.apiBase}/briefs/`, {
+    headers: postAPIHeaders,
+    method: "get",
+  });
 
-    if (resp.ok) {
-      return (await resp.json()) as Array<Brief>;
-    } else {
-      throw new Error("Failed to get all briefs. status:" + resp.status);
-    }
+  if (resp.ok) {
+    return (await resp.json()) as Array<Brief>;
+  } else {
+    throw new Error("Failed to get all briefs. status:" + resp.status);
+  }
 };
 
 export const getBrief = async (briefId: number | string) => {
@@ -74,20 +75,23 @@ export const getUserBriefs = async (user_id: string | number) => {
 };
 
 export const getBriefApplications = async (brifId: string | number) => {
-  return [];
-  // return dummyDashboardBriefApplications;
-  // const resp = await fetch(`${config.apiBase}/briefs/${brifId}/applications`, {
-  //   headers: postAPIHeaders,
-  //   method: "get",
-  // });
+  const resp = await fetch(
+    checkEnvironment().concat(
+      `${config.apiBase}/briefs/${brifId}/applications`
+    ),
+    {
+      headers: postAPIHeaders,
+      method: "get",
+    }
+  );
 
-  // if (resp.ok) {
-  //   return await resp.json();
-  // } else {
-  //   throw new Error(
-  //     "Failed to get all brief applications. status:" + resp.status
-  //   );
-  // }
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    throw new Error(
+      "Failed to get all brief applications. status:" + resp.status
+    );
+  }
 };
 
 export const changeBriefApplicationStatus = async (

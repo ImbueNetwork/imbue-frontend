@@ -29,6 +29,7 @@ import en from "javascript-time-ago/locale/en";
 import { BriefLists } from "@/components/Briefs/BriefsList";
 import { useRouter } from "next/router";
 import { ApplicationContainer } from "@/components/Briefs/ApplicationContainer";
+import Login from "@/components/Login";
 
 const timeAgo = new TimeAgo("en-US");
 
@@ -42,16 +43,7 @@ type FreelancerApplicationsType = {
 };
 
 const Dashboard = ({ user, isAuthenticated }: DashboardProps): JSX.Element => {
-  // const user = {
-  //   id: 6,
-  //   username: "mike",
-  //   getstream_token:
-  //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoibWlrZSJ9.oSxIRfDYQjN35KF0nx3tINBLh-mlnHKuqIWwxtU_Cnk",
-  //   display_name: "mike",
-  //   web3Accounts: [],
-  // };
-
-  // const [user, setUser] = useState<User | undefined>(undefined);
+  const [loginModal, setLoginModal] = useState<boolean>(!isAuthenticated);
 
   const [client, setClient] = useState<StreamChat>();
   const filters = { members: { $in: [user?.username] } };
@@ -77,18 +69,8 @@ const Dashboard = ({ user, isAuthenticated }: DashboardProps): JSX.Element => {
     setBriefApplications(await getBriefApplications(id));
   };
 
-  // useEffect(() => {
-  //   getUserProfile();
-  // }, []);
-
-  // const getUserProfile = async () => {
-  //   const userResponse: User = await getCurrentUser();
-  //   console.log({ userResponse });
-  // };
-
   useEffect(() => {
     setup();
-
     if (briefId) {
       getApplications(briefId);
     }
@@ -208,6 +190,12 @@ const Dashboard = ({ user, isAuthenticated }: DashboardProps): JSX.Element => {
           browsingUser={user}
         />
       )}
+
+      <Login
+        visible={loginModal}
+        setVisible={setLoginModal}
+        redirectUrl="/dashboard"
+      />
     </div>
   ) : (
     <p>GETSTREAM_API_KEY not found</p>
@@ -294,8 +282,6 @@ export const MyFreelancerApplications = ({
 
 Dashboard.getInitialProps = async () => {
   const userResponse = await getCurrentUser();
-
-  console.log({ userResponse });
 
   if (!userResponse) {
     return {
