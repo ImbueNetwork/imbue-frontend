@@ -430,7 +430,7 @@ const ApplicationPreview = (): JSX.Element => {
               Milestones
               {!isEditingBio && isApplicationOwner && (
                 <div
-                  className="ml-[10px]"
+                  className="ml-[10px] relative top-[-2px]"
                   onClick={() => setIsEditingBio(true)}
                 >
                   <FiEdit />
@@ -542,7 +542,7 @@ const ApplicationPreview = (): JSX.Element => {
         </div>
       </div>
 
-      <div className="container w-full bg-[#2c2c2c] border border-solid border-white rounded-[20px] py-[20px]">
+      <div className=" w-full bg-[#2c2c2c] border border-solid border-white rounded-[20px] py-[20px]">
         <p className="mx-14 mb-4 text-xl font-bold">Costs</p>
         <hr className="separator" />
 
@@ -588,8 +588,9 @@ const ApplicationPreview = (): JSX.Element => {
             <h3 className="text-xl font-bold m-0 p-0">
               How long will this project take?
             </h3>
+
             <select
-              className="bg-[#1a1a19] border border-solid border-[#fff] rounded-[5px] text-base px-[20px] py-[10px] mt-4"
+              className="bg-[#1a1a19] border border-solid border-[#fff] rounded-[5px] text-base px-[20px] py-[10px] mt-4 round"
               name="duration"
               placeholder="Select a duration"
               required
@@ -602,12 +603,12 @@ const ApplicationPreview = (): JSX.Element => {
             </select>
           </div>
           <div className="payment-options">
-            <h3 className="text-xl font-bold m-0 p-0">Currency</h3>
+            <h3 className="text-xl font-bold m-0 p-0 self-end">Currency</h3>
             <div className="network-amount">
               <select
                 name="currencyId"
                 onChange={handleChange}
-                className="bg-[#1a1a19] border border-solid border-[#fff] rounded-[5px] text-base px-[20px] py-[10px] mt-4"
+                className="bg-[#1a1a19] round border border-solid border-[#fff] rounded-[5px] text-base px-[20px] py-[10px] mt-4"
                 placeholder="Select a currency"
                 disabled={!isEditingBio}
                 defaultValue={Number(application?.currency_id)}
