@@ -287,7 +287,7 @@ export const SubmitProposal = (): JSX.Element => {
             </h3>
             <select
               name="duration"
-              className="bg-[#1a1a19] border border-solid border-[#fff] rounded-[5px] text-base px-[20px] py-[10px] mt-4"
+              className="bg-[#1a1a19] round border border-solid border-[#fff] rounded-[5px] text-base px-[20px] py-[10px] mt-4"
               placeholder="Select a duration"
               required
             >
@@ -306,7 +306,7 @@ export const SubmitProposal = (): JSX.Element => {
                 name="currencyId"
                 onChange={handleChange}
                 placeholder="Select a currency"
-                className="bg-[#1a1a19] border border-solid border-[#fff] rounded-[5px] text-base px-[20px] py-[10px] mt-4"
+                className="bg-[#1a1a19] round border border-solid border-[#fff] rounded-[5px] text-base px-[20px] py-[10px] mt-4"
                 required
               >
                 {currencies.map((currency: any) => (

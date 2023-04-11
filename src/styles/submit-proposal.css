@@ -14,14 +14,6 @@
   padding: 0;
 }
 
-.application-container h3 {
-  font-size: 20px;
-  line-height: 1.5;
-  font-weight: 700;
-  margin: 0;
-  padding: 0;
-}
-
 .brief-container {
   background: var(--theme-grey-dark);
   border: 1px solid var(--theme-white);

@@ -155,7 +155,7 @@ export const suggestedSkills = [
 
 export const dumyBriefs = [
   {
-    id: "1",
+    id: 1,
     headline: "Amazing Frontend Developer NEEDED!!",
     description:
       "We need some absolute wizard to create an ultra dynamic thing with carosels",
@@ -163,24 +163,42 @@ export const dumyBriefs = [
     scope_id: 2,
     duration: "3-6 months",
     duration_id: 2,
-    budget: 1000,
+    budget: "1000",
     created_by: "Dude Mckenzie",
     experience_level: "Intermediate",
     experience_id: 2,
-    created: new Date("2023-03-30T07:10:04.510Z"),
+    created: "2023-04-08T15:32:25.561Z",
     user_id: 1,
     project_id: null,
     number_of_briefs_submitted: 20,
     skills: [
-      { id: 1, name: "substrate" },
-      { id: 2, name: "rust" },
-      { id: 6, name: "c++" },
-      { id: 7, name: "polkadot" },
+      {
+        id: 1,
+        name: "substrate",
+      },
+      {
+        id: 2,
+        name: "rust",
+      },
+      {
+        id: 6,
+        name: "c++",
+      },
+      {
+        id: 7,
+        name: "polkadot",
+      },
     ],
     skill_ids: ["1", "2", "6", "7"],
     industries: [
-      { id: 1, name: "substrate" },
-      { id: 2, name: "rust" },
+      {
+        id: 1,
+        name: "substrate",
+      },
+      {
+        id: 2,
+        name: "rust",
+      },
     ],
     industry_ids: ["1", "2"],
   },
@@ -332,3 +350,96 @@ export const dummyDashboardBriefApplications = [
     ],
   },
 ];
+
+export const dummyApplicationProject = {
+  id: 1,
+  name: "Amazing Frontend Developer NEEDED!!",
+  logo: null,
+  description: null,
+  website: null,
+  category: null,
+  currency_id: 0,
+  chain_project_id: null,
+  total_cost_without_fee: "1000.00",
+  imbue_fee: "50.00",
+  status_id: 1,
+  required_funds: "1050.00",
+  owner: null,
+  user_id: 5,
+  create_block_number: null,
+  created: "2023-04-09T19:02:35.998Z",
+  modified: "2023-04-09T19:05:24.991Z",
+  brief_id: 1,
+  milestones: [
+    {
+      milestone_index: 0,
+      project_id: 1,
+      amount: "1000.00",
+      name: "first one",
+      percentage_to_unlock: 100,
+      is_approved: false,
+      created: "2023-04-09T19:05:24.991Z",
+      modified: "2023-04-09T19:05:24.991Z",
+    },
+  ],
+};
+
+export const dummyFreelanderProfile = {
+  id: 1,
+  freelanced_before:
+    "I've freelanced before however, i may need some extra help.",
+  freelancing_goal: "To make a little extra money on the side",
+  work_type: "",
+  education: "",
+  experience: "I've freelanced before however, i may need some extra help.",
+  facebook_link: "",
+  twitter_link: "",
+  telegram_link: "",
+  discord_link: "",
+  title: "Senior Frontend Developer",
+  bio: "The best life ever",
+  user_id: 5,
+  username: "mike",
+  display_name: "mike",
+  web3_address: "5GRHPcY3zEgJezesmYHQyuo7YouwXVjnDR8ZcX9CQuFJadaL",
+  created: "2023-04-08T15:38:29.157Z",
+  skills: [
+    {
+      id: 5,
+      name: "javascript",
+    },
+  ],
+  skill_ids: ["5"],
+  languages: [
+    {
+      id: 8,
+      name: "english",
+    },
+  ],
+  language_ids: ["8"],
+  services: [
+    {
+      id: 1,
+      name: "web development",
+    },
+    {
+      id: 2,
+      name: "web design",
+    },
+    {
+      id: 3,
+      name: "mobile (android/ios)",
+    },
+    {
+      id: 5,
+      name: "smart contracts",
+    },
+  ],
+  service_ids: ["1", "2", "3", "5"],
+  clients: [null],
+  client_ids: [null],
+  client_images: [],
+  client_image_ids: [null],
+  rating: null,
+  num_ratings: "0",
+};

@@ -3,16 +3,7 @@ import {
   dummyDashboardBriefApplications,
   dumyBriefs,
 } from "@/config/briefs-data";
-import { Brief, BriefSqlFilter } from "@/model";
-
-const getAPIHeaders = {
-  accept: "application/json",
-};
-
-const postAPIHeaders = {
-  ...getAPIHeaders,
-  "content-type": "application/json",
-};
+import { Brief, BriefSqlFilter, ProjectStatus } from "@/model";
 
 export const callSearchBriefs = async (filter: BriefSqlFilter) => {
   // return [] as Array<Brief>;
@@ -86,6 +77,30 @@ export const getBriefApplications = async (brifId: string | number) => {
   // } else {
   //   throw new Error(
   //     "Failed to get all brief applications. status:" + resp.status
+  //   );
+  // }
+};
+
+export const changeBriefApplicationStatus = async (
+  briefId: string | number,
+  projectId: number,
+  status_id: ProjectStatus
+) => {
+  return {};
+  // const resp = await fetch(`${config.apiBase}/briefs/${briefId}/status`, {
+  //   headers: postAPIHeaders,
+  //   method: "put",
+  //   body: JSON.stringify({
+  //     project_id: projectId,
+  //     status_id,
+  //   }),
+  // });
+
+  // if (resp.ok) {
+  //   return await resp.json();
+  // } else {
+  //   throw new Error(
+  //     `Failed to hire for briefId ${briefId} . status: ${resp.status}`
   //   );
   // }
 };
