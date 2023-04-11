@@ -422,7 +422,7 @@ export const fetchMilestoneByIndex = (projectId: string | number, milestoneId: s
     (tx: Knex.Transaction) =>
         tx<MilestoneDetails>("milestone_details").select().where({ project_id: projectId }).where('index', '=', milestoneId);
 
-export const fetchBriefApplications = (id: string) =>
+export const fetchBriefApplications = (id: string|string[]) =>
     (tx: Knex.Transaction) =>
         fetchAllProjects()(tx)
             .where({ "brief_id": id })
@@ -440,7 +440,7 @@ export const fetchAcceptedBriefs = (user_id: string) =>
             .where({ user_id })
             .select()
 
-export const fetchBrief = (id: string) =>
+export const fetchBrief = (id: string|string[]) =>
     (tx: Knex.Transaction) =>
         fetchAllBriefs()(tx)
             .where({ "briefs.id": id })
@@ -504,7 +504,7 @@ export const fetchItems = (ids: number[], tableName: string) =>
 //         tx<Skill>("skills").select("id","name").whereIn('id', ids );
 
 // Insert a brief and their respective skill and industry_ids.
-export const insertBrief = (brief: Brief, skill_ids: number[], industry_ids: number[], scope_id: number, duration_id: number) =>
+export const insertBrief = (brief: any, skill_ids: number[], industry_ids: number[], scope_id: number, duration_id: number) =>
     async (tx: Knex.Transaction) => (
         await tx("briefs").insert({
             headline: brief.headline,
@@ -560,7 +560,7 @@ export const insertFederatedCredential = (
     }).returning("*")
 )[0];
 
-export const upsertItems = (items: string[], tableName: string) => async (tx: Knex.Transaction) => {
+export const upsertItems = (items: any, tableName: string) => async (tx: Knex.Transaction) => {
     var item_ids: number[] = [];
     try {
         //TODO Convert to map
@@ -821,7 +821,8 @@ export const updateFreelancerDetails = (userId: number, f: Freelancer) =>
 export const searchBriefs =
     async (tx: Knex.Transaction, filter: BriefSqlFilter) =>
         // select everything that is associated with brief.
-        fetchAllBriefs()(tx).where(function () {
+        fetchAllBriefs()(tx)
+        .where(function () {
             if (filter.submitted_range.length > 0) {
                 this.whereBetween("users.briefs_submitted", [filter.submitted_range[0].toString(), Math.max(...filter.submitted_range).toString()]);
             }

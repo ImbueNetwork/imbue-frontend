@@ -3,9 +3,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import config from '../config'
 
 type ApiInfo = {
-    imbueNetworkWebsockAddr: string,
-    relayChainWebsockAddr: string,
-    getstreamApiKey: string,
+    imbueNetworkWebsockAddr: string | undefined,
+    relayChainWebsockAddr: string | undefined,
+    getstreamApiKey: string | undefined,
 }
 
 export default function handler(
