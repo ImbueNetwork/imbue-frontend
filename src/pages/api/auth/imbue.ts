@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { jwtOptions } from "./common";
 import config from "../config";
+import { setTokenCookie } from "../auth-cookies";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const { userOrEmail, password } = req.body;
@@ -30,16 +31,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
         const payload = { id: user.id };
         const token = jwt.sign(payload, jwtOptions.secretOrKey);
-        res.setHeader(
-          "Set-Cookie",
-          `access_token=${token}; Secure=${
-            config.environment !== "development"
-          }; HttpOnly`
-        );
-        //   res.cookie("access_token", token, {
-        //     secure: config.environment !== "development",
-        //     httpOnly: true,
-        //   });
+        setTokenCookie(res, token);
 
         res.send({ id: user.id, display_name: user.display_name });
       } catch (e) {
