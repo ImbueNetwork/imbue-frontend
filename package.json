@@ -29,7 +29,7 @@
     "material-components-web": "^14.0.0",
     "next": "13.2.4",
     "next-connect": "^0.13.0",
-    "passport": "^0.5.2",
+    "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "pg": "^8.7.1",
     "react": "18.2.0",
@@ -44,6 +44,7 @@
     "uuidv4": "^6.2.12"
   },
   "devDependencies": {
+    "@types/passport": "^1.0.12",
     "@types/styled-components": "^5.1.26",
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.21",

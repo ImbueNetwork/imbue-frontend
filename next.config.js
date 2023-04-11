@@ -10,8 +10,8 @@ const nextConfig = {
     // DB_NAME: "imbue",
     // DB_USER: "imbue",
     // DB_PASSWORD: "imbue",
-    GETSTREAM_API_KEY: process.env.GETSTREAM_API_KEY,
-    GETSTREAM_SECRET_KEY:process.env.GETSTREAM_SECRET_KEY,
+    GETSTREAM_API_KEY: process.env.GETSTREAM_API_KEY || "cvmy2kcxetnm",
+    GETSTREAM_SECRET_KEY:process.env.GETSTREAM_SECRET_KEY || "ffs9wnxe5c8yp26hhkrz69erfun94k22z7vsz98pzsutqxf9rfg3gz6qd57q29sq",
   },
   images: {
     remotePatterns: [

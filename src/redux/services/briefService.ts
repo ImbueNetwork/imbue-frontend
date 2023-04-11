@@ -5,6 +5,15 @@ import {
 } from "@/config/briefs-data";
 import { Brief, BriefSqlFilter, ProjectStatus } from "@/model";
 
+const getAPIHeaders = {
+  accept: "application/json",
+};
+
+const postAPIHeaders = {
+  ...getAPIHeaders,
+  "content-type": "application/json",
+};
+
 export const callSearchBriefs = async (filter: BriefSqlFilter) => {
   // return [] as Array<Brief>;
   //:TODO implement api for callSearchBriefs

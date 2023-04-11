@@ -1,8 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import db from "../../db";
 import * as models from "../../models";
-import { fetchItems } from '../../models';
-import { Brief, BriefSqlFilter } from "@/model";
+import { Brief, BriefSqlFilter, fetchItems } from '../../models';
 
 export default async function handler(
   req: NextApiRequest,
@@ -79,10 +78,9 @@ export async function fetchBriefApplications(briefId: string | string[]) {
 
 }
 
-
 export async function searchBriefs(req: NextApiRequest) {
   let response
-  const data: BriefSqlFilter = req.body;
+  const data = req.body as BriefSqlFilter;
   await db.transaction(async (tx: any) => {
     try {
 

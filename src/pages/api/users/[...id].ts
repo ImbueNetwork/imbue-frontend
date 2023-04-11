@@ -9,8 +9,8 @@ export default async function userHandler(
   res: NextApiResponse
 ) {
   const { query, method } = req
-  
-  const id = query.id
+
+  const id: string[] = query.id as string[]
   const name = query.name as string
 
   switch (method) {
@@ -151,20 +151,20 @@ export async function fetchAllUserBriefs(userId: string) {
 
 }
 
-export async function fetchUserById(userId: number) {
+export async function fetchUserById(userId: string) {
   let response
   await db.transaction(async tx => {
     try {
-      const user: User = await models.fetchUser(userId)(tx) as User;
-      if(user) {
-        response = {id: user.id, display_name: user.display_name, username: user.username};
+      const user: User = await models.fetchUser(Number(userId))(tx) as User;
+      if (user) {
+        response = { id: user.id, display_name: user.display_name, username: user.username };
       }
-  } catch (e) {
-      next(new Error(
-          `Failed to fetch user ${id}`,
-          { cause: e as Error }
-      ));
-  }
+    } catch (e) {
+      new Error(
+        `Failed to fetch user ${userId}`,
+        { cause: e as Error }
+      );
+    }
   });
   return response
 
@@ -175,15 +175,15 @@ export async function fetchUserByUsernameOrEmail(userOrEmail: string) {
   await db.transaction(async tx => {
     try {
       const user: User = await models.fetchUserOrEmail(userOrEmail)(tx) as User;
-      if(user) {
-        response = {id: user.id, display_name: user.display_name, username: user.username};
+      if (user) {
+        response = { id: user.id, display_name: user.display_name, username: user.username };
       }
-  } catch (e) {
-      next(new Error(
-          `Failed to fetch user ${id}`,
-          { cause: e as Error }
-      ));
-  }
+    } catch (e) {
+      new Error(
+        `Failed to fetch user ${userOrEmail}`,
+        { cause: e as Error }
+      );
+    }
   });
   return response
 

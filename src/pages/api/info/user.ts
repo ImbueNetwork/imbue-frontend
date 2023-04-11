@@ -33,9 +33,9 @@ export const imbueStrategy = new JwtStrategy(jwtOptions, async function (jwt_pay
     }
 });
 
-const authenticate = (method: string, req, res) =>
+const authenticate = (method: string, req: NextApiRequest, res: NextApiResponse) =>
     new Promise((resolve, reject) => {
-        passport.authenticate(method, { session: false }, (error, token) => {
+        passport.authenticate(method, { session: false }, (error: Error, token: any) => {
             if (error) {
                 reject(error)
             } else {
@@ -50,9 +50,9 @@ export default nextConnect()
     .use(passport.initialize())
     .get(async (req: NextApiRequest, res: NextApiResponse) => {
         try {
-            const user = await authenticate('jwt', req, res)
+            const user = await authenticate('jwt', req, res);
             res.status(200).send(user)
-        } catch (error) {
+        } catch (error: any) {
             console.error(error)
             res.status(401).send(error.message)
         }

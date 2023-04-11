@@ -38,9 +38,11 @@ export default nextConnect()
                             )(tx);
                             const payload = { id: user.id };
                             const token = jwt.sign(payload, jwtOptions.secretOrKey);
+
                             res.setHeader('Set-Cookie', serialize('access_token', token, {
                                 secure: config.environment !== "development",
-                                httpOnly: true 
+                                path: '/',
+                                httpOnly: true
                             }));
 
                             res.send({ id: user.id, display_name: user.display_name });

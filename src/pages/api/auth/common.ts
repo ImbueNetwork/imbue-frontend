@@ -4,6 +4,7 @@ import { serialize, parse } from 'cookie'
 import * as passportJwt from "passport-jwt"
 // @ts-ignore
 import jwt from 'jsonwebtoken';
+import { NextApiResponse } from 'next';
 
 export const ensureParams = (
    record: Record<string, any>,
@@ -68,11 +69,10 @@ export const jwtOptions = {
     secretOrKey: process.env.JWTSecret ?? 'mysecretword'
 };
 
-export function removeTokenCookie(res) {
+export function removeTokenCookie(res: NextApiResponse) {
     const cookie = serialize("access_token", '', {
       maxAge: -1,
       path: '/',
     })
-  
     res.setHeader('Set-Cookie', cookie)
   }
