@@ -1,11 +1,10 @@
-import next, { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 
 import db from "../../../db";
 import * as models from "../../../models";
 import { fetchWeb3AccountByAddress } from "../../../models";
 import { jwtOptions } from "../../common";
 import { signatureVerify } from "@polkadot/util-crypto";
-import { v4 as uuid } from "uuid";
 
 type Solution = {
   signature: string;
