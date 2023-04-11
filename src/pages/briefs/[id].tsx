@@ -69,7 +69,7 @@ const BriefDetails = (): JSX.Element => {
 
   const redirectToApply = () => {
     //TODO: redirect to apply for brief
-    // redirect(`/briefs/${brief.id}/apply`);
+    router.push(`/briefs/${brief.id}/apply`);
   };
 
   const handleMessageBoxClick = async () => {

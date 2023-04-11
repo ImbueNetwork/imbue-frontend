@@ -89,3 +89,14 @@ export const getBriefApplications = async (brifId: string | number) => {
   //   );
   // }
 };
+
+export const getUserBrief = async (userId: number, briefId: number) => {
+  return null;
+  // const resp = await fetch(
+  //   `${config.apiBase}/users/${userId}/briefs/${briefId}`
+  // );
+  // if (resp.ok) {
+  //   return resp.json();
+  // }
+  // return null;
+};
