@@ -2,12 +2,14 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import next from 'next';
 import db from "../db";
 import * as models from "../models";
+import { User } from '@/model';
 
 export default async function userHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   const { query, method } = req
+  
   const id = query.id
   const name = query.name as string
 
@@ -149,7 +151,7 @@ export async function fetchAllUserBriefs(userId: string) {
 
 }
 
-export async function fetchUserById(userId: string) {
+export async function fetchUserById(userId: number) {
   let response
   await db.transaction(async tx => {
     try {

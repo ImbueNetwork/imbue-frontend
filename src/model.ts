@@ -204,7 +204,7 @@ export type BriefSqlFilter = {
   submitted_is_max: boolean;
   length_range: Array<number>;
   length_is_max: boolean;
-  search_input: string;
+  search_input: string | string[];
 };
 
 export type FreelancerSqlFilter = {

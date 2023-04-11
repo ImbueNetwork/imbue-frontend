@@ -43,7 +43,6 @@
 .brief-info {
   display: flex;
   flex-direction: row;
-  min-height: 650px;
   border-radius: 20px;
 }
 
