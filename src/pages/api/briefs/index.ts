@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import db from "../db";
-import { fetchAllBriefs, fetchItems, incrementUserBriefSubmissions,upsertItems,insertBrief } from '../models';
-import {  BriefSqlFilter } from '@/model';
+import { fetchAllBriefs, fetchItems, incrementUserBriefSubmissions, upsertItems, insertBrief } from '../models';
+import { BriefSqlFilter } from '@/model';
 import * as models from "../models";
 import { Brief } from '@/model';
 
@@ -33,9 +33,14 @@ export default async function handler(
       }
     });
   }
-  else if(req.method === "POST"){
+  else if (req.method === "POST") {
     const response = await createBrief(req)
-    console.log(response);
+    res.status(200).json(
+      {
+        status: "Successful",
+        brief_id: response
+      }
+    )
   }
 
 }
@@ -84,7 +89,7 @@ export async function createBrief(req: NextApiRequest) {
       }
       await incrementUserBriefSubmissions(brief.user_id)(tx);
 
-      response = brief.id
+      response = brief_id
 
     } catch (e) {
       new Error(
@@ -94,6 +99,5 @@ export async function createBrief(req: NextApiRequest) {
       console.log(e);
     }
   });
-
   return response
 }

@@ -44,6 +44,7 @@ const BriefDetails = (): JSX.Element => {
   const isOwnerOfBrief = browsingUser && browsingUser.id == brief.user_id;
   const [showSimilarBrief, setShowSimilarBrief] = useState<boolean>(false);
   const [showClientHistory, setShowClientHistory] = useState<boolean>(false);
+  const [error, setError] = useState<any>()
 
   // TODO: need to get project category array from the brief
   const projectCategories = ["Product Development", "Health", "Wellness"];
@@ -57,8 +58,13 @@ const BriefDetails = (): JSX.Element => {
 
   const fetchData = async () => {
     if (id) {
-      const briefData: Brief = await getBrief(id);
-      setBrief(briefData);
+      const briefData: Brief | Error | undefined = await getBrief(id);
+      if(briefData?.id){
+        setBrief(briefData)
+      }
+      else{
+        briefData!==undefined && setError(briefData)
+      }
       setup();
     }
   };
@@ -170,6 +176,8 @@ const BriefDetails = (): JSX.Element => {
       )}
     </div>
   );
+
+  if(error) return <h2>{error.message}</h2>
 
   return (
     <div className="brief-details-container">

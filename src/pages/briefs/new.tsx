@@ -235,30 +235,32 @@ const NewBrief = (props: BriefProps): JSX.Element => {
 
   const onReviewPost = async () => {
     //TODO: implement api call
-    const user_id = (await utils.getCurrentUser()).id;
-
-    const resp = await fetch(`${config.apiBase}/briefs/`, {
-      headers: postAPIHeaders,
-      method: "post",
-      body: JSON.stringify({
-        headline,
-        industries,
-        description,
-        scope_id: scopeId,
-        experience_id: expId,
-        duration_id: durationId,
-        skills,
-        budget,
-        user_id,
-      }),
-    });
-
-    if (resp.ok) {
-      // could be 200 or 201
-      // Brief API successfully invoked
-      console.log("Brief created successfully via Brief REST API");
-    } else {
-      console.log("Failed to submit the brief");
+    try {
+      const user_id = (await utils.getCurrentUser())?.id;
+      const resp = await fetch(`${config.apiBase}/briefs/`, {
+        headers: postAPIHeaders,
+        method: "post",
+        body: JSON.stringify({
+          headline,
+          industries,
+          description,
+          scope_id: scopeId,
+          experience_id: expId,
+          duration_id: durationId,
+          skills,
+          budget,
+          user_id,
+        }),
+      });
+      if (resp.ok) {
+        // could be 200 or 201
+        // Brief API successfully invoked
+        console.log("Brief created successfully via Brief REST API");
+      } else {
+        console.log("Failed to submit the brief");
+      }
+    } catch (error) {
+      console.log(error);
     }
     setStep(step + 1);
   };
