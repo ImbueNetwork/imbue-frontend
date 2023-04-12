@@ -281,16 +281,20 @@ export const MyFreelancerApplications = ({
 };
 
 Dashboard.getInitialProps = async () => {
-  const userResponse = await getCurrentUser();
+  const storedObject = localStorage.getItem("userAuth");
 
-  if (!userResponse) {
+  if (storedObject) {
+    const parsedData = JSON.parse(storedObject);
+    const isAuthenticated = parsedData?.isAuthenticated;
+    const user = parsedData?.user;
+
     return {
-      isAuthenticated: false,
-      user: undefined,
+      isAuthenticated,
+      user,
     };
+  } else {
+    return { isAuthenticated: false, user: undefined };
   }
-
-  return { isAuthenticated: true, user: userResponse };
 };
 
 export default Dashboard;
