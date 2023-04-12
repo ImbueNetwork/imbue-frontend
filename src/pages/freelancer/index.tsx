@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import {
   stepData,
@@ -17,12 +18,12 @@ import {
 } from "@/redux/services/freelancerService";
 import { useRouter } from "next/router";
 import { FreelancerProps } from "@/types/freelancerTypes";
+import FullScreenLoader from "@/components/FullScreenLoader";
 
-const Freelancer = (): JSX.Element => {
-  const user = getDefaultFreelancer();
+const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
   const router = useRouter();
   const [step, setStep] = useState(0);
-  const displayName = user.display_name;
+  const displayName = user?.display_name;
   const [freelancingBefore, setFreelancingBefore] = useState("");
   const [goal, setGoal] = useState("");
   const [resume, setResume] = useState("");
@@ -33,15 +34,14 @@ const Freelancer = (): JSX.Element => {
   const [services, setServices] = useState<string[]>([]);
 
   useEffect(() => {
-    // findFreelancer();
+    findFreelancer();
   }, []);
 
   const findFreelancer = async () => {
-    const user: User = await utils.getCurrentUser();
     if (user) {
-      const userHasFreelancerProfile = await freelancerExists(user.username);
+      const userHasFreelancerProfile = await freelancerExists(user?.username);
       if (userHasFreelancerProfile) {
-        router.push(`freelancer/${user.username}/`);
+        router.push(`/freelancer/${user?.username}/`);
       }
     }
   };
@@ -308,9 +308,9 @@ const Freelancer = (): JSX.Element => {
       title,
       languages,
       services,
-      user_id: user.id,
-      username: user.display_name,
-      display_name: user.display_name,
+      user_id: user?.id,
+      username: user?.display_name,
+      display_name: user?.display_name,
       discord_link: "",
       facebook_link: "",
       telegram_link: "",
@@ -318,7 +318,7 @@ const Freelancer = (): JSX.Element => {
       clients: [],
       client_images: [],
       num_ratings: 0,
-      profileImageUrl: "/public/profile-image.png",
+      profileImageUrl: require("@/assets/images/profile-image.png"),
     });
   }
 
@@ -333,7 +333,10 @@ const Freelancer = (): JSX.Element => {
         </div>
         <div className={step === 0 ? "button-left" : "button-right"}>
           {step >= 1 && (
-            <button className="secondary-btn" onClick={() => setStep(step - 1)}>
+            <button
+              className="secondary-btn !mt-0"
+              onClick={() => setStep(step - 1)}
+            >
               Back
             </button>
           )}
@@ -364,7 +367,7 @@ const Freelancer = (): JSX.Element => {
             </button>
           ) : (
             <button
-              className="primary-btn in-dark w-button"
+              className="primary-btn in-dark w-button !mt-0"
               data-testid="next-button"
               disabled={!validate()}
               onClick={() => setStep(step + 1)}
@@ -376,6 +379,18 @@ const Freelancer = (): JSX.Element => {
       </div>
     </div>
   );
+};
+
+Freelancer.getInitialProps = async () => {
+  const userResponse = await utils.getCurrentUser();
+
+  if (!userResponse) {
+    return {
+      user: undefined,
+    };
+  }
+
+  return { user: userResponse };
 };
 
 export default Freelancer;
