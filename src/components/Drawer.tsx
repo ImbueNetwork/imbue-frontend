@@ -40,7 +40,7 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
     {
       icon: "logout",
       text: "Log out",
-      link: "",
+      link: "/logout",
     },
   ];
 
