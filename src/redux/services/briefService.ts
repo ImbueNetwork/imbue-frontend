@@ -36,8 +36,8 @@ export const getAllBriefs = async () => {
   const resp = await fetch(
     checkEnvironment().concat(`${config.apiBase}/briefs/`),
     {
-      headers: postAPIHeaders,
-      method: "get",
+    headers: postAPIHeaders,
+    method: "get",
     }
   );
 
@@ -50,16 +50,21 @@ export const getAllBriefs = async () => {
 
 export const getBrief = async (briefId: number | string) => {
   // return dumyBriefs[0] as Brief;
-  const resp = await fetch(`${config.apiBase}/briefs/${briefId}`, {
-    headers: postAPIHeaders,
-    method: "get",
-  });
-
-  if (resp.ok) {
-    return (await resp.json()) as Brief;
-  } else {
-    throw new Error("Failed to get all briefs. status:" + resp.status);
+  try {
+    const resp = await fetch(`${config.apiBase}/briefs/${briefId}`, {
+      headers: postAPIHeaders,
+      method: "get",
+    });
+  
+    if (resp.ok) {
+      return (await resp.json()) as Brief;
+    } else {
+      throw new Error("Failed to get all briefs. status:" + resp.status);
+    }
+  } catch (error) {
+    console.log(error);
   }
+  
 };
 
 export const getUserBriefs = async (user_id: string | number) => {

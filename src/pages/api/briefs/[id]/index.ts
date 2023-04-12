@@ -9,17 +9,42 @@ export default async function handler(
 ) {
   const { id: briefId } = req.query;
 
-  let response;
-
   if (briefId === "search") {
     const result = await searchBriefs(req);
 
     return res.status(200).json(result);
   }
+  else {
+    if (!briefId) return;
 
-  if (!briefId) return;
+    const response = await getBrief(briefId)
+    return res.status(200).json(response)
+  }
 
-  res.status(200).json(response);
+
+}
+
+export async function getBrief(id: string | string[]) {
+  if (!id) return
+
+  let response;
+  await db.transaction(async tx => {
+    try {
+      const brief = await models.fetchBrief(id)(tx);
+      await Promise.all([
+        brief.skills = await fetchItems(brief.skill_ids, "skills")(tx),
+        brief.industries = await fetchItems(brief.industry_ids, "skills")(tx),
+      ]);
+
+      response = brief
+    } catch (e) {
+      response = (new Error(
+        `Failed to fetch brief with id ${id}`,
+        { cause: e as Error }
+      ));
+    }
+  });
+  return response
 }
 
 export async function searchBriefs(req: NextApiRequest) {
