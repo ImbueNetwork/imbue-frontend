@@ -46,12 +46,13 @@ export const validProjectId = (candidate: any) => {
 };
 
 export const getCurrentUser = async () => {
-  return config.dummyUser;
-  // const resp = await fetch(`${config.apiBase}/user`);
-  // if (resp.ok) {
-  //   return resp.json();
-  // }
-  // return null;
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}info/user`)
+  );
+  if (resp.ok) {
+    return resp.json();
+  }
+  return null;
 };
 
 export const getProjectId = async () => {
@@ -86,14 +87,13 @@ export const fetchUserOrEmail = async (userOrEmail: string) => {
 };
 
 export const fetchUser = async (id: number) => {
-  return config.dummyUser;
-  // const resp = await fetch(`${config.apiBase}/users/byid/${id}`, {
-  //   headers: config.getAPIHeaders,
-  // });
-  // if (resp.ok) {
-  //   const user = await resp.json();
-  //   return user;
-  // }
+  const resp = await fetch(`${config.apiBase}/users/byid/${id}`, {
+    headers: config.getAPIHeaders,
+  });
+  if (resp.ok) {
+    const user = await resp.json();
+    return user;
+  }
 };
 
 export const badRouteEvent = (type: BadRoute) =>
@@ -114,9 +114,9 @@ export function validateForm(form: HTMLFormElement): boolean {
 }
 
 export const getStreamChat = async () => {
-  if (process.env.REACT_APP_GETSTREAM_API_KEY) {
-    return new StreamChat(process.env.REACT_APP_GETSTREAM_API_KEY);
-  }
+  const { imbueNetworkWebsockAddr, relayChainWebsockAddr, getstreamApiKey } =
+    await fetch(`${config.apiBase}/info`).then((resp) => resp.json());
+  return new StreamChat(getstreamApiKey);
 };
 
 function reportValidity(input: HTMLInputElement, submitting: boolean = false) {
@@ -125,3 +125,12 @@ function reportValidity(input: HTMLInputElement, submitting: boolean = false) {
   }
   input.reportValidity();
 }
+
+export const checkEnvironment = () => {
+  let base_url = "http://localhost:3000";
+  if (process.env.NODE_ENV === "production") {
+    base_url = "";
+  }
+
+  return base_url;
+};

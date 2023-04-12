@@ -25,9 +25,7 @@ export const SubmitProposal = (): JSX.Element => {
   const [brief, setBrief] = useState<Brief | any>();
   const [user, setUser] = useState<User>();
   const userHasWeb3Addresss = !!user?.web3_address;
-  const [showPolkadotAccounts, setShowPolkadotAccounts] = useState<boolean>(
-    !userHasWeb3Addresss
-  );
+  const [showPolkadotAccounts, setShowPolkadotAccounts] = useState<boolean>(true);
 
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
@@ -44,10 +42,10 @@ export const SubmitProposal = (): JSX.Element => {
     if (!freelancer) {
       router.push(`/freelancer`);
     }
-    getCurrenUserBrief();
+    getCurrentUserBrief();
   };
 
-  const getCurrenUserBrief = async () => {
+  const getCurrentUserBrief = async () => {
     if (briefId && user) {
       const userApplication: any = await getUserBrief(user?.id, briefId);
       if (userApplication) {
@@ -91,6 +89,15 @@ export const SubmitProposal = (): JSX.Element => {
     await selectAccount(account);
     setShowPolkadotAccounts(false);
   };
+
+
+  async function handleSubmit() { 
+    if (!userHasWeb3Addresss) {
+      setShowPolkadotAccounts(true);
+    } else {
+      await insertProject();
+    }
+  }
 
   async function insertProject() {
     //TODO: validate all milestone sum up to 100%
@@ -326,7 +333,7 @@ export const SubmitProposal = (): JSX.Element => {
       <div className="buttons-container">
         <button
           className="primary-btn in-dark w-button"
-          onClick={() => insertProject()}
+          onClick={() => handleSubmit()}
         >
           Submit
         </button>
