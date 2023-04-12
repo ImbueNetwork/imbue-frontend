@@ -81,28 +81,25 @@ const Profile = (): JSX.Element => {
 
   const getCurrentFreelancer = async () => {
     if (slug) {
-      const profileResponse = await getFreelancerProfile(slug);
+      const profileResponse: any = await getFreelancerProfile(slug);
       setFreelancer(profileResponse);
+      setup(profileResponse);
     } else {
-      //   router.back();
+      router.back();
     }
   };
 
-  const setup = async () => {
+  const setup = async (freelancerObject: Freelancer) => {
     if (freelancer) {
       const browsingUserResponse = await getCurrentUser();
       setBrowsingUser(browsingUserResponse);
-      setTargetUser(await fetchUser(freelancer?.user_id));
+      setTargetUser(await fetchUser(freelancerObject?.user_id));
     }
   };
 
   useEffect(() => {
     getCurrentFreelancer();
   }, [slug]);
-
-  useEffect(() => {
-    setup();
-  }, [freelancer]);
 
   //The fields must be pre populated correctly.
   const onSave = async () => {
@@ -115,9 +112,6 @@ const Profile = (): JSX.Element => {
   const handleMessageBoxClick = () => {
     if (browsingUser) {
       setShowMessageBox(true);
-    } else {
-      //TODO: check if authenticated
-      //   redirect("login", `/freelancer/${freelancer?.username}/`);
     }
   };
 
@@ -235,11 +229,13 @@ const Profile = (): JSX.Element => {
             </>
           ) : (
             <div className="bio">
-              {freelancer?.bio?.split?.("\n")?.map?.((line: any, index: number) => (
-                <p className="leading-[1.2] text-base" key={index}>
-                  {line}
-                </p>
-              ))}
+              {freelancer?.bio
+                ?.split?.("\n")
+                ?.map?.((line: any, index: number) => (
+                  <p className="leading-[1.2] text-base" key={index}>
+                    {line}
+                  </p>
+                ))}
             </div>
           )}
         </div>
