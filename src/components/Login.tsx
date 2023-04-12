@@ -8,7 +8,6 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { postAPIHeaders } from "@/config";
 import { TextField } from "@mui/material";
-import * as utils from "@/utils";
 import * as config from "@/config";
 import Link from "next/link";
 import styled from "@emotion/styled";
@@ -220,8 +219,10 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                   <div>
                     <span>Don&apos;t have an account?</span>
                     <Link
-                      href="#"
-                      onClick={() => router.push("/join")}
+                      href="/join"
+                      onClick={() => {
+                        setVisible(false);
+                      }}
                       className="signup"
                     >
                       Sign up
