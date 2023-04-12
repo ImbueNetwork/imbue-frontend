@@ -1,6 +1,8 @@
-import { Freelancer, FreelancerSqlFilter } from "@/model";
+import { Freelancer, FreelancerSqlFilter, Project } from "@/model";
 import { dummyDashboardApplications } from "@/config/briefs-data";
 import { freelancerData } from "@/config/freelancer-data";
+import * as config from "@/config";
+import { checkEnvironment } from "@/utils";
 
 export async function createFreelancingProfile(freelancer: any) {
   //TODO: make api call here
@@ -100,21 +102,21 @@ export const callSearchFreelancers = async (filter: FreelancerSqlFilter) => {
 };
 
 export const getFreelancerApplications = async (userId: number) => {
-  return dummyDashboardApplications;
-  // return [] as Array<Project>;
-  // const resp = await fetch(
-  //   `${config.apiBase}/freelancers/${userId}/applications`,
-  //   {
-  //     headers: postAPIHeaders,
-  //     method: "get",
-  //   }
-  // );
+  const resp = await fetch(
+    checkEnvironment().concat(
+      `${config.apiBase}/freelancers/${userId}/applications`
+    ),
+    {
+      headers: config.postAPIHeaders,
+      method: "get",
+    }
+  );
 
-  // if (resp.ok) {
-  //   return (await resp.json()) as Array<Project>;
-  // } else {
-  //   throw new Error(
-  //     "Failed to get all freelancer applications. status:" + resp.status
-  //   );
-  // }
+  if (resp.ok) {
+    return (await resp.json()) as Array<Project>;
+  } else {
+    throw new Error(
+      "Failed to get all freelancer applications. status:" + resp.status
+    );
+  }
 };

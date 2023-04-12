@@ -46,7 +46,9 @@ export const validProjectId = (candidate: any) => {
 };
 
 export const getCurrentUser = async () => {
-  const resp = await fetch(`${config.apiBase}/user`);
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}info/user`)
+  );
   if (resp.ok) {
     return resp.json();
   }
@@ -112,11 +114,10 @@ export function validateForm(form: HTMLFormElement): boolean {
 }
 
 export const getStreamChat = async () => {
-  const {imbueNetworkWebsockAddr, relayChainWebsockAddr, getstreamApiKey} = (await fetch(`${config.apiBase}/info`).then(
-      resp => resp.json()
-  ));
+  const { imbueNetworkWebsockAddr, relayChainWebsockAddr, getstreamApiKey } =
+    await fetch(`${config.apiBase}/info`).then((resp) => resp.json());
   return new StreamChat(getstreamApiKey);
-}
+};
 
 function reportValidity(input: HTMLInputElement, submitting: boolean = false) {
   if (input.validity.valueMissing) {
@@ -124,3 +125,12 @@ function reportValidity(input: HTMLInputElement, submitting: boolean = false) {
   }
   input.reportValidity();
 }
+
+export const checkEnvironment = () => {
+  let base_url = "http://localhost:3000";
+  if (process.env.NODE_ENV === "production") {
+    base_url = "";
+  }
+
+  return base_url;
+};

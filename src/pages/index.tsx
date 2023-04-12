@@ -1,14 +1,22 @@
-import Dashboard from "./dashboard";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/utils";
+import { User } from "stream-chat";
+import { useRouter } from "next/router";
 
 export default function Home() {
-  const user = {
-    id: 6,
-    username: "mike",
-    getstream_token:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoibWlrZSJ9.oSxIRfDYQjN35KF0nx3tINBLh-mlnHKuqIWwxtU_Cnk",
-    display_name: "mike",
-    web3Accounts: [],
+  const router = useRouter();
+
+  useEffect(() => {
+    getLogedInUser();
+  }, []);
+
+  const getLogedInUser = async () => {
+    const userResponse = await getCurrentUser();
+    if (userResponse) {
+      router.push("/dashboard");
+    }
   };
-  
-  return <Dashboard user={user} />;
+
+  return <></>;
 }

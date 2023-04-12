@@ -1,4 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
+import Login from "./Login";
+import { getCurrentUser } from "@/utils";
+import { useRouter } from "next/router";
 
 type DrawerProps = {
   visible: boolean;
@@ -6,6 +9,8 @@ type DrawerProps = {
 };
 
 const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
+  const router = useRouter();
+  const [loginModal, setLoginModal] = useState<boolean>(false);
   const linkItems = [
     {
       icon: "face",
@@ -38,6 +43,16 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
       link: "",
     },
   ];
+
+  const navigateToPage = async (link: string) => {
+    const userResponse = await getCurrentUser();
+    if (userResponse) {
+      router.push(link);
+      toggleVisibility();
+    } else {
+      setLoginModal(true);
+    }
+  };
   return (
     <div className={`drawer ${visible ? "open" : ""}`} id="right-drawer">
       <nav id="nav">
@@ -49,17 +64,29 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
                 className="menu-item"
                 id="menu-item__account-dashboard"
               >
-                <a title={item?.text} href={item.link}>
-                  <i className="material-icons" aria-hidden="true">
+                <p
+                  className="text-white dlex py-[12px] px-[20px]"
+                  title={item?.text}
+                  onClick={() => navigateToPage(item.link)}
+                >
+                  <i
+                    className="material-icons relative top-[4px]"
+                    aria-hidden="true"
+                  >
                     {item?.icon}
                   </i>
                   <span>{item?.text}</span>
-                </a>
+                </p>
               </li>
             );
           })}
         </ul>
       </nav>
+      <Login
+        visible={loginModal}
+        setVisible={setLoginModal}
+        redirectUrl="/dashboard"
+      />
     </div>
   );
 };
