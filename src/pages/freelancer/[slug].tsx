@@ -83,23 +83,26 @@ const Profile = (): JSX.Element => {
     if (slug) {
       const profileResponse: any = await getFreelancerProfile(slug);
       setFreelancer(profileResponse);
-      setup(profileResponse);
     } else {
       router.back();
     }
   };
 
-  const setup = async (freelancerObject: Freelancer) => {
+  const setup = async () => {
     if (freelancer) {
       const browsingUserResponse = await getCurrentUser();
       setBrowsingUser(browsingUserResponse);
-      setTargetUser(await fetchUser(freelancerObject?.user_id));
+      setTargetUser(await fetchUser(freelancer?.user_id));
     }
   };
 
   useEffect(() => {
     getCurrentFreelancer();
   }, [slug]);
+
+  useEffect(() => {
+    setup();
+  }, [freelancer]);
 
   //The fields must be pre populated correctly.
   const onSave = async () => {

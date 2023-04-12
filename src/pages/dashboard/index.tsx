@@ -57,8 +57,6 @@ const Dashboard = ({ user, isAuthenticated }: DashboardProps): JSX.Element => {
   const [briefApplications, setBriefApplications] = useState<Project[]>([]);
   const [myApplications, setMyApplications] = useState<Project[]>([]);
 
-  console.log({ user });
-
   const setup = async () => {
     if (user) {
       const myApplicationsResponse = await getFreelancerApplications(user?.id);
