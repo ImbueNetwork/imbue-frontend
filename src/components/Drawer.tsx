@@ -86,7 +86,10 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
       </div>
       <Login
         visible={loginModal}
-        setVisible={setLoginModal}
+        setVisible={(val) => {
+          setLoginModal(val);
+          toggleVisibility();
+        }}
         redirectUrl="/dashboard"
       />
     </>
