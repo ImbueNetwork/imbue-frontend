@@ -333,7 +333,10 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
         </div>
         <div className={step === 0 ? "button-left" : "button-right"}>
           {step >= 1 && (
-            <button className="secondary-btn" onClick={() => setStep(step - 1)}>
+            <button
+              className="secondary-btn !mt-0"
+              onClick={() => setStep(step - 1)}
+            >
               Back
             </button>
           )}

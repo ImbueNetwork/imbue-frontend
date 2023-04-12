@@ -54,40 +54,42 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
     }
   };
   return (
-    <div className={`drawer ${visible ? "open" : ""}`} id="right-drawer">
-      <nav id="nav">
-        <ul id="menu">
-          {linkItems.map((item, index: number) => {
-            return (
-              <li
-                key={`drawer-item-${index}`}
-                className="menu-item"
-                id="menu-item__account-dashboard"
-              >
-                <p
-                  className="text-white dlex py-[12px] px-[20px]"
-                  title={item?.text}
-                  onClick={() => navigateToPage(item.link)}
+    <>
+      <div className={`drawer ${visible ? "open" : ""}`} id="right-drawer">
+        <nav id="nav">
+          <ul id="menu">
+            {linkItems.map((item, index: number) => {
+              return (
+                <li
+                  key={`drawer-item-${index}`}
+                  className="menu-item"
+                  id="menu-item__account-dashboard"
                 >
-                  <i
-                    className="material-icons relative top-[4px]"
-                    aria-hidden="true"
+                  <p
+                    className="text-white dlex py-[12px] px-[20px]"
+                    title={item?.text}
+                    onClick={() => navigateToPage(item.link)}
                   >
-                    {item?.icon}
-                  </i>
-                  <span>{item?.text}</span>
-                </p>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+                    <i
+                      className="material-icons relative top-[4px]"
+                      aria-hidden="true"
+                    >
+                      {item?.icon}
+                    </i>
+                    <span>{item?.text}</span>
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </div>
       <Login
         visible={loginModal}
         setVisible={setLoginModal}
         redirectUrl="/dashboard"
       />
-    </div>
+    </>
   );
 };
 

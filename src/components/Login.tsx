@@ -221,7 +221,10 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                     <span>Don&apos;t have an account?</span>
                     <Link
                       href="#"
-                      onClick={() => router.push("/join")}
+                      onClick={() => {
+                        setVisible(false);
+                        router.push("/join");
+                      }}
                       className="signup"
                     >
                       Sign up
