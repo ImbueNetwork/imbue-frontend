@@ -25,7 +25,7 @@ export const imbueStrategy = new JwtStrategy(jwtOptions, async function (jwt_pay
             if (!user) {
                 next(`No user found with id: ${id}`, false);
             } else {
-                return next(null, { id: user.id, username: user.username, getstream_token: user.getstream_token, display_name: user.display_name, web3_address: web3Account?.address });
+                return next(null, { id: user.id, username: user.username, getstream_token: user.getstream_token, display_name: user.display_name, web3_address: web3Account?.address || null });
             }
         });
     } catch (e) {
@@ -33,7 +33,7 @@ export const imbueStrategy = new JwtStrategy(jwtOptions, async function (jwt_pay
     }
 });
 
-const authenticate = (method: string, req: NextApiRequest, res: NextApiResponse) =>
+export const authenticate = (method: string, req: NextApiRequest, res: NextApiResponse) =>
     new Promise((resolve, reject) => {
         passport.authenticate(method, { session: false }, (error: Error, token: any) => {
             if (error) {

@@ -30,6 +30,7 @@ import { BriefLists } from "@/components/Briefs/BriefsList";
 import { useRouter } from "next/router";
 import { ApplicationContainer } from "@/components/Briefs/ApplicationContainer";
 import Login from "@/components/Login";
+import { getServerSideProps } from "@/utils/serverSideProps";
 
 const timeAgo = new TimeAgo("en-US");
 
@@ -280,17 +281,6 @@ export const MyFreelancerApplications = ({
   );
 };
 
-Dashboard.getInitialProps = async () => {
-  const userResponse = await getCurrentUser();
-
-  if (!userResponse) {
-    return {
-      isAuthenticated: false,
-      user: undefined,
-    };
-  }
-
-  return { isAuthenticated: true, user: userResponse };
-};
+export { getServerSideProps };
 
 export default Dashboard;

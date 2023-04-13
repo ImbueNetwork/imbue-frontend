@@ -10,6 +10,7 @@ import ArrowIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
 import { useRouter } from "next/router";
 import BioPanel from "@/components/Briefs/BioPanel";
 import BioInsights from "@/components/Briefs/BioInsights";
+import { getServerSideProps } from "@/utils/serverSideProps";
 
 TimeAgo.addLocale(en);
 
@@ -200,5 +201,7 @@ const BriefDetails = (): JSX.Element => {
     </div>
   );
 };
+
+export { getServerSideProps };
 
 export default BriefDetails;
