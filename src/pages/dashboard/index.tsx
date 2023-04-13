@@ -30,6 +30,7 @@ import { BriefLists } from "@/components/Briefs/BriefsList";
 import { useRouter } from "next/router";
 import { ApplicationContainer } from "@/components/Briefs/ApplicationContainer";
 import Login from "@/components/Login";
+import { getServerSideProps } from "@/utils/serverSideProps";
 
 const timeAgo = new TimeAgo("en-US");
 
@@ -280,21 +281,6 @@ export const MyFreelancerApplications = ({
   );
 };
 
-Dashboard.getInitialProps = async () => {
-  const storedObject = localStorage.getItem("userAuth");
-
-  if (storedObject) {
-    const parsedData = JSON.parse(storedObject);
-    const isAuthenticated = parsedData?.isAuthenticated;
-    const user = parsedData?.user;
-
-    return {
-      isAuthenticated,
-      user,
-    };
-  } else {
-    return { isAuthenticated: false, user: undefined };
-  }
-};
+export { getServerSideProps };
 
 export default Dashboard;

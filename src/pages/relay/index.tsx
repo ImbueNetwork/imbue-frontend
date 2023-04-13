@@ -1,6 +1,7 @@
 import CustomButton from "@/components/CustomMaterialComponents/Button";
 import TextInput from "@/components/CustomMaterialComponents/TextInput";
 import { Buttons } from "@/utils/helper";
+import { getServerSideProps } from "@/utils/serverSideProps";
 import React, { useState } from "react";
 
 const TransferStyle = {
@@ -50,5 +51,7 @@ const Relay = () => {
     </div>
   );
 };
+
+export { getServerSideProps };
 
 export default Relay;
