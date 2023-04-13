@@ -20,6 +20,7 @@ import ChatPopup from "@/components/ChatPopup";
 import Image from "next/image";
 import { TextArea } from "@/components/Briefs/TextArea";
 import { useRouter } from "next/router";
+import { getServerSideProps } from "@/utils/serverSideProps";
 
 export type ProfileProps = {
   initFreelancer: Freelancer;
@@ -414,5 +415,7 @@ const Profile = (): JSX.Element => {
     </div>
   );
 };
+
+export { getServerSideProps };
 
 export default Profile;

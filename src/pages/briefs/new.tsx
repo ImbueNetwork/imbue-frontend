@@ -15,6 +15,7 @@ import {
 } from "@/config/briefs-data";
 import * as config from "@/config";
 import { BriefInfo, BriefProps } from "@/types/briefTypes";
+import { getServerSideProps } from "@/utils/serverSideProps";
 
 const getAPIHeaders = {
   accept: "application/json",
@@ -316,5 +317,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
     </div>
   );
 };
+
+export { getServerSideProps };
 
 export default NewBrief;

@@ -8,6 +8,7 @@ import { Buttons } from "@/utils/helper";
 import { categories } from "@/constants/constants";
 import * as model from "@/model";
 import { useWindowSize } from "@/hooks";
+import { getServerSideProps } from "@/utils/serverSideProps";
 
 const SpacedRow = styled.div`
   display: flex;
@@ -183,5 +184,7 @@ const Draft = (): JSX.Element => {
     </div>
   );
 };
+
+export { getServerSideProps };
 
 export default Draft;
