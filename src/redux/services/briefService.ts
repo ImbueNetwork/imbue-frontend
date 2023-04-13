@@ -48,7 +48,7 @@ export const getAllBriefs = async () => {
   }
 };
 
-export const getBrief = async (briefId: number | string) => {
+export const getBrief = async (briefId: number | string | string[]) => {
   // return dumyBriefs[0] as Brief;
   try {
     const resp = await fetch(`${config.apiBase}/briefs/${briefId}`, {
@@ -83,9 +83,12 @@ export const getUserBriefs = async (user_id: string | number) => {
 };
 
 export const getBriefApplications = async (brifId: string | number) => {
+  // http://localhost:3000/api/briefs/1/applications
+  console.log(checkEnvironment().concat(
+    `${config.apiBase}briefs/${brifId}/applications`));
   const resp = await fetch(
     checkEnvironment().concat(
-      `${config.apiBase}/briefs/${brifId}/applications`
+      `${config.apiBase}briefs/${brifId}/applications`
     ),
     {
       headers: postAPIHeaders,
