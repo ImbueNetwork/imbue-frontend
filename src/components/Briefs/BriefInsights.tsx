@@ -13,7 +13,7 @@ TimeAgo.addDefaultLocale(en);
 
 export const BriefInsights = ({ brief }: BriefInsightsProps) => {
   const timeAgo = new TimeAgo("en-US");
-  const timePosted = timeAgo.format(new Date(brief?.created));
+  const timePosted = brief?.created ? timeAgo.format(new Date(brief?.created)) : 0;
 
   const viewFullBrief = () => {
     redirect(`briefs/${brief.id}/`);
@@ -24,7 +24,7 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
       <div className="flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] mr-[5%]">
         <div className="brief-title">
           <h3 className="text-xl leading-[1.5] font-bold m-0 p-0">
-            {brief.headline}
+            {brief?.headline}
           </h3>
           <span
             className="text-[#b2ff0b] cursor-pointer text-base font-bold !m-0 !p-0 relative top-1"
@@ -34,7 +34,7 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
           </span>
         </div>
         <div className="text-inactive">
-          <p className="text-base">{brief.description}</p>
+          <p className="text-base">{brief?.description}</p>
         </div>
         <p className="text-inactive text-base leading-[1.5] font-bold m-0 p-0">
           Posted {timePosted}{" "}
@@ -45,7 +45,7 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
           <RiShieldUserLine color="var(--theme-white)" size={24} />
           <div className="insight-value">
             <h3 className="text-xl leading-[1.5] font-bold m-0 p-0">
-              {brief.experience_level}
+              {brief?.experience_level}
             </h3>
             <div className="text-inactive">Experience Level</div>
           </div>
@@ -54,7 +54,7 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
           <FaDollarSign color="var(--theme-white)" size={24} />
           <div className="insight-value">
             <h3 className="text-xl leading-[1.5] font-bold m-0 p-0">
-              ${Number(brief.budget).toLocaleString()}
+              ${Number(brief?.budget).toLocaleString()}
             </h3>
             <div className="text-inactive">Fixed Price</div>
           </div>
@@ -63,7 +63,7 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
           <FaRegCalendarAlt color="var(--theme-white)" size={24} />
           <div className="insight-value">
             <h3 className="text-xl leading-[1.5] font-bold m-0 p-0">
-              {brief.duration}
+              {brief?.duration}
             </h3>
             <div className="text-inactive">Project length</div>
           </div>

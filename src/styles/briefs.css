@@ -110,6 +110,7 @@ input::placeholder {
   gap: 16px;
   border-top: 1px solid var(--theme-light-grey);
   padding: 32px;
+  cursor: pointer;
 }
 
 .brief-item:hover {

@@ -84,7 +84,7 @@ const ApplicationPreview = (): JSX.Element => {
       freelancerUser?.username
     );
 
-    const brief: Brief = await getBrief(briefId);
+    const brief: Brief | undefined = await getBrief(briefId);
     const userResponse = await getCurrentUser();
 
     setFreelancer(freelancerResponse);
