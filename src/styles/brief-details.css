@@ -311,12 +311,3 @@
   fill: var(--theme-secondary) !important;
 }
 
-.MuiBox-root {
-  position: fixed;
-  right: 150px;
-  bottom: 0;
-  width: 400px;
-  min-height: 287px;
-  max-height: 480px;
-  background-color: var(--theme-grey-dark);
-}

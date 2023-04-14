@@ -13,6 +13,7 @@ import { useRouter } from "next/router";
 import ChatPopup from "@/components/ChatPopup";
 import { BriefInsights } from "@/components/Briefs/BriefInsights";
 import { Brief } from "@/model";
+import styles from '../../../../styles/brief-applications.module.css'
 
 interface BriefApplicationsProps {
     brief: Brief;
@@ -29,15 +30,15 @@ interface ApplicationContainerProps {
 
 export const ApplicationContainer = ({ application, redirectToApplication, handleMessageBoxClick }: ApplicationContainerProps) => {
     return (
-        <div className="applicant-wrapper" >
+        <div className={styles.applicantWrapper} >
             <Image
                 src={ProfilePhoto}
-                className="freelancer-profile-pic"
+                className={styles.freelancerProfilePic}
                 alt=""
             />
-            <div className="application-wrapper">
-                <div className="freelancer-info">
-                    <div className="user-id text-primary">
+            <div className={styles.applicationWrapper}>
+                <div className={styles.freelancerInfo}>
+                    <div className={styles.userId}>
                         @{application?.freelancer?.username}
                     </div>
                     {/* <div className="country">
@@ -49,7 +50,7 @@ export const ApplicationContainer = ({ application, redirectToApplication, handl
                         </div>
                     </div> */}
 
-                    <div className="ctas-container ml-auto">
+                    <div className={styles.ctasContainer}>
                         {/* TODO: Like/unlike feature. On hold */}
                         {/* <div className="cta-votes">
                                             <div className="cta-vote">
@@ -64,20 +65,20 @@ export const ApplicationContainer = ({ application, redirectToApplication, handl
                         <button className="primary-btn in-dark w-button" onClick={() => redirectToApplication(application?.id)}>
                             View proposal
                         </button>
-                        <button onClick={() => handleMessageBoxClick(application?.user_id, application?.freelancer)} className="secondary-btn in-dark w-button">
+                        <button onClick={() => handleMessageBoxClick(application?.user_id)} className="secondary-btn in-dark w-button">
                             Message
                         </button>
                     </div>
                 </div>
-                <div className="select-freelancer">
-                    <div className="freelancer-title">
+                <div className={styles.selectFreelancer}>
+                    <div className={styles.freelancerTitle}>
                         {application.freelancer.title}
                     </div>
                 </div>
                 <div className="text-base font-bold">
                     {application.name}
                 </div>
-                <div className="cover-letter">
+                <div className={styles.coverLetter}>
                     <div>
                         <span className="font-bold">Cover Letter - </span>
                         {/* TODO: Implement cover letters */}
@@ -86,12 +87,12 @@ export const ApplicationContainer = ({ application, redirectToApplication, handl
                                             .map((line, index) => (
                                                 <span key={index}>{line}</span>
                                             ))} */}
-                        Hello, I would like to help you! I have 4+ years Experience with web 3, so i’ll make things work properly. Feel free to communicate!
+                        <span className="font-bold">Hello, I would like to help you! I have 4+ years Experience with web 3, so i’ll make things work properly. Feel free to communicate!</span>
                     </div>
                 </div>
-                <div className="flex-row justify-between">
+                <div className="flex flex-row justify-between mt-6">
                     <div className="attachment">
-                        <h3>Attachment(s)</h3>
+                        <span className="font-bold">Attachment(s)</span>
                         <div className="flex p-3 gap-2">
                             {/* TODO: Implement */}
                             <FaPaperclip />
@@ -117,30 +118,33 @@ export const ApplicationContainer = ({ application, redirectToApplication, handl
     )
 }
 
-const BriefApplications = ({ browsingUser }: BriefApplicationsProps) => {
+const BriefApplications = () => {
     const [briefApplications, setBriefApplications] = useState<any[]>();
     const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
     const [targetUser, setTargetUser] = useState<User | null>(null);
     const [sortValue, setSortValue] = useState<string>('match');
     const [brief, setBrief] = useState<Brief>()
-
+    const [browsingUser, setBrowsingUser] = useState<User>()
+    
     const router = useRouter()
-    const {id:briefID} = router.query;
-
-    console.log(brief);
+    const { id: briefID } = router.query;
 
     const handleMessageBoxClick = async (user_id: any) => {
         if (browsingUser) {
-            setTargetUser(await fetchUser(user_id));
+            console.log(user_id);
+            const tg = (await fetchUser(user_id));
+            console.log(tg);
+            setTargetUser(tg)
             setShowMessageBox(true);
         } else {
             // router.push("login")
-            redirect("login", `/dapp/briefs/${brief?.id}/`)
+            // redirect("login", `/dapp/briefs/${brief?.id}/`)
         }
     }
 
     useEffect(() => {
-        async function setup(id : string | string[]) {
+        async function setup(id: string | string[]) {
+            setBrowsingUser(await getCurrentUser());
             const briefData = await getBrief(id);
             setBrief(briefData)
 
@@ -152,21 +156,20 @@ const BriefApplications = ({ browsingUser }: BriefApplicationsProps) => {
     }, [briefID]);
 
     const redirectToApplication = (applicationId: any) => {
-        router.push(`briefs/${brief?.id}/applications/${applicationId}/`)
+        router.push(`/briefs/${brief?.id}/applications/${applicationId}/`)
     };
 
-    if(!brief) return <h2>No brief found</h2>
+    if (!brief) return <h2>No brief found</h2>
 
-    return  (
-        <div className="page-wrapper">
+    return (
+        <div className="page-wrapper applicationList">
             {browsingUser && showMessageBox && <ChatPopup {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser }} />}
-            <div className="section">
-                <h3 className="section-title">Review proposals</h3>
-                <BriefInsights brief={brief} />
-            </div>
-            <div className="section">
-                <div className="w-full ml-auto flex items-end justify-between">
-                    <h3 className="section-title">All applicants</h3>
+            <p className={styles.sectionTitle + " mb-4"}>Review proposals</p>
+            
+            <BriefInsights brief={brief} />
+
+            <div className="w-full ml-auto flex items-center justify-between mt-6">
+                    <h3 className={styles.sectionTitle }>All applicants</h3>
                     <StyledEngineProvider injectFirst>
                         <FormControl>
                             <InputLabel id="demo-simple-select-helper-label">Sort</InputLabel>
@@ -183,6 +186,8 @@ const BriefApplications = ({ browsingUser }: BriefApplicationsProps) => {
                         </FormControl>
                     </StyledEngineProvider>
                 </div>
+
+            <div className={styles.section}>
                 {
                     briefApplications?.length
                         ? <div className="applicants-list">
