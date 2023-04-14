@@ -104,7 +104,7 @@ export const SubmitProposal = (): JSX.Element => {
   async function insertProject() {
     //TODO: validate all milestone sum up to 100%
     const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}/projects/)`),
+      checkEnvironment().concat(`${config.apiBase}/project`),
       {
         headers: config.postAPIHeaders,
         method: "post",
@@ -132,10 +132,12 @@ export const SubmitProposal = (): JSX.Element => {
       }
     );
 
+    console.log({ resp });
+
     if (resp.ok) {
       const applicationId = (await resp.json()).id;
-      //TODO: redirect
-      //   redirect(`/briefs/${brief?.id}/applications/${applicationId}/`);
+      applicationId &&
+        router.push(`/briefs/${brief?.id}/applications/${applicationId}/`);
     } else {
       console.log("Failed to submit the brief");
     }

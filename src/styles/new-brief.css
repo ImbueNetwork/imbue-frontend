@@ -65,7 +65,8 @@ h1 {
 .buttons {
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
+  gap: 16px;
+  margin-left: auto;
 }
 
 .name-panel-input-wrapper {

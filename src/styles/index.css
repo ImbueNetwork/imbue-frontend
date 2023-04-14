@@ -717,6 +717,7 @@ input[type="radio"] {
   border-radius: 1000px;
   color: var(--theme-secondary);
   padding: 8px 12px;
+  cursor: pointer;
 }
 
 .new-tag-input {
@@ -746,8 +747,6 @@ input[type="radio"] {
   color: black;
 }
 .secondary-btn {
-  margin-top: 16px;
-  margin-right: 16px;
   padding: 12px 24px;
   -webkit-align-self: center;
   -ms-flex-item-align: center;

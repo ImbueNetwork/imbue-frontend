@@ -48,7 +48,7 @@ export const getAllBriefs = async () => {
   }
 };
 
-export const getBrief = async (briefId: number | string) => {
+export const getBrief = async (briefId: number | string | string[]) => {
   try {
     const resp = await fetch(`${config.apiBase}/briefs/${briefId}`, {
       headers: postAPIHeaders,
@@ -81,10 +81,12 @@ export const getUserBriefs = async (user_id: string | number) => {
 };
 
 export const getBriefApplications = async (brifId: string | number) => {
+  // http://localhost:3000/api/briefs/1/applications
+  console.log(
+    checkEnvironment().concat(`${config.apiBase}briefs/${brifId}/applications`)
+  );
   const resp = await fetch(
-    checkEnvironment().concat(
-      `${config.apiBase}/briefs/${brifId}/applications`
-    ),
+    checkEnvironment().concat(`${config.apiBase}briefs/${brifId}/applications`),
     {
       headers: postAPIHeaders,
       method: "get",
@@ -105,23 +107,22 @@ export const changeBriefApplicationStatus = async (
   projectId: number,
   status_id: ProjectStatus
 ) => {
-  return {};
-  // const resp = await fetch(`${config.apiBase}/briefs/${briefId}/status`, {
-  //   headers: postAPIHeaders,
-  //   method: "put",
-  //   body: JSON.stringify({
-  //     project_id: projectId,
-  //     status_id,
-  //   }),
-  // });
+  const resp = await fetch(`${config.apiBase}/briefs/${briefId}/status`, {
+    headers: postAPIHeaders,
+    method: "put",
+    body: JSON.stringify({
+      project_id: projectId,
+      status_id,
+    }),
+  });
 
-  // if (resp.ok) {
-  //   return await resp.json();
-  // } else {
-  //   throw new Error(
-  //     `Failed to hire for briefId ${briefId} . status: ${resp.status}`
-  //   );
-  // }
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    throw new Error(
+      `Failed to hire for briefId ${briefId} . status: ${resp.status}`
+    );
+  }
 };
 
 export const getUserBrief = async (userId: number, briefId: number) => {
