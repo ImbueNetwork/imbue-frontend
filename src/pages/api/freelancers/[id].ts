@@ -7,7 +7,7 @@ import {
   insertFreelancerDetails,
   upsertItems,
 } from "../models";
-import { validateUserFromJwt, verifyUserIdFromJwt } from "../auth/common";
+import { verifyUserIdFromJwt } from "../auth/common";
 import next from "next";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -58,14 +58,6 @@ const getFreelancerByUsername = (
           "services"
         )(tx)),
       ]);
-
-      // Used to show/hide edit buttons if the correct user.
-      if (validateUserFromJwt(req, res, next, freelancer.user_id)) {
-        res.setHeader("Set-Cookie", "isUser=true; Path=/; HttpOnly; Secure");
-      } else {
-        res.setHeader("Set-Cookie", "isUser=false; Path=/; HttpOnly; Secure");
-      }
-
       res.status(200).json(freelancer);
     } catch (e) {
       new Error(`Failed to fetch freelancer details by username: ${username}`, {
