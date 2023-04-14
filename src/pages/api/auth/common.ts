@@ -5,6 +5,7 @@ import * as passportJwt from "passport-jwt"
 // @ts-ignore
 import jwt from 'jsonwebtoken';
 import { NextApiResponse } from 'next';
+import { getTokenCookie } from '../auth-cookies';
 
 export const ensureParams = (
    record: Record<string, any>,
@@ -22,14 +23,9 @@ export const ensureParams = (
    }
 }
 
-export const cookieExtractor = function(req: any) {
-    let token: any | null = null;
-    if (req && req.cookies) token = req.cookies['access_token'];
-    return token;
-};
 
 export function verifyUserIdFromJwt(req: any, res: any, next: any, user_id: number) {
-    const token = req.cookies.access_token;
+    const token = getTokenCookie(req);
     if (!token) {
       return res.status(401).send("You are not authorized to access this resource.");
     }
@@ -46,33 +42,7 @@ export function verifyUserIdFromJwt(req: any, res: any, next: any, user_id: numb
     }
   }
 
-export function validateUserFromJwt(req: any, res: any, next: any, user_id: number) {
-    const token = req.cookies.access_token;
-    if (!token) {
-        return false;
-    }
-
-    try {
-        const decoded = jwt.verify(token, jwtOptions.secretOrKey) as jwt.JwtPayload;
-        if (user_id == decoded.id) {
-           return true
-        } else {
-            return false;
-        }
-    } catch (error) {
-        return false;
-    }
-}
-
 export const jwtOptions = {
-    jwtFromRequest: cookieExtractor,
+    jwtFromRequest: getTokenCookie,
     secretOrKey: process.env.JWTSecret ?? 'mysecretword'
 };
-
-export function removeTokenCookie(res: NextApiResponse) {
-    const cookie = serialize("access_token", '', {
-      maxAge: -1,
-      path: '/',
-    })
-    res.setHeader('Set-Cookie', cookie)
-  }
