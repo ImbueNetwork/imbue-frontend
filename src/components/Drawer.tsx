@@ -11,6 +11,8 @@ type DrawerProps = {
 const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
   const router = useRouter();
   const [loginModal, setLoginModal] = useState<boolean>(false);
+  const [authenticated, setAuthenticated] = useState<boolean>(false);
+
   const linkItems = [
     {
       icon: "face",
@@ -39,16 +41,25 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
     },
     {
       icon: "logout",
-      text: "Log out",
+      text: authenticated ? "Sign Out" : "Sign In",
       link: "/logout",
     },
   ];
 
   const navigateToPage = async (link: string) => {
-    const userResponse = await getCurrentUser();
-    if (userResponse) {
-      router.push(link);
-      toggleVisibility();
+    const storedObject = localStorage.getItem("userAuth");
+    if (storedObject) {
+      const parsedData = JSON.parse(storedObject);
+      const isAuthenticated = parsedData?.isAuthenticated || false;
+      setAuthenticated(isAuthenticated);
+      if (isAuthenticated && link !== "/logout") {
+        router.push(link);
+        toggleVisibility();
+      } else if (link === "/logout") {
+        await localStorage.clear();
+        router.push(link);
+        toggleVisibility();
+      }
     } else {
       setLoginModal(true);
     }

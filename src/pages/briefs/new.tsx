@@ -284,7 +284,10 @@ const NewBrief = (props: BriefProps): JSX.Element => {
         <div className="contents">{panels[step] ?? <></>}</div>
         <div className="buttons">
           {step >= 1 && (
-            <button className="secondary-btn" onClick={() => setStep(step - 1)}>
+            <button
+              className="secondary-btn !mt-0"
+              onClick={() => setStep(step - 1)}
+            >
               Back
             </button>
           )}
@@ -298,7 +301,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
             </button>
           ) : step === stepData.length - 2 ? (
             <button
-              className="primary-btn in-dark w-button"
+              className="primary-btn in-dark w-button !mt-0"
               disabled={!validate()}
               onClick={() => onReviewPost()}
             >
@@ -306,7 +309,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
             </button>
           ) : (
             <button
-              className="primary-btn in-dark w-button"
+              className="primary-btn in-dark w-button !mt-0"
               data-testid="next-button"
               onClick={() => setStep(step + 1)}
               disabled={!validate()}

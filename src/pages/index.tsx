@@ -14,6 +14,11 @@ export default function Home() {
   const getLogedInUser = async () => {
     const userResponse = await getCurrentUser();
     if (userResponse) {
+      const userAuth = {
+        isAuthenticated: true,
+        user: userResponse,
+      };
+      localStorage.setItem("userAuth", JSON.stringify(userAuth));
       router.push("/dashboard");
     }
   };

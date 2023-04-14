@@ -66,14 +66,13 @@ export const getProjectId = async () => {
 };
 
 export const fetchProject = async (projectId: string | number | null) => {
-  return dummyApplicationProject;
-  // const resp = await fetch(`${config.apiBase}/projects/${projectId}`, {
-  //   headers: config.getAPIHeaders,
-  // });
-  // if (resp.ok) {
-  //   const project = await resp.json();
-  //   return project;
-  // }
+  const resp = await fetch(`${config.apiBase}project/${projectId}`, {
+    headers: config.getAPIHeaders,
+  });
+  if (resp.ok) {
+    const project = await resp.json();
+    return project;
+  }
 };
 
 export const fetchUserOrEmail = async (userOrEmail: string) => {
@@ -87,7 +86,7 @@ export const fetchUserOrEmail = async (userOrEmail: string) => {
 };
 
 export const fetchUser = async (id: number) => {
-  const resp = await fetch(`${config.apiBase}/users/byid/${id}`, {
+  const resp = await fetch(`${config.apiBase}users/byid/${id}`, {
     headers: config.getAPIHeaders,
   });
   if (resp.ok) {
