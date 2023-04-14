@@ -11,6 +11,7 @@ import { TextField } from "@mui/material";
 import * as config from "@/config";
 import Link from "next/link";
 import styled from "@emotion/styled";
+import { getCurrentUser } from "@/utils";
 
 const logoStyle = { height: "100%", width: "100%" };
 
@@ -133,10 +134,16 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     });
 
     if (resp.ok) {
-      //TODO: work on redirection
-      // await utils.redirectBack();
-      setVisible(false);
-      router.push(redirectUrl);
+      const userResponse = await getCurrentUser();
+      if (userResponse) {
+        const userAuth = {
+          isAuthenticated: true,
+          user: userResponse,
+        };
+        localStorage.setItem("userAuth", JSON.stringify(userAuth));
+        setVisible(false);
+        router.push(redirectUrl);
+      }
     } else {
       setErrorMessage("incorrect username or password");
     }

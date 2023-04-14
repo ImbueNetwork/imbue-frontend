@@ -7,6 +7,7 @@ import { ensureParams, jwtOptions } from "./common";
 import jwt from 'jsonwebtoken';
 import config from "../config";
 import { serialize } from 'cookie';
+import { setTokenCookie } from "../auth-cookies";
 
 export default nextConnect()
     .post(async (req: NextApiRequest, res: NextApiResponse) => {
@@ -39,12 +40,7 @@ export default nextConnect()
                             const payload = { id: user.id };
                             const token = jwt.sign(payload, jwtOptions.secretOrKey);
 
-                            res.setHeader('Set-Cookie', serialize('access_token', token, {
-                                secure: config.environment !== "development",
-                                path: '/',
-                                httpOnly: true
-                            }));
-
+                            setTokenCookie(res,token);
                             res.send({ id: user.id, display_name: user.display_name });
                         } catch (e) {
                             tx.rollback();
