@@ -1,0 +1,68 @@
+/* brief-details */
+.MuiBox-root {
+    position: fixed;
+    right: 150px;
+    bottom: 0;
+    width: 400px;
+    height: 480px;
+    background-color: var(--theme-grey-dark);
+}
+
+/* common.css */
+.MuiBottomNavigation-root {
+    background: var(--theme-grey-dark);
+    border-radius: 10px;
+    border: 1px solid var(--theme-light-white);
+    margin-bottom: 36px;
+    overflow: hidden;
+}
+
+.MuiButtonBase-root.MuiBottomNavigationAction-root.Mui-selected {
+    background-color: var(--theme-primary);
+    color: black;
+}
+
+.MuiButtonBase-root.MuiBottomNavigationAction-root {
+    max-width: 33.34%;
+    color: white;
+}
+
+.MuiBottomNavigationAction-label,
+.MuiBottomNavigationAction-label.Mui-selected {
+    font-size: 18px;
+}
+
+/* -------------- */
+
+.MuiFormControl-root {
+    margin-bottom: 24px;
+}
+
+#demo-simple-select-helper-label,
+#demo-simple-select-helper,
+.MuiSvgIcon-root.MuiSvgIcon-fontSizeMedium.MuiSelect-icon.MuiSelect-iconOutlined {
+    color: #fff;
+}
+
+.MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl:hover .MuiOutlinedInput-notchedOutline {
+    border: 1px solid white;
+}
+
+.MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation1.MuiPaper-root.MuiMenu-paper.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation8.MuiPopover-paper {
+    background-color: var(--theme-grey-dark);
+    color: white;
+}
+
+.MuiOutlinedInput-notchedOutline {
+    border-color: var(--theme-light-white);
+}
+
+.MuiFormControl-root{
+    width: 140px;
+    cursor: pointer;
+}
+
+.MuiPaper-root.MuiMenu-paper.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation8.MuiPopover-paper{
+    background: var(--theme-grey-dark);
+    color: white;
+}

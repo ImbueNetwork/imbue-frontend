@@ -7,8 +7,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   const id: any = query.id as string[];
 
-  console.log(id);
-
   if (method === "GET") {
     db.transaction(async (tx) => {
       try {
