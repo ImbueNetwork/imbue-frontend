@@ -1,0 +1,113 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import db from "../db";
+import * as models from "../models";
+
+type ProjectPkg = models.Project & {
+  milestones: models.Milestone[];
+};
+
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { method, query, body } = req;
+
+  const id: any = query.id as string[];
+
+  switch (method) {
+    case "GET":
+      getProjectById(res, id);
+      break;
+    case "PUT":
+      updateProjectById(res, id, body);
+      break;
+    default:
+      res.status(400).send({ message: "Bad Request" });
+  }
+}
+
+const getProjectById = (res: NextApiResponse, id: number) => {
+  db.transaction(async (tx) => {
+    try {
+      const project = await models.fetchProject(id)(tx);
+
+      if (!project) {
+        return res.status(404).end();
+      }
+
+      const pkg: ProjectPkg = {
+        ...project,
+        milestones: await models.fetchProjectMilestones(id)(tx),
+      };
+
+      res.send(pkg);
+    } catch (e) {
+      new Error(`Failed to fetch project by id: ${id}`, {
+        cause: e as Error,
+      });
+    }
+  });
+};
+
+const updateProjectById = (
+  res: NextApiResponse,
+  id: number,
+  body: Record<any, any>
+) => {
+  const {
+    name,
+    logo,
+    description,
+    website,
+    category,
+    required_funds,
+    currency_id,
+    chain_project_id,
+    owner,
+    milestones,
+    total_cost_without_fee,
+    imbue_fee,
+    user_id,
+  } = body;
+  db.transaction(async (tx) => {
+    try {
+      // ensure the project exists first
+      const exists = await models.fetchProject(id)(tx);
+
+      if (!exists) {
+        return res.status(404).end();
+      }
+
+      if (exists.user_id !== user_id) {
+        return res.status(403).end();
+      }
+
+      const project = await models.updateProject(id, {
+        name,
+        logo,
+        description,
+        website,
+        category,
+        chain_project_id,
+        required_funds,
+        currency_id,
+        owner,
+        total_cost_without_fee,
+        imbue_fee,
+      })(tx);
+
+      if (!project.id) {
+        return new Error("Cannot update milestones: `project_id` missing.");
+      }
+
+      // drop then recreate
+      await models.deleteMilestones(id)(tx);
+
+      const pkg: ProjectPkg = {
+        ...project,
+        milestones: await models.insertMilestones(milestones, project.id)(tx),
+      };
+
+      res.status(200).send(pkg);
+    } catch (cause) {
+      new Error(`Failed to update project.`, { cause: cause as Error });
+    }
+  });
+};

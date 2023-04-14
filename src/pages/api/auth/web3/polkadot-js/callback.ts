@@ -15,6 +15,7 @@ type Solution = {
 import jwt from 'jsonwebtoken';
 import config from "../../../config"
 import { serialize } from 'cookie';
+import { setTokenCookie } from "@/pages/api/auth-cookies";
 
 
 export default async function authHandler(
@@ -42,13 +43,7 @@ export default async function authHandler(
               if (signatureVerify(web3Account.challenge, solution.signature, solution.address).isValid) {
                 const payload = { id: user?.id };
                 const token = jwt.sign(payload, jwtOptions.secretOrKey);
-
-                res.setHeader('Set-Cookie', serialize('access_token', token, {
-                  secure: config.environment !== "development",
-                  path: '/',
-                  httpOnly: true
-                }));
-
+                setTokenCookie(res,token);
                 res.send({ success: true });
               }
             } else {

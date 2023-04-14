@@ -9,7 +9,7 @@ import { Brief, Currency, User } from "@/model";
 import { getBrief, getUserBrief } from "@/redux/services/briefService";
 import { BriefInsights } from "@/components/Briefs/BriefInsights";
 import AccountChoice from "@/components/AccountChoice";
-import { getCurrentUser, redirect } from "@/utils";
+import { checkEnvironment, getCurrentUser, redirect } from "@/utils";
 import { getFreelancerProfile } from "@/redux/services/freelancerService";
 import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { selectAccount } from "@/redux/services/polkadotService";
@@ -25,7 +25,8 @@ export const SubmitProposal = (): JSX.Element => {
   const [brief, setBrief] = useState<Brief | any>();
   const [user, setUser] = useState<User>();
   const userHasWeb3Addresss = !!user?.web3_address;
-  const [showPolkadotAccounts, setShowPolkadotAccounts] = useState<boolean>(true);
+  const [showPolkadotAccounts, setShowPolkadotAccounts] =
+    useState<boolean>(false);
 
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
@@ -34,15 +35,17 @@ export const SubmitProposal = (): JSX.Element => {
     getUserAndFreelancer();
   }, [briefId]);
 
+  useEffect(() => {
+    getCurrentUserBrief();
+  }, [user]);
+
   const getUserAndFreelancer = async () => {
     const userResponse = await getCurrentUser();
     setUser(userResponse);
-
     const freelancer = await getFreelancerProfile(userResponse?.username);
     if (!freelancer) {
       router.push(`/freelancer`);
     }
-    getCurrentUserBrief();
   };
 
   const getCurrentUserBrief = async () => {
@@ -50,7 +53,7 @@ export const SubmitProposal = (): JSX.Element => {
       const userApplication: any = await getUserBrief(user?.id, briefId);
       if (userApplication) {
         //TODO: redirect to brief application
-        // redirect(`briefs/${briefId}/applications/${userApplication?.id}/`);
+        router.push(`/briefs/${briefId}/applications/${userApplication?.id}/`);
       }
       const briefResponse: Brief | undefined = await getBrief(briefId);
       setBrief(briefResponse);
@@ -90,9 +93,8 @@ export const SubmitProposal = (): JSX.Element => {
     setShowPolkadotAccounts(false);
   };
 
-
-  async function handleSubmit() { 
-    if (!user?.web3_address) {
+  async function handleSubmit() {
+    if (!userHasWeb3Addresss) {
       setShowPolkadotAccounts(true);
     } else {
       await insertProject();
@@ -101,35 +103,41 @@ export const SubmitProposal = (): JSX.Element => {
 
   async function insertProject() {
     //TODO: validate all milestone sum up to 100%
-    const resp = await fetch(`${config.apiBase}/projects/`, {
-      headers: config.postAPIHeaders,
-      method: "post",
-      body: JSON.stringify({
-        user_id: user?.id,
-        name: `Brief Application: ${brief?.headline}`,
-        brief_id: brief?.id,
-        total_cost_without_fee: totalCostWithoutFee,
-        imbue_fee: imbueFee,
-        currency_id: currencyId,
-        milestones: milestones
-          .filter((m) => m.amount !== undefined)
-          .map((m) => {
-            return {
-              name: m.name,
-              amount: m.amount,
-              percentage_to_unlock: (
-                ((m.amount ?? 0) / totalCostWithoutFee) *
-                100
-              ).toFixed(0),
-            };
-          }),
-        required_funds: totalCost,
-      }),
-    });
+    const resp = await fetch(
+      checkEnvironment().concat(`${config.apiBase}/project`),
+      {
+        headers: config.postAPIHeaders,
+        method: "post",
+        body: JSON.stringify({
+          user_id: user?.id,
+          name: `Brief Application: ${brief?.headline}`,
+          brief_id: brief?.id,
+          total_cost_without_fee: totalCostWithoutFee,
+          imbue_fee: imbueFee,
+          currency_id: currencyId,
+          milestones: milestones
+            .filter((m) => m.amount !== undefined)
+            .map((m) => {
+              return {
+                name: m.name,
+                amount: m.amount,
+                percentage_to_unlock: (
+                  ((m.amount ?? 0) / totalCostWithoutFee) *
+                  100
+                ).toFixed(0),
+              };
+            }),
+          required_funds: totalCost,
+        }),
+      }
+    );
+
+    console.log({ resp });
 
     if (resp.ok) {
       const applicationId = (await resp.json()).id;
-      applicationId && router.push(`/briefs/${brief?.id}/applications/${applicationId}/`)      
+      applicationId &&
+        router.push(`/briefs/${brief?.id}/applications/${applicationId}/`);
     } else {
       console.log("Failed to submit the brief");
     }
@@ -345,46 +353,3 @@ export const SubmitProposal = (): JSX.Element => {
 };
 
 export default SubmitProposal;
-
-// export async function getStaticPaths() {
-//   // your code to fetch the list of brief IDs goes here
-//   const briefIds = [1, 2, 3]; // replace with actual brief IDs
-//   const paths = briefIds.map((briefId) => ({
-//     params: { id: briefId.toString() },
-//   }));
-//   return { paths, fallback: false };
-// }
-
-// export async function getStaticProps({ params }: any) {
-//   const briefId = params.id;
-//   // your code to fetch the brief data for the given "briefId" goes here
-//   console.log({ briefId });
-//   return {
-//     props: {
-//       briefId,
-//       // pass any other necessary data as props
-//     },
-//   };
-// }
-
-// document.addEventListener("DOMContentLoaded", async (event) => {
-//   let paths = window.location.pathname.split("/");
-//   let briefId = paths.length >= 2 && parseInt(paths[paths.length - 2]);
-//   const user = await getCurrentUser();
-//   const freelancer = await getFreelancerProfile(user.username);
-
-//   if (!freelancer) {
-//     redirect(`freelancers/new`);
-//   }
-
-//   if (briefId) {
-//     const userApplication = await getUserBrief(user.id, briefId);
-//     if (userApplication) {
-//       redirect(`briefs/${briefId}/applications/${userApplication.id}/`);
-//     }
-//     const brief: Brief = await getBrief(briefId);
-//     ReactDOMClient.createRoot(
-//       document.getElementById("submit-proposal")!
-//     ).render(<SubmitProposal brief={brief} user={user} />);
-//   }
-// });

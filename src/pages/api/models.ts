@@ -203,7 +203,7 @@ export const fetchUser = (id: number) =>
 
 export const fetchUserOrEmail = (userOrEmail: string) =>
     (tx: Knex.Transaction) =>
-        tx<User>("users").where({ username: userOrEmail })
+        tx<User>("users").where({ username: userOrEmail.toLocaleLowerCase() })
             .orWhere({ email: userOrEmail.toLowerCase() })
             .first()
             .debug(true);
