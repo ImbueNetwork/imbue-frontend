@@ -96,7 +96,8 @@
 .button-right {
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
+  gap: 16px;
+  margin-left: auto;
 }
 
 .name-panel-input-wrapper {
@@ -195,6 +196,7 @@
   line-height: 1;
   padding: 17px;
   border-radius: 8px;
+  cursor: pointer;
 }
 
 .freelance-xp-item.active {

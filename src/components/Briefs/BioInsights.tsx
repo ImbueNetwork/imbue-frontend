@@ -33,7 +33,7 @@ const BioInsights = ({
       <div className="subsection">
         <div className="header">
           <h3>Activities on this job</h3>
-          <div className="flex gap-3 items-center">
+          <div className="flex gap-3 items-center mt-4">
             <button
               className="primary-btn in-dark w-[auto] flex items-center gap-2"
               onClick={() => redirectToApply()}

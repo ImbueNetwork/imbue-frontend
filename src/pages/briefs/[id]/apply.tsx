@@ -52,7 +52,7 @@ export const SubmitProposal = (): JSX.Element => {
         //TODO: redirect to brief application
         // redirect(`briefs/${briefId}/applications/${userApplication?.id}/`);
       }
-      const briefResponse: Brief = await getBrief(briefId);
+      const briefResponse: Brief | undefined = await getBrief(briefId);
       setBrief(briefResponse);
     }
   };
@@ -92,7 +92,7 @@ export const SubmitProposal = (): JSX.Element => {
 
 
   async function handleSubmit() { 
-    if (!userHasWeb3Addresss) {
+    if (!user?.web3_address) {
       setShowPolkadotAccounts(true);
     } else {
       await insertProject();
@@ -129,8 +129,7 @@ export const SubmitProposal = (): JSX.Element => {
 
     if (resp.ok) {
       const applicationId = (await resp.json()).id;
-      //TODO: redirect
-      //   redirect(`/briefs/${brief?.id}/applications/${applicationId}/`);
+      applicationId && router.push(`/briefs/${brief?.id}/applications/${applicationId}/`)      
     } else {
       console.log("Failed to submit the brief");
     }
