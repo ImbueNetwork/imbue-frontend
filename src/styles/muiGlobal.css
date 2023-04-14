@@ -57,7 +57,7 @@
     border-color: var(--theme-light-white);
 }
 
-.MuiFormControl-root{
+.applicationList .MuiFormControl-root{
     width: 140px;
     cursor: pointer;
 }
