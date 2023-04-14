@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next"
-import { removeTokenCookie } from "./common"
+import { removeTokenCookie } from "../auth-cookies"
 
 export default async function logout(req: NextApiRequest, res: NextApiResponse) {
   removeTokenCookie(res)
