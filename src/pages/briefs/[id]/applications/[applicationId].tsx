@@ -335,20 +335,6 @@ const ApplicationPreview = (): JSX.Element => {
                 )}
               </div>
             </div>
-            <HirePopup
-              {...{
-                openPopup,
-                setOpenPopup,
-                brief,
-                freelancer,
-                application,
-                milestones,
-                totalCostWithoutFee,
-                imbueFee,
-                totalCost,
-                setLoading,
-              }}
-            />
           </>
         )}
 

@@ -19,7 +19,7 @@ const ChatPopup = (props: ChatPopupProps) => {
     <StyledEngineProvider injectFirst>
       <Slide
         direction="up"
-        className="z-10"
+        className="z-10 chat-popup"
         in={showMessageBox}
         mountOnEnter
         unmountOnExit

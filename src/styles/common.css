@@ -178,7 +178,7 @@
 
 .str-chat__channel-search,
 .str-chat__channel-preview {
-  padding: 25px 18px;
+  padding: 25px 20px !important; 
 }
 
 .str-chat__channel-search .str-chat__channel-search-bar {

@@ -11,6 +11,7 @@ import ChainService from "@/redux/services/chainService";
 import { getCurrentUser } from "@/utils";
 import { changeBriefApplicationStatus } from "@/redux/services/briefService";
 import Image from "next/image";
+import styles from '../styles/hire-modal.module.css'
 
 export const HirePopup = ({
   openPopup,
@@ -33,7 +34,6 @@ export const HirePopup = ({
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: "65vw",
-    height: "80vh",
     bgcolor: "#2c2c2c",
     color: "#fff",
     pt: "28px",
@@ -120,19 +120,19 @@ export const HirePopup = ({
         </h3>
         <hr className="separator" />
 
-        <div className="milestone-list ml-7 mr-16 mb-5">
+        <div className="milestone-list px-16 mb-5 max-h-96 overflow-y-scroll">
           {milestones?.map?.(({ name, amount }: any, index: any) => {
             return (
-              <div className="milestone-row" key={index}>
-                <div className="milestone-no">{index + 1}</div>
+              <div className={styles.milestoneRow} key={index}>
+                <h3 className="milestone-no">{index + 1}</h3>
                 <div className="input-wrappers">
                   <div className="description-wrapper">
                     <h3>Description</h3>
-                    <p>{milestones[index]?.name}</p>
+                    <h3>{milestones[index]?.name}</h3>
                   </div>
-                  <div className="budget-wrapper">
+                  <div className="budget-wrapper text-end">
                     <h3>Amount</h3>
-                    <p>{milestones[index]?.amount}</p>
+                    <h3>{milestones[index]?.amount}</h3>
                   </div>
                 </div>
               </div>
@@ -142,8 +142,8 @@ export const HirePopup = ({
         <hr className="separator" />
 
         <div className="">
-          <div className="budget-info mx-16 mt-7">
-            <div className="budget-description">
+          <div className={`${styles.budgetInfo} mx-16 mt-7`}>
+            <div className={styles.budgetDescription}>
               <h3>Total price of the project</h3>
               <div className="text-inactive">
                 This includes all milestonees, and is the amount client will see
@@ -153,16 +153,16 @@ export const HirePopup = ({
               ${Number?.(totalCostWithoutFee?.toFixed?.(2))?.toLocaleString()}
             </div>
           </div>
-          <div className="budget-info mx-16">
-            <div className="budget-description">
+          <div className={`${styles.budgetInfo} mx-16`}>
+            <div className={styles.budgetDescription}>
               <h3>Imbue Service Fee 5%</h3>
             </div>
             <div className="budget-value">
               ${Number?.(imbueFee?.toFixed?.(2))?.toLocaleString?.()}
             </div>
           </div>
-          <div className="budget-info mx-16">
-            <div className="budget-description">
+          <div className={`${styles.budgetInfo} mx-16`}>
+            <div className={styles.budgetDescription}>
               <h3>Total</h3>
             </div>
             <div className="budget-value">
