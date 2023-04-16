@@ -15,8 +15,6 @@ interface ChatPopupProps {
 const ChatPopup = (props: ChatPopupProps) => {
   const { showMessageBox, setShowMessageBox, browsingUser, targetUser } = props;
 
-  console.log(targetUser);
-
   return (
     <StyledEngineProvider injectFirst>
       <Slide
