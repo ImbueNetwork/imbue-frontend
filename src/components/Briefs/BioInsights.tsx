@@ -131,10 +131,10 @@ const BioInsights = ({
         </div>
       </div>
 
-      {!isOwnerOfBrief && (
-        <div className="mt-auto">
-          <hr className="separator" />
-          <div className="flex flex-col gap-4 mt-5">
+      <div className="mt-auto">
+        <hr className="separator" />
+        <div className="flex flex-col gap-4 mt-5">
+          {!isOwnerOfBrief && (
             <div className="w-full flex gap-3 items-center justify-between">
               <span className="text-xl">Meet the hiring team</span>
               <button
@@ -145,24 +145,26 @@ const BioInsights = ({
                 Message
               </button>
             </div>
-            <h3>Job Link</h3>
-            <div className="w-full h-12 p-3 bg-[#1A1A18] my-2 rounded-md">
-              <span>http://www.imbue.com</span>
-            </div>
-            <span className="primary-text font-bold cursor-pointer">
-              Copy Link
-            </span>
-          </div>
-          {browsingUser && showMessageBox && (
-            <ChatPopup
-              showMessageBox={showMessageBox}
-              setShowMessageBox={setShowMessageBox}
-              targetUser={targetUser}
-              browsingUser={browsingUser}
-            />
           )}
+          <h3>Job Link</h3>
+          <div className="w-full h-12 p-3 bg-[#1A1A18] my-2 rounded-md">
+            <span>http://www.imbue.com</span>
+          </div>
+          <span className="primary-text font-bold cursor-pointer">
+            Copy Link
+          </span>
         </div>
-      )}
+        {browsingUser && showMessageBox && (
+          <ChatPopup
+            showMessageBox={showMessageBox}
+            setShowMessageBox={setShowMessageBox}
+            targetUser={targetUser}
+            browsingUser={browsingUser}
+          />
+        )}
+      </div>
+
+
     </div>
   );
 };

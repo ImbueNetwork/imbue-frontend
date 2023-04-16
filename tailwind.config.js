@@ -18,10 +18,10 @@ module.exports = {
       },
 
       colors: {
-        "--theme-primary": "#b2ff0b",
-        "--theme-grey-dark": "#2c2c2c",
-        "--theme-secondary" : "#411dc9",
-        "--theme-light-white": "rgba(255, 255, 255, 0.25)",
+        "theme-grey-dark": "#2c2c2c",
+        "theme-secondary" : "#411dc9",
+        "secondary-dark-hover" : "#121c7f",
+        "light-white": "rgba(255, 255, 255, 0.25)",
         primary: "#b2ff0b",
       },
       screens: {

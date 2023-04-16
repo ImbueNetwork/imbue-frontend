@@ -12,6 +12,7 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
   const router = useRouter();
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [authenticated, setAuthenticated] = useState<boolean>(false);
+  const [redirectURL, setRedirectURL] = useState<string>()
 
   const linkItems = [
     {
@@ -61,6 +62,7 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
         toggleVisibility();
       }
     } else {
+      link !== "/logout" && setRedirectURL(link)
       setLoginModal(true);
     }
   };
@@ -101,7 +103,7 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
           setLoginModal(val);
           toggleVisibility();
         }}
-        redirectUrl="/dashboard"
+        redirectUrl={redirectURL || "/dashboard"}
       />
     </>
   );

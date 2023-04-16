@@ -5,11 +5,11 @@ import { Brief } from "@/model";
 import { redirect } from "@/utils";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
+TimeAgo.addDefaultLocale(en);
 
 interface BriefInsightsProps {
   brief: Brief;
 }
-TimeAgo.addDefaultLocale(en);
 
 export const BriefInsights = ({ brief }: BriefInsightsProps) => {
   const timeAgo = new TimeAgo("en-US");

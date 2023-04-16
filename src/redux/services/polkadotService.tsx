@@ -50,7 +50,14 @@ export async function authorise(
     }),
   });
   if (resp.ok) {
-    // setShowMessageBox(false)
+    const userResponse = await getCurrentUser();
+      if (userResponse) {
+        const userAuth = {
+          isAuthenticated: true,
+          user: userResponse,
+        };
+        localStorage.setItem("userAuth", JSON.stringify(userAuth));
+      }
   } else {
     // TODO: UX for 401
   }

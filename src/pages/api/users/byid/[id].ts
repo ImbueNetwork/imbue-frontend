@@ -18,13 +18,14 @@ export default async function userHandler(
         if (!user) {
           return res.status(404).end();
         }
-        res.send({
+        res.status(200).send({
           id: user.id,
           display_name: user.display_name,
           username: user.username,
         });
       } catch (e) {
         new Error(`Failed to fetch user ${id}`, { cause: e as Error });
+        res.status(404).end();
       }
     });
   }
