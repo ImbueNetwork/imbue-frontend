@@ -271,13 +271,14 @@
 
 .Accepted-button {
   background-color: var(--theme-primary);
+  color: black;
 }
 
 .ChangesRequested-button {
   background-color: yellow;
 }
 
-.PendingReviewButton {
+.PendingReview-button {
   background-color: var(--theme-background);
   color: white;
 }
