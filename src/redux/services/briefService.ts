@@ -66,25 +66,22 @@ export const getBrief = async (briefId: number | string | string[]) => {
 };
 
 export const getUserBriefs = async (user_id: string | number) => {
-  return {};
-  // const resp = await fetch(`${config.apiBase}/users/${user_id}/briefs/`, {
-  //   headers: postAPIHeaders,
-  //   method: "get",
-  // });
-  // if (resp.ok) {
-  //   return await resp.json();
-  // } else {
-  //   throw new Error(
-  //     `Failed to get all briefs for user ${user_id}. status: ${resp.status}`
-  //   );
-  // }
+  const resp = await fetch(`${config.apiBase}/users/${user_id}/briefs/`, {
+    headers: postAPIHeaders,
+    method: "get",
+  });
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    const error = new Error(
+      `Failed to get all briefs for user ${user_id}. status: ${resp.status}`
+    );
+    console.log(error);
+    return []
+  }
 };
 
 export const getBriefApplications = async (brifId: string | number) => {
-  // http://localhost:3000/api/briefs/1/applications
-  console.log(
-    checkEnvironment().concat(`${config.apiBase}briefs/${brifId}/applications`)
-  );
   const resp = await fetch(
     checkEnvironment().concat(`${config.apiBase}briefs/${brifId}/applications`),
     {

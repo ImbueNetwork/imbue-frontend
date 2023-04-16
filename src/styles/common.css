@@ -153,28 +153,6 @@
   border: 1px solid #262626;
   /* Navigation bar */
 }
-.MuiBottomNavigation-root {
-  background: var(--theme-grey-dark);
-  border-radius: 10px;
-  border: 1px solid var(--theme-light-white);
-  margin-bottom: 36px;
-  overflow: hidden;
-}
-
-.MuiButtonBase-root.MuiBottomNavigationAction-root.Mui-selected {
-  background-color: var(--theme-primary);
-  color: black;
-}
-
-.MuiButtonBase-root.MuiBottomNavigationAction-root {
-  max-width: 33.34%;
-  color: white;
-}
-
-.MuiBottomNavigationAction-label,
-.MuiBottomNavigationAction-label.Mui-selected {
-  font-size: 18px;
-}
 
 .modal-body,
 .modal-footer,
@@ -200,7 +178,7 @@
 
 .str-chat__channel-search,
 .str-chat__channel-preview {
-  padding: 25px 18px;
+  padding: 25px 20px !important; 
 }
 
 .str-chat__channel-search .str-chat__channel-search-bar {
@@ -293,13 +271,14 @@
 
 .Accepted-button {
   background-color: var(--theme-primary);
+  color: black;
 }
 
 .ChangesRequested-button {
   background-color: yellow;
 }
 
-.PendingReview-button {
+.PendingReviewButton {
   background-color: var(--theme-background);
   color: white;
 }

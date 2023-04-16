@@ -17,6 +17,7 @@ export default async function userHandler(
     case 'GET':
       // Get data from your database
       const resp = await handleGet(id);
+      
       if (resp) {
         res.status(200).json(resp);
       } else {
@@ -34,7 +35,7 @@ export default async function userHandler(
 }
 
 export async function handleGet(routes: string[]) {
-  const userId = routes[0];
+  const userId = routes[1];
   switch (routes.length) {
     case 3:
       switch (routes[1]) {
@@ -46,7 +47,7 @@ export async function handleGet(routes: string[]) {
           return await fetchProject(projectId);
       }
     case 2:
-      switch (routes[1]) {
+      switch (routes[0]) {
         case "briefs":
           return await fetchAllUserBriefs(userId);
         case "byid":

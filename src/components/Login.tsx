@@ -12,6 +12,7 @@ import * as config from "@/config";
 import Link from "next/link";
 import styled from "@emotion/styled";
 import { getCurrentUser } from "@/utils";
+import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
 
 const logoStyle = { height: "100%", width: "100%" };
 
@@ -63,56 +64,6 @@ const CssTextField = styled(TextField)({
   },
 });
 
-async function getAccountAndSign(account: InjectedAccountWithMeta) {
-  const resp = await fetch(`/auth/web3/${account.meta.source}/`, {
-    headers: postAPIHeaders,
-    method: "post",
-    body: JSON.stringify(account),
-  });
-
-  if (resp.ok) {
-    // could be 200 or 201
-    const { user, web3Account } = await resp.json();
-    const signature = await signWeb3Challenge(account, web3Account.challenge);
-
-    if (signature) {
-      return { signature, user };
-    } else {
-      // TODO: UX for no way to sign challenge?
-    }
-  }
-}
-
-async function authorise(
-  signature: SignerResult,
-  account: InjectedAccountWithMeta
-) {
-  const resp = await fetch(`/api/auth/web3/${account.meta.source}/callback`, {
-    headers: postAPIHeaders,
-    method: "post",
-    body: JSON.stringify({
-      signature: signature.signature,
-      address: account.address,
-    }),
-  });
-
-  if (resp.ok) {
-    const redirect =
-      new URLSearchParams(window.location.search).get("redirect") ||
-      "/dashboard";
-    const isRelative =
-      new URL(document.baseURI).origin ===
-      new URL(redirect, document.baseURI).origin;
-    if (isRelative) {
-      location.replace(redirect);
-    } else {
-      location.replace("/");
-    }
-  } else {
-    // TODO: UX for 401
-  }
-}
-
 const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   const [userOrEmail, setUserOrEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
@@ -156,10 +107,10 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   const accountSelected = async (
     account: InjectedAccountWithMeta
   ): Promise<any> => {
-    // :TODO make api call
-    // const result = await getAccountAndSign(account);
-    // await authorise(result?.signature as SignerResult, account);
-    router.push("/dashboard");
+    const result = await getAccountAndSign(account);
+    await authorise(result?.signature as SignerResult, account);
+    setVisible(false)
+    router.push(redirectUrl);
   };
 
   if (visible) {
@@ -234,10 +185,10 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                     >
                       Sign up
                     </Link>
-                    <span
+                    {/* <span
                       onClick={() => showPolkadotAccounts(true)}
                       className="mdc-deprecated-list-item__text"
-                    ></span>
+                    ></span> */}
                   </div>
                 </div>
               </form>

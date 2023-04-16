@@ -5,11 +5,11 @@ import { Brief } from "@/model";
 import { redirect } from "@/utils";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
+TimeAgo.addDefaultLocale(en);
 
 interface BriefInsightsProps {
   brief: Brief;
 }
-TimeAgo.addDefaultLocale(en);
 
 export const BriefInsights = ({ brief }: BriefInsightsProps) => {
   const timeAgo = new TimeAgo("en-US");
@@ -20,7 +20,7 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
   };
 
   return (
-    <div className="flex flex-row bg-[#2c2c2c] border border-solid border-[#ffffff40] rounded-[20px] p-[50px]">
+    <div className="flex flex-row bg-[#2c2c2c] border border-opacity-25 -border--theme-light-white rounded-[20px] p-[50px]">
       <div className="flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] mr-[5%]">
         <div className="brief-title">
           <h3 className="text-xl leading-[1.5] font-bold m-0 p-0">
