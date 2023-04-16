@@ -5,7 +5,6 @@ import { Brief, BriefSqlFilter } from "@/model";
 import { callSearchBriefs, getAllBriefs } from "@/redux/services/briefService";
 import { BriefFilterOption } from "@/types/briefTypes";
 import { useRouter } from "next/router";
-import { getServerSideProps } from "@/utils/serverSideProps";
 
 const Briefs = (): JSX.Element => {
   const [briefs, setBriefs] = useState<Brief[]>([]);
@@ -371,6 +370,5 @@ const Briefs = (): JSX.Element => {
   );
 };
 
-export { getServerSideProps };
 
 export default Briefs;
