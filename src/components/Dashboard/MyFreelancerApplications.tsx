@@ -2,14 +2,14 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { Freelancer, Project, ProjectStatus, User } from "@/model";
 import TimeAgo from "javascript-time-ago";
-
+import en from "javascript-time-ago/locale/en";
+TimeAgo.addLocale(en)
 
 type FreelancerApplicationsType = {
     myApplications: any;
   };
 
 const timeAgo = new TimeAgo("en-US");
-
 
 const MyFreelancerApplications = ({
     myApplications,
@@ -51,7 +51,7 @@ const MyFreelancerApplications = ({
               <h3 className="text-xl font-bold mb-3">{application?.name}</h3>
             </div>
             <div className="flex flex-col justify-evenly items-center ml-auto">
-              <span>{timeAgo.format(new Date(application?.created))}</span>
+              <span>{timeAgo?.format(new Date(application?.created))}</span>
               <div
                 className={`px-4 py-2 ${
                   ProjectStatus[application.status_id]
