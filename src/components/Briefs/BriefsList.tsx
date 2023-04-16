@@ -59,13 +59,13 @@ export const BriefLists = ({
           </div>
           {brief.project_id ? (
             <div className="flex flex-col items-center">
-              <h2>
+              <h3>
                 Milestones{" "}
                 <span className="primary-text">
                   {brief.milestones?.filter((m: any) => m?.is_approved)?.length}
                   /{brief.milestones?.length}
                 </span>
-              </h2>
+              </h3>
               <div className="w-48 bg-[#1C2608] h-1 relative my-auto">
                 <div
                   style={{

@@ -58,6 +58,8 @@ const Dashboard = ({ user, isAuthenticated }: DashboardProps): JSX.Element => {
   const [briefApplications, setBriefApplications] = useState<Project[]>([]);
   const [myApplications, setMyApplications] = useState<Project[]>([]);
 
+  const router = useRouter()
+
   const setup = async () => {
     if (user) {
       const myApplicationsResponse = await getFreelancerApplications(user?.id);
@@ -91,8 +93,7 @@ const Dashboard = ({ user, isAuthenticated }: DashboardProps): JSX.Element => {
   };
 
   const redirectToBriefApplications = (applicationId: string) => {
-    //TODO: redirect user to application
-    // redirect(`briefs/${briefId}/applications/${applicationId}/`);
+    router.push(`/briefs/${briefId}/applications/${applicationId}`)
   };
 
   const setupStreamChat = async () => {
