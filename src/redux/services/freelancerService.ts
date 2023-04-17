@@ -4,26 +4,29 @@ import { checkEnvironment } from "@/utils";
 
 export async function createFreelancingProfile(freelancer: any) {
   // Check that this user doesnt already have a freelancer profile.
-  const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}freelancers/`),
-    {
-      headers: config.postAPIHeaders,
-      method: "post",
-      body: JSON.stringify({ freelancer }),
-    }
-  );
-
-  console.log(freelancer);
-  console.log(resp);
-  if (resp.ok) {
-    // could be 200 or 201
-    // Freelancer API successfully invoked
-    console.log("Freelancer created successfully via Freelancer REST API");
-  } else {
-    throw new Error(
-      "Failed to create freelancer profile. status:" + resp.status
+  try {
+    const resp = await fetch(
+      checkEnvironment().concat(`${config.apiBase}freelancers/`),
+      {
+        headers: config.postAPIHeaders,
+        method: "post",
+        body: JSON.stringify({ freelancer }),
+      }
     );
+  
+    if (resp.ok) {
+      // could be 200 or 201
+      // Freelancer API successfully invoked
+      console.log("Freelancer created successfully via Freelancer REST API");
+    } else {
+      new Error(
+        "Failed to create freelancer profile. status:" + resp.status
+      );
+    }
+  } catch (error) {
+    console.log(error);
   }
+  
 }
 
 export const getAllFreelancers = async () => {

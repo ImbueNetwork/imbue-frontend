@@ -44,7 +44,7 @@ export const SubmitProposal = (): JSX.Element => {
     setUser(userResponse);
     const freelancer = await getFreelancerProfile(userResponse?.username);
     if (!freelancer) {
-      router.push(`/freelancer`);
+      router.push(`/freelancer/new`);
     }
   };
 

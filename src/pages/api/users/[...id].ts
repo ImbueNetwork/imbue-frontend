@@ -38,19 +38,19 @@ export async function handleGet(routes: string[]) {
   switch (routes.length) {
     case 3:
       switch (routes[1]) {
-        case "briefs":
-          const briefId = routes[2];
-          return await fetchUserBriefApplications(userId, briefId);
-        case "applications":
-          const projectId = routes[2];
-          return await fetchProject(projectId);
+        // case "briefs":
+        //   const briefId = routes[2];
+        //   return await fetchUserBriefApplications(userId, briefId);
+        // case "applications":
+        //   const projectId = routes[2];
+        //   return await fetchProject(projectId);
       }
     case 2:
       switch (routes[1]) {
-        case "briefs":
-          return await fetchAllUserBriefs(userId);
-        case "byid":
-          return await fetchUserById(userId);
+        // case "briefs":
+        //   return await fetchAllUserBriefs(userId);
+        // case "byid":
+        //   return await fetchUserById(userId);
         case "byusernameoremail":
           return await fetchUserByUsernameOrEmail(userId);
       }
@@ -116,6 +116,7 @@ export async function fetchAllUserBriefs(userId: string) {
   let response
   await db.transaction(async tx => {
     try {
+      console.log("hit");
       const briefs = await models.fetchUserBriefs(userId)(tx);
       const pendingReviewBriefs = briefs.filter(m => m.project_id == null);
       const briefsWithProjects = briefs.filter(m => m.project_id !== null);

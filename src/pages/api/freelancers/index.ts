@@ -56,8 +56,6 @@ const createFreelancer = (
         services_ids
       )(tx);
 
-      console.log(freelancer_id);
-
       if (!freelancer_id) {
         return new Error("Failed to insert freelancer details.");
       }
@@ -67,9 +65,9 @@ const createFreelancer = (
         freelancer_id: freelancer_id,
       });
     } catch (cause) {
-      console.log(new Error(`Failed to insert freelancer details .`, {
+      new Error(`Failed to insert freelancer details .`, {
         cause: cause as Error,
-      }))
+      });
     }
   });
 };

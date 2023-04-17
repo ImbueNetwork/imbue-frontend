@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import {
     stepData,
@@ -366,4 +367,16 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     );
   };
 
-export default Freelancer;
+Freelancer.getInitialProps = async () => {
+    const userResponse = await utils.getCurrentUser();
+  
+    if (!userResponse) {
+      return {
+        user: undefined,
+      };
+    }
+  
+    return { user: userResponse };
+  };
+  
+  export default Freelancer;

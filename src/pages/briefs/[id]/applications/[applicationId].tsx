@@ -286,7 +286,7 @@ const ApplicationPreview = (): JSX.Element => {
                 <p className="text-xl primary-text">@{freelancer?.username}</p>
               </div>
               <button
-                className="PendingReviewButton in-dark rounded-full px-8 py-4 dark-button"
+                className="PendingReview-button in-dark rounded-full px-8 py-4 dark-button"
                 onClick={() =>
                   handleMessageBoxClick(
                     application?.user_id,
