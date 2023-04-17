@@ -15,6 +15,7 @@ type ClientViewProps = {
 }
 
 const MyClientBriefsView = ({briefs, briefId, setBriefId,briefApplications,handleMessageBoxClick,redirectToBriefApplications}: ClientViewProps) => {
+  console.log(briefs);
     return (
         <div>
           {briefId ? (

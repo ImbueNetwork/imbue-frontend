@@ -34,17 +34,18 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
   const [services, setServices] = useState<string[]>([]);
 
   useEffect(() => {
-    findFreelancer();
-  }, []);
-
-  const findFreelancer = async () => {
-    if (user) {
-      const userHasFreelancerProfile = await freelancerExists(user?.username);
-      if (userHasFreelancerProfile) {
-        router.push(`/freelancer/${user?.username}/`);
+    const findFreelancer = async () => {
+      if (user) {
+        const userHasFreelancerProfile = await freelancerExists(user?.username);
+        if (userHasFreelancerProfile) {
+          router.push(`/freelancer/${user?.username}/`);
+        }
       }
-    }
-  };
+    };
+    findFreelancer();
+  }, [user]);
+
+  
 
   const HelloPanel = (
     <div className="hello-panel">
