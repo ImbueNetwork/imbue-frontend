@@ -308,7 +308,7 @@ const ApplicationPreview = (): JSX.Element => {
                           ProjectStatus.ChangesRequested
                         );
                       }}
-                      className="Request-btn in-dark  !rounded-full !px-1 !py-2 dark-button"
+                      className="Request-btn in-dark  !rounded-full !px-4 !py-2 dark-button"
                     >
                       Request Changes
                     </button>
