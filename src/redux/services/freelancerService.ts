@@ -12,6 +12,9 @@ export async function createFreelancingProfile(freelancer: any) {
       body: JSON.stringify({ freelancer }),
     }
   );
+
+  console.log(freelancer);
+  console.log(resp);
   if (resp.ok) {
     // could be 200 or 201
     // Freelancer API successfully invoked
