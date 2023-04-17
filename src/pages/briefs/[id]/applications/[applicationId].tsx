@@ -241,6 +241,13 @@ const ApplicationPreview = (): JSX.Element => {
     window.location.reload();
   };
 
+  const totalPercent = milestones.reduce((sum, { amount }) => {
+    const percent = Number(
+      ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
+    );
+    return sum + percent;
+  }, 0);
+
   return (
     <>
       <div className="application-container">
@@ -269,7 +276,7 @@ const ApplicationPreview = (): JSX.Element => {
                 <p
                   className="text-base mt-2 underline cursor-pointer primary-text"
                   onClick={() =>
-                    redirect(`freelancers/${freelancer?.username}/`)
+                    router.push(`/freelancer/${freelancer?.username}/`)
                   }
                 >
                   View Full Profile
@@ -631,6 +638,7 @@ const ApplicationPreview = (): JSX.Element => {
           {isEditingBio && (
             <button
               className="primary-btn in-dark w-button"
+              disabled={totalPercent !== 100}
               onClick={() => updateProject()}
             >
               Update
