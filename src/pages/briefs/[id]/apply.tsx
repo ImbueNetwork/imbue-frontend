@@ -153,6 +153,13 @@ export const SubmitProposal = (): JSX.Element => {
     </div>
   );
 
+  const totalPercent = milestones.reduce((sum, { amount }) => {
+    const percent = Number(
+      ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
+    );
+    return sum + percent;
+  }, 0);
+
   return (
     <div className="flex flex-col gap-[2.5rem] text-base leading-[1.5]">
       <div>
@@ -339,6 +346,7 @@ export const SubmitProposal = (): JSX.Element => {
       </div>
       <div className="buttons-container">
         <button
+          disabled={totalPercent !== 100}
           className="primary-btn in-dark w-button"
           onClick={() => handleSubmit()}
         >
