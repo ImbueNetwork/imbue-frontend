@@ -17,7 +17,6 @@ export default async function userHandler(
     case 'GET':
       // Get data from your database
       const resp = await handleGet(id);
-      
       if (resp) {
         res.status(200).json(resp);
       } else {

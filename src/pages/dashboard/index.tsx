@@ -49,14 +49,20 @@ const Dashboard = ({ user, isAuthenticated }: DashboardProps): JSX.Element => {
 
   const router = useRouter()
 
+
+
   const getApplications = async (id: string | number) => {
     setBriefApplications(await getBriefApplications(id));
   };
 
   useEffect(() => {
     const setup = async () => {
+      console.log("***** user is ");
+      console.log(user);
       if (user) {
         const myApplicationsResponse = await getFreelancerApplications(user?.id);
+        console.log("***** user is ");
+        console.log(myApplicationsResponse);
         setMyApplications(myApplicationsResponse);
         setBriefs(await getUserBriefs(user?.id));
       }
