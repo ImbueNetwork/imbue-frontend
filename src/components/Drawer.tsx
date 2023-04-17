@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Login from "./Login";
-import { getCurrentUser } from "@/utils";
 import { useRouter } from "next/router";
 
 type DrawerProps = {
@@ -12,7 +11,17 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
   const router = useRouter();
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [authenticated, setAuthenticated] = useState<boolean>(false);
-  const [redirectURL, setRedirectURL] = useState<string>()
+  const [redirectURL, setRedirectURL] = useState<string>();
+
+  useEffect(() => {
+    const storedObject = localStorage.getItem("userAuth");
+    if (storedObject) {
+      const parsedData = JSON.parse(storedObject);
+
+      const isAuthenticated = parsedData?.isAuthenticated || false;
+      setAuthenticated(isAuthenticated);
+    }
+  }, [visible]);
 
   const linkItems = [
     {
@@ -43,26 +52,20 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
     {
       icon: "logout",
       text: authenticated ? "Sign Out" : "Sign In",
-      link: "/logout",
+      link: authenticated ? "/logout" : "",
     },
   ];
 
   const navigateToPage = async (link: string) => {
-    const storedObject = localStorage.getItem("userAuth");
-    if (storedObject) {
-      const parsedData = JSON.parse(storedObject);
-      const isAuthenticated = parsedData?.isAuthenticated || false;
-      setAuthenticated(isAuthenticated);
-      if (isAuthenticated && link !== "/logout") {
-        router.push(link);
-        toggleVisibility();
-      } else if (link === "/logout") {
-        await localStorage.clear();
-        router.push(link);
-        toggleVisibility();
-      }
+    if (authenticated && link !== "/logout" && link !== "") {
+      router.push(link);
+      toggleVisibility();
+    } else if (link === "/logout") {
+      await localStorage.clear();
+      router.push(link);
+      toggleVisibility();
     } else {
-      link !== "/logout" && setRedirectURL(link)
+      link !== "/logout" && link !== "" && setRedirectURL(link);
       setLoginModal(true);
     }
   };
