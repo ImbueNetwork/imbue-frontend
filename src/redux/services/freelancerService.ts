@@ -40,7 +40,8 @@ export const getAllFreelancers = async () => {
   if (resp.ok) {
     return (await resp.json()) as Array<Freelancer>;
   } else {
-    throw new Error("Failed to get all briefs. status:" + resp.status);
+    console.log(new Error("Failed to get all briefs. status:" + resp.status))
+    return []
   }
 };
 
