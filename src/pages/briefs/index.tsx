@@ -146,7 +146,7 @@ const Briefs = (): JSX.Element => {
   };
 
   const fetchAndSetBriefs = async () => {
-    if (!Object.keys(router?.query).length) {
+    if (router.isReady && !Object.keys(router?.query).length) {
       setBriefs(await getAllBriefs())
     }
     else {
@@ -196,6 +196,7 @@ const Briefs = (): JSX.Element => {
         filter = { ...filter, length_range: strToIntRange(lengthRange) }
       }
       const result = await callSearchBriefs(filter);
+      console.log(result);
       setBriefs(result);
     }
   };
