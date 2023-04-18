@@ -14,6 +14,7 @@ import { getFreelancerProfile } from "@/redux/services/freelancerService";
 import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { selectAccount } from "@/redux/services/polkadotService";
 import { useRouter } from "next/router";
+import FullScreenLoader from "@/components/FullScreenLoader";
 
 interface MilestoneItem {
   name: string;
@@ -27,6 +28,7 @@ export const SubmitProposal = (): JSX.Element => {
   const userHasWeb3Addresss = !!user?.web3_address;
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
@@ -89,7 +91,9 @@ export const SubmitProposal = (): JSX.Element => {
   };
 
   const handleSelectAccount = async (account: InjectedAccountWithMeta) => {
+    setLoading(true);
     await selectAccount(account);
+    setLoading(false);
     setShowPolkadotAccounts(false);
   };
 
@@ -103,6 +107,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   async function insertProject() {
     //TODO: validate all milestone sum up to 100%
+    setLoading(true);
     const resp = await fetch(
       checkEnvironment().concat(`${config.apiBase}/project`),
       {
@@ -131,9 +136,7 @@ export const SubmitProposal = (): JSX.Element => {
         }),
       }
     );
-
-    console.log({ resp });
-
+    setLoading(false);
     if (resp.ok) {
       const applicationId = (await resp.json()).id;
       applicationId &&
@@ -161,11 +164,18 @@ export const SubmitProposal = (): JSX.Element => {
     return sum + percent;
   }, 0);
 
-  const allAmountsHaveValue = () => {
+  const allAmountAndNamesHaveValue = () => {
     for (let i = 0; i < milestones.length; i++) {
-      const { amount } = milestones[i];
+      const { amount, name } = milestones[i];
 
-      if (amount === undefined || amount === null || amount === 0) {
+      if (
+        amount === undefined ||
+        amount === null ||
+        amount === 0 ||
+        name === undefined ||
+        name === null ||
+        name.length === 0
+      ) {
         return false;
       }
     }
@@ -173,7 +183,7 @@ export const SubmitProposal = (): JSX.Element => {
     return true;
   };
 
-  const milestoneAmountsHaveValue = allAmountsHaveValue();
+  const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
 
   return (
     <div className="flex flex-col gap-[2.5rem] text-base leading-[1.5]">
@@ -361,7 +371,7 @@ export const SubmitProposal = (): JSX.Element => {
       </div>
       <div className="buttons-container">
         <button
-          disabled={totalPercent !== 100 || !milestoneAmountsHaveValue}
+          disabled={totalPercent !== 100 || !milestoneAmountsAndNamesHaveValue}
           className="primary-btn in-dark w-button"
           onClick={() => handleSubmit()}
         >
@@ -371,6 +381,7 @@ export const SubmitProposal = (): JSX.Element => {
         {/* <button className="secondary-btn">Save draft</button> */}
       </div>
       {showPolkadotAccounts && renderPolkadotJSModal}
+      {loading && <FullScreenLoader />}
     </div>
   );
 };
