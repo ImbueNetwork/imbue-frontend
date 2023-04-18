@@ -149,6 +149,7 @@ export const SubmitProposal = (): JSX.Element => {
         accountSelected={(account: InjectedAccountWithMeta) =>
           handleSelectAccount(account)
         }
+        closeModal={() => setShowPolkadotAccounts(false)}
       />
     </div>
   );
@@ -159,6 +160,20 @@ export const SubmitProposal = (): JSX.Element => {
     );
     return sum + percent;
   }, 0);
+
+  const allAmountsHaveValue = () => {
+    for (let i = 0; i < milestones.length; i++) {
+      const { amount } = milestones[i];
+
+      if (amount === undefined || amount === null || amount === 0) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const milestoneAmountsHaveValue = allAmountsHaveValue();
 
   return (
     <div className="flex flex-col gap-[2.5rem] text-base leading-[1.5]">
@@ -346,7 +361,7 @@ export const SubmitProposal = (): JSX.Element => {
       </div>
       <div className="buttons-container">
         <button
-          disabled={totalPercent !== 100}
+          disabled={totalPercent !== 100 || !milestoneAmountsHaveValue}
           className="primary-btn in-dark w-button"
           onClick={() => handleSubmit()}
         >

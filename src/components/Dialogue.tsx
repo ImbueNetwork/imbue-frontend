@@ -5,6 +5,7 @@ export type DialogueProps = {
   title: String;
   content?: ReactElement;
   actionList: ReactElement;
+  closeDialouge?: () => void;
 };
 
 export class Dialogue extends React.Component<DialogueProps> {
@@ -15,6 +16,9 @@ export class Dialogue extends React.Component<DialogueProps> {
   render() {
     return (
       <div
+        onClick={() => {
+          this.props?.closeDialouge && this.props?.closeDialouge();
+        }}
         className="mdc-dialog mdc-dialog--open flex fixed top-0 left-0 items-center justify-center box-border w-full h-full bg-[#000000bf]"
         id="dialog"
       >
