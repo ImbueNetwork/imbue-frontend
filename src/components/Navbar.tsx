@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import Drawer from "@/components/Drawer";
-import FullScreenLoader from "@/components/FullScreenLoader";
 
 const logoStyle = { height: "100%", width: "100%" };
 
@@ -40,7 +39,6 @@ function Navbar() {
         id="modal"
       />
       <Drawer visible={sideBarIsVisivle} toggleVisibility={toggleSideBar} />
-      <FullScreenLoader />
     </>
   );
 }

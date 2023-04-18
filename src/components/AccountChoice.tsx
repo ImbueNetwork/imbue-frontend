@@ -5,10 +5,12 @@ import { Dialogue } from "./Dialogue";
 
 type AccountChoiceProps = {
   accountSelected: (account: InjectedAccountWithMeta) => void;
+  closeModal?: () => void;
 };
 
 const AccountChoice = ({
   accountSelected,
+  closeModal,
 }: AccountChoiceProps): JSX.Element => {
   const [accounts, setAccounts] = React.useState<InjectedAccountWithMeta[]>([]);
 
@@ -24,6 +26,7 @@ const AccountChoice = ({
   return (
     <Dialogue
       title="Choose the account you would like to use"
+      closeDialouge={closeModal}
       actionList={
         <>
           {accounts.map((account, index: number) => {

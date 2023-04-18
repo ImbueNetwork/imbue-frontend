@@ -248,6 +248,27 @@ const ApplicationPreview = (): JSX.Element => {
     return sum + percent;
   }, 0);
 
+  const allAmountAndNamesHaveValue = () => {
+    for (let i = 0; i < milestones.length; i++) {
+      const { amount, name } = milestones[i];
+
+      if (
+        amount === undefined ||
+        amount === null ||
+        amount === 0 ||
+        name === undefined ||
+        name === null ||
+        name.length === 0
+      ) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
+
   return (
     <>
       <div className="application-container">
@@ -638,7 +659,9 @@ const ApplicationPreview = (): JSX.Element => {
           {isEditingBio && (
             <button
               className="primary-btn in-dark w-button"
-              disabled={totalPercent !== 100}
+              disabled={
+                totalPercent !== 100 || !milestoneAmountsAndNamesHaveValue
+              }
               onClick={() => updateProject()}
             >
               Update

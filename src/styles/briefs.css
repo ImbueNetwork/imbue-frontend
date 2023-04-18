@@ -115,8 +115,6 @@ input::placeholder {
 
 .brief-item:hover {
   background: var(--theme-purple-dark);
-  border: none;
-  border-radius: 10px;
   opacity: 0.86;
 }
 
