@@ -44,7 +44,7 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
     {
       icon: "group_add",
       text: isFreelancer ? "Freelancer Profile" : "Join The Freelancers",
-      link: isFreelancer ? `/freelancer/${user?.username}/` : "/freelancer",
+      link: isFreelancer ? `/freelancer/${user?.username}/` : "/freelancer/new",
     },
     {
       icon: "work",
