@@ -24,7 +24,7 @@ export const SubmitProposal = (): JSX.Element => {
   const [currencyId, setCurrencyId] = useState(0);
   const [brief, setBrief] = useState<Brief | any>();
   const [user, setUser] = useState<User>();
-  const userHasWeb3Addresss = !!user?.web3_address;
+  // const userHasWeb3Addresss = !!user?.web3_address;
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
 
@@ -94,7 +94,7 @@ export const SubmitProposal = (): JSX.Element => {
   };
 
   async function handleSubmit() {
-    if (!userHasWeb3Addresss) {
+    if (!user?.web3_address) {
       setShowPolkadotAccounts(true);
     } else {
       await insertProject();
