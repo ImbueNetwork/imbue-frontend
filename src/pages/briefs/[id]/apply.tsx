@@ -33,7 +33,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   useEffect(() => {
     getUserAndFreelancer();
-  }, [briefId]);
+  }, [briefId,user]);
 
   useEffect(() => {
     getCurrentUserBrief();

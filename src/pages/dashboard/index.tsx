@@ -49,8 +49,6 @@ const Dashboard = ({ user, isAuthenticated }: DashboardProps): JSX.Element => {
 
   const router = useRouter()
 
-
-
   const getApplications = async (id: string | number) => {
     setBriefApplications(await getBriefApplications(id));
   };
