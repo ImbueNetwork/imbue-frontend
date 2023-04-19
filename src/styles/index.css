@@ -111,13 +111,14 @@ ul li {
 
 .button-container {
   display: flex;
+  
 }
 
 .button-container button {
   border-radius: var(--hq-button-border-radius, 3px);
   background-color: var(--hq-secondary-button-background-color, inherit);
   color: var(--hq-secondary-button-color);
-  border: var(--hq-secondary-button-border);
+  /* border: var(--hq-secondary-button-border); */
   transition: var(--hq-base-transition);
   width: 100%;
   padding: var(--hq-button-padding, 10px);
@@ -126,16 +127,17 @@ ul li {
 }
 
 .button-container button.primary {
-  background-color: var(--hq-primary-button-background-color);
+  background-color: var(--theme-black-text);
   font-weight: bold;
+  border: 2px solid transparent;
 }
 
 .button-container button:hover {
-  background-color: var(--hq-secondary-button-background-hover-color);
+  /* border: 2px solid var(--theme-primary); */
 }
 
 .button-container button.primary:hover {
-  background-color: var(--hq-primary-button-background-hover-color);
+  border: 2px solid var(--theme-primary);
 }
 
 .w-button {
