@@ -5,7 +5,6 @@ import { Brief, BriefSqlFilter } from "@/model";
 import { callSearchBriefs, getAllBriefs } from "@/redux/services/briefService";
 import { BriefFilterOption } from "@/types/briefTypes";
 import { useRouter } from "next/router";
-import { getServerSideProps } from "@/utils/serverSideProps";
 
 const Briefs = (): JSX.Element => {
   const [briefs, setBriefs] = useState<Brief[]>([]);
@@ -118,7 +117,7 @@ const Briefs = (): JSX.Element => {
       },
       {
         // years * months
-        interiorIndex: 5,
+        interiorIndex: 4,
         search_for: [12 * 5],
         or_max: true,
         value: "5 years +",
@@ -147,7 +146,7 @@ const Briefs = (): JSX.Element => {
   };
 
   const fetchAndSetBriefs = async () => {
-    if (!Object.keys(router?.query).length) {
+    if (router.isReady && !Object.keys(router?.query).length) {
       setBriefs(await getAllBriefs())
     }
     else {
@@ -190,7 +189,6 @@ const Briefs = (): JSX.Element => {
 
       }
       if(lengthRange){
-        console.log(lengthRange);
         const range = strToIntRange(lengthRange);
         range.forEach((v: any) => {
           (document.getElementById(`2-${v - 1}`) as HTMLInputElement).checked = true
@@ -198,6 +196,7 @@ const Briefs = (): JSX.Element => {
         filter = { ...filter, length_range: strToIntRange(lengthRange) }
       }
       const result = await callSearchBriefs(filter);
+      console.log(result);
       setBriefs(result);
     }
   };
@@ -220,6 +219,7 @@ const Briefs = (): JSX.Element => {
     let submitted_is_max: boolean = false;
     let length_range: number[] = [];
     let length_is_max: boolean = false;
+    let length_range_prop : number[] = [];
 
     // default is max
     let hpw_max: number = 50;
@@ -257,8 +257,13 @@ const Briefs = (): JSX.Element => {
               const o2 = lengthFilters.options[parseInt(interiorIndex)];
               length_range = [...length_range, ...o2.search_for.slice()];
               length_is_max = o2.or_max;
-              break;
 
+              if(o2.search_for[0] === 12) length_range_prop = [...length_range_prop, 4]
+              else if(o2.search_for[0] === 60) length_range_prop = [...length_range_prop, 5]
+              else length_range_prop = length_range
+              
+              break;
+              
             default:
               console.log(
                 "Invalid filter option selected or unimplemented. type:" +
@@ -273,7 +278,7 @@ const Briefs = (): JSX.Element => {
     router.query.expRange = exp_range.length ? exp_range.toString() : []
     router.query.submitRange = submitted_range.length ? submitted_range.toString() : []
     router.query.submitted_is_max = submitted_is_max ? submitted_is_max.toString() : []
-    router.query.lengthRange = length_range.length ? length_range.toString() : []
+    router.query.lengthRange = length_range_prop.length ? length_range_prop.toString() : []
     router.push(router, undefined, { shallow: true })
 
     if (is_search) {
@@ -371,6 +376,5 @@ const Briefs = (): JSX.Element => {
   );
 };
 
-export { getServerSideProps };
 
 export default Briefs;

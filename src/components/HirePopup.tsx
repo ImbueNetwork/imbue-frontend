@@ -225,9 +225,9 @@ export const HirePopup = ({
           <div
             key={index}
             onClick={() => selectedAccount(account)}
-            className="w-2/3 h-14 grey-container mb-3 flex justify-center items-center cursor-pointer"
+            className="w-2/3 grey-container mb-3 flex justify-center items-center cursor-pointer button-container"
           >
-            <p className="text-center">{account.address}</p>
+            <button className="text-center primary break-all">{account.meta.name} ({account.meta.source})</button>
           </div>
         ))}
       </div>
