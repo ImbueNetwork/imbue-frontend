@@ -193,7 +193,7 @@
 .separator {
   width: 100%;
   height: 1px;
-  background: var(--theme-white);
+  /* background: var(--theme-white); */
   margin: 12px 0;
 }
 
