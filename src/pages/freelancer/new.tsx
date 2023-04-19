@@ -179,9 +179,7 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
             <p key={index}>{line}</p>
           ))}
         </div>
-        <p className="field-name">Your Skills</p>
-        <br />
-        <br />
+        <h3 className="field-name mt-4">Your Skills</h3>
         <div className="skills-container">
           <TagsInput
             suggestData={suggestedFreelancingSkills}

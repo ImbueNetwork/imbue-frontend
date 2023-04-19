@@ -45,7 +45,6 @@ export const HirePopup = ({
 
   const fetchAndSetAccounts = async () => {
     const accounts = await getWeb3Accounts();
-    console.log(accounts);
     setAccounts(accounts);
   };
 

@@ -90,9 +90,9 @@ export async function updateFreelancer(freelancer: Freelancer) {
     console.log("Freelancer updated successfully.");
     return (await resp.json()) as Freelancer;
   } else {
-    throw new Error(
+    console.log(new Error(
       "Failed to update freelancer profile. status:" + resp.status
-    );
+    ))
   }
 }
 

@@ -255,7 +255,7 @@ const Freelancers = (): JSX.Element => {
                                             </div>
                                         </div>
                                         <button
-                                            className={`${styles.primaryButton} w-full`}
+                                            className={`${styles.primaryButton} w-2/3`}
                                             onClick={() =>
                                                 redirectToProfile(username)
                                             }

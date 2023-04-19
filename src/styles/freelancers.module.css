@@ -19,7 +19,7 @@
     border-radius: 0px 0px 12px 12px;
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    width: 100%;
 }
 
 .freelancerProfilePic {
@@ -40,48 +40,47 @@
     position: relative;
     display: flex;
     justify-content: center;
+    align-items: center;
 }
 .freelancersView {
     display: flex;
     flex-direction: column;
+    width: 70%;
 }
 
 .primaryButton {
-    padding: 12px 24px;
+    padding: 10px 24px;
     -webkit-align-self: center;
     -ms-flex-item-align: center;
     -ms-grid-row-align: center;
     align-self: center;
-    border: 2px solid transparent;
-
     -webkit-transition: color 0.3s, background-color 0.3s;
     transition: color 0.3s, background-color 0.3s;
-
     color: #fff;
     font-size: 16px;
     font-family: Aeoniktrial, sans-serif;
     font-weight: 400;
     line-height: 22px;
     letter-spacing: 0.6px;
-
     text-align: center;
     text-decoration: none;
     text-transform: capitalize;
     border-radius: 12px;
     background-color: #411dc9;
-
     cursor: pointer;
+    margin-top: auto;
+    margin-bottom: 10px;
 }
 
 .skills {
     display: flex;
-    /* flex-wrap: wrap; */
-    /* gap: 20px; */
-    /* margin-top: 24px; */
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 24px;
 }
 
 .skill {
-    padding: 12px 24px;
+    padding: 7px 14px;
     border: 1px solid white;
     border-radius: 8px;
 }
@@ -144,6 +143,7 @@
 
 .filterPanel {
     flex: 1 0 30%;
+    width: 35%;
 }
 
 .filter-heading {

@@ -69,32 +69,40 @@ const ApplicationPreview = (): JSX.Element => {
   const applicationStatus = ProjectStatus[application?.status_id];
   const isApplicationOwner = user?.id == application?.user_id;
   const isBriefOwner = user?.id == brief?.user_id;
-  const [freelancerAccount, setFreelancerAccount] =
-    React.useState<InjectedAccountWithMeta>();
+  const [freelancerAccount, setFreelancerAccount] = useState<InjectedAccountWithMeta>();
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    const getSetUpData = async () => {
+      const applicationResponse = await fetchProject(applicationId);
+      const freelancerUser = await fetchUser(
+        Number(applicationResponse?.user_id)
+      );
+      const freelancerResponse = await getFreelancerProfile(
+        freelancerUser?.username
+      );
+  
+      const brief: Brief | undefined = await getBrief(briefId);
+      const userResponse = await getCurrentUser();
+  
+      setFreelancer(freelancerResponse);
+      setBrief(brief);
+      setApplication(applicationResponse);
+      setUser(userResponse);
+    };
+    
     if (briefId && applicationId) {
       getSetUpData();
     }
   }, [briefId, applicationId]);
 
-  const getSetUpData = async () => {
-    const applicationResponse = await fetchProject(applicationId);
-    const freelancerUser = await fetchUser(
-      Number(applicationResponse?.user_id)
-    );
-    const freelancerResponse = await getFreelancerProfile(
-      freelancerUser?.username
-    );
-
-    const brief: Brief | undefined = await getBrief(briefId);
-    const userResponse = await getCurrentUser();
-
-    setFreelancer(freelancerResponse);
-    setBrief(brief);
-    setApplication(applicationResponse);
-    setUser(userResponse);
+  
+  const fetchAndSetAccounts = async () => {
+    const accounts = await getWeb3Accounts();
+    const account = accounts.filter(
+      (account) => account.address === freelancer?.web3_address
+    )[0];
+    setFreelancerAccount(account);
   };
 
   useEffect(() => {
@@ -106,15 +114,8 @@ const ApplicationPreview = (): JSX.Element => {
       }
     }
     setup();
-  }, [brief]);
+  }, [brief,freelancer]);
 
-  const fetchAndSetAccounts = async () => {
-    const accounts = await getWeb3Accounts();
-    const account = accounts.filter(
-      (account) => account.address === freelancer?.web3_address
-    )[0];
-    setFreelancerAccount(account);
-  };
 
   const viewFullBrief = () => {
     router.push(`/briefs/${brief?.id}/`);
@@ -150,7 +151,6 @@ const ApplicationPreview = (): JSX.Element => {
     setLoading(false);
     setIsEditingBio(false);
   };
-
   const startWork = async () => {
     if (freelancerAccount) {
       setLoading(true);
