@@ -7,7 +7,9 @@ clean:
 	rm -rf .next
 
 clean_build: clean
+	yarn install --force
 	yarn build
+	
 
 migrate: migrate_latest
 
