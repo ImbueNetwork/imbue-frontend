@@ -14,10 +14,7 @@ interface BriefApplicationsProps {
   browsingUser: User;
 }
 
-export const BriefApplications = ({
-  brief,
-  browsingUser,
-}: BriefApplicationsProps) => {
+const BriefApplications = ({ brief, browsingUser }: BriefApplicationsProps) => {
   const [briefApplications, setBriefApplications] = useState<any[]>();
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
@@ -94,23 +91,4 @@ export const BriefApplications = ({
   );
 };
 
-// {...{ application, redirectToApplication, handleMessageBoxClick }}
-
-// document.addEventListener("DOMContentLoaded", async (event) => {
-//     let paths = window.location.pathname.split("/");
-//     let briefId = paths.length >= 2 && parseInt(paths[paths.length - 2]);
-
-//     if (briefId) {
-//         const brief: Brief = await getBrief(briefId);
-//         const browsingUser = await getCurrentUser();
-//         const isBriefOwner = brief.user_id == browsingUser.id;
-//         if (isBriefOwner) {
-//             ReactDOMClient.createRoot(
-//                 document.getElementById("brief-applications")!
-//             ).render(<BriefApplications brief={brief} browsingUser={browsingUser} />);
-//         } else {
-//             redirect(`briefs/${briefId}/`)
-//         }
-
-//     }
-// });
+export default BriefApplications;
