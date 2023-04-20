@@ -1,11 +1,15 @@
 DBDIR := "./src/pages/api/db"
 
 
-all: clean
+all: clean_build
 
-clean: clean_build
-clean_build:
-	yarn install --force 
+clean:
+	rm -rf .next
+
+clean_build: clean
+	yarn install --force
+	yarn build
+	
 
 migrate: migrate_latest
 
@@ -28,14 +32,11 @@ migrate_reset: node_modules
 seed:
 	yarn run knex --cwd ${DBDIR} seed:run
 
-db_up: migrate seed
+db_up: migrate
 
 db_down: migrate_reset
 
 cmd: db_up
-	node build/index.js
-
-start: db_up
 	yarn start
 
 .PHONY: all clean clean_build clean_deps build \

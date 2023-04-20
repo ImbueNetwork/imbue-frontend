@@ -52,7 +52,7 @@ const Project = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const briefData: Brief = await getBrief(id);
+      const briefData: any = await getBrief(id);
       setBrief(briefData);
     };
     id && fetchData();

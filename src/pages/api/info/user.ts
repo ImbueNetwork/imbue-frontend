@@ -4,7 +4,7 @@ import config from '../config'
 
 import db from "../db";
 import * as models from "../models";
-import { ensureParams, cookieExtractor, jwtOptions } from "../auth/common"
+import { ensureParams, jwtOptions } from "../auth/common"
 // @ts-ignore
 import * as passportJwt from "passport-jwt"
 // @ts-ignore
