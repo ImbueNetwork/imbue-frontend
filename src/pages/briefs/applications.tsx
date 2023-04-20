@@ -45,7 +45,7 @@ const BriefApplications = ({ brief, browsingUser }: BriefApplicationsProps) => {
   };
 
   return (
-    <div className="page-wrapper">
+    <div className="page-wrapper hq-layout">
       {browsingUser && showMessageBox && (
         <ChatPopup
           {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser }}

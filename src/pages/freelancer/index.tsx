@@ -46,12 +46,12 @@ const Freelancers = (): JSX.Element => {
         setFreelancers(data);
     };
 
-    const dedupeArray = async (input:any) => {
+    const dedupeArray = async (input: any) => {
         return input
-            .filter((thing:any, i:any, arr:any) => {
-                return arr.indexOf(arr.find((t:any) => t.id === thing.id)) === i;
+            .filter((thing: any, i: any, arr: any) => {
+                return arr.indexOf(arr.find((t: any) => t.id === thing.id)) === i;
             })
-            .sort(function (a:any, b:any) {
+            .sort(function (a: any, b: any) {
                 return a.name.localeCompare(b.name);
             });
     };
@@ -61,8 +61,8 @@ const Freelancers = (): JSX.Element => {
         void fetchAndSetFreelancers();
     }, []);
 
-    const redirectToProfile = (username:any) => {
-        utils.redirect(`freelancers/${username}/`);
+    const redirectToProfile = (username: any) => {
+        utils.redirect(`freelancer/${username}/`);
     };
 
     const skillsFilter = {
@@ -156,7 +156,7 @@ const Freelancers = (): JSX.Element => {
                         default:
                             console.log(
                                 "Invalid filter option selected or unimplemented. type:" +
-                                    filterType
+                                filterType
                             );
                     }
                 }
@@ -180,10 +180,10 @@ const Freelancers = (): JSX.Element => {
     };
 
     return (
-        <div>
-            <h1>Freelancers</h1>
+        <div className="mx-20">
             <div className={styles.freelancersContainer}>
                 <div className={styles.filterPanel}>
+                    <h1 className="mb-5">Freelancers</h1>
                     <div className={styles.filterHeading}>Filter By</div>
                     <FreelancerFilter
                         label={skillsFilter.label}
