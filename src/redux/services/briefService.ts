@@ -77,7 +77,7 @@ export const getUserBriefs = async (user_id: string | number) => {
       `Failed to get all briefs for user ${user_id}. status: ${resp.status}`
     );
     console.log(error);
-    return []
+    return [];
   }
 };
 
@@ -131,4 +131,20 @@ export const getUserBrief = async (userId: number, briefId: number) => {
   //   return resp.json();
   // }
   // return null;
+};
+
+export const getProjectById = async (projectId: string | number) => {
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}project/${projectId}`),
+    {
+      headers: postAPIHeaders,
+      method: "get",
+    }
+  );
+
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    throw new Error("Failed to get project. status:" + resp.status);
+  }
 };

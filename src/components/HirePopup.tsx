@@ -11,7 +11,8 @@ import ChainService from "@/redux/services/chainService";
 import { getCurrentUser } from "@/utils";
 import { changeBriefApplicationStatus } from "@/redux/services/briefService";
 import Image from "next/image";
-import styles from '../styles/hire-modal.module.css'
+import styles from "../styles/hire-modal.module.css";
+import { useRouter } from "next/router";
 
 export const HirePopup = ({
   openPopup,
@@ -25,6 +26,7 @@ export const HirePopup = ({
   totalCost,
   setLoading,
 }: any) => {
+  const router = useRouter();
   const [popupStage, setstage] = useState<number>(0);
   const [walletOptions, setWalletOptions] = useState<number[]>([0, 1, 2]);
   const [accounts, setAccounts] = React.useState<InjectedAccountWithMeta[]>([]);
@@ -86,6 +88,7 @@ export const HirePopup = ({
             application.id,
             ProjectStatus.Accepted
           );
+          router.push(`/project/${application.id}`);
           console.log(result.eventData);
         } else if (result.txError) {
           console.log("***** failed");

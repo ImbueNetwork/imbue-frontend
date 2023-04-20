@@ -1,5 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import { getProjectById } from "@/redux/services/briefService";
 import Image from "next/image";
-import React, { useState } from "react";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 
 const openForVotingTag = (): JSX.Element => {
   return (
@@ -93,6 +96,18 @@ const ExpandableDropDowns = () => {
 };
 
 function Project() {
+  const router = useRouter();
+  const [project, setProject] = useState({});
+  const projectId: any = router?.query?.id || 0;
+
+  useEffect(() => {
+    getProject();
+  }, [projectId]);
+
+  const getProject = async () => {
+    const projectRes = await getProjectById(projectId);
+    console.log({ projectRes });
+  };
   return (
     <div>
       <div className="flex flex-row bg-[#2c2c2c] border border-opacity-25 -border--theme-light-white rounded-[20px] p-[50px]">
