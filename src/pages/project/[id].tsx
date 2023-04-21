@@ -162,8 +162,9 @@ function Project() {
 
   // fetching the project data from api and from chain
   useEffect(() => {
-    getProject();
-    getChainProject();
+    if (projectId) {
+      getProject();
+    }
   }, [projectId]);
 
   const getChainProject = async () => {
@@ -188,6 +189,7 @@ function Project() {
     const userResponse = await utils.getCurrentUser();
     await setUser(userResponse);
     // getting freelancer data
+    getChainProject();
     getFreelancerData(userResponse?.username);
   };
 

@@ -17,13 +17,13 @@ const MyFreelancerApplications = ({
   const router = useRouter();
   const redirectToApplication = (application: Project) => {
     //TODO: redirect to projects page if accepted
-    if (application.status_id === ProjectStatus?.Accepted) {
-      router.push(`/project/${application?.id}`);
-    } else {
-      router.push(
-        `/briefs/${application.brief_id}/applications/${application.id}/`
-      );
-    }
+    // if (application.status_id === ProjectStatus?.Accepted) {
+    //   router.push(`/project/${application?.id}`);
+    // } else {
+    router.push(
+      `/briefs/${application.brief_id}/applications/${application.id}/`
+    );
+    // }
   };
 
   const redirectToDiscoverBriefs = () => {
