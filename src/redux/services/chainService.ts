@@ -346,7 +346,9 @@ class ChainService {
       )
     ).toHuman();
 
-    const raisedFunds = BigInt(projectOnChain.raisedFunds.replaceAll(",", ""));
+    const raisedFunds = BigInt(
+      projectOnChain?.raisedFunds?.replaceAll(",", "") || 0
+    );
     const milestones = await this.getProjectMilestones(projectOnChain);
 
     // get project state
@@ -462,7 +464,7 @@ class ChainService {
       ),
       initiator: projectOnChain.initiator,
       createBlockNumber: BigInt(
-        projectOnChain.createBlockNumber.replaceAll(",", "")
+        projectOnChain?.createBlockNumber?.replaceAll(",", "") || 0
       ),
       approvedForFunding: projectOnChain.approvedForFunding,
       fundingThresholdMet: projectOnChain.fundingThresholdMet,

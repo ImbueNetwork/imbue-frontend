@@ -88,7 +88,6 @@ export const HirePopup = ({
             application.id,
             ProjectStatus.Accepted
           );
-          router.push(`/project/${application.id}`);
           console.log(result.eventData);
         } else if (result.txError) {
           console.log("***** failed");
