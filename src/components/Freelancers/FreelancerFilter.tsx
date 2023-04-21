@@ -13,7 +13,7 @@ export const FreelancerFilter = ({ label, filter_options, filter_type }: Freelan
         <div className="filter-section">
             <div className={styles.filterLabel}>{label}</div>
             <div className={styles.filterOptionList}>
-                {filter_options.map(
+                {filter_options?.map(
                     ({ value, interiorIndex }) => (
                         <div className={styles.filterOption} key={value}>
                             <input
