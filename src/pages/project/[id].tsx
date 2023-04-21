@@ -297,6 +297,7 @@ function Project() {
                   {approvedMilStones?.length}/{project?.milestones?.length}
                 </span>
               </h3>
+              {/* TODO: add the mile stone step indicator */}
             </div>
           </div>
 
