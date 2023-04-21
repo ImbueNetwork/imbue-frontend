@@ -14,6 +14,7 @@ import FullScreenLoader from "@/components/FullScreenLoader";
 import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import moment from "moment";
 import AccountChoice from "@/components/AccountChoice";
+import { Dialogue } from "@/components/Dialogue";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -22,6 +23,7 @@ type ExpandableDropDownsProps = {
   index: number;
   dateCreated: Date;
   vote: () => void;
+  submitMilestone: () => void;
 };
 
 const openForVotingTag = (): JSX.Element => {
@@ -53,6 +55,7 @@ const ExpandableDropDowns = ({
   index,
   dateCreated,
   vote,
+  submitMilestone,
 }: ExpandableDropDownsProps) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -120,6 +123,13 @@ const ExpandableDropDowns = ({
         >
           Vote
         </button>
+        <button
+          className="primary-btn in-dark w-button font-normal h-[43px] items-center content-center !py-0 mt-[25px] px-8"
+          data-testid="next-button"
+          onClick={() => submitMilestone()}
+        >
+          Submit
+        </button>
       </div>
     </div>
   );
@@ -134,7 +144,13 @@ function Project() {
   );
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
+  const [submittingMilestone, setSubmittingMileStone] =
+    useState<boolean>(false);
+  const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
   const [mileStoneKeyInView, setMileStoneKeyInview] = useState<number>(0);
+  const [web3account, setWeb3Account] = useState<InjectedAccountWithMeta | any>(
+    {}
+  );
   const [loading, setLoading] = useState<boolean>(false);
   const projectId: any = router?.query?.id || 0;
 
@@ -174,7 +190,7 @@ function Project() {
   };
 
   // voting on a mile stone
-  const voteMileStone = async (web3Account: any) => {
+  const voteMileStone = async (web3Account: any, booleanValue: boolean) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
     const user: User | any = await utils.getCurrentUser();
@@ -183,7 +199,7 @@ function Project() {
       web3Account,
       onChainProject,
       mileStoneKeyInView,
-      true
+      booleanValue
     );
     setLoading(false);
     console.log({ voteResponse });
@@ -208,16 +224,50 @@ function Project() {
     <div>
       <AccountChoice
         accountSelected={async (account: InjectedAccountWithMeta) => {
-          // FIXME: since i don't know what status to check for when voting or submiting a milestone i am manually doing it here
-          // having a status to check makes this function resuable for both voting and submiting
-          // TODO: uncheck for which eer function you want to perform
-          // await submitMileStone(account);
-          // await voteMileStone(account);
+          if (submittingMilestone) {
+            await submitMileStone(account);
+          } else {
+            await setWeb3Account(account);
+            await setShowVotingModal(true);
+          }
           await setShowPolkadotAccounts(false);
         }}
         closeModal={() => setShowPolkadotAccounts(false)}
       />
     </div>
+  );
+
+  const renderVotingModal = (
+    <Dialogue
+      title="Want to appove milestone?"
+      closeDialouge={() => setShowVotingModal(false)}
+      actionList={
+        <>
+          <li className="button-container !bg-transparent !hover:bg-transparent  !border !border-solid !border-white">
+            <button
+              className="primary !bg-transparent !hover:bg-transparent"
+              onClick={() => {
+                voteMileStone(web3account, true);
+                setShowVotingModal(false);
+              }}
+            >
+              Yes
+            </button>
+          </li>
+          <li className="button-container !bg-transparent !hover:bg-transparent  !border !border-solid !border-white">
+            <button
+              className="primary !bg-transparent !hover:bg-transparent"
+              onClick={() => {
+                voteMileStone(web3account, false);
+                setShowVotingModal(false);
+              }}
+            >
+              No
+            </button>
+          </li>
+        </>
+      }
+    />
   );
 
   const approvedMilStones = project?.milestones?.filter?.(
@@ -347,10 +397,21 @@ function Project() {
               index={index}
               data={mileStone}
               dateCreated={project?.created}
-              vote={() => {
-                //TODO: refactor this for either voting or submitting a mile stone
-                setShowPolkadotAccounts(true);
-                setMileStoneKeyInview(mileStone.milestone_key);
+              vote={async () => {
+                // show polkadot account modal
+                await setShowPolkadotAccounts(true);
+                // set submitting mile stone to false
+                await setSubmittingMileStone(false);
+                // setMile stone key in view
+                await setMileStoneKeyInview(mileStone.milestone_key);
+              }}
+              submitMilestone={async () => {
+                // set submitting mile stone to true
+                await setSubmittingMileStone(true);
+                // show polkadot account modal
+                await setShowPolkadotAccounts(true);
+                // setMile stone key in view
+                await setMileStoneKeyInview(mileStone.milestone_key);
               }}
             />
           );
@@ -358,6 +419,7 @@ function Project() {
       )}
 
       {showPolkadotAccounts && renderPolkadotJSModal}
+      {showVotingModal && renderVotingModal}
     </div>
   );
 }
