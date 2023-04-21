@@ -25,7 +25,7 @@ const Freelancers = ({initialSkills, initialServices, initialLanguages, initialF
     const { skillsRangeProps, servicesRangeProps, languagesRangeProps, heading } = router.query
 
     const redirectToProfile = (username: any) => {
-        utils.redirect(`freelancer/${username}/`);
+        utils.redirect(`freelancers/${username}/`);
     };
 
     const skillsFilter = {
