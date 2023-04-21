@@ -172,12 +172,10 @@ function Project() {
     const imbueApi = await initImbueAPIInfo();
     const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
-    const chainProjRes = await chainService.getProject(projectId);
+    const onChainProjectRes = await chainService.getProject(projectId);
     setLoading(false);
-    if (chainProjRes) {
-      setOnChainProject(chainProjRes);
-      // chain project response
-      console.log({ chainProjRes });
+    if (onChainProjectRes) {
+      setOnChainProject(onChainProjectRes);
     }
   };
 
@@ -185,10 +183,8 @@ function Project() {
     const projectRes = await getProjectById(projectId);
     setProject(projectRes);
     // api  project response
-    console.log({ projectRes });
     const userResponse = await utils.getCurrentUser();
     await setUser(userResponse);
-    // getting freelancer data
     getChainProject();
     getFreelancerData(userResponse?.username);
   };
@@ -215,18 +211,30 @@ function Project() {
   };
 
   // submitting a mile stone
-  const submitMileStone = async (web3Account: any) => {
+  const submitMileStone = async (account: InjectedAccountWithMeta) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
     const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
-    const submitResponse = await chainService.submitMilestone(
-      web3Account,
+    const result = await chainService.submitMilestone(
+      account,
       onChainProject,
       mileStoneKeyInView
     );
+    while (true) {
+      if (result.status || result.txError) {
+        if (result.status) {
+          console.log("***** success");
+          console.log(result.eventData);
+        } else if (result.txError) {
+          console.log("***** failed");
+          console.log(result.errorMessage);
+        }
+        break;
+      }
+      await new Promise((f) => setTimeout(f, 1000));
+    }
     setLoading(false);
-    console.log({ submitResponse });
   };
 
   const renderPolkadotJSModal = (

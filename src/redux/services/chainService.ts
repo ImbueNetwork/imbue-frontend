@@ -101,10 +101,10 @@ class ChainService {
 
   public async submitMilestone(
     account: InjectedAccountWithMeta,
-    projectOnChain: any,
+    projectOnChain: ProjectOnChain,
     milestoneKey: number
   ): Promise<BasicTxResponse> {
-    const projectId = projectOnChain.milestones[0].projectKey;
+    const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic =
       await this.imbueApi.imbue.api.tx.imbueProposals.submitMilestone(
         projectId,
@@ -484,7 +484,8 @@ class ChainService {
       .map(
         (milestone: any) =>
           ({
-            project_id: Number(milestone.projectKey),
+            project_id: projectOnChain.id,
+            project_chain_id: Number(milestone.projectKey),
             milestone_key: Number(milestone.milestoneKey),
             name: milestone.name,
             percentage_to_unlock: Number(milestone.percentageToUnlock),

@@ -81,6 +81,7 @@ export type ProjectOnChain = {
 
 export type Milestone = {
   project_id: number;
+  project_chain_id: number;
   milestone_key: number;
   name: string;
   percentage_to_unlock: number;
