@@ -6,6 +6,12 @@ import { callSearchBriefs, getAllBriefs } from "@/redux/services/briefService";
 import { BriefFilterOption } from "@/types/briefTypes";
 import { useRouter } from "next/router";
 
+export const strToIntRange = (strList: any) => {
+  return Array.isArray(strList)
+    ? strList[0].split(',').map((v: any) => Number(v))
+    : strList?.split(',').map((v: any) => Number(v))
+}
+
 const Briefs = (): JSX.Element => {
   const [briefs, setBriefs] = useState<Brief[]>([]);
   const router = useRouter()
@@ -145,65 +151,61 @@ const Briefs = (): JSX.Element => {
     ],
   };
 
-  const fetchAndSetBriefs = async () => {
-    if (router.isReady && !Object.keys(router?.query).length) {
-      setBriefs(await getAllBriefs())
-    }
-    else {
-      let filter: BriefSqlFilter = {
-        experience_range: [],
-        submitted_range: [],
-        submitted_is_max: false,
-        length_range: [],
-        length_is_max: false,
-        search_input: "",
-      };
 
-      const strToIntRange = (strList: any) => {
-        return Array.isArray(strList)
-          ? strList[0].split(',').map((v: any) => Number(v))
-          : strList?.split(',').map((v: any) => Number(v))
-      }
-
-      if (expRange) {
-        const range = strToIntRange(expRange);
-        range.forEach((v: any) => {
-          (document.getElementById(`0-${v - 1}`) as HTMLInputElement).checked = true
-        });
-        filter = { ...filter, experience_range: strToIntRange(expRange) }
-      }
-      if (submitRange) {
-        const range = strToIntRange(submitRange);
-        range.forEach((v: any) => {
-          if (v > 0 && v < 5) (document.getElementById(`1-${0}`) as HTMLInputElement).checked = true
-          if (v >= 5 && v < 10) (document.getElementById(`1-${1}`) as HTMLInputElement).checked = true
-          if (v >= 10 && v < 15) (document.getElementById(`1-${2}`) as HTMLInputElement).checked = true
-          if (v > 15 ) (document.getElementById(`1-${3}`) as HTMLInputElement).checked = true
-        });
-        filter = { ...filter, submitted_range: strToIntRange(submitRange) }
-      }
-      if(heading) {
-        filter = {...filter, search_input : heading};
-
-        (document.getElementById("search-input") as HTMLInputElement).value = heading.toString()
-
-      }
-      if(lengthRange){
-        const range = strToIntRange(lengthRange);
-        range.forEach((v: any) => {
-          (document.getElementById(`2-${v - 1}`) as HTMLInputElement).checked = true
-        });
-        filter = { ...filter, length_range: strToIntRange(lengthRange) }
-      }
-      const result = await callSearchBriefs(filter);
-      console.log(result);
-      setBriefs(result);
-    }
-  };
 
   useEffect(() => {
-    fetchAndSetBriefs();
-  }, [router.query]);
+    const fetchAndSetBriefs = async () => {
+      if (!Object.keys(router?.query).length) {
+        setBriefs(await getAllBriefs())
+      }
+      else {
+        let filter: BriefSqlFilter = {
+          experience_range: [],
+          submitted_range: [],
+          submitted_is_max: false,
+          length_range: [],
+          length_is_max: false,
+          search_input: "",
+        };
+
+        if (expRange) {
+          const range = strToIntRange(expRange);
+          range.forEach((v: any) => {
+            const checkbox = document.getElementById(`0-${v - 1}`) as HTMLInputElement
+            if (checkbox) checkbox.checked = true
+          });
+          filter = { ...filter, experience_range: strToIntRange(expRange) }
+        }
+        if (submitRange) {
+          const range = strToIntRange(submitRange);
+          range.forEach((v: any) => {
+            if (v > 0 && v < 5) (document.getElementById(`1-${0}`) as HTMLInputElement).checked = true
+            if (v >= 5 && v < 10) (document.getElementById(`1-${1}`) as HTMLInputElement).checked = true
+            if (v >= 10 && v < 15) (document.getElementById(`1-${2}`) as HTMLInputElement).checked = true
+            if (v > 15) (document.getElementById(`1-${3}`) as HTMLInputElement).checked = true
+          });
+          filter = { ...filter, submitted_range: strToIntRange(submitRange) }
+        }
+        if (heading) {
+          filter = { ...filter, search_input: heading };
+          const input = document.getElementById("search-input") as HTMLInputElement
+          if (input) input.value = heading.toString()
+        }
+        if (lengthRange) {
+          const range = strToIntRange(lengthRange);
+          range.forEach((v: any) => {
+            const checkbox = document.getElementById(`2-${v - 1}`) as HTMLInputElement
+            if (checkbox) checkbox.checked = true
+          });
+          filter = { ...filter, length_range: strToIntRange(lengthRange) }
+        }
+        const result = await callSearchBriefs(filter);
+        setBriefs(result);
+      }
+    };
+
+    router.isReady && fetchAndSetBriefs();
+  }, [expRange, heading, lengthRange, router, submitRange]);
 
   // Here we have to get all the checked boxes and try and construct a query out of it...
   const onSearch = async () => {
@@ -219,7 +221,7 @@ const Briefs = (): JSX.Element => {
     let submitted_is_max: boolean = false;
     let length_range: number[] = [];
     let length_is_max: boolean = false;
-    let length_range_prop : number[] = [];
+    let length_range_prop: number[] = [];
 
     // default is max
     let hpw_max: number = 50;
@@ -258,12 +260,12 @@ const Briefs = (): JSX.Element => {
               length_range = [...length_range, ...o2.search_for.slice()];
               length_is_max = o2.or_max;
 
-              if(o2.search_for[0] === 12) length_range_prop = [...length_range_prop, 4]
-              else if(o2.search_for[0] === 60) length_range_prop = [...length_range_prop, 5]
+              if (o2.search_for[0] === 12) length_range_prop = [...length_range_prop, 4]
+              else if (o2.search_for[0] === 60) length_range_prop = [...length_range_prop, 5]
               else length_range_prop = length_range
-              
+
               break;
-              
+
             default:
               console.log(
                 "Invalid filter option selected or unimplemented. type:" +
@@ -274,7 +276,7 @@ const Briefs = (): JSX.Element => {
       }
     }
 
-    router.query.heading = search_value !== ""? search_value : []
+    router.query.heading = search_value !== "" ? search_value : []
     router.query.expRange = exp_range.length ? exp_range.toString() : []
     router.query.submitRange = submitted_range.length ? submitted_range.toString() : []
     router.query.submitted_is_max = submitted_is_max ? submitted_is_max.toString() : []
@@ -290,7 +292,7 @@ const Briefs = (): JSX.Element => {
         length_is_max,
         search_input: search_value,
       };
-      
+
       const briefs_filtered = await callSearchBriefs(filter);
       setBriefs(briefs_filtered);
     } else {
@@ -375,6 +377,5 @@ const Briefs = (): JSX.Element => {
     </div>
   );
 };
-
 
 export default Briefs;

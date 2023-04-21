@@ -12,63 +12,26 @@ import { FreelancerFilterOption, FilterOption } from "../../types/freelancerType
 import FreelancerFilter from "../../components/Freelancers/FreelancerFilter";
 import Image from "next/image";
 import profilePic from "../../assets/images/profile-image.png"
+import { useRouter } from "next/router";
+import { strToIntRange } from "../briefs";
 
-const Freelancers = (): JSX.Element => {
-    const [freelancers, setFreelancers] = useState<Freelancer[]>([]);
-    const [skills, setSkills] = useState<Item[]>([]);
-    const [services, setServices] = useState<Item[]>([]);
-    const [languages, setLanguages] = useState<Item[]>([]);
+const Freelancers = ({initialSkills, initialServices, initialLanguages, initialFreelancers}: any): JSX.Element => {
+    const [freelancers, setFreelancers] = useState<Freelancer[]>(initialFreelancers);
+    const [skills, setSkills] = useState<Item[]>(initialSkills);
+    const [services, setServices] = useState<Item[]>(initialServices);
+    const [languages, setLanguages] = useState<Item[]>(initialLanguages);
 
-    const fetchAndSetFreelancers = async () => {
-        const data = await getAllFreelancers();
+    const router = useRouter()
+    const { skillsRangeProps, servicesRangeProps, languagesRangeProps, heading } = router.query
 
-        let combinedSkills = Array.prototype.concat.apply(
-            [],
-            data.map((x) => x.skills)
-        ) as Item[];
-        const dedupedSkills = await dedupeArray(combinedSkills);
-
-        var combinedServices = Array.prototype.concat.apply(
-            [],
-            data.map((x) => x.services)
-        ) as Item[];
-        const dedupedServices = await dedupeArray(combinedServices);
-
-        var combinedLanguages = Array.prototype.concat.apply(
-            [],
-            data.map((x) => x.languages)
-        ) as Item[];
-        const dedupedLanguages = await dedupeArray(combinedLanguages);
-
-        setSkills(dedupedSkills);
-        setServices(dedupedServices);
-        setLanguages(dedupedLanguages);
-        setFreelancers(data);
-    };
-
-    const dedupeArray = async (input:any) => {
-        return input
-            .filter((thing:any, i:any, arr:any) => {
-                return arr.indexOf(arr.find((t:any) => t.id === thing.id)) === i;
-            })
-            .sort(function (a:any, b:any) {
-                return a.name.localeCompare(b.name);
-            });
-    };
-
-    useEffect(() => {
-        // TODO, show spinning loading wheel while we retreive data
-        void fetchAndSetFreelancers();
-    }, []);
-
-    const redirectToProfile = (username:any) => {
+    const redirectToProfile = (username: any) => {
         utils.redirect(`freelancers/${username}/`);
     };
 
     const skillsFilter = {
         filterType: FreelancerFilterOption.Services,
         label: "Skills",
-        options: skills.map((item) => {
+        options: skills?.map((item) => {
             let filter = {
                 interiorIndex: item.id,
                 value: item.name,
@@ -82,7 +45,7 @@ const Freelancers = (): JSX.Element => {
         // since its a range i need the
         filterType: FreelancerFilterOption.Services,
         label: "Services",
-        options: services.map((item) => {
+        options: services?.map((item) => {
             let filter = {
                 interiorIndex: item.id,
                 value: item.name,
@@ -96,7 +59,7 @@ const Freelancers = (): JSX.Element => {
         // Again i need the high and low values.
         filterType: FreelancerFilterOption.Languages,
         label: "Languages",
-        options: languages.map((item) => {
+        options: languages?.map((item) => {
             let filter = {
                 interiorIndex: item.id,
                 value: item.name,
@@ -104,6 +67,58 @@ const Freelancers = (): JSX.Element => {
             return filter;
         }),
     };
+
+    useEffect(() => {
+        const fetchAndSetBriefs = async () => {
+            if (Object.keys(router?.query).length) {
+                let filter: FreelancerSqlFilter = {
+                    skills_range: [],
+                    services_range: [],
+                    languages_range: [],
+                    search_input: "",
+                };
+    
+                if (heading) {
+                    filter = { ...filter, search_input: heading };
+                    const input = document.getElementById("search-input") as HTMLInputElement
+                    if (input) input.value = heading.toString()
+                  }
+
+                if (skillsRangeProps) {
+                    const range = strToIntRange(skillsRangeProps);
+                    range.forEach((v: any) => {
+                        const checkbox = document.getElementById(`0-${v}`) as HTMLInputElement
+                        if (checkbox) checkbox.checked = true
+                    });
+                    filter = { ...filter, skills_range: strToIntRange(skillsRangeProps) }
+                }
+               
+                if (servicesRangeProps) {
+                    const range = strToIntRange(servicesRangeProps);
+                    range.forEach((v: any) => {
+                        const checkbox = document.getElementById(`1-${v}`) as HTMLInputElement
+                        if (checkbox) checkbox.checked = true
+                    });
+                    filter = { ...filter, services_range: strToIntRange(servicesRangeProps) }
+                }
+                
+                if (languagesRangeProps) {
+                    const range = strToIntRange(languagesRangeProps);
+                    range.forEach((v: any) => {
+                        const checkbox = document.getElementById(`2-${v}`) as HTMLInputElement
+                        if (checkbox) checkbox.checked = true
+                    });
+                    filter = { ...filter, services_range: strToIntRange(languagesRangeProps) }
+                }
+    
+                const filteredFreelancers = await callSearchFreelancers(filter);
+                setFreelancers(filteredFreelancers);
+            }
+        };
+
+        router.isReady && fetchAndSetBriefs();
+    }, [router, skills, services, languages, skillsRangeProps, heading, languagesRangeProps, servicesRangeProps]);
+    
 
     const onSearch = async () => {
         const elements = document.getElementsByClassName(
@@ -156,12 +171,18 @@ const Freelancers = (): JSX.Element => {
                         default:
                             console.log(
                                 "Invalid filter option selected or unimplemented. type:" +
-                                    filterType
+                                filterType
                             );
                     }
                 }
             }
         }
+
+        router.query.heading = search_value !== "" ? search_value : []
+        router.query.skillsRangeProps = skillsRange.length ? skillsRange.toString() : []
+        router.query.servicesRangeProps = servicesRange.length ? servicesRange.toString() : []
+        router.query.languagesRangeProps = languagesRange.length ? languagesRange.toString() : []
+        router.push(router, undefined, { shallow: true })
 
         if (is_search) {
             const filter: FreelancerSqlFilter = {
@@ -172,18 +193,20 @@ const Freelancers = (): JSX.Element => {
             };
 
             const filteredFreelancers = await callSearchFreelancers(filter);
+            console.log(filteredFreelancers);
             setFreelancers(filteredFreelancers);
-        } else {
+        } 
+        else {
             const allFreelancers = await getAllFreelancers();
             setFreelancers(allFreelancers);
         }
     };
 
     return (
-        <div>
-            <h1>Freelancers</h1>
+        <div className="mx-20">
             <div className={styles.freelancersContainer}>
                 <div className={styles.filterPanel}>
+                    <h1 className="mb-5">Freelancers</h1>
                     <div className={styles.filterHeading}>Filter By</div>
                     <FreelancerFilter
                         label={skillsFilter.label}
@@ -271,6 +294,49 @@ const Freelancers = (): JSX.Element => {
         </div>
     );
 };
+
+
+export async function getServerSideProps(context:any) {
+
+    const dedupeArray = async (input: any) => {
+        return input
+            .filter((thing: any, i: any, arr: any) => {
+                return arr.indexOf(arr.find((t: any) => t.id === thing.id)) === i;
+            })
+            .sort(function (a: any, b: any) {
+                return a.name.localeCompare(b.name);
+            });
+    };
+
+    const data = await getAllFreelancers();
+
+        let combinedSkills = Array.prototype.concat.apply(
+            [],
+            data.map((x) => x.skills)
+        ) as Item[];
+        const dedupedSkills = await dedupeArray(combinedSkills);
+
+        var combinedServices = Array.prototype.concat.apply(
+            [],
+            data.map((x) => x.services)
+        ) as Item[];
+        const dedupedServices = await dedupeArray(combinedServices);
+
+        var combinedLanguages = Array.prototype.concat.apply(
+            [],
+            data.map((x) => x.languages)
+        ) as Item[];
+        const dedupedLanguages = await dedupeArray(combinedLanguages);
+
+    return {
+      props: {
+        initialSkills : dedupedSkills,
+        initialServices : dedupedServices,
+        initialLanguages : dedupedLanguages,
+        initialFreelancers : Object.keys(context.query).length ? [] : data
+      }, 
+    }
+  }
 
 export default Freelancers
 

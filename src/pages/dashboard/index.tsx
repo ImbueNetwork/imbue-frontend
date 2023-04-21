@@ -108,7 +108,7 @@ const Dashboard = ({ user, isAuthenticated }: DashboardProps): JSX.Element => {
   }, [client, user?.getstream_token, user?.username]);
 
   return client ? (
-    <div className="-mt-8">
+    <div className="-mt-8 hq-layout">
       <StyledEngineProvider injectFirst>
         <BottomNavigation
           showLabels

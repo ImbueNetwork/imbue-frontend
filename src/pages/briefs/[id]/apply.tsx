@@ -186,7 +186,7 @@ export const SubmitProposal = (): JSX.Element => {
   const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
 
   return (
-    <div className="flex flex-col gap-[2.5rem] text-base leading-[1.5]">
+    <div className="flex flex-col gap-[2.5rem] text-base leading-[1.5] hq-layout">
       <div>
         <h3 className="ml-[2rem] mb-[0.5rem] text-xl leading-[1.5] font-bold m-0 p-0  flex">
           Job description

@@ -181,7 +181,7 @@ const BriefDetails = (): JSX.Element => {
   if(error) return <h2>{error.message}</h2>
 
   return (
-    <div className="brief-details-container">
+    <div className="brief-details-container hq-layout">
       <div className="brief-info">
         {/* TODO: Implement */}
         <BioPanel brief={brief} projectCategories={projectCategories} />

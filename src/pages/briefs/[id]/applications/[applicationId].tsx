@@ -271,7 +271,7 @@ const ApplicationPreview = (): JSX.Element => {
 
   return (
     <>
-      <div className="application-container">
+      <div className="application-container hq-layout">
         {user && showMessageBox && (
           <ChatPopup
             {...{
