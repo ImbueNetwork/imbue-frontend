@@ -15,6 +15,8 @@ import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import moment from "moment";
 import AccountChoice from "@/components/AccountChoice";
 import { Dialogue } from "@/components/Dialogue";
+import ChatPopup from "@/components/ChatPopup";
+import Login from "@/components/Login";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -142,6 +144,8 @@ function Project() {
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>(
     {}
   );
+  const [user, setUser] = useState<User | any>();
+  const [targetUser, setTargetUser] = useState<User | null>(null);
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
   const [submittingMilestone, setSubmittingMileStone] =
@@ -151,7 +155,9 @@ function Project() {
   const [web3account, setWeb3Account] = useState<InjectedAccountWithMeta | any>(
     {}
   );
+  const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [loginModal, setLoginModal] = useState<boolean>(false);
   const projectId: any = router?.query?.id || 0;
 
   // fetching the project data from api and from chain
@@ -180,6 +186,7 @@ function Project() {
     // api  project response
     console.log({ projectRes });
     const userResponse = await utils.getCurrentUser();
+    await setUser(userResponse);
     // getting freelancer data
     getFreelancerData(userResponse?.username);
   };
@@ -193,8 +200,8 @@ function Project() {
   const voteMileStone = async (web3Account: any, booleanValue: boolean) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
-    const user: User | any = await utils.getCurrentUser();
-    const chainService = new ChainService(imbueApi, user);
+    const userRes: User | any = await utils.getCurrentUser();
+    const chainService = new ChainService(imbueApi, userRes);
     const voteResponse = await chainService.voteOnMilestone(
       web3Account,
       onChainProject,
@@ -279,9 +286,28 @@ function Project() {
     ? timeAgo.format(new Date(project?.created))
     : 0;
 
+  const handleMessageBoxClick = async (user_id: number, freelancer: any) => {
+    if (user_id) {
+      setShowMessageBox(true);
+      setTargetUser(await utils.fetchUser(user_id));
+    } else {
+      setLoginModal(true);
+    }
+  };
+
   return (
     <div>
       {loading && <FullScreenLoader />}
+      {user && showMessageBox && (
+        <ChatPopup
+          {...{
+            showMessageBox,
+            setShowMessageBox,
+            browsingUser: user,
+            targetUser,
+          }}
+        />
+      )}
       <div className="flex flex-row bg-[#2c2c2c] border border-opacity-25 -border--theme-light-white rounded-[20px] p-[50px]">
         <div className="flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] mr-[5%]">
           <div className="brief-title">
@@ -324,6 +350,9 @@ function Project() {
             </p>
 
             <button
+              onClick={() =>
+                handleMessageBoxClick(project?.user_id, freelancer?.username)
+              }
               className="primary-btn in-dark w-button !mt-0 font-normal h-[43px] items-center content-center !py-0 ml-[40px] px-8"
               data-testid="next-button"
             >
@@ -420,6 +449,13 @@ function Project() {
 
       {showPolkadotAccounts && renderPolkadotJSModal}
       {showVotingModal && renderVotingModal}
+      <Login
+        visible={loginModal}
+        setVisible={(val) => {
+          setLoginModal(val);
+        }}
+        redirectUrl={`/project/${projectId}/`}
+      />
     </div>
   );
 }
