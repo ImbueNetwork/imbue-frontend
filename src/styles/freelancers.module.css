@@ -188,6 +188,7 @@
     gap: 16px;
     background: var(--theme-grey-dark);
     border-radius: .75rem;
+    border: 1px solid var(--theme-light-white)
 }
 
 .skillsButton{

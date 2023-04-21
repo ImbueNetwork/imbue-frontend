@@ -8,6 +8,8 @@ import {
   FaTelegram,
   FaDiscord,
   FaStar,
+  FaRegThumbsUp,
+  FaRegThumbsDown,
 } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
 import { IoPeople } from "react-icons/io5";
@@ -21,34 +23,42 @@ import ChatPopup from "@/components/ChatPopup";
 import Image from "next/image";
 import { TextArea } from "@/components/Briefs/TextArea";
 import { useRouter } from "next/router";
-import { getServerSideProps } from "@/utils/serverSideProps";
 import { GrCertificate } from 'react-icons/gr'
+import { AiOutlineUser } from 'react-icons/ai'
+import { MdOutlineWatchLater } from 'react-icons/md'
+import { ImStack } from 'react-icons/im'
 import styles from '@/styles/freelancers.module.css'
+import fiverrIcon from "@/assets/images/fiverr.png"
+import ImbueIcon from "@/assets/svgs/loader.svg"
+import { authenticate } from "@/pages/api/info/user";
+import { FormControl, InputAdornment, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import SearchIcon from '@mui/icons-material/Search';
+import { StyledEngineProvider } from "@mui/system";
+
 
 export type ProfileProps = {
   initFreelancer: Freelancer;
+  user: User
 };
 
-const Profile = (): JSX.Element => {
+const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const router = useRouter();
   const slug = router.query.slug as string;
-  const [freelancer, setFreelancer] = useState<any | undefined>();
+  const [freelancer, setFreelancer] = useState<any>(initFreelancer);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
-  const [browsingUser, setBrowsingUser] = useState<User | null>(null);
+  const [browsingUser, setBrowsingUser] = useState<User>(user);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
-  const isCurrentFreelancer =
-    browsingUser && browsingUser.id == freelancer?.user_id;
-
-  console.log(freelancer);
+  const isCurrentFreelancer = browsingUser && browsingUser.id == freelancer?.user_id;
 
   const socials = [
     {
       label: "Facebook",
       key: "facebook_link",
-      value: freelancer?.facebook_link,
+      // value: freelancer?.facebook_link,
+      value: "facebook.com",
       icon: (
-        <FaFacebook
+        <FaFacebook color="#4267B2"
           onClick={() => window.open(freelancer?.facebook_link, "_blank")}
         />
       ),
@@ -56,9 +66,10 @@ const Profile = (): JSX.Element => {
     {
       label: "Twitter",
       key: "twitter_link",
-      value: freelancer?.twitter_link,
+      // value: freelancer?.twitter_link,
+      value: "twitter.com",
       icon: (
-        <FaTwitter
+        <FaTwitter color="#1DA1F2"
           onClick={() => window.open(freelancer?.twitter_link, "_blank")}
         />
       ),
@@ -85,27 +96,51 @@ const Profile = (): JSX.Element => {
     },
   ];
 
-  const getCurrentFreelancer = async () => {
-    if (slug) {
-      const profileResponse: any = await getFreelancerProfile(slug);
-      console.log(profileResponse);
-      setFreelancer(profileResponse);
-    } else {
-      router.back();
-    }
-  };
+  const work = {
+    title: "Product Development Engineer",
+    ratings: 3,
+    time: "Jan 19, 2023 - Jan 20, 2023",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed rhoncus elit nec imperdiet mollis. Donec et pharetra magna. Fusce sed urna vestibulum, pretium turpis eu, ultricies urna. Donec faucibus, justo sed pretium commodo, felis sapien malesuada mauris, a finibus orci dolor non ante. Morbi aliquam tortor in massa efficitur pulvinar. Ut interdum tempor aliquet. Duis eget dignissim nunc. Ut non ligula nec lectus cursus tincidunt eget nec mauris",
+    budget: 23000,
+    budgetType: "Fixed Price"
+  }
+
+  const reviews = [
+    {
+      name: "Sam",
+      ratings: 3,
+      time: "1 month",
+      description: "I have created a web NFT marketplace landing page for imbue , you can check on my profile to see more",
+      countryCode: "US",
+      country: "United States",
+      image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60"
+    },
+    {
+      name: "Sausan",
+      ratings: 3,
+      time: "1 month",
+      description: "I have created a web NFT marketplace landing page for imbue , you can check on my profile to see more",
+      countryCode: "NO",
+      country: "Norway",
+      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60"
+    },
+    {
+      name: "Aala S.",
+      ratings: 3,
+      time: "1 month",
+      description: "I have contacted idris muhammad for building web3 for new eBook product that i am developing for my coaching business",
+      countryCode: "CA",
+      country: "Canada",
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60"
+    },
+
+  ]
 
   const setup = async () => {
     if (freelancer) {
-      const browsingUserResponse = await getCurrentUser();
-      setBrowsingUser(browsingUserResponse);
       setTargetUser(await fetchUser(freelancer?.user_id));
     }
   };
-
-  useEffect(() => {
-    getCurrentFreelancer();
-  }, [slug]);
 
   useEffect(() => {
     setup();
@@ -143,8 +178,8 @@ const Profile = (): JSX.Element => {
       <div className="flex justify-evenly mx-[80px]">
 
         <div className="flex flex-col gap-[70px] w-[40%]">
-          <div className="flex flex-col gap-[16px] pb-[30px] px-[100px] bg-theme-grey-dark rounded-xl">
-            <div className="h-[160px] w-[160px] bg-[#2c2c2c] rounded-[100%] p-[50px] z-[2] relative mt-[-120px] unset">
+          <div className="flex flex-col gap-[16px] pb-[30px] px-[100px] bg-theme-grey-dark rounded-xl border border-light-white">
+            <div className="h-[160px] w-[160px] bg-[#2c2c2c] rounded-[100%] p-[50px] z-[2] relative mt-[-120px] unset mx-auto">
               <Image
                 src={require("@/assets/images/profile-image.png")}
                 alt="profile h-full w-full image"
@@ -219,8 +254,62 @@ const Profile = (): JSX.Element => {
                             <MdKeyboardArrowDown size="20" />
                         </div> */}
             </div>
+            <hr className="separator" />
 
-            <hr className="separator"/>
+            <div className="flex items-center gap-3">
+              <p className="text-xl">Among my clients</p>
+              <span className="h-4 w-4 flex justify-center items-center rounded-full bg-gray-500 text-black">?</span>
+            </div>
+            <div className="flex justify-between">
+              <div className="flex items-center gap-3">
+                <Image className="rounded-lg" height={40} width={40} src={fiverrIcon} alt="Fiverr Icon" />
+                <p>Fiverr</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Image className="rounded-lg" height={40} width={40} src={ImbueIcon} alt="Imbue Icon" />
+                <p>Imbue</p>
+              </div>
+            </div>
+            <hr className="separator" />
+
+            <div>
+              <p className="text-xl">Wallet Address</p>
+              <div className="mt-3 border break-words p-3 rounded-md bg-black">
+                0x524c3d9e935649A448FA33666048C
+              </div>
+            </div>
+            <hr className="separator" />
+
+            <div>
+              <div className="flex justify-between mb-3">
+                <div className="flex items-center gap-4">
+                  <AiOutlineUser size={24} />
+                  <p className="text-light-grey">Member Since</p>
+                </div>
+                <div>
+                  Jan 2023
+                </div>
+              </div>
+              <div className="flex justify-between mb-3">
+                <div className="flex items-center gap-4">
+                  <MdOutlineWatchLater size={24} />
+                  <p className="text-light-grey">Last project Delivery</p>
+                </div>
+                <div>
+                  2 hour
+                </div>
+              </div>
+              <div className="flex justify-between mb-3">
+                <div className="flex items-center gap-4">
+                  <ImStack size={24} />
+                  <p className="text-light-grey">Number of projects</p>
+                </div>
+                <div>
+                  58
+                </div>
+              </div>
+            </div>
+
           </div>
 
           <div className="flex">
@@ -392,7 +481,7 @@ const Profile = (): JSX.Element => {
                     </div> */}
           </div>
 
-          <div className="py-[40px] px-[70px] flex flex-col gap-[16px] bg-theme-grey-dark rounded-xl ">
+          <div className={styles.freelancerProfileSection}>
             <div className="header-editable">
               <h5>About</h5>
             </div>
@@ -426,7 +515,6 @@ const Profile = (): JSX.Element => {
               </div>
             </>
             )}
-
             <hr className="separator" />
 
 
@@ -466,11 +554,115 @@ const Profile = (): JSX.Element => {
             </>
             )}
           </div>
-
-
         </div>
 
-        <div className="w-[45%] bg-[#2c2c2c]"></div>
+        <div className="w-[45%]">
+          <div className="bg-theme-grey-dark rounded-xl border border-light-white">
+            <div className="px-[80px] py-[30px] border-b border-b-light-white">
+              <h3 className="mb-3">Work History</h3>
+              <p className="text-primary">Completed Projects (3)</p>
+            </div>
+            <div>
+              {
+                [...Array(3)].map((v, i) => (
+                  <div key={i} className="px-[80px] py-[30px] flex flex-col gap-3 border-b last:border-b-0 border-b-light-white">
+                    <p className="text-xl">{work.title}</p>
+                    <div className="flex gap-8">
+                      <div>
+                        {
+                          [...Array(4)].map((r, ri) => <FaStar size={24} key={ri} color={(ri + 1) > work.ratings ? "white" : "var(--theme-primary)"} />)
+                        }
+                      </div>
+                      <p className="text-light-grey">{work.time}</p>
+                    </div>
+                    <p className="text-light-grey">{work.description}</p>
+                    <div className="flex justify-between">
+                      <p className="">${work.budget}</p>
+                      <p className="">{work.budgetType}</p>
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+          <p className="text-primary text-right m-2 cursor-pointer">View More</p>
+
+          <StyledEngineProvider injectFirst>
+            <div className="flex flex-col">
+              <TextField
+                id="outlined-controlled"
+                label="Search"
+                sx={{ maxWidth: "350px" }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <FormControl variant="standard" sx={{ m: 1, minWidth: 180, maxWidth: "100px" }}>
+                <InputLabel id="demo-simple-select-standard-label">Sort by most relevant</InputLabel>
+                <Select
+                  labelId="demo-simple-select-standard-label"
+                  id="demo-simple-select-standard"
+                  // value={age}
+                  // onChange={handleChange}
+                  label="Sort by most relevant"
+                >
+                  <MenuItem value={10}>Ratings</MenuItem>
+                  <MenuItem value={20}>Budget</MenuItem>
+                  <MenuItem value={30}>Date</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
+          </StyledEngineProvider>
+          <hr className="separator" />
+
+          <div className="flex flex-col gap-5">
+            {
+              reviews.map((review, index) => (
+                <div key={index} className="flex flex-col gap-3 pt-2 pb-5 border-b last:border-b-0 border-b-light-white">
+                  <div className="flex gap-3">
+                    <div className="h-[46px] w-[46px] rounded-full overflow-hidden relative">
+                      <Image className="object-cover" src={review.image} fill alt="user" />
+                    </div>
+                    <div>
+                      <p>{review.name}</p>
+                      <div className="flex gap-2 items-center">
+                        <ReactCountryFlag countryCode={review.countryCode} />
+                        <span>{review.country}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center">
+                    {
+                      [...Array(4)].map((r, ri) => <FaStar size={24} key={ri} color={(ri + 1) > review.ratings ? "white" : "var(--theme-primary)"} />)
+                    }
+                    <span className="text-light-grey ml-2">| {review.time}</span>
+                  </div>
+                  <p className="mt-2">{review.description}</p>
+                  <div className="flex gap-4">
+                    <p>Helpful?</p>
+                    <div className="flex gap-3">
+                      <div className="cta-vote">
+                        <FaRegThumbsUp />
+                        Yes
+                      </div>
+                      <div className="cta-vote">
+                        <FaRegThumbsDown />
+                        No
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            }
+
+          </div>
+
+        </div>
 
       </div>
       {browsingUser && showMessageBox && (
@@ -482,6 +674,31 @@ const Profile = (): JSX.Element => {
   );
 };
 
-export { getServerSideProps };
+
+export const getServerSideProps = async (context: any) => {
+  const { req, res, query } = context;
+
+  let initFreelancer: any;
+  if (query.slug) {
+    initFreelancer = await getFreelancerProfile(query.slug);
+  }
+
+  try {
+    const user = await authenticate("jwt", req, res);
+    if (user) {
+      return { props: { isAuthenticated: true, user, initFreelancer } };
+    }
+  } catch (error: any) {
+    console.error(error);
+  }
+
+  return {
+    redirect: {
+      destination: "/",
+      permanent: false,
+    },
+  };
+};
 
 export default Profile;
+
