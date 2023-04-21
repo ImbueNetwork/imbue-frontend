@@ -243,7 +243,7 @@ function Project() {
       closeDialouge={() => setShowVotingModal(false)}
       actionList={
         <>
-          <li className="button-container !bg-transparent !hover:bg-transparent  !border !border-solid !border-white">
+          <li className="button-container !bg-transparent !hover:bg-gray-950  !border !border-solid !border-white">
             <button
               className="primary !bg-transparent !hover:bg-transparent"
               onClick={() => {
