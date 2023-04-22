@@ -6,11 +6,15 @@ import { Dialogue } from "./Dialogue";
 type AccountChoiceProps = {
   accountSelected: (account: InjectedAccountWithMeta) => void;
   closeModal?: () => void;
+  filterByInitiator?: boolean;
+  initiator?: string;
 };
 
 const AccountChoice = ({
   accountSelected,
   closeModal,
+  filterByInitiator,
+  initiator,
 }: AccountChoiceProps): JSX.Element => {
   const [accounts, setAccounts] = React.useState<InjectedAccountWithMeta[]>([]);
 
@@ -23,13 +27,49 @@ const AccountChoice = ({
     setAccounts(accountsResponse);
   };
 
+  const initiatorOnly = accounts.filter((account) => {
+    const { address } = account;
+    return address === initiator;
+  });
+
   return (
     <Dialogue
       title="Choose the account you would like to use"
       closeDialouge={closeModal}
       actionList={
         <>
-          {accounts.map((account, index: number) => {
+          {filterByInitiator
+            ? initiatorOnly?.map?.((account, index: number) => {
+                const {
+                  meta: { name, source },
+                } = account;
+                return (
+                  <li className="button-container" key={index}>
+                    <button
+                      className="primary"
+                      onClick={() => accountSelected(account)}
+                    >
+                      {`${name} (${source})`}
+                    </button>
+                  </li>
+                );
+              })
+            : accounts.map((account, index: number) => {
+                const {
+                  meta: { name, source },
+                } = account;
+                return (
+                  <li className="button-container" key={index}>
+                    <button
+                      className="primary"
+                      onClick={() => accountSelected(account)}
+                    >
+                      {`${name} (${source})`}
+                    </button>
+                  </li>
+                );
+              })}
+          {/* {accounts.map((account, index: number) => {
             const {
               meta: { name, source },
             } = account;
@@ -43,7 +83,7 @@ const AccountChoice = ({
                 </button>
               </li>
             );
-          })}
+          })} */}
         </>
       }
     />
