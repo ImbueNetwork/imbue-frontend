@@ -32,7 +32,7 @@ const MilestoneItem = ({
   }, []);
 
   const displayMilestoneToggle = (): JSX.Element => {
-    if (milestone.isApproved) {
+    if (milestone.is_approved) {
       if (toggleActive) {
         return (
           <div>
