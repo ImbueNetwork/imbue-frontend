@@ -69,7 +69,8 @@ const ApplicationPreview = (): JSX.Element => {
   const applicationStatus = OffchainProjectState[application?.status_id];
   const isApplicationOwner = user?.id == application?.user_id;
   const isBriefOwner = user?.id == brief?.user_id;
-  const [freelancerAccount, setFreelancerAccount] = useState<InjectedAccountWithMeta>();
+  const [freelancerAccount, setFreelancerAccount] =
+    useState<InjectedAccountWithMeta>();
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -81,22 +82,21 @@ const ApplicationPreview = (): JSX.Element => {
       const freelancerResponse = await getFreelancerProfile(
         freelancerUser?.username
       );
-  
+
       const brief: Brief | undefined = await getBrief(briefId);
       const userResponse = await getCurrentUser();
-  
+
       setFreelancer(freelancerResponse);
       setBrief(brief);
       setApplication(applicationResponse);
       setUser(userResponse);
     };
-    
+
     if (briefId && applicationId) {
       getSetUpData();
     }
   }, [briefId, applicationId]);
 
-  
   const fetchAndSetAccounts = async () => {
     const accounts = await getWeb3Accounts();
     const account = accounts.filter(
@@ -114,8 +114,7 @@ const ApplicationPreview = (): JSX.Element => {
       }
     }
     setup();
-  }, [brief,freelancer]);
-
+  }, [brief, freelancer]);
 
   const viewFullBrief = () => {
     router.push(`/briefs/${brief?.id}/`);
@@ -298,7 +297,7 @@ const ApplicationPreview = (): JSX.Element => {
                 <p
                   className="text-base mt-2 underline cursor-pointer primary-text"
                   onClick={() =>
-                    router.push(`/freelancer/${freelancer?.username}/`)
+                    router.push(`/freelancers/${freelancer?.username}/`)
                   }
                 >
                   View Full Profile
@@ -320,7 +319,8 @@ const ApplicationPreview = (): JSX.Element => {
               </button>
 
               <div className="grid grid-cols-2 gap-2">
-                {application?.status_id == OffchainProjectState.PendingReview ? (
+                {application?.status_id ==
+                OffchainProjectState.PendingReview ? (
                   <>
                     <button
                       onClick={() => {
@@ -678,7 +678,7 @@ const ApplicationPreview = (): JSX.Element => {
         setVisible={(val) => {
           setLoginModal(val);
         }}
-        redirectUrl={`/freelancer/${freelancer?.username}/`}
+        redirectUrl={`/freelancers/${freelancer?.username}/`}
       />
     </>
   );

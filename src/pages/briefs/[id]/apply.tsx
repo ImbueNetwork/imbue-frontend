@@ -35,7 +35,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   useEffect(() => {
     getUserAndFreelancer();
-  }, [briefId,user]);
+  }, [briefId, user]);
 
   useEffect(() => {
     getCurrentUserBrief();
@@ -46,7 +46,7 @@ export const SubmitProposal = (): JSX.Element => {
     setUser(userResponse);
     const freelancer = await getFreelancerProfile(userResponse?.username);
     if (!freelancer) {
-      router.push(`/freelancer/new`);
+      router.push(`/freelancers/new`);
     }
   };
 
