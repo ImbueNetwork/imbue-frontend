@@ -488,6 +488,7 @@ class ChainService {
             name: projectOffChain.milestones[milestone.milestoneKey].name,
             modified: projectOffChain.milestones[milestone.milestoneKey].modified,
             percentage_to_unlock: Number(milestone.percentageToUnlock),
+            amount: Number(projectOffChain.milestones[milestone.milestoneKey].amount),
             is_approved: milestone.isApproved,
           } as Milestone)
       );

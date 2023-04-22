@@ -52,90 +52,7 @@ const projectStateTag = (dateCreated: Date, text: string): JSX.Element => {
   );
 };
 
-const ExpandableDropDowns = ({
-  milestone,
-  index,
-  modified,
-  vote,
-  submitMilestone,
-}: ExpandableDropDownsProps) => {
-  const [expanded, setExpanded] = useState(false);
 
-  return (
-    <div className="transparent-conatainer relative !bg-[#2c2c2c] !py-[20px] !border !border-white rounded-[20px]">
-      <div
-        onClick={() => {
-          setExpanded(!expanded);
-        }}
-        className="flex justify-between w-full items-center"
-      >
-        <div className="flex flex-row">
-          <h3 className="text-[39px] font-normal leading-[60px]">
-            Milestone {index + 1}
-          </h3>
-          <h3 className="text-[24px] ml-[32px] font-normal leading-[60px]">
-            {milestone?.name}
-          </h3>
-        </div>
-        <div className="flex flex-row items-center">
-          {
-          milestone?.is_approved ? projectStateTag(modified, "Completed")
-            : openForVotingTag()}
-
-          <Image
-            src={require(expanded
-              ? "@/assets/svgs/minus_btn.svg"
-              : "@/assets/svgs/plus_btn.svg")}
-            height={25}
-            width={25}
-            alt="dropdownstate"
-          />
-        </div>
-      </div>
-
-      <div className={`${!expanded && "hidden"} my-6`}>
-        <p className="text-[14px] font-normal text-white">
-          Percentage of funds to be released{" "}
-          <span className="text-[#BAFF36]">{milestone?.percentage_to_unlock}%</span>
-        </p>
-        <p className="text-[14px] font-normal text-white">
-          Funding to be released{" "}
-          <span className="text-[#BAFF36]">
-            {Number(milestone?.amount)?.toLocaleString?.()} $IMBU
-          </span>
-        </p>
-
-        <p className="text-[16px] font-normal text-[#a6a6a6] leading-[178.15%] mt-[23px] w-[80%]">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
-          purus sit amet luctus venenatis, lectus magna fringilla urna,
-          porttitor rhoncus dolor purus non enim praesent elementum facilisis
-          leo, vel fringilla est ullamcorper eget nulla facilisi etiam dignissim
-          diam quis enim lobortis scelerisque fermentum dui faucibus in ornare
-          quam viverra orci sagittis eu volutpat odio facilisis mauris sit amet
-          massa vitae tortor condimentum lacinia quis vel eros donec ac odio
-          tempor orci dapibus ultrices in iaculis nunc sed augue lacus, viverra
-          vitae congue eu, consequat ac felis donec et odio pellentesque diam
-          volutpat commodo sed egestas egestas fringilla phasellus faucibus
-        </p>
-
-        <button
-          className="primary-btn in-dark w-button font-normal h-[43px] items-center content-center !py-0 mt-[25px] px-8"
-          data-testid="next-button"
-          onClick={() => vote()}
-        >
-          Vote
-        </button>
-        <button
-          className="primary-btn in-dark w-button font-normal h-[43px] items-center content-center !py-0 mt-[25px] px-8"
-          data-testid="next-button"
-          onClick={() => submitMilestone()}
-        >
-          Submit
-        </button>
-      </div>
-    </div>
-  );
-};
 
 function Project() {
   const router = useRouter();
@@ -159,6 +76,7 @@ function Project() {
   const [loading, setLoading] = useState<boolean>(false);
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const projectId: any = router?.query?.id || 0;
+  const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -178,8 +96,11 @@ function Project() {
       console.log("******")
       console.log(onChainProjectRes);
       console.log(OnchainProjectState[onChainProjectRes.projectState]);
-      const milestoneBeingVotedOn = await chainService.findFirstPendingMilestone(onChainProjectRes.milestones);
-      console.log("milestone being voted on is ", milestoneBeingVotedOn);
+      if(onChainProjectRes.projectState == OnchainProjectState.OpenForVoting) {
+          const firstPendingMilestone = await chainService.findFirstPendingMilestone(onChainProjectRes.milestones);
+          setMilestoneBeingVotedOn(firstPendingMilestone);
+      }
+
       setOnChainProject(onChainProjectRes);
     }
   };
@@ -308,6 +229,94 @@ function Project() {
     } else {
       setLoginModal(true);
     }
+  };
+
+
+  const ExpandableDropDowns = ({
+    milestone,
+    index,
+    modified,
+    vote,
+    submitMilestone,
+  }: ExpandableDropDownsProps) => {
+    const [expanded, setExpanded] = useState(false);
+  
+    return (
+      <div className="transparent-conatainer relative !bg-[#2c2c2c] !py-[20px] !border !border-white rounded-[20px]">
+        <div
+          onClick={() => {
+            setExpanded(!expanded);
+          }}
+          className="flex justify-between w-full items-center"
+        >
+          <div className="flex flex-row">
+            <h3 className="text-[39px] font-normal leading-[60px]">
+              Milestone {index + 1}
+            </h3>
+            <h3 className="text-[24px] ml-[32px] font-normal leading-[60px]">
+              {milestone?.name}
+            </h3>
+          </div>
+          <div className="flex flex-row items-center">
+            {
+              milestone?.is_approved ? projectStateTag(modified, "Completed")
+              : (milestone?.milestone_key == milestoneBeingVotedOn) ? openForVotingTag()
+              : projectStateTag(modified, "Not Started")
+             }
+  
+            <Image
+              src={require(expanded
+                ? "@/assets/svgs/minus_btn.svg"
+                : "@/assets/svgs/plus_btn.svg")}
+              height={25}
+              width={25}
+              alt="dropdownstate"
+            />
+          </div>
+        </div>
+  
+        <div className={`${!expanded && "hidden"} my-6`}>
+          <p className="text-[14px] font-normal text-white">
+            Percentage of funds to be released{" "}
+            <span className="text-[#BAFF36]">{milestone?.percentage_to_unlock}%</span>
+          </p>
+          <p className="text-[14px] font-normal text-white">
+            Funding to be released{" "}
+            <span className="text-[#BAFF36]">
+              {Number(milestone?.amount)?.toLocaleString?.()} $IMBU
+            </span>
+          </p>
+  
+          <p className="text-[16px] font-normal text-[#a6a6a6] leading-[178.15%] mt-[23px] w-[80%]">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
+            purus sit amet luctus venenatis, lectus magna fringilla urna,
+            porttitor rhoncus dolor purus non enim praesent elementum facilisis
+            leo, vel fringilla est ullamcorper eget nulla facilisi etiam dignissim
+            diam quis enim lobortis scelerisque fermentum dui faucibus in ornare
+            quam viverra orci sagittis eu volutpat odio facilisis mauris sit amet
+            massa vitae tortor condimentum lacinia quis vel eros donec ac odio
+            tempor orci dapibus ultrices in iaculis nunc sed augue lacus, viverra
+            vitae congue eu, consequat ac felis donec et odio pellentesque diam
+            volutpat commodo sed egestas egestas fringilla phasellus faucibus
+          </p>
+  
+          <button
+            className="primary-btn in-dark w-button font-normal h-[43px] items-center content-center !py-0 mt-[25px] px-8"
+            data-testid="next-button"
+            onClick={() => vote()}
+          >
+            Vote
+          </button>
+          <button
+            className="primary-btn in-dark w-button font-normal h-[43px] items-center content-center !py-0 mt-[25px] px-8"
+            data-testid="next-button"
+            onClick={() => submitMilestone()}
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    );
   };
 
   return (
