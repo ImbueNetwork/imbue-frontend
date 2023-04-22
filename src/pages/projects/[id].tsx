@@ -1,5 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Freelancer, Milestone, Project, ProjectOnChain, OnchainProjectState, User } from "@/model";
+import {
+  Freelancer,
+  Milestone,
+  Project,
+  ProjectOnChain,
+  OnchainProjectState,
+  User,
+} from "@/model";
 import { getProjectById } from "@/redux/services/briefService";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -172,12 +179,17 @@ function Project() {
     const imbueApi = await initImbueAPIInfo();
     const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
-    const onChainProjectRes: ProjectOnChain = await chainService.getProject(projectId);
+    const onChainProjectRes: ProjectOnChain = await chainService.getProject(
+      projectId
+    );
     setLoading(false);
     if (onChainProjectRes) {
-      console.log("******")
+      console.log("******");
       console.log(OnchainProjectState[onChainProjectRes.projectState]);
-      const milestoneBeingVotedOn = await chainService.findFirstPendingMilestone(onChainProjectRes.milestones);
+      const milestoneBeingVotedOn =
+        await chainService.findFirstPendingMilestone(
+          onChainProjectRes.milestones
+        );
       console.log("milestone being voted on is ", milestoneBeingVotedOn);
       setOnChainProject(onChainProjectRes);
     }
@@ -390,7 +402,31 @@ function Project() {
                   {approvedMilStones?.length}/{project?.milestones?.length}
                 </span>
               </h3>
-              {/* TODO: add the mile stone step indicator */}
+            </div>
+            {/* mile stone step indicator */}
+            <div className="w-48 bg-[#1C2608] mt-5 h-1 relative my-auto">
+              <div
+                style={{
+                  width: `${
+                    (onChainProject?.milestones?.filter?.(
+                      (m: any) => m?.is_approved
+                    )?.length /
+                      onChainProject?.milestones?.length) *
+                    100
+                  }%`,
+                }}
+                className="h-full rounded-xl Accepted-button absolute"
+              ></div>
+              <div className="flex justify-evenly">
+                {onChainProject?.milestones?.map((m: any, i: number) => (
+                  <div
+                    key={i}
+                    className={`h-4 w-4 ${
+                      m.is_approved ? "Accepted-button" : "bg-[#1C2608]"
+                    } rounded-full -mt-1.5`}
+                  ></div>
+                ))}
+              </div>
             </div>
           </div>
 
