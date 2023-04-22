@@ -108,7 +108,7 @@ const Dashboard = ({ user, isAuthenticated }: DashboardProps): JSX.Element => {
   }, [client, user?.getstream_token, user?.username]);
 
   return client ? (
-    <div className="-mt-8">
+    <div className="-mt-8 hq-layout">
       <StyledEngineProvider injectFirst>
         <BottomNavigation
           showLabels
@@ -127,7 +127,7 @@ const Dashboard = ({ user, isAuthenticated }: DashboardProps): JSX.Element => {
         </BottomNavigation>
       </StyledEngineProvider>
 
-      {selectedOption === 1 && <MyClientBriefsView {...{ briefId, briefs, setBriefId, briefApplications, handleMessageBoxClick, redirectToBriefApplications }} />}
+      {selectedOption === 1 && <MyClientBriefsView {...{ briefs, briefId, setBriefId,briefApplications,handleMessageBoxClick,redirectToBriefApplications }} />}
       {selectedOption === 2 && <ChatBox client={client} filters={filters} />}
       {selectedOption === 3 && <MyFreelancerApplications myApplications={myApplications} />}
 

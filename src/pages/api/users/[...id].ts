@@ -17,7 +17,6 @@ export default async function userHandler(
     case 'GET':
       // Get data from your database
       const resp = await handleGet(id);
-      
       if (resp) {
         res.status(200).json(resp);
       } else {
@@ -35,23 +34,23 @@ export default async function userHandler(
 }
 
 export async function handleGet(routes: string[]) {
-  const userId = routes[1];
+  const userId = routes[0];
   switch (routes.length) {
     case 3:
       switch (routes[1]) {
-        case "briefs":
-          const briefId = routes[2];
-          return await fetchUserBriefApplications(userId, briefId);
-        case "applications":
-          const projectId = routes[2];
-          return await fetchProject(projectId);
+        // case "briefs":
+        //   const briefId = routes[2];
+        //   return await fetchUserBriefApplications(userId, briefId);
+        // case "applications":
+        //   const projectId = routes[2];
+        //   return await fetchProject(projectId);
       }
     case 2:
-      switch (routes[0]) {
-        case "briefs":
-          return await fetchAllUserBriefs(userId);
-        case "byid":
-          return await fetchUserById(userId);
+      switch (routes[1]) {
+        // case "briefs":
+        //   return await fetchAllUserBriefs(userId);
+        // case "byid":
+        //   return await fetchUserById(userId);
         case "byusernameoremail":
           return await fetchUserByUsernameOrEmail(userId);
       }
@@ -117,6 +116,7 @@ export async function fetchAllUserBriefs(userId: string) {
   let response
   await db.transaction(async tx => {
     try {
+      console.log("hit");
       const briefs = await models.fetchUserBriefs(userId)(tx);
       const pendingReviewBriefs = briefs.filter(m => m.project_id == null);
       const briefsWithProjects = briefs.filter(m => m.project_id !== null);

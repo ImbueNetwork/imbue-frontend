@@ -278,7 +278,7 @@
   background-color: yellow;
 }
 
-.PendingReviewButton {
+.PendingReview-button {
   background-color: var(--theme-background);
   color: white;
 }

@@ -66,3 +66,16 @@
     background: var(--theme-grey-dark);
     color: white;
 }
+
+.profile-container .MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-outlined.MuiFormLabel-colorPrimary.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-outlined,
+.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedEnd,
+.MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-standard.MuiFormLabel-colorPrimary.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-standard,
+.MuiSvgIcon-root.MuiSvgIcon-fontSizeMedium.MuiSelect-icon.MuiSelect-iconStandard,
+.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiInput-input{
+    color: white;
+}
+
+.profile-container .MuiInputAdornment-root.MuiInputAdornment-positionEnd.MuiInputAdornment-outlined.MuiInputAdornment-sizeMedium{
+    color: white;
+    cursor: pointer;
+}

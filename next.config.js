@@ -21,6 +21,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "drupal.org",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
     ],
   },
 };

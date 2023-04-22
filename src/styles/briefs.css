@@ -1,5 +1,5 @@
 .search-briefs-container {
-  margin: 72px;
+  margin: 0 72px;
   display: flex;
   flex-direction: row;
 }

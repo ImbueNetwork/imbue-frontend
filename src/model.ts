@@ -212,7 +212,7 @@ export type FreelancerSqlFilter = {
   skills_range: Array<number>;
   services_range: Array<number>;
   languages_range: Array<number>;
-  search_input: string;
+  search_input: string | string[];
 };
 export type ApplicationData = {
   brief_id: number;

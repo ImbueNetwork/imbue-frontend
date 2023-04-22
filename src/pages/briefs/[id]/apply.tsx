@@ -25,7 +25,7 @@ export const SubmitProposal = (): JSX.Element => {
   const [currencyId, setCurrencyId] = useState(0);
   const [brief, setBrief] = useState<Brief | any>();
   const [user, setUser] = useState<User>();
-  const userHasWeb3Addresss = !!user?.web3_address;
+  // const userHasWeb3Addresss = !!user?.web3_address;
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -35,7 +35,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   useEffect(() => {
     getUserAndFreelancer();
-  }, [briefId]);
+  }, [briefId,user]);
 
   useEffect(() => {
     getCurrentUserBrief();
@@ -46,7 +46,7 @@ export const SubmitProposal = (): JSX.Element => {
     setUser(userResponse);
     const freelancer = await getFreelancerProfile(userResponse?.username);
     if (!freelancer) {
-      router.push(`/freelancer`);
+      router.push(`/freelancer/new`);
     }
   };
 
@@ -98,7 +98,7 @@ export const SubmitProposal = (): JSX.Element => {
   };
 
   async function handleSubmit() {
-    if (!userHasWeb3Addresss) {
+    if (!user?.web3_address) {
       setShowPolkadotAccounts(true);
     } else {
       await insertProject();
@@ -186,7 +186,7 @@ export const SubmitProposal = (): JSX.Element => {
   const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
 
   return (
-    <div className="flex flex-col gap-[2.5rem] text-base leading-[1.5]">
+    <div className="flex flex-col gap-[2.5rem] text-base leading-[1.5] hq-layout">
       <div>
         <h3 className="ml-[2rem] mb-[0.5rem] text-xl leading-[1.5] font-bold m-0 p-0  flex">
           Job description

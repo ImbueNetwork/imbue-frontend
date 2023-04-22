@@ -21,8 +21,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       break;
     case "GET":
       getAllFreelancers(res);
-    default:
-      res.status(400).send({ message: "Bad Request" });
+    // default:
+    //   res.status(400).send({ message: "Bad Request" });
   }
 }
 
@@ -75,6 +75,7 @@ const createFreelancer = (
 const getAllFreelancers = (res: NextApiResponse) => {
   db.transaction(async (tx) => {
     try {
+      console.log("object");
       await fetchAllFreelancers()(tx).then(async (freelancers: any) => {
         await Promise.all([
           ...freelancers.map(async (freelancer: any) => {

@@ -4,23 +4,29 @@ import { checkEnvironment } from "@/utils";
 
 export async function createFreelancingProfile(freelancer: any) {
   // Check that this user doesnt already have a freelancer profile.
-  const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}freelancers/`),
-    {
-      headers: config.postAPIHeaders,
-      method: "post",
-      body: JSON.stringify({ freelancer }),
-    }
-  );
-  if (resp.ok) {
-    // could be 200 or 201
-    // Freelancer API successfully invoked
-    console.log("Freelancer created successfully via Freelancer REST API");
-  } else {
-    throw new Error(
-      "Failed to create freelancer profile. status:" + resp.status
+  try {
+    const resp = await fetch(
+      checkEnvironment().concat(`${config.apiBase}freelancers/`),
+      {
+        headers: config.postAPIHeaders,
+        method: "post",
+        body: JSON.stringify({ freelancer }),
+      }
     );
+  
+    if (resp.ok) {
+      // could be 200 or 201
+      // Freelancer API successfully invoked
+      console.log("Freelancer created successfully via Freelancer REST API");
+    } else {
+      new Error(
+        "Failed to create freelancer profile. status:" + resp.status
+      );
+    }
+  } catch (error) {
+    console.log(error);
   }
+  
 }
 
 export const getAllFreelancers = async () => {
@@ -34,7 +40,8 @@ export const getAllFreelancers = async () => {
   if (resp.ok) {
     return (await resp.json()) as Array<Freelancer>;
   } else {
-    throw new Error("Failed to get all briefs. status:" + resp.status);
+    console.log(new Error("Failed to get all briefs. status:" + resp.status))
+    return []
   }
 };
 
@@ -83,9 +90,9 @@ export async function updateFreelancer(freelancer: Freelancer) {
     console.log("Freelancer updated successfully.");
     return (await resp.json()) as Freelancer;
   } else {
-    throw new Error(
+    console.log(new Error(
       "Failed to update freelancer profile. status:" + resp.status
-    );
+    ))
   }
 }
 

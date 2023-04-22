@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Login from "./Login";
 import { useRouter } from "next/router";
+import { freelancerExists } from "@/redux/services/freelancerService";
+import { User } from "@/model";
 
 type DrawerProps = {
   visible: boolean;
@@ -12,15 +14,25 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [authenticated, setAuthenticated] = useState<boolean>(false);
   const [redirectURL, setRedirectURL] = useState<string>();
+  const [isFreelancer, setIsFreelancer] = useState<boolean>(false)
+  const [user, setUser] = useState<User>()
 
   useEffect(() => {
+    const findFreelancer = async (user:any) => {
+      if (user) {
+        setIsFreelancer(await freelancerExists(user?.username))
+      }
+    };
+
     const storedObject = localStorage.getItem("userAuth");
     if (storedObject) {
       const parsedData = JSON.parse(storedObject);
-
+      findFreelancer(parsedData.user)
+      setUser(parsedData.user)
       const isAuthenticated = parsedData?.isAuthenticated || false;
       setAuthenticated(isAuthenticated);
     }
+    
   }, [visible]);
 
   const linkItems = [
@@ -31,8 +43,8 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
     },
     {
       icon: "group_add",
-      text: "Join The Freelancers",
-      link: "/freelancer",
+      text: isFreelancer ? "Freelancer Profile" : "Join The Freelancers",
+      link: isFreelancer ? `/freelancer/${user?.username}/` : "/freelancer/new",
     },
     {
       icon: "work",
