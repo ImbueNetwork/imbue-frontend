@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import React from "react";
-import { Freelancer, Project, ProjectStatus, User } from "@/model";
+import { Freelancer, Project, OffchainProjectState, User } from "@/model";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 TimeAgo.addLocale(en);
@@ -58,10 +58,10 @@ const MyFreelancerApplications = ({
             <span>{timeAgo?.format(new Date(application?.created))}</span>
             <div
               className={`px-4 py-2 ${
-                ProjectStatus[application.status_id]
+                OffchainProjectState[application.status_id]
               }-button w-fit rounded-full`}
             >
-              {ProjectStatus[application.status_id]}
+              {OffchainProjectState[application.status_id]}
             </div>
           </div>
         </div>

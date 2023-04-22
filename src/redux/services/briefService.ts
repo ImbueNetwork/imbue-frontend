@@ -3,7 +3,7 @@ import {
   dummyDashboardBriefApplications,
   dumyBriefs,
 } from "@/config/briefs-data";
-import { Brief, BriefSqlFilter, ProjectStatus } from "@/model";
+import { Brief, BriefSqlFilter, OffchainProjectState } from "@/model";
 import { checkEnvironment } from "@/utils";
 
 const getAPIHeaders = {
@@ -102,7 +102,7 @@ export const getBriefApplications = async (brifId: string | number) => {
 export const changeBriefApplicationStatus = async (
   briefId: string | number,
   projectId: number,
-  status_id: ProjectStatus
+  status_id: OffchainProjectState
 ) => {
   const resp = await fetch(`${config.apiBase}/briefs/${briefId}/status`, {
     headers: postAPIHeaders,

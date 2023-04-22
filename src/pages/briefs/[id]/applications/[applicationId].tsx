@@ -8,7 +8,7 @@ import {
   Currency,
   Freelancer,
   Project,
-  ProjectStatus,
+  OffchainProjectState,
   User,
 } from "@/model";
 import {
@@ -66,7 +66,7 @@ const ApplicationPreview = (): JSX.Element => {
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [briefOwner, setBriefOwner] = useState<User>();
-  const applicationStatus = ProjectStatus[application?.status_id];
+  const applicationStatus = OffchainProjectState[application?.status_id];
   const isApplicationOwner = user?.id == application?.user_id;
   const isBriefOwner = user?.id == brief?.user_id;
   const [freelancerAccount, setFreelancerAccount] = useState<InjectedAccountWithMeta>();
@@ -232,7 +232,7 @@ const ApplicationPreview = (): JSX.Element => {
 
   const updateApplicationState = async (
     application: any,
-    projectStatus: ProjectStatus
+    projectStatus: OffchainProjectState
   ) => {
     await updateBriefApplicationStatus(
       application?.brief_id,
@@ -320,7 +320,7 @@ const ApplicationPreview = (): JSX.Element => {
               </button>
 
               <div className="grid grid-cols-2 gap-2">
-                {application?.status_id == ProjectStatus.PendingReview ? (
+                {application?.status_id == OffchainProjectState.PendingReview ? (
                   <>
                     <button
                       onClick={() => {
@@ -334,7 +334,7 @@ const ApplicationPreview = (): JSX.Element => {
                       onClick={() => {
                         updateApplicationState(
                           application,
-                          ProjectStatus.ChangesRequested
+                          OffchainProjectState.ChangesRequested
                         );
                       }}
                       className="Request-btn in-dark  !rounded-full !px-4 !py-2 dark-button"
@@ -345,7 +345,7 @@ const ApplicationPreview = (): JSX.Element => {
                       onClick={() => {
                         updateApplicationState(
                           application,
-                          ProjectStatus.Rejected
+                          OffchainProjectState.Rejected
                         );
                       }}
                       className="Rejected-btn in-dark  !rounded-full !px-1 !py-2 dark-button"

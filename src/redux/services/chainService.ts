@@ -7,7 +7,7 @@ import {
   Milestone,
   Project,
   ProjectOnChain,
-  ProjectState,
+  OnchainProjectState,
   RoundType,
   User,
 } from "@/model";
@@ -352,7 +352,7 @@ class ChainService {
     const milestones = await this.getProjectMilestones(projectOnChain);
 
     // get project state
-    let projectState = ProjectState.PendingProjectApproval;
+    let projectState = OnchainProjectState.PendingProjectApproval;
     let userIsInitiator = await this.isUserInitiator(this.user, projectOnChain);
     let projectInContributionRound = false;
     let projectInVotingRound = false;
@@ -401,41 +401,37 @@ class ChainService {
       // Initators cannot contribute to their own project
       if (userIsInitiator) {
         if (projectInVotingRound) {
-          projectState = ProjectState.OpenForVoting;
+          projectState = OnchainProjectState.OpenForVoting;
         } else if (projectInContributionRound) {
-          projectState = ProjectState.OpenForContribution;
+          projectState = OnchainProjectState.OpenForContribution;
         } else if (lastApprovedMilestoneKey >= 0) {
-          projectState = ProjectState.OpenForWithdraw;
+          projectState = OnchainProjectState.OpenForWithdraw;
         } else {
-          projectState = ProjectState.PendingMilestoneSubmission;
+          projectState = OnchainProjectState.PendingMilestoneSubmission;
         }
       } else if (projectInVotingRound) {
-        projectState = ProjectState.OpenForVoting;
+        projectState = OnchainProjectState.OpenForVoting;
       } else {
-        projectState = ProjectState.PendingMilestoneSubmission;
+        projectState = OnchainProjectState.PendingMilestoneSubmission;
       }
     } else if (!userIsInitiator && projectInContributionRound) {
-      projectState = ProjectState.OpenForContribution;
+      projectState = OnchainProjectState.OpenForContribution;
     } else {
       // Project not yet open for funding
       if (projectOnChain.approvedForFunding && !projectInContributionRound) {
-        projectState = ProjectState.PendingFundingApproval;
+        projectState = OnchainProjectState.PendingFundingApproval;
       } else if (userIsInitiator) {
         if (projectInContributionRound) {
-          projectState = ProjectState.OpenForContribution;
+          projectState = OnchainProjectState.OpenForContribution;
         } else {
-          projectState = ProjectState.PendingProjectApproval;
+          projectState = OnchainProjectState.PendingProjectApproval;
         }
       } else {
-        projectState = ProjectState.PendingProjectApproval;
+        projectState = OnchainProjectState.PendingProjectApproval;
       }
     }
     const convertedProject: ProjectOnChain = {
       id: projectOnChain.milestones[0].projectKey,
-      name: projectOnChain.name,
-      logo: projectOnChain.logo,
-      website: projectOnChain.website,
-      description: project.description,
       requiredFunds: BigInt(projectOnChain.requiredFunds.replaceAll(",", "")),
       requiredFundsFormatted:
         projectOnChain.requiredFunds.replaceAll(",", "") / 1e12,
