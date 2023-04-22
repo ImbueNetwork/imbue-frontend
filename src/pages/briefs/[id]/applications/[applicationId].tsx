@@ -168,7 +168,7 @@ const ApplicationPreview = (): JSX.Element => {
             console.log("***** success");
             const projectId = parseInt(result.eventData[2]);
             await updateProject(projectId);
-            router.push(`/project/${applicationId}`);
+            router.push(`/projects/${applicationId}`);
           } else if (result.txError) {
             console.log("***** failed");
             console.log(result.errorMessage);
