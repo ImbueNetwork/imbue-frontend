@@ -1,4 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import nextConnect from 'next-connect'
+import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
+import { decodeAddress, encodeAddress } from "@polkadot/keyring";
+import { hexToU8a, isHex } from '@polkadot/util';
 
 import db from "../../../db";
 import * as models from "../../../models";
@@ -8,8 +12,8 @@ import { signatureVerify } from "@polkadot/util-crypto";
 
 type Solution = {
   signature: string;
-  address: string;
-  type: string;
+  challenge: string;
+  account: InjectedAccountWithMeta;
 };
 
 import jwt from 'jsonwebtoken';
@@ -18,48 +22,77 @@ import { serialize } from 'cookie';
 import { setTokenCookie } from "@/pages/api/auth-cookies";
 
 
-export default async function authHandler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
+export default nextConnect()
+  .post(async (req: NextApiRequest, res: NextApiResponse) => {
+    db.transaction(async tx => {
+      try {
+        const solution: Solution = req.body;
+        const account = solution.account;
+        const address = solution.account.address;
+        const web3Account = await fetchWeb3AccountByAddress(
+          address
+        )(tx);
 
-  const { query, method } = req
-  switch (method) {
-    case 'POST':
-
-      db.transaction(async tx => {
-        try {
-          const solution: Solution = req.body;
-          const web3Account = await fetchWeb3AccountByAddress(
-            solution.address
-          )(tx);
-
-          if (!web3Account) {
-            res.status(404);
-          } else {
-            const user = await models.fetchUser(web3Account.user_id)(tx);
-
-            if (user?.id) {
-              if (signatureVerify(web3Account.challenge, solution.signature, solution.address).isValid) {
-                const payload = { id: user?.id };
-                const token = jwt.sign(payload, jwtOptions.secretOrKey);
-                setTokenCookie(res,token);
-                res.send({ success: true });
-              }
+        if (!web3Account) {
+          res.status(404);
+        } else {
+          const existingUser = await models.fetchUser(web3Account.user_id)(tx);
+          if (existingUser?.id) {
+            if (signatureVerify(solution.challenge, solution.signature, address).isValid) {
+              const payload = { id: existingUser?.id };
+              const token = jwt.sign(payload, jwtOptions.secretOrKey);
+              setTokenCookie(res, token);
+              res.send({ success: true });
             } else {
               res.status(404);
             }
+          } else {
+            try {
+              encodeAddress(
+                isHex(address)
+                  ? hexToU8a(address)
+                  : decodeAddress(address)
+              );
+            } catch (e: any) {
+              res.status(400).end(`Invalid address param. ${(e as Error).message}`)
+            }
+            models.getOrCreateFederatedUser(
+              account.meta.source,
+              address,
+              account.meta.name!,
+              async (err: Error, user: models.User) => {
+                if (err) {
+                  res.status(500).end(`Error: ${err.message}`)
+                }
+                if (!user) {
+                  res.status(404).end(`No user provided`)
+                }
+                // create a `challenge` uuid and insert it into the users
+                // table respond with the challenge
+                db.transaction(async tx => {
+                  try {
+                    const [web3Account, isInsert] = await models.upsertWeb3Challenge(
+                      user, address, account.type!, solution.challenge
+                    )(tx);
+
+                    if (isInsert) {
+                      res.status(201);
+                    }
+                    res.send({ user, web3Account });
+                  } catch (e) {
+                    await tx.rollback();
+                    res.status(500).end(`Unable to upsert web3 challenge for address: ${address}`,)
+                  }
+                });
+              }
+            );
+
+
           }
-        } catch (e) {
-          await tx.rollback();
-          res.status(500).end(`Unable to finalise login.`,)
         }
-      });
-      break
-    default:
-      res.setHeader('Allow', ['GET', 'PUT'])
-      res.status(405).end(`Method ${method} Not Allowed`)
-  }
-}
-
-
+      } catch (e) {
+        await tx.rollback();
+        res.status(500).end(`Unable to finalise login.`,)
+      }
+    });
+  });

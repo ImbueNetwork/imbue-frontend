@@ -223,6 +223,14 @@ export const upsertWeb3Challenge = (
             })
             .first();
 
+        console.log("**** in upsert, web3Account is")
+        console.log(web3Account);
+        console.log("**** in upsert, params are")
+        console.log(address);
+        console.log(user);
+        console.log(type);
+        console.log(challenge);
+
         if (!web3Account) {
             return [
                 (
@@ -236,6 +244,8 @@ export const upsertWeb3Challenge = (
                 true
             ];
         }
+
+        console.log("**** done")
 
         return [
             (
@@ -591,9 +601,6 @@ export const getOrCreateFederatedUser = (
 ) => {
     db.transaction(async tx => {
         let user: User;
-
-
-
         try {
             /**
              * Do we already have a federated_credential ?
@@ -603,8 +610,11 @@ export const getOrCreateFederatedUser = (
                 subject: username,
             }).first();
 
+
+            console.log("**** federated is")
+            console.log(federated);
             /**
-             * If not, create the `usr`, then the `federated_credential`
+             * If not, create the `user`, then the `federated_credential`
              */
             if (!federated) {
                 user = await insertUserByDisplayName(displayName, username)(tx);

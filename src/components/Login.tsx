@@ -84,8 +84,6 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
       }),
     });
 
-    console.log({ resp });
-
     if (resp.ok) {
       const userResponse = await getCurrentUser();
       if (userResponse) {
@@ -110,7 +108,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     account: InjectedAccountWithMeta
   ): Promise<any> => {
     const result = await getAccountAndSign(account);
-    await authorise(result?.signature as SignerResult, account);
+    await authorise(result?.signature as SignerResult,result?.challenge!, account);
     setVisible(false);
     router.push(redirectUrl);
   };
