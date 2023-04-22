@@ -24,6 +24,7 @@ import AccountChoice from "@/components/AccountChoice";
 import { Dialogue } from "@/components/Dialogue";
 import ChatPopup from "@/components/ChatPopup";
 import Login from "@/components/Login";
+import { ProjectStatus } from "../api/models";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -63,12 +64,9 @@ function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
   const [freelancer, setFreelancer] = useState<Freelancer | any>({});
-  const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>(
-    {}
-  );
-  const [projectState, setProjectState] = useState<string>("");
+  const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
   const [user, setUser] = useState<User | any>();
-  const [targetUser, setTargetUser] = useState<User | null>(null);
+  const [chatTargetUser, setChatTargetUser] = useState<User | null>(null);
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
   const [submittingMilestone, setSubmittingMileStone] =
@@ -85,7 +83,8 @@ function Project() {
   const [loading, setLoading] = useState<boolean>(false);
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const projectId: any = router?.query?.id || 0;
-  const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
+  const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>(0);
+  const [isApplicant, setIsApplicant] = useState<boolean>();
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -102,6 +101,7 @@ function Project() {
     const onChainProjectRes: ProjectOnChain = await chainService.getProject(
       projectId
     );
+    setIsApplicant(onChainProjectRes.initiator == user.web3_address);
     setLoading(false);
     if (onChainProjectRes) {
       console.log("******");
@@ -241,7 +241,7 @@ function Project() {
   const handleMessageBoxClick = async (user_id: number, freelancer: any) => {
     if (user_id) {
       setShowMessageBox(true);
-      setTargetUser(await utils.fetchUser(user_id));
+      setChatTargetUser(await utils.fetchUser(user_id));
     } else {
       setLoginModal(true);
     }
@@ -318,20 +318,27 @@ function Project() {
             phasellus faucibus
           </p>
 
-          <button
-            className="primary-btn in-dark w-button font-normal h-[43px] items-center content-center !py-0 mt-[25px] px-8"
-            data-testid="next-button"
-            onClick={() => vote()}
-          >
-            Vote
-          </button>
-          <button
-            className="primary-btn in-dark w-button font-normal h-[43px] items-center content-center !py-0 mt-[25px] px-8"
-            data-testid="next-button"
-            onClick={() => submitMilestone()}
-          >
-            Submit
-          </button>
+          {milestone.milestone_key == milestoneBeingVotedOn && (
+            <button
+              className="primary-btn in-dark w-button font-normal h-[43px] items-center content-center !py-0 mt-[25px] px-8"
+              data-testid="next-button"
+              onClick={() => vote()}
+            >
+              Vote
+            </button>
+          )}
+
+          {isApplicant &&
+            onChainProject?.projectState !==
+              OnchainProjectState.OpenForVoting && (
+              <button
+                className="primary-btn in-dark w-button font-normal h-[43px] items-center content-center !py-0 mt-[25px] px-8"
+                data-testid="next-button"
+                onClick={() => submitMilestone()}
+              >
+                Submit
+              </button>
+            )}
         </div>
       </div>
     );
@@ -346,7 +353,7 @@ function Project() {
             showMessageBox,
             setShowMessageBox,
             browsingUser: user,
-            targetUser,
+            targetUser: chatTargetUser,
           }}
         />
       )}
