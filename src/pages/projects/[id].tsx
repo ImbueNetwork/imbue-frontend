@@ -17,6 +17,7 @@ import AccountChoice from "@/components/AccountChoice";
 import { Dialogue } from "@/components/Dialogue";
 import ChatPopup from "@/components/ChatPopup";
 import Login from "@/components/Login";
+import { ProjectStatus } from "../api/models";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -58,11 +59,9 @@ function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
   const [freelancer, setFreelancer] = useState<Freelancer | any>({});
-  const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>(
-    {}
-  );
+  const [onChainProject, setOnChainProject] = useState<ProjectOnChain>();
   const [user, setUser] = useState<User | any>();
-  const [targetUser, setTargetUser] = useState<User | null>(null);
+  const [chatTargetUser, setChatTargetUser] = useState<User | null>(null);
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
   const [submittingMilestone, setSubmittingMileStone] =
@@ -76,7 +75,8 @@ function Project() {
   const [loading, setLoading] = useState<boolean>(false);
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const projectId: any = router?.query?.id || 0;
-  const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
+  const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>(0);
+  const [isApplicant, setIsApplicant] = useState<boolean>();
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -91,14 +91,15 @@ function Project() {
     const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
     const onChainProjectRes: ProjectOnChain = await chainService.getProject(projectId);
+    setIsApplicant(onChainProjectRes.initiator == user.web3_address);
     setLoading(false);
     if (onChainProjectRes) {
       console.log("******")
       console.log(onChainProjectRes);
       console.log(OnchainProjectState[onChainProjectRes.projectState]);
-      if(onChainProjectRes.projectState == OnchainProjectState.OpenForVoting) {
-          const firstPendingMilestone = await chainService.findFirstPendingMilestone(onChainProjectRes.milestones);
-          setMilestoneBeingVotedOn(firstPendingMilestone);
+      if (onChainProjectRes.projectState == OnchainProjectState.OpenForVoting) {
+        const firstPendingMilestone = await chainService.findFirstPendingMilestone(onChainProjectRes.milestones);
+        setMilestoneBeingVotedOn(firstPendingMilestone);
       }
 
       setOnChainProject(onChainProjectRes);
@@ -225,7 +226,7 @@ function Project() {
   const handleMessageBoxClick = async (user_id: number, freelancer: any) => {
     if (user_id) {
       setShowMessageBox(true);
-      setTargetUser(await utils.fetchUser(user_id));
+      setChatTargetUser(await utils.fetchUser(user_id));
     } else {
       setLoginModal(true);
     }
@@ -240,7 +241,7 @@ function Project() {
     submitMilestone,
   }: ExpandableDropDownsProps) => {
     const [expanded, setExpanded] = useState(false);
-  
+
     return (
       <div className="transparent-conatainer relative !bg-[#2c2c2c] !py-[20px] !border !border-white rounded-[20px]">
         <div
@@ -260,10 +261,10 @@ function Project() {
           <div className="flex flex-row items-center">
             {
               milestone?.is_approved ? projectStateTag(modified, "Completed")
-              : (milestone?.milestone_key == milestoneBeingVotedOn) ? openForVotingTag()
-              : projectStateTag(modified, "Not Started")
-             }
-  
+                : (milestone?.milestone_key == milestoneBeingVotedOn) ? openForVotingTag()
+                  : projectStateTag(modified, "Not Started")
+            }
+
             <Image
               src={require(expanded
                 ? "@/assets/svgs/minus_btn.svg"
@@ -274,7 +275,7 @@ function Project() {
             />
           </div>
         </div>
-  
+
         <div className={`${!expanded && "hidden"} my-6`}>
           <p className="text-[14px] font-normal text-white">
             Percentage of funds to be released{" "}
@@ -286,7 +287,7 @@ function Project() {
               {Number(milestone?.amount)?.toLocaleString?.()} $IMBU
             </span>
           </p>
-  
+
           <p className="text-[16px] font-normal text-[#a6a6a6] leading-[178.15%] mt-[23px] w-[80%]">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
             purus sit amet luctus venenatis, lectus magna fringilla urna,
@@ -299,21 +300,27 @@ function Project() {
             vitae congue eu, consequat ac felis donec et odio pellentesque diam
             volutpat commodo sed egestas egestas fringilla phasellus faucibus
           </p>
-  
-          <button
-            className="primary-btn in-dark w-button font-normal h-[43px] items-center content-center !py-0 mt-[25px] px-8"
-            data-testid="next-button"
-            onClick={() => vote()}
-          >
-            Vote
-          </button>
-          <button
-            className="primary-btn in-dark w-button font-normal h-[43px] items-center content-center !py-0 mt-[25px] px-8"
-            data-testid="next-button"
-            onClick={() => submitMilestone()}
-          >
-            Submit
-          </button>
+
+          {milestone.milestone_key == milestoneBeingVotedOn &&
+            <button
+              className="primary-btn in-dark w-button font-normal h-[43px] items-center content-center !py-0 mt-[25px] px-8"
+              data-testid="next-button"
+              onClick={() => vote()}
+            >
+              Vote
+            </button>
+          }
+
+          {isApplicant && onChainProject?.projectState !== OnchainProjectState.OpenForVoting && 
+
+            <button
+              className="primary-btn in-dark w-button font-normal h-[43px] items-center content-center !py-0 mt-[25px] px-8"
+              data-testid="next-button"
+              onClick={() => submitMilestone()}
+            >
+              Submit
+            </button>
+          }
         </div>
       </div>
     );
@@ -328,7 +335,7 @@ function Project() {
             showMessageBox,
             setShowMessageBox,
             browsingUser: user,
-            targetUser,
+            targetUser: chatTargetUser,
           }}
         />
       )}
