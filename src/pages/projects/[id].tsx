@@ -21,9 +21,9 @@ import Login from "@/components/Login";
 TimeAgo.addDefaultLocale(en);
 
 type ExpandableDropDownsProps = {
-  data: Milestone;
+  milestone: Milestone;
   index: number;
-  dateCreated: Date;
+  modified: Date;
   vote: () => void;
   submitMilestone: () => void;
 };
@@ -53,9 +53,9 @@ const projectStateTag = (dateCreated: Date, text: string): JSX.Element => {
 };
 
 const ExpandableDropDowns = ({
-  data,
+  milestone,
   index,
-  dateCreated,
+  modified,
   vote,
   submitMilestone,
 }: ExpandableDropDownsProps) => {
@@ -74,12 +74,12 @@ const ExpandableDropDowns = ({
             Milestone {index + 1}
           </h3>
           <h3 className="text-[24px] ml-[32px] font-normal leading-[60px]">
-            {data?.name}
+            {milestone?.name}
           </h3>
         </div>
         <div className="flex flex-row items-center">
-          {data?.isApproved
-            ? projectStateTag(dateCreated, "Completed")
+          {
+          milestone?.is_approved ? projectStateTag(modified, "Completed")
             : openForVotingTag()}
 
           <Image
@@ -96,12 +96,12 @@ const ExpandableDropDowns = ({
       <div className={`${!expanded && "hidden"} my-6`}>
         <p className="text-[14px] font-normal text-white">
           Percentage of funds to be released{" "}
-          <span className="text-[#BAFF36]">{data?.percentage_to_unlock}%</span>
+          <span className="text-[#BAFF36]">{milestone?.percentage_to_unlock}%</span>
         </p>
         <p className="text-[14px] font-normal text-white">
           Funding to be released{" "}
           <span className="text-[#BAFF36]">
-            {Number(data?.amount)?.toLocaleString?.()} $IMBU
+            {Number(milestone?.amount)?.toLocaleString?.()} $IMBU
           </span>
         </p>
 
@@ -176,6 +176,7 @@ function Project() {
     setLoading(false);
     if (onChainProjectRes) {
       console.log("******")
+      console.log(onChainProjectRes);
       console.log(OnchainProjectState[onChainProjectRes.projectState]);
       const milestoneBeingVotedOn = await chainService.findFirstPendingMilestone(onChainProjectRes.milestones);
       console.log("milestone being voted on is ", milestoneBeingVotedOn);
@@ -292,7 +293,7 @@ function Project() {
   );
 
   const approvedMilStones = project?.milestones?.filter?.(
-    (milstone: Milestone) => milstone?.isApproved === true
+    (milstone: Milestone) => milstone?.is_approved === true
   );
 
   const timeAgo = new TimeAgo("en-US");
@@ -433,20 +434,20 @@ function Project() {
       </div>
 
       {onChainProject?.milestones?.map?.(
-        (mileStone: Milestone, index: number) => {
+        (milestone: Milestone, index: number) => {
           return (
             <ExpandableDropDowns
               key={`${index}-milestone`}
               index={index}
-              data={mileStone}
-              dateCreated={project?.created}
+              milestone={milestone}
+              modified={milestone?.modified!}
               vote={async () => {
                 // show polkadot account modal
                 await setShowPolkadotAccounts(true);
                 // set submitting mile stone to false
                 await setSubmittingMileStone(false);
                 // setMile stone key in view
-                await setMileStoneKeyInview(mileStone.milestone_key);
+                await setMileStoneKeyInview(milestone.milestone_key);
               }}
               submitMilestone={async () => {
                 // set submitting mile stone to true
@@ -454,7 +455,7 @@ function Project() {
                 // show polkadot account modal
                 await setShowPolkadotAccounts(true);
                 // setMile stone key in view
-                await setMileStoneKeyInview(mileStone.milestone_key);
+                await setMileStoneKeyInview(milestone.milestone_key);
               }}
             />
           );

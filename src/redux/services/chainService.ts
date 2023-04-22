@@ -17,6 +17,7 @@ import type { ITuple } from "@polkadot/types/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import type { EventRecord } from "@polkadot/types/interfaces";
 import * as utils from "@/utils";
+import MilestoneItem from "@/components/MilestoneItem";
 
 type EventDetails = {
   eventName: string;
@@ -349,7 +350,7 @@ class ChainService {
     const raisedFunds = BigInt(
       projectOnChain?.raisedFunds?.replaceAll(",", "") || 0
     );
-    const milestones = await this.getProjectMilestones(projectOnChain);
+    const milestones = await this.getProjectMilestones(projectOnChain, project);
 
     // get project state
     let projectState = OnchainProjectState.PendingProjectApproval;
@@ -473,19 +474,21 @@ class ChainService {
   }
 
   public async getProjectMilestones(
-    projectOnChain: ProjectOnChain
+    projectOnChain: ProjectOnChain,
+    projectOffChain: any
   ): Promise<Milestone[]> {
     let milestones: Milestone[] = Object.keys(projectOnChain.milestones)
       .map((milestoneItem: any) => projectOnChain.milestones[milestoneItem])
       .map(
         (milestone: any) =>
           ({
-            project_id: projectOnChain.id,
+            project_id: projectOffChain.id,
             project_chain_id: Number(milestone.projectKey),
             milestone_key: Number(milestone.milestoneKey),
-            name: milestone.name,
+            name: projectOffChain.milestones[milestone.milestoneKey].name,
+            modified: projectOffChain.milestones[milestone.milestoneKey].modified,
             percentage_to_unlock: Number(milestone.percentageToUnlock),
-            isApproved: milestone.isApproved,
+            is_approved: milestone.isApproved,
           } as Milestone)
       );
 
@@ -512,7 +515,7 @@ class ChainService {
     milestones: Milestone[]
   ): Promise<number> {
     const firstmilestone = milestones.find(
-      (milestone) => !milestone.isApproved
+      (milestone) => !milestone.is_approved
     );
     if (firstmilestone) {
       return firstmilestone.milestone_key;
@@ -526,7 +529,7 @@ class ChainService {
     const firstmilestone = milestones
       .slice()
       .reverse()
-      .find((milestone) => milestone.isApproved);
+      .find((milestone) => milestone.is_approved);
     if (firstmilestone) {
       return firstmilestone.milestone_key;
     }

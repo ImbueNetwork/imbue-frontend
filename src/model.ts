@@ -84,8 +84,9 @@ export type Milestone = {
   project_chain_id: number;
   milestone_key: number;
   name: string;
+  modified?: Date;
   percentage_to_unlock: number;
-  isApproved: boolean;
+  is_approved: boolean;
   amount: number;
 };
 
