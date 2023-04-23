@@ -13,13 +13,14 @@ import { signatureVerify } from "@polkadot/util-crypto";
 type Solution = {
   signature: string;
   challenge: string;
-  account: InjectedAccountWithMeta;
+  account: WalletAccount;
 };
 
 import jwt from 'jsonwebtoken';
 import config from "../../../config"
 import { serialize } from 'cookie';
 import { setTokenCookie } from "@/pages/api/auth-cookies";
+import { WalletAccount } from "@talismn/connect-wallets";
 
 
 export default nextConnect()
@@ -57,9 +58,9 @@ export default nextConnect()
               res.status(400).end(`Invalid address param. ${(e as Error).message}`)
             }
             models.getOrCreateFederatedUser(
-              account.meta.source,
+              account.source,
               address,
-              account.meta.name!,
+              account.name!,
               async (err: Error, user: models.User) => {
                 if (err) {
                   res.status(500).end(`Error: ${err.message}`)

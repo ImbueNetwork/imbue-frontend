@@ -13,6 +13,7 @@ import Link from "next/link";
 import styled from "@emotion/styled";
 import { getCurrentUser } from "@/utils";
 import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
+import { WalletAccount } from "@talismn/connect-wallets";
 
 const logoStyle = { height: "100%", width: "100%" };
 
@@ -105,7 +106,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   };
 
   const accountSelected = async (
-    account: InjectedAccountWithMeta
+    account: WalletAccount
   ): Promise<any> => {
     const result = await getAccountAndSign(account);
     await authorise(result?.signature as SignerResult,result?.challenge!, account);

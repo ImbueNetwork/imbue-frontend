@@ -4,6 +4,7 @@ import { signWeb3Challenge } from "@/utils/polkadot";
 import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { SignerResult } from "@polkadot/api/types";
 import { v4 as uuid } from "uuid";
+import { WalletAccount } from "@talismn/connect-wallets";
 
 const getAPIHeaders = {
   accept: "application/json",
@@ -14,7 +15,7 @@ const postAPIHeaders = {
   "content-type": "application/json",
 };
 
-export async function getAccountAndSign(account: InjectedAccountWithMeta) {
+export async function getAccountAndSign(account: WalletAccount) {
   const challenge = uuid();
   const signature = await signWeb3Challenge(account, challenge);
   if (signature) {
@@ -30,9 +31,9 @@ export async function getAccountAndSign(account: InjectedAccountWithMeta) {
 export async function authorise(
   signature: SignerResult,
   challenge: string,
-  account: InjectedAccountWithMeta
+  account: WalletAccount
 ) {
-  const resp = await fetch(`/api/auth/web3/${account.meta.source}/callback`, {
+  const resp = await fetch(`/api/auth/web3/polkadot`, {
     headers: postAPIHeaders,
     method: "post",
     body: JSON.stringify({
