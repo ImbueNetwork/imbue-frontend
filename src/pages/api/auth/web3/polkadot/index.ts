@@ -13,7 +13,7 @@ import { signatureVerify } from "@polkadot/util-crypto";
 type Solution = {
   signature: string;
   challenge: string;
-  account: WalletAccount;
+  account: any;
 };
 
 import jwt from 'jsonwebtoken';

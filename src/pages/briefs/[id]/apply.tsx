@@ -15,6 +15,7 @@ import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { selectAccount } from "@/redux/services/polkadotService";
 import { useRouter } from "next/router";
 import FullScreenLoader from "@/components/FullScreenLoader";
+import { WalletAccount } from "@talismn/connect-wallets";
 
 interface MilestoneItem {
   name: string;
@@ -90,7 +91,7 @@ export const SubmitProposal = (): JSX.Element => {
     setCurrencyId(Number(event.target.value));
   };
 
-  const handleSelectAccount = async (account: InjectedAccountWithMeta) => {
+  const handleSelectAccount = async (account: WalletAccount) => {
     setLoading(true);
     await selectAccount(account);
     setLoading(false);
@@ -149,7 +150,7 @@ export const SubmitProposal = (): JSX.Element => {
   const renderPolkadotJSModal = (
     <div>
       <AccountChoice
-        accountSelected={(account: InjectedAccountWithMeta) =>
+        accountSelected={(account: WalletAccount) =>
           handleSelectAccount(account)
         }
         closeModal={() => setShowPolkadotAccounts(false)}
