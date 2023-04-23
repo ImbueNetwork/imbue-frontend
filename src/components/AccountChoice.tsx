@@ -47,6 +47,7 @@ const AccountChoice = ({
       ]}
       header="Connect wallet"
       showAccountsList={true}
+      onWalletConnectClose={closeModal}
       onAccountSelected={(account: WalletAccount) => {
         accountSelected(account);
       }}

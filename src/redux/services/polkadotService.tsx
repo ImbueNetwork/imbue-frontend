@@ -4,7 +4,7 @@ import { signWeb3Challenge } from "@/utils/polkadot";
 import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { SignerResult } from "@polkadot/api/types";
 import { v4 as uuid } from "uuid";
-import { WalletAccount } from "@talismn/connect-wallets";
+import { Wallet, WalletAccount } from "@talismn/connect-wallets";
 
 const getAPIHeaders = {
   accept: "application/json",
@@ -56,7 +56,7 @@ export async function authorise(
   }
 }
 
-export const selectAccount = async (account: InjectedAccountWithMeta) => {
+export const selectAccount = async (account: WalletAccount) => {
   const result = await getAccountAndSign(account);
   if (result?.signature) {
     await authorise(result?.signature as SignerResult, result?.challenge!, account);

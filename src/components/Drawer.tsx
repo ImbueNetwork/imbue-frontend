@@ -70,25 +70,16 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
   ];
 
   const navigateToPage = async (link: string) => {
-    console.log("**** clicked")
-    console.log(link)
-    console.log(authenticated)
     if (authenticated && link !== "/logout" && link !== "") {
-      console.log("**** 1")
-
       router.push(link);
       toggleVisibility();
     } else if (link === "/logout") {
-      console.log("**** 2")
       await localStorage.clear();
       router.push(link);
       toggleVisibility();
     } else {
-      console.log("**** 3")
       link !== "/logout" && link !== "" && setRedirectURL(link);
       setLoginModal(true);
-      toggleVisibility();
-      router.push(link);
     }
   };
   return (

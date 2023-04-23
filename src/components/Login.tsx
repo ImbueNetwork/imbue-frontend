@@ -109,7 +109,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     account: WalletAccount
   ): Promise<any> => {
     const result = await getAccountAndSign(account);
-    await authorise(result?.signature as SignerResult,result?.challenge!, account);
+    await authorise(result?.signature as SignerResult, result?.challenge!, account);
     setVisible(false);
     router.push(redirectUrl);
   };
@@ -118,9 +118,10 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     if (polkadotAccountsVisible) {
       return (
         <AccountChoice
-          accountSelected={(account: InjectedAccountWithMeta) =>
+          accountSelected={(account: WalletAccount) =>
             accountSelected(account)
           }
+          closeModal={() => setVisible(false)}
         />
       );
     } else {
