@@ -10,48 +10,34 @@ type AccountChoiceProps = {
   accountSelected: (account: any) => void;
   closeModal?: () => void;
   filterByInitiator?: boolean;
-  initiator?: string;
+  initiator_address?: string;
 };
 
 const AccountChoice = ({
   accountSelected,
   closeModal,
   filterByInitiator,
-  initiator,
+  initiator_address,
 }: AccountChoiceProps): JSX.Element => {
-  const [accounts, setAccounts] = React.useState<InjectedAccountWithMeta[]>([]);
-  const [filteredWallet, setFilteredWallet] = React.useState<WalletAccount[]>([]);
-
-  React.useEffect(() => {
-    getAccounts();
-  }, []);
-
-  const getAccounts = async () => {
-    const accountsResponse: InjectedAccountWithMeta[] = await getWeb3Accounts();
-    setAccounts(accountsResponse);
-  };
-
-  const initiatorOnly = accounts.filter((account) => {
-    const { address } = account;
-    return address === initiator;
-  });
-
+  const header = filterByInitiator ? `Connect with ${initiator_address}` : "Connect wallet";
   return (
-    <WalletSelect
-      dappName={"Imbue"}
-      open={true}
-      walletList={[
-        new TalismanWallet(),
-        new PolkadotjsWallet(),
-        new SubWallet(),
-      ]}
-      header="Connect wallet"
-      showAccountsList={true}
-      onWalletConnectClose={closeModal}
-      onAccountSelected={(account: WalletAccount) => {
-        accountSelected(account);
-      }}
-    />
+    <>
+      <WalletSelect
+        dappName={"Imbue"}
+        open={true}
+        walletList={[
+          new TalismanWallet(),
+          new PolkadotjsWallet(),
+          new SubWallet(),
+        ]}
+        header={header}
+        showAccountsList={true}
+        onWalletConnectClose={closeModal}
+        onAccountSelected={(account: WalletAccount) => {
+          accountSelected(account);
+        }}
+      />
+    </>
   );
 };
 
