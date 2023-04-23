@@ -322,3 +322,16 @@ select.round {
   -moz-appearance: none;
   min-width: 150px;
 }
+
+.pill-button{
+  padding: 12px 24px;
+  border: 1px solid white;
+  border-radius: 8px;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.pill-button:hover{
+  background: white;
+  color: black;
+}

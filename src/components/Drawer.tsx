@@ -14,7 +14,7 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [authenticated, setAuthenticated] = useState<boolean>(false);
   const [redirectURL, setRedirectURL] = useState<string>();
-  const [isFreelancer, setIsFreelancer] = useState<boolean>(false)
+  const [isFreelancer, setIsFreelancer] = useState<any>(false)
   const [user, setUser] = useState<User>()
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
     {
       icon: "group_add",
       text: isFreelancer ? "Freelancer Profile" : "Join The Freelancers",
-      link: isFreelancer ? `/freelancer/${user?.username}/` : "/freelancer/new",
+      link: isFreelancer ? `/freelancers/${user?.username}/` : "/freelancers/new",
     },
     {
       icon: "work",

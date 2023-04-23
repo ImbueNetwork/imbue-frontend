@@ -364,7 +364,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                     {/* TODO: Add Skills */}
                     {freelancer?.skills?.map?.((skill: any) => (
                       <p
-                        className={styles.skillsButton}
+                        className={`pill-button`}
                         key={skill?.id}
                       >
                         {skill.name}

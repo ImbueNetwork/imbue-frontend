@@ -67,9 +67,8 @@
     color: white;
 }
 
-.profile-container .MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-outlined.MuiFormLabel-colorPrimary.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-outlined,
+.MuiFormLabel-root,
 .MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedEnd,
-.MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-standard.MuiFormLabel-colorPrimary.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-standard,
 .MuiSvgIcon-root.MuiSvgIcon-fontSizeMedium.MuiSelect-icon.MuiSelect-iconStandard,
 .MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiInput-input{
     color: white;
@@ -79,3 +78,5 @@
     color: white;
     cursor: pointer;
 }
+
+/* .MuiFormControl-root .MuiTextField-root */
