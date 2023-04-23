@@ -105,6 +105,12 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     showPolkadotAccounts(true);
   };
 
+  const closeModal = (): void => {
+    showPolkadotAccounts(false);
+    setVisible(false);
+  };
+
+
   const accountSelected = async (
     account: WalletAccount
   ): Promise<any> => {
@@ -121,7 +127,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
           accountSelected={(account: WalletAccount) =>
             accountSelected(account)
           }
-          closeModal={() => setVisible(false)}
+          closeModal={() => closeModal()}
         />
       );
     } else {
