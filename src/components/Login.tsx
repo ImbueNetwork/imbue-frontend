@@ -183,39 +183,34 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                         setVisible(false);
                       }}
                       className="signup"
-                    >
-                      Sign up
+                    > Sign up
                     </Link>
-                    {/* <span
-                      onClick={() => showPolkadotAccounts(true)}
-                      className="mdc-deprecated-list-item__text"
-                    ></span> */}
                   </div>
                 </div>
               </form>
 
               <li
-                className="mdc-deprecated-list-item flex flex-row items-center mt-8"
+                className="mdc-deprecated-list-item flex flex-row items-center mt-8 cursor-pointer"
                 tabIndex={0}
                 data-mdc-dialog-action="web3"
+                onClick={() => clicked()}
               >
                 <span className="mdc-deprecated-list-item__graphic h-[40px] w-[40px] flex mr-[16px]">
                   <Image
                     src={
-                      "https://avatars.githubusercontent.com/u/33775474?s=200&amp;amp;v=4"
+                      "https://raw.githubusercontent.com/TalismanSociety/talisman-connect/master/packages/connect-wallets/src/lib/talisman-wallet/TalismanLogo.svg"
                     }
                     width={40}
                     height={40}
-                    className="w-full"
+                    className="w-full cursor-pointer"
                     style={logoStyle}
                     alt={"avaterImage"}
                   />
                 </span>
                 <span
-                  onClick={() => clicked()}
-                  className="mdc-deprecated-list-item__text"
+                  className="cursor-pointer"
                 >
-                  {"Sign in with your polkadot{.js} extension"}
+                  {"Sign in with a wallet"}
                 </span>
               </li>
             </div>
