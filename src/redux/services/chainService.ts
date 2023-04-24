@@ -11,7 +11,6 @@ import {
   RoundType,
   User,
 } from "@/model";
-import type { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import type { DispatchError } from "@polkadot/types/interfaces";
 import type { ITuple } from "@polkadot/types/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";

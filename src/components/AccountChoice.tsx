@@ -1,4 +1,3 @@
-import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { getWeb3Accounts } from "@/utils/polkadot";
 import * as React from "react";
 import { Dialogue } from "./Dialogue";

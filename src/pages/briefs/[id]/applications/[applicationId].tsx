@@ -160,12 +160,12 @@ const ApplicationPreview = (): JSX.Element => {
           if (result.status) {
             console.log("***** success");
             const projectId = parseInt(result.eventData[2]);
-            await updateProject(projectId);
             while(true) {
               const projectIsOnChain = await chainService.getProjectOnChain(
                 projectId
               );
               if(projectIsOnChain) {
+                await updateProject(projectId);
                 router.push(`/projects/${applicationId}`);
               }
               await new Promise((f) => setTimeout(f, 1000));

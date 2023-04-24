@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
@@ -28,10 +27,7 @@ export const HirePopup = ({
   totalCost,
   setLoading,
 }: any) => {
-  const router = useRouter();
   const [popupStage, setstage] = useState<number>(0);
-  const [walletOptions, setWalletOptions] = useState<number[]>([0, 1, 2]);
-  const [accounts, setAccounts] = React.useState<InjectedAccountWithMeta[]>([]);
   const modalStyle = {
     position: "absolute" as "absolute",
     top: "50%",
