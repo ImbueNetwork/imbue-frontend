@@ -18,7 +18,6 @@ import * as utils from "@/utils";
 import { getWeb3Accounts, initImbueAPIInfo } from "@/utils/polkadot";
 import ChainService from "@/redux/services/chainService";
 import FullScreenLoader from "@/components/FullScreenLoader";
-import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import moment from "moment";
 import AccountChoice from "@/components/AccountChoice";
 import { Dialogue } from "@/components/Dialogue";
@@ -77,9 +76,6 @@ function Project() {
     Record<any, any>
   >({});
   const [mileStoneKeyInView, setMileStoneKeyInview] = useState<number>(0);
-  const [web3account, setWeb3Account] = useState<InjectedAccountWithMeta | any>(
-    {}
-  );
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [loginModal, setLoginModal] = useState<boolean>(false);
@@ -182,15 +178,7 @@ function Project() {
   const renderPolkadotJSModal = (
     <div>
       <AccountChoice
-        accountSelected={async (account: WalletAccount) => {
-          if (submittingMilestone) {
-            await submitMilestone(account);
-          } else {
-            await setWeb3Account(account);
-            await setShowVotingModal(true);
-          }
-          await setShowPolkadotAccounts(false);
-        }}
+        accountSelected={async (account: WalletAccount) => submitMilestone(account)}
         visible={showPolkadotAccounts}
         setVisible={setShowPolkadotAccounts}
         initiatorAddress={onChainProject?.initiator}

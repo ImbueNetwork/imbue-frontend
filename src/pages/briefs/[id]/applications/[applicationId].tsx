@@ -23,7 +23,6 @@ import { HirePopup } from "@/components/HirePopup";
 import ChatPopup from "@/components/ChatPopup";
 import ChainService from "@/redux/services/chainService";
 import { getWeb3Accounts, initImbueAPIInfo } from "@/utils/polkadot";
-import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { blake2AsHex } from "@polkadot/util-crypto";
 import { Backdrop, CircularProgress } from "@mui/material";
 import Image from "next/image";

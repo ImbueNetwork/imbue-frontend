@@ -255,11 +255,11 @@ class ChainService {
   }
 
   async submitExtrinsic(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     extrinsic: SubmittableExtrinsic<"promise">
   ): Promise<BasicTxResponse> {
     const { web3FromSource } = await import("@polkadot/extension-dapp");
-    const injector = await web3FromSource(account.meta.source);
+    const injector = await web3FromSource(account.source);
     const transactionState: BasicTxResponse = {} as BasicTxResponse;
     try {
       const unsubscribe = await extrinsic.signAndSend(

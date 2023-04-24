@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from 'next-connect'
-import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { decodeAddress, encodeAddress } from "@polkadot/keyring";
 import { hexToU8a, isHex } from '@polkadot/util';
 
