@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogTitle } from "@mui/material";
 import { WalletSelect } from "@talismn/connect-components";
 import { Wallet, WalletAccount } from "@talismn/connect-wallets";
 import { PolkadotjsWallet, SubWallet, TalismanWallet, EnkryptWallet } from "@talismn/connect-wallets"
+import { truncateMiddle } from '@talismn/connect-ui';
 
 type AccountChoiceProps = {
   accountSelected: (account: WalletAccount) => void;
@@ -21,7 +22,8 @@ const AccountChoice = ({
   filterByInitiator,
   initiatorAddress,
 }: AccountChoiceProps): JSX.Element => {
-  const header = filterByInitiator ? `Connect with ${initiatorAddress}` : "Connect wallet";
+
+  const header = filterByInitiator ? `Connect with ${truncateMiddle(initiatorAddress)}` : "Connect wallet";
   return (
     <>
       <WalletSelect
