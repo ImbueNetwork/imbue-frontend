@@ -18,6 +18,7 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import type { EventRecord } from "@polkadot/types/interfaces";
 import * as utils from "@/utils";
 import MilestoneItem from "@/components/MilestoneItem";
+import { Wallet, WalletAccount } from "@talismn/connect-wallets";
 
 type EventDetails = {
   eventName: string;
@@ -42,7 +43,7 @@ class ChainService {
   }
 
   public async commenceWork(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     briefId: string
   ): Promise<BasicTxResponse> {
     const extrinsic = await this.imbueApi.imbue.api.tx.imbueBriefs.commenceWork(
@@ -56,7 +57,7 @@ class ChainService {
   }
 
   public async hireFreelancer(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     briefOwners: string[],
     freelancerAddress: string,
     budget: bigint,
@@ -82,7 +83,7 @@ class ChainService {
   }
 
   public async contribute(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     projectOnChain: any,
     contribution: bigint
   ): Promise<BasicTxResponse> {
@@ -101,7 +102,7 @@ class ChainService {
   }
 
   public async submitMilestone(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     projectOnChain: ProjectOnChain,
     milestoneKey: number
   ): Promise<BasicTxResponse> {
@@ -119,7 +120,7 @@ class ChainService {
   }
 
   public async voteOnMilestone(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     projectOnChain: any,
     milestoneKey: number,
     userVote: boolean
@@ -140,7 +141,7 @@ class ChainService {
   }
 
   public async approveMilestone(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     projectOnChain: any,
     milestoneKey: number
   ): Promise<BasicTxResponse> {
@@ -159,7 +160,7 @@ class ChainService {
   }
 
   public async withdraw(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     projectOnChain: any
   ): Promise<BasicTxResponse> {
     const projectId = projectOnChain.milestones[0].projectKey;
@@ -174,17 +175,15 @@ class ChainService {
   }
 
   async submitImbueExtrinsic(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     extrinsic: SubmittableExtrinsic<"promise">,
     eventName: String
   ): Promise<BasicTxResponse> {
-    const { web3FromSource } = await import("@polkadot/extension-dapp");
-    const injector = await web3FromSource(account.meta.source);
     const transactionState: BasicTxResponse = {} as BasicTxResponse;
     try {
       const unsubscribe = await extrinsic.signAndSend(
         account.address,
-        { signer: injector.signer },
+        { signer: account.signer! },
         (result) => {
           this.imbueApi.imbue.api.query.system.events(
             (events: EventRecord[]) => {
