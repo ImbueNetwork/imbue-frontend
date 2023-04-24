@@ -33,13 +33,17 @@ export async function authorise(
   challenge: string,
   account: WalletAccount
 ) {
+  const existingUser = await getCurrentUser();
+
   const resp = await fetch(`/api/auth/web3/polkadot`, {
+
     headers: postAPIHeaders,
     method: "post",
     body: JSON.stringify({
       signature: signature.signature,
       challenge,
       account,
+      logged_in_user: existingUser,
     }),
   });
   if (resp.ok) {

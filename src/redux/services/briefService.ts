@@ -122,15 +122,17 @@ export const changeBriefApplicationStatus = async (
   }
 };
 
-export const getUserBrief = async (userId: number, briefId: number) => {
-  return null;
-  // const resp = await fetch(
-  //   `${config.apiBase}/users/${userId}/briefs/${briefId}`
-  // );
-  // if (resp.ok) {
-  //   return resp.json();
-  // }
-  // return null;
+export const getFreelancerBrief = async (userId: number, briefId: number) => {
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}users/${userId}/briefs/${briefId}`),
+    {
+      headers: postAPIHeaders,
+      method: "get",
+    }
+  );
+  if (resp.ok) {
+    return resp.json();
+  }
 };
 
 export const getProjectById = async (projectId: string | number) => {

@@ -650,7 +650,7 @@ export const fetchFreelancerDetailsByUserID = (user_id: number | string) =>
             .first()
             .debug(false)
 
-export const fetchFreelancerDetailsByUsername = (username: string) =>
+export const fetchFreelancerDetailsByUsername = (username: string|string[]) =>
     (tx: Knex.Transaction) =>
         fetchAllFreelancers()(tx)
             .where({ username: username })

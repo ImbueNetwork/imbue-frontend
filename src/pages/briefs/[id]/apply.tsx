@@ -6,7 +6,7 @@ import MilestoneItem from "@/components/Briefs/MileStoneItem";
 import { timeData } from "@/config/briefs-data";
 import * as config from "@/config";
 import { Brief, Currency, User } from "@/model";
-import { getBrief, getUserBrief } from "@/redux/services/briefService";
+import { getBrief, getFreelancerBrief } from "@/redux/services/briefService";
 import { BriefInsights } from "@/components/Briefs/BriefInsights";
 import AccountChoice from "@/components/AccountChoice";
 import { checkEnvironment, getCurrentUser, redirect } from "@/utils";
@@ -53,9 +53,8 @@ export const SubmitProposal = (): JSX.Element => {
 
   const getCurrentUserBrief = async () => {
     if (briefId && user) {
-      const userApplication: any = await getUserBrief(user?.id, briefId);
+      const userApplication: any = await getFreelancerBrief(user?.id, briefId);
       if (userApplication) {
-        //TODO: redirect to brief application
         router.push(`/briefs/${briefId}/applications/${userApplication?.id}/`);
       }
       const briefResponse: Brief | undefined = await getBrief(briefId);
@@ -101,6 +100,7 @@ export const SubmitProposal = (): JSX.Element => {
   async function handleSubmit() {
     if (!user?.web3_address) {
       setShowPolkadotAccounts(true);
+      await insertProject();
     } else {
       await insertProject();
     }
@@ -137,7 +137,6 @@ export const SubmitProposal = (): JSX.Element => {
         }),
       }
     );
-    setLoading(false);
     if (resp.ok) {
       const applicationId = (await resp.json()).id;
       applicationId &&
@@ -145,6 +144,7 @@ export const SubmitProposal = (): JSX.Element => {
     } else {
       console.log("Failed to submit the brief");
     }
+    setLoading(false);
   }
 
   const renderPolkadotJSModal = (
