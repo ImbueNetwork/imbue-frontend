@@ -121,7 +121,7 @@ function reportValidity(input: HTMLInputElement, submitting: boolean = false) {
 export const checkEnvironment = () => {
   let base_url = "http://localhost:3000";
   if (process.env.NODE_ENV === "production") {
-    base_url = "";
+    base_url;
   }
 
   return base_url;
