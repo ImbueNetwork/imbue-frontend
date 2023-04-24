@@ -59,10 +59,6 @@ export const BriefLists = ({
             <h3 className="text-sm lg:text-xl font-bold">{brief.headline}</h3>
             <p className="text-xs lg:text-[16px]">
               Budget ${Number(brief.budget).toLocaleString()} - Public
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
             </p>
             <p className="text-xs lg:text-[16px]">
               Created {timeAgo.format(new Date(brief.created))}

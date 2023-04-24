@@ -96,22 +96,11 @@ function Project() {
     const imbueApi = await initImbueAPIInfo();
     const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
-<<<<<<< HEAD
-    const onChainProjectRes = await chainService.getProject(
-      projectId
-    );
-    if (onChainProjectRes) {
-
-      const isApplicant = onChainProjectRes.initiator == user.web3_address;
-
-      if(isApplicant){
-=======
     const onChainProjectRes = await chainService.getProject(projectId);
     if (onChainProjectRes) {
       const isApplicant = onChainProjectRes.initiator == user.web3_address;
 
       if (isApplicant) {
->>>>>>> origin/main
         await getFreelancerData(user.username);
       }
 
