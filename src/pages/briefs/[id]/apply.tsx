@@ -376,7 +376,6 @@ export const SubmitProposal = (): JSX.Element => {
         {/* TODO: Add Drafts Functionality */}
         {/* <button className="secondary-btn">Save draft</button> */}
       </div>
-      {/* {showPolkadotAccounts && renderPolkadotJSModal} */}
       <AccountChoice
         accountSelected={(account: WalletAccount) =>
           handleSelectAccount(account)
