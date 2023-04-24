@@ -124,7 +124,7 @@ class ChainService {
     milestoneKey: number,
     userVote: boolean
   ): Promise<BasicTxResponse> {
-    const projectId = projectOnChain.milestones[0].projectKey;
+    const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic =
       await this.imbueApi.imbue.api.tx.imbueProposals.voteOnMilestone(
         projectId,
