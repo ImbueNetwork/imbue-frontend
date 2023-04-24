@@ -108,7 +108,8 @@ export const SubmitProposal = (): JSX.Element => {
   async function insertProject() {
     //TODO: validate all milestone sum up to 100%
     setLoading(true);
-    const resp = await fetch(`${config.apiBase}/project`,
+    const resp = await fetch(
+      checkEnvironment().concat(`${config.apiBase}/project`),
       {
         headers: config.postAPIHeaders,
         method: "post",

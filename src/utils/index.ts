@@ -54,7 +54,8 @@ export const getProjectId = async () => {
 };
 
 export const fetchProject = async (projectId: string | number | null) => {
-  const resp = await fetch(`${config.apiBase}project/${projectId}`,
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}project/${projectId}`),
     {
       headers: config.getAPIHeaders,
     }
