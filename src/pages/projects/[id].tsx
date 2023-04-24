@@ -15,7 +15,7 @@ import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import { getFreelancerProfile } from "@/redux/services/freelancerService";
 import * as utils from "@/utils";
-import { getWeb3Accounts, initImbueAPIInfo } from "@/utils/polkadot";
+import {initImbueAPIInfo } from "@/utils/polkadot";
 import ChainService from "@/redux/services/chainService";
 import FullScreenLoader from "@/components/FullScreenLoader";
 import moment from "moment";
@@ -100,7 +100,14 @@ function Project() {
       projectId
     );
     if (onChainProjectRes) {
-      setIsApplicant(onChainProjectRes.initiator == user.web3_address);
+
+      const isApplicant = onChainProjectRes.initiator == user.web3_address;
+
+      if(isApplicant){
+        await getFreelancerData(user.username);
+      }
+
+      setIsApplicant(isApplicant);
       console.log("******");
       console.log(onChainProjectRes);
       console.log(OnchainProjectState[onChainProjectRes.projectState]);
@@ -124,7 +131,6 @@ function Project() {
     const userResponse = await utils.getCurrentUser();
     await setUser(userResponse);
     await getChainProject();
-    await getFreelancerData(userResponse?.username);
   };
 
   const getFreelancerData = async (freelancerName: string) => {
@@ -133,7 +139,10 @@ function Project() {
   };
 
   // voting on a mile stone
-  const voteOnMilestone = async (account: WalletAccount, booleanValue: boolean) => {
+  const voteOnMilestone = async (account: WalletAccount, vote: boolean) => {
+    console.log("***** voting on milestone");
+    console.log(account);
+    console.log(vote);
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
     const userRes: User | any = await utils.getCurrentUser();
@@ -142,7 +151,7 @@ function Project() {
       account,
       onChainProject,
       mileStoneKeyInView,
-      booleanValue
+      vote
     );
     setLoading(false);
     console.log({ voteResponse });
@@ -185,7 +194,16 @@ function Project() {
         filterByInitiator
       />
     </div>
+    
   );
+
+  const showAccountChoice = (vote: boolean) => {
+    <AccountChoice
+      accountSelected={(account) => voteOnMilestone(account, vote)}
+      visible={true}
+      setVisible={setShowVotingModal}
+    />
+  }
 
   const renderVotingModal = (
     <Dialogue
@@ -214,20 +232,12 @@ function Project() {
             </button>
           </li>
 
-
         </>
       }
     />
   );
 
 
-  const showAccountChoice = (vote: boolean) => {
-    return <AccountChoice
-      accountSelected={(account) => voteOnMilestone(account, vote)}
-      visible={true}
-      setVisible={setShowVotingModal}
-    />
-  }
 
   const approvedMilStones = project?.milestones?.filter?.(
     (milstone: Milestone) => milstone?.is_approved === true
@@ -499,9 +509,9 @@ function Project() {
               modified={milestone?.modified!}
               vote={async () => {
                 // show polkadot account modal
-                await setShowPolkadotAccounts(true);
+                // await setShowPolkadotAccounts(true);
                 // set submitting mile stone to false
-                await setSubmittingMileStone(false);
+                await setShowVotingModal(true);
                 // setMile stone key in view
                 await setMileStoneKeyInview(milestone.milestone_key);
               }}
