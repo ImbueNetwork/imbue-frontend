@@ -12,7 +12,7 @@ type AccountChoiceProps = {
   setVisible: Function;
   visible: boolean;
   filterByInitiator?: boolean;
-  initiator_address?: string;
+  initiatorAddress?: string;
   closeModal?: () => void;
 }
 
@@ -21,9 +21,9 @@ const AccountChoice = ({
   visible,
   setVisible,
   filterByInitiator,
-  initiator_address,
+  initiatorAddress,
 }: AccountChoiceProps): JSX.Element => {
-  const header = filterByInitiator ? `Connect with ${initiator_address}` : "Connect wallet";
+  const header = filterByInitiator ? `Connect with ${initiatorAddress}` : "Connect wallet";
   return (
     <>
       <WalletSelect
