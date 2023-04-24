@@ -18,13 +18,13 @@ import * as utils from "@/utils";
 import { initImbueAPIInfo } from "@/utils/polkadot";
 import ChainService from "@/redux/services/chainService";
 import FullScreenLoader from "@/components/FullScreenLoader";
-import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import moment from "moment";
 import AccountChoice from "@/components/AccountChoice";
 import { Dialogue } from "@/components/Dialogue";
 import ChatPopup from "@/components/ChatPopup";
 import Login from "@/components/Login";
 import { ProjectStatus } from "../api/models";
+import { WalletAccount } from "@talismn/connect-wallets";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -72,18 +72,15 @@ function Project() {
   const [submittingMilestone, setSubmittingMileStone] =
     useState<boolean>(false);
   const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
-  const [projectChainService, setProjectChainService] = useState<
-    Record<any, any>
+  const [votingWalletAccount, setVotingWalletAccount] = useState<
+    WalletAccount | any
   >({});
   const [mileStoneKeyInView, setMileStoneKeyInview] = useState<number>(0);
-  const [web3account, setWeb3Account] = useState<InjectedAccountWithMeta | any>(
-    {}
-  );
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const projectId: any = router?.query?.id || 0;
-  const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>(0);
+  const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
   const [isApplicant, setIsApplicant] = useState<boolean>();
 
   // fetching the project data from api and from chain
@@ -98,12 +95,15 @@ function Project() {
     const imbueApi = await initImbueAPIInfo();
     const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
-    const onChainProjectRes: ProjectOnChain = await chainService.getProject(
-      projectId
-    );
-    setIsApplicant(onChainProjectRes.initiator == user.web3_address);
-    setLoading(false);
+    const onChainProjectRes = await chainService.getProject(projectId);
     if (onChainProjectRes) {
+      const isApplicant = onChainProjectRes.initiator == user.web3_address;
+
+      if (isApplicant) {
+        await getFreelancerData(user.username);
+      }
+
+      setIsApplicant(isApplicant);
       console.log("******");
       console.log(onChainProjectRes);
       console.log(OnchainProjectState[onChainProjectRes.projectState]);
@@ -117,6 +117,7 @@ function Project() {
 
       setOnChainProject(onChainProjectRes);
     }
+    setLoading(false);
   };
 
   const getProject = async () => {
@@ -126,7 +127,6 @@ function Project() {
     const userResponse = await utils.getCurrentUser();
     await setUser(userResponse);
     await getChainProject();
-    await getFreelancerData(userResponse?.username);
   };
 
   const getFreelancerData = async (freelancerName: string) => {
@@ -135,23 +135,26 @@ function Project() {
   };
 
   // voting on a mile stone
-  const voteMileStone = async (web3Account: any, booleanValue: boolean) => {
+  const voteOnMilestone = async (account: WalletAccount, vote: boolean) => {
+    console.log("***** voting on milestone");
+    console.log(account);
+    console.log(vote);
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
     const userRes: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, userRes);
     const voteResponse = await chainService.voteOnMilestone(
-      web3Account,
+      account,
       onChainProject,
       mileStoneKeyInView,
-      booleanValue
+      vote
     );
     setLoading(false);
     console.log({ voteResponse });
   };
 
   // submitting a mile stone
-  const submitMileStone = async (account: InjectedAccountWithMeta) => {
+  const submitMilestone = async (account: WalletAccount) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
     const user: User | any = await utils.getCurrentUser();
@@ -180,17 +183,17 @@ function Project() {
   const renderPolkadotJSModal = (
     <div>
       <AccountChoice
-        accountSelected={async (account: InjectedAccountWithMeta) => {
+        accountSelected={async (account: WalletAccount) => {
           if (submittingMilestone) {
-            await submitMileStone(account);
+            submitMilestone(account);
           } else {
-            await setWeb3Account(account);
+            await setVotingWalletAccount(account);
             await setShowVotingModal(true);
           }
-          await setShowPolkadotAccounts(false);
         }}
-        closeModal={() => setShowPolkadotAccounts(false)}
-        initiator_address={onChainProject?.initiator}
+        visible={showPolkadotAccounts}
+        setVisible={setShowPolkadotAccounts}
+        initiatorAddress={onChainProject?.initiator}
         filterByInitiator
       />
     </div>
@@ -206,7 +209,7 @@ function Project() {
             <button
               className="primary !bg-transparent !hover:bg-transparent"
               onClick={() => {
-                voteMileStone(web3account, true);
+                voteOnMilestone(votingWalletAccount, true);
                 setShowVotingModal(false);
               }}
             >
@@ -217,7 +220,7 @@ function Project() {
             <button
               className="primary !bg-transparent !hover:bg-transparent"
               onClick={() => {
-                voteMileStone(web3account, false);
+                voteOnMilestone(votingWalletAccount, false);
                 setShowVotingModal(false);
               }}
             >

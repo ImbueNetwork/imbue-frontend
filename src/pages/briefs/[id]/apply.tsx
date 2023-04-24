@@ -6,12 +6,11 @@ import MilestoneItem from "@/components/Briefs/MileStoneItem";
 import { timeData } from "@/config/briefs-data";
 import * as config from "@/config";
 import { Brief, Currency, User } from "@/model";
-import { getBrief, getUserBrief } from "@/redux/services/briefService";
+import { getBrief, getFreelancerBrief } from "@/redux/services/briefService";
 import { BriefInsights } from "@/components/Briefs/BriefInsights";
 import AccountChoice from "@/components/AccountChoice";
 import { checkEnvironment, getCurrentUser, redirect } from "@/utils";
 import { getFreelancerProfile } from "@/redux/services/freelancerService";
-import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { selectAccount } from "@/redux/services/polkadotService";
 import { useRouter } from "next/router";
 import FullScreenLoader from "@/components/FullScreenLoader";
@@ -53,9 +52,8 @@ export const SubmitProposal = (): JSX.Element => {
 
   const getCurrentUserBrief = async () => {
     if (briefId && user) {
-      const userApplication: any = await getUserBrief(user?.id, briefId);
+      const userApplication: any = await getFreelancerBrief(user?.id, briefId);
       if (userApplication) {
-        //TODO: redirect to brief application
         router.push(`/briefs/${briefId}/applications/${userApplication?.id}/`);
       }
       const briefResponse: Brief | undefined = await getBrief(briefId);
@@ -96,6 +94,7 @@ export const SubmitProposal = (): JSX.Element => {
     await selectAccount(account);
     setLoading(false);
     setShowPolkadotAccounts(false);
+    await insertProject();
   };
 
   async function handleSubmit() {
@@ -137,7 +136,6 @@ export const SubmitProposal = (): JSX.Element => {
         }),
       }
     );
-    setLoading(false);
     if (resp.ok) {
       const applicationId = (await resp.json()).id;
       applicationId &&
@@ -145,16 +143,12 @@ export const SubmitProposal = (): JSX.Element => {
     } else {
       console.log("Failed to submit the brief");
     }
+    setLoading(false);
   }
 
   const renderPolkadotJSModal = (
     <div>
-      <AccountChoice
-        accountSelected={(account: WalletAccount) =>
-          handleSelectAccount(account)
-        }
-        closeModal={() => setShowPolkadotAccounts(false)}
-      />
+      
     </div>
   );
 
@@ -381,7 +375,14 @@ export const SubmitProposal = (): JSX.Element => {
         {/* TODO: Add Drafts Functionality */}
         {/* <button className="secondary-btn">Save draft</button> */}
       </div>
-      {showPolkadotAccounts && renderPolkadotJSModal}
+      <AccountChoice
+        accountSelected={(account: WalletAccount) =>
+          handleSelectAccount(account)
+        }
+        visible={showPolkadotAccounts}
+        setVisible={setShowPolkadotAccounts}
+
+      />
       {loading && <FullScreenLoader />}
     </div>
   );

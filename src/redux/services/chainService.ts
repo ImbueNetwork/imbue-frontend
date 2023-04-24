@@ -11,13 +11,13 @@ import {
   RoundType,
   User,
 } from "@/model";
-import type { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import type { DispatchError } from "@polkadot/types/interfaces";
 import type { ITuple } from "@polkadot/types/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import type { EventRecord } from "@polkadot/types/interfaces";
 import * as utils from "@/utils";
 import MilestoneItem from "@/components/MilestoneItem";
+import { Wallet, WalletAccount } from "@talismn/connect-wallets";
 
 type EventDetails = {
   eventName: string;
@@ -42,7 +42,7 @@ class ChainService {
   }
 
   public async commenceWork(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     briefId: string
   ): Promise<BasicTxResponse> {
     const extrinsic = await this.imbueApi.imbue.api.tx.imbueBriefs.commenceWork(
@@ -56,7 +56,7 @@ class ChainService {
   }
 
   public async hireFreelancer(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     briefOwners: string[],
     freelancerAddress: string,
     budget: bigint,
@@ -82,7 +82,7 @@ class ChainService {
   }
 
   public async contribute(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     projectOnChain: any,
     contribution: bigint
   ): Promise<BasicTxResponse> {
@@ -101,7 +101,7 @@ class ChainService {
   }
 
   public async submitMilestone(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     projectOnChain: ProjectOnChain,
     milestoneKey: number
   ): Promise<BasicTxResponse> {
@@ -119,12 +119,12 @@ class ChainService {
   }
 
   public async voteOnMilestone(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     projectOnChain: any,
     milestoneKey: number,
     userVote: boolean
   ): Promise<BasicTxResponse> {
-    const projectId = projectOnChain.milestones[0].projectKey;
+    const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic =
       await this.imbueApi.imbue.api.tx.imbueProposals.voteOnMilestone(
         projectId,
@@ -140,7 +140,7 @@ class ChainService {
   }
 
   public async approveMilestone(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     projectOnChain: any,
     milestoneKey: number
   ): Promise<BasicTxResponse> {
@@ -159,7 +159,7 @@ class ChainService {
   }
 
   public async withdraw(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     projectOnChain: any
   ): Promise<BasicTxResponse> {
     const projectId = projectOnChain.milestones[0].projectKey;
@@ -174,17 +174,15 @@ class ChainService {
   }
 
   async submitImbueExtrinsic(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     extrinsic: SubmittableExtrinsic<"promise">,
     eventName: String
   ): Promise<BasicTxResponse> {
-    const { web3FromSource } = await import("@polkadot/extension-dapp");
-    const injector = await web3FromSource(account.meta.source);
     const transactionState: BasicTxResponse = {} as BasicTxResponse;
     try {
       const unsubscribe = await extrinsic.signAndSend(
         account.address,
-        { signer: injector.signer },
+        { signer: account.signer! },
         (result) => {
           this.imbueApi.imbue.api.query.system.events(
             (events: EventRecord[]) => {
@@ -256,11 +254,11 @@ class ChainService {
   }
 
   async submitExtrinsic(
-    account: InjectedAccountWithMeta,
+    account: WalletAccount,
     extrinsic: SubmittableExtrinsic<"promise">
   ): Promise<BasicTxResponse> {
     const { web3FromSource } = await import("@polkadot/extension-dapp");
-    const injector = await web3FromSource(account.meta.source);
+    const injector = await web3FromSource(account.source);
     const transactionState: BasicTxResponse = {} as BasicTxResponse;
     try {
       const unsubscribe = await extrinsic.signAndSend(
@@ -341,12 +339,10 @@ class ChainService {
   }
 
   async convertToOnChainProject(project: Project) {
-    const projectOnChain: any = (
-      await this.imbueApi.imbue?.api.query.imbueProposals.projects(
-        project.chain_project_id
-      )
-    ).toHuman();
+    if(!project.chain_project_id)
+      return;
 
+    const projectOnChain: any = await this.getProjectOnChain(project.chain_project_id!);
     const raisedFunds = BigInt(
       projectOnChain?.raisedFunds?.replaceAll(",", "") || 0
     );
@@ -535,6 +531,15 @@ class ChainService {
       return firstmilestone.milestone_key;
     }
     return -1;
+  }
+
+  public async getProjectOnChain(chain_project_id: string | number) {
+    const projectOnChain: any = (
+      await this.imbueApi.imbue?.api.query.imbueProposals.projects(
+        chain_project_id
+      )
+    ).toHuman();
+    return projectOnChain;
   }
 }
 

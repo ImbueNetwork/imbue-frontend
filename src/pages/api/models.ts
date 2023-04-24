@@ -215,21 +215,12 @@ export const upsertWeb3Challenge = (
     challenge: string,
 ) => async (tx: Knex.Transaction):
         Promise<[web3Account: Web3Account, isInsert: boolean]> => {
-
         const web3Account = await tx<Web3Account>("web3_accounts")
             .select()
             .where({
                 user_id: user?.id
             })
             .first();
-
-        console.log("**** in upsert, web3Account is")
-        console.log(web3Account);
-        console.log("**** in upsert, params are")
-        console.log(address);
-        console.log(user);
-        console.log(type);
-        console.log(challenge);
 
         if (!web3Account) {
             return [
@@ -244,8 +235,6 @@ export const upsertWeb3Challenge = (
                 true
             ];
         }
-
-        console.log("**** done")
 
         return [
             (
@@ -650,7 +639,7 @@ export const fetchFreelancerDetailsByUserID = (user_id: number | string) =>
             .first()
             .debug(false)
 
-export const fetchFreelancerDetailsByUsername = (username: string) =>
+export const fetchFreelancerDetailsByUsername = (username: string|string[]) =>
     (tx: Knex.Transaction) =>
         fetchAllFreelancers()(tx)
             .where({ username: username })
