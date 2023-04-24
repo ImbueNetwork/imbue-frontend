@@ -341,10 +341,12 @@ class ChainService {
   }
 
   async convertToOnChainProject(project: Project) {
-    if(!project.chain_project_id)
-      return;
+    const projectOnChain: any = (
+      await this.imbueApi.imbue?.api.query.imbueProposals.projects(
+        project.chain_project_id
+      )
+    ).toHuman();
 
-    const projectOnChain: any = await this.getProjectOnChain(project.chain_project_id!);
     const raisedFunds = BigInt(
       projectOnChain?.raisedFunds?.replaceAll(",", "") || 0
     );
@@ -533,15 +535,6 @@ class ChainService {
       return firstmilestone.milestone_key;
     }
     return -1;
-  }
-
-  public async getProjectOnChain(chain_project_id: string | number) {
-    const projectOnChain: any = (
-      await this.imbueApi.imbue?.api.query.imbueProposals.projects(
-        chain_project_id
-      )
-    ).toHuman();
-    return projectOnChain;
   }
 }
 
