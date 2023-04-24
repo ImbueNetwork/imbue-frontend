@@ -149,12 +149,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   const renderPolkadotJSModal = (
     <div>
-      <AccountChoice
-        accountSelected={(account: WalletAccount) =>
-          handleSelectAccount(account)
-        }
-        closeModal={() => setShowPolkadotAccounts(false)}
-      />
+      
     </div>
   );
 
@@ -381,7 +376,16 @@ export const SubmitProposal = (): JSX.Element => {
         {/* TODO: Add Drafts Functionality */}
         {/* <button className="secondary-btn">Save draft</button> */}
       </div>
-      {showPolkadotAccounts && renderPolkadotJSModal}
+      {/* {showPolkadotAccounts && renderPolkadotJSModal} */}
+      <AccountChoice
+        accountSelected={(account: WalletAccount) =>
+          handleSelectAccount(account)
+        }
+        closeModal={() => setShowPolkadotAccounts(false)}
+        visible={showPolkadotAccounts}
+        setVisible={setShowPolkadotAccounts}
+
+      />
       {loading && <FullScreenLoader />}
     </div>
   );

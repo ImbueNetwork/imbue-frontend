@@ -14,8 +14,8 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [authenticated, setAuthenticated] = useState<boolean>(false);
   const [redirectURL, setRedirectURL] = useState<string>();
-  const [isFreelancer, setIsFreelancer] = useState<boolean>(false);
-  const [user, setUser] = useState<User>();
+  const [isFreelancer, setIsFreelancer] = useState<any>(false)
+  const [user, setUser] = useState<User>()
 
   useEffect(() => {
     const findFreelancer = async (user: any) => {
@@ -41,11 +41,14 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
       link: "/dashboard",
     },
     {
+      icon: "groups",
+      text: "Discover Freelancers",
+      link: `/freelancers`
+    },
+    {
       icon: "group_add",
       text: isFreelancer ? "Freelancer Profile" : "Join The Freelancers",
-      link: isFreelancer
-        ? `/freelancers/${user?.username}/`
-        : "/freelancers/new",
+      link: isFreelancer ? `/freelancers/${user?.username}/` : "/freelancers/new",
     },
     {
       icon: "work",
@@ -70,14 +73,20 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
   ];
 
   const navigateToPage = async (link: string) => {
-    if (authenticated && link !== "/logout" && link !== "") {
+    if(link === "/briefs" || link ==='/freelancers'){
       router.push(link);
       toggleVisibility();
-    } else if (link === "/logout") {
-      await localStorage.clear();
+    }
+    else if (authenticated && link !== "/logout" && link !== "") {
       router.push(link);
       toggleVisibility();
-    } else {
+    } 
+    else if (link === "/logout") {
+      localStorage.clear();
+      router.push(link);
+      toggleVisibility();
+    } 
+    else {
       link !== "/logout" && link !== "" && setRedirectURL(link);
       setLoginModal(true);
     }

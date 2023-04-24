@@ -7,12 +7,13 @@ import { Dialogue } from "@/components/Dialogue";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { postAPIHeaders } from "@/config";
-import { TextField } from "@mui/material";
+import { Dialog, DialogContent, DialogTitle, TextField, useMediaQuery } from "@mui/material";
 import * as config from "@/config";
 import Link from "next/link";
 import styled from "@emotion/styled";
 import { getCurrentUser } from "@/utils";
 import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
+import { useTheme } from '@mui/material/styles';
 import { WalletAccount } from "@talismn/connect-wallets";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { useGoogleLogin, GoogleLogin } from '@react-oauth/google';
@@ -74,6 +75,8 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   const [errorMessage, setErrorMessage] = useState<string>();
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
   const router = useRouter();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const imbueLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     setErrorMessage(undefined);
@@ -104,12 +107,8 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     }
   };
 
-  const clicked = (): void => {
-    showPolkadotAccounts(true);
-  };
-
   const closeModal = (): void => {
-    showPolkadotAccounts(false);
+    showPolkadotAccounts(true);
     setVisible(false);
   };
 
@@ -140,32 +139,33 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   const accountSelected = async (
     account: WalletAccount
   ): Promise<any> => {
-    const result = await getAccountAndSign(account);
-    await authorise(result?.signature as SignerResult, result?.challenge!, account);
-    setVisible(false);
-    router.push(redirectUrl);
+    try {
+      const result = await getAccountAndSign(account);
+      await authorise(result?.signature as SignerResult, result?.challenge!, account);
+      setVisible(false);
+      router.push(redirectUrl);
+    } catch (error) {
+      console.log(error);
+    }
+
   };
 
-  if (visible) {
-    if (polkadotAccountsVisible) {
-      return (
-        <AccountChoice
-          accountSelected={(account: WalletAccount) =>
-            accountSelected(account)
-          }
-          closeModal={() => closeModal()}
-        />
-      );
-    } else {
-      return (
-        <Dialogue
-          title="You must be signed in to continue"
-          content={
-            <p className="text-base text-[#ebeae2] mb-5 relative top-[-10px]">
+  return (
+    <>
+      <Dialog
+        fullScreen={fullScreen}
+        open={visible}
+        onClose={() => setVisible(false)}
+        aria-labelledby="responsive-dialog-title"
+      >
+        {<div className="min-w-[450px] py-2">
+          <DialogTitle className="text-center" id="responsive-dialog-title">
+            {"You must be signed in to continue"}
+          </DialogTitle>
+          <DialogContent>
+            <p className="text-base text-[#ebeae2] mb-7 relative text-center">
               Please use the link below to sign in.
             </p>
-          }
-          actionList={
             <div>
               <form
                 id="contribution-submission-form"
@@ -174,7 +174,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                 onSubmit={imbueLogin}
               >
                 <div className="login justify-center items-center w-full flex flex-col">
-                  <div className="flex justify-center pb-[10px] w-[70%]">
+                  <div className="flex justify-center pb-[10px] w-[80%]">
                     <CssTextField
                       label="Email/Username"
                       onChange={(e: any) => setUserOrEmail(e.target.value)}
@@ -182,7 +182,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                       required
                     />
                   </div>
-                  <div className="flex justify-center pb-[10px] w-[70%]">
+                  <div className="flex justify-center pb-[10px] w-[80%]">
                     <CssTextField
                       label="Password"
                       onChange={(e: any) => setPassword(e.target.value)}
@@ -197,7 +197,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                       {errorMessage}
                     </span>
                   </div>
-                  <div className="w-[70%] mt-7 mb-5">
+                  <div className="w-[70%] mt-1 mb-5">
                     <button
                       type="submit"
                       // disabled={!this.state.creds.username && !this.state.creds.password}
@@ -215,8 +215,9 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                       onClick={() => {
                         setVisible(false);
                       }}
-                      className="signup"
-                    > Sign up
+                      className="signup text-primary ml-1"
+                    >
+                      Sign up
                     </Link>
                   </div>
                 </div>
@@ -224,25 +225,26 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
 
               <div className="login justify-center items-center w-full flex flex-col">
 
-                <li className="w-[65%] mt-1 mb-2">
+                <li className="max-w-[65%] mt-1 mb-2">
                   <GoogleOAuthProvider clientId={config.googleClientId}>
                     <GoogleLogin
-                    useOneTap={true}
-                      onSuccess={creds => googleLogin(creds)}
+                      useOneTap={true}
+                      onSuccess={(creds: any) => googleLogin(creds)}
                       onError={() => {
                         console.log('Login Failed');
                       }}
-                    />                  </GoogleOAuthProvider>
+                    />
+                  </GoogleOAuthProvider>
                 </li>
               </div>
 
               <div className="login justify-center items-center w-full flex flex-col">
 
                 <li
-                  className="w-[70%] mt-7 mb-5  mdc-deprecated-list-item flex flex-row items-center mt-8 cursor-pointer"
+                  className="mt-4 mdc-deprecated-list-item flex flex-row items-center cursor-pointer"
                   tabIndex={0}
                   data-mdc-dialog-action="web3"
-                  onClick={() => clicked()}
+                  onClick={() => closeModal()}
                 >
                   <span className="mdc-deprecated-list-item__graphic h-[40px] w-[40px] flex mr-[16px]">
                     <Image
@@ -267,13 +269,22 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
 
 
             </div>
-          }
-        />
-      );
-    }
-  } else {
-    return <></>
-  }
+
+          </DialogContent>
+        </div>
+
+        }
+      </Dialog>
+
+      <AccountChoice
+        accountSelected={(account: WalletAccount) =>
+          accountSelected(account)
+        }
+        visible={polkadotAccountsVisible}
+        setVisible={showPolkadotAccounts}
+      />
+    </>
+  )
 };
 
 export default Login;
