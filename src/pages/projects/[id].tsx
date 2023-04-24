@@ -15,7 +15,7 @@ import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import { getFreelancerProfile } from "@/redux/services/freelancerService";
 import * as utils from "@/utils";
-import { initImbueAPIInfo } from "@/utils/polkadot";
+import {initImbueAPIInfo } from "@/utils/polkadot";
 import ChainService from "@/redux/services/chainService";
 import FullScreenLoader from "@/components/FullScreenLoader";
 import moment from "moment";
@@ -89,6 +89,7 @@ function Project() {
       getProject();
     }
   }, [projectId]);
+
 
   const getChainProject = async () => {
     setLoading(true);
@@ -197,7 +198,16 @@ function Project() {
         filterByInitiator
       />
     </div>
+    
   );
+
+  const showAccountChoice = (vote: boolean) => {
+    <AccountChoice
+      accountSelected={(account) => voteOnMilestone(account, vote)}
+      visible={true}
+      setVisible={setShowVotingModal}
+    />
+  }
 
   const renderVotingModal = (
     <Dialogue
@@ -227,10 +237,13 @@ function Project() {
               No
             </button>
           </li>
+
         </>
       }
     />
   );
+
+
 
   const approvedMilStones = project?.milestones?.filter?.(
     (milstone: Milestone) => milstone?.is_approved === true
@@ -278,9 +291,9 @@ function Project() {
           <div className="flex flex-row items-center">
             {milestone?.is_approved
               ? projectStateTag(modified, "Completed")
-              : milestone?.milestone_key == milestoneBeingVotedOn
-              ? openForVotingTag()
-              : projectStateTag(modified, "Not Started")}
+              : (milestone?.milestone_key == milestoneBeingVotedOn)
+                ? openForVotingTag()
+                : projectStateTag(modified, "Not Started")}
 
             <Image
               src={require(expanded
@@ -333,7 +346,7 @@ function Project() {
 
           {isApplicant &&
             onChainProject?.projectState !==
-              OnchainProjectState.OpenForVoting && (
+            OnchainProjectState.OpenForVoting && (
               <button
                 className="primary-btn in-dark w-button font-normal h-[43px] items-center content-center !py-0 mt-[25px] px-8"
                 data-testid="next-button"
@@ -433,13 +446,12 @@ function Project() {
             <div className="w-48 bg-[#1C2608] mt-5 h-1 relative my-auto">
               <div
                 style={{
-                  width: `${
-                    (onChainProject?.milestones?.filter?.(
-                      (m: any) => m?.is_approved
-                    )?.length /
+                  width: `${(onChainProject?.milestones?.filter?.(
+                    (m: any) => m?.is_approved
+                  )?.length /
                       onChainProject?.milestones?.length) *
                     100
-                  }%`,
+                    }%`,
                 }}
                 className="h-full rounded-xl Accepted-button absolute"
               ></div>
@@ -447,9 +459,8 @@ function Project() {
                 {onChainProject?.milestones?.map((m: any, i: number) => (
                   <div
                     key={i}
-                    className={`h-4 w-4 ${
-                      m.is_approved ? "Accepted-button" : "bg-[#1C2608]"
-                    } rounded-full -mt-1.5`}
+                    className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"
+                      } rounded-full -mt-1.5`}
                   ></div>
                 ))}
               </div>
@@ -504,9 +515,9 @@ function Project() {
               modified={milestone?.modified!}
               vote={async () => {
                 // show polkadot account modal
-                await setShowPolkadotAccounts(true);
+                // await setShowPolkadotAccounts(true);
                 // set submitting mile stone to false
-                await setSubmittingMileStone(false);
+                await setShowVotingModal(true);
                 // setMile stone key in view
                 await setMileStoneKeyInview(milestone.milestone_key);
               }}

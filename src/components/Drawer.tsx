@@ -68,7 +68,7 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
     {
       icon: "logout",
       text: authenticated ? "Sign Out" : "Sign In",
-      link: authenticated ? "/logout" : "",
+      link: authenticated ? "/logout" : "/login",
     },
   ];
 
@@ -91,6 +91,7 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
       setLoginModal(true);
     }
   };
+
   return (
     <>
       <div className={`drawer ${visible ? "open" : ""}`} id="right-drawer">

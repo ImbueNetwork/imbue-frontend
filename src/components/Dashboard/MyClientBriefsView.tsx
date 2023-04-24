@@ -44,13 +44,13 @@ const MyClientBriefsView = ({
         </div>
       ) : (
         <div>
-          <h2 className="text-xl font-bold mb-3">Open Briefs</h2>
+          <h2 className="text-base lg:text-xl font-bold mb-3">Open Briefs</h2>
           <BriefLists
             briefs={briefs?.briefsUnderReview}
             setBriefId={setBriefId}
             showNewBriefButton={true}
           />
-          <h2 className="text-xl font-bold mb-3 mt-10">Projects</h2>
+          <h2 className="text-base lg:text-xl font-bold mb-3 mt-4 lg:mt-10">Projects</h2>
           <BriefLists
             briefs={briefs?.acceptedBriefs}
             areAcceptedBriefs={true}

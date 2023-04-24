@@ -147,6 +147,6 @@ export const getProjectById = async (projectId: string | number) => {
   if (resp.ok) {
     return await resp.json();
   } else {
-    throw new Error("Failed to get project. status:" + resp.status);
+    new Error("Failed to get project. status:" + resp.status);
   }
 };
