@@ -95,12 +95,12 @@ export const SubmitProposal = (): JSX.Element => {
     await selectAccount(account);
     setLoading(false);
     setShowPolkadotAccounts(false);
+    await insertProject();
   };
 
   async function handleSubmit() {
     if (!user?.web3_address) {
       setShowPolkadotAccounts(true);
-      await insertProject();
     } else {
       await insertProject();
     }

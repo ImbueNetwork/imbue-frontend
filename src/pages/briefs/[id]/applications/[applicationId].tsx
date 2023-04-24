@@ -151,6 +151,8 @@ const ApplicationPreview = (): JSX.Element => {
     setIsEditingBio(false);
   };
   const startWork = async () => {
+    console.log("**** starting work");
+    console.log(freelancerAccount);
     if (freelancerAccount) {
       setLoading(true);
       const imbueApi = await initImbueAPIInfo();
@@ -167,7 +169,7 @@ const ApplicationPreview = (): JSX.Element => {
             console.log("***** success");
             const projectId = parseInt(result.eventData[2]);
             await updateProject(projectId);
-            router.push(`/project/${applicationId}`);
+            router.push(`/projects/${applicationId}`);
           } else if (result.txError) {
             console.log("***** failed");
             console.log(result.errorMessage);
