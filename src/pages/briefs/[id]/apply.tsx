@@ -11,7 +11,6 @@ import { BriefInsights } from "@/components/Briefs/BriefInsights";
 import AccountChoice from "@/components/AccountChoice";
 import { checkEnvironment, getCurrentUser, redirect } from "@/utils";
 import { getFreelancerProfile } from "@/redux/services/freelancerService";
-import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { selectAccount } from "@/redux/services/polkadotService";
 import { useRouter } from "next/router";
 import FullScreenLoader from "@/components/FullScreenLoader";
@@ -380,7 +379,6 @@ export const SubmitProposal = (): JSX.Element => {
         accountSelected={(account: WalletAccount) =>
           handleSelectAccount(account)
         }
-        closeModal={() => setShowPolkadotAccounts(false)}
         visible={showPolkadotAccounts}
         setVisible={setShowPolkadotAccounts}
 

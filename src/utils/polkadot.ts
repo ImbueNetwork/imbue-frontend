@@ -1,5 +1,4 @@
 import type {
-  InjectedAccountWithMeta,
   InjectedExtension,
 } from "@polkadot/extension-inject/types";
 import type { DispatchError } from "@polkadot/types/interfaces";

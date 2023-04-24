@@ -18,7 +18,6 @@ import * as utils from "@/utils";
 import { getWeb3Accounts, initImbueAPIInfo } from "@/utils/polkadot";
 import ChainService from "@/redux/services/chainService";
 import FullScreenLoader from "@/components/FullScreenLoader";
-import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import moment from "moment";
 import AccountChoice from "@/components/AccountChoice";
 import { Dialogue } from "@/components/Dialogue";
@@ -77,9 +76,6 @@ function Project() {
     Record<any, any>
   >({});
   const [mileStoneKeyInView, setMileStoneKeyInview] = useState<number>(0);
-  const [web3account, setWeb3Account] = useState<InjectedAccountWithMeta | any>(
-    {}
-  );
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [loginModal, setLoginModal] = useState<boolean>(false);
@@ -100,7 +96,7 @@ function Project() {
     const imbueApi = await initImbueAPIInfo();
     const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
-    const onChainProjectRes  = await chainService.getProject(
+    const onChainProjectRes = await chainService.getProject(
       projectId
     );
     if (onChainProjectRes) {
@@ -137,13 +133,13 @@ function Project() {
   };
 
   // voting on a mile stone
-  const voteMileStone = async (web3Account: any, booleanValue: boolean) => {
+  const voteOnMilestone = async (account: WalletAccount, booleanValue: boolean) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
     const userRes: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, userRes);
     const voteResponse = await chainService.voteOnMilestone(
-      web3Account,
+      account,
       onChainProject,
       mileStoneKeyInView,
       booleanValue
@@ -182,16 +178,7 @@ function Project() {
   const renderPolkadotJSModal = (
     <div>
       <AccountChoice
-        accountSelected={async (account: WalletAccount) => {
-          if (submittingMilestone) {
-            await submitMilestone(account);
-          } else {
-            await setWeb3Account(account);
-            await setShowVotingModal(true);
-          }
-          await setShowPolkadotAccounts(false);
-        }}
-        closeModal={() => setShowPolkadotAccounts(false)}
+        accountSelected={async (account: WalletAccount) => submitMilestone(account)}
         visible={showPolkadotAccounts}
         setVisible={setShowPolkadotAccounts}
         initiatorAddress={onChainProject?.initiator}
@@ -210,8 +197,7 @@ function Project() {
             <button
               className="primary !bg-transparent !hover:bg-transparent"
               onClick={() => {
-                voteMileStone(web3account, true);
-                setShowVotingModal(false);
+                showAccountChoice(true);
               }}
             >
               Yes
@@ -221,17 +207,27 @@ function Project() {
             <button
               className="primary !bg-transparent !hover:bg-transparent"
               onClick={() => {
-                voteMileStone(web3account, false);
-                setShowVotingModal(false);
+                showAccountChoice(false);
               }}
             >
               No
             </button>
           </li>
+
+
         </>
       }
     />
   );
+
+
+  const showAccountChoice = (vote: boolean) => {
+    return <AccountChoice
+      accountSelected={(account) => voteOnMilestone(account, vote)}
+      visible={true}
+      setVisible={setShowVotingModal}
+    />
+  }
 
   const approvedMilStones = project?.milestones?.filter?.(
     (milstone: Milestone) => milstone?.is_approved === true
@@ -280,8 +276,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, "Completed")
               : (milestone?.milestone_key == milestoneBeingVotedOn)
-              ? openForVotingTag()
-              : projectStateTag(modified, "Not Started")}
+                ? openForVotingTag()
+                : projectStateTag(modified, "Not Started")}
 
             <Image
               src={require(expanded
@@ -334,7 +330,7 @@ function Project() {
 
           {isApplicant &&
             onChainProject?.projectState !==
-              OnchainProjectState.OpenForVoting && (
+            OnchainProjectState.OpenForVoting && (
               <button
                 className="primary-btn in-dark w-button font-normal h-[43px] items-center content-center !py-0 mt-[25px] px-8"
                 data-testid="next-button"
@@ -434,13 +430,12 @@ function Project() {
             <div className="w-48 bg-[#1C2608] mt-5 h-1 relative my-auto">
               <div
                 style={{
-                  width: `${
-                    (onChainProject?.milestones?.filter?.(
-                      (m: any) => m?.is_approved
-                    )?.length /
+                  width: `${(onChainProject?.milestones?.filter?.(
+                    (m: any) => m?.is_approved
+                  )?.length /
                       onChainProject?.milestones?.length) *
                     100
-                  }%`,
+                    }%`,
                 }}
                 className="h-full rounded-xl Accepted-button absolute"
               ></div>
@@ -448,9 +443,8 @@ function Project() {
                 {onChainProject?.milestones?.map((m: any, i: number) => (
                   <div
                     key={i}
-                    className={`h-4 w-4 ${
-                      m.is_approved ? "Accepted-button" : "bg-[#1C2608]"
-                    } rounded-full -mt-1.5`}
+                    className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"
+                      } rounded-full -mt-1.5`}
                   ></div>
                 ))}
               </div>

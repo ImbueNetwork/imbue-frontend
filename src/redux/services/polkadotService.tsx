@@ -1,7 +1,6 @@
 import * as config from "@/config";
 import { getCurrentUser } from "@/utils";
 import { signWeb3Challenge } from "@/utils/polkadot";
-import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { SignerResult } from "@polkadot/api/types";
 import { v4 as uuid } from "uuid";
 import { Wallet, WalletAccount } from "@talismn/connect-wallets";

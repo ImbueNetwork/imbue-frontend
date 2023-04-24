@@ -1,4 +1,3 @@
-import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { getWeb3Accounts } from "@/utils/polkadot";
 import * as React from "react";
 import { Dialogue } from "./Dialogue";
@@ -13,7 +12,6 @@ type AccountChoiceProps = {
   visible: boolean;
   filterByInitiator?: boolean;
   initiatorAddress?: string;
-  closeModal?: () => void;
 }
 
 const AccountChoice = ({
