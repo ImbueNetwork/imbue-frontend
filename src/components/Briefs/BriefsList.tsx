@@ -55,10 +55,11 @@ export const BriefLists = ({
           }}
           className={`flex cursor-pointer hover:bg-secondary-dark-hover px-5 py-3 lg:px-[2.5rem] lg:py-[2rem] justify-between border-b border-b-light-white last:border-b-0`}
         >
-          <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-bold">{brief.headline}</h3>
-            <p className="text-[16px]">
-              Budget ${Number(brief.budget).toLocaleString()}
+          <div className="flex flex-col gap-1 lg:gap-3">
+            <h3 className="text-sm lg:text-xl font-bold">{brief.headline}</h3>
+            <p className="text-xs lg:text-[16px]">
+              Budget ${Number(brief.budget).toLocaleString()} - Public
+
             </p>
             <p className="text-xs lg:text-[16px]">
               Created {timeAgo.format(new Date(brief.created))}

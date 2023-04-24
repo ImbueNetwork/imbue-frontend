@@ -195,9 +195,6 @@ function Project() {
   const renderPolkadotJSModal = (
     <div>
       <AccountChoice
-<<<<<<< HEAD
-        accountSelected={async (account: WalletAccount) => submitMilestone(account)}
-=======
         accountSelected={async (account: WalletAccount) => {
           if (submittingMilestone) {
             submitMilestone(account);
@@ -206,7 +203,6 @@ function Project() {
             await setShowVotingModal(true);
           }
         }}
->>>>>>> origin/main
         visible={showPolkadotAccounts}
         setVisible={setShowPolkadotAccounts}
         initiatorAddress={onChainProject?.initiator}
@@ -234,12 +230,8 @@ function Project() {
             <button
               className="primary !bg-transparent !hover:bg-transparent"
               onClick={() => {
-<<<<<<< HEAD
-                showAccountChoice(true);
-=======
                 voteOnMilestone(votingWalletAccount, true);
                 setShowVotingModal(false);
->>>>>>> origin/main
               }}
             >
               Yes
@@ -249,12 +241,8 @@ function Project() {
             <button
               className="primary !bg-transparent !hover:bg-transparent"
               onClick={() => {
-<<<<<<< HEAD
-                showAccountChoice(false);
-=======
                 voteOnMilestone(votingWalletAccount, false);
                 setShowVotingModal(false);
->>>>>>> origin/main
               }}
             >
               No
