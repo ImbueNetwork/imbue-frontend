@@ -72,8 +72,8 @@ function Project() {
   const [submittingMilestone, setSubmittingMileStone] =
     useState<boolean>(false);
   const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
-  const [projectChainService, setProjectChainService] = useState<
-    Record<any, any>
+  const [votingWalletAccount, setVotingWalletAccount] = useState<
+    WalletAccount | any
   >({});
   const [mileStoneKeyInView, setMileStoneKeyInview] = useState<number>(0);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
@@ -96,6 +96,7 @@ function Project() {
     const imbueApi = await initImbueAPIInfo();
     const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
+<<<<<<< HEAD
     const onChainProjectRes = await chainService.getProject(
       projectId
     );
@@ -104,6 +105,13 @@ function Project() {
       const isApplicant = onChainProjectRes.initiator == user.web3_address;
 
       if(isApplicant){
+=======
+    const onChainProjectRes = await chainService.getProject(projectId);
+    if (onChainProjectRes) {
+      const isApplicant = onChainProjectRes.initiator == user.web3_address;
+
+      if (isApplicant) {
+>>>>>>> origin/main
         await getFreelancerData(user.username);
       }
 
@@ -187,7 +195,18 @@ function Project() {
   const renderPolkadotJSModal = (
     <div>
       <AccountChoice
+<<<<<<< HEAD
         accountSelected={async (account: WalletAccount) => submitMilestone(account)}
+=======
+        accountSelected={async (account: WalletAccount) => {
+          if (submittingMilestone) {
+            submitMilestone(account);
+          } else {
+            await setVotingWalletAccount(account);
+            await setShowVotingModal(true);
+          }
+        }}
+>>>>>>> origin/main
         visible={showPolkadotAccounts}
         setVisible={setShowPolkadotAccounts}
         initiatorAddress={onChainProject?.initiator}
@@ -215,7 +234,12 @@ function Project() {
             <button
               className="primary !bg-transparent !hover:bg-transparent"
               onClick={() => {
+<<<<<<< HEAD
                 showAccountChoice(true);
+=======
+                voteOnMilestone(votingWalletAccount, true);
+                setShowVotingModal(false);
+>>>>>>> origin/main
               }}
             >
               Yes
@@ -225,7 +249,12 @@ function Project() {
             <button
               className="primary !bg-transparent !hover:bg-transparent"
               onClick={() => {
+<<<<<<< HEAD
                 showAccountChoice(false);
+=======
+                voteOnMilestone(votingWalletAccount, false);
+                setShowVotingModal(false);
+>>>>>>> origin/main
               }}
             >
               No
