@@ -52,7 +52,7 @@ export const getAllBriefs = async () => {
 export const getBrief = async (briefId: number | string | string[]) => {
   try {
     const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}/briefs/${briefId}`), {
+      checkEnvironment().concat(`${config.apiBase}briefs/${briefId}`), {
       headers: postAPIHeaders,
       method: "get",
     });
@@ -69,7 +69,7 @@ export const getBrief = async (briefId: number | string | string[]) => {
 
 export const getUserBriefs = async (user_id: string | number) => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}/users/${user_id}/briefs/`), {
+    checkEnvironment().concat(`${config.apiBase}users/${user_id}/briefs/`), {
     headers: postAPIHeaders,
     method: "get",
   });
@@ -108,7 +108,7 @@ export const changeBriefApplicationStatus = async (
   status_id: OffchainProjectState
 ) => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}/briefs/${briefId}/status`), {
+    checkEnvironment().concat(`${config.apiBase}briefs/${briefId}/status`), {
     headers: postAPIHeaders,
     method: "put",
     body: JSON.stringify({

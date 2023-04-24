@@ -82,7 +82,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     event.preventDefault();
 
     const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}/auth/imbue/`), {
+      checkEnvironment().concat(`${config.apiBase}auth/imbue/`), {
       headers: postAPIHeaders,
       method: "post",
       body: JSON.stringify({
@@ -114,7 +114,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
 
   const googleLogin = async (response: any) => {
     const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}/auth/google/`), {
+      checkEnvironment().concat(`${config.apiBase}auth/google/`), {
       headers: postAPIHeaders,
       method: "post",
       body: JSON.stringify(response),
