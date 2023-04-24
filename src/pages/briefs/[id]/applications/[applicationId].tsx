@@ -10,6 +10,7 @@ import {
   Project,
   OffchainProjectState,
   User,
+  ProjectOnChain,
 } from "@/model";
 import {
   changeBriefApplicationStatus as updateBriefApplicationStatus,
@@ -151,8 +152,6 @@ const ApplicationPreview = (): JSX.Element => {
     setIsEditingBio(false);
   };
   const startWork = async () => {
-    console.log("**** starting work");
-    console.log(freelancerAccount);
     if (freelancerAccount) {
       setLoading(true);
       const imbueApi = await initImbueAPIInfo();
@@ -169,7 +168,15 @@ const ApplicationPreview = (): JSX.Element => {
             console.log("***** success");
             const projectId = parseInt(result.eventData[2]);
             await updateProject(projectId);
-            router.push(`/projects/${applicationId}`);
+            while(true) {
+              const projectIsOnChain = await chainService.getProjectOnChain(
+                projectId
+              );
+              if(projectIsOnChain) {
+                router.push(`/projects/${applicationId}`);
+              }
+              await new Promise((f) => setTimeout(f, 1000));
+            }
           } else if (result.txError) {
             console.log("***** failed");
             console.log(result.errorMessage);

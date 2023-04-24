@@ -83,7 +83,7 @@ function Project() {
   const [loading, setLoading] = useState<boolean>(false);
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const projectId: any = router?.query?.id || 0;
-  const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>(0);
+  const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
   const [isApplicant, setIsApplicant] = useState<boolean>();
 
   // fetching the project data from api and from chain
@@ -275,7 +275,7 @@ function Project() {
           <div className="flex flex-row items-center">
             {milestone?.is_approved
               ? projectStateTag(modified, "Completed")
-              : milestone?.milestone_key == milestoneBeingVotedOn
+              : (milestone?.milestone_key == milestoneBeingVotedOn)
               ? openForVotingTag()
               : projectStateTag(modified, "Not Started")}
 

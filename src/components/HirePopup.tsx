@@ -92,6 +92,8 @@ export const HirePopup = ({
         } else if (result.txError) {
           console.log("***** failed");
           console.log(result.errorMessage);
+
+          // TODO, SHOW ERROR POPUP
         }
         break;
       }
