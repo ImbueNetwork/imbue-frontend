@@ -191,7 +191,6 @@ function Project() {
           }
           await setShowPolkadotAccounts(false);
         }}
-        closeModal={() => setShowPolkadotAccounts(false)}
         visible={showPolkadotAccounts}
         setVisible={setShowPolkadotAccounts}
         initiatorAddress={onChainProject?.initiator}

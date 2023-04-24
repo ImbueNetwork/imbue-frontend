@@ -380,7 +380,6 @@ export const SubmitProposal = (): JSX.Element => {
         accountSelected={(account: WalletAccount) =>
           handleSelectAccount(account)
         }
-        closeModal={() => setShowPolkadotAccounts(false)}
         visible={showPolkadotAccounts}
         setVisible={setShowPolkadotAccounts}
 

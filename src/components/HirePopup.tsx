@@ -13,6 +13,8 @@ import { changeBriefApplicationStatus } from "@/redux/services/briefService";
 import Image from "next/image";
 import styles from "../styles/hire-modal.module.css";
 import { useRouter } from "next/router";
+import { WalletAccount } from "@talismn/connect-wallets";
+import AccountChoice from "./AccountChoice";
 
 export const HirePopup = ({
   openPopup,
@@ -45,12 +47,7 @@ export const HirePopup = ({
     zIndex: 1,
   };
 
-  const fetchAndSetAccounts = async () => {
-    const accounts = await getWeb3Accounts();
-    setAccounts(accounts);
-  };
-
-  const selectedAccount = async (account: InjectedAccountWithMeta) => {
+  const selectedAccount = async (account: WalletAccount) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
     const user: User | any = await getCurrentUser();
@@ -103,10 +100,6 @@ export const HirePopup = ({
     setstage(0);
     setOpenPopup(false);
   };
-
-  useEffect(() => {
-    void fetchAndSetAccounts();
-  }, []);
 
   const FirstContent = () => {
     return (
@@ -225,19 +218,15 @@ export const HirePopup = ({
         <h3 className="text-center w-full text-xl font-bold my-4 primary-text">
           Choose Your Account
         </h3>
-        {accounts.map((account, index) => (
-          <div
-            key={index}
-            onClick={() => selectedAccount(account)}
-            className="w-2/3 grey-container mb-3 flex justify-center items-center cursor-pointer button-container"
-          >
-            <button className="text-center primary break-all">{account.meta.name} ({account.meta.source})</button>
-          </div>
-        ))}
+
+        <AccountChoice
+          accountSelected={(account) => selectedAccount(account)}
+          visible={true}
+          setVisible={setOpenPopup}
+        />
       </div>
     );
   };
-
   return (
     <>
       <Modal

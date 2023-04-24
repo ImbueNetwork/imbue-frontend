@@ -13,7 +13,6 @@ type AccountChoiceProps = {
   visible: boolean;
   filterByInitiator?: boolean;
   initiatorAddress?: string;
-  closeModal?: () => void;
 }
 
 const AccountChoice = ({
