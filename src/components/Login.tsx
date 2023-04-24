@@ -74,8 +74,6 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   const [errorMessage, setErrorMessage] = useState<string>();
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
   const router = useRouter();
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const imbueLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     setErrorMessage(undefined);
@@ -134,14 +132,14 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
       setErrorMessage("incorrect username or password");
     }
   }
-
+  
   const accountSelected = async (
     account: WalletAccount
   ): Promise<any> => {
     try {
       const result = await getAccountAndSign(account);
       await authorise(result?.signature as SignerResult, result?.challenge!, account);
-      setVisible(false);
+      // setVisible(false);
       router.push(redirectUrl);
     } catch (error) {
       console.log(error);
@@ -152,12 +150,11 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   return (
     <>
       <Dialog
-        fullScreen={fullScreen}
         open={visible}
         onClose={() => setVisible(false)}
         aria-labelledby="responsive-dialog-title"
       >
-        {<div className="min-w-[450px] py-2">
+        {<div className="lg:min-w-[450px] py-2">
           <DialogTitle className="text-center" id="responsive-dialog-title">
             {"You must be signed in to continue"}
           </DialogTitle>
@@ -224,7 +221,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
 
               <div className="login justify-center items-center w-full flex flex-col">
 
-                <li className="max-w-[65%] mt-1 mb-2">
+                <li className="lg:max-w-[65%] mt-1 mb-2">
                   <GoogleOAuthProvider clientId={config.googleClientId}>
                     <GoogleLogin
                       useOneTap={true}

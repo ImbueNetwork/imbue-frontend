@@ -23,7 +23,6 @@ function Navbar() {
               </div>
             </Link>
           </h1>
-          <div className="spacer" />
           <div className="context-menu" id="context-menu">
             <div className="context-menu-item" onClick={toggleSideBar}>
               <a id="main-menu" className="material-icons">
