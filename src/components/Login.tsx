@@ -14,6 +14,9 @@ import styled from "@emotion/styled";
 import { getCurrentUser } from "@/utils";
 import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
 import { WalletAccount } from "@talismn/connect-wallets";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { useGoogleLogin, GoogleLogin } from '@react-oauth/google';
+import jwt from 'jsonwebtoken';
 
 const logoStyle = { height: "100%", width: "100%" };
 
@@ -110,6 +113,29 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     setVisible(false);
   };
 
+  const googleLogin = async (response: any) => {
+    const resp = await fetch(`${config.apiBase}/auth/google/`, {
+      headers: postAPIHeaders,
+      method: "post",
+      body: JSON.stringify(response),
+    });
+
+
+    if (resp.ok) {
+      const userResponse = await getCurrentUser();
+      if (userResponse) {
+        const userAuth = {
+          isAuthenticated: true,
+          user: userResponse,
+        };
+        localStorage.setItem("userAuth", JSON.stringify(userAuth));
+        setVisible(false);
+        router.push(redirectUrl);
+      }
+    } else {
+      setErrorMessage("incorrect username or password");
+    }
+  }
 
   const accountSelected = async (
     account: WalletAccount
@@ -196,37 +222,57 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                 </div>
               </form>
 
-              <li
-                className="mdc-deprecated-list-item flex flex-row items-center mt-8 cursor-pointer"
-                tabIndex={0}
-                data-mdc-dialog-action="web3"
-                onClick={() => clicked()}
-              >
-                <span className="mdc-deprecated-list-item__graphic h-[40px] w-[40px] flex mr-[16px]">
-                  <Image
-                    src={
-                      "https://raw.githubusercontent.com/TalismanSociety/talisman-connect/master/packages/connect-wallets/src/lib/talisman-wallet/TalismanLogo.svg"
-                    }
-                    width={40}
-                    height={40}
-                    className="w-full cursor-pointer"
-                    style={logoStyle}
-                    alt={"avaterImage"}
-                  />
-                </span>
-                <span
-                  className="cursor-pointer"
+              <div className="login justify-center items-center w-full flex flex-col">
+
+                <li className="w-[65%] mt-1 mb-2">
+                  <GoogleOAuthProvider clientId={config.googleClientId}>
+                    <GoogleLogin
+                    useOneTap={true}
+                      onSuccess={creds => googleLogin(creds)}
+                      onError={() => {
+                        console.log('Login Failed');
+                      }}
+                    />                  </GoogleOAuthProvider>
+                </li>
+              </div>
+
+              <div className="login justify-center items-center w-full flex flex-col">
+
+                <li
+                  className="w-[70%] mt-7 mb-5  mdc-deprecated-list-item flex flex-row items-center mt-8 cursor-pointer"
+                  tabIndex={0}
+                  data-mdc-dialog-action="web3"
+                  onClick={() => clicked()}
                 >
-                  {"Sign in with a wallet"}
-                </span>
-              </li>
+                  <span className="mdc-deprecated-list-item__graphic h-[40px] w-[40px] flex mr-[16px]">
+                    <Image
+                      src={
+                        "https://raw.githubusercontent.com/TalismanSociety/talisman-connect/master/packages/connect-wallets/src/lib/talisman-wallet/TalismanLogo.svg"
+                      }
+                      width={40}
+                      height={40}
+                      className="w-full cursor-pointer"
+                      style={logoStyle}
+                      alt={"avaterImage"}
+                    />
+                  </span>
+                  <span
+                    className="cursor-pointer"
+                  >
+                    {"Sign in with a wallet"}
+                  </span>
+                </li>
+              </div>
+
+
+
             </div>
           }
         />
       );
     }
   } else {
-    return <></>;
+    return <></>
   }
 };
 
