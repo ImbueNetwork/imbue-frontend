@@ -3,60 +3,45 @@ import { getWeb3Accounts } from "@/utils/polkadot";
 import * as React from "react";
 import { Dialogue } from "./Dialogue";
 import { Dialog, DialogContent, DialogTitle } from "@mui/material";
+import { WalletSelect } from "@talismn/connect-components";
+import { Wallet, WalletAccount } from "@talismn/connect-wallets";
+import { PolkadotjsWallet, SubWallet, TalismanWallet, EnkryptWallet } from "@talismn/connect-wallets"
 
 type AccountChoiceProps = {
-  accountSelected: (account: InjectedAccountWithMeta) => void;
+  accountSelected: (account: WalletAccount) => void;
   setVisible: Function;
   visible: boolean;
-};
+  filterByInitiator?: boolean;
+  initiator_address?: string;
+}
 
 const AccountChoice = ({
   accountSelected,
   visible,
   setVisible,
+  filterByInitiator,
+  initiator_address,
 }: AccountChoiceProps): JSX.Element => {
-  const [accounts, setAccounts] = React.useState<InjectedAccountWithMeta[]>([]);
-
-  React.useEffect(() => {
-    getAccounts();
-  }, []);
-
-  const getAccounts = async () => {
-    const accountsResponse: InjectedAccountWithMeta[] = await getWeb3Accounts();
-    setAccounts(accountsResponse);
-  };
-
+  const header = filterByInitiator ? `Connect with ${initiator_address}` : "Connect wallet";
   return (
-    <Dialog
-      open={visible}
-      onClose={()=>setVisible(false)}
-      aria-labelledby="responsive-dialog-title"
-    >
-      <DialogContent>
-      <DialogTitle id="responsive-dialog-title">
-          {"Choose the account you would like to use"}
-        </DialogTitle>
-                <div className="min-w-[400px] px-2 py-1 flex flex-col gap-2">
-        {accounts.map((account, index: number) => {
-          const {
-            meta: { name, source },
-          } = account;
-          return (
-            <li className="button-container" key={index}>
-              <button
-                className="primary"
-                onClick={() => accountSelected(account)}
-              >
-                {`${name} (${source})`}
-              </button>
-            </li>
-          );
-        })}
-      </div>
-      </DialogContent>
-
-    </Dialog>
-  )
+    <>
+      <WalletSelect
+        dappName={"Imbue"}
+        open={visible}
+        walletList={[
+          new TalismanWallet(),
+          new PolkadotjsWallet(),
+          new SubWallet(),
+        ]}
+        header={header}
+        showAccountsList={visible}
+        onWalletConnectClose={() => setVisible(false)}
+        onAccountSelected={(account: WalletAccount) => {
+          accountSelected(account);
+        }}
+      />
+    </>
+  );
 };
 
 export default AccountChoice;

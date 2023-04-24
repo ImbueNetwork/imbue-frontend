@@ -15,6 +15,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     db.transaction(async (tx) => {
       try {
         const user = await models.fetchUserOrEmail(userOrEmail)(tx);
+        console.log({ user });
         if (!user) {
           return res.status(404).end();
         }

@@ -14,6 +14,7 @@ import styled from "@emotion/styled";
 import { getCurrentUser } from "@/utils";
 import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
 import { useTheme } from '@mui/material/styles';
+import { WalletAccount } from "@talismn/connect-wallets";
 
 const logoStyle = { height: "100%", width: "100%" };
 
@@ -103,17 +104,24 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     }
   };
 
-  const clicked = (): void => {
+  const closeModal = (): void => {
     showPolkadotAccounts(true);
+    setVisible(false);
   };
+  console.log(redirectUrl);
 
   const accountSelected = async (
-    account: InjectedAccountWithMeta
+    account: WalletAccount
   ): Promise<any> => {
-    const result = await getAccountAndSign(account);
-    await authorise(result?.signature as SignerResult, account);
-    setVisible(false)
-    router.push(redirectUrl);
+    try {
+      const result = await getAccountAndSign(account);
+      await authorise(result?.signature as SignerResult, result?.challenge!, account);
+      setVisible(false);
+      router.push(redirectUrl);
+    } catch (error) {
+      console.log(error);
+    }
+
   };
 
   return (
@@ -124,12 +132,12 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
         onClose={() => setVisible(false)}
         aria-labelledby="responsive-dialog-title"
       >
-        {<div>
-          <DialogTitle id="responsive-dialog-title">
+        {<div className="min-w-[450px] py-2">
+          <DialogTitle className="text-center" id="responsive-dialog-title">
             {"You must be signed in to continue"}
           </DialogTitle>
           <DialogContent>
-            <p className="text-base text-[#ebeae2] mb-6 relative">
+            <p className="text-base text-[#ebeae2] mb-7 relative text-center">
               Please use the link below to sign in.
             </p>
             <div>
@@ -140,7 +148,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                 onSubmit={imbueLogin}
               >
                 <div className="login justify-center items-center w-full flex flex-col">
-                  <div className="flex justify-center pb-[10px] w-[70%]">
+                  <div className="flex justify-center pb-[10px] w-[80%]">
                     <CssTextField
                       label="Email/Username"
                       onChange={(e: any) => setUserOrEmail(e.target.value)}
@@ -148,7 +156,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                       required
                     />
                   </div>
-                  <div className="flex justify-center pb-[10px] w-[70%]">
+                  <div className="flex justify-center pb-[10px] w-[80%]">
                     <CssTextField
                       label="Password"
                       onChange={(e: any) => setPassword(e.target.value)}
@@ -185,36 +193,32 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                     >
                       Sign up
                     </Link>
-                    {/* <span
-                      onClick={() => showPolkadotAccounts(true)}
-                      className="mdc-deprecated-list-item__text"
-                    ></span> */}
                   </div>
                 </div>
               </form>
 
               <li
-                className="mdc-deprecated-list-item flex flex-row items-center mt-8"
+                className="mdc-deprecated-list-item flex justify-center items-center mt-8 cursor-pointer"
                 tabIndex={0}
                 data-mdc-dialog-action="web3"
+                onClick={() => closeModal()}
               >
                 <span className="mdc-deprecated-list-item__graphic h-[40px] w-[40px] flex mr-[16px]">
                   <Image
                     src={
-                      "https://avatars.githubusercontent.com/u/33775474?s=200&amp;amp;v=4"
+                      "https://raw.githubusercontent.com/TalismanSociety/talisman-connect/master/packages/connect-wallets/src/lib/talisman-wallet/TalismanLogo.svg"
                     }
                     width={40}
                     height={40}
-                    className="w-full"
+                    className="w-full cursor-pointer"
                     style={logoStyle}
                     alt={"avaterImage"}
                   />
                 </span>
                 <span
-                  onClick={() => clicked()}
-                  className="mdc-deprecated-list-item__text"
+                  className="cursor-pointer"
                 >
-                  {"Sign in with your polkadot{.js} extension"}
+                  {"Sign in with a wallet"}
                 </span>
               </li>
             </div>
@@ -226,7 +230,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
       </Dialog>
 
       <AccountChoice
-        accountSelected={(account: InjectedAccountWithMeta) =>
+        accountSelected={(account: WalletAccount) =>
           accountSelected(account)
         }
         visible={polkadotAccountsVisible}

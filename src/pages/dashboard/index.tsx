@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
-import { Freelancer, Project, ProjectStatus, User } from "@/model";
+import { Freelancer, Project, OffchainProjectState, User } from "@/model";
 import { StreamChat } from "stream-chat";
 import {
   Chat,

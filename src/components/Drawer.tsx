@@ -18,21 +18,20 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
   const [user, setUser] = useState<User>()
 
   useEffect(() => {
-    const findFreelancer = async (user:any) => {
+    const findFreelancer = async (user: any) => {
       if (user) {
-        setIsFreelancer(await freelancerExists(user?.username))
+        setIsFreelancer(await freelancerExists(user?.username));
       }
     };
 
     const storedObject = localStorage.getItem("userAuth");
     if (storedObject) {
       const parsedData = JSON.parse(storedObject);
-      findFreelancer(parsedData.user)
-      setUser(parsedData.user)
+      findFreelancer(parsedData.user);
+      setUser(parsedData.user);
       const isAuthenticated = parsedData?.isAuthenticated || false;
       setAuthenticated(isAuthenticated);
     }
-    
   }, [visible]);
 
   const linkItems = [

@@ -5,13 +5,14 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import { getWeb3Accounts, initImbueAPIInfo } from "../utils/polkadot";
-import { Currency, ProjectStatus, User } from "@/model";
+import { Currency, OffchainProjectState, User } from "@/model";
 import { blake2AsHex } from "@polkadot/util-crypto";
 import ChainService from "@/redux/services/chainService";
 import { getCurrentUser } from "@/utils";
 import { changeBriefApplicationStatus } from "@/redux/services/briefService";
 import Image from "next/image";
-import styles from '../styles/hire-modal.module.css'
+import styles from "../styles/hire-modal.module.css";
+import { useRouter } from "next/router";
 
 export const HirePopup = ({
   openPopup,
@@ -25,6 +26,7 @@ export const HirePopup = ({
   totalCost,
   setLoading,
 }: any) => {
+  const router = useRouter();
   const [popupStage, setstage] = useState<number>(0);
   const [walletOptions, setWalletOptions] = useState<number[]>([0, 1, 2]);
   const [accounts, setAccounts] = React.useState<InjectedAccountWithMeta[]>([]);
@@ -58,7 +60,7 @@ export const HirePopup = ({
     const freelancerAddress: string = freelancer.web3_address;
     const budget: bigint = BigInt(totalCost * 1e12);
     const initialContribution: bigint = BigInt(totalCost * 1e12);
-    application.status_id = ProjectStatus.Accepted;
+    application.status_id = OffchainProjectState.Accepted;
     delete application.modified;
     const briefHash = blake2AsHex(JSON.stringify(application));
     const currencyId = application.currency_id;
@@ -84,7 +86,7 @@ export const HirePopup = ({
           await changeBriefApplicationStatus(
             briefId!,
             application.id,
-            ProjectStatus.Accepted
+            OffchainProjectState.Accepted
           );
           console.log(result.eventData);
         } else if (result.txError) {

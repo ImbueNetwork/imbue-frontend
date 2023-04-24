@@ -111,6 +111,18 @@
   );
   --hq-disabled-button-color: var(--disabled-button-color);
   --hq-base-transition: var(--base-transition);
+
+  /* talisman */
+  --talisman-connect-control-background: #383838;
+  --talisman-connect-control-foreground: inherit;
+  --talisman-connect-active-background: #5a5a5a;
+  --talisman-connect-active-foreground: inherit;
+  --talisman-connect-modal-background: var(--theme-grey-dark);
+  --talisman-connect-modal-foreground: var(--theme-white);
+  --talisman-connect-button-background: var(
+    --talisman-connect-control-background
+  );
+  --talisman-connect-button-foreground: var(--theme-white);
 }
 
 .primary-btn:disabled {
@@ -334,4 +346,8 @@ select.round {
 .pill-button:hover{
   background: white;
   color: black;
+}
+
+.Modal header div{
+  color: white;
 }

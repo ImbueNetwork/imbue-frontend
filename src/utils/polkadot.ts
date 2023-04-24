@@ -9,9 +9,8 @@ import { stringToHex } from "@polkadot/util";
 import * as config from "../config";
 export const imbueNetwork = "Imbue Network";
 import dynamic from "next/dynamic";
-
-
-
+import { checkEnvironment } from ".";
+import { WalletAccount } from "@talismn/connect-wallets";
 
 const sr25519Keyring = new Keyring({ type: "sr25519", ss58Format: 2 });
 
@@ -29,7 +28,7 @@ export type ImbueApiInfo = {
 export const initImbueAPIInfo = async () => {
   showLoading();
   const { imbueNetworkWebsockAddr, relayChainWebsockAddr } = await fetch(
-    `${config.apiBase}/info`
+    checkEnvironment().concat(`${config.apiBase}/info`)
   ).then((resp) => resp.json());
   const imbueApi = await initPolkadotJSAPI(imbueNetworkWebsockAddr);
   const relayChainApi = await initPolkadotJSAPI(relayChainWebsockAddr);
@@ -113,12 +112,7 @@ export const enableAppForExtension = (
   attempts: number = 10
 ): Promise<InjectedExtension[]> => {
   return new Promise(async (resolve, reject) => {
-
-    const { web3Enable} = await import(
-      "@polkadot/extension-dapp"
-    );
-
-
+    const { web3Enable } = await import("@polkadot/extension-dapp");
 
     const extensions = await web3Enable(appName);
     if (!extensions.length) {
@@ -139,9 +133,7 @@ export const enableAppForExtension = (
 };
 
 export const getWeb3Accounts = async () => {
-  const { web3Accounts } = await import(
-    "@polkadot/extension-dapp"
-  );
+  const { web3Accounts } = await import("@polkadot/extension-dapp");
   try {
     const extensions = await enableAppForExtension(imbueNetwork);
     if (!extensions.length) {
@@ -157,23 +149,16 @@ export const getWeb3Accounts = async () => {
 };
 
 export const signWeb3Challenge = async (
-  account: InjectedAccountWithMeta,
+  account: WalletAccount,
   challenge: string
 ) => {
-  const {  web3FromSource } = await import(
-    "@polkadot/extension-dapp"
-  );
-  const injector = await web3FromSource(account.meta.source);
-  const signRaw = injector.signer.signRaw;
-
-  if (signRaw) {
-    const signature = await signRaw({
-      address: account.address,
-      data: stringToHex(challenge),
-      type: "bytes",
-    });
-    return signature;
-  }
+  const signer = account?.wallet?.signer;
+  const signature = await signer.signRaw({
+    address: account.address,
+    data: stringToHex(challenge),
+    type: "bytes",
+  });
+  return signature
 };
 
 export function getDispatchError(dispatchError: DispatchError): string {
