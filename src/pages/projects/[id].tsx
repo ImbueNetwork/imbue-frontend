@@ -190,7 +190,7 @@ function Project() {
           await setShowPolkadotAccounts(false);
         }}
         closeModal={() => setShowPolkadotAccounts(false)}
-        initiator={onChainProject?.initiator}
+        initiator_address={onChainProject?.initiator}
         filterByInitiator
       />
     </div>

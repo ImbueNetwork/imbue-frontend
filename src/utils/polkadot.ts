@@ -10,6 +10,7 @@ import * as config from "../config";
 export const imbueNetwork = "Imbue Network";
 import dynamic from "next/dynamic";
 import { checkEnvironment } from ".";
+import { WalletAccount } from "@talismn/connect-wallets";
 
 const sr25519Keyring = new Keyring({ type: "sr25519", ss58Format: 2 });
 
@@ -148,21 +149,16 @@ export const getWeb3Accounts = async () => {
 };
 
 export const signWeb3Challenge = async (
-  account: InjectedAccountWithMeta,
+  account: WalletAccount,
   challenge: string
 ) => {
-  const { web3FromSource } = await import("@polkadot/extension-dapp");
-  const injector = await web3FromSource(account.meta.source);
-  const signRaw = injector.signer.signRaw;
-
-  if (signRaw) {
-    const signature = await signRaw({
-      address: account.address,
-      data: stringToHex(challenge),
-      type: "bytes",
-    });
-    return signature;
-  }
+  const signer = account?.wallet?.signer;
+  const signature = await signer.signRaw({
+    address: account.address,
+    data: stringToHex(challenge),
+    type: "bytes",
+  });
+  return signature
 };
 
 export function getDispatchError(dispatchError: DispatchError): string {
