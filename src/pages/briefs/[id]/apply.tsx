@@ -15,6 +15,7 @@ import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { selectAccount } from "@/redux/services/polkadotService";
 import { useRouter } from "next/router";
 import FullScreenLoader from "@/components/FullScreenLoader";
+import { WalletAccount } from "@talismn/connect-wallets";
 
 interface MilestoneItem {
   name: string;
@@ -35,7 +36,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   useEffect(() => {
     getUserAndFreelancer();
-  }, [briefId,user]);
+  }, [briefId, user]);
 
   useEffect(() => {
     getCurrentUserBrief();
@@ -46,7 +47,7 @@ export const SubmitProposal = (): JSX.Element => {
     setUser(userResponse);
     const freelancer = await getFreelancerProfile(userResponse?.username);
     if (!freelancer) {
-      router.push(`/freelancer/new`);
+      router.push(`/freelancers/new`);
     }
   };
 
@@ -90,7 +91,7 @@ export const SubmitProposal = (): JSX.Element => {
     setCurrencyId(Number(event.target.value));
   };
 
-  const handleSelectAccount = async (account: InjectedAccountWithMeta) => {
+  const handleSelectAccount = async (account: WalletAccount) => {
     setLoading(true);
     await selectAccount(account);
     setLoading(false);
@@ -149,7 +150,7 @@ export const SubmitProposal = (): JSX.Element => {
   const renderPolkadotJSModal = (
     <div>
       <AccountChoice
-        accountSelected={(account: InjectedAccountWithMeta) =>
+        accountSelected={(account: WalletAccount) =>
           handleSelectAccount(account)
         }
         closeModal={() => setShowPolkadotAccounts(false)}
@@ -186,7 +187,7 @@ export const SubmitProposal = (): JSX.Element => {
   const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
 
   return (
-    <div className="flex flex-col gap-[2.5rem] text-base leading-[1.5]">
+    <div className="flex flex-col gap-[2.5rem] text-base leading-[1.5] hq-layout">
       <div>
         <h3 className="ml-[2rem] mb-[0.5rem] text-xl leading-[1.5] font-bold m-0 p-0  flex">
           Job description

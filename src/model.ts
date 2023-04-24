@@ -6,12 +6,24 @@ export enum Currency {
   MGX = 4,
 }
 
-export enum ProjectStatus {
+// ONCHAIN PROJECT STATE
+export enum OffchainProjectState {
   Draft = 0,
   PendingReview = 1,
   ChangesRequested = 2,
   Rejected = 3,
   Accepted = 4,
+}
+
+// ONCHAIN PROJECT STATE
+export enum OnchainProjectState {
+  PendingProjectApproval = 0,
+  PendingFundingApproval = 1,
+  OpenForContribution = 2,
+  PendingMilestoneSubmission = 3 ,
+  PendingMilestoneApproval = 4,
+  OpenForVoting= 5,
+  OpenForWithdraw = 6,
 }
 
 export enum RoundType {
@@ -46,22 +58,10 @@ export type Project = {
   modified?: Date;
 };
 
-export enum ProjectState {
-  PendingProjectApproval,
-  PendingFundingApproval,
-  OpenForContribution,
-  PendingMilestoneSubmission,
-  PendingMilestoneApproval,
-  OpenForVoting,
-  OpenForWithdraw,
-}
+
 
 export type ProjectOnChain = {
   id?: string | number;
-  name: string;
-  logo: string;
-  description: string;
-  website: string;
   requiredFunds: bigint;
   requiredFundsFormatted: number;
   raisedFunds: bigint;
@@ -76,15 +76,17 @@ export type ProjectOnChain = {
   fundingThresholdMet: boolean;
   roundKey: number | undefined;
   cancelled: boolean;
-  projectState: ProjectState;
+  projectState: OnchainProjectState;
 };
 
 export type Milestone = {
   project_id: number;
+  project_chain_id: number;
   milestone_key: number;
   name: string;
+  modified?: Date;
   percentage_to_unlock: number;
-  isApproved: boolean;
+  is_approved: boolean;
   amount: number;
 };
 
@@ -211,7 +213,7 @@ export type FreelancerSqlFilter = {
   skills_range: Array<number>;
   services_range: Array<number>;
   languages_range: Array<number>;
-  search_input: string;
+  search_input: string | string[];
 };
 export type ApplicationData = {
   brief_id: number;

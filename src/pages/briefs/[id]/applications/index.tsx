@@ -60,7 +60,7 @@ const BriefApplications = () => {
     if (!brief) return <h2>No brief found</h2>
 
     return (
-        <div className="page-wrapper applicationList">
+        <div className="page-wrapper applicationList hq-layout">
             {browsingUser && showMessageBox && <ChatPopup {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser }} />}
             <p className={styles.sectionTitle + " mb-4"}>Review proposals</p>
             

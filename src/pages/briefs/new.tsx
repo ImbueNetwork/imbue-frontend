@@ -267,7 +267,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
   };
 
   return (
-    <div className="new-brief-details-container">
+    <div className="new-brief-details-container hq-layout">
       <div className="left-panel">
         <ProgressBar
           titleArray={["Description", "Skills", "Scope", "Budget"]}

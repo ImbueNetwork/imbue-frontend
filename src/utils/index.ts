@@ -10,20 +10,10 @@ export type BadRoute =
 
 export function redirect(path: string, returnUrl?: string) {
   if (returnUrl) {
-    let redirect = new URL(
-      `${window.location.origin}/${path}?redirect=${returnUrl}`
-    );
-    console.log("handlesubmit");
-
-    window.location.replace(redirect);
-  } else if (path.startsWith("http")) {
-    let redirect = new URL(path);
-    window.location.replace(redirect);
-  } else {
-    console.log("handlesubmit");
-    let redirect = new URL(`${window.location.origin}/${path}`);
-    redirect.search = window.location.search;
-    window.location.replace(redirect);
+    window.location.href = `${window.location.origin}/${path}?redirect=${returnUrl}`;
+  }
+  else {
+    window.location.href = `${window.location.origin}/${path}`
   }
 }
 
@@ -66,9 +56,12 @@ export const getProjectId = async () => {
 };
 
 export const fetchProject = async (projectId: string | number | null) => {
-  const resp = await fetch(`${config.apiBase}project/${projectId}`, {
-    headers: config.getAPIHeaders,
-  });
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}project/${projectId}`),
+    {
+      headers: config.getAPIHeaders,
+    }
+  );
   if (resp.ok) {
     const project = await resp.json();
     return project;

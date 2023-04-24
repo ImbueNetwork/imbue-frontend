@@ -22,6 +22,7 @@ module.exports = {
         "theme-secondary" : "#411dc9",
         "secondary-dark-hover" : "#121c7f",
         "light-white": "rgba(255, 255, 255, 0.25)",
+        "light-grey": "rgba(235, 234, 226, 0.5)",
         primary: "#b2ff0b",
       },
       screens: {

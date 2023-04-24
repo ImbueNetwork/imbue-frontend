@@ -10,10 +10,12 @@ export const BriefLists = ({
   briefs = [],
   setBriefId,
   showNewBriefButton,
+  areAcceptedBriefs,
 }: {
   briefs: any[];
   setBriefId: Function;
-  showNewBriefButton?: Boolean;
+  showNewBriefButton?: boolean;
+  areAcceptedBriefs?: boolean;
 }) => {
   const router = useRouter();
 
@@ -37,16 +39,20 @@ export const BriefLists = ({
     return <h2 className="text-[16px]">Nothing to show</h2>;
 
   return (
-    <div className="bg-[#2c2c2c] hover:bg-[#121c7f] mb-8 border border-solid border-[#787777] rounded-[0.75rem]">
+    <div className="bg-[#2c2c2c]  mb-8 border border-solid border-[#787777] overflow-hidden rounded-[0.75rem]">
       {briefs?.map((brief, index) => (
         <div
           key={index}
-          onClick={() =>
+          onClick={() => {
             brief.number_of_applications &&
-            !brief.project_id &&
-            setBriefId(brief.id)
-          }
-          className="flex cursor-pointer px-[2.5rem] py-[2rem] justify-between"
+              !brief.project_id &&
+              setBriefId(brief.id);
+
+            areAcceptedBriefs && router.push(`/projects/${brief?.project_id}`);
+          }}
+          className={`flex cursor-pointer hover:bg-[#121c7f] px-[2.5rem] py-[2rem] justify-between ${
+            index !== briefs.length - 1 ? "border-b border-b-violet-50" : ""
+          }`}
         >
           <div className="flex flex-col gap-3">
             <h3 className="text-xl font-bold">{brief.headline}</h3>
