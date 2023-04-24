@@ -327,7 +327,7 @@ export const insertToTable = <T>(item: string, table_name: string) =>
         }).returning("*")
     )[0];
 
-export const updateFederatedLoginUser = (user: User, username: string, email: string, password: string) =>
+export const updateFederatedLoginUser = (user: User, username: string, email: string, password?: string) =>
     async (tx: Knex.Transaction) => (
         await tx<User>("users").update({
             username: username.toLowerCase(),
@@ -609,10 +609,6 @@ export const getOrCreateFederatedUser = (
                 issuer,
                 subject: username,
             }).first();
-
-
-            console.log("**** federated is")
-            console.log(federated);
             /**
              * If not, create the `user`, then the `federated_credential`
              */
@@ -641,7 +637,7 @@ export const getOrCreateFederatedUser = (
             done(null, user);
         } catch (err) {
             done(new Error(
-                "Failed to upsert federated authentication."
+                `Failed to upsert federated authentication. ${err}`
             ));
         }
     });
