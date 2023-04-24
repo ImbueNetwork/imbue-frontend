@@ -7,12 +7,13 @@ import { Dialogue } from "@/components/Dialogue";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { postAPIHeaders } from "@/config";
-import { TextField } from "@mui/material";
+import { Dialog, DialogContent, DialogTitle, TextField, useMediaQuery } from "@mui/material";
 import * as config from "@/config";
 import Link from "next/link";
 import styled from "@emotion/styled";
 import { getCurrentUser } from "@/utils";
 import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
+import { useTheme } from '@mui/material/styles';
 
 const logoStyle = { height: "100%", width: "100%" };
 
@@ -70,6 +71,8 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   const [errorMessage, setErrorMessage] = useState<string>();
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
   const router = useRouter();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const imbueLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     setErrorMessage(undefined);
@@ -113,25 +116,22 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     router.push(redirectUrl);
   };
 
-  if (visible) {
-    if (polkadotAccountsVisible) {
-      return (
-        <AccountChoice
-          accountSelected={(account: InjectedAccountWithMeta) =>
-            accountSelected(account)
-          }
-        />
-      );
-    } else {
-      return (
-        <Dialogue
-          title="You must be signed in to continue"
-          content={
-            <p className="text-base text-[#ebeae2] mb-5 relative top-[-10px]">
+  return (
+    <>
+      <Dialog
+        fullScreen={fullScreen}
+        open={visible}
+        onClose={() => setVisible(false)}
+        aria-labelledby="responsive-dialog-title"
+      >
+        {<div>
+          <DialogTitle id="responsive-dialog-title">
+            {"You must be signed in to continue"}
+          </DialogTitle>
+          <DialogContent>
+            <p className="text-base text-[#ebeae2] mb-6 relative">
               Please use the link below to sign in.
             </p>
-          }
-          actionList={
             <div>
               <form
                 id="contribution-submission-form"
@@ -181,7 +181,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                       onClick={() => {
                         setVisible(false);
                       }}
-                      className="signup"
+                      className="signup text-primary ml-1"
                     >
                       Sign up
                     </Link>
@@ -218,13 +218,22 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                 </span>
               </li>
             </div>
-          }
-        />
-      );
-    }
-  } else {
-    return <></>;
-  }
+
+          </DialogContent>
+        </div>
+
+        }
+      </Dialog>
+
+      <AccountChoice
+        accountSelected={(account: InjectedAccountWithMeta) =>
+          accountSelected(account)
+        }
+        visible={polkadotAccountsVisible}
+        setVisible={showPolkadotAccounts}
+      />
+    </>
+  )
 };
 
 export default Login;

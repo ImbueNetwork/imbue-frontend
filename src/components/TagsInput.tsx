@@ -42,9 +42,9 @@ export const TagsInput = ({
     <>
       <div className="selected-tags">
         {tags.map((tag, i) => (
-          <div key={i} className="selected-tag-item">
+          <div key={i} className="selected-tag-item cursor-pointer" onClick={() => handleDelete(i)}>
             {tag}
-            <div className="unselect-tag" onClick={() => handleDelete(i)}>
+            <div className="unselect-tag">
               x
             </div>
           </div>

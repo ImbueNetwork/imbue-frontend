@@ -68,7 +68,7 @@
 }
 
 .MuiFormLabel-root,
-.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedEnd,
+.MuiInputBase-input,
 .MuiSvgIcon-root.MuiSvgIcon-fontSizeMedium.MuiSelect-icon.MuiSelect-iconStandard,
 .MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiInput-input{
     color: white;
@@ -79,4 +79,7 @@
     cursor: pointer;
 }
 
-/* .MuiFormControl-root .MuiTextField-root */
+.MuiDialog-paper{
+    background-color: var(--theme-grey-dark);
+    color: white;
+}

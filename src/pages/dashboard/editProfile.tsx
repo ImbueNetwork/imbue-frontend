@@ -8,7 +8,29 @@ const EditProfile = (): JSX.Element => {
 
     const handleSubmit = (e: any) => {
         e.preventDefault()
-        console.log(e.target.firstName);
+        const firstName = e.target.firstName.value
+        const lastName = e.target.lastName.value
+        const otherName = e.target.lastName.value
+        const country = e.target.country.value
+        const city = e.target.city.value
+        const network = e.target.network.value
+        const publicKey = e.target.publicKey.value
+        const bio = e.target.bio.value
+        const education = e.target.education.value
+        const certification = e.target.certification.value
+        console.log({
+            firstName,
+            lastName,
+            otherName,
+            country,
+            city,
+            network,
+            publicKey,
+            bio,
+            education,
+            certification,
+            skills
+        });
     }
 
     return (
@@ -117,8 +139,8 @@ const EditProfile = (): JSX.Element => {
                             <TextField
                                 className='w-full'
                                 id="outlined-basic"
-                                label="Eduction"
-                                name='eduction'
+                                label="Education"
+                                name='education'
                             />
 
                             <TextField
