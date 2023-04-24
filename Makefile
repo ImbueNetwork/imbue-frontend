@@ -10,7 +10,6 @@ clean_build: clean
 	yarn install --force
 	yarn build
 	
-
 migrate: migrate_latest
 
 migrate_latest: node_modules
@@ -31,6 +30,8 @@ migrate_reset: node_modules
 	'
 seed:
 	yarn run knex --cwd ${DBDIR} seed:run
+
+db_seed: migrate seed
 
 db_up: migrate
 

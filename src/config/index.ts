@@ -12,7 +12,7 @@ export const postAPIHeaders = {
 export const grantProposalsURL = "/proposals";
 export const dashboardUrl = "/dashboard";
 
-export const googleAuthEndpoint = "/auth/oauth2/accounts.google.com/login";
+export const googleClientId = "826260703449-jpjbjnm9v1669mm7n5hevgfuj5pbr705.apps.googleusercontent.com";
 
 export const proposalsDraftLocalDraftKey = "imbu-proposals-draft:local-draft";
 

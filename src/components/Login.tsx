@@ -15,6 +15,9 @@ import { getCurrentUser } from "@/utils";
 import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
 import { useTheme } from '@mui/material/styles';
 import { WalletAccount } from "@talismn/connect-wallets";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { useGoogleLogin, GoogleLogin } from '@react-oauth/google';
+import jwt from 'jsonwebtoken';
 
 const logoStyle = { height: "100%", width: "100%" };
 
@@ -108,7 +111,30 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     showPolkadotAccounts(true);
     setVisible(false);
   };
-  console.log(redirectUrl);
+
+  const googleLogin = async (response: any) => {
+    const resp = await fetch(`${config.apiBase}/auth/google/`, {
+      headers: postAPIHeaders,
+      method: "post",
+      body: JSON.stringify(response),
+    });
+
+
+    if (resp.ok) {
+      const userResponse = await getCurrentUser();
+      if (userResponse) {
+        const userAuth = {
+          isAuthenticated: true,
+          user: userResponse,
+        };
+        localStorage.setItem("userAuth", JSON.stringify(userAuth));
+        setVisible(false);
+        router.push(redirectUrl);
+      }
+    } else {
+      setErrorMessage("incorrect username or password");
+    }
+  }
 
   const accountSelected = async (
     account: WalletAccount
@@ -171,7 +197,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                       {errorMessage}
                     </span>
                   </div>
-                  <div className="w-[70%] mt-7 mb-5">
+                  <div className="w-[70%] mt-1 mb-5">
                     <button
                       type="submit"
                       // disabled={!this.state.creds.username && !this.state.creds.password}
@@ -197,30 +223,51 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                 </div>
               </form>
 
-              <li
-                className="mdc-deprecated-list-item flex justify-center items-center mt-8 cursor-pointer"
-                tabIndex={0}
-                data-mdc-dialog-action="web3"
-                onClick={() => closeModal()}
-              >
-                <span className="mdc-deprecated-list-item__graphic h-[40px] w-[40px] flex mr-[16px]">
-                  <Image
-                    src={
-                      "https://raw.githubusercontent.com/TalismanSociety/talisman-connect/master/packages/connect-wallets/src/lib/talisman-wallet/TalismanLogo.svg"
-                    }
-                    width={40}
-                    height={40}
-                    className="w-full cursor-pointer"
-                    style={logoStyle}
-                    alt={"avaterImage"}
-                  />
-                </span>
-                <span
-                  className="cursor-pointer"
+              <div className="login justify-center items-center w-full flex flex-col">
+
+                <li className="max-w-[65%] mt-1 mb-2">
+                  <GoogleOAuthProvider clientId={config.googleClientId}>
+                    <GoogleLogin
+                      useOneTap={true}
+                      onSuccess={(creds: any) => googleLogin(creds)}
+                      onError={() => {
+                        console.log('Login Failed');
+                      }}
+                    />
+                  </GoogleOAuthProvider>
+                </li>
+              </div>
+
+              <div className="login justify-center items-center w-full flex flex-col">
+
+                <li
+                  className="mt-4 mdc-deprecated-list-item flex flex-row items-center cursor-pointer"
+                  tabIndex={0}
+                  data-mdc-dialog-action="web3"
+                  onClick={() => closeModal()}
                 >
-                  {"Sign in with a wallet"}
-                </span>
-              </li>
+                  <span className="mdc-deprecated-list-item__graphic h-[40px] w-[40px] flex mr-[16px]">
+                    <Image
+                      src={
+                        "https://raw.githubusercontent.com/TalismanSociety/talisman-connect/master/packages/connect-wallets/src/lib/talisman-wallet/TalismanLogo.svg"
+                      }
+                      width={40}
+                      height={40}
+                      className="w-full cursor-pointer"
+                      style={logoStyle}
+                      alt={"avaterImage"}
+                    />
+                  </span>
+                  <span
+                    className="cursor-pointer"
+                  >
+                    {"Sign in with a wallet"}
+                  </span>
+                </li>
+              </div>
+
+
+
             </div>
 
           </DialogContent>
