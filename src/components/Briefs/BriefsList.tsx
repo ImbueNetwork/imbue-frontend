@@ -57,7 +57,7 @@ export const BriefLists = ({
           <div className="flex flex-col gap-3">
             <h3 className="text-xl font-bold">{brief.headline}</h3>
             <p className="text-[16px]">
-              Budget ${Number(brief.budget).toLocaleString()} - Public
+              Budget ${Number(brief.budget).toLocaleString()}
             </p>
             <p className="text-[16px]">
               Created {timeAgo.format(new Date(brief.created))}
