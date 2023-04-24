@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { AiFillPlusCircle, AiFillMinusCircle } from "react-icons/ai";
 import { BsCircleFill } from "react-icons/bs";
-import { Currency, Milestone, ProjectOnChain, ProjectState } from "@/model";
+import { Currency, Milestone, ProjectOnChain, OnchainProjectState } from "@/model";
 
 export type MilestonesItemProps = {
   milestone: Milestone;
@@ -32,7 +32,7 @@ const MilestoneItem = ({
   }, []);
 
   const displayMilestoneToggle = (): JSX.Element => {
-    if (milestone.isApproved) {
+    if (milestone.is_approved) {
       if (toggleActive) {
         return (
           <div>

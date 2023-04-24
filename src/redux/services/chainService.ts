@@ -7,7 +7,7 @@ import {
   Milestone,
   Project,
   ProjectOnChain,
-  ProjectState,
+  OnchainProjectState,
   RoundType,
   User,
 } from "@/model";
@@ -17,6 +17,7 @@ import type { ITuple } from "@polkadot/types/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import type { EventRecord } from "@polkadot/types/interfaces";
 import * as utils from "@/utils";
+import MilestoneItem from "@/components/MilestoneItem";
 
 type EventDetails = {
   eventName: string;
@@ -101,10 +102,10 @@ class ChainService {
 
   public async submitMilestone(
     account: InjectedAccountWithMeta,
-    projectOnChain: any,
+    projectOnChain: ProjectOnChain,
     milestoneKey: number
   ): Promise<BasicTxResponse> {
-    const projectId = projectOnChain.milestones[0].projectKey;
+    const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic =
       await this.imbueApi.imbue.api.tx.imbueProposals.submitMilestone(
         projectId,
@@ -346,11 +347,13 @@ class ChainService {
       )
     ).toHuman();
 
-    const raisedFunds = BigInt(projectOnChain.raisedFunds.replaceAll(",", ""));
-    const milestones = await this.getProjectMilestones(projectOnChain);
+    const raisedFunds = BigInt(
+      projectOnChain?.raisedFunds?.replaceAll(",", "") || 0
+    );
+    const milestones = await this.getProjectMilestones(projectOnChain, project);
 
     // get project state
-    let projectState = ProjectState.PendingProjectApproval;
+    let projectState = OnchainProjectState.PendingProjectApproval;
     let userIsInitiator = await this.isUserInitiator(this.user, projectOnChain);
     let projectInContributionRound = false;
     let projectInVotingRound = false;
@@ -399,41 +402,37 @@ class ChainService {
       // Initators cannot contribute to their own project
       if (userIsInitiator) {
         if (projectInVotingRound) {
-          projectState = ProjectState.OpenForVoting;
+          projectState = OnchainProjectState.OpenForVoting;
         } else if (projectInContributionRound) {
-          projectState = ProjectState.OpenForContribution;
+          projectState = OnchainProjectState.OpenForContribution;
         } else if (lastApprovedMilestoneKey >= 0) {
-          projectState = ProjectState.OpenForWithdraw;
+          projectState = OnchainProjectState.OpenForWithdraw;
         } else {
-          projectState = ProjectState.PendingMilestoneSubmission;
+          projectState = OnchainProjectState.PendingMilestoneSubmission;
         }
       } else if (projectInVotingRound) {
-        projectState = ProjectState.OpenForVoting;
+        projectState = OnchainProjectState.OpenForVoting;
       } else {
-        projectState = ProjectState.PendingMilestoneSubmission;
+        projectState = OnchainProjectState.PendingMilestoneSubmission;
       }
     } else if (!userIsInitiator && projectInContributionRound) {
-      projectState = ProjectState.OpenForContribution;
+      projectState = OnchainProjectState.OpenForContribution;
     } else {
       // Project not yet open for funding
       if (projectOnChain.approvedForFunding && !projectInContributionRound) {
-        projectState = ProjectState.PendingFundingApproval;
+        projectState = OnchainProjectState.PendingFundingApproval;
       } else if (userIsInitiator) {
         if (projectInContributionRound) {
-          projectState = ProjectState.OpenForContribution;
+          projectState = OnchainProjectState.OpenForContribution;
         } else {
-          projectState = ProjectState.PendingProjectApproval;
+          projectState = OnchainProjectState.PendingProjectApproval;
         }
       } else {
-        projectState = ProjectState.PendingProjectApproval;
+        projectState = OnchainProjectState.PendingProjectApproval;
       }
     }
     const convertedProject: ProjectOnChain = {
       id: projectOnChain.milestones[0].projectKey,
-      name: projectOnChain.name,
-      logo: projectOnChain.logo,
-      website: projectOnChain.website,
-      description: project.description,
       requiredFunds: BigInt(projectOnChain.requiredFunds.replaceAll(",", "")),
       requiredFundsFormatted:
         projectOnChain.requiredFunds.replaceAll(",", "") / 1e12,
@@ -462,7 +461,7 @@ class ChainService {
       ),
       initiator: projectOnChain.initiator,
       createBlockNumber: BigInt(
-        projectOnChain.createBlockNumber.replaceAll(",", "")
+        projectOnChain?.createBlockNumber?.replaceAll(",", "") || 0
       ),
       approvedForFunding: projectOnChain.approvedForFunding,
       fundingThresholdMet: projectOnChain.fundingThresholdMet,
@@ -475,18 +474,22 @@ class ChainService {
   }
 
   public async getProjectMilestones(
-    projectOnChain: ProjectOnChain
+    projectOnChain: ProjectOnChain,
+    projectOffChain: any
   ): Promise<Milestone[]> {
     let milestones: Milestone[] = Object.keys(projectOnChain.milestones)
       .map((milestoneItem: any) => projectOnChain.milestones[milestoneItem])
       .map(
         (milestone: any) =>
           ({
-            project_id: Number(milestone.projectKey),
+            project_id: projectOffChain.id,
+            project_chain_id: Number(milestone.projectKey),
             milestone_key: Number(milestone.milestoneKey),
-            name: milestone.name,
+            name: projectOffChain.milestones[milestone.milestoneKey].name,
+            modified: projectOffChain.milestones[milestone.milestoneKey].modified,
             percentage_to_unlock: Number(milestone.percentageToUnlock),
-            isApproved: milestone.isApproved,
+            amount: Number(projectOffChain.milestones[milestone.milestoneKey].amount),
+            is_approved: milestone.isApproved,
           } as Milestone)
       );
 
@@ -513,7 +516,7 @@ class ChainService {
     milestones: Milestone[]
   ): Promise<number> {
     const firstmilestone = milestones.find(
-      (milestone) => !milestone.isApproved
+      (milestone) => !milestone.is_approved
     );
     if (firstmilestone) {
       return firstmilestone.milestone_key;
@@ -527,7 +530,7 @@ class ChainService {
     const firstmilestone = milestones
       .slice()
       .reverse()
-      .find((milestone) => milestone.isApproved);
+      .find((milestone) => milestone.is_approved);
     if (firstmilestone) {
       return firstmilestone.milestone_key;
     }

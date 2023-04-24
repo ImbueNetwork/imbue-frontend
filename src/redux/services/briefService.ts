@@ -3,7 +3,7 @@ import {
   dummyDashboardBriefApplications,
   dumyBriefs,
 } from "@/config/briefs-data";
-import { Brief, BriefSqlFilter, ProjectStatus } from "@/model";
+import { Brief, BriefSqlFilter, OffchainProjectState } from "@/model";
 import { checkEnvironment } from "@/utils";
 
 const getAPIHeaders = {
@@ -77,7 +77,7 @@ export const getUserBriefs = async (user_id: string | number) => {
       `Failed to get all briefs for user ${user_id}. status: ${resp.status}`
     );
     console.log(error);
-    return []
+    return [];
   }
 };
 
@@ -102,7 +102,7 @@ export const getBriefApplications = async (brifId: string | number) => {
 export const changeBriefApplicationStatus = async (
   briefId: string | number,
   projectId: number,
-  status_id: ProjectStatus
+  status_id: OffchainProjectState
 ) => {
   const resp = await fetch(`${config.apiBase}/briefs/${briefId}/status`, {
     headers: postAPIHeaders,
@@ -131,4 +131,20 @@ export const getUserBrief = async (userId: number, briefId: number) => {
   //   return resp.json();
   // }
   // return null;
+};
+
+export const getProjectById = async (projectId: string | number) => {
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}project/${projectId}`),
+    {
+      headers: postAPIHeaders,
+      method: "get",
+    }
+  );
+
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    throw new Error("Failed to get project. status:" + resp.status);
+  }
 };
