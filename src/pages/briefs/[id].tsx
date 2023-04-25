@@ -45,7 +45,7 @@ const BriefDetails = (): JSX.Element => {
   const isOwnerOfBrief = browsingUser && browsingUser.id == brief.user_id;
   const [showSimilarBrief, setShowSimilarBrief] = useState<boolean>(false);
   const [showClientHistory, setShowClientHistory] = useState<boolean>(false);
-  const [error, setError] = useState<any>()
+  const [error, setError] = useState<any>();
 
   // TODO: need to get project category array from the brief
   const projectCategories = ["Product Development", "Health", "Wellness"];
@@ -66,7 +66,7 @@ const BriefDetails = (): JSX.Element => {
       }
     }
   };
-
+  
   useEffect(() => {
     fetchData();
   }, [id]);
@@ -85,7 +85,7 @@ const BriefDetails = (): JSX.Element => {
   };
 
   const ClientHistory = (
-    <div className="transparent-conatainer relative">
+    <div className="transparent-conatainer relative max-width-750px:!px-3">
       <div className="flex justify-between w-full">
         <h3>Client Contact History (4)</h3>
         <div
@@ -134,7 +134,7 @@ const BriefDetails = (): JSX.Element => {
   );
 
   const SimilarProjects = (
-    <div className="transparent-conatainer relative">
+    <div className="transparent-conatainer relative max-width-750px:!px-3">
       <div className="flex justify-between w-full">
         <h3>Similar projects on Imbue</h3>
         <div
@@ -157,13 +157,15 @@ const BriefDetails = (): JSX.Element => {
         {[3, 3, 3].map((history, index) => (
           <div key={`${index}-sim-brief`} className="similar-brief">
             <div className="similar-brief-details">
-              <h3>NFT Mining</h3>
-              <span>
+              <h3 className="max-width-750px:!text-base">NFT Mining</h3>
+              <span className="max-width-750px:!text-base max-width-750px:overflow-hidden max-width-750px:text-ellipsis max-width-750px:ml-3 max-width-750px:line-clamp-2">
                 Hi guys, I have an NFT I would like to design. The NFT has to
                 have a picture of......
               </span>
             </div>
-            <button className="primary-btn in-dark w-button">View Brief</button>
+            <button className="primary-btn in-dark w-button max-width-750px:!px-[9px] max-width-750px:mr-0">
+              View Brief
+            </button>
           </div>
         ))}
       </div>
@@ -175,11 +177,11 @@ const BriefDetails = (): JSX.Element => {
     </div>
   );
 
-  if(error) return <h2>{error.message}</h2>
+  if (error) return <h2>{error.message}</h2>;
 
   return (
     <div className="brief-details-container hq-layout">
-      <div className="brief-info">
+      <div className="brief-info max-width-750px:!flex-col">
         {/* TODO: Implement */}
         <BioPanel brief={brief} projectCategories={projectCategories} />
         <BioInsights
