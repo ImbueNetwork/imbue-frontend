@@ -3,6 +3,7 @@ import Login from "./Login";
 import { useRouter } from "next/router";
 import { freelancerExists } from "@/redux/services/freelancerService";
 import { User } from "@/model";
+import { getCurrentUser } from "@/utils";
 
 type DrawerProps = {
   visible: boolean;
@@ -18,20 +19,15 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
   const [user, setUser] = useState<User>()
 
   useEffect(() => {
-    const findFreelancer = async (user: any) => {
-      if (user) {
+    const setup = async () => {
+      const user = await getCurrentUser() || false;
+      setAuthenticated(user !== false);
+      if(user) {
         setIsFreelancer(await freelancerExists(user?.username));
+        setUser(user);
       }
     };
-
-    const storedObject = localStorage.getItem("userAuth");
-    if (storedObject) {
-      const parsedData = JSON.parse(storedObject);
-      findFreelancer(parsedData.user);
-      setUser(parsedData.user);
-      const isAuthenticated = parsedData?.isAuthenticated || false;
-      setAuthenticated(isAuthenticated);
-    }
+      setup();
   }, [visible]);
 
   const linkItems = [
@@ -73,7 +69,7 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
   ];
 
   const navigateToPage = async (link: string) => {
-    if(authenticated){
+    if (authenticated) {
       router.push(link);
     } else {
       setLoginModal(true);
