@@ -37,8 +37,7 @@ export const validProjectId = (candidate: any) => {
 
 export const getCurrentUser = async () => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}info/user`)
-  );
+    checkEnvironment().concat(`${config.apiBase}info/user`));
   if (resp.ok) {
     return resp.json();
   }
@@ -69,7 +68,8 @@ export const fetchProject = async (projectId: string | number | null) => {
 };
 
 export const fetchUserOrEmail = async (userOrEmail: string) => {
-  const resp = await fetch(`${config.apiBase}/users/${userOrEmail}`, {
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}users/${userOrEmail}`), {
     headers: config.getAPIHeaders,
   });
   if (resp.ok) {
@@ -79,7 +79,8 @@ export const fetchUserOrEmail = async (userOrEmail: string) => {
 };
 
 export const fetchUser = async (id: number) => {
-  const resp = await fetch(`${config.apiBase}users/byid/${id}`, {
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}users/byid/${id}`), {
     headers: config.getAPIHeaders,
   });
   if (resp.ok) {
@@ -107,7 +108,8 @@ export function validateForm(form: HTMLFormElement): boolean {
 
 export const getStreamChat = async () => {
   const { imbueNetworkWebsockAddr, relayChainWebsockAddr, getstreamApiKey } =
-    await fetch(`${config.apiBase}/info`).then((resp) => resp.json());
+    await fetch(
+      checkEnvironment().concat(`${config.apiBase}info`)).then((resp) => resp.json());
   return new StreamChat(getstreamApiKey);
 };
 
@@ -119,10 +121,6 @@ function reportValidity(input: HTMLInputElement, submitting: boolean = false) {
 }
 
 export const checkEnvironment = () => {
-  let base_url = "http://localhost:3000";
-  if (process.env.NODE_ENV === "production") {
-    base_url;
-  }
-
+  let base_url = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
   return base_url;
 };

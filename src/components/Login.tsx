@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogTitle, TextField, useMediaQuery } from "@m
 import * as config from "@/config";
 import Link from "next/link";
 import styled from "@emotion/styled";
-import { getCurrentUser } from "@/utils";
+import { checkEnvironment, getCurrentUser } from "@/utils";
 import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
 import { useTheme } from '@mui/material/styles';
 import { WalletAccount } from "@talismn/connect-wallets";
@@ -81,7 +81,8 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     setErrorMessage(undefined);
     event.preventDefault();
 
-    const resp = await fetch(`${config.apiBase}/auth/imbue/`, {
+    const resp = await fetch(
+      checkEnvironment().concat(`${config.apiBase}auth/imbue/`), {
       headers: postAPIHeaders,
       method: "post",
       body: JSON.stringify({
@@ -112,7 +113,8 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   };
 
   const googleLogin = async (response: any) => {
-    const resp = await fetch(`${config.apiBase}/auth/google/`, {
+    const resp = await fetch(
+      checkEnvironment().concat(`${config.apiBase}auth/google/`), {
       headers: postAPIHeaders,
       method: "post",
       body: JSON.stringify(response),

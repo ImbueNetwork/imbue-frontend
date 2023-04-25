@@ -38,6 +38,7 @@ db_up: migrate
 db_down: migrate_reset
 
 cmd: db_up
+	yarn build
 	yarn start
 
 .PHONY: all clean clean_build clean_deps build \
