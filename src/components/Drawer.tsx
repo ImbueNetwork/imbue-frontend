@@ -41,6 +41,11 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
       link: "/dashboard",
     },
     {
+      icon: "groups",
+      text: "Discover Freelancers",
+      link: `/freelancers`
+    },
+    {
       icon: "group_add",
       text: isFreelancer ? "Freelancer Profile" : "Join The Freelancers",
       link: isFreelancer ? `/freelancers/${user?.username}/` : "/freelancers/new",
@@ -63,23 +68,30 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
     {
       icon: "logout",
       text: authenticated ? "Sign Out" : "Sign In",
-      link: authenticated ? "/logout" : "",
+      link: authenticated ? "/logout" : "/login",
     },
   ];
 
   const navigateToPage = async (link: string) => {
-    if (authenticated && link !== "/logout" && link !== "") {
+    if (link === "/briefs" || link === '/freelancers') {
       router.push(link);
       toggleVisibility();
-    } else if (link === "/logout") {
-      await localStorage.clear();
+    }
+    else if (authenticated && link !== "/logout" && link !== "/login") {
       router.push(link);
       toggleVisibility();
-    } else {
-      link !== "/logout" && link !== "" && setRedirectURL(link);
+    }
+    else if (link === "/logout") {
+      localStorage.clear();
+      router.push(link);
+      toggleVisibility();
+    }
+    else if (link == "/login") {
+      (router.pathname !== "/") ? setRedirectURL(router.pathname) : setRedirectURL('/dashboard');
       setLoginModal(true);
     }
   };
+
   return (
     <>
       <div className={`drawer ${visible ? "open" : ""}`} id="right-drawer">

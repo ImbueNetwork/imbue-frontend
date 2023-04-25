@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { signWeb3Challenge } from "@/utils/polkadot";
 import { SignerResult } from "@polkadot/api/types";
 import AccountChoice from "@/components/AccountChoice";
@@ -11,13 +10,15 @@ import { Dialog, DialogContent, DialogTitle, TextField, useMediaQuery } from "@m
 import * as config from "@/config";
 import Link from "next/link";
 import styled from "@emotion/styled";
-import { getCurrentUser } from "@/utils";
+import { checkEnvironment, getCurrentUser } from "@/utils";
 import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
 import { useTheme } from '@mui/material/styles';
 import { WalletAccount } from "@talismn/connect-wallets";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { useGoogleLogin, GoogleLogin } from '@react-oauth/google';
 import jwt from 'jsonwebtoken';
+import { StyledEngineProvider } from "@mui/material/styles";
+
 
 const logoStyle = { height: "100%", width: "100%" };
 
@@ -75,14 +76,13 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   const [errorMessage, setErrorMessage] = useState<string>();
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
   const router = useRouter();
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const imbueLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     setErrorMessage(undefined);
     event.preventDefault();
 
-    const resp = await fetch(`${config.apiBase}/auth/imbue/`, {
+    const resp = await fetch(
+      checkEnvironment().concat(`${config.apiBase}auth/imbue/`), {
       headers: postAPIHeaders,
       method: "post",
       body: JSON.stringify({
@@ -113,7 +113,8 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   };
 
   const googleLogin = async (response: any) => {
-    const resp = await fetch(`${config.apiBase}/auth/google/`, {
+    const resp = await fetch(
+      checkEnvironment().concat(`${config.apiBase}auth/google/`), {
       headers: postAPIHeaders,
       method: "post",
       body: JSON.stringify(response),
@@ -135,14 +136,14 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
       setErrorMessage("incorrect username or password");
     }
   }
-
+  
   const accountSelected = async (
     account: WalletAccount
   ): Promise<any> => {
     try {
       const result = await getAccountAndSign(account);
       await authorise(result?.signature as SignerResult, result?.challenge!, account);
-      setVisible(false);
+      // setVisible(false);
       router.push(redirectUrl);
     } catch (error) {
       console.log(error);
@@ -152,13 +153,13 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
 
   return (
     <>
+    <StyledEngineProvider injectFirst>
       <Dialog
-        fullScreen={fullScreen}
         open={visible}
         onClose={() => setVisible(false)}
         aria-labelledby="responsive-dialog-title"
       >
-        {<div className="min-w-[450px] py-2">
+        {<div className="lg:min-w-[450px] py-2">
           <DialogTitle className="text-center" id="responsive-dialog-title">
             {"You must be signed in to continue"}
           </DialogTitle>
@@ -225,7 +226,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
 
               <div className="login justify-center items-center w-full flex flex-col">
 
-                <li className="max-w-[65%] mt-1 mb-2">
+                <li className="lg:max-w-[65%] mt-1 mb-2">
                   <GoogleOAuthProvider clientId={config.googleClientId}>
                     <GoogleLogin
                       useOneTap={true}
@@ -275,6 +276,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
 
         }
       </Dialog>
+      </StyledEngineProvider>
 
       <AccountChoice
         accountSelected={(account: WalletAccount) =>

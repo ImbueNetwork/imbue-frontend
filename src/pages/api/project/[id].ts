@@ -13,7 +13,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (method) {
     case "GET":
-      getProjectById(res, id);
+      return getProjectById(res, id);
       break;
     case "PUT":
       updateProjectById(res, id, body);

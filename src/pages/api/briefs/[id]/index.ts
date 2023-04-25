@@ -20,8 +20,6 @@ export default async function handler(
     const response = await getBrief(briefId)
     return res.status(200).json(response)
   }
-
-
 }
 
 export async function getBrief(id: string | string[]) {

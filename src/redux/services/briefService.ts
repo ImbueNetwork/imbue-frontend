@@ -18,7 +18,8 @@ const postAPIHeaders = {
 export const callSearchBriefs = async (filter: BriefSqlFilter) => {
   // return [] as Array<Brief>;
   //:TODO implement api for callSearchBriefs
-  const resp = await fetch(`${config.apiBase}/briefs/search`, {
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}briefs/search`), {
     headers: postAPIHeaders,
     method: "post",
     body: JSON.stringify(filter),
@@ -34,7 +35,7 @@ export const getAllBriefs = async () => {
   // return dumyBriefs as Array<Brief>;
   //:TODO implement api for getting briefs
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}/briefs/`),
+    checkEnvironment().concat(`${config.apiBase}briefs/`),
     {
       headers: postAPIHeaders,
       method: "get",
@@ -50,7 +51,8 @@ export const getAllBriefs = async () => {
 
 export const getBrief = async (briefId: number | string | string[]) => {
   try {
-    const resp = await fetch(`${config.apiBase}/briefs/${briefId}`, {
+    const resp = await fetch(
+      checkEnvironment().concat(`${config.apiBase}briefs/${briefId}`), {
       headers: postAPIHeaders,
       method: "get",
     });
@@ -66,7 +68,8 @@ export const getBrief = async (briefId: number | string | string[]) => {
 };
 
 export const getUserBriefs = async (user_id: string | number) => {
-  const resp = await fetch(`${config.apiBase}/users/${user_id}/briefs/`, {
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}users/${user_id}/briefs/`), {
     headers: postAPIHeaders,
     method: "get",
   });
@@ -104,7 +107,8 @@ export const changeBriefApplicationStatus = async (
   projectId: number,
   status_id: OffchainProjectState
 ) => {
-  const resp = await fetch(`${config.apiBase}/briefs/${briefId}/status`, {
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}briefs/${briefId}/status`), {
     headers: postAPIHeaders,
     method: "put",
     body: JSON.stringify({
@@ -122,15 +126,17 @@ export const changeBriefApplicationStatus = async (
   }
 };
 
-export const getUserBrief = async (userId: number, briefId: number) => {
-  return null;
-  // const resp = await fetch(
-  //   `${config.apiBase}/users/${userId}/briefs/${briefId}`
-  // );
-  // if (resp.ok) {
-  //   return resp.json();
-  // }
-  // return null;
+export const getFreelancerBrief = async (userId: number, briefId: number) => {
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}users/${userId}/briefs/${briefId}`),
+    {
+      headers: postAPIHeaders,
+      method: "get",
+    }
+  );
+  if (resp.ok) {
+    return resp.json();
+  }
 };
 
 export const getProjectById = async (projectId: string | number) => {
@@ -145,6 +151,6 @@ export const getProjectById = async (projectId: string | number) => {
   if (resp.ok) {
     return await resp.json();
   } else {
-    throw new Error("Failed to get project. status:" + resp.status);
+    new Error("Failed to get project. status:" + resp.status);
   }
 };

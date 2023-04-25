@@ -274,7 +274,7 @@ div#layout {
 #main-header {
   display: flex;
   z-index: 1;
-  flex-wrap: wrap;
+  justify-content: space-between;
   line-height: 1.15rem;
   padding: 0 30px;
 }
@@ -385,7 +385,12 @@ div#layout {
 
 @media screen and (max-width: 500px) {
   .padded {
-    padding: calc(var(--hq-layout-padding) / 2);
+    padding: calc(var(--hq-layout-padding) / 2) 0;
+  }
+  
+  .primary-btn {
+    font-size: 12px;
+    padding: 8px 18px;
   }
 }
 

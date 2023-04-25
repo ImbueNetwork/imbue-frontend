@@ -19,7 +19,7 @@ export default nextConnect()
             try {
                 const project = await models.fetchUserBriefApplications(userId.toString(), briefID.toString())(tx);
                 if (!project) {
-                    return res.status(401).send({error: "Brief Application not found"})
+                    return res.status(404).send({error: "Brief Application not found"})
                 }
                 response = {
                     ...project,

@@ -10,6 +10,7 @@ import {
   Project,
   OffchainProjectState,
   User,
+  ProjectOnChain,
 } from "@/model";
 import {
   changeBriefApplicationStatus as updateBriefApplicationStatus,
@@ -22,12 +23,13 @@ import { HirePopup } from "@/components/HirePopup";
 import ChatPopup from "@/components/ChatPopup";
 import ChainService from "@/redux/services/chainService";
 import { getWeb3Accounts, initImbueAPIInfo } from "@/utils/polkadot";
-import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { blake2AsHex } from "@polkadot/util-crypto";
 import { Backdrop, CircularProgress } from "@mui/material";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import Login from "@/components/Login";
+import { WalletAccount } from "@talismn/connect-wallets";
+import AccountChoice from "@/components/AccountChoice";
 
 interface MilestoneItem {
   name: string;
@@ -70,7 +72,7 @@ const ApplicationPreview = (): JSX.Element => {
   const isApplicationOwner = user?.id == application?.user_id;
   const isBriefOwner = user?.id == brief?.user_id;
   const [freelancerAccount, setFreelancerAccount] =
-    useState<InjectedAccountWithMeta>();
+    useState<WalletAccount>();
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -97,20 +99,12 @@ const ApplicationPreview = (): JSX.Element => {
     }
   }, [briefId, applicationId]);
 
-  const fetchAndSetAccounts = async () => {
-    const accounts = await getWeb3Accounts();
-    const account = accounts.filter(
-      (account) => account.address === freelancer?.web3_address
-    )[0];
-    setFreelancerAccount(account);
-  };
 
   useEffect(() => {
     async function setup() {
       if (brief) {
         const briefOwner: User = await fetchUser(brief?.user_id);
         setBriefOwner(briefOwner);
-        await fetchAndSetAccounts();
       }
     }
     setup();
@@ -150,15 +144,15 @@ const ApplicationPreview = (): JSX.Element => {
     setLoading(false);
     setIsEditingBio(false);
   };
-  const startWork = async () => {
-    if (freelancerAccount) {
+
+  const startWork = async (account: WalletAccount) => {
       setLoading(true);
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);
       delete application.modified;
       const briefHash = blake2AsHex(JSON.stringify(application));
       const result = await chainService?.commenceWork(
-        freelancerAccount,
+        account,
         briefHash
       );
       while (true) {
@@ -166,8 +160,16 @@ const ApplicationPreview = (): JSX.Element => {
           if (result.status) {
             console.log("***** success");
             const projectId = parseInt(result.eventData[2]);
-            await updateProject(projectId);
-            router.push(`/project/${applicationId}`);
+            while(true) {
+              const projectIsOnChain = await chainService.getProjectOnChain(
+                projectId
+              );
+              if(projectIsOnChain) {
+                await updateProject(projectId);
+                router.push(`/projects/${applicationId}`);
+              }
+              await new Promise((f) => setTimeout(f, 1000));
+            }
           } else if (result.txError) {
             console.log("***** failed");
             console.log(result.errorMessage);
@@ -177,7 +179,6 @@ const ApplicationPreview = (): JSX.Element => {
         await new Promise((f) => setTimeout(f, 1000));
       }
       setLoading(false);
-    }
   };
 
   const filteredApplication = application?.milestones
@@ -393,7 +394,7 @@ const ApplicationPreview = (): JSX.Element => {
               </button>
               {application?.status_id === 4 ? (
                 <button
-                  onClick={() => brief?.project_id && startWork()}
+                  onClick={() => brief?.project_id && setOpenPopup(true)}
                   className="Accepted-btn in-dark rounded-full text-black px-6 py-3"
                 >
                   Start Work
@@ -408,6 +409,14 @@ const ApplicationPreview = (): JSX.Element => {
                 </button>
               )}
             </div>
+
+        <AccountChoice
+          accountSelected={(account) => startWork(account)}
+          visible={openPopup}
+          setVisible={setOpenPopup}
+          initiatorAddress={application?.initiator}
+          filterByInitiator
+        />
           </div>
         )}
 

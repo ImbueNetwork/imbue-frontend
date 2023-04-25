@@ -1,4 +1,3 @@
-import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { getWeb3Accounts } from "@/utils/polkadot";
 import * as React from "react";
 import { Dialogue } from "./Dialogue";
@@ -6,13 +5,14 @@ import { Dialog, DialogContent, DialogTitle } from "@mui/material";
 import { WalletSelect } from "@talismn/connect-components";
 import { Wallet, WalletAccount } from "@talismn/connect-wallets";
 import { PolkadotjsWallet, SubWallet, TalismanWallet, EnkryptWallet } from "@talismn/connect-wallets"
+import { truncateMiddle } from '@talismn/connect-ui';
 
 type AccountChoiceProps = {
   accountSelected: (account: WalletAccount) => void;
   setVisible: Function;
   visible: boolean;
   filterByInitiator?: boolean;
-  initiator_address?: string;
+  initiatorAddress?: string;
 }
 
 const AccountChoice = ({
@@ -20,9 +20,10 @@ const AccountChoice = ({
   visible,
   setVisible,
   filterByInitiator,
-  initiator_address,
+  initiatorAddress,
 }: AccountChoiceProps): JSX.Element => {
-  const header = filterByInitiator ? `Connect with ${initiator_address}` : "Connect wallet";
+
+  const header = filterByInitiator ? `Connect with ${truncateMiddle(initiatorAddress)}` : "Connect wallet";
   return (
     <>
       <WalletSelect

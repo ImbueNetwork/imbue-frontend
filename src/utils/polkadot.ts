@@ -1,5 +1,4 @@
 import type {
-  InjectedAccountWithMeta,
   InjectedExtension,
 } from "@polkadot/extension-inject/types";
 import type { DispatchError } from "@polkadot/types/interfaces";
@@ -28,7 +27,7 @@ export type ImbueApiInfo = {
 export const initImbueAPIInfo = async () => {
   showLoading();
   const { imbueNetworkWebsockAddr, relayChainWebsockAddr } = await fetch(
-    checkEnvironment().concat(`${config.apiBase}/info`)
+    checkEnvironment().concat(`${config.apiBase}info`)
   ).then((resp) => resp.json());
   const imbueApi = await initPolkadotJSAPI(imbueNetworkWebsockAddr);
   const relayChainApi = await initPolkadotJSAPI(relayChainWebsockAddr);
