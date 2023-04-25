@@ -73,21 +73,9 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
   ];
 
   const navigateToPage = async (link: string) => {
-    if (link === "/briefs" || link === '/freelancers') {
+    if(authenticated){
       router.push(link);
-      toggleVisibility();
-    }
-    else if (authenticated && link !== "/logout" && link !== "/login") {
-      router.push(link);
-      toggleVisibility();
-    }
-    else if (link === "/logout") {
-      localStorage.clear();
-      router.push(link);
-      toggleVisibility();
-    }
-    else if (link == "/login") {
-      (router.pathname !== "/") ? setRedirectURL(router.pathname) : setRedirectURL('/dashboard');
+    } else {
       setLoginModal(true);
     }
   };
