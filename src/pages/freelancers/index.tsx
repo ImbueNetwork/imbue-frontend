@@ -193,7 +193,6 @@ const Freelancers = ({initialSkills, initialServices, initialLanguages, initialF
             };
 
             const filteredFreelancers = await callSearchFreelancers(filter);
-            console.log(filteredFreelancers);
             setFreelancers(filteredFreelancers);
         } 
         else {

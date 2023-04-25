@@ -52,23 +52,21 @@ const BriefDetails = (): JSX.Element => {
 
   const id: any = router?.query?.id || 0;
 
-  const setup = async () => {
-    setBrowsingUser(await getCurrentUser());
-    setTargetUser(await fetchUser(brief.user_id));
-  };
-
   const fetchData = async () => {
     if (id) {
       const briefData: Brief | Error | undefined = await getBrief(id);
-      if (briefData?.id) {
-        setBrief(briefData);
-      } else {
-        briefData !== undefined && setError(briefData);
+      if(briefData?.id){
+        const targetUser = await fetchUser(briefData.user_id);
+        setBrief(briefData)
+        setBrowsingUser(await getCurrentUser());
+        setTargetUser(targetUser);
       }
-      setup();
+      else{
+        briefData!==undefined && setError(briefData)
+      }
     }
   };
-
+  
   useEffect(() => {
     fetchData();
   }, [id]);
