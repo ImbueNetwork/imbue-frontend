@@ -26,8 +26,8 @@ export type ChatProps = {
   showMessageBox: boolean;
 };
 
-export function CustomChannelHeader(props: ChannelHeaderProps) {
-  const { title } = props;
+export function CustomChannelHeader(props: any) {
+  const { title,setShowChatList } = props;
   const {
     channel,
     members = {},
@@ -44,14 +44,13 @@ export function CustomChannelHeader(props: ChannelHeaderProps) {
   });
 
   return (
-    <div className="py-3 border-b border-b-white border-opacity-25">
-      <div className="w-full flex gap-3 items-center ml-3">
+    <div className="py-2 lg:py-3 border-b border-b-white border-opacity-25">
+      <div className="w-full flex gap-2 lg:gap-3 items-center ml-3">
+        <span className="md:hidden" onClick={()=>setShowChatList(true)}>X</span>
         <div className="relative">
           <Image
             src={require("@/assets/images/profile-image.png")}
-            height={48}
-            width={48}
-            className="w-12 h-12 rounded-full object-cover object-top"
+            className="w-9 h-9 lg:w-12 lg:h-12 rounded-full object-cover object-top"
             alt="profileImage"
           />
           {watcher_count && watcher_count >= 2 && (
@@ -59,7 +58,7 @@ export function CustomChannelHeader(props: ChannelHeaderProps) {
           )}
         </div>
         <div className="flex flex-col items-start">
-          <span className="header-pound font-bold text-lg w-1/2">
+          <span className="header-pound font-bold text-sm lg:text-lg break-words max-w-[130px]">
             {chatTitle.length > 22
               ? `${chatTitle?.substring(0, 22)}...`
               : chatTitle}
@@ -147,7 +146,7 @@ export const ChatBox = ({
             <Chat client={client} theme="str-chat__theme-dark">
               <Channel channel={channel}>
                 <Window>
-                  <div className="">
+                  <div>
                     <div
                       className="w-5 cursor-pointer absolute top-2 right-1 z-10 font-semibold"
                       onClick={() => setShowMessageBox(false)}

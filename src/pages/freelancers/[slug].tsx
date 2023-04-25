@@ -27,7 +27,7 @@ import { GrCertificate } from 'react-icons/gr'
 import { AiOutlineUser } from 'react-icons/ai'
 import { MdOutlineWatchLater } from 'react-icons/md'
 import { ImStack } from 'react-icons/im'
-import styles from '@/styles/freelancers.module.css'
+import styles from '@/styles/modules/freelancers.module.css'
 import fiverrIcon from "@/assets/images/fiverr.png"
 import ImbueIcon from "@/assets/svgs/loader.svg"
 import { authenticate } from "@/pages/api/info/user";

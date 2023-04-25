@@ -13,7 +13,7 @@ import { useRouter } from "next/router";
 import ChatPopup from "@/components/ChatPopup";
 import { BriefInsights } from "@/components/Briefs/BriefInsights";
 import { Brief } from "@/model";
-import styles from '../../../../styles/brief-applications.module.css'
+import styles from '@/styles/modules/brief-applications.module.css'
 import { ApplicationContainer } from "@/components/Briefs/ApplicationContainer";
 
 const BriefApplications = () => {

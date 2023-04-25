@@ -14,7 +14,7 @@ function Navbar() {
   };
   return (
     <>
-      <header className="padded" id="header-wrapper">
+      <header className="py-[15px] lg:py-[30px]" id="header-wrapper">
         <div id="main-header">
           <h1 className="main-title">
             <Link href="/">

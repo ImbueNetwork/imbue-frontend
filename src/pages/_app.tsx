@@ -10,6 +10,7 @@ import "@/styles/new-freelancer.css";
 import "@/styles/brief-details.css";
 import "@/styles/submit-proposal.css";
 import "@/styles/muiGlobal.css"
+import "@/styles/stream-chat.css"
 
 export default function App({ Component, pageProps }: AppProps) {
   return (

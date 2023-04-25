@@ -385,7 +385,7 @@ div#layout {
 
 @media screen and (max-width: 500px) {
   .padded {
-    padding: calc(var(--hq-layout-padding) / 2) 0;
+    padding: calc(var(--hq-layout-padding) / 2);
   }
   
   .primary-btn {
