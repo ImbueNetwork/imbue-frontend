@@ -58,7 +58,7 @@ export function CustomChannelHeader(props: any) {
           )}
         </div>
         <div className="flex flex-col items-start">
-          <span className="header-pound font-bold text-sm lg:text-lg break-words max-w-[130px]">
+          <span className="header-pound font-bold text-sm lg:text-lg break-words max-w-[130px] lg:max-w-full">
             {chatTitle.length > 22
               ? `${chatTitle?.substring(0, 22)}...`
               : chatTitle}
@@ -124,7 +124,7 @@ export const ChatBox = ({
         const client = await getStreamChat();
 
         if (client) {
-          const currentChannel = `${targetUser.display_name} ${targetUser.username}`;
+          const currentChannel = `${targetUser.display_name} <> ${user.display_name}`;
 
           client.connectUser(
             {

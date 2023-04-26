@@ -73,6 +73,11 @@
 	border-radius: 10px;
 }
 
+.chatList{
+	-webkit-overflow-scrolling: touch;
+	overflow: scroll;
+}
+
 .str-chat ::-webkit-scrollbar-thumb,
 .chat__list ::-webkit-scrollbar-thumb {
 	background: #505050;
@@ -159,5 +164,9 @@
 
 	.str-chat__message-inner{
 		margin-right: 0 !important;
+	}
+
+	.str-chat__channel-list .str-chat__channel-list-messenger{
+		height: 66vh !important;
 	}
 }

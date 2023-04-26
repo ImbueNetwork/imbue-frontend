@@ -10,7 +10,7 @@ import ChainService from "@/redux/services/chainService";
 import { getCurrentUser } from "@/utils";
 import { changeBriefApplicationStatus } from "@/redux/services/briefService";
 import Image from "next/image";
-import styles from "../styles/hire-modal.module.css";
+import styles from "../styles/modules/hire-modal.module.css";
 import { useRouter } from "next/router";
 import { WalletAccount } from "@talismn/connect-wallets";
 import AccountChoice from "./AccountChoice";

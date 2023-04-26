@@ -130,17 +130,19 @@ function ChatBox({ client, filters }: { client: StreamChat; filters: object }) {
   const [channels, setChannels] = useState<any>([]);
   const [channel, setChannel] = useState<any>();
 
-  console.log(showChatList);
-
   function CustomListContainer() {
+    const { channel:channelContext, setActiveChannel } = useChatContext();
 
     const getUserName = (index: string) => {
       const array: any = Object.values(channels[index]?.state?.members)
-      const fullUsername = array[0].user.name
       let username = "Not Found"
-      if (fullUsername) {
-        username = fullUsername.length > 22 ? `${fullUsername?.substring(0, 22)}...` : fullUsername
-      }
+
+      array.forEach(function (key:any) {
+        if (array.length === 2 && key.user_id !== client.userID){ 
+          username = key.user_id.length > 22 ? `${key.user_id?.substring(0, 22)}...` : key.user_id
+        }
+      })
+
       return username
     }
 
@@ -153,32 +155,35 @@ function ChatBox({ client, filters }: { client: StreamChat; filters: object }) {
     }
 
     return channels.length ? (
-      <div className=''>
+      <div className='str-chat__channel-list-messenger str-chat__channel-list-messenger-react'>
+      <div className='str-chat__channel-list-messenger__main str-chat__channel-list-messenger-react__main'>
         {channels.map((mych: any, index: string) => (
           <button
             key={mych.cid}
             onClick={() => {
               setChannel(mych);
+              setActiveChannel(mych)
               setShowChatList(false);
             }}
-            className="str-chat__channel-preview-messenger str-chat__channel-preview">
+            className={`str-chat__channel-preview-messenger str-chat__channel-preview ${!mobileView && (mych.cid === channelContext?.cid) && "str-chat__channel-preview-messenger--active"}`}>
             <div className="str-chat__channel-preview-messenger--left">
               <div className="str-chat__avatar str-chat__avatar--circle str-chat__message-sender-avatar">
                 <Image
-                  height={30}
-                  width={30}
+                  height={mobileView ? 30: 40}
+                  width={mobileView ? 30: 40}
                   src={mych.data.image || require('@/assets/images/profile-image.png')}
                   alt=""
-                  className='rounded-full object-cover'
+                  className='h-[30px] max-w-[30px] lg:h-[40px] lg:max-w-[40px] rounded-full object-cover'
                 />
               </div>
             </div>
             <div className="text-white flex flex-col">
-              <span className='text-[14px]'>{getUserName(index)}</span>
+              <span className='text-[14px] lg:text-[16px] font-bold'>{getUserName(index)}</span>
               <span className='str-chat__channel-preview-messenger--last-message'>{getLastMessage(index)}</span>
             </div>
           </button>
         ))}
+      </div>
       </div>
     ) : (
       <></>
@@ -213,7 +218,8 @@ function ChatBox({ client, filters }: { client: StreamChat; filters: object }) {
         ) : (
           <div className="flex h-full">
             <div className="chat-list-container border-r border-r-white">
-              <ChannelList filters={filters} showChannelSearch={true} />
+              <ChannelList renderChannels={renderChannels} List={CustomListContainer} filters={filters} showChannelSearch={true} />
+              {/* <ChannelList filters={filters} showChannelSearch={true} /> */}
             </div>
             <Channel>
               <Window>
