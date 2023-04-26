@@ -5,6 +5,7 @@ import { callSearchBriefs, getAllBriefs } from "@/redux/services/briefService";
 import { BriefFilterOption } from "@/types/briefTypes";
 import { useRouter } from "next/router";
 import { FiFilter } from "react-icons/fi";
+import { useWindowSize } from "@/hooks";
 
 export const strToIntRange = (strList: any) => {
   return Array.isArray(strList)
@@ -16,7 +17,7 @@ const Briefs = (): JSX.Element => {
   const [briefs, setBriefs] = useState<Brief[]>([]);
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const router = useRouter();
-  // default is max
+  const size = useWindowSize();
 
   const {
     expRange,
@@ -351,9 +352,11 @@ const Briefs = (): JSX.Element => {
       h-full
       max-width-750px:overflow-y-scroll
       `}
-        style={{ display: filterVisble ? "block" : "none" }}
+        style={{
+          display:
+            size?.width <= 750 ? (filterVisble ? "block" : "none") : "block",
+        }}
       >
-        {/* max-width-750px:${filterVisble ? "block" : "hidden"} */}
         <div className="filter-heading">Filter By</div>
         <BriefFilter
           label={expfilter.label}
