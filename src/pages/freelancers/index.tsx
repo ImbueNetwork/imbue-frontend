@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Freelancer, FreelancerSqlFilter, Item } from "../../model";
-import styles from "../../styles/freelancers.module.css";
+import * as utils from "../../utils";
+import styles from '@/styles/modules/freelancers.module.css'
 import {
   callSearchFreelancers,
   getAllFreelancers,

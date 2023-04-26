@@ -1,6 +1,6 @@
 import React from "react";
 import { FreelancerFilterOption, FilterOption } from "../../types/freelancerTypes";
-import styles from "../../styles/freelancers.module.css"
+import styles from "@/styles/modules/freelancers.module.css"
 
 type FreelancerFilterProps = {
     label: string;

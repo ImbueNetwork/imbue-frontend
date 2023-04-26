@@ -36,11 +36,15 @@ export const validProjectId = (candidate: any) => {
 };
 
 export const getCurrentUser = async () => {
-  const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}info/user`));
-  if (resp.ok) {
-    return resp.json();
-  }
+  try {
+    const resp = await fetch(
+      checkEnvironment().concat(`${config.apiBase}info/user`));
+    if (resp.ok) {
+      return resp.json();
+    }
+  } catch (error) {
+    console.log(error);
+  }  
   return null;
 };
 

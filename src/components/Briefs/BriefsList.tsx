@@ -2,18 +2,16 @@ import React from "react";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import { useRouter } from "next/router";
-TimeAgo.addDefaultLocale(en);
+TimeAgo.addLocale(en);
 
 const timeAgo = new TimeAgo("en-US");
 
 export const BriefLists = ({
   briefs = [],
-  setBriefId,
   showNewBriefButton,
   areAcceptedBriefs,
 }: {
   briefs: any[];
-  setBriefId: Function;
   showNewBriefButton?: boolean;
   areAcceptedBriefs?: boolean;
 }) => {
@@ -22,6 +20,15 @@ export const BriefLists = ({
   const redirectToNewBrief = () => {
     router.push("/briefs/new");
   };
+
+  const handleItemClick = (brief:any) =>{
+    if(brief.number_of_applications && !brief.project_id ){
+      router.query.briefId = brief.id
+      router.push(router, undefined, {shallow: true})
+    }
+
+  areAcceptedBriefs && router.push(`/projects/${brief?.project_id}`);
+  }
 
   if (briefs?.length === 0 && showNewBriefButton)
     return (
@@ -46,13 +53,7 @@ export const BriefLists = ({
       {briefs?.map((brief, index) => (
         <div
           key={index}
-          onClick={() => {
-            brief.number_of_applications &&
-              !brief.project_id &&
-              setBriefId(brief.id);
-
-            areAcceptedBriefs && router.push(`/projects/${brief?.project_id}`);
-          }}
+          onClick={() => handleItemClick(brief)}
           className={`flex cursor-pointer hover:bg-secondary-dark-hover px-5 py-3 lg:px-[2.5rem] lg:py-[2rem] justify-between border-b border-b-light-white last:border-b-0`}
         >
           <div className="flex flex-col gap-1 lg:gap-3">

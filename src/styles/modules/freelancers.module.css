@@ -180,27 +180,27 @@
   margin-left: 8px;
 }
 
-.freelancerProfileSection {
-  padding: 32px 60px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  background: var(--theme-grey-dark);
-  border-radius: 0.75rem;
-  border: 1px solid var(--theme-light-white);
+
+.freelancerProfileSection{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: var(--theme-grey-dark);
+    border-radius: .75rem;
+    border: 1px solid var(--theme-light-white)
 }
 
 .whiteIcon path {
   stroke: white;
 }
 
-@media (max-width: 800px) {
-  .freelancers {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  .freelancer {
-    width: 100%;
-  }
+@media (max-width: 500px) {
+    .freelancers {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .freelancer {
+        width: 100%;
+    }
 }
