@@ -262,9 +262,9 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
         // TODO: minimum required length for description
         return false;
       }
-      if (step === 4 && !languages.length) {
-        return false;
-      }
+      // if (step === 4 && !languages.length) {
+      //   return false;
+      // }
       if (step === 5 && !skills.length) {
         return false;
       }

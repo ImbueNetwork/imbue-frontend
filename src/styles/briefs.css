@@ -169,3 +169,15 @@ input::placeholder {
 .proposals-count {
   color: var(--theme-primary);
 }
+
+@media (max-width: 750px) {
+  .briefs-heading {
+    margin: 15px;
+  }
+  .brief-item {
+    padding: 15px;
+  }
+  .brief-tags {
+    flex-wrap: wrap;
+  }
+}

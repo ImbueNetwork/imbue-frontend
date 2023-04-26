@@ -16,8 +16,8 @@ const BioPanel = ({ brief, projectCategories }: BioPanelData) => {
   const timePosted = timeAgo.format(new Date(brief.created));
 
   return (
-    <div className="brief-bio py-5 px-10">
-      <div className="subsection">
+    <div className="brief-bio py-5 px-10 max-width-750px:!p-5 max-width-750px:!w-full max-width-1100px:p-[1rem]">
+      <div className="subsection max-width-750px:!my-0">
         <div className="header">
           <h2>{brief.headline}</h2>
         </div>

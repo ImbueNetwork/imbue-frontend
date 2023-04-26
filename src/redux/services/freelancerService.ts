@@ -13,16 +13,6 @@ export async function createFreelancingProfile(freelancer: any) {
         body: JSON.stringify({ freelancer }),
       }
     );
-  
-    if (resp.ok) {
-      // could be 200 or 201
-      // Freelancer API successfully invoked
-      console.log("Freelancer created successfully via Freelancer REST API");
-    } else {
-      new Error(
-        "Failed to create freelancer profile. status:" + resp.status
-      );
-    }
   } catch (error) {
     console.log(error);
   }
@@ -87,12 +77,9 @@ export async function updateFreelancer(freelancer: Freelancer) {
   );
 
   if (resp.ok) {
-    console.log("Freelancer updated successfully.");
     return (await resp.json()) as Freelancer;
   } else {
-    console.log(new Error(
-      "Failed to update freelancer profile. status:" + resp.status
-    ))
+    console.log("Failed to update freelancer profile. status:" + resp.status)
   }
 }
 

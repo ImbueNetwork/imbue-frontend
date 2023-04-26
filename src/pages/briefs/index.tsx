@@ -1,23 +1,34 @@
-import { redirect } from "@/utils";
 import React, { useEffect, useState } from "react";
 import BriefFilter from "@/components/BriefFilter";
 import { Brief, BriefSqlFilter } from "@/model";
 import { callSearchBriefs, getAllBriefs } from "@/redux/services/briefService";
 import { BriefFilterOption } from "@/types/briefTypes";
 import { useRouter } from "next/router";
+import { FiFilter } from "react-icons/fi";
+import { useWindowSize } from "@/hooks";
 
 export const strToIntRange = (strList: any) => {
   return Array.isArray(strList)
-    ? strList[0].split(',').map((v: any) => Number(v))
-    : strList?.split(',').map((v: any) => Number(v))
-}
+    ? strList[0].split(",").map((v: any) => Number(v))
+    : strList?.split(",").map((v: any) => Number(v));
+};
 
 const Briefs = (): JSX.Element => {
   const [briefs, setBriefs] = useState<Brief[]>([]);
-  const router = useRouter()
-  // default is max
+  const [filterVisble, setFilterVisible] = useState<boolean>(false);
+  const router = useRouter();
+  const size = useWindowSize();
 
-  const { expRange, submitRange, submitted_is_max, lengthRange, length_is_max, hpw_max, hpw_is_max, heading } = router.query
+  const {
+    expRange,
+    submitRange,
+    submitted_is_max,
+    lengthRange,
+    length_is_max,
+    hpw_max,
+    hpw_is_max,
+    heading,
+  } = router.query;
 
   // The thing with this implentation is that the interior order must stay totally ordered.
   // The interior index is used to specify which entry will be used in the search brief.
@@ -130,6 +141,7 @@ const Briefs = (): JSX.Element => {
       },
     ],
   };
+
   const hoursPwFilter = {
     filterType: BriefFilterOption.HoursPerWeek,
     label: "Hours Per Week",
@@ -151,14 +163,11 @@ const Briefs = (): JSX.Element => {
     ],
   };
 
-
-
   useEffect(() => {
     const fetchAndSetBriefs = async () => {
       if (!Object.keys(router?.query).length) {
-        setBriefs(await getAllBriefs())
-      }
-      else {
+        setBriefs(await getAllBriefs());
+      } else {
         let filter: BriefSqlFilter = {
           experience_range: [],
           submitted_range: [],
@@ -171,33 +180,47 @@ const Briefs = (): JSX.Element => {
         if (expRange) {
           const range = strToIntRange(expRange);
           range.forEach((v: any) => {
-            const checkbox = document.getElementById(`0-${v - 1}`) as HTMLInputElement
-            if (checkbox) checkbox.checked = true
+            const checkbox = document.getElementById(
+              `0-${v - 1}`
+            ) as HTMLInputElement;
+            if (checkbox) checkbox.checked = true;
           });
-          filter = { ...filter, experience_range: strToIntRange(expRange) }
+          filter = { ...filter, experience_range: strToIntRange(expRange) };
         }
         if (submitRange) {
           const range = strToIntRange(submitRange);
           range.forEach((v: any) => {
-            if (v > 0 && v < 5) (document.getElementById(`1-${0}`) as HTMLInputElement).checked = true
-            if (v >= 5 && v < 10) (document.getElementById(`1-${1}`) as HTMLInputElement).checked = true
-            if (v >= 10 && v < 15) (document.getElementById(`1-${2}`) as HTMLInputElement).checked = true
-            if (v > 15) (document.getElementById(`1-${3}`) as HTMLInputElement).checked = true
+            if (v > 0 && v < 5)
+              (document.getElementById(`1-${0}`) as HTMLInputElement).checked =
+                true;
+            if (v >= 5 && v < 10)
+              (document.getElementById(`1-${1}`) as HTMLInputElement).checked =
+                true;
+            if (v >= 10 && v < 15)
+              (document.getElementById(`1-${2}`) as HTMLInputElement).checked =
+                true;
+            if (v > 15)
+              (document.getElementById(`1-${3}`) as HTMLInputElement).checked =
+                true;
           });
-          filter = { ...filter, submitted_range: strToIntRange(submitRange) }
+          filter = { ...filter, submitted_range: strToIntRange(submitRange) };
         }
         if (heading) {
           filter = { ...filter, search_input: heading };
-          const input = document.getElementById("search-input") as HTMLInputElement
-          if (input) input.value = heading.toString()
+          const input = document.getElementById(
+            "search-input"
+          ) as HTMLInputElement;
+          if (input) input.value = heading.toString();
         }
         if (lengthRange) {
           const range = strToIntRange(lengthRange);
           range.forEach((v: any) => {
-            const checkbox = document.getElementById(`2-${v - 1}`) as HTMLInputElement
-            if (checkbox) checkbox.checked = true
+            const checkbox = document.getElementById(
+              `2-${v - 1}`
+            ) as HTMLInputElement;
+            if (checkbox) checkbox.checked = true;
           });
-          filter = { ...filter, length_range: strToIntRange(lengthRange) }
+          filter = { ...filter, length_range: strToIntRange(lengthRange) };
         }
         const result = await callSearchBriefs(filter);
         setBriefs(result);
@@ -260,28 +283,36 @@ const Briefs = (): JSX.Element => {
               length_range = [...length_range, ...o2.search_for.slice()];
               length_is_max = o2.or_max;
 
-              if (o2.search_for[0] === 12) length_range_prop = [...length_range_prop, 4]
-              else if (o2.search_for[0] === 60) length_range_prop = [...length_range_prop, 5]
-              else length_range_prop = length_range
+              if (o2.search_for[0] === 12)
+                length_range_prop = [...length_range_prop, 4];
+              else if (o2.search_for[0] === 60)
+                length_range_prop = [...length_range_prop, 5];
+              else length_range_prop = length_range;
 
               break;
 
             default:
               console.log(
                 "Invalid filter option selected or unimplemented. type:" +
-                filterType
+                  filterType
               );
           }
         }
       }
     }
 
-    router.query.heading = search_value !== "" ? search_value : []
-    router.query.expRange = exp_range.length ? exp_range.toString() : []
-    router.query.submitRange = submitted_range.length ? submitted_range.toString() : []
-    router.query.submitted_is_max = submitted_is_max ? submitted_is_max.toString() : []
-    router.query.lengthRange = length_range_prop.length ? length_range_prop.toString() : []
-    router.push(router, undefined, { shallow: true })
+    router.query.heading = search_value !== "" ? search_value : [];
+    router.query.expRange = exp_range.length ? exp_range.toString() : [];
+    router.query.submitRange = submitted_range.length
+      ? submitted_range.toString()
+      : [];
+    router.query.submitted_is_max = submitted_is_max
+      ? submitted_is_max.toString()
+      : [];
+    router.query.lengthRange = length_range_prop.length
+      ? length_range_prop.toString()
+      : [];
+    router.push(router, undefined, { shallow: true });
 
     if (is_search) {
       const filter: BriefSqlFilter = {
@@ -301,11 +332,31 @@ const Briefs = (): JSX.Element => {
     }
   };
 
-  const onSavedBriefs = () => { };
+  const onSavedBriefs = () => {};
+
+  const toggleFilter = () => {
+    setFilterVisible(!filterVisble);
+  };
 
   return (
-    <div className="search-briefs-container">
-      <div className="filter-panel">
+    <div className="search-briefs-container max-width-750px:!block max-width-750px:!m-0 ">
+      <div
+        className={`filter-panel 
+      max-width-750px:fixed 
+      max-width-750px:w-full 
+      max-width-750px:top-0 
+      max-width-750px:bg-black 
+      max-width-750px:z-10
+      max-width-750px:px-[20px]
+      max-width-750px:pt-[20px]
+      h-full
+      max-width-750px:overflow-y-scroll
+      `}
+        style={{
+          display:
+            size?.width <= 750 ? (filterVisble ? "block" : "none") : "block",
+        }}
+      >
         <div className="filter-heading">Filter By</div>
         <BriefFilter
           label={expfilter.label}
@@ -322,8 +373,27 @@ const Briefs = (): JSX.Element => {
           filter_type={BriefFilterOption.Length}
           filter_options={lengthFilters.options}
         ></BriefFilter>
+        <div className="tab-section mb-10 min-width-500px:!hidden">
+          <button
+            onClick={() => {
+              onSearch();
+              toggleFilter();
+            }}
+            className="rounded-full text-black bg-white px-10 py-2"
+          >
+            Search
+          </button>
+          <button
+            onClick={() => {
+              setFilterVisible(false);
+            }}
+            className="rounded-full text-black bg-white px-10 py-2 ml-5"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
-      <div className="briefs-section">
+      <div className="briefs-section  max-width-750px:overflow-hidden">
         <div className="briefs-heading">
           <div className="tab-section">
             <div className="tab-item" onClick={onSearch}>
@@ -331,6 +401,12 @@ const Briefs = (): JSX.Element => {
             </div>
             <div className="tab-item" onClick={onSavedBriefs}>
               Saved Briefs
+            </div>
+            <div
+              className={`tab-item text-right min-width-750px:hidden`}
+              onClick={toggleFilter}
+            >
+              <FiFilter color="#fff" />
             </div>
           </div>
           <input
