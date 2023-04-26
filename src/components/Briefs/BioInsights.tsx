@@ -29,18 +29,35 @@ const BioInsights = ({
   targetUser,
 }: BioInsightsProps) => {
   return (
-    <div className="brief-insights px-10 py-5">
-      <div className="subsection">
+    <div
+      className="brief-insights 
+    px-10 py-5 
+    max-width-750px:!w-full 
+    max-width-750px:!p-5 
+    max-width-750px:mt-10
+    max-width-1800px:p-[1rem]
+    "
+    >
+      <div className="subsection max-width-750px:!my-0">
         <div className="header">
           <h3>Activities on this job</h3>
-          <div className="flex gap-3 items-center mt-4">
+          <div className="flex gap-3 items-center mt-4 max-width-1100px:flex-col max-width-750px:flex-row">
             <button
-              className="primary-btn in-dark w-[auto] flex items-center gap-2"
+              className="primary-btn 
+              in-dark w-[auto] 
+              max-width-750px:!px-4 
+              flex 
+              items-center 
+              gap-2
+              max-width-1100px:w-full
+              "
               onClick={() => redirectToApply()}
             >
               Submit a Proposal <FaRegShareSquare />
             </button>
-            <button className="primary-btn primary-btn-outlined">Save</button>
+            <button className="primary-btn primary-btn-outlined max-width-1100px:w-full max-width-500px:w-auto">
+              Save
+            </button>
           </div>
         </div>
       </div>
@@ -88,7 +105,7 @@ const BioInsights = ({
       <h3>About Client</h3>
 
       <div className="subsection pb-2">
-        <div className="brief-insights-stat flex gap-2 justify-start">
+        <div className="brief-insights-stat flex gap-2 justify-start max-width-1800px:flex-wrap">
           <VerifiedIcon className="secondary-icon" />
           <span className="font-bold">Payment method verified</span>
           <div>
@@ -163,8 +180,6 @@ const BioInsights = ({
           />
         )}
       </div>
-
-
     </div>
   );
 };

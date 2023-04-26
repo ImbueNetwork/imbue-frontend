@@ -19,18 +19,21 @@ module.exports = {
 
       colors: {
         "theme-grey-dark": "#2c2c2c",
-        "theme-secondary" : "#411dc9",
-        "secondary-dark-hover" : "#121c7f",
+        "theme-secondary": "#411dc9",
+        "secondary-dark-hover": "#121c7f",
         "light-white": "rgba(255, 255, 255, 0.25)",
         "light-grey": "rgba(235, 234, 226, 0.5)",
         primary: "#b2ff0b",
       },
       screens: {
+        "max-width-1800px": { raw: "(max-width: 1800px)" },
         "max-width-1100px": { raw: "(max-width: 1100px)" },
         "max-width-868px": { raw: "(max-width: 868px)" },
         "max-width-750px": { raw: "(max-width: 750px)" },
         "max-width-500px": { raw: "(max-width: 500px)" },
         "min-width-1280px": { raw: "(min-width: 1280px)" },
+        "min-width-750px": { raw: "(min-width: 750px)" },
+        "min-width-500px": { raw: "(min-width: 500px)" },
       },
     },
   },
