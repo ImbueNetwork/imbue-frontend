@@ -1,16 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
-import { Freelancer, User } from "@/model";
-import { StreamChat } from "stream-chat";
+import { User } from "@/model";
 import {
   Chat,
   Channel,
-  ChannelHeader,
   MessageInput,
   MessageList,
   Thread,
   Window,
-  ChannelHeaderProps,
   useChatContext,
   useChannelStateContext,
 } from "stream-chat-react";
@@ -18,6 +15,7 @@ import "stream-chat-react/dist/css/v2/index.css";
 import { getStreamChat } from "../utils";
 import { Skeleton } from "@mui/material";
 import Image from "next/image";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export type ChatProps = {
   user: User;
@@ -27,17 +25,11 @@ export type ChatProps = {
 };
 
 export function CustomChannelHeader(props: any) {
-  const { title,setShowChatList } = props;
-  const {
-    channel,
-    members = {},
-    watcher_count,
-    watchers,
-  } = useChannelStateContext();
-  const { client, setActiveChannel } = useChatContext();
-  let chatTitle = "Not Found";
-
+  const { closeChat } = props;
+  const {members = {},watcher_count} = useChannelStateContext();
+  const { client } = useChatContext();
   const membersCount = Object.keys(members).length;
+  let chatTitle = "Not Found";
 
   Object.keys(members).forEach(function (key, index) {
     if (membersCount === 2 && key !== client.userID) chatTitle = key;
@@ -46,7 +38,7 @@ export function CustomChannelHeader(props: any) {
   return (
     <div className="py-2 lg:py-3 border-b border-b-white border-opacity-25">
       <div className="w-full flex gap-2 lg:gap-3 items-center ml-3">
-        <span className="md:hidden" onClick={()=>setShowChatList(true)}>X</span>
+        <span className="md:hidden" onClick={closeChat}><ArrowBackIcon /></span>
         <div className="relative">
           <Image
             src={require("@/assets/images/profile-image.png")}
@@ -58,7 +50,7 @@ export function CustomChannelHeader(props: any) {
           )}
         </div>
         <div className="flex flex-col items-start">
-          <span className="header-pound font-bold text-sm lg:text-lg break-words max-w-[130px] lg:max-w-full">
+          <span className="header-pound font-bold text-sm lg:text-lg break-words max-w-[130px] md:max-w-full">
             {chatTitle.length > 22
               ? `${chatTitle?.substring(0, 22)}...`
               : chatTitle}

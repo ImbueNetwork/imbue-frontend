@@ -15,31 +15,24 @@ export const ApplicationContainer = ({
   handleMessageBoxClick,
 }: ApplicationContainerProps) => {
   return (
-    <div className="flex flex-row px-[60px] py-[35px] gap-[50px] border-b-[none]">
-      <Image
-        src={require("@/assets/images/profile-image.png")}
-        className="h-[45px] w-[45px] object-cover"
-        alt={"profile-picture"}
-        height={45}
-        width={45}
-      />
-      <div className="flex flex-col gap-[10px] grow">
-        <div className="flex flex-row items-center">
-          <div className="user-id text-primary">
+    <div className="flex flex-col p-[20px] lg:px-[60px] lg:py-[35px] border-b border-b-light-white last:border-b-0">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-5">
+          <Image
+            src={require("@/assets/images/profile-image.png")}
+            className="h-[45px] w-[45px] lg:h-[60px] lg:w-[60px]  object-cover"
+            alt={"profile-picture"}
+            height={45}
+            width={45}
+          />
+
+          <div className="user-id text-primary text-[10px] lg:text-base max-w-[100px] lg:max-w-full break-words">
             @{application?.freelancer?.username}
           </div>
-          {/* <div className="country">
-                        <div className="country-flag">
-                            <ReactCountryFlag countryCode="us" />
-                        </div>
-                        <div className="country-name text-grey">
-                            United States
-                        </div>
-                    </div> */}
-
-          <div className="ctas-container ml-auto">
-            {/* TODO: Like/unlike feature. On hold */}
-            {/* <div className="cta-votes">
+        </div>
+        <div className="ctas-container flex flex-col lg:flex-row gap-2">
+          {/* TODO: Like/unlike feature. On hold */}
+          {/* <div className="cta-votes">
                                             <div className="cta-vote">
                                                 <FaRegThumbsUp />
                                                 Yes
@@ -49,24 +42,39 @@ export const ApplicationContainer = ({
                                                 No
                                             </div>
                                         </div> */}
-            <button
-              className="primary-btn in-dark w-button"
-              onClick={() => redirectToApplication(application?.id)}
-            >
-              View proposal
-            </button>
-            <button
-              onClick={() =>
-                handleMessageBoxClick(
-                  application?.user_id,
-                  application?.freelancer
-                )
-              }
-              className="secondary-btn in-dark w-button"
-            >
-              Message
-            </button>
-          </div>
+          <button
+            className="primary-btn in-dark w-button"
+            onClick={() => redirectToApplication(application?.id)}
+          >
+            View proposal
+          </button>
+          <button
+            onClick={() =>
+              handleMessageBoxClick(
+                application?.user_id,
+                application?.freelancer
+              )
+            }
+            className="secondary-btn in-dark w-button"
+          >
+            Message
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-[10px] grow">
+        <div className="flex flex-row items-center">
+
+          {/* <div className="country">
+                        <div className="country-flag">
+                            <ReactCountryFlag countryCode="us" />
+                        </div>
+                        <div className="country-name text-grey">
+                            United States
+                        </div>
+                    </div> */}
+
+
         </div>
 
         <div className="flex flex-row items-center justify-between">
@@ -90,20 +98,20 @@ export const ApplicationContainer = ({
           </div>
         </div>
 
-        <div className="flex-row flex justify-between">
+        <div className="flex items-center lg:items-start lg:justify-between">
           <div className="text-base">
             <h3 className="text-base">Attachment(s)</h3>
-            <div className="flex p-3 gap-2">
+            <div className="flex py-3 gap-2">
               {/* TODO: Implement */}
-              <FaPaperclip />
-              <div className="text-[#ffffff80] text-[16px]">
+              <FaPaperclip color="#b2ff0b"/>
+              <div className="text-[#ffffff80] w-4/5 lg:w-full text-xs lg:text-[16px] break-words">
                 https://www.behance.net/abbioty
               </div>
             </div>
           </div>
           <div>
             <div className="flex gap-2 flex-col items-center">
-              <span className="font-bold text-primary">
+              <span className="font-bold text-primary text-xs lg:text-base">
                 Milestones ({application?.milestones?.length})
               </span>
               <div className="text-[#ffffff80] text-[16px]">

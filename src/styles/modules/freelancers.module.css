@@ -182,7 +182,6 @@
 
 
 .freelancerProfileSection{
-    padding: 32px 60px;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -195,7 +194,7 @@
     stroke: white;
   }
 
-@media (max-width: 800px) {
+@media (max-width: 500px) {
     .freelancers {
         display: flex;
         flex-direction: column;
