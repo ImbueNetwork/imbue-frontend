@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import db from "../../db";
-import next from "next";
 import {
   Brief,
   fetchBrief,
@@ -30,7 +29,7 @@ export default async function handler(
           return new Error("Brief does not exist.");
         }
         let briefOwner = (await fetchUser(brief.user_id)(tx)) as User;
-        verifyUserIdFromJwt(req, res, next, briefOwner?.id);
+        verifyUserIdFromJwt(req, res, briefOwner?.id);
         let project = await fetchProject(projectId)(tx);
         if (!project) {
           return new Error("Project does not exist.");
