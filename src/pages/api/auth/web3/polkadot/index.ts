@@ -37,7 +37,7 @@ export default nextConnect()
         }
         const loggedInUser = req.body.logged_in_user;
         if (loggedInUser) {
-          verifyUserIdFromJwt(req, res, next, loggedInUser.id);
+          verifyUserIdFromJwt(req, res, loggedInUser.id);
           db.transaction(async tx => {
             const [web3Account, isInsert] = await models.updateOrInsertUserWeb3Address(
               loggedInUser, address, account.type, solution.challenge

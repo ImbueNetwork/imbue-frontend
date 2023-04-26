@@ -8,7 +8,6 @@ import {
   upsertItems,
 } from "../models";
 import { verifyUserIdFromJwt } from "../auth/common";
-import next from "next";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const { body, method } = req;
@@ -31,7 +30,7 @@ const createFreelancer = (
   req: NextApiRequest,
   freelancer: Freelancer
 ) => {
-  verifyUserIdFromJwt(req, res, next, freelancer.user_id);
+  verifyUserIdFromJwt(req, res, freelancer.user_id);
   db.transaction(async (tx) => {
     try {
       const skill_ids = await upsertItems(freelancer.skills, "skills")(tx);

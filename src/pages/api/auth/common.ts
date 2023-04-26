@@ -24,7 +24,7 @@ export const ensureParams = (
 }
 
 
-export function verifyUserIdFromJwt(req: any, res: any, next: any, user_id: number) {
+export function verifyUserIdFromJwt(req: any, res: any, user_id: number) {
     const token = getTokenCookie(req);
     if (!token) {
       return res.status(401).send("You are not authorized to access this resource.");
