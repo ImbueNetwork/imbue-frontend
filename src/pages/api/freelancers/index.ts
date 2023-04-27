@@ -74,7 +74,6 @@ const createFreelancer = (
 const getAllFreelancers = (res: NextApiResponse) => {
   db.transaction(async (tx) => {
     try {
-      console.log("object");
       await fetchAllFreelancers()(tx).then(async (freelancers: any) => {
         await Promise.all([
           ...freelancers.map(async (freelancer: any) => {

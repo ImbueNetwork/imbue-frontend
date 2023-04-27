@@ -1,5 +1,4 @@
 .search-briefs-container {
-  margin: 0 72px;
   display: flex;
   flex-direction: row;
 }
@@ -170,14 +169,20 @@ input::placeholder {
   color: var(--theme-primary);
 }
 
-@media (max-width: 750px) {
+@media (max-width: 500px) {
   .briefs-heading {
-    margin: 15px;
+    margin: 25px 15px;
   }
+
   .brief-item {
     padding: 15px;
   }
+
   .brief-tags {
     flex-wrap: wrap;
+  }
+
+  .search-input {
+    width: 100%;
   }
 }

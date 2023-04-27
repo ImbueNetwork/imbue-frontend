@@ -339,7 +339,7 @@ const Briefs = (): JSX.Element => {
   };
 
   return (
-    <div className="search-briefs-container max-width-750px:!block max-width-750px:!m-0 ">
+    <div className="search-briefs-container px-[15px] lg:px-[40px]">
       <div
         className={`filter-panel 
       max-width-750px:fixed 

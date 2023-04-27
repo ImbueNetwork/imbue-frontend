@@ -4,7 +4,7 @@ import styles from "@/styles/modules/freelancers.module.css"
 
 type FreelancerFilterProps = {
     label: string;
-    filter_options: Array<FilterOption>;
+    filter_options: Array<FilterOption> | undefined;
     filter_type: FreelancerFilterOption;
 };
 

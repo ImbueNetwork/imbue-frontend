@@ -29,6 +29,7 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
     };
       setup();
   }, [visible]);
+  
 
   const linkItems = [
     {
@@ -74,6 +75,7 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
     } else {
       setLoginModal(true);
     }
+    toggleVisibility()
   };
 
   return (
