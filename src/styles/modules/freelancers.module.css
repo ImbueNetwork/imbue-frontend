@@ -121,15 +121,6 @@
   cursor: pointer;
 }
 
-.searchInput {
-  background: rgba(235, 234, 226, 0.11);
-  border: 0.75px solid rgba(235, 234, 226, 0.5);
-  backdrop-filter: blur(7.5px);
-  border-radius: 8px;
-  width: 75%;
-  height: 60px;
-}
-
 .freelancersContainer input {
   color: rgba(235, 234, 226);
   padding-left: 16px;

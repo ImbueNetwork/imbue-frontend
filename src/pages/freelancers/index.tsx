@@ -18,27 +18,65 @@ import { strToIntRange } from "../briefs";
 import { useWindowSize } from "@/hooks";
 import { FiFilter } from "react-icons/fi";
 
-const Freelancers = ({
-  initialSkills,
-  initialServices,
-  initialLanguages,
-  initialFreelancers,
-}: any): JSX.Element => {
-  const [freelancers, setFreelancers] =
-    useState<Freelancer[]>(initialFreelancers);
-  const [skills, setSkills] = useState<Item[]>(initialSkills);
-  const [services, setServices] = useState<Item[]>(initialServices);
-  const [languages, setLanguages] = useState<Item[]>(initialLanguages);
+const Freelancers = (): JSX.Element => {
+  const [freelancers, setFreelancers] = useState<Freelancer[] | undefined>();
+  const [skills, setSkills] = useState<Item[]>();
+  const [services, setServices] = useState<Item[]>();
+  const [languages, setLanguages] = useState<Item[]>();
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
 
   const router = useRouter();
   const size = useWindowSize();
+
   const { skillsRangeProps, servicesRangeProps, languagesRangeProps, heading } =
     router.query;
 
   const redirectToProfile = (username: any) => {
     router.push(`/freelancers/${username}/`);
   };
+
+  const dedupeArray = async (input: any) => {
+    return input
+      .filter((thing: any, i: any, arr: any) => {
+        return arr.indexOf(arr.find((t: any) => t.id === thing.id)) === i;
+      })
+      .sort(function (a: any, b: any) {
+        return a.name.localeCompare(b.name);
+      });
+  };
+
+  useEffect(() => {
+    const setFilters = async () => {
+
+      const data : Freelancer[] = await getAllFreelancers();
+
+      let combinedSkills = Array.prototype.concat.apply(
+        [],
+        data.map((x) => x.skills)
+      ) as Item[];
+      const dedupedSkills = await dedupeArray(combinedSkills);
+
+      var combinedServices = Array.prototype.concat.apply(
+        [],
+        data.map((x) => x.services)
+      ) as Item[];
+      const dedupedServices = await dedupeArray(combinedServices);
+
+      var combinedLanguages = Array.prototype.concat.apply(
+        [],
+        data.map((x) => x.languages)
+      ) as Item[];
+      const dedupedLanguages = await dedupeArray(combinedLanguages);
+
+      setSkills(dedupedSkills);
+      setServices(dedupedServices);
+      setLanguages(dedupedLanguages);
+      setFreelancers(data)
+    }
+
+    setFilters()
+  }, [])
+
 
   const skillsFilter = {
     filterType: FreelancerFilterOption.Services,
@@ -196,7 +234,7 @@ const Freelancers = ({
             default:
               console.log(
                 "Invalid filter option selected or unimplemented. type:" +
-                  filterType
+                filterType
               );
           }
         }
@@ -236,7 +274,7 @@ const Freelancers = ({
   };
 
   return (
-    <div className="mx-20 max-width-1100px:mx-0">
+    <div className="px-[15px] lg:px-[40px]">
       <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
         <div
           className={`${styles.filterPanel}
@@ -310,16 +348,16 @@ const Freelancers = ({
             </div>
             <input
               id="search-input"
-              className={styles.searchInput}
+              className={`search-input`}
               placeholder="Search"
             />
             <div className="search-result">
-              <span className="result-count">{freelancers.length}</span>
+              <span className="result-count">{freelancers?.length}</span>
               <span> freelancers found</span>
             </div>
           </div>
           <div className={`${styles.freelancers} max-width-750px:!px-0`}>
-            {freelancers
+            { freelancers?.length && freelancers
               .slice(0, 10)
               .map(({ title, username, display_name, skills }, index) => (
                 <div className={styles.freelancer} key={index}>
@@ -356,46 +394,5 @@ const Freelancers = ({
     </div>
   );
 };
-
-export async function getServerSideProps(context: any) {
-  const dedupeArray = async (input: any) => {
-    return input
-      .filter((thing: any, i: any, arr: any) => {
-        return arr.indexOf(arr.find((t: any) => t.id === thing.id)) === i;
-      })
-      .sort(function (a: any, b: any) {
-        return a.name.localeCompare(b.name);
-      });
-  };
-
-  const data = await getAllFreelancers();
-
-  let combinedSkills = Array.prototype.concat.apply(
-    [],
-    data.map((x) => x.skills)
-  ) as Item[];
-  const dedupedSkills = await dedupeArray(combinedSkills);
-
-  var combinedServices = Array.prototype.concat.apply(
-    [],
-    data.map((x) => x.services)
-  ) as Item[];
-  const dedupedServices = await dedupeArray(combinedServices);
-
-  var combinedLanguages = Array.prototype.concat.apply(
-    [],
-    data.map((x) => x.languages)
-  ) as Item[];
-  const dedupedLanguages = await dedupeArray(combinedLanguages);
-
-  return {
-    props: {
-      initialSkills: dedupedSkills,
-      initialServices: dedupedServices,
-      initialLanguages: dedupedLanguages,
-      initialFreelancers: Object.keys(context.query).length ? [] : data,
-    },
-  };
-}
 
 export default Freelancers;
