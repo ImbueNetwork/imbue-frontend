@@ -1,0 +1,197 @@
+.freelancersContainer {
+  margin: 0 72px;
+  display: flex;
+  flex-direction: row;
+}
+
+.freelancers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-column-gap: 20px;
+  grid-row-gap: 20px;
+  padding-left: 20px;
+  /* padding-right: 100px; */
+}
+
+.freelancer {
+  background: #0f0f0f;
+  border: 1px solid #2c2c2c;
+  border-radius: 0px 0px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.freelancerProfilePic {
+  width: 50%;
+  height: 80%;
+}
+
+.freelancerInfo {
+  border-top: none;
+  border-bottom: none;
+  padding: 16px 20px;
+}
+
+.freelancerImageContainer {
+  width: 100%;
+  aspect-ratio: 3/2;
+  background: rgba(0, 0, 0, 0.67);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.freelancersView {
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+}
+
+.primaryButton {
+  padding: 10px 24px;
+  -webkit-align-self: center;
+  -ms-flex-item-align: center;
+  -ms-grid-row-align: center;
+  align-self: center;
+  -webkit-transition: color 0.3s, background-color 0.3s;
+  transition: color 0.3s, background-color 0.3s;
+  color: #fff;
+  font-size: 16px;
+  font-family: Aeoniktrial, sans-serif;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: 0.6px;
+  text-align: center;
+  text-decoration: none;
+  text-transform: capitalize;
+  border-radius: 12px;
+  background-color: #411dc9;
+  cursor: pointer;
+  margin-top: auto;
+  margin-bottom: 10px;
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.skill {
+  padding: 7px 14px;
+  border: 1px solid white;
+  border-radius: 8px;
+}
+
+.freelancersContainer p {
+  font-size: 16px;
+  line-height: 1.2;
+  color: var(--theme-ink-color);
+  margin: 0;
+}
+
+.searchHeading {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin: 32px;
+}
+
+.filterHeading {
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--theme-title-color);
+  margin-bottom: 30px;
+}
+
+.tabSection {
+  display: flex;
+  flex-direction: row;
+}
+
+.tabItem {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+  width: 112px;
+  color: var(--theme-title-color);
+  cursor: pointer;
+}
+
+.freelancersContainer input {
+  color: rgba(235, 234, 226);
+  padding-left: 16px;
+  font-size: 16px;
+  line-height: 30px;
+}
+
+.freelancersContainer input::placeholder {
+  color: rgba(235, 234, 226, 0.75);
+}
+
+.filterPanel {
+  flex: 1 0 30%;
+  width: 35%;
+}
+
+.filter-heading {
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--theme-title-color);
+  margin-bottom: 30px;
+}
+
+.filterLabel {
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--theme-title-color);
+  margin-bottom: 20px;
+}
+
+.filterOptionList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 48px;
+}
+
+.filterOption {
+  font-size: 16px;
+  line-height: 1.2;
+  user-select: none;
+  cursor: pointer;
+}
+
+.filterOption > label {
+  margin-left: 8px;
+}
+
+
+.freelancerProfileSection{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: var(--theme-grey-dark);
+    border-radius: .75rem;
+    border: 1px solid var(--theme-light-white)
+}
+
+.whiteIcon path {
+  stroke: white;
+}
+
+@media (max-width: 500px) {
+    .freelancers {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .freelancer {
+        width: 100%;
+    }
+}

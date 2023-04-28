@@ -1,16 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
-import { Freelancer, User } from "@/model";
-import { StreamChat } from "stream-chat";
+import { User } from "@/model";
 import {
   Chat,
   Channel,
-  ChannelHeader,
   MessageInput,
   MessageList,
   Thread,
   Window,
-  ChannelHeaderProps,
   useChatContext,
   useChannelStateContext,
 } from "stream-chat-react";
@@ -18,6 +15,7 @@ import "stream-chat-react/dist/css/v2/index.css";
 import { getStreamChat } from "../utils";
 import { Skeleton } from "@mui/material";
 import Image from "next/image";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export type ChatProps = {
   user: User;
@@ -26,32 +24,25 @@ export type ChatProps = {
   showMessageBox: boolean;
 };
 
-export function CustomChannelHeader(props: ChannelHeaderProps) {
-  const { title } = props;
-  const {
-    channel,
-    members = {},
-    watcher_count,
-    watchers,
-  } = useChannelStateContext();
-  const { client, setActiveChannel } = useChatContext();
-  let chatTitle = "Not Found";
-
+export function CustomChannelHeader(props: any) {
+  const { closeChat } = props;
+  const {members = {},watcher_count} = useChannelStateContext();
+  const { client } = useChatContext();
   const membersCount = Object.keys(members).length;
+  let chatTitle = "Not Found";
 
   Object.keys(members).forEach(function (key, index) {
     if (membersCount === 2 && key !== client.userID) chatTitle = key;
   });
 
   return (
-    <div className="py-3 border-b border-b-white border-opacity-25">
-      <div className="w-full flex gap-3 items-center ml-3">
+    <div className="py-2 lg:py-3 border-b border-b-white border-opacity-25">
+      <div className="w-full flex gap-2 lg:gap-3 items-center ml-3">
+        <span className="md:hidden" onClick={closeChat}><ArrowBackIcon /></span>
         <div className="relative">
           <Image
             src={require("@/assets/images/profile-image.png")}
-            height={48}
-            width={48}
-            className="w-12 h-12 rounded-full object-cover object-top"
+            className="w-9 h-9 lg:w-12 lg:h-12 rounded-full object-cover object-top"
             alt="profileImage"
           />
           {watcher_count && watcher_count >= 2 && (
@@ -59,7 +50,7 @@ export function CustomChannelHeader(props: ChannelHeaderProps) {
           )}
         </div>
         <div className="flex flex-col items-start">
-          <span className="header-pound font-bold text-lg w-1/2">
+          <span className="header-pound font-bold text-sm lg:text-lg break-words max-w-[130px] md:max-w-full">
             {chatTitle.length > 22
               ? `${chatTitle?.substring(0, 22)}...`
               : chatTitle}
@@ -125,7 +116,7 @@ export const ChatBox = ({
         const client = await getStreamChat();
 
         if (client) {
-          const currentChannel = `${targetUser.display_name} ${targetUser.username}`;
+          const currentChannel = `${targetUser.display_name} <> ${user.display_name}`;
 
           client.connectUser(
             {
@@ -147,7 +138,7 @@ export const ChatBox = ({
             <Chat client={client} theme="str-chat__theme-dark">
               <Channel channel={channel}>
                 <Window>
-                  <div className="">
+                  <div>
                     <div
                       className="w-5 cursor-pointer absolute top-2 right-1 z-10 font-semibold"
                       onClick={() => setShowMessageBox(false)}

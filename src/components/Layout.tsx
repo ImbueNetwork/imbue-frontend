@@ -9,7 +9,7 @@ function Layout({ children }: LayoutProps) {
   return (
     <React.Fragment>
       <Navbar />
-      <main className="padded !p-[var(--hq-layout-padding)]" id="main-content">
+      <main className="padded lg:!p-[var(--hq-layout-padding)]" id="main-content">
         {children}
       </main>
     </React.Fragment>

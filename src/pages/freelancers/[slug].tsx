@@ -27,7 +27,7 @@ import { GrCertificate } from 'react-icons/gr'
 import { AiOutlineUser } from 'react-icons/ai'
 import { MdOutlineWatchLater } from 'react-icons/md'
 import { ImStack } from 'react-icons/im'
-import styles from '@/styles/freelancers.module.css'
+import styles from '@/styles/modules/freelancers.module.css'
 import fiverrIcon from "@/assets/images/fiverr.png"
 import ImbueIcon from "@/assets/svgs/loader.svg"
 import { authenticate } from "@/pages/api/info/user";
@@ -165,7 +165,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   };
 
   return (
-    <div className="profile-container -mt-8">
+    <div className="profile-container lg:-mt-8">
       <div className="banner">
         <Image
           src={require("@/assets/images/profile-banner.png")}
@@ -175,21 +175,21 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         />
       </div>
 
-      <div className="flex justify-evenly mx-[80px]">
+      <div className="flex flex-col lg:flex-row justify-evenly lg:mx-[40px] px-[30px] lg:px-[40px]">
 
-        <div className="flex flex-col gap-[70px] w-[40%]">
-          <div className="flex flex-col gap-[16px] pb-[30px] px-[100px] bg-theme-grey-dark rounded-xl border border-light-white">
-            <div className="h-[160px] w-[160px] bg-[#2c2c2c] rounded-[100%] p-[50px] z-[2] relative mt-[-120px] unset mx-auto">
+        <div className="flex flex-col lg:items-center gap-[20px] lg:gap-[70px] lg:w-[40%]">
+          <div className="w-full flex flex-col items-center gap-[16px] pb-[30px] bg-theme-grey-dark rounded-xl border border-light-white">
+            <div className="h-[160px] w-[160px] bg-[#2c2c2c] rounded-[100%] p-[50px] relative mt-[-120px] unset mx-auto">
               <Image
                 src={require("@/assets/images/profile-image.png")}
                 alt="profile h-full w-full image"
               />
             </div>
-            <div className="flex flex-col gap-[16px] -mt-11 z-10">
-              <h3 className="!text-2xl font-bold">{freelancer?.display_name}</h3>
-              <div className="flex gap-[15px] items-center">
-                <p className="text-[16px] leading-[1.2] text-[#ebeae2] text-primary">
-                  @{freelancer?.username?.length > 20 ? freelancer?.username?.slice(0, 20) + '...' : freelancer?.username}
+            <div className="w-full flex flex-col gap-[16px] -mt-11 px-[30px] lg:px-[40px]">
+              <h3 className="!text-2xl font-bold text-center z-[1]">{freelancer?.display_name}</h3>
+              <div className="flex gap-[15px] items-center justify-center flex-wrap">
+                <p className="text-[16px] leading-[1.2] text-primary max-w-full break-words text-center">
+                  @{freelancer?.username}
                 </p>
                 <div className="flex items-center gap-2">
                   <IoPeople color="var(--theme-secondary)" size="24px" />
@@ -198,14 +198,14 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                   </p>
                 </div>
               </div>
-              <div className="flex gap-[12px]">
+              <div className="flex justify-center gap-[12px]">
                 <ReactCountryFlag countryCode="US" />
                 <p className="text-[16px] leading-[1.2] text-[#ebeae2]">
                   Los Angeles, United State
                 </p>
               </div>
               {/* TODO: Implement reviews */}
-              <div className="rating flex gap-3">
+              <div className="rating flex justify-center gap-3">
                 <p className="mb-3">
                   <FaStar color="var(--theme-primary)" />
                   <FaStar color="var(--theme-primary)" />
@@ -220,7 +220,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                 </p>
               </div>
 
-              <div className="connect-buttons flex gap-[24px] mb-[20px]">
+              <div className="connect-buttons flex justify-center gap-[24px] mb-[20px]">
                 {!isCurrentFreelancer && (
                   <>
                     <button
@@ -260,7 +260,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
               <p className="text-xl">Among my clients</p>
               <span className="h-4 w-4 flex justify-center items-center rounded-full bg-gray-500 text-black">?</span>
             </div>
-            <div className="flex justify-between">
+            <div className="grid grid-cols-2 px-[30px] lg:px-[40px] justify-center md:grid-cols-3 gap-5 w-full">
               <div className="flex items-center gap-3">
                 <Image className="rounded-lg" height={40} width={40} src={fiverrIcon} alt="Fiverr Icon" />
                 <p>Fiverr</p>
@@ -272,7 +272,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
             </div>
             <hr className="separator" />
 
-            <div>
+            <div className="w-full px-[30px] lg:px-[40px]">
               <p className="text-xl">Wallet Address</p>
               <div className="mt-3 border break-words p-3 rounded-md bg-black">
                 0x524c3d9e935649A448FA33666048C
@@ -280,7 +280,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
             </div>
             <hr className="separator" />
 
-            <div>
+            <div className="w-full px-[30px] lg:px-[40px]">
               <div className="flex justify-between mb-3">
                 <div className="flex items-center gap-4">
                   <AiOutlineUser size={24} />
@@ -312,16 +312,16 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
 
           </div>
 
-          <div className="flex">
+          <div className="flex w-full">
             <div className="flex flex-col gap-[36px] grow shrink-0 basis-[40%]">
-              <div className={styles.freelancerProfileSection}>
-                <div className="mx-[30px]">
+              <div className={`${styles.freelancerProfileSection} py-[30px]`}>
+                <div className="mx-[30px] lg:mx-[40px]">
                   <h5>Linked Account</h5>
                   <div className="flex flex-col gap-[16px] mt-[24px]">
                     {socials?.map(({ label, key, value, icon }, index) =>
                       !isEditMode ? (
                         <div
-                          className="w-[300px] h-[40px] flex justify-between items-center"
+                          className="h-[40px] flex justify-between items-center"
                           key={index}
                         >
                           <p className="text-base leading--1.2]">{label} </p>
@@ -331,7 +331,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                         </div>
                       ) : (
                         <div
-                          className="w-[300px] h-[40px] flex justify-between items-center"
+                          className="h-[40px] flex justify-between items-center"
                           key={index}
                         >
                           <TextArea
@@ -356,7 +356,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
 
                 <hr className="separator" />
 
-                <div className="mx-[30px]">
+                <div className="mx-[30px] lg:mx-[40px]">
                   <div className="header-editable">
                     <h5>Skills</h5>
                   </div>
@@ -375,7 +375,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
 
                 <hr className="separator" />
                 {/* TODO: Implement */}
-                <div className="ml-[30px]">
+                <div className="ml-[30px] lg:mx-[40px]">
                   <div className="header-editable">
                     <h5>Certification</h5>
                     <div className="flex gap-3 mt-4">
@@ -481,8 +481,8 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                     </div> */}
           </div>
 
-          <div className={styles.freelancerProfileSection}>
-            <div className="header-editable">
+          <div className={`${styles.freelancerProfileSection} w-full py-[30px]`}>
+            <div className="header-editable px-[30px] lg:px-[40px]">
               <h5>About</h5>
             </div>
             {isEditMode ? (
@@ -504,7 +504,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                 />
               </>
             ) : (<>
-              <div className="bio">
+              <div className="bio px-[30px] lg:px-[40px]">
                 {freelancer?.bio
                   ?.split?.("\n")
                   ?.map?.((line: any, index: number) => (
@@ -518,7 +518,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
             <hr className="separator" />
 
 
-            <div className="header-editable">
+            <div className="header-editable px-[30px] lg:px-[40px]">
               <h5>Education</h5>
             </div>
             {isEditMode ? (
@@ -540,7 +540,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                 />
               </>
             ) : (<>
-              <div className="bio">
+              <div className="bio px-[30px] lg:px-[40px]">
                 {/* TODO: Implementation */}
                 {/* {freelancer?.education
                   ?.split?.("\n")
@@ -556,7 +556,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
           </div>
         </div>
 
-        <div className="w-[45%]">
+        <div className="lg:w-[50%] mt-[20px] lg:mt-0">
           <div className="bg-theme-grey-dark rounded-xl border border-light-white">
             <div className="px-[80px] py-[30px] border-b border-b-light-white">
               <h3 className="mb-3">Work History</h3>
@@ -565,12 +565,12 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
             <div>
               {
                 [...Array(3)].map((v, i) => (
-                  <div key={i} className="px-[80px] py-[30px] flex flex-col gap-3 border-b last:border-b-0 border-b-light-white">
+                  <div key={i} className="px-[30px] lg:px-[80px] py-[30px] flex flex-col gap-3 border-b last:border-b-0 border-b-light-white">
                     <p className="text-xl">{work.title}</p>
-                    <div className="flex gap-8">
-                      <div>
+                    <div className="flex gap-3 lg:gap-8 flex-wrap items-center justify-between">
+                      <div className="flex">
                         {
-                          [...Array(4)].map((r, ri) => <FaStar size={24} key={ri} color={(ri + 1) > work.ratings ? "white" : "var(--theme-primary)"} />)
+                          [...Array(4)].map((r, ri) => <FaStar className="lg:h-[24px] lg:w-[24px]" key={ri} color={(ri + 1) > work.ratings ? "white" : "var(--theme-primary)"} />)
                         }
                       </div>
                       <p className="text-light-grey">{work.time}</p>
@@ -638,7 +638,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
 
                   <div className="flex items-center">
                     {
-                      [...Array(4)].map((r, ri) => <FaStar size={24} key={ri} color={(ri + 1) > review.ratings ? "white" : "var(--theme-primary)"} />)
+                      [...Array(4)].map((r, ri) => <FaStar className="lg:h-[24px] lg:w-[24px]" key={ri} color={(ri + 1) > review.ratings ? "white" : "var(--theme-primary)"} />)
                     }
                     <span className="text-light-grey ml-2">| {review.time}</span>
                   </div>
