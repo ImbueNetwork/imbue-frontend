@@ -20,13 +20,13 @@ import { FiFilter } from "react-icons/fi";
 import { GetServerSidePropsContext } from "next";
 import Loading from "./freelanersLoading";
 
-const Freelancers = ({freelancerProps}:{freelancerProps:Freelancer[]}): JSX.Element => {
-  const [freelancers, setFreelancers] = useState<Freelancer[]>();
+const Freelancers = (): JSX.Element => {
+  const [freelancers, setFreelancers] = useState<Freelancer[] | undefined>();
   const [skills, setSkills] = useState<Item[]>();
   const [services, setServices] = useState<Item[]>();
   const [languages, setLanguages] = useState<Item[]>();
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(true)
 
   const router = useRouter();
   const size = useWindowSize();
@@ -50,7 +50,6 @@ const Freelancers = ({freelancerProps}:{freelancerProps:Freelancer[]}): JSX.Elem
 
   useEffect(() => {
     const setFilters = async () => {
-      setLoading(true)
 
       const data : Freelancer[] = await getAllFreelancers();
 
@@ -391,16 +390,5 @@ const Freelancers = ({freelancerProps}:{freelancerProps:Freelancer[]}): JSX.Elem
     </div>
   );
 };
-
-// export async function getServerSideProps(context:GetServerSidePropsContext) {
-
-//   const data : Freelancer[] = await getAllFreelancers();
-
-//   return {
-//     props: {
-//       freelancerProps: data
-//     }
-//   }
-// }
 
 export default Freelancers;
