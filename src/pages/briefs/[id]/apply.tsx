@@ -188,7 +188,7 @@ export const SubmitProposal = (): JSX.Element => {
         {brief && <BriefInsights brief={brief} />}
       </div>
       <div>
-        <div className="milestones border border-solidborder-white py-5 rounded-[20px] bg-theme-grey-dark">
+        <div className="milestones border border-white py-5 rounded-[20px] bg-theme-grey-dark">
           <div className="flex flex-col lg:flex-row justify-between mx-14 -mb-3">
             <h3 className="text-xl leading-[1.5] font-bold m-0 p-0 flex">
               Milestones
@@ -216,7 +216,7 @@ export const SubmitProposal = (): JSX.Element => {
                         Description
                       </h3>
                       <textarea
-                        className="input-description bg-[#1a1a19] border border-solid border-white text-base leading-5 py-3 px-5"
+                        className="input-description bg-[#1a1a19] border border-white text-base leading-5 py-3 px-5"
                         value={name}
                         onChange={(e) =>
                           setMilestones([
@@ -236,7 +236,7 @@ export const SubmitProposal = (): JSX.Element => {
                       </h3>
                       <input
                         type="number"
-                        className="input-budget bg-[#1a1a19] border border-solid border-white text-base leading-5 rounded-[5px] py-3 px-5"
+                        className="input-budget bg-[#1a1a19] border border-white text-base leading-5 rounded-[5px] py-3 px-5"
                         value={amount || ""}
                         onChange={(e) =>
                           setMilestones([
@@ -320,14 +320,14 @@ export const SubmitProposal = (): JSX.Element => {
         <h3 className="ml-8 mb-2 text-xl font-bold m-0 p-0 flex">
           Payment terms
         </h3>
-        <div className="bg-theme-grey-dark border border-solid border-white py-5 rounded-[20px] flex flex-col lg:flex-row lg:justify-between gap-3 px-14">
+        <div className="bg-theme-grey-dark border border-white py-5 rounded-[20px] flex flex-col lg:flex-row lg:justify-between gap-3 px-14">
           <div className="duration-selector">
             <h3 className="text-xl font-bold m-0 p-0">
               How long will this project take?
             </h3>
             <select
               name="duration"
-              className="bg-[#1a1a19] round border border-solidborder-white rounded-[5px] text-base px-5 py-3 mt-4"
+              className="bg-[#1a1a19] round border border-white rounded-[5px] text-base px-5 py-3 mt-4"
               placeholder="Select a duration"
               required
             >
@@ -346,7 +346,7 @@ export const SubmitProposal = (): JSX.Element => {
                 name="currencyId"
                 onChange={handleChange}
                 placeholder="Select a currency"
-                className="bg-[#1a1a19] round border border-solidborder-white rounded-[5px] text-base px-5 py-3 mt-4"
+                className="bg-[#1a1a19] round border border-white rounded-[5px] text-base px-5 py-3 mt-4"
                 required
               >
                 {currencies.map((currency: any) => (
