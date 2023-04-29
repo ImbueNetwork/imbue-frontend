@@ -12,25 +12,25 @@ function Layout({ children }: LayoutProps) {
   const [progress, setProgress] = useState(0)
   const router = useRouter()
 
-  useEffect(()=>{
-    router.events.on("routeChangeStart", ()=>setProgress(35))
-    router.events.on("routeChangeComplete", ()=>setProgress(100))
-    router.events.on("routeChangeError", ()=>setProgress(100))
+  useEffect(() => {
+    router.events.on("routeChangeStart", () => setProgress(35))
+    router.events.on("routeChangeComplete", () => setProgress(100))
+    router.events.on("routeChangeError", () => setProgress(100))
 
-    return () =>{
-      router.events.off("routeChangeStart", ()=>setProgress(35))
-      router.events.off("routeChangeComplete", ()=>setProgress(100))
-      router.events.off("routeChangeError", ()=>setProgress(100))
+    return () => {
+      router.events.off("routeChangeStart", () => setProgress(35))
+      router.events.off("routeChangeComplete", () => setProgress(100))
+      router.events.off("routeChangeError", () => setProgress(100))
     }
 
-  },[router])
+  }, [router])
   return (
     <React.Fragment>
-      {progress > 0 && <LoadingBar 
-      color='#b2ff0b'
-      progress={progress}
-      onLoaderFinished={() => setProgress(0)}
-      waitingTime={200}
+      {progress > 0 && <LoadingBar
+        color='#b2ff0b'
+        progress={progress}
+        onLoaderFinished={() => setProgress(0)}
+        waitingTime={200}
       />}
       <Navbar />
       <main className="padded lg:!p-[var(--hq-layout-padding)]" id="main-content">
