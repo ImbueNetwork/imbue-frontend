@@ -9,7 +9,7 @@ import { Skeleton } from '@mui/material';
 import { StyledEngineProvider } from "@mui/system";
 
 
-export default function Loading() {
+export default function LoadingFreelancers() {
     const size = useWindowSize();
     const [filterVisble, setFilterVisible] = useState<boolean>(false);
 

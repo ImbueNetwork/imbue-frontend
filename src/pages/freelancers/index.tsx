@@ -18,7 +18,7 @@ import { strToIntRange } from "../briefs";
 import { useWindowSize } from "@/hooks";
 import { FiFilter } from "react-icons/fi";
 import { GetServerSidePropsContext } from "next";
-import Loading from "./freelanersLoading";
+import LoadingFreelancers from "../../components/Freelancers/FreelancersLoading";
 
 const Freelancers = (): JSX.Element => {
   const [freelancers, setFreelancers] = useState<Freelancer[] | undefined>();
@@ -277,7 +277,7 @@ const Freelancers = (): JSX.Element => {
     setFilterVisible(!filterVisble);
   };
 
-  if(loading) return <Loading/>
+  if(loading) return <LoadingFreelancers/>
 
   return (
     <div className="px-[15px] lg:px-[40px]">
