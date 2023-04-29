@@ -12,7 +12,7 @@ export const ProgressBar = ({
   return (
     <div className="progressbar-container">
       {titleArray?.map((title, index) => (
-        <div key={index} style={{ zIndex: 20 }}>
+        <div key={index} style={{ zIndex: 1 }}>
           <div
             className={`progress-step-circle ${
               currentValue >= index ? "active" : "disabled"

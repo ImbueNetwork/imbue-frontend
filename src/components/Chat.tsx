@@ -22,10 +22,12 @@ export type ChatProps = {
   targetUser: User;
   setShowMessageBox: Function;
   showMessageBox: boolean;
+  chatPopUp?:boolean;
 };
 
 export function CustomChannelHeader(props: any) {
-  const { closeChat } = props;
+  const { closeChat,chatPopUp } = props;
+
   const {members = {},watcher_count} = useChannelStateContext();
   const { client } = useChatContext();
   const membersCount = Object.keys(members).length;
@@ -38,7 +40,7 @@ export function CustomChannelHeader(props: any) {
   return (
     <div className="py-2 lg:py-3 border-b border-b-white border-opacity-25">
       <div className="w-full flex gap-2 lg:gap-3 items-center ml-3">
-        <span className="md:hidden" onClick={closeChat}><ArrowBackIcon /></span>
+        {!chatPopUp && <span className="md:hidden" onClick={closeChat}><ArrowBackIcon /></span>}
         <div className="relative">
           <Image
             src={require("@/assets/images/profile-image.png")}
@@ -107,6 +109,7 @@ export const ChatBox = ({
   targetUser,
   showMessageBox,
   setShowMessageBox,
+  chatPopUp
 }: ChatProps) => {
   const [content, setContent] = useState<any>(<CustomSkeletonLoading />);
 
@@ -145,7 +148,7 @@ export const ChatBox = ({
                     >
                       x
                     </div>
-                    <CustomChannelHeader />
+                    <CustomChannelHeader chatPopUp={chatPopUp}/>
                   </div>
                   <MessageList />
                   <div className="border-t border-t-white border-opacity-25">

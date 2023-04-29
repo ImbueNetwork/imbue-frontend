@@ -135,6 +135,7 @@
 .filterPanel {
   flex: 1 0 30%;
   width: 35%;
+  height: 100%;
 }
 
 .filter-heading {
@@ -184,6 +185,21 @@
 .whiteIcon path {
   stroke: white;
 }
+
+@media (max-width: 750px) {
+    .filterPanel {
+      position: fixed;
+      width: 100% !important;
+      top: 0;
+      background-color: black;
+      z-index: 10;
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-top: 20px;
+      overflow-y: scroll;
+    }
+}
+
 
 @media (max-width: 500px) {
     .freelancers {

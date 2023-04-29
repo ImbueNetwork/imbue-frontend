@@ -82,7 +82,15 @@
 .MuiDialog-paper {
     background-color: var(--theme-grey-dark);
     color: white;
+    margin: 7px auto;
 }
+
+
+.freelancer .MuiSkeleton-root{
+    background-color: #ffffff1c;
+}
+
+
 
 @media screen and (max-width: 470px) {
     .MuiBottomNavigation-root{
@@ -93,5 +101,12 @@
     .MuiBottomNavigationAction-label,
     .MuiBottomNavigationAction-label.Mui-selected {
         font-size: 12px;
+    }
+    
+    .chat-popup.MuiBox-root {
+        position: fixed;
+        right: 10px;
+        margin: 0 auto;
+        width: 300px;
     }
 }

@@ -183,7 +183,7 @@ ul li {
 	background-color: #411dc9;
 	font-family: Aeoniktrial, sans-serif;
 	font-weight: 400;
-	text-align: right;
+	text-align: center;
 }
 
 .primary-btn.in-dark:hover {
@@ -589,8 +589,8 @@ input[type='radio'] {
 }
 
 .progress-step-circle {
-	width: 16px;
-	height: 16px;
+	width: 20px;
+	height: 20px;
 	border-radius: 100%;
 }
 
@@ -715,7 +715,7 @@ input[type='radio'] {
 	text-align: right;
 	font-size: 12px;
 	line-height: 16px;
-	color: white;
+	color: black;
 }
 
 .secondary-btn {
@@ -759,8 +759,15 @@ input:-webkit-autofill {
 
 
 @media screen and (max-width: 500px) {
+
+	h2{
+		font-size: 26px;
+		line-height: 2rem;
+	}
+
 	.padded {
-		padding: calc(var(--hq-layout-padding) / 2 0);
+		padding: calc(var(--hq-layout-padding) / 2) 0;
+		height: calc(100vh - 60px);
 	}
 
 	.primary-btn,
@@ -768,6 +775,11 @@ input:-webkit-autofill {
 		font-size: 12px;
 		padding: 5px 10px;
 	}
+
+	.option-children-container{
+		padding-left: 0;
+	}
+	
 }
 
 /**
