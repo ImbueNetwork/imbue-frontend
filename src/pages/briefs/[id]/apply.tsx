@@ -180,15 +180,15 @@ export const SubmitProposal = (): JSX.Element => {
   const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
 
   return (
-    <div className="flex flex-col gap-[2.5rem] text-base leading-[1.5] hq-layout">
+    <div className="flex flex-col gap-10 text-base leading-[1.5] hq-layout">
       <div>
-        <h3 className="ml-[2rem] mb-[0.5rem] text-xl leading-[1.5] font-bold m-0 p-0  flex">
+        <h3 className="ml-8 mb-2 text-xl leading-[1.5] font-bold m-0 p-0  flex">
           Job description
         </h3>
         {brief && <BriefInsights brief={brief} />}
       </div>
       <div>
-        <div className="milestones border border-solid border-[#fff] py-[20px] rounded-[20px] bg-theme-grey-dark">
+        <div className="milestones border border-solidborder-white py-5 rounded-[20px] bg-theme-grey-dark">
           <div className="flex flex-col lg:flex-row justify-between mx-14 -mb-3">
             <h3 className="text-xl leading-[1.5] font-bold m-0 p-0 flex">
               Milestones
@@ -212,11 +212,11 @@ export const SubmitProposal = (): JSX.Element => {
                   <div className="milestone-no text-base">{index + 1}</div>
                   <div className="flex flex-col lg:flex-row justify-between w-full">
                     <div className="w-full lg:w-1/2">
-                      <h3 className="mb-[1.25rem] text-xl font-bold m-0 p-0">
+                      <h3 className="mb-5 text-xl font-bold m-0 p-0">
                         Description
                       </h3>
                       <textarea
-                        className="input-description bg-[#1a1a19] border border-solid border-white text-base leading-[20px] py-[10px] px-[20px]"
+                        className="input-description bg-[#1a1a19] border border-solid border-white text-base leading-5 py-3 px-5"
                         value={name}
                         onChange={(e) =>
                           setMilestones([
@@ -231,12 +231,12 @@ export const SubmitProposal = (): JSX.Element => {
                       />
                     </div>
                     <div className="flex flex-col w-[fit-content] lg:items-end">
-                      <h3 className="mb-[1.25rem] text-xl font-bold m-0 p-0">
+                      <h3 className="mb-5 text-xl font-bold m-0 p-0">
                         Amount
                       </h3>
                       <input
                         type="number"
-                        className="input-budget bg-[#1a1a19] border border-solid border-white text-base leading-[20px] rounded-[5px] py-[10px] px-[20px]"
+                        className="input-budget bg-[#1a1a19] border border-solid border-white text-base leading-5 rounded-[5px] py-3 px-5"
                         value={amount || ""}
                         onChange={(e) =>
                           setMilestones([
@@ -279,7 +279,7 @@ export const SubmitProposal = (): JSX.Element => {
           </p>
           <hr className="separator" />
 
-          <div className="flex flex-row items-center mb-[20px] mx-14">
+          <div className="flex flex-row items-center mb-5 mx-14">
             <div className="flex flex-col flex-grow">
               <h3 className="text-xl font-bold m-0 p-0">
                 Total price of the project
@@ -294,7 +294,7 @@ export const SubmitProposal = (): JSX.Element => {
           </div>
           <hr className="separator" />
 
-          <div className="flex flex-row items-center mb-[20px] mx-14">
+          <div className="flex flex-row items-center mb-5 mx-14">
             <div className="flex flex-col flex-grow">
               <h3 className="text-xl font-bold m-0 p-0">
                 Imbue Service Fee 5% - Learn more about Imbue’s fees
@@ -306,7 +306,7 @@ export const SubmitProposal = (): JSX.Element => {
           </div>
           <hr className="separator" />
 
-          <div className="flex flex-row items-center mb-[20px] mx-14">
+          <div className="flex flex-row items-center mb-5 mx-14">
             <div className="flex flex-col flex-grow">
               <h3 className="text-xl font-bold m-0 p-0">Total</h3>
             </div>
@@ -317,17 +317,17 @@ export const SubmitProposal = (): JSX.Element => {
         </div>
       </div>
       <div>
-        <h3 className="ml-[2rem] mb-[0.5rem] text-xl font-bold m-0 p-0 flex">
+        <h3 className="ml-8 mb-2 text-xl font-bold m-0 p-0 flex">
           Payment terms
         </h3>
-        <div className="bg-theme-grey-dark border border-solid border-[#fff] py-[20px] rounded-[20px] flex flex-col lg:flex-row lg:justify-between gap-3 px-14">
+        <div className="bg-theme-grey-dark border border-solid border-white py-5 rounded-[20px] flex flex-col lg:flex-row lg:justify-between gap-3 px-14">
           <div className="duration-selector">
             <h3 className="text-xl font-bold m-0 p-0">
               How long will this project take?
             </h3>
             <select
               name="duration"
-              className="bg-[#1a1a19] round border border-solid border-[#fff] rounded-[5px] text-base px-[20px] py-[10px] mt-4"
+              className="bg-[#1a1a19] round border border-solidborder-white rounded-[5px] text-base px-5 py-3 mt-4"
               placeholder="Select a duration"
               required
             >
@@ -346,7 +346,7 @@ export const SubmitProposal = (): JSX.Element => {
                 name="currencyId"
                 onChange={handleChange}
                 placeholder="Select a currency"
-                className="bg-[#1a1a19] round border border-solid border-[#fff] rounded-[5px] text-base px-[20px] py-[10px] mt-4"
+                className="bg-[#1a1a19] round border border-solidborder-white rounded-[5px] text-base px-5 py-3 mt-4"
                 required
               >
                 {currencies.map((currency: any) => (
