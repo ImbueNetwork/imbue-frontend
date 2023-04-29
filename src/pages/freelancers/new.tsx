@@ -278,32 +278,39 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     };
   
     async function createProfile() {
-      setStep(step + 1);
-  
-      await createFreelancingProfile({
-        id: 0,
-        bio,
-        education: "",
-        experience: freelancingBefore,
-        freelanced_before: freelancingBefore,
-        freelancing_goal: goal,
-        work_type: "",
-        skills,
-        title,
-        languages,
-        services,
-        user_id: user?.id,
-        username: user?.display_name,
-        display_name: user?.display_name,
-        discord_link: "",
-        facebook_link: "",
-        telegram_link: "",
-        twitter_link: "",
-        clients: [],
-        client_images: [],
-        num_ratings: 0,
-        profileImageUrl: require("@/assets/images/profile-image.png"),
-      });
+      try {
+        const response : any = await createFreelancingProfile({
+          id: 0,
+          bio,
+          education: "",
+          experience: freelancingBefore,
+          freelanced_before: freelancingBefore,
+          freelancing_goal: goal,
+          work_type: "",
+          skills,
+          title,
+          languages,
+          services,
+          user_id: user?.id,
+          username: user?.display_name,
+          display_name: user?.display_name,
+          discord_link: "",
+          facebook_link: "",
+          telegram_link: "",
+          twitter_link: "",
+          clients: [],
+          client_images: [],
+          num_ratings: 0,
+          profileImageUrl: require("@/assets/images/profile-image.png"),
+        });
+        
+        if(response.status === 201){
+          setStep(step + 1);
+        }
+
+      } catch (error) {
+        console.log(error);
+      }
     }
   
     return (
@@ -327,7 +334,7 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
   
             {step === 0 ? (
               <button
-                className="primary-btn in-dark w-button"
+                className="primary-btn in-dark w-button ml-auto"
                 onClick={() => setStep(1)}
                 data-testid="get-started-button"
               >

@@ -16,6 +16,7 @@ import {
 import * as config from "@/config";
 import { BriefInfo, BriefProps } from "@/types/briefTypes";
 import { getServerSideProps } from "@/utils/serverSideProps";
+import styles from '../../styles/modules/newBrief.module.css'
 
 const getAPIHeaders = {
   accept: "application/json",
@@ -53,10 +54,10 @@ const NewBrief = (props: BriefProps): JSX.Element => {
 
   const NamePanel = (
     <>
-      <p className="field-name">Write a headline for your brief</p>
-      <div className="name-panel-input-wrapper">
-        <input
-          className="brief-detail-field-input text-black"
+      <p className={styles.fieldName}>Write a headline for your brief</p>
+      <div className={styles.namePanelInputWrapper}>
+        <textarea
+          className={styles.briefDetailFieldInput}
           data-testid="headline-input"
           placeholder="Enter the name of your project"
           name="headline"
@@ -64,10 +65,10 @@ const NewBrief = (props: BriefProps): JSX.Element => {
           onChange={(e) => setHeadline(e.target.value)}
         />
       </div>
-      <p className="field-name">Examples</p>
-      <div className="name-panel-name-examples">
+      <p className={styles.fieldName}>Examples</p>
+      <div className={styles.namePanelNameExamples}>
         {nameExamples.map((name, index) => (
-          <p className="name-panel-name-example" key={index}>
+          <p className={styles.namePanelNameExample} key={index}>
             {name}
           </p>
         ))}
@@ -77,8 +78,8 @@ const NewBrief = (props: BriefProps): JSX.Element => {
 
   const IndustriesPanel = (
     <>
-      <p className="field-name">Search industries or add your own</p>
-      <div className="industry-container">
+      <p className={styles.fieldName}>Search industries or add your own</p>
+      <div className={styles.industryContainer}>
         <TagsInput
           suggestData={suggestedIndustries}
           data-testid="industries-input"
@@ -90,9 +91,9 @@ const NewBrief = (props: BriefProps): JSX.Element => {
   );
 
   const DescriptionPanel = (
-    <div className="description-panel">
-      <p className="field-name">Describe your project in a few sentences</p>
-      <div className="description-container">
+    <div className={styles.descriptionPanel}>
+      <p className={styles.fieldName}>Describe your project in a few sentences</p>
+      <div className={styles.descriptionContainer}>
         <TextArea
           value={description}
           name="description"
@@ -108,8 +109,8 @@ const NewBrief = (props: BriefProps): JSX.Element => {
 
   const SkillsPanel = (
     <>
-      <p className="field-name">Search the skills</p>
-      <div className="skills-container">
+      <p className={styles.fieldName}>Search the skills</p>
+      <div className={styles.skillsContainer}>
         <TagsInput
           suggestData={suggestedSkills}
           tags={skills}
@@ -120,7 +121,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
   );
 
   const ExperienceLevelPanel = (
-    <div className="experience-level-container">
+    <div className={styles.experienceLevelContainer}>
       {experiencedLevel.map(({ label, value }, index) => (
         <Option
           label={label}
@@ -134,7 +135,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
   );
 
   const ScopePanel = (
-    <div className="scope-container">
+    <div className={styles.scopeContainer}>
       {scopeData.map(({ label, value, description }, index) => (
         <Option
           label={label}
@@ -144,7 +145,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
           onSelect={() => setScopeId(value)}
         >
           {description ? (
-            <div className="scope-item-description">{description}</div>
+            <div className={styles.scopeItemDescription}>{description}</div>
           ) : (
             <></>
           )}
@@ -154,7 +155,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
   );
 
   const TimePanel = (
-    <div className="time-container">
+    <div className={styles.timeContainer}>
       {timeData.map(({ label, value }, index) => (
         <Option
           label={label}
@@ -169,18 +170,18 @@ const NewBrief = (props: BriefProps): JSX.Element => {
 
   const BudgetPanel = (
     <div>
-      <p className="field-name">Maximum project budget (USD)</p>
-      <div className="budget-input-container">
+      <p className={styles.fieldName}>Maximum project budget (USD)</p>
+      <div className={styles.budgetInputContainer}>
         <input
-          className="brief-detail-field-input text-black"
-          style={{ paddingLeft: "24px" }}
+          className={styles.briefDetailFieldInput}
+          style={{ paddingLeft: "24px", height:"auto" }}
           type="number"
           value={budget || ""}
           onChange={(e) => setBudget(Number(e.target.value))}
         />
-        <div className="budget-currency-container">$</div>
+        <div className={styles.budgetCurrencyContainer}>$</div>
       </div>
-      <div className="budget-description">
+      <div className={styles.budgetDescription}>
         You will be able to set milestones which divide your project into
         manageable phases.
       </div>
@@ -188,8 +189,8 @@ const NewBrief = (props: BriefProps): JSX.Element => {
   );
 
   const ConfirmPanel = (
-    <div className="description-panel">
-      <p className="field-name">Thank you for your submission!</p>
+    <div className={styles.descriptionPanel}>
+      <p className={styles.fieldName}>Thank you for your submission!</p>
     </div>
   );
 
@@ -267,22 +268,22 @@ const NewBrief = (props: BriefProps): JSX.Element => {
   };
 
   return (
-    <div className="new-brief-details-container hq-layout">
-      <div className="left-panel">
+    <div className={`${styles.newBriefContainer} hq-layout`}>
+      <div className={styles.leftPanel}>
         <ProgressBar
           titleArray={["Description", "Skills", "Scope", "Budget"]}
           currentValue={stepData[step].progress}
         />
-        <h1 className="heading">{stepData[step].heading}</h1>
+        <h1 className={styles.heading}>{stepData[step].heading}</h1>
         {stepData[step].content.split("\n").map((content, index) => (
-          <p className="help" key={index}>
+          <p className={styles.help} key={index}>
             {content}
           </p>
         ))}
       </div>
-      <div className="right-panel">
-        <div className="contents">{panels[step] ?? <></>}</div>
-        <div className="buttons">
+      <div className={styles.rightPanel}>
+        <div className={styles.contents}>{panels[step] ?? <></>}</div>
+        <div className={styles.buttons}>
           {step >= 1 && (
             <button
               className="secondary-btn !mt-0"

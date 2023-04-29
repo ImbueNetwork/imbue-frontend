@@ -8,7 +8,7 @@ export const stepData = [
     progress: 1,
   },
   {
-    heading: "A few quick questions: have you freelanced before?",
+    heading: "A few quick questions: Have you freelanced before?",
     content: `This tells us how much help to give you along the way.\n
         (We won’t share your answer with anyone else, including potential clients.)`,
     progress: 2,

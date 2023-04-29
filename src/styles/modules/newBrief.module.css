@@ -1,8 +1,15 @@
-h1 {
+.newBriefContainer h1 {
   font-size: 52px;
   line-height: 1.1;
   color: var(--theme-title-color);
   margin: 0px;
+}
+
+.fieldName {
+  font-size: 20px;
+  line-height: 1.15;
+  color: var(--theme-black-text);
+  font-weight: bold;
 }
 
 .field-input {
@@ -17,7 +24,7 @@ h1 {
   color: black;
 }
 
-.new-brief-details-container {
+.newBriefContainer {
   display: flex;
   flex-direction: row;
   width: 100%;
@@ -28,14 +35,14 @@ h1 {
   border-radius: 20px;
 }
 
-.left-panel {
+.leftPanel {
   background-color: #2c2c2c;
   padding: 64px 32px 64px 48px;
   width: 50%;
   border-radius: 20px 0px 0px 20px;
 }
 
-.right-panel {
+.rightPanel {
   display: flex;
   flex-direction: column;
   background-color: var(--theme-ink-color);
@@ -48,7 +55,7 @@ h1 {
   padding: 112px 32px 64px 0px;
 }
 
-.help {
+.leftPanel .help {
   color: var(--theme-ink-color);
   padding-right: 48px;
   padding-bottom: 8px;
@@ -69,72 +76,85 @@ h1 {
   margin-left: auto;
 }
 
-.name-panel-input-wrapper {
+.namePanelInputWrapper {
   margin-top: 24px;
   margin-bottom: 40px;
 }
 
-.name-panel-name-examples {
+.namePanelNameExamples {
   display: flex;
   flex-direction: column;
   margin-top: 16px;
   padding-bottom: 128px;
 }
 
-.name-panel-name-example {
+.namePanelNameExample {
   font-size: 20px;
   color: black;
   line-height: 1.5;
   margin: 0px;
 }
 
-.description-panel {
+.descriptionPanel {
   display: flex;
   flex-direction: column;
   height: 90%;
 }
 
-.description-container {
+.descriptionContainer {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   margin-top: 24px;
 }
 
-.scope-container {
+.scopeContainer {
   display: flex;
   flex-direction: column;
   gap: 40px;
   padding-bottom: 80px;
 }
 
-.scope-item-description {
+.scopeItemDescription {
   color: var(--theme-black-text);
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.25;
 }
 
-.time-container {
+.timeContainer {
   display: flex;
   flex-direction: column;
   gap: 64px;
   margin-bottom: 120px;
 }
 
-.experience-level-container {
+.experienceLevelContainer {
   display: flex;
   flex-direction: column;
   gap: 64px;
   margin-bottom: 120px;
 }
 
-.budget-input-container {
+.budgetInputContainer {
   position: relative;
   margin-top: 24px;
   margin-bottom: 32px;
 }
 
-.budget-currency-container {
+.briefDetailFieldInput {
+  background-color: var(--theme-ink-color);
+  border: solid 1px black;
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
+  padding: 8px 8px 8px 16px;
+  width: 100%;
+  height: 180px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: black;
+}
+
+.budgetCurrencyContainer {
   position: absolute;
   top: 0px;
   left: 8px;
@@ -146,72 +166,129 @@ h1 {
   color: var(--theme-black-text);
 }
 
-.budget-description {
+.budgetDescription {
   margin-bottom: 160px;
   padding-right: 112px;
+  color: black;
 }
 
-.industry-container {
+.industryContainer {
   padding-top: 24px;
   padding-bottom: 80px;
 }
 
-.skills-container {
+.skillsContainer {
   padding-top: 24px;
   padding-bottom: 80px;
 }
 
-@media screen and (max-width: 868px) {
+@media screen and (max-width: 500px) {
+
+  .newBriefContainer {
+    max-width: 95%;
+    margin: auto auto;
+    min-height: 300px;
+  }
+
+  .fieldName {
+    font-size: 16px;
+  }
+
+  .leftPanel {
+    width: 45%;
+    padding: 20px;
+    border-radius: 20px 0px 0px 20px;
+    padding: 35px 20px 20px 20px;
+  }
+
+  .leftPanel .heading {
+    padding: 50px 0 20px 0;
+    font-size: 20px;
+  }
+
+  .leftPanel .help {
+    padding-right: 0;
+    font-size: 14px;
+  }
+
+  .rightPanel {
+    width: 55%;
+    border-radius: 0px 20px 20px 0px;
+    padding: 35px 20px 20px 20px;
+    margin: 0px;
+  }
+
+  .rightPanel input[type='radio'] {
+    height: 12px;
+    width: 12px;
+  }
+
+  .timeContainer {
+    gap: 26px;
+  }
+
+  .scopeContainer {
+    gap: 22px;
+    padding-bottom: 10px;
+  }
+
+  .namePanelInputWrapper {
+    display: flex;
+  }
+
+  .buttons {
+    width: 100%;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .contents {
+    justify-content: flex-start;
+    flex-grow: 0;
+    padding-bottom: 0;
+  }
+
+  .experienceLevelContainer {
+    gap: 30px;
+    margin-top: 20px;
+  }
+
+  .budgetDescription{
+    padding: 0;
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .namePanelNameExamples{
+    padding-bottom: 20px;
+  }
+
+  .namePanelNameExample{
+    font-size: 14px;
+  }
+
+  .namePanelInputWrapper .briefDetailFieldInput{
+    height: 100%;
+    min-height: 110px;
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .industryContainer{
+    padding-bottom: 0;
+  }
+
+  .descriptionContainer textarea{
+    min-height: 200px;
+    font-size: 14px;
+  }
+
   .brief-details-container {
     flex-direction: column;
     max-height: 100%;
     border-radius: 0px;
     margin-right: 0px;
-  }
-  .left-panel {
-    background-color: #2c2c2c;
-    padding: 24px 12px 24px 28px;
-    width: 90%;
-    border-radius: 0px;
-    margin: 0px;
-  }
-
-  .right-panel {
-    display: flex;
-    flex-direction: column;
-    background-color: var(--theme-ink-color);
-    padding: 20px;
-    width: 90%;
-    border-radius: 0px;
-    margin: 0px;
-  }
-  .name-panel-input-wrapper {
-    display: flex;
-    flex: 1;
-  }
-
-  .buttons{
-    width: 100%;
-    gap: 0;
-    justify-content: space-between;
-    margin-top: 20px;
-  }
-
-  .contents{
-    justify-content: flex-start;
-  }
-
-  .experience-level-container{
-    gap: 30px;
-    margin-top: 20px;
-  }
-
-  .field-name{
-    font-size: 18px;
-  }
-
-  .right-panel input[type='radio']{
-    height: 12px;
-    width: 12px;
   }
 }
