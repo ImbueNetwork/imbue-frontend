@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
-import ReactDOMClient from "react-dom/client";
 import { FiPlusCircle } from "react-icons/fi";
 import MilestoneItem from "@/components/Briefs/MileStoneItem";
 import { timeData } from "@/config/briefs-data";
@@ -148,7 +147,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   const renderPolkadotJSModal = (
     <div>
-      
+
     </div>
   );
 
@@ -190,8 +189,8 @@ export const SubmitProposal = (): JSX.Element => {
       </div>
       <div>
         <div className="milestones border border-solid border-[#fff] py-[20px] rounded-[20px] bg-[#2c2c2c]">
-          <div className="milestone-header mx-14 -mb-3">
-            <h3 className="ml-[2rem] mb-[0.5rem] text-xl leading-[1.5] font-bold m-0 p-0 flex">
+          <div className="flex flex-col lg:flex-row justify-between mx-14 -mb-3">
+            <h3 className="text-xl leading-[1.5] font-bold m-0 p-0 flex">
               Milestones
             </h3>
             <h3 className="text-xl leading-[1.5] font-bold m-0 p-0">
@@ -211,8 +210,8 @@ export const SubmitProposal = (): JSX.Element => {
               return (
                 <div className="milestone-row !p-0" key={index}>
                   <div className="milestone-no text-base">{index + 1}</div>
-                  <div className="input-wrappers">
-                    <div className="description-wrapper">
+                  <div className="flex flex-col lg:flex-row justify-between w-full">
+                    <div className="w-full lg:w-1/2">
                       <h3 className="mb-[1.25rem] text-xl font-bold m-0 p-0">
                         Description
                       </h3>
@@ -231,7 +230,7 @@ export const SubmitProposal = (): JSX.Element => {
                         }
                       />
                     </div>
-                    <div className="flex flex-col w-[fit-content] items-end">
+                    <div className="flex flex-col w-[fit-content] lg:items-end">
                       <h3 className="mb-[1.25rem] text-xl font-bold m-0 p-0">
                         Amount
                       </h3>
@@ -251,7 +250,7 @@ export const SubmitProposal = (): JSX.Element => {
                         }
                       />
                       {totalCostWithoutFee !== 0 && (
-                        <div className="flex flex-col items-end mt-[auto] gap-[8px] w-full">
+                        <div className="flex flex-col items-end mt-3 gap-2 w-full">
                           <div className="progress-value text-base">
                             {percent}%
                           </div>
@@ -321,7 +320,7 @@ export const SubmitProposal = (): JSX.Element => {
         <h3 className="ml-[2rem] mb-[0.5rem] text-xl font-bold m-0 p-0 flex">
           Payment terms
         </h3>
-        <div className="bg-[#2c2c2c] border border-solid border-[#fff] py-[20px] rounded-[20px] payment-details px-14">
+        <div className="bg-[#2c2c2c] border border-solid border-[#fff] py-[20px] rounded-[20px] flex flex-col lg:flex-row lg:justify-between gap-3 px-14">
           <div className="duration-selector">
             <h3 className="text-xl font-bold m-0 p-0">
               How long will this project take?

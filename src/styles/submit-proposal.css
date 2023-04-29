@@ -224,7 +224,6 @@
 .payment-options {
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
 .network-amount {

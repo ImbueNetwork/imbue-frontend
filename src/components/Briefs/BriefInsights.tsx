@@ -20,7 +20,7 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
   };
 
   return (
-    <div className="flex flex-row bg-[#2c2c2c] border border-opacity-25 -border--theme-light-white rounded-[20px] p-[50px]">
+    <div className="flex flex-col lg:flex-row gap-4 lg:gap-2 bg-[#2c2c2c] border border-opacity-25 -border--theme-light-white rounded-[20px] p-[50px]">
       <div className="flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] mr-[5%]">
         <div className="brief-title">
           <h3 className="text-xl leading-[1.5] font-bold m-0 p-0">
@@ -40,7 +40,7 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
           Posted {timePosted}{" "}
         </p>
       </div>
-      <div className="flex flex-col gap-[50px] flex-grow flex-shrink-0 basis-[20%]">
+      <div className="flex flex-col gap-[10px] lg:gap-[30px] flex-grow flex-shrink-0 basis-[20%]">
         <div className="insight-item">
           <RiShieldUserLine color="var(--theme-white)" size={24} />
           <div className="insight-value">

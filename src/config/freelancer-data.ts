@@ -1,7 +1,6 @@
 export const stepData = [
   {
-    heading: `Hello {name}, ready to
-        find an opportunity?`,
+    heading: `Hello {name}, ready to find an opportunity?`,
     content: `Answer a few questions and start building your profile\n
         Apply for open briefs or list your skills for clients to hire\n
         Get paid safely and securely!`,
