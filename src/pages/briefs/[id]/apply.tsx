@@ -188,7 +188,7 @@ export const SubmitProposal = (): JSX.Element => {
         {brief && <BriefInsights brief={brief} />}
       </div>
       <div>
-        <div className="milestones border border-solid border-[#fff] py-[20px] rounded-[20px] bg-[#2c2c2c]">
+        <div className="milestones border border-solid border-[#fff] py-[20px] rounded-[20px] bg-theme-grey-dark">
           <div className="flex flex-col lg:flex-row justify-between mx-14 -mb-3">
             <h3 className="text-xl leading-[1.5] font-bold m-0 p-0 flex">
               Milestones
@@ -320,7 +320,7 @@ export const SubmitProposal = (): JSX.Element => {
         <h3 className="ml-[2rem] mb-[0.5rem] text-xl font-bold m-0 p-0 flex">
           Payment terms
         </h3>
-        <div className="bg-[#2c2c2c] border border-solid border-[#fff] py-[20px] rounded-[20px] flex flex-col lg:flex-row lg:justify-between gap-3 px-14">
+        <div className="bg-theme-grey-dark border border-solid border-[#fff] py-[20px] rounded-[20px] flex flex-col lg:flex-row lg:justify-between gap-3 px-14">
           <div className="duration-selector">
             <h3 className="text-xl font-bold m-0 p-0">
               How long will this project take?
