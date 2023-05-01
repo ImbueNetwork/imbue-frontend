@@ -17,7 +17,7 @@ const spinnerStyle = {
   animation: "rotation 4s infinite linear",
 };
 const BlackBg = styled.div`
-  height: 100vh;
+  height: 100%;
   width: 100%;
   position: fixed;
   background-color: rgba(0, 0, 0, 0.5);
