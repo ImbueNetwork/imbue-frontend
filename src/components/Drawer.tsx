@@ -22,58 +22,66 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
     const setup = async () => {
       const user = await getCurrentUser() || false;
       setAuthenticated(user !== false);
-      if(user) {
+      if (user) {
         setIsFreelancer(await freelancerExists(user?.username));
         setUser(user);
       }
     };
-      setup();
+    setup();
   }, [visible]);
-  
+
 
   const linkItems = [
     {
       icon: "face",
       text: "Dashboard",
       link: "/dashboard",
+      needAuthentication: true,
     },
     {
       icon: "groups",
       text: "Discover Freelancers",
-      link: `/freelancers`
+      link: `/freelancers`,
+      needAuthentication: false,
     },
     {
       icon: "group_add",
       text: isFreelancer ? "Freelancer Profile" : "Join The Freelancers",
       link: isFreelancer ? `/freelancers/${user?.username}/` : "/freelancers/new",
+      needAuthentication: true,
     },
     {
       icon: "work",
       text: "Submit A Brief",
       link: "/briefs/new",
+      needAuthentication: true,
     },
     {
       icon: "search",
       text: "Discover Briefs",
       link: "/briefs",
+      needAuthentication: false,
     },
     {
       icon: "money",
       text: "Transfer Funds",
       link: "/relay",
+      needAuthentication: false,
     },
     {
       icon: "logout",
       text: authenticated ? "Sign Out" : "Sign In",
       link: authenticated ? "/logout" : "/login",
+      needAuthentication: true,
     },
   ];
 
-  const navigateToPage = async (link: string) => {
-    if (authenticated) {
-      router.push(link);
-    } else {
+  const navigateToPage = async (link: string, needAuthentication: boolean) => {
+    if (needAuthentication && !authenticated) {
       setLoginModal(true);
+    }
+    else {
+      router.push(link);
     }
     toggleVisibility()
   };
@@ -93,7 +101,7 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
                   <p
                     className="text-white dlex py-[12px] px-[20px]"
                     title={item?.text}
-                    onClick={() => navigateToPage(item.link)}
+                    onClick={() => navigateToPage(item.link, item.needAuthentication)}
                   >
                     <i
                       className="material-icons relative top-[4px]"
