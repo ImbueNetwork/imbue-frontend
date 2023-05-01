@@ -554,9 +554,9 @@ function Project() {
               modified={milestone?.modified!}
               vote={async () => {
                 // show polkadot account modal
-                // await setShowPolkadotAccounts(true);
+                await setShowPolkadotAccounts(true);
                 // set submitting mile stone to false
-                await setShowVotingModal(true);
+                await setSubmittingMileStone(false);
                 // setMile stone key in view
                 await setMileStoneKeyInview(milestone.milestone_key);
               }}
