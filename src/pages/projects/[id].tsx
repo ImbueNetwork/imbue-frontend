@@ -277,7 +277,7 @@ function Project() {
       !border 
       !border-white 
       rounded-[20px]
-      max-width-750px:!px-[20px]
+      max-lg:!px-[20px]
       max-width-750px:!pb-[30px]
       "
       >
@@ -333,7 +333,7 @@ function Project() {
             </span>
           </p>
 
-          <p className="text-[16px] font-normal text-[#a6a6a6] leading-[178.15%] mt-[23px] w-[80%]">
+          <p className=" text-base font-normal text-[#a6a6a6] leading-[178.15%] mt-[23px] w-[80%]">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
             purus sit amet luctus venenatis, lectus magna fringilla urna,
             porttitor rhoncus dolor purus non enim praesent elementum facilisis
@@ -374,7 +374,7 @@ function Project() {
   };
 
   return (
-    <div className="max-width-868px:p-[var(--hq-layout-padding)]">
+    <div className="max-lg:p-[var(--hq-layout-padding)]">
       {loading && <FullScreenLoader />}
       {user && showMessageBox && (
         <ChatPopup
@@ -394,39 +394,39 @@ function Project() {
        border-opacity-25 
        -border--theme-light-white 
        rounded-[20px] 
-       p-[50px]
-       max-width-750px:p-[20px]
-       max-width-750px:flex-col
+       p-12
+       max-lg:p-5
+       max-lg:flex-col
        "
       >
-        <div className="flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] max-width-868px:basis-[60%] mr-[5%]  max-width-750px:mr-0">
+        <div className="flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] max-lg:basis-[60%] mr-[5%]  max-lg:mr-0">
           <div className="brief-title">
-            <h3 className="text-[32px] max-width-750px:text-[24px] leading-[1.5] font-normal m-0 p-0">
+            <h3 className="text-[32px] max-lg:text-[24px] leading-[1.5] font-normal m-0 p-0">
               {project?.name}
             </h3>
             <span
               onClick={() => {
                 // project?.brief_id
               }}
-              className="text-[#b2ff0b] cursor-pointer text-[20px]  max-width-750px:text-[16px]  font-normal !m-0 !p-0 relative top-4"
+              className="text-[#b2ff0b] cursor-pointer text-[20px]  max-lg: text-base  font-normal !m-0 !p-0 relative top-4"
             >
               View full brief
             </span>
           </div>
           <div className="text-inactive w-[80%]">
-            <p className="text-[16px] font-normal leading-[178.15%]">
+            <p className=" text-base font-normal leading-[178.15%]">
               {project?.description}
             </p>
           </div>
-          <p className="text-inactive text-[16px] font-normal leading-[1.5] m-0 p-0">
+          <p className="text-inactive  text-base font-normal leading-[1.5] m-0 p-0">
             Posted {timePosted}
           </p>
 
-          <p className="text-white text-[20px] font-normal leading-[1.5] mt-[16px] p-0">
+          <p className="text-white text-xl font-normal leading-[1.5] mt-[16px] p-0">
             Freelancer hired
           </p>
 
-          <div className="flex flex-row items-center max-width-750px:flex-wrap mt-[20px]">
+          <div className="flex flex-row items-center max-lg:flex-wrap mt-5">
             <Image
               src={require("@/assets/images/profile-image.png")}
               alt="freelaner-icon"
@@ -435,7 +435,7 @@ function Project() {
               className="border border-solid border-white rounded-[25px]"
             />
 
-            <p className="text-white text-[20px] font-normal leading-[1.5] p-0 mx-[27px]">
+            <p className="text-white text-[20px] font-normal leading-[1.5] p-0 mx-7">
               {freelancer?.display_name}
             </p>
 
@@ -447,16 +447,16 @@ function Project() {
               in-dark w-button 
               !mt-0 
               font-normal 
-              h-[43px] 
-              max-width-750px:!w-full 
-              max-width-750px:!text-center 
-              max-width-750px:!ml-0 
-              max-width-750px:!mt-5 
+              h-11
+              max-lg:!w-full 
+              max-lg:!text-center 
+              max-lg:!ml-0 
+              max-lg:!mt-5 
               items-center 
               content-center 
               !py-0 ml-[40px] 
               px-8
-              max-width-750px:!mr-0
+              max-lg:!mr-0
               "
               data-testid="next-button"
             >
@@ -464,7 +464,7 @@ function Project() {
             </button>
           </div>
         </div>
-        <div className="flex flex-col gap-[50px] flex-grow flex-shrink-0 basis-[20%]  max-width-750px:mt-10">
+        <div className="flex flex-col gap-[50px] flex-grow flex-shrink-0 basis-[20%]  max-lg:mt-10">
           <div className="flex flex-col">
             <div className="flex flex-row">
               <Image
@@ -474,7 +474,7 @@ function Project() {
                 alt={"shieldIcon"}
               />
 
-              <h3 className="text-xl leading-[1.5] ml-[24px] font-normal m-0 p-0">
+              <h3 className="text-xl leading-[1.5] ml-6  font-normal m-0 p-0">
                 Milestone{" "}
                 <span className="text-[#BAFF36]">
                   {approvedMilStones?.length}/{project?.milestones?.length}
@@ -516,15 +516,13 @@ function Project() {
                 width={24}
                 alt={"dollarSign"}
               />
-              <h3 className="text-xl leading-[1.5] ml-[24px] font-normal m-0 p-0">
+              <h3 className="text-xl leading-[1.5] ml-6 font-normal m-0 p-0">
                 {Number(project?.total_cost_without_fee)?.toLocaleString()}{" "}
                 $IMBU
               </h3>
             </div>
 
-            <div className="text-inactive ml-[20%] mt-[7px]">
-              Budget - Fixed
-            </div>
+            <div className="text-inactive ml-[20%] mt-2">Budget - Fixed</div>
           </div>
 
           <div className="flex flex-col">
@@ -536,12 +534,12 @@ function Project() {
                 alt={"calenderIcon"}
               />
 
-              <h3 className="text-xl leading-[1.5] ml-[24px] font-normal m-0 p-0">
+              <h3 className="text-xl leading-[1.5] ml-6 font-normal m-0 p-0">
                 1 to 3 months
               </h3>
             </div>
 
-            <div className="text-inactive  ml-[20%] mt-[7px]">Timeline</div>
+            <div className="text-inactive  ml-[20%] mt-2">Timeline</div>
           </div>
         </div>
       </div>
