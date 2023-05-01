@@ -34,6 +34,7 @@ type ExpandableDropDownsProps = {
   modified: Date;
   vote: () => void;
   submitMilestone: () => void;
+  withdraw: () => void;
 };
 
 const openForVotingTag = (): JSX.Element => {
@@ -150,7 +151,7 @@ function Project() {
     console.log({ voteResponse });
   };
 
-  // submitting a mile stone
+  // submitting a milestone
   const submitMilestone = async (account: WalletAccount) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
@@ -177,12 +178,41 @@ function Project() {
     setLoading(false);
   };
 
+
+  // submitting a milestone
+  const withdraw = async (account: WalletAccount) => {
+    setLoading(true);
+    const imbueApi = await initImbueAPIInfo();
+    const user: User | any = await utils.getCurrentUser();
+    const chainService = new ChainService(imbueApi, user);
+    const result = await chainService.withdraw(
+      account,
+      onChainProject
+    );
+    while (true) {
+      if (result.status || result.txError) {
+        if (result.status) {
+          console.log("***** success");
+          console.log(result.eventData);
+        } else if (result.txError) {
+          console.log("***** failed");
+          console.log(result.errorMessage);
+        }
+        break;
+      }
+      await new Promise((f) => setTimeout(f, 1000));
+    }
+    setLoading(false);
+  };
+
   const renderPolkadotJSModal = (
     <div>
       <AccountChoice
         accountSelected={async (account: WalletAccount) => {
           if (submittingMilestone) {
             submitMilestone(account);
+          } else if (withdrawMilestone) {
+            withdraw(account);
           } else {
             await setVotingWalletAccount(account);
             await setShowVotingModal(true);
@@ -261,6 +291,7 @@ function Project() {
     modified,
     vote,
     submitMilestone,
+    withdraw,
   }: ExpandableDropDownsProps) => {
     const [expanded, setExpanded] = useState(false);
 
@@ -344,7 +375,7 @@ function Project() {
             phasellus faucibus
           </p>
 
-          {milestone.milestone_key == milestoneBeingVotedOn && (
+          {!isApplicant && milestone.milestone_key == milestoneBeingVotedOn && (
             <button
               className="primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8"
               data-testid="next-button"
@@ -367,7 +398,7 @@ function Project() {
             )}
 
 
-          {isApplicant && milestone.milestone_key == milestoneBeingVotedOn && (
+          {isApplicant && milestone.is_approved && (
             <button
               className="primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8"
               data-testid="next-button"
@@ -558,17 +589,21 @@ function Project() {
               index={index}
               milestone={milestone}
               modified={milestone?.modified!}
-              vote={async () => {
-                // show polkadot account modal
-                // await setShowPolkadotAccounts(true);
-                // set submitting mile stone to false
-                await setShowVotingModal(true);
-                // setMile stone key in view
-                await setMilestoneKeyInView(milestone.milestone_key);
-              }}
               submitMilestone={async () => {
                 // set submitting mile stone to true
                 await setSubmittingMilestone(true);
+                // show polkadot account modal
+                await setShowPolkadotAccounts(true);
+                // setMile stone key in view
+                await setMilestoneKeyInView(milestone.milestone_key);
+              }}
+              vote={async () => {
+                await setShowPolkadotAccounts(true);
+                await setMilestoneKeyInView(milestone.milestone_key);
+              }}
+              withdraw={async () => {
+                // set submitting mile stone to true
+                await setWithdrawMilestone(true);
                 // show polkadot account modal
                 await setShowPolkadotAccounts(true);
                 // setMile stone key in view
