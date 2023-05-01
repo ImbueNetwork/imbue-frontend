@@ -194,6 +194,28 @@ Before you can submit a proposal for a brief you need to have a freelancer profi
    <img src="./public/readme/images/freelancerDone.png" alt="Alt text" width="700" height="400">
    <br/><br/>
 
+##### Submitting a proposal for a brief
+  Now as a freelancer you can submit a proposal for a brief, and the brief creator can accept or reject your proposal
+    <br/><br/>
+    - Step 1: From the dashboard view go the menu and click the ```Discover briefs``` button, as shown below
+    <br/><br/>
+    <img src="./public/readme/images/discoverBriefMainMenu.png" alt="Alt text" width="700" height="400">
+    <br/><br/>
+    - Step 2: Upon clicking you will be redirected to the discover briefs page as shown below
+    <br/><br/>
+    <img src="./public/readme/images/discoverBriefs.png" alt="Alt text" width="700" height="400">
+    <br/><br/>
+    - Step 3: Click on the brief you want to submit a proposal for, and you will be redirected to the brief details page as shown below
+     For this example we will be submitting a proposal for the brief ```Evo_brief```
+    <br/><br/>
+    <img src="./public/readme/images/briefDetails.png" alt="Alt text" width="700" height="400">
+    <br/><br/>
+     Here in brief details page you can see the client contact history and also could find the similar project in our imbue portal
+     <br/><br/>
+    - Step 4: Click on the ```Submit Proposal``` button, and you will be redirected to the submit proposal page as shown below
+    <br/><br/>
+
+
 ## Resources
 
 Here are some resources for learning more about NextJS and related technologies:
