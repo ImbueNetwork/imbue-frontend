@@ -235,6 +235,35 @@ Before you can submit a proposal for a brief you need to have a freelancer profi
     <img src="./public/readme/images/proposalPendingReview.png" alt="Alt text" width="700" height="400">
     <br/><br/>
 
+##### Viewing the submitted proposal for a brief and accepting it
+   <br/><br/>
+   Now once the freelancer has submitted the proposal, the brief owner can view the proposal and accept or reject it
+    <br/><br/>
+ - Step 1: From the client view in the dashboard you can see any open briefs you have as shown below
+    <br/><br/>
+    <img src="./public/readme/images/openBriefProposalList.png" alt="Alt text" width="700" height="400">
+    <br/><br/>
+ - Step 2: Click on the brief you want to view the proposal for, and you will be shown with the quick short view of the brief as shown below
+     <br/><br/>
+     For this example we will be viewing the proposal for the brief ```Evo_brief```  
+     <br/><br/>
+    <img src="./public/readme/images/openBriefProposalShortView.png" alt="Alt text" width="700" height="400">
+    <br/><br/>
+ - Step 3: Click on the ```View Proposal``` button, and you will be redirected to the proposal details page as shown below
+     <br/><br/>
+    <img src="./public/readme/images/openBriefProposalDetailsView.png" alt="Alt text" width="700" height="400">
+    <br/><br/>
+    From here you can review the details and can either accept, reject or request changes in the proposal
+ - Step 4: Click on the ```Accept Proposal``` button, and you will client view in the dashboard showing all the accepted brief list 
+     <br/><br/>
+    <img src="./public/readme/images/proposalAcceptedList.png" alt="Alt text" width="700" height="400">
+    <br/><br/>
+    Here you can see the details of the proposal and the milestones. Click on the one you want to see and it will show you more details about the milestone status.
+    You can message the freelancer from here. It looks like this as shown below
+    <br/><br/>
+    <img src="./public/readme/images/proposalAcceptedList.png" alt="Alt text" width="700" height="400">
+  
+
 
 
 ## Resources
