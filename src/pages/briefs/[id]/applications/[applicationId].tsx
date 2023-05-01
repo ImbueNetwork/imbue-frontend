@@ -624,6 +624,7 @@ const ApplicationPreview = (): JSX.Element => {
                 name="duration"
                 placeholder="Select a duration"
                 required
+                disabled={!isEditingBio}
               >
                 {durationOptions.map(({ label, value }, index) => (
                   <option value={value} key={index} className="duration-option">
