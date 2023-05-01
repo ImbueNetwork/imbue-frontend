@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { FiPlusCircle } from "react-icons/fi";
-import MilestoneItem from "@/components/Briefs/MileStoneItem";
+import MilestoneItem from "@/components/Briefs/MilestoneItem";
 import { timeData } from "@/config/briefs-data";
 import * as config from "@/config";
 import { Brief, Currency, User } from "@/model";
