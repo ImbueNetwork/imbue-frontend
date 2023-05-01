@@ -213,7 +213,28 @@ Before you can submit a proposal for a brief you need to have a freelancer profi
      Here in brief details page you can see the client contact history and also could find the similar project in our imbue portal
      <br/><br/>
     - Step 4: Click on the ```Submit Proposal``` button, and you will be redirected to the submit proposal page as shown below
+     <br/><br/>
+     Here you can see a lot of details in multiple sections, lets discuss each in details
+     <br/>
+     **First Section** gives you the job description of the brief and some important details in short. You can click on the ```View Full Brief``` link to see the full brief details
+     <br/><br/>
+    <img src="./public/readme/images/submitProposalFirstSection.png" alt="Alt text" width="700" height="400">
+     <br/><br/>
+     **Second Section** gives you the details about the milestones as shown below, here you can add more milestones(by clicking into ```Add Milestone``` button)
+      and add amount for each milestones
     <br/><br/>
+    <img src="./public/readme/images/submitProposalSecondSection.png" alt="Alt text" width="700" height="400">
+    <br/><br/>
+    **Third Section** gives you the details about the payment terms like the timing and the currency you will like to receive your payment in
+     (we support multiple currency)
+    <br/><br/>
+    <img src="./public/readme/images/submitProposalThirdSection.png" alt="Alt text" width="600" height="200">
+    <br/><br/>
+  - Step 5: Enter all the proposal details and click submit, you will be shown that your brief is now pending with the brief owner as shown below
+    <br/><br/>
+    <img src="./public/readme/images/proposalPendingReview.png" alt="Alt text" width="700" height="400">
+    <br/><br/>
+
 
 
 ## Resources
