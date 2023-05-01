@@ -1,4 +1,5 @@
 import React from "react";
+import styles from '../styles/modules/newBrief.module.css'
 
 export type OptionProps = {
   label: string;
@@ -20,7 +21,7 @@ export const Option = ({ label, value, checked, children, onSelect }: OptionProp
             e.target.checked && onSelect();
           }}
         />
-        <p className="field-name">{label}</p>
+        <p className={styles.fieldName}>{label}</p>
       </div>
       <div className="option-children-container">{children}</div>
     </div>

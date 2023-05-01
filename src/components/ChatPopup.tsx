@@ -38,6 +38,7 @@ const ChatPopup = (props: ChatPopupProps) => {
                 targetUser={targetUser}
                 setShowMessageBox={setShowMessageBox}
                 showMessageBox={showMessageBox}
+                chatPopUp={true}
               ></ChatBox>
             ) : (
               <p>GETSTREAM_API_KEY not found</p>

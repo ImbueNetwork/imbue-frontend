@@ -1,0 +1,294 @@
+.newBriefContainer h1 {
+  font-size: 52px;
+  line-height: 1.1;
+  color: var(--theme-title-color);
+  margin: 0px;
+}
+
+.fieldName {
+  font-size: 20px;
+  line-height: 1.15;
+  color: var(--theme-black-text);
+  font-weight: bold;
+}
+
+.field-input {
+  background-color: var(--theme-ink-color);
+  border: solid 1px black;
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
+  padding: 8px 8px 8px 16px;
+  width: 100%;
+  font-size: 16px;
+  line-height: 1.5;
+  color: black;
+}
+
+.newBriefContainer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  min-height: 650px;
+  max-height: 650px;
+  align-self: center;
+  margin-right: auto;
+  border-radius: 20px;
+}
+
+.leftPanel {
+  background-color: #2c2c2c;
+  padding: 64px 32px 64px 48px;
+  width: 50%;
+  border-radius: 20px 0px 0px 20px;
+}
+
+.rightPanel {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--theme-ink-color);
+  padding: 32px 64px;
+  width: 50%;
+  border-radius: 0px 20px 20px 0px;
+}
+
+.heading {
+  padding: 112px 32px 64px 0px;
+}
+
+.leftPanel .help {
+  color: var(--theme-ink-color);
+  padding-right: 48px;
+  padding-bottom: 8px;
+}
+
+.contents {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: flex-end;
+  padding-bottom: 16px;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  margin-left: auto;
+}
+
+.namePanelInputWrapper {
+  margin-top: 24px;
+  margin-bottom: 40px;
+}
+
+.namePanelNameExamples {
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+  padding-bottom: 128px;
+}
+
+.namePanelNameExample {
+  font-size: 20px;
+  color: black;
+  line-height: 1.5;
+  margin: 0px;
+}
+
+.descriptionPanel {
+  display: flex;
+  flex-direction: column;
+  height: 90%;
+}
+
+.descriptionContainer {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  margin-top: 24px;
+}
+
+.scopeContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding-bottom: 80px;
+}
+
+.scopeItemDescription {
+  color: var(--theme-black-text);
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.timeContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 64px;
+  margin-bottom: 120px;
+}
+
+.experienceLevelContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 64px;
+  margin-bottom: 120px;
+}
+
+.budgetInputContainer {
+  position: relative;
+  margin-top: 24px;
+  margin-bottom: 32px;
+}
+
+.briefDetailFieldInput {
+  background-color: var(--theme-ink-color);
+  border: solid 1px black;
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
+  padding: 8px 8px 8px 16px;
+  width: 100%;
+  height: 180px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: black;
+}
+
+.budgetCurrencyContainer {
+  position: absolute;
+  top: 0px;
+  left: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: var(--theme-black-text);
+}
+
+.budgetDescription {
+  margin-bottom: 160px;
+  padding-right: 112px;
+  color: black;
+}
+
+.industryContainer {
+  padding-top: 24px;
+  padding-bottom: 80px;
+}
+
+.skillsContainer {
+  padding-top: 24px;
+  padding-bottom: 80px;
+}
+
+@media screen and (max-width: 500px) {
+
+  .newBriefContainer {
+    max-width: 95%;
+    margin: auto auto;
+    min-height: 300px;
+  }
+
+  .fieldName {
+    font-size: 16px;
+  }
+
+  .leftPanel {
+    width: 45%;
+    padding: 20px;
+    border-radius: 20px 0px 0px 20px;
+    padding: 35px 20px 20px 20px;
+  }
+
+  .leftPanel .heading {
+    padding: 50px 0 20px 0;
+    font-size: 20px;
+  }
+
+  .leftPanel .help {
+    padding-right: 0;
+    font-size: 14px;
+  }
+
+  .rightPanel {
+    width: 55%;
+    border-radius: 0px 20px 20px 0px;
+    padding: 35px 20px 20px 20px;
+    margin: 0px;
+  }
+
+  .rightPanel input[type='radio'] {
+    height: 12px;
+    width: 12px;
+  }
+
+  .timeContainer {
+    gap: 26px;
+  }
+
+  .scopeContainer {
+    gap: 22px;
+    padding-bottom: 10px;
+  }
+
+  .namePanelInputWrapper {
+    display: flex;
+  }
+
+  .buttons {
+    width: 100%;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .contents {
+    justify-content: flex-start;
+    flex-grow: 0;
+    padding-bottom: 0;
+  }
+
+  .experienceLevelContainer {
+    gap: 30px;
+    margin-top: 20px;
+  }
+
+  .budgetDescription{
+    padding: 0;
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .namePanelNameExamples{
+    padding-bottom: 20px;
+  }
+
+  .namePanelNameExample{
+    font-size: 14px;
+  }
+
+  .namePanelInputWrapper .briefDetailFieldInput{
+    height: 100%;
+    min-height: 110px;
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .industryContainer{
+    padding-bottom: 0;
+  }
+
+  .descriptionContainer textarea{
+    min-height: 200px;
+    font-size: 14px;
+  }
+
+  .brief-details-container {
+    flex-direction: column;
+    max-height: 100%;
+    border-radius: 0px;
+    margin-right: 0px;
+  }
+}

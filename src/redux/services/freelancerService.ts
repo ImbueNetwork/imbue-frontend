@@ -13,6 +13,8 @@ export async function createFreelancingProfile(freelancer: any) {
         body: JSON.stringify({ freelancer }),
       }
     );
+
+    return resp
   } catch (error) {
     console.log(error);
   }

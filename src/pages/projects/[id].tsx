@@ -15,7 +15,7 @@ import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import { getFreelancerProfile } from "@/redux/services/freelancerService";
 import * as utils from "@/utils";
-import {initImbueAPIInfo } from "@/utils/polkadot";
+import { initImbueAPIInfo } from "@/utils/polkadot";
 import ChainService from "@/redux/services/chainService";
 import FullScreenLoader from "@/components/FullScreenLoader";
 import moment from "moment";
@@ -89,7 +89,6 @@ function Project() {
       getProject();
     }
   }, [projectId]);
-
 
   const getChainProject = async () => {
     setLoading(true);
@@ -198,7 +197,6 @@ function Project() {
         filterByInitiator
       />
     </div>
-    
   );
 
   const showAccountChoice = (vote: boolean) => {
@@ -206,8 +204,8 @@ function Project() {
       accountSelected={(account) => voteOnMilestone(account, vote)}
       visible={true}
       setVisible={setShowVotingModal}
-    />
-  }
+    />;
+  };
 
   const renderVotingModal = (
     <Dialogue
@@ -237,13 +235,10 @@ function Project() {
               No
             </button>
           </li>
-
         </>
       }
     />
   );
-
-
 
   const approvedMilStones = project?.milestones?.filter?.(
     (milstone: Milestone) => milstone?.is_approved === true
@@ -273,27 +268,45 @@ function Project() {
     const [expanded, setExpanded] = useState(false);
 
     return (
-      <div className="transparent-conatainer relative !bg-[#2c2c2c] !py-[20px] !border !border-white rounded-[20px]">
+      <div
+        className="
+      transparent-conatainer 
+      relative 
+      !bg-[#2c2c2c] 
+      !py-[20px] 
+      !border 
+      !border-white 
+      rounded-[20px]
+      max-lg:!px-[20px]
+      max-width-750px:!pb-[30px]
+      "
+      >
         <div
           onClick={() => {
             setExpanded(!expanded);
           }}
-          className="flex justify-between w-full items-center"
+          className="
+          flex 
+          justify-between 
+          w-full 
+          items-center 
+          max-width-750px:flex-col 
+          max-width-750px:flex"
         >
-          <div className="flex flex-row">
-            <h3 className="text-[39px] font-normal leading-[60px]">
+          <div className="flex flex-row max-width-750px:w-full">
+            <h3 className="text-[39px] max-width-750px:text-[24px] font-normal leading-[60px]">
               Milestone {index + 1}
             </h3>
             <h3 className="text-[24px] ml-[32px] font-normal leading-[60px]">
               {milestone?.name}
             </h3>
           </div>
-          <div className="flex flex-row items-center">
+          <div className="flex flex-row items-center max-width-750px:w-full max-width-750px:justify-between">
             {milestone?.is_approved
               ? projectStateTag(modified, "Completed")
-              : (milestone?.milestone_key == milestoneBeingVotedOn)
-                ? openForVotingTag()
-                : projectStateTag(modified, "Not Started")}
+              : milestone?.milestone_key == milestoneBeingVotedOn
+              ? openForVotingTag()
+              : projectStateTag(modified, "Not Started")}
 
             <Image
               src={require(expanded
@@ -320,7 +333,7 @@ function Project() {
             </span>
           </p>
 
-          <p className="text-[16px] font-normal text-[#a6a6a6] leading-[178.15%] mt-[23px] w-[80%]">
+          <p className=" text-base font-normal text-[#a6a6a6] leading-[178.15%] mt-[23px] w-[80%]">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
             purus sit amet luctus venenatis, lectus magna fringilla urna,
             porttitor rhoncus dolor purus non enim praesent elementum facilisis
@@ -336,7 +349,7 @@ function Project() {
 
           {milestone.milestone_key == milestoneBeingVotedOn && (
             <button
-              className="primary-btn in-dark w-button font-normal h-[43px] items-center content-center !py-0 mt-[25px] px-8"
+              className="primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8"
               data-testid="next-button"
               onClick={() => vote()}
             >
@@ -346,9 +359,9 @@ function Project() {
 
           {isApplicant &&
             onChainProject?.projectState !==
-            OnchainProjectState.OpenForVoting && (
+              OnchainProjectState.OpenForVoting && (
               <button
-                className="primary-btn in-dark w-button font-normal h-[43px] items-center content-center !py-0 mt-[25px] px-8"
+                className="primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8"
                 data-testid="next-button"
                 onClick={() => submitMilestone()}
               >
@@ -361,7 +374,7 @@ function Project() {
   };
 
   return (
-    <div>
+    <div className="max-lg:p-[var(--hq-layout-padding)]">
       {loading && <FullScreenLoader />}
       {user && showMessageBox && (
         <ChatPopup
@@ -373,35 +386,47 @@ function Project() {
           }}
         />
       )}
-      <div className="flex flex-row bg-[#2c2c2c] border border-opacity-25 -border--theme-light-white rounded-[20px] p-[50px]">
-        <div className="flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] mr-[5%]">
+      <div
+        className="flex 
+      flex-row
+       bg-[#2c2c2c] 
+       border 
+       border-opacity-25 
+       -border--theme-light-white 
+       rounded-[20px] 
+       p-12
+       max-lg:p-5
+       max-lg:flex-col
+       "
+      >
+        <div className="flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] max-lg:basis-[60%] mr-[5%]  max-lg:mr-0">
           <div className="brief-title">
-            <h3 className="text-[32px] leading-[1.5] font-normal m-0 p-0">
+            <h3 className="text-[32px] max-lg:text-[24px] leading-[1.5] font-normal m-0 p-0">
               {project?.name}
             </h3>
             <span
               onClick={() => {
                 // project?.brief_id
               }}
-              className="text-[#b2ff0b] cursor-pointer text-[20px] font-normal !m-0 !p-0 relative top-4"
+              className="text-[#b2ff0b] cursor-pointer text-[20px]  max-lg: text-base  font-normal !m-0 !p-0 relative top-4"
             >
               View full brief
             </span>
           </div>
           <div className="text-inactive w-[80%]">
-            <p className="text-[16px] font-normal leading-[178.15%]">
+            <p className=" text-base font-normal leading-[178.15%]">
               {project?.description}
             </p>
           </div>
-          <p className="text-inactive text-[16px] font-normal leading-[1.5] m-0 p-0">
+          <p className="text-inactive  text-base font-normal leading-[1.5] m-0 p-0">
             Posted {timePosted}
           </p>
 
-          <p className="text-white text-[20px] font-normal leading-[1.5] mt-[16px] p-0">
+          <p className="text-white text-xl font-normal leading-[1.5] mt-[16px] p-0">
             Freelancer hired
           </p>
 
-          <div className="flex flex-row items-center mt-[20px]">
+          <div className="flex flex-row items-center max-lg:flex-wrap mt-5">
             <Image
               src={require("@/assets/images/profile-image.png")}
               alt="freelaner-icon"
@@ -410,7 +435,7 @@ function Project() {
               className="border border-solid border-white rounded-[25px]"
             />
 
-            <p className="text-white text-[20px] font-normal leading-[1.5] p-0 mx-[27px]">
+            <p className="text-white text-[20px] font-normal leading-[1.5] p-0 mx-7">
               {freelancer?.display_name}
             </p>
 
@@ -418,14 +443,28 @@ function Project() {
               onClick={() =>
                 handleMessageBoxClick(project?.user_id, freelancer?.username)
               }
-              className="primary-btn in-dark w-button !mt-0 font-normal h-[43px] items-center content-center !py-0 ml-[40px] px-8"
+              className="primary-btn 
+              in-dark w-button 
+              !mt-0 
+              font-normal 
+              h-11
+              max-lg:!w-full 
+              max-lg:!text-center 
+              max-lg:!ml-0 
+              max-lg:!mt-5 
+              items-center 
+              content-center 
+              !py-0 ml-[40px] 
+              px-8
+              max-lg:!mr-0
+              "
               data-testid="next-button"
             >
               Message
             </button>
           </div>
         </div>
-        <div className="flex flex-col gap-[50px] flex-grow flex-shrink-0 basis-[20%]">
+        <div className="flex flex-col gap-[50px] flex-grow flex-shrink-0 basis-[20%]  max-lg:mt-10">
           <div className="flex flex-col">
             <div className="flex flex-row">
               <Image
@@ -435,7 +474,7 @@ function Project() {
                 alt={"shieldIcon"}
               />
 
-              <h3 className="text-xl leading-[1.5] ml-[24px] font-normal m-0 p-0">
+              <h3 className="text-xl leading-[1.5] ml-6  font-normal m-0 p-0">
                 Milestone{" "}
                 <span className="text-[#BAFF36]">
                   {approvedMilStones?.length}/{project?.milestones?.length}
@@ -446,12 +485,13 @@ function Project() {
             <div className="w-48 bg-[#1C2608] mt-5 h-1 relative my-auto">
               <div
                 style={{
-                  width: `${(onChainProject?.milestones?.filter?.(
-                    (m: any) => m?.is_approved
-                  )?.length /
+                  width: `${
+                    (onChainProject?.milestones?.filter?.(
+                      (m: any) => m?.is_approved
+                    )?.length /
                       onChainProject?.milestones?.length) *
                     100
-                    }%`,
+                  }%`,
                 }}
                 className="h-full rounded-xl Accepted-button absolute"
               ></div>
@@ -459,8 +499,9 @@ function Project() {
                 {onChainProject?.milestones?.map((m: any, i: number) => (
                   <div
                     key={i}
-                    className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"
-                      } rounded-full -mt-1.5`}
+                    className={`h-4 w-4 ${
+                      m.is_approved ? "Accepted-button" : "bg-[#1C2608]"
+                    } rounded-full -mt-1.5`}
                   ></div>
                 ))}
               </div>
@@ -475,15 +516,13 @@ function Project() {
                 width={24}
                 alt={"dollarSign"}
               />
-              <h3 className="text-xl leading-[1.5] ml-[24px] font-normal m-0 p-0">
+              <h3 className="text-xl leading-[1.5] ml-6 font-normal m-0 p-0">
                 {Number(project?.total_cost_without_fee)?.toLocaleString()}{" "}
                 $IMBU
               </h3>
             </div>
 
-            <div className="text-inactive ml-[20%] mt-[7px]">
-              Budget - Fixed
-            </div>
+            <div className="text-inactive ml-[20%] mt-2">Budget - Fixed</div>
           </div>
 
           <div className="flex flex-col">
@@ -495,12 +534,12 @@ function Project() {
                 alt={"calenderIcon"}
               />
 
-              <h3 className="text-xl leading-[1.5] ml-[24px] font-normal m-0 p-0">
+              <h3 className="text-xl leading-[1.5] ml-6 font-normal m-0 p-0">
                 1 to 3 months
               </h3>
             </div>
 
-            <div className="text-inactive  ml-[20%] mt-[7px]">Timeline</div>
+            <div className="text-inactive  ml-[20%] mt-2">Timeline</div>
           </div>
         </div>
       </div>

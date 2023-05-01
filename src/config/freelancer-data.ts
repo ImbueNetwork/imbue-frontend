@@ -1,14 +1,13 @@
 export const stepData = [
   {
-    heading: `Hello {name}, ready to
-        find an opportunity?`,
+    heading: `Hello {name}, ready to find an opportunity?`,
     content: `Answer a few questions and start building your profile\n
         Apply for open briefs or list your skills for clients to hire\n
         Get paid safely and securely!`,
     progress: 1,
   },
   {
-    heading: "A few quick questions: have you freelanced before?",
+    heading: "A few quick questions: Have you freelanced before?",
     content: `This tells us how much help to give you along the way.\n
         (We won’t share your answer with anyone else, including potential clients.)`,
     progress: 2,

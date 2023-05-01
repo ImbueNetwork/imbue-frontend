@@ -17,6 +17,8 @@ import { useRouter } from "next/router";
 import { strToIntRange } from "../briefs";
 import { useWindowSize } from "@/hooks";
 import { FiFilter } from "react-icons/fi";
+import { GetServerSidePropsContext } from "next";
+import LoadingFreelancers from "../../components/Freelancers/FreelancersLoading";
 
 const Freelancers = (): JSX.Element => {
   const [freelancers, setFreelancers] = useState<Freelancer[] | undefined>();
@@ -24,6 +26,7 @@ const Freelancers = (): JSX.Element => {
   const [services, setServices] = useState<Item[]>();
   const [languages, setLanguages] = useState<Item[]>();
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true)
 
   const router = useRouter();
   const size = useWindowSize();
@@ -72,6 +75,7 @@ const Freelancers = (): JSX.Element => {
       setServices(dedupedServices);
       setLanguages(dedupedLanguages);
       setFreelancers(data)
+      setLoading(false)
     }
 
     setFilters()
@@ -273,21 +277,13 @@ const Freelancers = (): JSX.Element => {
     setFilterVisible(!filterVisble);
   };
 
+  if(loading) return <LoadingFreelancers/>
+
   return (
     <div className="px-[15px] lg:px-[40px]">
       <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
         <div
-          className={`${styles.filterPanel}
-        max-width-750px:fixed 
-        max-width-750px:!w-full 
-        max-width-750px:top-0 
-      max-width-750px:bg-black 
-        max-width-750px:z-10
-        max-width-750px:px-[20px]
-        max-width-750px:pt-[20px]
-        h-full
-        max-width-750px:overflow-y-scroll
-        `}
+          className={`${styles.filterPanel}`}
           style={{
             display:
               size?.width <= 750 ? (filterVisble ? "block" : "none") : "block",

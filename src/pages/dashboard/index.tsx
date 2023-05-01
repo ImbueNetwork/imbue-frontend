@@ -18,6 +18,7 @@ import MyClientBriefsView from '@/components/Dashboard/MyClientBriefsView';
 import DashboardChatBox from '@/components/Dashboard/MyChatBox';
 import { Brief } from '@/model';
 import { ApplicationData } from '@/model';
+import FullScreenLoader from '@/components/FullScreenLoader';
 
 export type DashboardProps = {
   user: User;
@@ -38,6 +39,7 @@ const Dashboard = ({ user, isAuthenticated, myBriefs, myApplicationsResponse  }:
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [briefApplications, setBriefApplications] = useState<Project[]>([]);
   const [myApplications, setMyApplications] = useState<Project[]>(myApplicationsResponse);
+  const [loadingStreamChat, setLoadingStreamChat]= useState<boolean>(true)
 
   const router = useRouter();  
 
@@ -68,6 +70,7 @@ const Dashboard = ({ user, isAuthenticated, myBriefs, myApplicationsResponse  }:
   useEffect(() => {
     const setupStreamChat = async () => {
       setClient(await getStreamChat());
+      setLoadingStreamChat(false)
     };
     setupStreamChat();
   }, []);
@@ -89,6 +92,8 @@ const Dashboard = ({ user, isAuthenticated, myBriefs, myApplicationsResponse  }:
       });
     }
   }, [client, user?.getstream_token, user?.username]);
+
+  if(loadingStreamChat) return <FullScreenLoader/>
 
   return client ? (
     <div className="lg:-mt-8 hq-layout px-[15px]">

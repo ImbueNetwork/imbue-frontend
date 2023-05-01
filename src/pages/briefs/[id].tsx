@@ -180,7 +180,7 @@ const BriefDetails = (): JSX.Element => {
   if (error) return <h2>{error.message}</h2>;
 
   return (
-    <div className="brief-details-container hq-layout">
+    <div className="brief-details-container hq-layout px-[15px] lg:px-[40px]">
       <div className="brief-info max-width-750px:!flex-col">
         {/* TODO: Implement */}
         <BioPanel brief={brief} projectCategories={projectCategories} />

@@ -56,16 +56,23 @@ const createFreelancer = (
       )(tx);
 
       if (!freelancer_id) {
-        return new Error("Failed to insert freelancer details.");
+
+        return res.status(401).send({
+          status: "Failed",
+          error : new Error("Failed to insert freelancer details.")
+        });
       }
 
-      res.status(201).send({
+      return res.status(201).send({
         status: "Successful",
         freelancer_id: freelancer_id,
       });
     } catch (cause) {
-      new Error(`Failed to insert freelancer details .`, {
-        cause: cause as Error,
+      return res.status(401).send({
+        status: "Failed",
+        error : new Error(`Failed to insert freelancer details .`, {
+          cause: cause as Error,
+        })
       });
     }
   });
