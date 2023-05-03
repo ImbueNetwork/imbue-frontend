@@ -180,7 +180,7 @@ export type Item = {
 
 // The same as backend/briefs
 export type Brief = {
-  id: number;
+  id: number | string;
   headline: string;
   industries: Item[];
   description: string;
