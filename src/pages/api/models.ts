@@ -595,9 +595,9 @@ export const getOrCreateFederatedUser = (
              * Do we already have a federated_credential ?
              */
             const federated = await tx<FederatedCredential>("federated_credentials").select().where({
-                issuer,
                 subject: username,
             }).first();
+
             /**
              * If not, create the `user`, then the `federated_credential`
              */

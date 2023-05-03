@@ -39,18 +39,6 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
       needAuthentication: true,
     },
     {
-      icon: "groups",
-      text: "Discover Freelancers",
-      link: `/freelancers`,
-      needAuthentication: false,
-    },
-    {
-      icon: "group_add",
-      text: isFreelancer ? "Freelancer Profile" : "Join The Freelancers",
-      link: isFreelancer ? `/freelancers/${user?.username}/` : "/freelancers/new",
-      needAuthentication: true,
-    },
-    {
       icon: "work",
       text: "Submit A Brief",
       link: "/briefs/new",
@@ -61,6 +49,18 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
       text: "Discover Briefs",
       link: "/briefs",
       needAuthentication: false,
+    },
+    {
+      icon: "groups",
+      text: "Discover Freelancers",
+      link: `/freelancers`,
+      needAuthentication: false,
+    },
+    {
+      icon: "group_add",
+      text: isFreelancer ? "Freelancer Profile" : "Join The Freelancers",
+      link: isFreelancer ? `/freelancers/${user?.username}/` : "/freelancers/new",
+      needAuthentication: true,
     },
     {
       icon: "money",
