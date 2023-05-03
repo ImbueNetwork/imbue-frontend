@@ -346,7 +346,7 @@ const ApplicationPreview = (): JSX.Element => {
 								Message
 							</button>
 							{application?.status_id === 4 ? (
-								<button onClick={() => brief?.project_id && setOpenPopup(true)} className="Accepted-btn text-black in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[14px]">
+								<button className="Accepted-btn text-black in-dark text-xs lg:text-base rounded-full py-[7px] px-3 ml-3 lg:ml-0 lg:px-6 md:py-[14px]" onClick={() => brief?.project_id && setOpenPopup(true)} >
 									Start Work
 								</button>
 							) : (
@@ -515,7 +515,7 @@ const ApplicationPreview = (): JSX.Element => {
 						<div className="duration-selector">
 							<h3 className="text-xl font-bold m-0 p-0">How long will this project take?</h3>
 							<select
-								className="bg-[#1a1a19] border border-solid border-[#fff] rounded-[5px] text-base px-[20px] py-[10px] mt-4 round"
+								className="bg-[#1a1a19] border border-light-white rounded-[5px] text-base px-[20px] py-[10px] mt-4 round"
 								name="duration"
 								placeholder="Select a duration"
 								required
@@ -533,7 +533,7 @@ const ApplicationPreview = (): JSX.Element => {
 								<select
 									name="currencyId"
 									onChange={handleChange}
-									className="bg-[#1a1a19] round border border-solid border-[#fff] rounded-[5px] text-base px-[20px] py-[10px] mt-4"
+									className="bg-[#1a1a19] round border border-light-white rounded-[5px] text-base px-[20px] py-[10px] mt-4"
 									placeholder="Select a currency"
 									disabled={!isEditingBio}
 									defaultValue={Number(application?.currency_id)}
