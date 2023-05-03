@@ -34,7 +34,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   useEffect(() => {
     getUserAndFreelancer();
-  }, [briefId, user]);
+  }, [briefId]);
 
   useEffect(() => {
     getCurrentUserBrief();
@@ -189,20 +189,20 @@ export const SubmitProposal = (): JSX.Element => {
       </div>
       <div>
         <div className="milestones border border-white py-5 rounded-[20px] bg-theme-grey-dark">
-          <div className="flex flex-col lg:flex-row justify-between mx-14 -mb-3">
-            <h3 className="text-xl leading-[1.5] font-bold m-0 p-0 flex">
+          <div className="flex flex-row justify-between mx-5 lg:mx-14 -mb-3">
+            <h3 className="text-lg lg:text-xl leading-[1.5] font-bold m-0 p-0 flex">
               Milestones
             </h3>
-            <h3 className="text-xl leading-[1.5] font-bold m-0 p-0">
+            <h3 className="text-lg lg:text-xl leading-[1.5] font-bold m-0 p-0">
               Client&apos;s budget: ${Number(brief?.budget)?.toLocaleString()}
             </h3>
           </div>
           <hr className="separator" />
 
-          <p className="mx-14 text-xl font-bold">
+          <p className="mx-5 lg:mx-14 text-base lg:text-lg font-bold">
             How many milestone do you want to include?
           </p>
-          <div className="milestone-list mx-14">
+          <div className="milestone-list mx-5 lg:mx-14">
             {milestones.map(({ name, amount }, index) => {
               const percent = Number(
                 ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)

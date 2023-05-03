@@ -135,12 +135,27 @@
 }
 
 .input-description {
+  background-color: #1a1a19;
   height: 8rem;
+  border: 1px solid var(--theme-light-white);
+  padding: 10px 20px;
 }
 
 .value-input .input-budget {
+  background-color: #1a1a19;
+  border:1px solid var(--theme-light-white);
+  border-radius: 5px;
+  padding: 10px 20px;
   position: relative;
   text-align: right;
+}
+
+.input-budget {
+  background-color: #1a1a19;
+  border:1px solid var(--theme-light-white);
+  border-radius: 5px;
+  padding: 10px 20px;
+  width: 100%;
 }
 
 .value-input .input-budget:before {
@@ -193,7 +208,7 @@
 .separator {
   width: 100%;
   height: 1px;
-  /* background: var(--theme-white); */
+  border-color: var(--theme-light-white);
   margin: 12px 0;
 }
 
@@ -265,4 +280,28 @@
 
 .modal-container ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+/* @media screen and (max-width: 1024px) {
+
+  .input-description {
+    padding: 10px 10px;
+    width: 80%;
+  }
+  
+.input-budget {
+    width: 50%;
+  }
+} */
+
+
+@media screen and (max-width: 500px) {
+
+  .payment-details {
+    flex-direction: column;
+  }
+
+  .input-description {
+    padding: 10px 10px;
+  }
 }
