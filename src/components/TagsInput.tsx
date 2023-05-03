@@ -1,4 +1,5 @@
-import React, { useState, KeyboardEvent } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, KeyboardEvent, useEffect } from "react";
 
 export type TagsInputProps = {
   tags: string[];
@@ -11,7 +12,7 @@ export const TagsInput = ({
   suggestData,
   onChange,
 }: TagsInputProps): JSX.Element => {
-  const [vtags, setTags] = useState<string[]>(tags);
+  const [vtags, setTags] = useState<string[]>([]);
   const [input, setInput] = useState("");
 
   const handleDelete = (targetIndex: number) => {
@@ -33,7 +34,7 @@ export const TagsInput = ({
   };
 
   const addItem = (item: string) => {
-    const newTags = [...vtags, item];
+    const newTags = [...tags, item];
     setTags(newTags);
     onChange(newTags);
   };
@@ -42,11 +43,13 @@ export const TagsInput = ({
     <>
       <div className="selected-tags">
         {tags.map((tag, i) => (
-          <div key={i} className="selected-tag-item cursor-pointer" onClick={() => handleDelete(i)}>
+          <div
+            key={i}
+            className="selected-tag-item cursor-pointer"
+            onClick={() => handleDelete(i)}
+          >
             {tag}
-            <div className="unselect-tag">
-              x
-            </div>
+            <div className="unselect-tag">x</div>
           </div>
         ))}
         <input

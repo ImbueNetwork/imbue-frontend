@@ -20,9 +20,9 @@ export enum OnchainProjectState {
   PendingProjectApproval = 0,
   PendingFundingApproval = 1,
   OpenForContribution = 2,
-  PendingMilestoneSubmission = 3 ,
+  PendingMilestoneSubmission = 3,
   PendingMilestoneApproval = 4,
-  OpenForVoting= 5,
+  OpenForVoting = 5,
   OpenForWithdraw = 6,
 }
 
@@ -57,8 +57,6 @@ export type Project = {
   created: Date;
   modified?: Date;
 };
-
-
 
 export type ProjectOnChain = {
   id?: string | number;
@@ -182,7 +180,7 @@ export type Item = {
 
 // The same as backend/briefs
 export type Brief = {
-  id: string;
+  id: number;
   headline: string;
   industries: Item[];
   description: string;
@@ -191,7 +189,7 @@ export type Brief = {
   scope_level: string;
   duration: string;
   duration_id: number;
-  budget: number;
+  budget: bigint | any;
   created: Date;
   created_by: string;
   experience_level: string;

@@ -2,6 +2,8 @@ import { Brief } from "@/model";
 import React from "react";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
+import { FiEdit } from "react-icons/fi";
+import { useRouter } from "next/router";
 
 TimeAgo.addLocale(en);
 
@@ -10,16 +12,44 @@ const timeAgo = new TimeAgo("en-US");
 type BioPanelData = {
   brief: Brief;
   projectCategories: string[];
+  isOwnerOfBrief?: boolean | null;
 };
 
-const BioPanel = ({ brief, projectCategories }: BioPanelData) => {
+const BioPanel = ({
+  brief,
+  projectCategories,
+  isOwnerOfBrief,
+}: BioPanelData) => {
   const timePosted = timeAgo.format(new Date(brief.created));
+  const router = useRouter();
 
   return (
     <div className="brief-bio py-5 px-10 max-width-750px:!p-5 max-width-750px:!w-full max-width-1100px:p-[1rem]">
       <div className="subsection max-width-750px:!my-0">
-        <div className="header">
-          <h2>{brief.headline}</h2>
+        <div className="flex flex-wrap flex-col items-start">
+          <div className="header">
+            <h2>{brief.headline}</h2>
+          </div>
+
+          {isOwnerOfBrief && (
+            <button
+              className="primary-btn 
+              in-dark w-[auto] 
+              max-width-750px:!px-4 
+              flex 
+              items-center 
+              gap-2
+              my-4
+              !self-start
+              "
+              onClick={() => {
+                router.push(`/briefs/${brief?.id}/edit`);
+              }}
+            >
+              Edit Proposal
+              <FiEdit size={16} />
+            </button>
+          )}
         </div>
         <span className="time_posted primary-text mt-3">
           Posted {timePosted} by {brief.created_by}

@@ -1,5 +1,5 @@
 import React from "react";
-import styles from '../styles/modules/newBrief.module.css'
+import styles from "../styles/modules/newBrief.module.css";
 
 export type OptionProps = {
   label: string;
@@ -7,9 +7,17 @@ export type OptionProps = {
   checked?: boolean;
   children?: React.ReactNode;
   onSelect: () => void;
+  textclass?: string;
 };
 
-export const Option = ({ label, value, checked, children, onSelect }: OptionProps): JSX.Element => {
+export const Option = ({
+  label,
+  value,
+  checked,
+  children,
+  onSelect,
+  textclass,
+}: OptionProps): JSX.Element => {
   return (
     <div className="option-container" onClick={onSelect}>
       <div className="option-inner">
@@ -21,9 +29,9 @@ export const Option = ({ label, value, checked, children, onSelect }: OptionProp
             e.target.checked && onSelect();
           }}
         />
-        <p className={styles.fieldName}>{label}</p>
+        <p className={`${styles.fieldName} ${textclass}`}>{label}</p>
       </div>
       <div className="option-children-container">{children}</div>
     </div>
   );
-}
+};

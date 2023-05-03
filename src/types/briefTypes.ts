@@ -1,3 +1,5 @@
+import { Item } from "@/model";
+
 export type FilterOption = {
   interiorIndex: number;
   search_for: number[];
@@ -21,12 +23,13 @@ export type BriefState = {
 
 export type BriefInfo = {
   headline: string;
-  industries: string[];
+  industries: string[] | Item[];
   description: string;
   scope_id: number | undefined;
   experience_id: number | undefined;
   duration_id: number | undefined;
-  skills: string[];
+  skills: string[] | Item[];
   budget: bigint | undefined;
-  user_id: number | undefined;
+  user_id?: number | undefined;
+  brief_id?: number | undefined;
 };
