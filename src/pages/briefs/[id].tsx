@@ -48,25 +48,24 @@ const BriefDetails = (): JSX.Element => {
   const [error, setError] = useState<any>();
 
   // TODO: need to get project category array from the brief
-  const projectCategories = ["Product Development", "Health", "Wellness"];
+  const projectCategories = brief?.industries?.map?.((item) => item?.name);
 
   const id: any = router?.query?.id || 0;
 
   const fetchData = async () => {
     if (id) {
       const briefData: Brief | Error | undefined = await getBrief(id);
-      if(briefData?.id){
+      if (briefData?.id) {
         const targetUser = await fetchUser(briefData.user_id);
-        setBrief(briefData)
+        setBrief(briefData);
         setBrowsingUser(await getCurrentUser());
         setTargetUser(targetUser);
-      }
-      else{
-        briefData!==undefined && setError(briefData)
+      } else {
+        briefData !== undefined && setError(briefData);
       }
     }
   };
-  
+
   useEffect(() => {
     fetchData();
   }, [id]);
@@ -183,7 +182,11 @@ const BriefDetails = (): JSX.Element => {
     <div className="brief-details-container hq-layout px-[15px] lg:px-[40px]">
       <div className="brief-info max-width-750px:!flex-col">
         {/* TODO: Implement */}
-        <BioPanel brief={brief} projectCategories={projectCategories} />
+        <BioPanel
+          brief={brief}
+          isOwnerOfBrief={isOwnerOfBrief}
+          projectCategories={projectCategories}
+        />
         <BioInsights
           redirectToApply={redirectToApply}
           brief={brief}

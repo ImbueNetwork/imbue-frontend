@@ -72,8 +72,7 @@ function Project() {
     useState<boolean>(false);
   const [submittingMilestone, setSubmittingMilestone] =
     useState<boolean>(false);
-  const [withdrawMilestone, setWithdrawMilestone] =
-    useState<boolean>(false);
+  const [withdrawMilestone, setWithdrawMilestone] = useState<boolean>(false);
   const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
   const [votingWalletAccount, setVotingWalletAccount] = useState<
     WalletAccount | any
@@ -178,17 +177,13 @@ function Project() {
     setLoading(false);
   };
 
-
   // submitting a milestone
   const withdraw = async (account: WalletAccount) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
     const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
-    const result = await chainService.withdraw(
-      account,
-      onChainProject
-    );
+    const result = await chainService.withdraw(account, onChainProject);
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
@@ -333,8 +328,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, "Completed")
               : milestone?.milestone_key == milestoneBeingVotedOn
-                ? openForVotingTag()
-                : projectStateTag(modified, "Not Started")}
+              ? openForVotingTag()
+              : projectStateTag(modified, "Not Started")}
 
             <Image
               src={require(expanded
@@ -387,7 +382,7 @@ function Project() {
 
           {isApplicant &&
             onChainProject?.projectState !==
-            OnchainProjectState.OpenForVoting && (
+              OnchainProjectState.OpenForVoting && (
               <button
                 className="primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8"
                 data-testid="next-button"
@@ -396,7 +391,6 @@ function Project() {
                 Submit
               </button>
             )}
-
 
           {isApplicant && milestone.is_approved && (
             <button
@@ -524,12 +518,13 @@ function Project() {
             <div className="w-48 bg-[#1C2608] mt-5 h-1 relative my-auto">
               <div
                 style={{
-                  width: `${(onChainProject?.milestones?.filter?.(
-                    (m: any) => m?.is_approved
-                  )?.length /
-                    onChainProject?.milestones?.length) *
+                  width: `${
+                    (onChainProject?.milestones?.filter?.(
+                      (m: any) => m?.is_approved
+                    )?.length /
+                      onChainProject?.milestones?.length) *
                     100
-                    }%`,
+                  }%`,
                 }}
                 className="h-full rounded-xl Accepted-button absolute"
               ></div>
@@ -537,8 +532,9 @@ function Project() {
                 {onChainProject?.milestones?.map((m: any, i: number) => (
                   <div
                     key={i}
-                    className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"
-                      } rounded-full -mt-1.5`}
+                    className={`h-4 w-4 ${
+                      m.is_approved ? "Accepted-button" : "bg-[#1C2608]"
+                    } rounded-full -mt-1.5`}
                   ></div>
                 ))}
               </div>
