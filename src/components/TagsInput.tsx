@@ -16,7 +16,7 @@ export const TagsInput = ({
   const [input, setInput] = useState("");
 
   const handleDelete = (targetIndex: number) => {
-    const newTags = vtags.filter((_, index) => index !== targetIndex);
+    const newTags = tags.filter((_, index) => index !== targetIndex);
     setTags(newTags);
     onChange(newTags);
   };

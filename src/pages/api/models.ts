@@ -576,7 +576,7 @@ export const updateBrief =
     experience_id: number,
     duration_id: number,
     budget: bigint,
-    brief_id: number,
+    brief_id: number | string,
     skill_ids: number[],
     industry_ids: number[]
   ) =>

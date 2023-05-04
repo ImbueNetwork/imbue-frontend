@@ -48,7 +48,7 @@ const BriefDetails = (): JSX.Element => {
   const [error, setError] = useState<any>();
 
   // TODO: need to get project category array from the brief
-  const projectCategories = ["Product Development", "Health", "Wellness"];
+  const projectCategories = brief?.industries?.map?.((item) => item?.name);
 
   const id: any = router?.query?.id || 0;
 
