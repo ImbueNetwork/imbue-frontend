@@ -34,6 +34,7 @@ type ExpandableDropDownsProps = {
   modified: Date;
   vote: () => void;
   submitMilestone: () => void;
+  withdraw: () => void;
 };
 
 const openForVotingTag = (): JSX.Element => {
@@ -69,13 +70,15 @@ function Project() {
   const [chatTargetUser, setChatTargetUser] = useState<User | null>(null);
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
-  const [submittingMilestone, setSubmittingMileStone] =
+  const [submittingMilestone, setSubmittingMilestone] =
+    useState<boolean>(false);
+  const [withdrawMilestone, setWithdrawMilestone] =
     useState<boolean>(false);
   const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
   const [votingWalletAccount, setVotingWalletAccount] = useState<
     WalletAccount | any
   >({});
-  const [mileStoneKeyInView, setMileStoneKeyInview] = useState<number>(0);
+  const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [loginModal, setLoginModal] = useState<boolean>(false);
@@ -104,8 +107,6 @@ function Project() {
       }
 
       setIsApplicant(isApplicant);
-      console.log("******");
-      console.log(onChainProjectRes);
       console.log(OnchainProjectState[onChainProjectRes.projectState]);
       if (onChainProjectRes.projectState == OnchainProjectState.OpenForVoting) {
         const firstPendingMilestone =
@@ -136,9 +137,6 @@ function Project() {
 
   // voting on a mile stone
   const voteOnMilestone = async (account: WalletAccount, vote: boolean) => {
-    console.log("***** voting on milestone");
-    console.log(account);
-    console.log(vote);
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
     const userRes: User | any = await utils.getCurrentUser();
@@ -146,14 +144,14 @@ function Project() {
     const voteResponse = await chainService.voteOnMilestone(
       account,
       onChainProject,
-      mileStoneKeyInView,
+      milestoneKeyInView,
       vote
     );
     setLoading(false);
     console.log({ voteResponse });
   };
 
-  // submitting a mile stone
+  // submitting a milestone
   const submitMilestone = async (account: WalletAccount) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
@@ -162,7 +160,34 @@ function Project() {
     const result = await chainService.submitMilestone(
       account,
       onChainProject,
-      mileStoneKeyInView
+      milestoneKeyInView
+    );
+    while (true) {
+      if (result.status || result.txError) {
+        if (result.status) {
+          console.log("***** success");
+          console.log(result.eventData);
+        } else if (result.txError) {
+          console.log("***** failed");
+          console.log(result.errorMessage);
+        }
+        break;
+      }
+      await new Promise((f) => setTimeout(f, 1000));
+    }
+    setLoading(false);
+  };
+
+
+  // submitting a milestone
+  const withdraw = async (account: WalletAccount) => {
+    setLoading(true);
+    const imbueApi = await initImbueAPIInfo();
+    const user: User | any = await utils.getCurrentUser();
+    const chainService = new ChainService(imbueApi, user);
+    const result = await chainService.withdraw(
+      account,
+      onChainProject
     );
     while (true) {
       if (result.status || result.txError) {
@@ -186,6 +211,8 @@ function Project() {
         accountSelected={async (account: WalletAccount) => {
           if (submittingMilestone) {
             submitMilestone(account);
+          } else if (withdrawMilestone) {
+            withdraw(account);
           } else {
             await setVotingWalletAccount(account);
             await setShowVotingModal(true);
@@ -240,7 +267,7 @@ function Project() {
     />
   );
 
-  const approvedMilStones = project?.milestones?.filter?.(
+  const approvedMilestones = project?.milestones?.filter?.(
     (milstone: Milestone) => milstone?.is_approved === true
   );
 
@@ -264,6 +291,7 @@ function Project() {
     modified,
     vote,
     submitMilestone,
+    withdraw,
   }: ExpandableDropDownsProps) => {
     const [expanded, setExpanded] = useState(false);
 
@@ -305,8 +333,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, "Completed")
               : milestone?.milestone_key == milestoneBeingVotedOn
-              ? openForVotingTag()
-              : projectStateTag(modified, "Not Started")}
+                ? openForVotingTag()
+                : projectStateTag(modified, "Not Started")}
 
             <Image
               src={require(expanded
@@ -347,7 +375,7 @@ function Project() {
             phasellus faucibus
           </p>
 
-          {milestone.milestone_key == milestoneBeingVotedOn && (
+          {!isApplicant && milestone.milestone_key == milestoneBeingVotedOn && (
             <button
               className="primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8"
               data-testid="next-button"
@@ -359,7 +387,7 @@ function Project() {
 
           {isApplicant &&
             onChainProject?.projectState !==
-              OnchainProjectState.OpenForVoting && (
+            OnchainProjectState.OpenForVoting && (
               <button
                 className="primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8"
                 data-testid="next-button"
@@ -368,6 +396,17 @@ function Project() {
                 Submit
               </button>
             )}
+
+
+          {isApplicant && milestone.is_approved && (
+            <button
+              className="primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8"
+              data-testid="next-button"
+              onClick={() => withdraw()}
+            >
+              Withdraw
+            </button>
+          )}
         </div>
       </div>
     );
@@ -477,7 +516,7 @@ function Project() {
               <h3 className="text-xl leading-[1.5] ml-6  font-normal m-0 p-0">
                 Milestone{" "}
                 <span className="text-[#BAFF36]">
-                  {approvedMilStones?.length}/{project?.milestones?.length}
+                  {approvedMilestones?.length}/{project?.milestones?.length}
                 </span>
               </h3>
             </div>
@@ -485,13 +524,12 @@ function Project() {
             <div className="w-48 bg-[#1C2608] mt-5 h-1 relative my-auto">
               <div
                 style={{
-                  width: `${
-                    (onChainProject?.milestones?.filter?.(
-                      (m: any) => m?.is_approved
-                    )?.length /
-                      onChainProject?.milestones?.length) *
+                  width: `${(onChainProject?.milestones?.filter?.(
+                    (m: any) => m?.is_approved
+                  )?.length /
+                    onChainProject?.milestones?.length) *
                     100
-                  }%`,
+                    }%`,
                 }}
                 className="h-full rounded-xl Accepted-button absolute"
               ></div>
@@ -499,9 +537,8 @@ function Project() {
                 {onChainProject?.milestones?.map((m: any, i: number) => (
                   <div
                     key={i}
-                    className={`h-4 w-4 ${
-                      m.is_approved ? "Accepted-button" : "bg-[#1C2608]"
-                    } rounded-full -mt-1.5`}
+                    className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"
+                      } rounded-full -mt-1.5`}
                   ></div>
                 ))}
               </div>
@@ -552,21 +589,25 @@ function Project() {
               index={index}
               milestone={milestone}
               modified={milestone?.modified!}
-              vote={async () => {
-                // show polkadot account modal
-                // await setShowPolkadotAccounts(true);
-                // set submitting mile stone to false
-                await setShowVotingModal(true);
-                // setMile stone key in view
-                await setMileStoneKeyInview(milestone.milestone_key);
-              }}
               submitMilestone={async () => {
                 // set submitting mile stone to true
-                await setSubmittingMileStone(true);
+                await setSubmittingMilestone(true);
                 // show polkadot account modal
                 await setShowPolkadotAccounts(true);
                 // setMile stone key in view
-                await setMileStoneKeyInview(milestone.milestone_key);
+                await setMilestoneKeyInView(milestone.milestone_key);
+              }}
+              vote={async () => {
+                await setShowPolkadotAccounts(true);
+                await setMilestoneKeyInView(milestone.milestone_key);
+              }}
+              withdraw={async () => {
+                // set submitting mile stone to true
+                await setWithdrawMilestone(true);
+                // show polkadot account modal
+                await setShowPolkadotAccounts(true);
+                // setMile stone key in view
+                await setMilestoneKeyInView(milestone.milestone_key);
               }}
             />
           );
