@@ -7,10 +7,10 @@ import { getCurrentUser } from "@/utils";
 
 type DrawerProps = {
   visible: boolean;
-  toggleVisibility: () => void;
+  setSideBarIsVisible: (value:boolean) => void;
 };
 
-const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
+const Drawer = ({ visible, setSideBarIsVisible }: DrawerProps): JSX.Element => {
   const router = useRouter();
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [authenticated, setAuthenticated] = useState<boolean>(false);
@@ -83,7 +83,7 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
     else {
       router.push(link);
     }
-    toggleVisibility()
+    setSideBarIsVisible(false)
   };
 
   return (
@@ -121,7 +121,7 @@ const Drawer = ({ visible, toggleVisibility }: DrawerProps): JSX.Element => {
         visible={loginModal}
         setVisible={(val) => {
           setLoginModal(val);
-          toggleVisibility();
+          setSideBarIsVisible(false);
         }}
         redirectUrl={redirectURL || "/dashboard"}
       />
