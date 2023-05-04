@@ -43,6 +43,7 @@ export const EditProposal = (): JSX.Element => {
   const [user, setUser] = useState<User | null>();
   const [industries, setIndustries] = useState<string[]>([]);
   const [description, setDescription] = useState("");
+  const [headline, setHeadline] = useState("");
   const [expId, setExpId] = useState<number>();
   const [scopeId, setScopeId] = useState<number>();
   const [durationId, setDurationId] = useState<number>();
@@ -66,6 +67,7 @@ export const EditProposal = (): JSX.Element => {
       const industryNames = briefResponse?.industries?.map?.(
         (item) => item?.name
       );
+      const projectHeadline: any = briefResponse?.headline;
       const projectBudget: any = briefResponse?.budget;
       const projectDescription = briefResponse?.description;
       const projectScope = briefResponse?.scope_id;
@@ -80,6 +82,7 @@ export const EditProposal = (): JSX.Element => {
       setScopeId(projectScope);
       setExpId(projectExperience);
       setDurationId(projectDuration);
+      setHeadline(projectHeadline);
     } else {
       router.push(`/briefs/${briefId}`);
     }
@@ -93,7 +96,7 @@ export const EditProposal = (): JSX.Element => {
     setLoading(true);
     const updateBriefResponse = await updateBriefById({
       description,
-      headline: brief.headline,
+      headline: headline,
       industries,
       scope_id: scopeId,
       skills,
@@ -126,11 +129,23 @@ export const EditProposal = (): JSX.Element => {
       "
       >
         <h1 className=" text-4xl leading-[50px] !text-white m-0 font-normal mx-0">
-          {brief?.headline}
+          Edit Brief Details
         </h1>
       </header>
       <div className="imbu-proposals-draft-submission-form">
         <fieldset>
+          <p className={`${styles.fieldName} !text-white !text-3xl`}>
+            Headline
+          </p>
+          <div className={styles.budgetInputContainer}>
+            <input
+              className={styles.briefDetailFieldInput}
+              style={{ paddingLeft: "24px", height: "auto" }}
+              type="text"
+              value={headline || ""}
+              onChange={(e) => setHeadline(e.target.value)}
+            />
+          </div>
           <h1 className="!text-3xl m-0 font-normal my-0 mx-0">Skills</h1>
           <div className={styles.skillsContainer}>
             <TagsInput
