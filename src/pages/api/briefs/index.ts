@@ -25,7 +25,7 @@ export default async function handler(
               brief.skills = await fetchItems(brief.skill_ids, "skills")(tx);
               brief.industries = await fetchItems(
                 brief.industry_ids,
-                "skills"
+                "industries"
               )(tx);
             }),
           ]);
@@ -48,35 +48,6 @@ export default async function handler(
       brief_id: response,
     });
   }
-}
-
-export async function fetchBrief(briefId: string) {
-  let response;
-  await db.transaction(async (tx: any) => {
-    try {
-      const brief = await models.fetchBrief(briefId)(tx);
-
-      if (!brief) {
-        return brief;
-      }
-
-      await Promise.all([
-        (brief.skills = await fetchItems(brief.skill_ids, "skills")(tx)),
-        (brief.industries = await fetchItems(
-          brief.industry_ids,
-          "industries"
-        )(tx)),
-      ]);
-
-      response = brief;
-    } catch (e) {
-      new Error(`Failed to fetch projects for user id: ${briefId}`, {
-        cause: e as Error,
-      });
-    }
-  });
-
-  return response;
 }
 
 export async function createBrief(req: NextApiRequest) {

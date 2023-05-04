@@ -52,51 +52,36 @@ export const EditProposal = (): JSX.Element => {
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
   const [skills, setSkills] = useState<string[]>([]);
-
   useEffect(() => {
-    if (!user && briefId) {
-      getUserAndFreelancer();
-    }
-  }, [briefId, user]);
-
-  useEffect(() => {
-    if (user) {
-      getCurrentUserBrief();
-    }
-  }, [user]);
-
-  const getUserAndFreelancer = async () => {
-    const userResponse = await getCurrentUser();
-    setUser(userResponse);
-    const freelancer = await getFreelancerProfile(userResponse?.username);
-    if (!freelancer) {
-      router.push(`/freelancers/new`);
-    }
-  };
+    getCurrentUserBrief();
+  }, [briefId]);
 
   const getCurrentUserBrief = async () => {
-    if (briefId && user) {
-      const briefResponse: Brief | undefined = await getBrief(briefId);
-      if (briefResponse) {
-        const skillNames = briefResponse?.skills?.map?.((item) => item?.name);
-        const industryNames = briefResponse?.industries?.map?.(
-          (item) => item?.name
-        );
-        const projectBudget: any = briefResponse?.budget;
-        const projectDescription = briefResponse?.description;
-        const projectScope = briefResponse?.scope_id;
-        const projectExperience = briefResponse?.experience_id;
-        const projectDuration = briefResponse?.duration_id;
+    const userResponse = await getCurrentUser();
+    setUser(userResponse);
+    const briefResponse: Brief | undefined = await getBrief(briefId);
+    const userOwnsBriefs = briefResponse?.user_id == userResponse?.id;
+    if (briefResponse && userResponse && userOwnsBriefs) {
+      const skillNames = briefResponse?.skills?.map?.((item) => item?.name);
+      const industryNames = briefResponse?.industries?.map?.(
+        (item) => item?.name
+      );
+      const projectBudget: any = briefResponse?.budget;
+      const projectDescription = briefResponse?.description;
+      const projectScope = briefResponse?.scope_id;
+      const projectExperience = briefResponse?.experience_id;
+      const projectDuration = briefResponse?.duration_id;
 
-        setBrief(briefResponse);
-        setSkills(skillNames);
-        setIndustries(industryNames);
-        setBudget(projectBudget);
-        setDescription(projectDescription);
-        setScopeId(projectScope);
-        setExpId(projectExperience);
-        setDurationId(projectDuration);
-      }
+      setBrief(briefResponse);
+      setSkills(skillNames);
+      setIndustries(industryNames);
+      setBudget(projectBudget);
+      setDescription(projectDescription);
+      setScopeId(projectScope);
+      setExpId(projectExperience);
+      setDurationId(projectDuration);
+    } else {
+      router.push(`/briefs/${briefId}`);
     }
   };
 
