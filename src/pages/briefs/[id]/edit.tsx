@@ -129,7 +129,7 @@ export const EditProposal = (): JSX.Element => {
   }
 
   return (
-    <div className="flex flex-row max-width-868px:block hq-layout">
+    <div className="flex flex-row max-width-868px:block hq-layout max-md:px-7">
       <header
         className="
       max-w-[400px] 
