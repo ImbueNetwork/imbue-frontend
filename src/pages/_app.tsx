@@ -12,13 +12,27 @@ import "@/styles/brief-details.css";
 import "@/styles/submit-proposal.css";
 import "@/styles/muiGlobal.css"
 import "@/styles/stream-chat.css"
+import { ThemeProvider, createTheme } from "@mui/material";
+
 
 export default function App({ Component, pageProps }: AppProps) {
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: '#b2ff0b',
+      },
+      secondary: {
+        main: '#411dc9',
+      },
+    },
+  });
   return (
     <>
       <Head><title>Imbue</title></Head>
       <Layout>
-        <Component {...pageProps} />
+        <ThemeProvider theme={theme}>
+          <Component {...pageProps} />
+        </ThemeProvider>
       </Layout>
     </>
   );

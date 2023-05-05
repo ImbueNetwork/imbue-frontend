@@ -205,7 +205,7 @@
   color: #000;
 }
 
-.Request-btn {
+.Requested-btn {
   background-color: yellow;
   color: #000;
 }
@@ -246,4 +246,15 @@ select.round {
 
 .Modal header div{
   color: white;
+}
+
+.button-group button:hover{
+  background-color: var(--theme-secondary-hover);
+  color: white;
+  transition: all;
+  transition-duration: 300ms;
+}
+
+.country-picker option{
+  background: var(--theme-black-text);
 }

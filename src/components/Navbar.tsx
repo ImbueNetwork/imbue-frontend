@@ -37,7 +37,7 @@ function Navbar() {
         className={`modal ${sideBarIsVisivle ? "show" : ""}`}
         id="modal"
       />
-      <Drawer visible={sideBarIsVisivle} toggleVisibility={toggleSideBar} />
+      <Drawer visible={sideBarIsVisivle} setSideBarIsVisible={setSideBarIsVisible} />
     </>
   );
 }
