@@ -644,7 +644,7 @@ input[type='radio'] {
 	flex-direction: row;
 	flex-wrap: wrap;
 	gap: 4px;
-	background: var(--theme-ink-color);
+	/* background: var(--theme-ink-color); */
 	border: 1px solid var(--theme-black-text);
 	border-radius: 20px;
 	backdrop-filter: blur(8px);
@@ -755,6 +755,10 @@ input:-webkit-autofill:active {
 
 input:-webkit-autofill {
 	-webkit-text-fill-color: white !important;
+}
+
+.profile-container .textarea-remaining{
+	color: white;
 }
 
 

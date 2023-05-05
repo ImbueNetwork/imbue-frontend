@@ -254,3 +254,7 @@ select.round {
   transition: all;
   transition-duration: 300ms;
 }
+
+.country-picker option{
+  background: var(--theme-black-text);
+}

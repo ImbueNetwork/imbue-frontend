@@ -31,9 +31,11 @@ import styles from '@/styles/modules/freelancers.module.css'
 import fiverrIcon from "@/assets/images/fiverr.png"
 import ImbueIcon from "@/assets/svgs/loader.svg"
 import { authenticate } from "@/pages/api/info/user";
-import { FormControl, InputAdornment, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Badge, FormControl, InputAdornment, InputLabel, MenuItem, Select, TextField, ToggleButton } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { StyledEngineProvider } from "@mui/system";
+import { CountryDropdown, RegionDropdown, CountryRegionData } from 'react-country-region-selector';
+import EditSkills from "@/components/CustomMaterialComponents/EditSkills";
 
 
 export type ProfileProps = {
@@ -50,6 +52,30 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const isCurrentFreelancer = browsingUser && browsingUser.id == freelancer?.user_id;
+
+  // react country selector
+  const [country, setCountry] = useState('');
+  const [region, setRegion] = useState('');
+
+  // add among my clients
+  const [openAddClient, setOpenAddClient] = useState<boolean>(false)
+  const [clients, setClients] = useState([
+    { id: 1, name: "Fiverr", icon: fiverrIcon },
+    { id: 2, name: "Imbue", icon: ImbueIcon },
+  ])
+
+  const addAClient = () => {
+    setClients((prev) => [...prev, { id: Number(prev.length) + 1, name: "Imbue", icon: ImbueIcon }])
+  }
+
+  const removeClient = (id: number) => {
+    const newClients = clients.filter((client) => client.id !== id)
+    setClients(newClients)
+  }
+
+  // skills
+  const [skills, setSkills] = useState<string[]>([]);
+
 
   const socials = [
     {
@@ -149,7 +175,9 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   //The fields must be pre populated correctly.
   const onSave = async () => {
     if (freelancer) {
-      await updateFreelancer(freelancer);
+      console.log(freelancer);
+      // TODO: Implement api endpoint
+      // await updateFreelancer(freelancer);
       flipEdit();
     }
   };
@@ -163,6 +191,11 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const flipEdit = () => {
     setIsEditMode(!isEditMode);
   };
+
+  const handleUpdateState = (e: any) => {
+    const newFreelancer = { ...freelancer, [e?.target?.name]: e?.target?.value }
+    setFreelancer(newFreelancer)
+  }
 
   return (
     <div className="profile-container lg:-mt-8">
@@ -186,25 +219,66 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
               />
             </div>
             <div className="w-full flex flex-col gap-[16px] -mt-11 px-[30px] lg:px-[40px]">
-              <h3 className="!text-2xl font-bold text-center z-[1]">{freelancer?.display_name}</h3>
+              {
+                isEditMode
+                  ? <TextField onChange={(e) => handleUpdateState(e)} id="outlined-basic" name="display_name" label="Name" variant="outlined" defaultValue={freelancer?.display_name} />
+                  : <h3 className="!text-2xl font-bold text-center z-[1]">{freelancer?.display_name}</h3>
+              }
+
               <div className="flex gap-[15px] items-center justify-center flex-wrap">
-                <p className="text-[16px] leading-[1.2] text-primary max-w-full break-words text-center">
-                  @{freelancer?.username}
-                </p>
-                <div className="flex items-center gap-2">
-                  <IoPeople color="var(--theme-secondary)" size="24px" />
-                  <p className="text-[16px] leading-[1.2] text-[#ebeae2]">
-                    {freelancer?.title}
-                  </p>
+                {
+                  isEditMode
+                    ? <TextField className="w-full" id="outlined-basic" label="Username" variant="outlined" defaultValue={freelancer?.username} />
+                    : <p className="text-[16px] leading-[1.2] text-primary max-w-full break-words text-center">
+                      @{freelancer?.username}
+                    </p>
+                }
+
+                <div className="flex items-center gap-2 w-full justify-center">
+                  {
+                    isEditMode
+                      ? <TextField className="w-full" id="outlined-basic" label="Tittle" variant="outlined" defaultValue={freelancer?.title} />
+                      : <>
+                        <IoPeople color="var(--theme-secondary)" size="24px" />
+                        <p className="text-[16px] leading-[1.2] text-[#ebeae2]">
+                          {freelancer?.title}
+                        </p>
+                      </>
+                  }
+
                 </div>
               </div>
-              <div className="flex justify-center gap-[12px]">
-                <ReactCountryFlag countryCode="US" />
-                <p className="text-[16px] leading-[1.2] text-[#ebeae2]">
-                  Los Angeles, United State
-                </p>
-              </div>
+              {
+                isEditMode
+                  ? (
+                    <div className="w-full">
+                      <h3 className="text-lg mb-2">Your Location</h3>
+                      <div className="country-picker flex flex-wrap gap-2">
+                        <CountryDropdown
+                          classes="bg-transparent border border-light-white px-3 py-4 rounded-xl max-w-full"
+                          value={country}
+                          onChange={(val) => setCountry(val)} />
+                        <RegionDropdown
+                          classes="bg-transparent border border-light-white px-3 py-4 rounded-xl max-w-full"
+                          country={country}
+                          value={region}
+                          onChange={(val) => setRegion(val)} />
+                      </div>
+                    </div>
+
+                  )
+                  : (
+                    <div className="flex justify-center gap-[12px]">
+                      <ReactCountryFlag countryCode="US" />
+                      <p className="text-[16px] leading-[1.2] text-[#ebeae2]">
+                        Los Angeles, United State
+                      </p>
+                    </div>
+                  )
+              }
+
               {/* TODO: Implement reviews */}
+
               <div className="rating flex justify-center gap-3">
                 <p className="mb-3">
                   <FaStar color="var(--theme-primary)" />
@@ -260,16 +334,38 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
               <p className="text-xl">Among my clients</p>
               <span className="h-4 w-4 flex justify-center items-center rounded-full bg-gray-500 text-black">?</span>
             </div>
+
             <div className="grid grid-cols-2 px-[30px] lg:px-[40px] justify-center md:grid-cols-3 gap-5 w-full">
-              <div className="flex items-center gap-3">
-                <Image className="rounded-lg" height={40} width={40} src={fiverrIcon} alt="Fiverr Icon" />
-                <p>Fiverr</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <Image className="rounded-lg" height={40} width={40} src={ImbueIcon} alt="Imbue Icon" />
-                <p>Imbue</p>
-              </div>
+              {
+                clients?.map((client) => (
+                  <div key={client.name}
+                    onClick={() => removeClient(client.id)}
+                    className="flex items-center gap-3 w-fit mx-auto">
+                    <Badge className="client-badge" color="error" overlap="circular" badgeContent="-" invisible={!isEditMode}>
+                      <div>
+                        <Image className="rounded-lg" height={40} width={40} src={client.icon} alt={client.name} />
+                        <p>{client.name}</p>
+                      </div>
+                    </Badge>
+                  </div>
+                ))
+              }
+              {
+                isEditMode && (
+                  <ToggleButton
+                    className="w-11 h-11 my-auto borde border-light-white mx-auto"
+                    value="check"
+                    selected={openAddClient}
+                    onChange={() => {
+                      addAClient()
+                    }}
+                  >
+                    <span className="text-2xl text-white">+</span>
+                  </ToggleButton>
+                )
+              }
             </div>
+
             <hr className="separator" />
 
             <div className="w-full px-[30px] lg:px-[40px]">
@@ -278,6 +374,8 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                 0x524c3d9e935649A448FA33666048C
               </div>
             </div>
+
+           {isEditMode &&  <button className="primary-btn in-dark w-2/3">Connect wallet</button>}
             <hr className="separator" />
 
             <div className="w-full px-[30px] lg:px-[40px]">
@@ -319,37 +417,43 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                   <h5>Linked Account</h5>
                   <div className="flex flex-col gap-[16px] mt-[24px]">
                     {socials?.map(({ label, key, value, icon }, index) =>
-                      !isEditMode ? (
-                        <div
-                          className="h-[40px] flex justify-between items-center"
-                          key={index}
-                        >
-                          <p className="text-base leading--1.2]">{label} </p>
-                          <button className="bg-[#262626] w-[32px] h-[32px] rounded-[10px] text-[#ebeae2] border-none text-[20px] font-semibold items-center justify-center">
-                            {socials && value ? icon : "+"}
-                          </button>
-                        </div>
-                      ) : (
-                        <div
-                          className="h-[40px] flex justify-between items-center"
-                          key={index}
-                        >
-                          <TextArea
-                            value={freelancer && freelancer[key]}
-                            onChange={(e) => {
-                              if (freelancer) {
-                                setFreelancer({
-                                  ...freelancer,
-                                  [key]: e.target.value,
-                                });
-                              }
-                            }}
-                            //   className="bio-input"
-                            className="bio-inpu bg-[#1a1a19] text-white border border-solid border-[#fff]"
-                            id="bio-input-id"
-                          />
-                        </div>
-                      )
+
+                      <div
+                        className="h-auto flex flex-wrap justify-between items-center"
+                        key={index}
+                      >
+                        <p className="text-base leading--1.2]">{label} </p>
+                        {
+                          isEditMode
+                            ? (
+                              <div
+                                className="h-auto w-full lg:w-2/3 flex justify-between items-center"
+                                key={index}
+                              >
+                                <TextArea
+                                  value={freelancer && freelancer[key]}
+                                  onChange={(e) => {
+                                    if (freelancer) {
+                                      setFreelancer({
+                                        ...freelancer,
+                                        [key]: e.target.value,
+                                      });
+                                    }
+                                  }}
+                                  //   className="bio-input"
+                                  className="bio-inpu bg-[#1a1a19] text-white border border-light-white"
+                                  id="bio-input-id"
+                                />
+                              </div>
+                            )
+                            : (
+                              <button className="bg-[#262626] w-[32px] h-[32px] rounded-[10px] text-[#ebeae2] border-none text-[20px] font-semibold items-center justify-center">
+                                {socials && value ? icon : "+"}
+                              </button>
+                            )
+                        }
+
+                      </div>
                     )}
                   </div>
                 </div>
@@ -360,17 +464,25 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                   <div className="header-editable">
                     <h5>Skills</h5>
                   </div>
-                  <div className="flex flex-wrap gap-[20px] mt-[24px]">
-                    {/* TODO: Add Skills */}
-                    {freelancer?.skills?.map?.((skill: any) => (
-                      <p
-                        className={`pill-button`}
-                        key={skill?.id}
-                      >
-                        {skill.name}
-                      </p>
-                    ))}
-                  </div>
+                  {
+                    isEditMode
+                      ? (
+                        <EditSkills {...{ skills, setSkills }} />
+                      )
+                      : (
+                        <div className="flex flex-wrap gap-[20px] mt-[24px]">
+                          {freelancer?.skills?.map?.((skill: any) => (
+                            <p
+                              className={`pill-button`}
+                              key={skill?.id}
+                            >
+                              {skill.name}
+                            </p>
+                          ))}
+                        </div>
+                      )
+                  }
+
                 </div>
 
                 <hr className="separator" />
@@ -481,8 +593,8 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                     </div> */}
           </div>
 
-          <div className={`${styles.freelancerProfileSection} w-full py-[30px]`}>
-            <div className="header-editable px-[30px] lg:px-[40px]">
+          <div className={`${styles.freelancerProfileSection} w-full py-[30px] px-[30px] lg:px-[40px]`}>
+            <div className="header-editable">
               <h5>About</h5>
             </div>
             {isEditMode ? (
@@ -499,12 +611,12 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                     }
                   }}
                   rows={8}
-                  className="bio-inpu bg-[#1a1a19] text-white border border-solid border-[#fff]"
+                  className="bio-inpu px-4 py-2 bg-[#1a1a19] text-white border border-light-white"
                   id="bio-input-id"
                 />
               </>
             ) : (<>
-              <div className="bio px-[30px] lg:px-[40px]">
+              <div className="bio">
                 {freelancer?.bio
                   ?.split?.("\n")
                   ?.map?.((line: any, index: number) => (
@@ -518,7 +630,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
             <hr className="separator" />
 
 
-            <div className="header-editable px-[30px] lg:px-[40px]">
+            <div className="header-editable">
               <h5>Education</h5>
             </div>
             {isEditMode ? (
@@ -535,12 +647,12 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                     }
                   }}
                   rows={8}
-                  className="bio-inpu bg-[#1a1a19] text-white border border-solid border-[#fff]"
+                  className="bio-inpu px-4 py-2 bg-[#1a1a19] text-white border border-light-white"
                   id="bio-input-id"
                 />
               </>
             ) : (<>
-              <div className="bio px-[30px] lg:px-[40px]">
+              <div className="bio">
                 {/* TODO: Implementation */}
                 {/* {freelancer?.education
                   ?.split?.("\n")
@@ -558,14 +670,14 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
 
         <div className="lg:w-[50%] mt-[20px] lg:mt-0">
           <div className="bg-theme-grey-dark rounded-xl border border-light-white">
-            <div className="px-[80px] py-[30px] border-b border-b-light-white">
+            <div className="px-[30px] lg:px-[40px] py-[30px] border-b border-b-light-white">
               <h3 className="mb-3">Work History</h3>
               <p className="text-primary">Completed Projects (3)</p>
             </div>
             <div>
               {
                 [...Array(3)].map((v, i) => (
-                  <div key={i} className="px-[30px] lg:px-[80px] py-[30px] flex flex-col gap-3 border-b last:border-b-0 border-b-light-white">
+                  <div key={i} className="px-[30px] lg:px-[40px] py-[30px] flex flex-col gap-3 border-b last:border-b-0 border-b-light-white">
                     <p className="text-xl">{work.title}</p>
                     <div className="flex gap-3 lg:gap-8 flex-wrap items-center justify-between">
                       <div className="flex">
