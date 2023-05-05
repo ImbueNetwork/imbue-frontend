@@ -49,7 +49,6 @@ const BioInsights = ({
               flex 
               items-center 
               gap-2
-              max-width-1100px:w-full
               "
               onClick={() => redirectToApply()}
             >
