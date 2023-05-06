@@ -98,7 +98,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
           isAuthenticated: true,
           user: userResponse,
         };
-        localStorage.setItem("userAuth", JSON.stringify(userAuth));
+        // localStorage.setItem("userAuth", JSON.stringify(userAuth));
         setVisible(false);
         router.push(redirectUrl);
       }
@@ -128,7 +128,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
           isAuthenticated: true,
           user: userResponse,
         };
-        localStorage.setItem("userAuth", JSON.stringify(userAuth));
+        // localStorage.setItem("userAuth", JSON.stringify(userAuth));
         setVisible(false);
         router.push(redirectUrl);
       }
@@ -248,16 +248,6 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                   onClick={() => closeModal()}
                 >
                   <span className="mdc-deprecated-list-item__graphic h-[40px] w-[40px] flex mr-[16px]">
-                    <Image
-                      src={
-                        "https://raw.githubusercontent.com/TalismanSociety/talisman-connect/master/packages/connect-wallets/src/lib/talisman-wallet/TalismanLogo.svg"
-                      }
-                      width={40}
-                      height={40}
-                      className="w-full cursor-pointer"
-                      style={logoStyle}
-                      alt={"avaterImage"}
-                    />
                   </span>
                   <span
                     className="cursor-pointer"

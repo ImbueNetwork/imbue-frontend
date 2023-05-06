@@ -53,7 +53,7 @@ export async function authorise(
         isAuthenticated: true,
         user: userResponse,
       };
-      localStorage.setItem("userAuth", JSON.stringify(userAuth));
+      // localStorage.setItem("userAuth", JSON.stringify(userAuth));
     }
   } else {
     // TODO: UX for 401

@@ -196,8 +196,7 @@ export const fetchUserOrEmail =
     tx<User>("users")
       .where({ username: userOrEmail.toLocaleLowerCase() })
       .orWhere({ email: userOrEmail.toLowerCase() })
-      .first()
-      .debug(true);
+      .first();
 
 export const upsertWeb3Challenge =
   (user: User, address: string, type: string, challenge: string) =>
@@ -718,15 +717,13 @@ export const fetchFreelancerDetailsByUserID =
   (user_id: number | string) => (tx: Knex.Transaction) =>
     fetchAllFreelancers()(tx)
       .where({ "freelancers.user_id": user_id })
-      .first()
-      .debug(false);
+      .first();
 
 export const fetchFreelancerDetailsByUsername =
   (username: string | string[]) => (tx: Knex.Transaction) =>
     fetchAllFreelancers()(tx)
       .where({ username: username })
-      .first()
-      .debug(false);
+      .first();
 
 export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
   tx
@@ -968,5 +965,4 @@ export const searchFreelancers = async (
     })
     .where("username", "ilike", "%" + filter.search_input + "%")
     .where("title", "ilike", "%" + filter.search_input + "%")
-    .where("bio", "ilike", "%" + filter.search_input + "%")
-    .debug(true);
+    .where("bio", "ilike", "%" + filter.search_input + "%");

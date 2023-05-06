@@ -40,7 +40,7 @@ export default nextConnect()
                             const payload = { id: user.id };
                             const token = jwt.sign(payload, jwtOptions.secretOrKey);
 
-                            setTokenCookie(res,token);
+                            await setTokenCookie(res,token);
                             res.send({ id: user.id, display_name: user.display_name });
                         } catch (e) {
                             tx.rollback();
