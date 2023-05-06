@@ -20,6 +20,7 @@ export default nextConnect()
         new Error(`Failed to fetch freelancer applications by userid: ${id}`, {
           cause: e as Error,
         });
+        return res.status(404).end();
       }
     });
   });

@@ -241,13 +241,13 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
 
               <div className="login justify-center items-center w-full flex flex-col">
 
-                <li
-                  className="mt-4 mdc-deprecated-list-item flex flex-row items-center cursor-pointer"
+              <li
+                  className="mt-4 flex flex-row items-center cursor-pointer"
                   tabIndex={0}
                   data-mdc-dialog-action="web3"
                   onClick={() => closeModal()}
                 >
-                  <span className="mdc-deprecated-list-item__graphic h-[40px] w-[40px] flex mr-[16px]">
+                  <span className="mdc-deprecated-list-item__graphic h-[40px] flex mr-[0px]">
                   </span>
                   <span
                     className="cursor-pointer"
