@@ -3,7 +3,7 @@ import { removeTokenCookie } from "../auth-cookies"
 
 export default async function logout(req: NextApiRequest, res: NextApiResponse) {
   removeTokenCookie(res);
-  localStorage.clear();
+  // localStorage.clear();
   res.writeHead(302, { Location: '/' })
   res.end()
 }

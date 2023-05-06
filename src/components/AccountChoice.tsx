@@ -31,8 +31,8 @@ const AccountChoice = ({
         open={visible}
         walletList={[
           new TalismanWallet(),
-          new PolkadotjsWallet(),
           new SubWallet(),
+          new PolkadotjsWallet(),
         ]}
         header={header}
         showAccountsList={visible}

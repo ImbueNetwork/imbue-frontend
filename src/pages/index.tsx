@@ -20,7 +20,7 @@ export default function Home() {
         isAuthenticated: true,
         user: userResponse,
       };
-      localStorage.setItem("userAuth", JSON.stringify(userAuth));
+      // localStorage.setItem("userAuth", JSON.stringify(userAuth));
       router.push("/dashboard");
     }
   };

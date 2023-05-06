@@ -15,7 +15,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     db.transaction(async (tx) => {
       try {
         const user = await models.fetchUserOrEmail(userOrEmail)(tx);
-        console.log({ user });
         if (!user) {
           return res.status(404).end();
         }
@@ -32,7 +31,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
         const payload = { id: user.id };
         const token = jwt.sign(payload, jwtOptions.secretOrKey);
-        setTokenCookie(res, token);
+        await setTokenCookie(res, token);
 
         res.send({ id: user.id, display_name: user.display_name });
       } catch (e) {
