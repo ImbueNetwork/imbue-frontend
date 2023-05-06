@@ -20,6 +20,7 @@ module.exports = {
       colors: {
         "theme-grey-dark": "#2c2c2c",
         "theme-secondary": "#411dc9",
+        "theme-coral": "#FC6760",
         "secondary-dark-hover": "#121c7f",
         "light-white": "rgba(255, 255, 255, 0.25)",
         "light-grey": "rgba(235, 234, 226, 0.5)",

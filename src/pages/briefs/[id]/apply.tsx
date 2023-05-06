@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { FiPlusCircle } from "react-icons/fi";
-import MilestoneItem from "@/components/Briefs/MileStoneItem";
+import MilestoneItem from "@/components/Briefs/MilestoneItem";
 import { timeData } from "@/config/briefs-data";
 import * as config from "@/config";
 import { Brief, Currency, User } from "@/model";
@@ -34,7 +34,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   useEffect(() => {
     getUserAndFreelancer();
-  }, [briefId, user]);
+  }, [briefId]);
 
   useEffect(() => {
     getCurrentUserBrief();
@@ -188,35 +188,35 @@ export const SubmitProposal = (): JSX.Element => {
         {brief && <BriefInsights brief={brief} />}
       </div>
       <div>
-        <div className="milestones border border-white py-5 rounded-[20px] bg-theme-grey-dark">
-          <div className="flex flex-col lg:flex-row justify-between mx-14 -mb-3">
-            <h3 className="text-xl leading-[1.5] font-bold m-0 p-0 flex">
+        <div className="milestones border border-light-white py-5 rounded-[20px] bg-theme-grey-dark">
+          <div className="flex flex-row justify-between mx-5 lg:mx-14 -mb-3">
+            <h3 className="text-lg lg:text-xl leading-[1.5] font-bold m-0 p-0 flex">
               Milestones
             </h3>
-            <h3 className="text-xl leading-[1.5] font-bold m-0 p-0">
+            <h3 className="text-lg lg:text-xl leading-[1.5] font-bold m-0 p-0">
               Client&apos;s budget: ${Number(brief?.budget)?.toLocaleString()}
             </h3>
           </div>
           <hr className="separator" />
 
-          <p className="mx-14 text-xl font-bold">
+          <p className="mx-5 lg:mx-14 text-base lg:text-lg font-bold">
             How many milestone do you want to include?
           </p>
-          <div className="milestone-list mx-14">
+          <div className="milestone-list mx-5 lg:mx-14">
             {milestones.map(({ name, amount }, index) => {
               const percent = Number(
                 ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
               );
               return (
                 <div className="milestone-row !p-0" key={index}>
-                  <div className="milestone-no text-base">{index + 1}</div>
-                  <div className="flex flex-col lg:flex-row justify-between w-full">
-                    <div className="w-full lg:w-1/2">
-                      <h3 className="mb-5 text-xl font-bold m-0 p-0">
+                  <div className="text-base mr-4 lg:mr-9">{index + 1}.</div>
+                  <div className="flex flex-row justify-between w-full">
+                    <div className="w-3/5 lg:w-1/2">
+                      <h3 className="mb-2 lg:mb-5 text-lg lg:text-xl font-bold m-0 p-0">
                         Description
                       </h3>
                       <textarea
-                        className="input-description bg-[#1a1a19] border border-white text-base leading-5 py-3 px-5"
+                        className="input-description text-base"
                         value={name}
                         onChange={(e) =>
                           setMilestones([
@@ -230,7 +230,7 @@ export const SubmitProposal = (): JSX.Element => {
                         }
                       />
                     </div>
-                    <div className="flex flex-col w-[fit-content] lg:items-end">
+                    <div className="flex flex-col w-1/3 lg:items-end">
                       <h3 className="mb-5 text-xl font-bold m-0 p-0">
                         Amount
                       </h3>
@@ -271,7 +271,7 @@ export const SubmitProposal = (): JSX.Element => {
             })}
           </div>
           <p
-            className="clickable-text btn-add-milestone mx-14 !mb-0 text-xl font-bold"
+            className="clickable-text btn-add-milestone mx-5 lg:mx-14 !mb-0 text-base lg:text-xl font-bold"
             onClick={onAddMilestone}
           >
             <FiPlusCircle color="var(--theme-primary)" />
@@ -279,12 +279,12 @@ export const SubmitProposal = (): JSX.Element => {
           </p>
           <hr className="separator" />
 
-          <div className="flex flex-row items-center mb-5 mx-14">
+          <div className="flex flex-row items-center mb-5 mx-5 lg:mx-14">
             <div className="flex flex-col flex-grow">
-              <h3 className="text-xl font-bold m-0 p-0">
+              <h3 className="text-lg lg:text-xl font-bold m-0 p-0">
                 Total price of the project
               </h3>
-              <div className="text-inactive">
+              <div className="text-inactive text-sm lg:text-base">
                 This includes all milestonees, and is the amount client will see
               </div>
             </div>
@@ -294,9 +294,9 @@ export const SubmitProposal = (): JSX.Element => {
           </div>
           <hr className="separator" />
 
-          <div className="flex flex-row items-center mb-5 mx-14">
+          <div className="flex flex-row items-center mb-5 mx-5 lg:mx-14">
             <div className="flex flex-col flex-grow">
-              <h3 className="text-xl font-bold m-0 p-0">
+              <h3 className="text-lg lg:text-xl font-bold m-0 p-0">
                 Imbue Service Fee 5% - Learn more about Imbue’s fees
               </h3>
             </div>
@@ -306,7 +306,7 @@ export const SubmitProposal = (): JSX.Element => {
           </div>
           <hr className="separator" />
 
-          <div className="flex flex-row items-center mb-5 mx-14">
+          <div className="flex flex-row items-center mb-5 mx-5 lg:mx-14">
             <div className="flex flex-col flex-grow">
               <h3 className="text-xl font-bold m-0 p-0">Total</h3>
             </div>
@@ -320,14 +320,14 @@ export const SubmitProposal = (): JSX.Element => {
         <h3 className="ml-8 mb-2 text-xl font-bold m-0 p-0 flex">
           Payment terms
         </h3>
-        <div className="bg-theme-grey-dark border border-white py-5 rounded-[20px] flex flex-col lg:flex-row lg:justify-between gap-3 px-14">
+        <div className="bg-theme-grey-dark border border-light-white py-5 rounded-[20px] flex flex-col lg:flex-row lg:justify-between gap-3 px-5 lg:px-14">
           <div className="duration-selector">
-            <h3 className="text-xl font-bold m-0 p-0">
+            <h3 className="text-lg lg:text-xl font-bold m-0 p-0">
               How long will this project take?
             </h3>
             <select
               name="duration"
-              className="bg-[#1a1a19] round border border-white rounded-[5px] text-base px-5 py-3 mt-4"
+              className="bg-[#1a1a19] round border border-light-white rounded-[5px] text-base px-5 py-3 mt-4"
               placeholder="Select a duration"
               required
             >
@@ -339,14 +339,14 @@ export const SubmitProposal = (): JSX.Element => {
             </select>
           </div>
           <div className="payment-options">
-            <h3 className="text-xl font-bold m-0 p-0">Currency</h3>
+            <h3 className="text-lg lg:text-xl font-bold m-0 p-0">Currency</h3>
 
             <div className="network-amount">
               <select
                 name="currencyId"
                 onChange={handleChange}
                 placeholder="Select a currency"
-                className="bg-[#1a1a19] round border border-white rounded-[5px] text-base px-5 py-3 mt-4"
+                className="bg-[#1a1a19] round border border-light-white rounded-[5px] text-base px-5 py-3 mt-4"
                 required
               >
                 {currencies.map((currency: any) => (

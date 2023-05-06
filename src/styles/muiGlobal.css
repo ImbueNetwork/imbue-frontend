@@ -90,6 +90,9 @@
     background-color: #ffffff1c;
 }
 
+.client-badge .MuiBadge-badge{
+    cursor: pointer;
+}
 
 
 @media screen and (max-width: 470px) {

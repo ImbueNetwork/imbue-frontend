@@ -14,6 +14,7 @@ import styles from "../styles/modules/hire-modal.module.css";
 import { useRouter } from "next/router";
 import { WalletAccount } from "@talismn/connect-wallets";
 import AccountChoice from "./AccountChoice";
+import { useMediaQuery } from "@mui/material";
 
 export const HirePopup = ({
   openPopup,
@@ -28,16 +29,18 @@ export const HirePopup = ({
   setLoading,
 }: any) => {
   const [popupStage, setstage] = useState<number>(0);
+  const mobileView = useMediaQuery('(max-width:480px)');
+
   const modalStyle = {
     position: "absolute" as "absolute",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "65vw",
+    width: mobileView ? "98vw" : "65vw",
     bgcolor: "#2c2c2c",
     color: "#fff",
-    pt: "28px",
-    pb: "28px",
+    pt:  mobileView ? "10px" :"28px",
+    pb:  mobileView ? "10px" :"28px",
     boxShadow: 24,
     borderRadius: "20px",
     zIndex: 1,
@@ -100,32 +103,32 @@ export const HirePopup = ({
   const FirstContent = () => {
     return (
       <div className="relative modal-container">
-        <div className="flex w-full justify-start items-center gap-11 px-16 pb-2">
+        <div className="flex w-full justify-start items-center px-5 gap-5 pt-8 md:px-10 lg:gap-11 lg:px-16 lg:pb-2">
           <Image
-            className="w-16 h-16 rounded-full object-cover"
+            className="w-12 h-12 md:w-16 md:h-16 rounded-full object-cover"
             src={require("@/assets/images/profile-image.png")}
             alt="profileImage"
           />
           <span className="text-xl font-bold">{freelancer?.display_name}</span>
         </div>
-        <h3 className="absolute top-0 text-center w-full text-xl font-bold primary-text">
+        <h3 className="absolute top-0 text-center w-full text-lg lg:text-xl font-bold primary-text">
           Hire This Freelancer
         </h3>
         <hr className="separator" />
 
-        <div className="milestone-list px-16 mb-5 max-h-96 overflow-y-scroll">
+        <div className="milestone-list px-5 lg:px-16 mb-5 max-h-96 overflow-y-scroll">
           {milestones?.map?.(({ name, amount }: any, index: any) => {
             return (
               <div className={styles.milestoneRow} key={index}>
-                <h3 className="milestone-no">{index + 1}</h3>
-                <div className="input-wrappers">
-                  <div className="description-wrapper">
-                    <h3>Description</h3>
-                    <h3>{milestones[index]?.name}</h3>
+                <h3 className="mr-3 lg:mr-9 text-lg">{index + 1}.</h3>
+                <div className="flex justify-between w-full">
+                  <div>
+                    <h3 className="text-lg mb-1">Description</h3>
+                    <p className="text-base">{milestones[index]?.name}</p>
                   </div>
                   <div className="budget-wrapper text-end">
-                    <h3>Amount</h3>
-                    <h3>{milestones[index]?.amount}</h3>
+                    <h3 className="text-lg mb-1">Amount</h3>
+                    <p>{milestones[index]?.amount}</p>
                   </div>
                 </div>
               </div>
@@ -135,9 +138,9 @@ export const HirePopup = ({
         <hr className="separator" />
 
         <div className="">
-          <div className={`${styles.budgetInfo} mx-16 mt-7`}>
+          <div className={`${styles.budgetInfo} mx-5 lg:mx-16 lg:mt-7`}>
             <div className={styles.budgetDescription}>
-              <h3>Total price of the project</h3>
+              <h3 className="mb-2 text-lg">Total price of the project</h3>
               <div className="text-inactive">
                 This includes all milestonees, and is the amount client will see
               </div>
@@ -146,17 +149,17 @@ export const HirePopup = ({
               ${Number?.(totalCostWithoutFee?.toFixed?.(2))?.toLocaleString()}
             </div>
           </div>
-          <div className={`${styles.budgetInfo} mx-16`}>
+          <div className={`${styles.budgetInfo} mx-5 lg:mx-16`}>
             <div className={styles.budgetDescription}>
-              <h3>Imbue Service Fee 5%</h3>
+              <h3 className="text-lg">Imbue Service Fee 5%</h3>
             </div>
             <div className="budget-value">
               ${Number?.(imbueFee?.toFixed?.(2))?.toLocaleString?.()}
             </div>
           </div>
-          <div className={`${styles.budgetInfo} mx-16`}>
+          <div className={`${styles.budgetInfo} mx-5 lg:mx-16`}>
             <div className={styles.budgetDescription}>
-              <h3>Total</h3>
+              <h3 className="text-lg">Total</h3>
             </div>
             <div className="budget-value">
               ${Number?.(totalCost?.toFixed?.(2))?.toLocaleString?.()}
@@ -167,7 +170,7 @@ export const HirePopup = ({
 
         <button
           onClick={() => setstage(1)}
-          className="primary-btn in-dark w-button mx-16"
+          className="primary-btn in-dark w-button mx-5 lg:mx-16"
         >
           Approve
         </button>
@@ -177,15 +180,15 @@ export const HirePopup = ({
 
   const SecondContent = () => {
     return (
-      <div className="flex flex-col justify-center items-center modal-container w-2/3 mx-auto my-auto">
-        <h3 className="text-center w-full text-xl font-bold my-4 primary-text">
+      <div className="flex flex-col justify-center items-center modal-container px-5 lg:px-0 lg:w-2/3 mx-auto my-auto">
+        <h3 className="text-center w-full text-lg lg:text-xl font-bold my-4 primary-text">
           Deposit Fuds
         </h3>
-        <p className="text-center w-full text-xl font-bold my-4">
+        <p className="text-center w-full text-lg lg:text-xl font-bold my-4">
           Deposit the funds required for the project, these funds will be taken
           from your account once the freelancer starts the project.
         </p>
-        <p className="text-center w-full text-xl font-bold my-4">
+        <p className="text-center w-full text-lg lg:text-xl font-bold my-4">
           The funds are then paid to the freelancer iin stages only when you
           approve the completion of each milestone
         </p>
@@ -199,7 +202,7 @@ export const HirePopup = ({
           onClick={() => {
             setstage(2);
           }}
-          className="primary-btn in-dark w-button w-1/3 mx-16"
+          className="primary-btn in-dark w-button lg:w-1/3 lg:mx-16"
           style={{ textAlign: "center" }}
         >
           Deposit Funds

@@ -4,6 +4,7 @@ import {
   dumyBriefs,
 } from "@/config/briefs-data";
 import { Brief, BriefSqlFilter, OffchainProjectState } from "@/model";
+import { BriefInfo } from "@/types/briefTypes";
 import { checkEnvironment } from "@/utils";
 
 const getAPIHeaders = {
@@ -19,11 +20,13 @@ export const callSearchBriefs = async (filter: BriefSqlFilter) => {
   // return [] as Array<Brief>;
   //:TODO implement api for callSearchBriefs
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}briefs/search`), {
-    headers: postAPIHeaders,
-    method: "post",
-    body: JSON.stringify(filter),
-  });
+    checkEnvironment().concat(`${config.apiBase}briefs/search`),
+    {
+      headers: postAPIHeaders,
+      method: "post",
+      body: JSON.stringify(filter),
+    }
+  );
   if (resp.ok) {
     return (await resp.json()) as Array<Brief>;
   } else {
@@ -52,10 +55,12 @@ export const getAllBriefs = async () => {
 export const getBrief = async (briefId: number | string | string[]) => {
   try {
     const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}briefs/${briefId}`), {
-      headers: postAPIHeaders,
-      method: "get",
-    });
+      checkEnvironment().concat(`${config.apiBase}briefs/${briefId}`),
+      {
+        headers: postAPIHeaders,
+        method: "get",
+      }
+    );
 
     if (resp.ok) {
       return (await resp.json()) as Brief;
@@ -69,10 +74,12 @@ export const getBrief = async (briefId: number | string | string[]) => {
 
 export const getUserBriefs = async (user_id: string | number) => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}users/${user_id}/briefs/`), {
-    headers: postAPIHeaders,
-    method: "get",
-  });
+    checkEnvironment().concat(`${config.apiBase}users/${user_id}/briefs/`),
+    {
+      headers: postAPIHeaders,
+      method: "get",
+    }
+  );
   if (resp.ok) {
     return await resp.json();
   } else {
@@ -108,14 +115,16 @@ export const changeBriefApplicationStatus = async (
   status_id: OffchainProjectState
 ) => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}briefs/${briefId}/status`), {
-    headers: postAPIHeaders,
-    method: "put",
-    body: JSON.stringify({
-      project_id: projectId,
-      status_id,
-    }),
-  });
+    checkEnvironment().concat(`${config.apiBase}briefs/${briefId}/status`),
+    {
+      headers: postAPIHeaders,
+      method: "put",
+      body: JSON.stringify({
+        project_id: projectId,
+        status_id,
+      }),
+    }
+  );
 
   if (resp.ok) {
     return await resp.json();
@@ -128,7 +137,9 @@ export const changeBriefApplicationStatus = async (
 
 export const getFreelancerBrief = async (userId: number, briefId: number) => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}users/${userId}/briefs/${briefId}`),
+    checkEnvironment().concat(
+      `${config.apiBase}users/${userId}/briefs/${briefId}`
+    ),
     {
       headers: postAPIHeaders,
       method: "get",
@@ -152,5 +163,37 @@ export const getProjectById = async (projectId: string | number) => {
     return await resp.json();
   } else {
     new Error("Failed to get project. status:" + resp.status);
+  }
+};
+
+export const updateBriefById = async (params: BriefInfo) => {
+  try {
+    const resp = await fetch(`${config.apiBase}/briefs/`, {
+      headers: postAPIHeaders,
+      method: "put",
+      body: JSON.stringify({
+        headline: params.headline,
+        industries: params.industries,
+        description: params.description,
+        scope_id: params.scope_id,
+        experience_id: params.experience_id,
+        duration_id: params.duration_id,
+        skills: params.skills,
+        budget: params.budget,
+        id: params.brief_id,
+      }),
+    });
+    if (resp.ok) {
+      // could be 200 or 201
+      // Brief update API successfully invoked
+      console.log("Brief Updated successfully via Brief REST API");
+      return true;
+    } else {
+      console.log("Failed to submit the brief");
+      return false;
+    }
+  } catch (error) {
+    console.log(error);
+    return false;
   }
 };

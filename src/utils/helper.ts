@@ -34,3 +34,16 @@ export const buttonStyleBasedOnVariantPassed = (
       return buttonType.outline;
   }
 };
+
+export function findObjectsByName(
+  names: string[],
+  objects: { name: string; id: number }[]
+): { name: string; id: number }[] {
+  const matchedObjects: { name: string; id: number }[] = [];
+  for (const object of objects) {
+    if (names.includes(object.name)) {
+      matchedObjects.push({ name: object.name, id: object.id });
+    }
+  }
+  return matchedObjects;
+}

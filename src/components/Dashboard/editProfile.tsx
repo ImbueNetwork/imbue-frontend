@@ -1,6 +1,6 @@
 import { FormControl, TextField } from '@mui/material';
 import React, { useState } from 'react';
-import { TagsInput } from "../../components/TagsInput";
+import { TagsInput } from "../TagsInput";
 import { suggestedFreelancingSkills, } from "@/config/freelancer-data";
 
 const EditProfile = (): JSX.Element => {

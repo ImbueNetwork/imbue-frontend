@@ -31,9 +31,8 @@ export async function getBrief(id: string | string[]) {
       const brief = await models.fetchBrief(id)(tx);
       await Promise.all([
         brief.skills = await fetchItems(brief.skill_ids, "skills")(tx),
-        brief.industries = await fetchItems(brief.industry_ids, "skills")(tx),
+        brief.industries = await fetchItems(brief.industry_ids, "industries")(tx),
       ]);
-
       response = brief
     } catch (e) {
       response = (new Error(
@@ -56,7 +55,7 @@ export async function searchBriefs(req: NextApiRequest) {
         briefs,
         ...briefs.map(async (brief: any) => {
           brief.skills = await fetchItems(brief.skill_ids, "skills")(tx);
-          brief.industries = await fetchItems(brief.industry_ids, "skills")(tx);
+          brief.industries = await fetchItems(brief.industry_ids, "industries")(tx);
         }),
       ]);
 
