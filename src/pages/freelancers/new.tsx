@@ -18,6 +18,7 @@ import {
   } from "@/redux/services/freelancerService";
   import { useRouter } from "next/router";
   import { FreelancerProps } from "@/types/freelancerTypes";
+  import styles from '../../styles/modules/Freelancers/new-Freelancer.module.css'
 
 const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     const router = useRouter();
@@ -33,8 +34,8 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     const [services, setServices] = useState<string[]>([]);     
   
     const HelloPanel = (
-      <div className="hello-panel">
-        <div className="content-text-small">
+      <div className={styles.helloPanel}>
+        <div className={styles.contentTextSmall}>
           {stepData[step].content
             .split("\n")
             .map((line: string, index: number) => (
@@ -45,21 +46,21 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     );
   
     const FreelanceExperience = (
-      <div className="freelance-xp-container">
-        <div className="content-text-small-flex">
+      <div className={styles.freelanceXpContainer}>
+        <div className={styles.contentTextSmallFlex}>
           {stepData[step].content
             .split("\n")
             .map((line: string, index: number) => (
               <p key={index}>{line}</p>
             ))}
         </div>
-        <div className="freelance-xp-options">
+        <div className={styles.freelanceXpOptions}>
           {freelancedBefore.map(({ label, value }, index) => (
             <div
               key={index}
               data-testid={`freelance-xp-${index}`}
-              className={`freelance-xp-item ${
-                freelancingBefore === value ? "active" : ""
+              className={`${styles.freelanceXpItem} ${
+                freelancingBefore === value ? styles.active : ""
               }`}
               onClick={() => setFreelancingBefore(value)}
             >
@@ -71,18 +72,18 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     );
   
     const FreelancingGoal = (
-      <div className="freelance-xp-container">
-        <div className="content-text-small-flex">
+      <div className={styles.freelanceXpContainer}>
+        <div className={styles.contentTextSmallFlex}>
           {stepData[step].content.split("\n").map((line, index) => (
             <p key={index}>{line}</p>
           ))}
         </div>
-        <div className="freelance-xp-options">
+        <div className={styles.freelanceXpOptions}>
           {freelancingGoal.map(({ label, value }, index) => (
             <div
               key={index}
               data-testid={`freelance-goal-${index}`}
-              className={`freelance-xp-item ${goal === value ? "active" : ""}`}
+              className={`${styles.freelanceXpItem} ${goal === value ? styles.active : ""}`}
               onClick={() => setGoal(value)}
             >
               {label}
@@ -94,17 +95,17 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
   
     const ImportResume = (
       // TODO:
-      <div className="freelance-xp-container">
-        <div className="content-text-small-flex">
+      <div className={styles.freelanceXpContainer}>
+        <div className={styles.contentTextSmallFlex}>
           {stepData[step].content.split("\n").map((line, index) => (
             <p key={index}>{line}</p>
           ))}
         </div>
-        <div className="freelance-xp-options">
+        <div className={styles.freelanceXpOptions}>
           {importInformation.map(({ label, value }, index) => (
             <div
               key={index}
-              className={`freelance-xp-item ${resume === value ? "active" : ""}`}
+              className={`${styles.freelanceXpItem} ${resume === value ? styles.active : ""}`}
               onClick={() => setResume(value)}
             >
               {label}
@@ -115,15 +116,15 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     );
   
     const TitlePanel = (
-      <div className="freelance-xp-container">
-        <div className="content-text-small-flex">
+      <div className={styles.freelanceXpContainer}>
+        <div className={styles.contentTextSmallFlex}>
           {stepData[step].content.split("\n").map((line, index) => (
             <p key={index}>{line}</p>
           ))}
         </div>
-        <div className="name-panel-input-wrapper">
+        <div className={styles.namePanelInputWrapper}>
           <input
-            className="field-input"
+            className={styles.fieldInput}
             placeholder="Enter your title"
             data-testid="title"
             name="title"
@@ -135,8 +136,8 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     );
   
     const ExperiencePanel = (
-      <div className="freelance-xp-container">
-        <div className="content-text-small-flex">
+      <div className={styles.freelanceXpContainer}>
+        <div className={styles.contentTextSmallFlex}>
           {stepData[step].content.split("\n").map((line, index) => (
             <p key={index}>{line}</p>
           ))}
@@ -145,8 +146,8 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     );
   
     const EducationPanel = (
-      <div className="freelance-xp-container">
-        <div className="content-text-small-flex">
+      <div className={styles.freelanceXpContainer}>
+        <div className={styles.contentTextSmallFlex}>
           {stepData[step].content.split("\n").map((line, index) => (
             <p key={index}>{line}</p>
           ))}
@@ -155,13 +156,13 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     );
   
     const LanguagePanel = (
-      <div className="freelance-xp-container">
-        <div className="content-text-small-flex">
+      <div className={styles.freelanceXpContainer}>
+        <div className={styles.contentTextSmallFlex}>
           {stepData[step].content.split("\n").map((line, index) => (
             <p key={index}>{line}</p>
           ))}
         </div>
-        <div className="skills-container">
+        <div className="mt-6 pb-20">
           <TagsInput
             suggestData={suggestedLanguages}
             data-testid="languages"
@@ -173,14 +174,14 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     );
   
     const SkillsPanel = (
-      <div className="freelance-xp-container">
-        <div className="content-text-small-flex">
+      <div className={styles.freelanceXpContainer}>
+        <div className={styles.contentTextSmallFlex}>
           {stepData[step].content.split("\n").map((line, index) => (
             <p key={index}>{line}</p>
           ))}
         </div>
-        <h3 className="field-name mt-4">Your Skills</h3>
-        <div className="skills-container">
+        <h3 className="text-lg text-black mt-5">Your Skills</h3>
+        <div className="mt-5 mb-20">
           <TagsInput
             suggestData={suggestedFreelancingSkills}
             tags={skills}
@@ -191,16 +192,16 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     );
   
     const BioPanel = (
-      <div className="freelance-xp-container">
-        <div className="content-text-small-flex">
+      <div className={styles.freelanceXpContainer}>
+        <div className={styles.contentTextSmallFlex}>
           {stepData[step].content.split("\n").map((line, index) => (
             <p key={index}>{line}</p>
           ))}
         </div>
   
-        <div className="name-panel-input-wrapper">
+        <div className={styles.namePanelInputWrapper}>
           <textarea
-            className="field-input large"
+            className={`${styles.fieldInput} ${styles.large}`}
             placeholder="Enter your bio"
             data-testid="bio"
             name="bio"
@@ -214,13 +215,13 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     );
   
     const ServicesPanel = (
-      <div className="freelance-xp-container">
-        <div className="content-text-small-flex">
+      <div className={styles.freelanceXpContainer}>
+        <div className={styles.contentTextSmallFlex}>
           {stepData[step].content.split("\n").map((line, index) => (
             <p key={index}>{line}</p>
           ))}
         </div>
-        <div className="skills-container">
+        <div className="mt-5 mb-20">
           <TagsInput
             suggestData={suggestedServices}
             tags={services}
@@ -231,8 +232,8 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     );
   
     const ConfirmPanel = (
-      <div className="description-panel">
-        <p className="content-text">Thank you for your submission!</p>
+      <div className={styles.descriptionPanel}>
+        <p>Thank you for your submission!</p>
       </div>
     );
   
@@ -314,15 +315,15 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     }
   
     return (
-      <div className="freelancer-details-container">
-        <div className="main-panel">
-          <div className="freelancer-contents">
-            <h2 className="name-title">
+      <div className={styles.freelancerDetailsContainer}>
+        <div className={styles.mainPanel}>
+          <div className={styles.freelancerContents}>
+            <h2 className="text-theme-secondary">
               {stepData[step].heading.replace("{name}", displayName)}
             </h2>
             {panels[step] ?? <></>}
           </div>
-          <div className={step === 0 ? "button-left" : "button-right"}>
+          <div className={step === 0 ? styles.buttonLeft : styles.buttonRight}>
             {step >= 1 && (
               <button
                 className="secondary-btn !mt-0"
@@ -334,7 +335,7 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
   
             {step === 0 ? (
               <button
-                className="primary-btn in-dark w-button ml-auto"
+                className="primary-btn in-dark w-button mr-auto mt-6"
                 onClick={() => setStep(1)}
                 data-testid="get-started-button"
               >

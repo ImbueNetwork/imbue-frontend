@@ -244,6 +244,17 @@ select.round {
   color: black;
 }
 
+.pill-button.primary{
+  background: #202124;
+  color: white;
+  border: 0;
+}
+
+.pill-button.primary:hover{
+  background: var(--talisman-connect-active-background, #d2d2d2);
+  border-color: var(--talisman-connect-active-background, #d2d2d2);
+}
+
 .Modal header div{
   color: white;
 }
