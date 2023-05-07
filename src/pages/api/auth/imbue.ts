@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import nextConnect from 'next-connect'
 import * as models from "../models";
 import db from "../db";
 import { generateGetStreamToken, updateUserGetStreamToken } from "../models";
@@ -8,14 +9,13 @@ import { jwtOptions } from "./common";
 import config from "../config";
 import { setTokenCookie } from "../auth-cookies";
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { userOrEmail, password } = req.body;
 
-  if (req.method === "POST") {
+export default nextConnect()
+  .post(async (req: NextApiRequest, res: NextApiResponse) => {
+    const { userOrEmail, password } = req.body;
     db.transaction(async (tx) => {
       try {
         const user = await models.fetchUserOrEmail(userOrEmail)(tx);
-        console.log({ user });
         if (!user) {
           return res.status(404).end();
         }
@@ -32,14 +32,11 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
         const payload = { id: user.id };
         const token = jwt.sign(payload, jwtOptions.secretOrKey);
-        setTokenCookie(res, token);
+        await setTokenCookie(res, token);
 
-        res.send({ id: user.id, display_name: user.display_name });
+        return res.send({ id: user.id, display_name: user.display_name });
       } catch (e) {
         new Error(`Failed to fetch user ${userOrEmail}`, { cause: e as Error });
       }
     });
-  } else {
-    res.status(400).send({ message: "Bad Request" });
-  }
-}
+  });

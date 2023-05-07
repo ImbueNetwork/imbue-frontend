@@ -585,16 +585,20 @@ function Project() {
               index={index}
               milestone={milestone}
               modified={milestone?.modified!}
+              vote={async () => {
+                // show polkadot account modal
+                await setShowPolkadotAccounts(true);
+                // set submitting mile stone to false
+                await setSubmittingMilestone(false);
+                // setMile stone key in view
+                await setMilestoneKeyInView(milestone.milestone_key);
+              }}
               submitMilestone={async () => {
                 // set submitting mile stone to true
                 await setSubmittingMilestone(true);
                 // show polkadot account modal
                 await setShowPolkadotAccounts(true);
                 // setMile stone key in view
-                await setMilestoneKeyInView(milestone.milestone_key);
-              }}
-              vote={async () => {
-                await setShowPolkadotAccounts(true);
                 await setMilestoneKeyInView(milestone.milestone_key);
               }}
               withdraw={async () => {
