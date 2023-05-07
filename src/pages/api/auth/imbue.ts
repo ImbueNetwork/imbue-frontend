@@ -24,17 +24,15 @@ export default nextConnect()
           const token = await generateGetStreamToken(user);
           await updateUserGetStreamToken(user?.id, token)(tx);
         }
-
         const loginSuccessful = await bcrypt.compare(password, user.password);
         if (!loginSuccessful) {
           return res.status(404).end();
         }
-
         const payload = { id: user.id };
-        const token = jwt.sign(payload, jwtOptions.secretOrKey);
+        const token = await jwt.sign(payload, jwtOptions.secretOrKey);
         await setTokenCookie(res, token);
-
         return res.send({ id: user.id, display_name: user.display_name });
+
       } catch (e) {
         new Error(`Failed to fetch user ${userOrEmail}`, { cause: e as Error });
       }
