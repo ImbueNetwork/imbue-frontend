@@ -18,6 +18,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { useGoogleLogin, GoogleLogin } from '@react-oauth/google';
 import jwt from 'jsonwebtoken';
 import { StyledEngineProvider } from "@mui/material/styles";
+import * as utils from "@/utils";
 
 
 const logoStyle = { height: "100%", width: "100%" };
@@ -92,7 +93,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     });
 
     if (resp.ok) {
-      router.push(redirectUrl);
+      utils.redirect(redirectUrl);
     } else {
       setErrorMessage("incorrect username or password");
     }
@@ -112,7 +113,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     });
 
     if (resp.ok) {
-      router.push(redirectUrl);
+      utils.redirect(redirectUrl);
     } else {
       setErrorMessage("incorrect username or password");
     }
@@ -124,7 +125,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     try {
       const result = await getAccountAndSign(account);
       await authorise(result?.signature as SignerResult, result?.challenge!, account);
-      router.push(redirectUrl);
+      utils.redirect(redirectUrl);
     } catch (error) {
       console.log(error);
     }
