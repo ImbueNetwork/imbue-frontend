@@ -1,0 +1,148 @@
+.fieldInput {
+    background-color: var(--theme-ink-color);
+    border: solid 1px black;
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+    padding: 8px 8px 8px 16px;
+    width: 100%;
+    font-size: 16px;
+    line-height: 1.5;
+    color: black;
+}
+
+.large {
+    height: 30%;
+}
+
+.freelancerDetailsContainer {
+    display: flex;
+    flex-direction: row;
+    min-height: 650px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 20px;
+}
+
+.mainPanel {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--theme-ink-color);
+    padding: 20px 54px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 30px;
+}
+
+.help {
+    color: var(--theme-ink-color);
+    padding-right: 48px;
+    padding-bottom: 8px;
+}
+
+.freelancerContents {
+    padding-top: 2%;
+    padding-bottom: 2%;
+    height: 100%;
+    flex-grow: 1;
+}
+
+.buttonLeft {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.buttonRight {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-left: auto;
+}
+
+.namePanelInputWrapper {
+    margin-top: 24px;
+    margin-bottom: 40px;
+}
+
+.nameTitle {
+    color: var(--theme-secondary);
+}
+
+.contentTextSmall {
+    width: 90%;
+    color: #2c2c2c;
+    font-size: 23px;
+    text-align: left;
+    padding-top: 5%;
+}
+
+.helloPanel {
+    display: flex;
+    flex-direction: row;
+}
+
+.freelanceXpContainer {}
+
+.freelanceXpOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.freelanceXpItem {
+    display: flex;
+    flex-direction: column;
+    background: var(--theme-imbue-white);
+    color: var(--theme-imbue-purple);
+    font-size: 15px;
+    line-height: 1;
+    padding: 17px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.active {
+    border: 2px solid rgba(56, 29, 193, 0.5);
+}
+
+.contentTextSmallFlex {
+    justify-content: center;
+    align-items: flex-start;
+    color: #2c2c2c;
+    margin: 12px 0;
+}
+
+
+.descriptionPanel {
+    display: flex;
+    flex-direction: column;
+    height: 90%;
+}
+
+
+@media screen and (max-width: 500px) {
+
+    .freelancerDetailsContainer {
+        max-width: 800px;
+        min-height: 480px;
+        height: 90%;
+        padding: 0 30px;
+    }
+
+    .mainPanel{
+        height: fit-content;
+        margin: auto;
+        padding: 30px 30px;
+    }
+
+    .contentTextSmall{
+        width: 100%;
+        font-size: 16px;
+    }
+
+}

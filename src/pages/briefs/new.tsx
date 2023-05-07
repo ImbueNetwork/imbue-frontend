@@ -174,7 +174,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
       <div className={styles.budgetInputContainer}>
         <input
           className={styles.briefDetailFieldInput}
-          style={{ paddingLeft: "24px", height:"auto" }}
+          style={{ paddingLeft: "24px", height: "auto" }}
           type="number"
           value={budget || ""}
           onChange={(e) => setBudget(Number(e.target.value))}
@@ -268,59 +268,62 @@ const NewBrief = (props: BriefProps): JSX.Element => {
   };
 
   return (
-    <div className={`${styles.newBriefContainer} hq-layout`}>
-      <div className={styles.leftPanel}>
-        <ProgressBar
-          titleArray={["Description", "Skills", "Scope", "Budget"]}
-          currentValue={stepData[step].progress}
-        />
-        <h1 className={styles.heading}>{stepData[step].heading}</h1>
-        {stepData[step].content.split("\n").map((content, index) => (
-          <p className={styles.help} key={index}>
-            {content}
-          </p>
-        ))}
-      </div>
-      <div className={styles.rightPanel}>
-        <div className={styles.contents}>{panels[step] ?? <></>}</div>
-        <div className={styles.buttons}>
-          {step >= 1 && (
-            <button
-              className="secondary-btn !mt-0"
-              onClick={() => setStep(step - 1)}
-            >
-              Back
-            </button>
-          )}
+    <div className="h-[90%] flex">
+      <div className={`${styles.newBriefContainer} hq-layout`}>
+        <div className={styles.leftPanel}>
+          <ProgressBar
+            titleArray={["Description", "Skills", "Scope", "Budget"]}
+            currentValue={stepData[step].progress}
+          />
+          <h1 className={styles.heading}>{stepData[step].heading}</h1>
+          {stepData[step].content.split("\n").map((content, index) => (
+            <p className={styles.help} key={index}>
+              {content}
+            </p>
+          ))}
+        </div>
+        <div className={styles.rightPanel}>
+          <div className={styles.contents}>{panels[step] ?? <></>}</div>
+          <div className={styles.buttons}>
+            {step >= 1 && (
+              <button
+                className="secondary-btn !mt-0"
+                onClick={() => setStep(step - 1)}
+              >
+                Back
+              </button>
+            )}
 
-          {step === stepData.length - 1 ? (
-            <button
-              className="primary-btn in-dark w-button"
-              onClick={() => utils.redirect("briefs")}
-            >
-              Discover Briefs
-            </button>
-          ) : step === stepData.length - 2 ? (
-            <button
-              className="primary-btn in-dark w-button !mt-0"
-              disabled={!validate()}
-              onClick={() => onReviewPost()}
-            >
-              Submit
-            </button>
-          ) : (
-            <button
-              className="primary-btn in-dark w-button !mt-0"
-              data-testid="next-button"
-              onClick={() => setStep(step + 1)}
-              disabled={!validate()}
-            >
-              {stepData[step].next ? `Next: ${stepData[step].next}` : "Next"}
-            </button>
-          )}
+            {step === stepData.length - 1 ? (
+              <button
+                className="primary-btn in-dark w-button"
+                onClick={() => utils.redirect("briefs")}
+              >
+                Discover Briefs
+              </button>
+            ) : step === stepData.length - 2 ? (
+              <button
+                className="primary-btn in-dark w-button !mt-0"
+                disabled={!validate()}
+                onClick={() => onReviewPost()}
+              >
+                Submit
+              </button>
+            ) : (
+              <button
+                className="primary-btn in-dark w-button !mt-0"
+                data-testid="next-button"
+                onClick={() => setStep(step + 1)}
+                disabled={!validate()}
+              >
+                {stepData[step].next ? `Next: ${stepData[step].next}` : "Next"}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
+
   );
 };
 

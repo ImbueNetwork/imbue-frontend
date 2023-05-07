@@ -47,7 +47,7 @@ const MyFreelancerApplications = ({
 
   return (
     <div className="bg-[#2c2c2c] border border-light-white relative rounded-[0.75rem] overflow-hidden">
-      {myApplications.map((application: Project, index: number) => (
+      {myApplications?.map((application: Project, index: number) => (
         <div
           key={index}
           onClick={() => redirectToApplication(application)}
