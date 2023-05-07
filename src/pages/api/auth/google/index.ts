@@ -22,7 +22,7 @@ export default nextConnect()
                 const usernameExists = await fetchUserOrEmail(username)(tx);
                 if (usernameExists?.id) {
                     const payload = { id: usernameExists?.id };
-                    const token = jwt.sign(payload, jwtOptions.secretOrKey);
+                    const token = await jwt.sign(payload, jwtOptions.secretOrKey);
                     await setTokenCookie(res, token);
                     res.send({ success: true });
                 } else {
@@ -45,7 +45,7 @@ export default nextConnect()
                                         user, username, email
                                     )(tx);
                                     const payload = { id: user.id };
-                                    const token = jwt.sign(payload, jwtOptions.secretOrKey);
+                                    const token = await jwt.sign(payload, jwtOptions.secretOrKey);
                                     await setTokenCookie(res, token);
                                     res.send({ id: user.id, display_name: user.display_name });
                                 });

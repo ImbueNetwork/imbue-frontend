@@ -52,7 +52,7 @@ export default nextConnect()
 
           if (userExists) {
             const payload = { id: userExists?.user_id };
-            const token = jwt.sign(payload, jwtOptions.secretOrKey);
+            const token = await jwt.sign(payload, jwtOptions.secretOrKey);
             await setTokenCookie(res, token);
             return res.send({ success: true });
           }

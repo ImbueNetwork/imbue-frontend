@@ -38,7 +38,7 @@ export default nextConnect()
                                 user, username, email, password
                             )(tx);
                             const payload = { id: user.id };
-                            const token = jwt.sign(payload, jwtOptions.secretOrKey);
+                            const token = await jwt.sign(payload, jwtOptions.secretOrKey);
 
                             await setTokenCookie(res,token);
                             res.send({ id: user.id, display_name: user.display_name });
