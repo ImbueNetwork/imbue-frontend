@@ -45,7 +45,6 @@ export default nextConnect()
             return res.send({ existingUser: loggedInUser, web3Account });
           });
         } else {
-
           const userExists = await fetchWeb3AccountByAddress(
             address
           )(tx);

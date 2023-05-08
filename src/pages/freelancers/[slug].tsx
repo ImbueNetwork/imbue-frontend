@@ -271,7 +271,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                     <div className="flex justify-center gap-[12px]">
                       <ReactCountryFlag countryCode="US" />
                       <p className="text-[16px] leading-[1.2] text-[#ebeae2]">
-                        Los Angeles, United State
+                        Los Angeles, United States
                       </p>
                     </div>
                   )
