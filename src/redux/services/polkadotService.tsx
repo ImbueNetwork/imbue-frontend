@@ -46,18 +46,7 @@ export async function authorise(
       logged_in_user: existingUser,
     }),
   });
-  if (resp.ok) {
-    const userResponse = await getCurrentUser();
-    if (userResponse) {
-      const userAuth = {
-        isAuthenticated: true,
-        user: userResponse,
-      };
-      // localStorage.setItem("userAuth", JSON.stringify(userAuth));
-    }
-  } else {
-    // TODO: UX for 401
-  }
+  return resp;
 }
 
 export const selectAccount = async (account: WalletAccount) => {
