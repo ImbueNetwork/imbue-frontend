@@ -210,6 +210,8 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                   <li className="lg:max-w-[65%] mt-1 mb-2">
                     <GoogleOAuthProvider clientId={config.googleClientId}>
                       <GoogleLogin
+                        theme="filled_black"
+                        shape="rectangular"
                         useOneTap={true}
                         onSuccess={(creds: any) => googleLogin(creds)}
                         onError={() => {
@@ -228,13 +230,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                     data-mdc-dialog-action="web3"
                     onClick={() => closeModal()}
                   >
-                    <span className="mdc-deprecated-list-item__graphic h-[40px] flex mr-[0px]">
-                    </span>
-                    <span
-                      className="cursor-pointer"
-                    >
-                      {"Sign in with a wallet"}
-                    </span>
+                    <button className="pill-button primary">{"Sign in with a wallet"}</button>
                   </li>
                 </div>
 
