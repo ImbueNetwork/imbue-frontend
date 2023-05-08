@@ -124,7 +124,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   ): Promise<any> => {
     try {
       const result = await getAccountAndSign(account);
-      await authorise(result?.signature as SignerResult, result?.challenge!, account);
+      const resp = await authorise(result?.signature as SignerResult, result?.challenge!, account);
       utils.redirect(redirectUrl);
     } catch (error) {
       console.log(error);
