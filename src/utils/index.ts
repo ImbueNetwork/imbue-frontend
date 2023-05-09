@@ -1,5 +1,6 @@
 import * as config from "@/config";
 import { dummyApplicationProject } from "@/config/briefs-data";
+import { Project } from "@/model";
 import { StreamChat } from "stream-chat";
 
 export type BadRoute =
@@ -44,7 +45,7 @@ export const getCurrentUser = async () => {
     }
   } catch (error) {
     console.log(error);
-  }  
+  }
   return null;
 };
 
@@ -59,15 +60,19 @@ export const getProjectId = async () => {
 };
 
 export const fetchProject = async (projectId: string | number | null) => {
-  const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}project/${projectId}`),
-    {
-      headers: config.getAPIHeaders,
+  try {
+    const resp = await fetch(
+      checkEnvironment().concat(`${config.apiBase}project/${projectId}`),
+      {
+        headers: config.getAPIHeaders,
+        method: "get",
+      }
+    );
+    if (resp.ok) {
+      return (await resp.json()) as Project;
     }
-  );
-  if (resp.ok) {
-    const project = await resp.json();
-    return project;
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -75,6 +80,7 @@ export const fetchUserOrEmail = async (userOrEmail: string) => {
   const resp = await fetch(
     checkEnvironment().concat(`${config.apiBase}users/${userOrEmail}`), {
     headers: config.getAPIHeaders,
+    method: "get",
   });
   if (resp.ok) {
     const user = await resp.json();

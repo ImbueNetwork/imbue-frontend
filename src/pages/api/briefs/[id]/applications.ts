@@ -2,12 +2,14 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../db";
 import * as models from "../../models";
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { query, method } = req;
+import nextConnect from 'next-connect'
 
-  const id: any = query.id as string[];
+export default nextConnect()
+  .get(async (req: NextApiRequest, res: NextApiResponse) => {
+    const { query, method } = req;
 
-  if (method === "GET") {
+    const id: any = query.id as string[];
+
     db.transaction(async (tx) => {
       try {
         const briefApplications = await models.fetchBriefApplications(id)(tx);
@@ -33,7 +35,5 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         });
       }
     });
-  } else {
-    new Error(`Failed to fetch brief applications by userid: ${id}`);
-  }
-}
+
+  });

@@ -105,7 +105,7 @@ const ApplicationPreview = (): JSX.Element => {
 
 	const updateProject = async (chainProjectId?: number) => {
 		setLoading(true);
-		await fetch(`${config.apiBase}/project/${application.id}`, {
+		const resp = await fetch(`${config.apiBase}/project/${application.id}`, {
 			headers: config.postAPIHeaders,
 			method: 'put',
 			body: JSON.stringify({
@@ -127,8 +127,11 @@ const ApplicationPreview = (): JSX.Element => {
 				chain_project_id: chainProjectId,
 			}),
 		});
-		setLoading(false);
-		setIsEditingBio(false);
+
+		if (resp.ok) {
+			setLoading(false);
+			setIsEditingBio(false);
+		}
 	};
 
 	const startWork = async (account: WalletAccount) => {
@@ -148,6 +151,7 @@ const ApplicationPreview = (): JSX.Element => {
 						if (projectIsOnChain) {
 							await updateProject(projectId);
 							router.push(`/projects/${applicationId}`);
+							break;
 						}
 						await new Promise((f) => setTimeout(f, 1000));
 					}
