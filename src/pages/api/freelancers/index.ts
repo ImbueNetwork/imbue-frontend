@@ -9,103 +9,91 @@ import {
 } from "../models";
 import { verifyUserIdFromJwt } from "../auth/common";
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { body, method } = req;
+import nextConnect from 'next-connect'
 
-  const freelancer = body.freelancer;
-
-  switch (method) {
-    case "POST":
-      createFreelancer(res, req, freelancer);
-      break;
-    case "GET":
-      getAllFreelancers(res);
-    // default:
-    //   res.status(400).send({ message: "Bad Request" });
-  }
-}
-
-const createFreelancer = (
-  res: NextApiResponse,
-  req: NextApiRequest,
-  freelancer: Freelancer
-) => {
-  verifyUserIdFromJwt(req, res, freelancer.user_id);
-  db.transaction(async (tx) => {
-    try {
-      const skill_ids = await upsertItems(freelancer.skills, "skills")(tx);
-      const language_ids = await upsertItems(
-        freelancer.languages,
-        "languages"
-      )(tx);
-      const services_ids = await upsertItems(
-        freelancer.services,
-        "services"
-      )(tx);
-      let client_ids: number[] = [];
-
-      if (freelancer.clients) {
-        client_ids = await upsertItems(freelancer.clients, "services")(tx);
+export default nextConnect()
+  .get(async (req: NextApiRequest, res: NextApiResponse) => {
+    const { body, method } = req;
+    const freelancer = body.freelancer;
+    db.transaction(async (tx) => {
+      try {
+        await fetchAllFreelancers()(tx).then(async (freelancers: any) => {
+          await Promise.all([
+            ...freelancers.map(async (freelancer: any) => {
+              freelancer.skills = await fetchItems(
+                freelancer.skill_ids,
+                "skills"
+              )(tx);
+              freelancer.client_images = await fetchItems(
+                freelancer.client_ids,
+                "clients"
+              )(tx);
+              freelancer.languages = await fetchItems(
+                freelancer.language_ids,
+                "languages"
+              )(tx);
+              freelancer.services = await fetchItems(
+                freelancer.service_ids,
+                "services"
+              )(tx);
+            }),
+          ]);
+          res.send(freelancers);
+        });
+      } catch (e) {
+        new Error(`Failed to fetch all freelancers`, { cause: e as Error });
       }
-      const freelancer_id = await insertFreelancerDetails(
-        freelancer,
-        skill_ids,
-        language_ids,
-        client_ids,
-        services_ids
-      )(tx);
+    });
 
-      if (!freelancer_id) {
+  }).put(async (req: NextApiRequest, res: NextApiResponse) => {
 
+    const { body, method } = req;
+    const freelancer = body.freelancer;
+
+    verifyUserIdFromJwt(req, res, freelancer.user_id);
+    db.transaction(async (tx) => {
+      try {
+        const skill_ids = await upsertItems(freelancer.skills, "skills")(tx);
+        const language_ids = await upsertItems(
+          freelancer.languages,
+          "languages"
+        )(tx);
+        const services_ids = await upsertItems(
+          freelancer.services,
+          "services"
+        )(tx);
+        let client_ids: number[] = [];
+
+        if (freelancer.clients) {
+          client_ids = await upsertItems(freelancer.clients, "services")(tx);
+        }
+        const freelancer_id = await insertFreelancerDetails(
+          freelancer,
+          skill_ids,
+          language_ids,
+          client_ids,
+          services_ids
+        )(tx);
+
+        if (!freelancer_id) {
+
+          return res.status(401).send({
+            status: "Failed",
+            error: new Error("Failed to insert freelancer details.")
+          });
+        }
+
+        return res.status(201).send({
+          status: "Successful",
+          freelancer_id: freelancer_id,
+        });
+      } catch (cause) {
         return res.status(401).send({
           status: "Failed",
-          error : new Error("Failed to insert freelancer details.")
+          error: new Error(`Failed to insert freelancer details .`, {
+            cause: cause as Error,
+          })
         });
       }
-
-      return res.status(201).send({
-        status: "Successful",
-        freelancer_id: freelancer_id,
-      });
-    } catch (cause) {
-      return res.status(401).send({
-        status: "Failed",
-        error : new Error(`Failed to insert freelancer details .`, {
-          cause: cause as Error,
-        })
-      });
-    }
+    });
   });
-};
-
-const getAllFreelancers = (res: NextApiResponse) => {
-  db.transaction(async (tx) => {
-    try {
-      await fetchAllFreelancers()(tx).then(async (freelancers: any) => {
-        await Promise.all([
-          ...freelancers.map(async (freelancer: any) => {
-            freelancer.skills = await fetchItems(
-              freelancer.skill_ids,
-              "skills"
-            )(tx);
-            freelancer.client_images = await fetchItems(
-              freelancer.client_ids,
-              "clients"
-            )(tx);
-            freelancer.languages = await fetchItems(
-              freelancer.language_ids,
-              "languages"
-            )(tx);
-            freelancer.services = await fetchItems(
-              freelancer.service_ids,
-              "services"
-            )(tx);
-          }),
-        ]);
-        res.send(freelancers);
-      });
-    } catch (e) {
-      new Error(`Failed to fetch all freelancers`, { cause: e as Error });
-    }
-  });
-};

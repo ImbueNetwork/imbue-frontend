@@ -3,10 +3,12 @@ import db from "../db";
 import * as models from "../models";
 import { Freelancer, fetchItems, searchFreelancers } from "../models";
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req;
 
-  if (method === "POST") {
+import nextConnect from 'next-connect'
+
+export default nextConnect()
+  .put(async (req: NextApiRequest, res: NextApiResponse) => {
+    const { method } = req;
     db.transaction(async (tx) => {
       try {
         const filter: models.FreelancerSqlFilter = req.body;
@@ -41,5 +43,4 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         new Error(`Failed to search all freelancers`, { cause: e as Error });
       }
     });
-  }
-}
+  });

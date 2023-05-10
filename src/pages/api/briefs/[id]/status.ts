@@ -10,18 +10,17 @@ import {
   acceptBriefApplication,
 } from "../../models";
 import { verifyUserIdFromJwt } from "../../auth/common";
+import nextConnect from 'next-connect'
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  const { body, method } = req;
-  const { id }: any = req.query;
+export default nextConnect()
+  .put(async (req: NextApiRequest, res: NextApiResponse) => {
 
-  const projectId = body?.project_id;
-  const status_id = body?.status_id;
+    const { body, method } = req;
+    const { id }: any = req.query;
 
-  if (method === "PUT") {
+    const projectId = body?.project_id;
+    const status_id = body?.status_id;
+
     db.transaction(async (tx) => {
       try {
         let brief: Brief = await fetchBrief(id)(tx);
@@ -43,5 +42,4 @@ export default async function handler(
         return new Error(`Failed to accept brief application: ${e.message}`);
       }
     });
-  }
-}
+  });
