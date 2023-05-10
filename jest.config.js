@@ -13,7 +13,7 @@ const customJestConfig = {
     "^next/router$": "<rootDir>/tests/__mocks__/next/router.js",
     "^@components/(.*)$": "<rootDir>/src/components/$1",
     "^@pages/(.*)$": "<rootDir>/src/pages/$1",
-    "^@services/(.*)$": "<rootDir>/src/redux/services/$1",
+    "^@redux/(.*)$": "<rootDir>/src/redux/$1",
     "^@/(.*)$": "<rootDir>/src/$1",
   },
 };
