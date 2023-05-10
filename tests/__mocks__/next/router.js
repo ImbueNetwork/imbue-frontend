@@ -2,7 +2,8 @@ module.exports = {
   useRouter: jest.fn(() => ({
     route: "/",
     pathname: "",
-    query: "",
+    query: {},
+    isReady: true,
     asPath: "",
     push: jest.fn(),
     replace: jest.fn(),

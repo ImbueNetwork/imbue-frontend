@@ -11,7 +11,10 @@ import {
 import React from "react";
 import { act } from "@testing-library/react";
 import Briefs from "@/pages/briefs";
-import { getAllBriefs, callSearchBriefs } from "@/redux/services/briefService";
+import {
+  getAllBriefs,
+  callSearchBriefs,
+} from "../src/redux/services/briefService";
 import {
   amountOfBriefsSubmitted,
   briefsData,
@@ -20,7 +23,7 @@ import {
   searchMockResponse,
 } from "./__mocks__/briefsData";
 
-jest.mock("@/redux/services/briefService", () => ({
+jest.mock("../src/redux/services/briefService", () => ({
   getAllBriefs: jest.fn(),
   callSearchBriefs: jest.fn(),
 }));
