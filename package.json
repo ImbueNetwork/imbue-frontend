@@ -58,10 +58,13 @@
     "uuidv4": "^6.2.12"
   },
   "devDependencies": {
+    "@testing-library/react": "^14.0.0",
     "@testing-library/react-hooks": "^8.0.1",
+    "@testing-library/user-event": "^14.4.3",
     "@types/jest": "^29.5.1",
     "@types/passport": "^1.0.12",
     "@types/styled-components": "^5.1.26",
+    "@types/testing-library__jest-dom": "^5.14.5",
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.21",
     "tailwindcss": "^3.3.1"
