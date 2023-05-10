@@ -339,118 +339,119 @@ const Briefs = (): JSX.Element => {
   };
 
   return (
-    <div className="search-briefs-container px-[15px] lg:px-[40px]">
-      <div
-        className={`filter-panel 
-      max-width-750px:fixed 
-      max-width-750px:w-full 
-      max-width-750px:top-0 
-      max-width-750px:bg-black 
-      max-width-750px:z-10
-      max-width-750px:px-[20px]
-      max-width-750px:pt-[20px]
-      h-full
-      max-width-750px:overflow-y-scroll
-      `}
-        style={{
-          display:
-            size?.width <= 750 ? (filterVisble ? "block" : "none") : "block",
-        }}
-      >
-        <div className="filter-heading">Filter By</div>
-        <BriefFilter
-          label={expfilter.label}
-          filter_type={BriefFilterOption.ExpLevel}
-          filter_options={expfilter.options}
-        ></BriefFilter>
-        <BriefFilter
-          label={submittedFilters.label}
-          filter_type={BriefFilterOption.AmountSubmitted}
-          filter_options={submittedFilters.options}
-        ></BriefFilter>
-        <BriefFilter
-          label={lengthFilters.label}
-          filter_type={BriefFilterOption.Length}
-          filter_options={lengthFilters.options}
-        ></BriefFilter>
-        <div className="tab-section mb-10 min-width-500px:!hidden">
-          <button
-            onClick={() => {
-              onSearch();
-              toggleFilter();
-            }}
-            className="rounded-full text-black bg-white px-10 py-2"
-          >
-            Search
-          </button>
-          <button
-            onClick={() => {
-              setFilterVisible(false);
-            }}
-            className="rounded-full text-black bg-white px-10 py-2 ml-5"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-      <div className="briefs-section  max-width-750px:overflow-hidden">
-        <div className="briefs-heading">
-          <div className="tab-section">
-            <div className="tab-item" onClick={onSearch}>
-              Search
-            </div>
-            <div className="tab-item" onClick={onSavedBriefs}>
-              Saved Briefs
-            </div>
-            <div
-              className={`tab-item text-right min-width-750px:hidden`}
-              onClick={toggleFilter}
-            >
-              <FiFilter color="#fff" />
-            </div>
-          </div>
-          <input
-            id="search-input"
-            className="search-input px-[12px]"
-            placeholder="Search"
-          />
-          <div className="search-result">
-            <span className="result-count">{briefs.length}</span>
-            <span> briefs found</span>
-          </div>
-        </div>
-        <div className="briefs-list">
-          {briefs.map((item, itemIndex) => (
-            <div
-              className="brief-item"
-              key={itemIndex}
-              onClick={() => router.push(`/briefs/${item?.id}/`)}
-            >
-              <div className="brief-title">{item.headline}</div>
-              <div className="brief-time-info">
-                {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
-              </div>
-              <div className="brief-description">{item.description}</div>
+    <p test-id="result">ekfdjnm</p>
+    // <div className="search-briefs-container px-[15px] lg:px-[40px]">
+    //   <div
+    //     className={`filter-panel
+    //   max-width-750px:fixed
+    //   max-width-750px:w-full
+    //   max-width-750px:top-0
+    //   max-width-750px:bg-black
+    //   max-width-750px:z-10
+    //   max-width-750px:px-[20px]
+    //   max-width-750px:pt-[20px]
+    //   h-full
+    //   max-width-750px:overflow-y-scroll
+    //   `}
+    //     style={{
+    //       display:
+    //         size?.width <= 750 ? (filterVisble ? "block" : "none") : "block",
+    //     }}
+    //   >
+    //     <div className="filter-heading">Filter By</div>
+    //     <BriefFilter
+    //       label={expfilter.label}
+    //       filter_type={BriefFilterOption.ExpLevel}
+    //       filter_options={expfilter.options}
+    //     ></BriefFilter>
+    //     <BriefFilter
+    //       label={submittedFilters.label}
+    //       filter_type={BriefFilterOption.AmountSubmitted}
+    //       filter_options={submittedFilters.options}
+    //     ></BriefFilter>
+    //     <BriefFilter
+    //       label={lengthFilters.label}
+    //       filter_type={BriefFilterOption.Length}
+    //       filter_options={lengthFilters.options}
+    //     ></BriefFilter>
+    //     <div className="tab-section mb-10 min-width-500px:!hidden">
+    //       <button
+    //         onClick={() => {
+    //           onSearch();
+    //           toggleFilter();
+    //         }}
+    //         className="rounded-full text-black bg-white px-10 py-2"
+    //       >
+    //         Search
+    //       </button>
+    //       <button
+    //         onClick={() => {
+    //           setFilterVisible(false);
+    //         }}
+    //         className="rounded-full text-black bg-white px-10 py-2 ml-5"
+    //       >
+    //         Cancel
+    //       </button>
+    //     </div>
+    //   </div>
+    //   <div className="briefs-section  max-width-750px:overflow-hidden">
+    //     <div className="briefs-heading">
+    //       <div className="tab-section">
+    //         <div className="tab-item" onClick={onSearch}>
+    //           Search
+    //         </div>
+    //         <div className="tab-item" onClick={onSavedBriefs}>
+    //           Saved Briefs
+    //         </div>
+    //         <div
+    //           className={`tab-item text-right min-width-750px:hidden`}
+    //           onClick={toggleFilter}
+    //         >
+    //           <FiFilter color="#fff" />
+    //         </div>
+    //       </div>
+    //       <input
+    //         id="search-input"
+    //         className="search-input px-[12px]"
+    //         placeholder="Search"
+    //       />
+    //       <div className="search-result">
+    //         <span className="result-count">{briefs.length}</span>
+    //         <span> briefs found</span>
+    //       </div>
+    //     </div>
+    //     <div className="briefs-list">
+    //       {briefs.map((item, itemIndex) => (
+    //         <div
+    //           className="brief-item"
+    //           key={itemIndex}
+    //           onClick={() => router.push(`/briefs/${item?.id}/`)}
+    //         >
+    //           <div className="brief-title">{item.headline}</div>
+    //           <div className="brief-time-info">
+    //             {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
+    //           </div>
+    //           <div className="brief-description">{item.description}</div>
 
-              <div className="brief-tags">
-                {item.skills.map((skill: any, skillIndex: any) => (
-                  <div className="tag-item" key={skillIndex}>
-                    {skill.name}
-                  </div>
-                ))}
-              </div>
+    //           <div className="brief-tags">
+    //             {item.skills.map((skill: any, skillIndex: any) => (
+    //               <div className="tag-item" key={skillIndex}>
+    //                 {skill.name}
+    //               </div>
+    //             ))}
+    //           </div>
 
-              <div className="brief-proposals">
-                <span className="proposals-heading">Proposals Submitted: </span>
-                <span className="proposals-count">
-                  {item.number_of_briefs_submitted}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+    //           <div className="brief-proposals">
+    //             <span className="proposals-heading">Proposals Submitted: </span>
+    //             <span className="proposals-count">
+    //               {item.number_of_briefs_submitted}
+    //             </span>
+    //           </div>
+    //         </div>
+    //       ))}
+    //     </div>
+    //   </div>
+    // </div>
   );
 };
 
