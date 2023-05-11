@@ -116,7 +116,6 @@ export async function fetchAllUserBriefs(userId: string) {
   let response
   await db.transaction(async tx => {
     try {
-      console.log("hit");
       const briefs = await models.fetchUserBriefs(userId)(tx);
       const pendingReviewBriefs = briefs.filter(m => m.project_id == null);
       const briefsWithProjects = briefs.filter(m => m.project_id !== null);

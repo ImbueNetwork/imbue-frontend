@@ -7,9 +7,11 @@ type ProjectPkg = models.Project & {
   milestones: models.Milestone[];
 };
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req;
-  if (method === "POST") {
+import nextConnect from 'next-connect'
+
+export default nextConnect()
+  .post(async (req: NextApiRequest, res: NextApiResponse) => {
+    const { method } = req;
     const {
       name,
       logo,
@@ -62,7 +64,5 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         });
       }
     });
-  } else {
-    res.status(400).send({ message: "Bad Request" });
-  }
-}
+
+  });

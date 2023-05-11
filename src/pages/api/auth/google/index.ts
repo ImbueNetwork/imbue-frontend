@@ -14,7 +14,6 @@ export default nextConnect()
             if (!userInfo) {
                 res.status(404);
             } else {
-                console.log(userInfo);
                 const email = userInfo.email;
                 const username = email.replaceAll('.', '');
                 const displayname = userInfo.name;
