@@ -37,21 +37,11 @@ const Dashboard = ({ user, isAuthenticated, myBriefs, myApplicationsResponse  }:
   // const [briefId, setBriefId] = useState<number | undefined>();
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
-  const [briefApplications, setBriefApplications] = useState<Project[]>([]);
   const [myApplications, setMyApplications] = useState<Project[]>(myApplicationsResponse);
   const [loadingStreamChat, setLoadingStreamChat]= useState<boolean>(true)
-
+  
   const router = useRouter();  
-
   const {briefId} = router.query
-
-  useEffect(() => {
-    const getApplications = async (id: string | number) => {
-      setBriefApplications(await getBriefApplications(id));
-    };
-    
-    briefId && getApplications(briefId.toString());
-  }, [briefId, user]);
 
   const handleMessageBoxClick = async (user_id: number, freelancer: Freelancer) => {
     if (user_id) {
@@ -110,7 +100,7 @@ const Dashboard = ({ user, isAuthenticated, myBriefs, myApplicationsResponse  }:
         </BottomNavigation>
       </StyledEngineProvider>
 
-      {selectedOption === 1 && <MyClientBriefsView {...{ briefs, briefId, briefApplications, handleMessageBoxClick, redirectToBriefApplications }} />}
+      {selectedOption === 1 && <MyClientBriefsView {...{ briefs, briefId, handleMessageBoxClick, redirectToBriefApplications }} />}
       {selectedOption === 2 && <DashboardChatBox client={client} filters={filters} />}
       {selectedOption === 3 && <MyFreelancerApplications myApplications={myApplications} />}
 
