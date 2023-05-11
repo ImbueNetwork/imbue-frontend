@@ -17,8 +17,6 @@ import AccountChoice from "./AccountChoice";
 import { useMediaQuery } from "@mui/material";
 
 export const HirePopup = ({
-  openPopup,
-  setOpenPopup,
   brief,
   freelancer,
   application,
@@ -30,6 +28,7 @@ export const HirePopup = ({
 }: any) => {
   const [popupStage, setstage] = useState<number>(0);
   const mobileView = useMediaQuery('(max-width:480px)');
+	const [openPopup, setOpenPopup] = useState<boolean>(false);
 
   const modalStyle = {
     position: "absolute" as "absolute",

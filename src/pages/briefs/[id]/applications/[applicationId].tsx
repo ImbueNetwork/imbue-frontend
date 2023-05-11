@@ -21,6 +21,7 @@ import { WalletAccount } from '@talismn/connect-wallets';
 import AccountChoice from '@/components/AccountChoice';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import BriefOwnerHeader from '@/components/Application/BriefOwnerHeader';
 
 interface MilestoneItem {
 	name: string;
@@ -51,12 +52,10 @@ const ApplicationPreview = (): JSX.Element => {
 	const applicationStatus = OffchainProjectState[application?.status_id];
 	const isApplicationOwner = user?.id == application?.user_id;
 	const isBriefOwner = user?.id == brief?.user_id;
-	const [freelancerAccount, setFreelancerAccount] = useState<WalletAccount>();
 	const [loading, setLoading] = useState<boolean>(false);
 
 	const router = useRouter();
-	const { id, applicationId }: any = router.query;
-	const briefId = id;
+	const { id: briefId, applicationId }: any = router.query;
 
 	// MUI components
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -242,90 +241,14 @@ const ApplicationPreview = (): JSX.Element => {
 				)}
 
 				{isBriefOwner && (
-					<>
-						<div className="flex items-center w-full md:justify-between lg:px-10 flex-wrap gap-4">
-							<div className="flex gap-5 items-center">
-								<Image className="w-16 h-16 rounded-full object-cover cursor-pointer"
-									src={require('@/assets/images/profile-image.png')}
-									priority
-									alt="profileImage" />
-								<Badge badgeContent={"Hired"} color="primary" invisible={!(application?.status_id === OffchainProjectState.Accepted)}>
-									<p className="text-2xl font-bold">{freelancer?.display_name}</p>
-								</Badge>
-							</div>
-							{
-								<p className="text-base text-primary max-w-[50%] break-words">@
-									{(mobileView && freelancer?.username?.length > 16)
-										? `${freelancer?.username.substr(0, 16)}...`
-										: freelancer?.username
-									}
-								</p>
-							}
-
-
-							<div className='relative flex gap-3'>
-
-								<button 
-								className="Pending Review-btn in-dark text-xs lg:text-base rounded-full py-3 px-6 lg:px-6 lg:py-[14px]" 
-								onClick={() => brief && handleMessageBoxClick(application?.user_id, freelancer?.username)}>
-									Message
-								</button>
-
-								<button
-									id="demo-customized-button"
-									aria-controls={open ? 'demo-customized-menu' : undefined}
-									aria-haspopup="true"
-									aria-expanded={open ? 'true' : undefined}
-									onClick={handleOptionsClick}
-									className='primary-btn in-dark w-button !text-xs lg:!text-base'
-								>
-									Options
-									<KeyboardArrowDownIcon fontSize='small' className='ml-2' />
-								</button>
-								<Menu
-									id="basic-menu"
-									anchorEl={anchorEl}
-									open={open}
-									onClose={handleOptionsClose}
-									MenuListProps={{
-										'aria-labelledby': 'basic-button',
-									}}
-								>
-									<MenuItem onClick={() => {
-										handleOptionsClose()
-										router.push(`/freelancers/${freelancer?.username}/`)
-									}}>
-										Freelancer Profile
-									</MenuItem>
-									{application?.status_id == OffchainProjectState.PendingReview && (
-										<>
-											<MenuItem onClick={() => {
-												handleOptionsClose()
-												setOpenPopup(true)
-											}}>
-												Hire
-											</MenuItem>
-											<MenuItem
-												onClick={() => {
-													handleOptionsClose()
-													updateApplicationState(application, OffchainProjectState.ChangesRequested);
-												}}>
-												Request Changes
-											</MenuItem>
-											<MenuItem
-												onClick={() => {
-													handleOptionsClose()
-													updateApplicationState(application, OffchainProjectState.Rejected);
-												}}>
-												Reject
-											</MenuItem>
-
-										</>
-									)}
-								</Menu>
-							</div>
-						</div>
-					</>
+					<BriefOwnerHeader {...{
+						brief,
+						freelancer,
+						application,
+						handleMessageBoxClick,
+						setOpenPopup,
+						updateApplicationState
+					}} />
 				)}
 
 				{isApplicationOwner && (
@@ -358,16 +281,13 @@ const ApplicationPreview = (): JSX.Element => {
 								<button className={`${applicationStatusId[application?.status_id]}-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[14px]`}>{applicationStatusId[application?.status_id]}</button>
 							)}
 						</div>
-
-
 						<AccountChoice accountSelected={(account) => startWork(account)} visible={openPopup} setVisible={setOpenPopup} initiatorAddress={application?.initiator} filterByInitiator />
 					</div>
 				)}
 
+
 				<HirePopup
 					{...{
-						openPopup,
-						setOpenPopup,
 						brief,
 						freelancer,
 						application,
@@ -541,7 +461,7 @@ const ApplicationPreview = (): JSX.Element => {
 									className="bg-[#1a1a19] round border border-light-white rounded-[5px] text-base px-[20px] py-[10px] mt-4"
 									placeholder="Select a currency"
 									disabled={!isEditingBio}
-									defaultValue={Number(application?.currency_id)}
+									defaultValue={Number(application?.currency_id) || 0}
 									required>
 									{currencies.map((currency, index) => (
 										<option value={index} key={index} className="duration-option">
@@ -573,7 +493,7 @@ const ApplicationPreview = (): JSX.Element => {
 				setVisible={(val) => {
 					setLoginModal(val);
 				}}
-				redirectUrl={`/freelancers/${freelancer?.username}/`}
+				redirectUrl={router.pathname}
 			/>
 		</>
 	);
