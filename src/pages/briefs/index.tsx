@@ -341,11 +341,11 @@ const Briefs = (): JSX.Element => {
   return (
     <div className="search-briefs-container px-[15px] lg:px-[40px]">
       <div
-        className={`filter-panel 
-      max-width-750px:fixed 
-      max-width-750px:w-full 
-      max-width-750px:top-0 
-      max-width-750px:bg-black 
+        className={`filter-panel
+      max-width-750px:fixed
+      max-width-750px:w-full
+      max-width-750px:top-0
+      max-width-750px:bg-black
       max-width-750px:z-10
       max-width-750px:px-[20px]
       max-width-750px:pt-[20px]
