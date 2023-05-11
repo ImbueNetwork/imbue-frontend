@@ -6,6 +6,7 @@ import { WalletSelect } from "@talismn/connect-components";
 import { Wallet, WalletAccount } from "@talismn/connect-wallets";
 import { PolkadotjsWallet, SubWallet, TalismanWallet, EnkryptWallet } from "@talismn/connect-wallets"
 import { truncateMiddle } from '@talismn/connect-ui';
+import { title } from "process";
 
 type AccountChoiceProps = {
   accountSelected: (account: WalletAccount) => void;
@@ -13,6 +14,7 @@ type AccountChoiceProps = {
   visible: boolean;
   filterByInitiator?: boolean;
   initiatorAddress?: string;
+  title?: string;
 }
 
 const AccountChoice = ({
@@ -21,6 +23,7 @@ const AccountChoice = ({
   setVisible,
   filterByInitiator,
   initiatorAddress,
+  title
 }: AccountChoiceProps): JSX.Element => {
 
   const header = filterByInitiator ? `Connect with ${truncateMiddle(initiatorAddress)}` : "Connect wallet";
@@ -34,7 +37,7 @@ const AccountChoice = ({
           new SubWallet(),
           new PolkadotjsWallet(),
         ]}
-        header={header}
+        header={title ? title : header}
         showAccountsList={visible}
         onWalletConnectClose={() => setVisible(false)}
         onAccountSelected={(account: WalletAccount) => {

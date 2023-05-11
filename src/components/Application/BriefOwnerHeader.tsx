@@ -1,21 +1,27 @@
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
-import { Brief, Currency, Freelancer, Project, OffchainProjectState, User, ProjectOnChain } from '@/model';
-import { Backdrop, Badge, Button, CircularProgress, IconButton, Menu, MenuItem, useMediaQuery } from '@mui/material';
-import { fetchProject, fetchUser, getCurrentUser, redirect } from '@/utils';
+import React, { useState } from 'react';
+import { Brief, Freelancer, Project, OffchainProjectState} from '@/model';
+import { Badge, Menu, MenuItem, useMediaQuery } from '@mui/material';
 import { useRouter } from 'next/router';
-import { getFreelancerProfile } from '@/redux/services/freelancerService';
-import { changeBriefApplicationStatus as updateBriefApplicationStatus, getBrief } from '@/redux/services/briefService';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { HirePopup } from '../HirePopup';
 
+interface MilestoneItem {
+    name: string;
+    amount: number | undefined;
+}
 
 type BriefOwnerHeaderProps = {
     brief: Brief;
     freelancer: Freelancer;
     application: Project | any;
     handleMessageBoxClick: (user_id: number, freelancer: any) => void;
-    setOpenPopup: Function;
-    updateApplicationState: (application: any, projectStatus: OffchainProjectState) => void
+    updateApplicationState: (application: any, projectStatus: OffchainProjectState) => void;
+    milestones: MilestoneItem[];
+    totalCostWithoutFee: number;
+    imbueFee: number;
+    totalCost: number;
+    setLoading: Function;
 }
 
 const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
@@ -24,10 +30,15 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         freelancer,
         application,
         handleMessageBoxClick,
-        setOpenPopup,
-        updateApplicationState
+        updateApplicationState,
+        milestones,
+        totalCostWithoutFee,
+        imbueFee,
+        totalCost,
+        setLoading,
     } = props
 
+    const [openPopup, setOpenPopup] = useState<boolean>(false);
     const router = useRouter();
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -124,6 +135,21 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                     )}
                 </Menu>
             </div>
+
+            <HirePopup
+                {...{
+                    openPopup,
+                    setOpenPopup,
+                    brief,
+                    freelancer,
+                    application,
+                    milestones,
+                    totalCostWithoutFee,
+                    imbueFee,
+                    totalCost,
+                    setLoading,
+                }}
+            />
         </div>
     );
 };

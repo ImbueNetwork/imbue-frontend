@@ -8,7 +8,6 @@ import { changeBriefApplicationStatus as updateBriefApplicationStatus, getBrief 
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
 import { fetchProject, fetchUser, getCurrentUser, redirect } from '@/utils';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
-import { HirePopup } from '@/components/HirePopup';
 import ChatPopup from '@/components/ChatPopup';
 import ChainService from '@/redux/services/chainService';
 import { getWeb3Accounts, initImbueAPIInfo } from '@/utils/polkadot';
@@ -22,6 +21,7 @@ import AccountChoice from '@/components/AccountChoice';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import BriefOwnerHeader from '@/components/Application/BriefOwnerHeader';
+import ApplicationOwnerHeader from '@/components/Application/ApplicationOwnerHeader';
 
 interface MilestoneItem {
 	name: string;
@@ -56,16 +56,6 @@ const ApplicationPreview = (): JSX.Element => {
 
 	const router = useRouter();
 	const { id: briefId, applicationId }: any = router.query;
-
-	// MUI components
-	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-	const open = Boolean(anchorEl);
-	const handleOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
-		setAnchorEl(event.currentTarget);
-	};
-	const handleOptionsClose = () => {
-		setAnchorEl(null);
-	};
 
 	const mobileView = useMediaQuery('(max-width:480px)');
 
@@ -134,38 +124,6 @@ const ApplicationPreview = (): JSX.Element => {
 		}
 	};
 
-	const startWork = async (account: WalletAccount) => {
-		setLoading(true);
-		const imbueApi = await initImbueAPIInfo();
-		const chainService = new ChainService(imbueApi, user);
-		delete application.modified;
-		const briefHash = blake2AsHex(JSON.stringify(application));
-		const result = await chainService?.commenceWork(account, briefHash);
-		while (true) {
-			if (result.status || result.txError) {
-				if (result.status) {
-					console.log('***** success');
-					const projectId = parseInt(result.eventData[2]);
-					while (true) {
-						const projectIsOnChain = await chainService.getProjectOnChain(projectId);
-						if (projectIsOnChain) {
-							await updateProject(projectId);
-							router.push(`/projects/${applicationId}`);
-							break;
-						}
-						await new Promise((f) => setTimeout(f, 1000));
-					}
-				} else if (result.txError) {
-					console.log('***** failed');
-					console.log(result.errorMessage);
-				}
-				break;
-			}
-			await new Promise((f) => setTimeout(f, 1000));
-		}
-		setLoading(false);
-	};
-
 	const filteredApplication = application?.milestones
 		?.filter?.((m: any) => m?.amount !== undefined)
 		?.map?.((m: any) => {
@@ -231,7 +189,7 @@ const ApplicationPreview = (): JSX.Element => {
 	const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
 
 	return (
-		<>
+		<div>
 			<div className="application-container hq-layout px-4 mt-3 lg:mt-0 lg:px-0">
 				{user && showMessageBox && (
 					<ChatPopup
@@ -251,62 +209,33 @@ const ApplicationPreview = (): JSX.Element => {
 						application,
 						handleMessageBoxClick,
 						setOpenPopup,
-						updateApplicationState
-					}} />
-				)}
-
-				{isApplicationOwner && (
-					<div className="flex items-center w-full lg:justify-between lg:px-10 flex-wrap">
-						<div className="flex gap-5 items-center">
-							<Image className="w-16 h-16 rounded-full object-cover cursor-pointer"
-								src={require('@/assets/images/profile-image.png')}
-								priority
-								alt="profileImage" />
-							<p className="text-2xl font-bold">{briefOwner?.display_name}</p>
-						</div>
-						{
-							<p className="text-base text-primary break-words text-center ml-3">@
-								{(mobileView && briefOwner?.username?.length > 16)
-									? `${briefOwner?.username.substr(0, 16)}...`
-									: briefOwner?.username
-								}
-							</p>
-						}
-
-						<div className='ml-auto lg:ml-0'>
-							<button className="primary-btn in-dark w-button !text-xs lg:!text-base" onClick={() => brief && handleMessageBoxClick(brief?.user_id, freelancer?.username)}>
-								Message
-							</button>
-							{application?.status_id === 4 ? (
-								<button className="Accepted-btn text-black in-dark text-xs lg:text-base rounded-full py-[7px] px-3 ml-3 lg:ml-0 lg:px-6 md:py-[14px]" onClick={() => brief?.project_id && setOpenPopup(true)} >
-									Start Work
-								</button>
-							) : (
-								<button className={`${applicationStatusId[application?.status_id]}-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[14px]`}>{applicationStatusId[application?.status_id]}</button>
-							)}
-						</div>
-						<AccountChoice accountSelected={(account) => startWork(account)} visible={openPopup} setVisible={setOpenPopup} initiatorAddress={application?.initiator} filterByInitiator />
-					</div>
-				)}
-
-
-				<HirePopup
-					{...{
-						brief,
-						freelancer,
-						application,
+						updateApplicationState,
 						milestones,
 						totalCostWithoutFee,
 						imbueFee,
 						totalCost,
 						setLoading,
-					}}
-				/>
+					}} />
+				)}
 
+				{isApplicationOwner && (
+					<ApplicationOwnerHeader {...{
+						briefOwner,
+						brief,
+						handleMessageBoxClick,
+						freelancer,
+						application,
+						setLoading,
+						updateProject,
+						user
+					}}
+					/>
+				)}
+
+				{/* loading screen while connecting to wallet*/}
 				<Backdrop
 					sx={{ color: '#fff', zIndex: 5 }}
 					open={loading}
-				// onClick={handleClose}
 				>
 					<CircularProgress color="inherit" />
 				</Backdrop>
@@ -499,7 +428,7 @@ const ApplicationPreview = (): JSX.Element => {
 				}}
 				redirectUrl={router.pathname}
 			/>
-		</>
+		</div>
 	);
 };
 

@@ -17,6 +17,8 @@ import AccountChoice from "./AccountChoice";
 import { useMediaQuery } from "@mui/material";
 
 export const HirePopup = ({
+  openPopup: openHirePopup,
+  setOpenPopup: setOpenHirePopup,
   brief,
   freelancer,
   application,
@@ -28,7 +30,6 @@ export const HirePopup = ({
 }: any) => {
   const [popupStage, setstage] = useState<number>(0);
   const mobileView = useMediaQuery('(max-width:480px)');
-	const [openPopup, setOpenPopup] = useState<boolean>(false);
 
   const modalStyle = {
     position: "absolute" as "absolute",
@@ -38,8 +39,8 @@ export const HirePopup = ({
     width: mobileView ? "98vw" : "65vw",
     bgcolor: "#2c2c2c",
     color: "#fff",
-    pt:  mobileView ? "10px" :"28px",
-    pb:  mobileView ? "10px" :"28px",
+    pt: mobileView ? "10px" : "28px",
+    pb: mobileView ? "10px" : "28px",
     boxShadow: 24,
     borderRadius: "20px",
     zIndex: 1,
@@ -96,7 +97,7 @@ export const HirePopup = ({
     }
     setLoading(false);
     setstage(0);
-    setOpenPopup(false);
+    setOpenHirePopup(false);
   };
 
   const FirstContent = () => {
@@ -210,29 +211,23 @@ export const HirePopup = ({
     );
   };
 
-  const ThirdContent = () => {
-    return (
-      <div className="flex flex-col justify-center items-center modal-container">
-        <h3 className="text-center w-full text-xl font-bold my-4 primary-text">
-          Choose Your Account
-        </h3>
+  if (popupStage === 2 && openHirePopup) return (
+    <AccountChoice
+      title="Choose Your Wallet"
+      accountSelected={(account) => selectedAccount(account)}
+      visible={true}
+      setVisible={setOpenHirePopup}
+    />
+  )
 
-        <AccountChoice
-          accountSelected={(account) => selectedAccount(account)}
-          visible={true}
-          setVisible={setOpenPopup}
-        />
-      </div>
-    );
-  };
   return (
     <>
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
-        open={openPopup}
+        open={openHirePopup}
         onClose={() => {
-          setOpenPopup(false);
+          setOpenHirePopup(false);
         }}
         closeAfterTransition
         slots={{ backdrop: Backdrop }}
@@ -243,11 +238,10 @@ export const HirePopup = ({
           },
         }}
       >
-        <Fade in={openPopup}>
+        <Fade in={openHirePopup}>
           <Box sx={modalStyle}>
-            {!popupStage && openPopup && <FirstContent />}
+            {!popupStage && openHirePopup && <FirstContent />}
             {popupStage === 1 && <SecondContent />}
-            {popupStage === 2 && <ThirdContent />}
           </Box>
         </Fade>
       </Modal>
