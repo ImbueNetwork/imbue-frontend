@@ -18,7 +18,7 @@ import {
 import {
   amountOfBriefsSubmitted,
   briefsData,
-  intermidiateExpData,
+  intermediateExpData,
   projectLengthData,
   searchMockResponse,
 } from "./__mocks__/briefsData";
@@ -93,7 +93,7 @@ describe("Briefs component", () => {
     if (appContainer) {
       fireEvent.click(intermidiateCheckBox);
 
-      mockCallSearchBriefs.mockResolvedValue(intermidiateExpData);
+      mockCallSearchBriefs.mockResolvedValue(intermediateExpData);
       // search for intermidiate briefs
       await waitFor(() =>
         fireEvent.click(appContainer.getElementsByClassName("tab-item")[0])

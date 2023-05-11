@@ -154,7 +154,7 @@ export const projectLengthData = [
   },
 ];
 
-export const intermidiateExpData = [
+export const intermediateExpData = [
   {
     id: 1,
     headline: "briefOne",
