@@ -20,6 +20,7 @@ import Login from '@/components/Login';
 import { WalletAccount } from '@talismn/connect-wallets';
 import AccountChoice from '@/components/AccountChoice';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 interface MilestoneItem {
 	name: string;
@@ -40,11 +41,6 @@ const ApplicationPreview = (): JSX.Element => {
 	const [user, setUser] = useState<User | any>();
 	const [application, setApplication] = useState<Project | any>();
 	const [freelancer, setFreelancer] = useState<Freelancer | any>();
-
-	const router = useRouter();
-	const { id, applicationId }: any = router.query;
-	const briefId = id;
-
 	const [loginModal, setLoginModal] = useState<boolean>(false);
 	const [currencyId, setCurrencyId] = useState(application?.currency_id);
 	const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
@@ -58,6 +54,11 @@ const ApplicationPreview = (): JSX.Element => {
 	const [freelancerAccount, setFreelancerAccount] = useState<WalletAccount>();
 	const [loading, setLoading] = useState<boolean>(false);
 
+	const router = useRouter();
+	const { id, applicationId }: any = router.query;
+	const briefId = id;
+
+	// MUI components
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 	const open = Boolean(anchorEl);
 	const handleOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -228,7 +229,7 @@ const ApplicationPreview = (): JSX.Element => {
 
 	return (
 		<>
-			<div className="application-container hq-layout px-4 mt-3 lg:mt-0 lg:px-0 ">
+			<div className="application-container hq-layout px-4 mt-3 lg:mt-0 lg:px-0">
 				{user && showMessageBox && (
 					<ChatPopup
 						{...{
@@ -242,7 +243,7 @@ const ApplicationPreview = (): JSX.Element => {
 
 				{isBriefOwner && (
 					<>
-						<div className="flex items-center w-full justify-between lg:px-10">
+						<div className="flex items-center w-full md:justify-between lg:px-10 flex-wrap gap-4">
 							<div className="flex gap-5 items-center">
 								<Image className="w-16 h-16 rounded-full object-cover cursor-pointer"
 									src={require('@/assets/images/profile-image.png')}
@@ -262,17 +263,25 @@ const ApplicationPreview = (): JSX.Element => {
 							}
 
 
-							<div className='relative'>
-								<IconButton
-									aria-label="more"
-									id="long-button"
-									aria-controls={open ? 'long-menu' : undefined}
-									aria-expanded={open ? 'true' : undefined}
+							<div className='relative flex gap-3'>
+
+								<button 
+								className="Pending Review-btn in-dark text-xs lg:text-base rounded-full py-3 px-6 lg:px-6 lg:py-[14px]" 
+								onClick={() => brief && handleMessageBoxClick(application?.user_id, freelancer?.username)}>
+									Message
+								</button>
+
+								<button
+									id="demo-customized-button"
+									aria-controls={open ? 'demo-customized-menu' : undefined}
 									aria-haspopup="true"
+									aria-expanded={open ? 'true' : undefined}
 									onClick={handleOptionsClick}
+									className='primary-btn in-dark w-button !text-xs lg:!text-base'
 								>
-									<MoreVertIcon htmlColor='white' />
-								</IconButton>
+									Options
+									<KeyboardArrowDownIcon fontSize='small' className='ml-2' />
+								</button>
 								<Menu
 									id="basic-menu"
 									anchorEl={anchorEl}
@@ -288,10 +297,6 @@ const ApplicationPreview = (): JSX.Element => {
 									}}>
 										Freelancer Profile
 									</MenuItem>
-									<MenuItem onClick={() => {
-										handleOptionsClose()
-										handleMessageBoxClick(application?.user_id, freelancer?.username)
-									}}>Message</MenuItem>
 									{application?.status_id == OffchainProjectState.PendingReview && (
 										<>
 											<MenuItem onClick={() => {

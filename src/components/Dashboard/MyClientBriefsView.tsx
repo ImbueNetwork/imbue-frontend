@@ -1,31 +1,47 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ApplicationContainer } from "../Briefs/ApplicationContainer";
-import { Brief, Freelancer } from "@/model";
+import { Brief, Freelancer, Project } from "@/model";
 import { BriefLists } from "../Briefs/BriefsList";
 import { useRouter } from "next/router";
+import { getBriefApplications } from "@/redux/services/briefService";
+import FullScreenLoader from "../FullScreenLoader";
 
 type ClientViewProps = {
   briefId: string | string[] | undefined;
-  briefApplications: any;
   handleMessageBoxClick: (userId: number, freelander: Freelancer) => void;
   redirectToBriefApplications: (applicationId: string) => void;
   briefs: any;
 };
 
-const MyClientBriefsView = ({
-  briefs,
-  briefId,
-  briefApplications,
-  handleMessageBoxClick,
-  redirectToBriefApplications,
-}: ClientViewProps) => {
+const MyClientBriefsView = (props: ClientViewProps) => {
+
+  const {
+    briefs,
+    briefId,
+    handleMessageBoxClick,
+    redirectToBriefApplications,
+  } = props
+
+  const [briefApplications, setBriefApplications] = useState<Project[]>([]);
+  const [loadingApplications, setLoadingApplications] = useState<boolean>(true);
   const router = useRouter()
+
+  useEffect(() => {
+    const getApplications = async (id: string | number) => {
+      setBriefApplications(await getBriefApplications(id));
+    };
+    briefId && getApplications(briefId.toString());
+    setLoadingApplications(false)
+  }, [briefId]);
+
 
   const goBack = () =>{
     router.query.briefId = []
     router.replace(router, undefined, {shallow:true})
   }
+
+  if(loadingApplications) return <FullScreenLoader/>
 
   return (
     <div>
