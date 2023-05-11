@@ -21,10 +21,7 @@ import { WalletAccount } from '@talismn/connect-wallets';
 import AccountChoice from '@/components/AccountChoice';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-<<<<<<< HEAD
 import BriefOwnerHeader from '@/components/Application/BriefOwnerHeader';
-=======
->>>>>>> origin/main
 
 interface MilestoneItem {
 	name: string;
@@ -58,12 +55,7 @@ const ApplicationPreview = (): JSX.Element => {
 	const [loading, setLoading] = useState<boolean>(false);
 
 	const router = useRouter();
-<<<<<<< HEAD
 	const { id: briefId, applicationId }: any = router.query;
-=======
-	const { id, applicationId }: any = router.query;
-	const briefId = id;
->>>>>>> origin/main
 
 	// MUI components
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -253,7 +245,6 @@ const ApplicationPreview = (): JSX.Element => {
 				)}
 
 				{isBriefOwner && (
-<<<<<<< HEAD
 					<BriefOwnerHeader {...{
 						brief,
 						freelancer,
@@ -262,92 +253,6 @@ const ApplicationPreview = (): JSX.Element => {
 						setOpenPopup,
 						updateApplicationState
 					}} />
-=======
-					<>
-						<div className="flex items-center w-full md:justify-between lg:px-10 flex-wrap gap-4">
-							<div className="flex gap-5 items-center">
-								<Image className="w-16 h-16 rounded-full object-cover cursor-pointer"
-									src={require('@/assets/images/profile-image.png')}
-									priority
-									alt="profileImage" />
-								<Badge badgeContent={"Hired"} color="primary" invisible={!(application?.status_id === OffchainProjectState.Accepted)}>
-									<p className="text-2xl font-bold">{freelancer?.display_name}</p>
-								</Badge>
-							</div>
-							{
-								<p className="text-base text-primary max-w-[50%] break-words">@
-									{(mobileView && freelancer?.username?.length > 16)
-										? `${freelancer?.username.substr(0, 16)}...`
-										: freelancer?.username
-									}
-								</p>
-							}
-
-
-							<div className='relative flex gap-3'>
-
-								<button 
-								className="Pending Review-btn in-dark text-xs lg:text-base rounded-full py-3 px-6 lg:px-6 lg:py-[14px]" 
-								onClick={() => brief && handleMessageBoxClick(application?.user_id, freelancer?.username)}>
-									Message
-								</button>
-
-								<button
-									id="demo-customized-button"
-									aria-controls={open ? 'demo-customized-menu' : undefined}
-									aria-haspopup="true"
-									aria-expanded={open ? 'true' : undefined}
-									onClick={handleOptionsClick}
-									className='primary-btn in-dark w-button !text-xs lg:!text-base'
-								>
-									Options
-									<KeyboardArrowDownIcon fontSize='small' className='ml-2' />
-								</button>
-								<Menu
-									id="basic-menu"
-									anchorEl={anchorEl}
-									open={open}
-									onClose={handleOptionsClose}
-									MenuListProps={{
-										'aria-labelledby': 'basic-button',
-									}}
-								>
-									<MenuItem onClick={() => {
-										handleOptionsClose()
-										router.push(`/freelancers/${freelancer?.username}/`)
-									}}>
-										Freelancer Profile
-									</MenuItem>
-									{application?.status_id == OffchainProjectState.PendingReview && (
-										<>
-											<MenuItem onClick={() => {
-												handleOptionsClose()
-												setOpenPopup(true)
-											}}>
-												Hire
-											</MenuItem>
-											<MenuItem
-												onClick={() => {
-													handleOptionsClose()
-													updateApplicationState(application, OffchainProjectState.ChangesRequested);
-												}}>
-												Request Changes
-											</MenuItem>
-											<MenuItem
-												onClick={() => {
-													handleOptionsClose()
-													updateApplicationState(application, OffchainProjectState.Rejected);
-												}}>
-												Reject
-											</MenuItem>
-
-										</>
-									)}
-								</Menu>
-							</div>
-						</div>
-					</>
->>>>>>> origin/main
 				)}
 
 				{isApplicationOwner && (
