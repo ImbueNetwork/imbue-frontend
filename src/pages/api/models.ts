@@ -715,15 +715,11 @@ export const getOrCreateFederatedUser = (
 
 export const fetchFreelancerDetailsByUserID =
   (user_id: number | string) => (tx: Knex.Transaction) =>
-    fetchAllFreelancers()(tx)
-      .where({ "freelancers.user_id": user_id })
-      .first();
+    fetchAllFreelancers()(tx).where({ "freelancers.user_id": user_id }).first();
 
 export const fetchFreelancerDetailsByUsername =
   (username: string | string[]) => (tx: Knex.Transaction) =>
-    fetchAllFreelancers()(tx)
-      .where({ username: username })
-      .first();
+    fetchAllFreelancers()(tx).where({ username: username }).first();
 
 export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
   tx
@@ -882,7 +878,15 @@ export const insertFreelancerDetails =
       });
 
 export const updateFreelancerDetails =
-  (userId: number, f: Freelancer) => async (tx: Knex.Transaction) =>
+  (
+    userId: number,
+    f: Freelancer,
+    skill_ids: number[],
+    language_ids: number[],
+    client_ids: number[],
+    service_ids: number[]
+  ) =>
+  async (tx: Knex.Transaction) =>
     await tx<Freelancer>("freelancers")
       .update({
         freelanced_before: f.freelanced_before,
@@ -899,7 +903,70 @@ export const updateFreelancerDetails =
         user_id: f.user_id,
       })
       .where({ user_id: userId })
-      .returning("id");
+      .returning("id")
+      .then(async (ids) => {
+        if (skill_ids) {
+          await tx("freelancer_skills")
+            .where({ freelancer_id: ids[0] })
+            .delete();
+
+          skill_ids.forEach(async (skillId) => {
+            if (skillId) {
+              await tx("freelancer_skills").insert({
+                freelancer_id: ids[0],
+                skill_id: skillId,
+              });
+            }
+          });
+        }
+
+        if (language_ids) {
+          await tx("freelancer_languages")
+            .where({ freelancer_id: ids[0] })
+            .delete();
+
+          language_ids.forEach(async (langId) => {
+            if (langId) {
+              await tx("freelancer_languages").insert({
+                freelancer_id: ids[0],
+                language_id: langId,
+              });
+            }
+          });
+        }
+
+        if (client_ids) {
+          await tx("freelancer_clients")
+            .where({ freelancer_id: ids[0] })
+            .delete();
+
+          client_ids.forEach(async (clientId) => {
+            if (clientId) {
+              await tx("freelancer_clients").insert({
+                freelancer_id: ids[0],
+                client_id: clientId,
+              });
+            }
+          });
+        }
+
+        if (service_ids) {
+          await tx("freelancer_services")
+            .where({ freelancer_id: ids[0] })
+            .delete();
+
+          service_ids.forEach(async (serviceId) => {
+            if (serviceId) {
+              await tx("freelancer_services").insert({
+                freelancer_id: ids[0],
+                service_id: serviceId,
+              });
+            }
+          });
+        }
+
+        return ids[0];
+      });
 
 // The search briefs and all these lovely parameters.
 // Since we are using checkboxes only i unfortunatly ended up using all these parameters.
