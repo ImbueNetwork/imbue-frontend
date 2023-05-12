@@ -82,7 +82,7 @@ const updateFreelancerDetailsProfile = async (
       if (freelancer.clients) {
         client_ids = await models.upsertItems(
           freelancer.clients,
-          "services"
+          "clients"
         )(tx);
       }
 
