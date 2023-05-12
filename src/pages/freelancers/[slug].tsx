@@ -65,12 +65,19 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   ])
 
   const addAClient = () => {
-    setClients((prev) => [...prev, { id: Number(prev.length) + 1, name: "Imbue", icon: ImbueIcon }])
+    const newClients = [...clients, { id: Number(clients.length) + 1, name: "Imbue", icon: ImbueIcon }]
+    setClients(newClients)
+    setFreelancer((prev:Freelancer)=>{
+      return {...prev, clients : newClients}
+    })
   }
 
   const removeClient = (id: number) => {
     const newClients = clients.filter((client) => client.id !== id)
     setClients(newClients)
+    setFreelancer((prev:Freelancer)=>{
+      return {...prev, clients : newClients}
+    })
   }
 
   // skills
