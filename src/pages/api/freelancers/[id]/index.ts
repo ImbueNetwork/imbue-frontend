@@ -60,9 +60,7 @@ const updateFreelancerDetailsProfile = async (
   body: any,
   res: NextApiResponse
 ) => {
-  const freelancer: models.Freelancer = body;
-
-  console.log(freelancer);
+  const freelancer: models.Freelancer | any = body.freelancer;
 
   let response;
   await db.transaction(async (tx: any) => {
