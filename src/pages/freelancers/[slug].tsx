@@ -53,6 +53,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const isCurrentFreelancer = browsingUser && browsingUser.id == freelancer?.user_id;
 
+
   // react country selector
   const [country, setCountry] = useState('');
   const [region, setRegion] = useState('');
@@ -182,9 +183,8 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   //The fields must be pre populated correctly.
   const onSave = async () => {
     if (freelancer) {
-      console.log(freelancer);
       // TODO: Implement api endpoint
-      // await updateFreelancer(freelancer);
+      await updateFreelancer(freelancer);
       flipEdit();
     }
   };

@@ -8,10 +8,11 @@ export default nextConnect().get(
   async (req: NextApiRequest, res: NextApiResponse) => {
     const { id: username } = req.query;
     const { method, body } = req;
-    if (!username) return;
+
     if (method === "PUT") {
       updateFreelancerDetailsProfile(body, res);
     } else if (method === "GET") {
+      if (!username) return;
       getFreelancerDetails(username, res);
     }
   }
@@ -60,8 +61,9 @@ const updateFreelancerDetailsProfile = async (
   body: any,
   res: NextApiResponse
 ) => {
-  console.log({ body });
   const freelancer: models.Freelancer = body;
+
+  console.log(freelancer);
 
   let response;
   await db.transaction(async (tx: any) => {
