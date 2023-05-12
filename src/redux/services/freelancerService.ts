@@ -9,7 +9,7 @@ export async function createFreelancingProfile(freelancer: any) {
       checkEnvironment().concat(`${config.apiBase}freelancers/`),
       {
         headers: config.postAPIHeaders,
-        method: "post",
+        method: "put",
         body: JSON.stringify({ freelancer }),
       }
     );

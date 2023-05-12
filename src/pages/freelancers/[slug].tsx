@@ -69,21 +69,21 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
     const newClients = [...clients, { id: Number(clients.length) + 1, name: "Imbue", icon: ImbueIcon }]
     setClients(newClients)
     setFreelancer((prev:Freelancer)=>{
-      return {...prev, clients : newClients}
+      return {...prev, clients : newClients.map((c)=> c.name)}
     })
+    console.log(newClients);
   }
 
   const removeClient = (id: number) => {
     const newClients = clients.filter((client) => client.id !== id)
     setClients(newClients)
     setFreelancer((prev:Freelancer)=>{
-      return {...prev, clients : newClients}
+      return {...prev, clients : newClients.map((c)=> c.name)}
     })
   }
 
   // skills
-  const [skills, setSkills] = useState<string[]>([]);
-
+  const [skills, setSkills] = useState<string[]>(freelancer?.skills?.map((skill:{id:number,name:string})=>skill.name));
 
   const socials = [
     {
@@ -183,8 +183,13 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   //The fields must be pre populated correctly.
   const onSave = async () => {
     if (freelancer) {
-      // TODO: Implement api endpoint
-      await updateFreelancer(freelancer);
+
+      let data = freelancer;
+      data = {...data, 
+        skills : skills,
+        clients: []
+      }
+      await updateFreelancer(data);
       flipEdit();
     }
   };
@@ -244,7 +249,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                 <div className="flex items-center gap-2 w-full justify-center">
                   {
                     isEditMode
-                      ? <TextField className="w-full" id="outlined-basic" label="Tittle" variant="outlined" defaultValue={freelancer?.title} />
+                      ? <TextField onChange={(e) => handleUpdateState(e)}  className="w-full" id="outlined-basic" name="title" label="Tittle" variant="outlined" defaultValue={freelancer?.title} />
                       : <>
                         <IoPeople color="var(--theme-secondary)" size="24px" />
                         <p className="text-[16px] leading-[1.2] text-[#ebeae2]">
@@ -345,7 +350,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
             <div className="grid grid-cols-2 px-[30px] lg:px-[40px] justify-center md:grid-cols-3 gap-5 w-full">
               {
                 clients?.map((client) => (
-                  <div key={client.name}
+                  <div key={client.id}
                     onClick={() => removeClient(client.id)}
                     className="flex items-center gap-3 w-fit mx-auto">
                     <Badge className="client-badge" color="error" overlap="circular" badgeContent="-" invisible={!isEditMode}>
@@ -474,14 +479,14 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                   {
                     isEditMode
                       ? (
-                        <EditSkills {...{ skills, setSkills }} />
+                        <EditSkills {...{skills, setSkills}}/>
                       )
                       : (
                         <div className="flex flex-wrap gap-[20px] mt-[24px]">
-                          {freelancer?.skills?.map?.((skill: any) => (
+                          {freelancer?.skills?.length > 0 && freelancer?.skills?.map?.((skill: any, skillIndex : string) => (
                             <p
-                              className={`pill-button`}
-                              key={skill?.id}
+                              className={`pill-button capitalize`}
+                              key={skillIndex}
                             >
                               {skill.name}
                             </p>
@@ -668,7 +673,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                       {line}
                     </p>
                   ))} */}
-                Bsc. Computer Science
+                {freelancer.education}
               </div>
             </>
             )}
