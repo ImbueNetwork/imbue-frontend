@@ -905,6 +905,12 @@ export const updateFreelancerDetails =
       .where({ user_id: userId })
       .returning("id")
       .then(async (ids) => {
+        if (userId) {
+          await tx("users").where({ id: userId }).update({
+            display_name: f.display_name,
+          });
+        }
+
         if (skill_ids) {
           await tx("freelancer_skills")
             .where({ freelancer_id: ids[0] })
