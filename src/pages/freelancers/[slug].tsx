@@ -68,8 +68,8 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const addAClient = () => {
     const newClients = [...clients, { id: Number(clients.length) + 1, name: "Imbue", icon: ImbueIcon }]
     setClients(newClients)
-    setFreelancer((prev:Freelancer)=>{
-      return {...prev, clients : newClients.map((c)=> c.name)}
+    setFreelancer((prev: Freelancer) => {
+      return { ...prev, clients: newClients.map((c) => c.name) }
     })
     console.log(newClients);
   }
@@ -77,13 +77,27 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const removeClient = (id: number) => {
     const newClients = clients.filter((client) => client.id !== id)
     setClients(newClients)
-    setFreelancer((prev:Freelancer)=>{
-      return {...prev, clients : newClients.map((c)=> c.name)}
+    setFreelancer((prev: Freelancer) => {
+      return { ...prev, clients: newClients.map((c) => c.name) }
     })
   }
 
   // skills
-  const [skills, setSkills] = useState<string[]>(freelancer?.skills?.map((skill:{id:number,name:string})=>skill.name));
+  const [skills, setSkills] = useState<string[]>(freelancer?.skills?.map((skill: { id: number, name: string }) => skill?.name?.charAt(0).toUpperCase() + skill?.name?.slice(1)));
+
+  useEffect(() => {
+    setFreelancer({ ...freelancer, skills: skills.map((skill) => { return { name: skill } }) })
+  }, [skills])
+
+
+  function urlify(text: string) {
+    var urlRegex = /(https?:\/\/[^\s]+)/g;
+    if (!urlRegex.test(text)) {
+      const finalUrl = new URL(`https://${text}`);
+      return finalUrl.origin;
+    }
+    return text;
+  }
 
   const socials = [
     {
@@ -93,7 +107,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
       value: "facebook.com",
       icon: (
         <FaFacebook color="#4267B2"
-          onClick={() => window.open(freelancer?.facebook_link, "_blank")}
+          onClick={() => freelancer?.facebook_link && window.open(urlify(freelancer?.facebook_link), "_blank")}
         />
       ),
     },
@@ -104,7 +118,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
       value: "twitter.com",
       icon: (
         <FaTwitter color="#1DA1F2"
-          onClick={() => window.open(freelancer?.twitter_link, "_blank")}
+          onClick={() => freelancer?.twitter_link && window.open(urlify(freelancer?.twitter_link), "_blank")}
         />
       ),
     },
@@ -114,7 +128,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
       value: freelancer?.telegram_link,
       icon: (
         <FaTelegram
-          onClick={() => window.open(freelancer?.telegram_link, "_blank")}
+          onClick={() => freelancer?.telegram_link && window.open(urlify(freelancer?.telegram_link), "_blank")}
         />
       ),
     },
@@ -124,7 +138,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
       value: freelancer?.discord_link,
       icon: (
         <FaDiscord
-          onClick={() => window.open(freelancer?.discord_link, "_blank")}
+          onClick={() => freelancer?.discord_link && window.open(urlify(freelancer?.discord_link), "_blank")}
         />
       ),
     },
@@ -139,6 +153,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
     budgetType: "Fixed Price"
   }
 
+  const [sortReviews, setSortReviews] = useState<any>("relevant")
   const reviews = [
     {
       name: "Sam",
@@ -185,8 +200,9 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
     if (freelancer) {
 
       let data = freelancer;
-      data = {...data, 
-        skills : skills,
+      data = {
+        ...data,
+        skills: skills,
         clients: []
       }
       await updateFreelancer(data);
@@ -228,6 +244,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
               <Image
                 src={require("@/assets/images/profile-image.png")}
                 alt="profile h-full w-full image"
+                sizes="24"
               />
             </div>
             <div className="w-full flex flex-col gap-[16px] -mt-11 px-[30px] lg:px-[40px]">
@@ -240,7 +257,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
               <div className="flex gap-[15px] items-center justify-center flex-wrap">
                 {
                   isEditMode
-                    ? <TextField className="w-full" id="outlined-basic" label="Username" variant="outlined" defaultValue={freelancer?.username} />
+                    ? <TextField onChange={(e) => handleUpdateState(e)} className="w-full" id="outlined-basic" name="username" label="Username" variant="outlined" defaultValue={freelancer?.username} />
                     : <p className="text-[16px] leading-[1.2] text-primary max-w-full break-words text-center">
                       @{freelancer?.username}
                     </p>
@@ -249,7 +266,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                 <div className="flex items-center gap-2 w-full justify-center">
                   {
                     isEditMode
-                      ? <TextField onChange={(e) => handleUpdateState(e)}  className="w-full" id="outlined-basic" name="title" label="Tittle" variant="outlined" defaultValue={freelancer?.title} />
+                      ? <TextField onChange={(e) => handleUpdateState(e)} className="w-full" id="outlined-basic" name="title" label="Tittle" variant="outlined" defaultValue={freelancer?.title} />
                       : <>
                         <IoPeople color="var(--theme-secondary)" size="24px" />
                         <p className="text-[16px] leading-[1.2] text-[#ebeae2]">
@@ -387,7 +404,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
               </div>
             </div>
 
-           {isEditMode &&  <button className="primary-btn in-dark w-2/3">Connect wallet</button>}
+            {isEditMode && <button className="primary-btn in-dark w-2/3">Connect wallet</button>}
             <hr className="separator" />
 
             <div className="w-full px-[30px] lg:px-[40px]">
@@ -434,7 +451,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                         className="h-auto flex flex-wrap justify-between items-center"
                         key={index}
                       >
-                        <p className="text-base leading--1.2]">{label} </p>
+                        <p className="text-base">{label} </p>
                         {
                           isEditMode
                             ? (
@@ -479,16 +496,16 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                   {
                     isEditMode
                       ? (
-                        <EditSkills {...{skills, setSkills}}/>
+                        <EditSkills {...{ skills, setSkills }} />
                       )
                       : (
                         <div className="flex flex-wrap gap-[20px] mt-[24px]">
-                          {freelancer?.skills?.length > 0 && freelancer?.skills?.map?.((skill: any, skillIndex : string) => (
+                          {freelancer?.skills?.map?.((skill: any, skillIndex: string) => (
                             <p
                               className={`pill-button capitalize`}
                               key={skillIndex}
                             >
-                              {skill.name}
+                              {skill?.name}
                             </p>
                           ))}
                         </div>
@@ -726,17 +743,18 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                 }}
               />
               <FormControl variant="standard" sx={{ m: 1, minWidth: 180, maxWidth: "100px" }}>
-                <InputLabel id="demo-simple-select-standard-label">Sort by most relevant</InputLabel>
+                <InputLabel id="demo-simple-select-standard-label">Sort by</InputLabel>
                 <Select
                   labelId="demo-simple-select-standard-label"
                   id="demo-simple-select-standard"
-                  // value={age}
-                  // onChange={handleChange}
-                  label="Sort by most relevant"
+                  value={sortReviews}
+                  onChange={(e) => setSortReviews(e.target.value)}
+                  label="Sort by"
                 >
-                  <MenuItem value={10}>Ratings</MenuItem>
-                  <MenuItem value={20}>Budget</MenuItem>
-                  <MenuItem value={30}>Date</MenuItem>
+                  <MenuItem value="relevant">Most Relevant</MenuItem>
+                  <MenuItem value="ratings">Ratings</MenuItem>
+                  <MenuItem value="budget">Budget</MenuItem>
+                  <MenuItem value="date">Date</MenuItem>
                 </Select>
               </FormControl>
             </div>
@@ -749,7 +767,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                 <div key={index} className="flex flex-col gap-3 pt-2 pb-5 border-b last:border-b-0 border-b-light-white">
                   <div className="flex gap-3">
                     <div className="h-[46px] w-[46px] rounded-full overflow-hidden relative">
-                      <Image className="object-cover" src={review.image} fill alt="user" />
+                      <Image sizes="24" className="object-cover" src={review.image} fill alt="user" />
                     </div>
                     <div>
                       <p>{review.name}</p>
