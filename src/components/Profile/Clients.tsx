@@ -5,7 +5,12 @@ import { Freelancer } from '@/model';
 import { Badge, ToggleButton } from '@mui/material';
 import Image from 'next/image';
 
-const Clients = ({ setFreelancer, isEditMode }: any) => {
+type ClientsProps ={
+    setFreelancer : Function; 
+    isEditMode: boolean;
+}
+
+const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
     const [clients, setClients] = useState([
         { id: 1, name: "Fiverr", icon: fiverrIcon },
         { id: 2, name: "Imbue", icon: ImbueIcon },

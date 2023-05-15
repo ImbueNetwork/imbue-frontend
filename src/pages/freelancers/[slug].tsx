@@ -35,6 +35,7 @@ import { StyledEngineProvider } from "@mui/system";
 import CountrySelector from "@/components/Profile/CountrySelector";
 import Clients from "@/components/Profile/Clients";
 import Skills from "@/components/Profile/Skills";
+import UploadImage from "@/components/Profile/UploadImage";
 
 
 export type ProfileProps = {
@@ -205,13 +206,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
 
         <div className="flex flex-col lg:items-center gap-[20px] lg:gap-[70px] lg:w-[40%]">
           <div className="w-full flex flex-col items-center gap-[16px] pb-[30px] bg-theme-grey-dark rounded-xl border border-light-white">
-            <div className="h-[160px] w-[160px] bg-[#2c2c2c] rounded-[100%] p-[50px] relative mt-[-120px] unset mx-auto">
-              <Image
-                src={require("@/assets/images/profile-image.png")}
-                alt="profile h-full w-full image"
-                sizes="24"
-              />
-            </div>
+            <UploadImage {...{isEditMode}}/>
             <div className="w-full flex flex-col gap-[16px] -mt-11 px-[30px] lg:px-[40px]">
               {
                 isEditMode
