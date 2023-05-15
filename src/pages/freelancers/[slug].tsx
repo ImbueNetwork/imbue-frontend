@@ -18,7 +18,7 @@ import {
   getFreelancerProfile,
   updateFreelancer,
 } from "@/redux/services/freelancerService";
-import { fetchUser, getCurrentUser } from "../../utils";
+import { fetchUser } from "../../utils";
 import ChatPopup from "@/components/ChatPopup";
 import Image from "next/image";
 import { TextArea } from "@/components/Briefs/TextArea";
@@ -28,14 +28,13 @@ import { AiOutlineUser } from 'react-icons/ai'
 import { MdOutlineWatchLater } from 'react-icons/md'
 import { ImStack } from 'react-icons/im'
 import styles from '@/styles/modules/freelancers.module.css'
-import fiverrIcon from "@/assets/images/fiverr.png"
-import ImbueIcon from "@/assets/svgs/loader.svg"
 import { authenticate } from "@/pages/api/info/user";
 import { Badge, FormControl, InputAdornment, InputLabel, MenuItem, Select, TextField, ToggleButton } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { StyledEngineProvider } from "@mui/system";
-import { CountryDropdown, RegionDropdown, CountryRegionData } from 'react-country-region-selector';
-import EditSkills from "@/components/CustomMaterialComponents/EditSkills";
+import CountrySelector from "@/components/Profile/CountrySelector";
+import Clients from "@/components/Profile/Clients";
+import Skills from "@/components/Profile/Skills";
 
 
 export type ProfileProps = {
@@ -52,43 +51,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const isCurrentFreelancer = browsingUser && browsingUser.id == freelancer?.user_id;
-
-
-  // react country selector
-  const [country, setCountry] = useState('');
-  const [region, setRegion] = useState('');
-
-  // add among my clients
-  const [openAddClient, setOpenAddClient] = useState<boolean>(false)
-  const [clients, setClients] = useState([
-    { id: 1, name: "Fiverr", icon: fiverrIcon },
-    { id: 2, name: "Imbue", icon: ImbueIcon },
-  ])
-
-  const addAClient = () => {
-    const newClients = [...clients, { id: Number(clients.length) + 1, name: "Imbue", icon: ImbueIcon }]
-    setClients(newClients)
-    setFreelancer((prev: Freelancer) => {
-      return { ...prev, clients: newClients.map((c) => c.name) }
-    })
-    console.log(newClients);
-  }
-
-  const removeClient = (id: number) => {
-    const newClients = clients.filter((client) => client.id !== id)
-    setClients(newClients)
-    setFreelancer((prev: Freelancer) => {
-      return { ...prev, clients: newClients.map((c) => c.name) }
-    })
-  }
-
-  // skills
   const [skills, setSkills] = useState<string[]>(freelancer?.skills?.map((skill: { id: number, name: string }) => skill?.name?.charAt(0).toUpperCase() + skill?.name?.slice(1)));
-
-  useEffect(() => {
-    setFreelancer({ ...freelancer, skills: skills.map((skill) => { return { name: skill } }) })
-  }, [skills])
-
 
   function urlify(text: string) {
     var urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -97,6 +60,48 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
       return finalUrl.origin;
     }
     return text;
+  }
+
+  useEffect(() => {
+
+  const setup = async () => {
+    if (freelancer) {
+      setTargetUser(await fetchUser(freelancer?.user_id));
+    }
+  };
+
+    setup();
+  }, [freelancer]);
+
+  //The fields must be pre populated correctly.
+  const onSave = async () => {
+    if (freelancer) {
+
+      let data = freelancer;
+      data = {
+        ...data,
+        skills : skills,
+        clients: []
+      }
+
+      await updateFreelancer(data);
+      flipEdit();
+    }
+  };
+
+  const handleMessageBoxClick = () => {
+    if (browsingUser) {
+      setShowMessageBox(true);
+    }
+  };
+
+  const flipEdit = () => {
+    setIsEditMode(!isEditMode);
+  };
+
+  const handleUpdateState = (e: any) => {
+    const newFreelancer = { ...freelancer, [e?.target?.name]: e?.target?.value }
+    setFreelancer(newFreelancer)
   }
 
   const socials = [
@@ -185,46 +190,6 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
 
   ]
 
-  const setup = async () => {
-    if (freelancer) {
-      setTargetUser(await fetchUser(freelancer?.user_id));
-    }
-  };
-
-  useEffect(() => {
-    setup();
-  }, [freelancer]);
-
-  //The fields must be pre populated correctly.
-  const onSave = async () => {
-    if (freelancer) {
-
-      let data = freelancer;
-      data = {
-        ...data,
-        skills: skills,
-        clients: []
-      }
-      await updateFreelancer(data);
-      flipEdit();
-    }
-  };
-
-  const handleMessageBoxClick = () => {
-    if (browsingUser) {
-      setShowMessageBox(true);
-    }
-  };
-
-  const flipEdit = () => {
-    setIsEditMode(!isEditMode);
-  };
-
-  const handleUpdateState = (e: any) => {
-    const newFreelancer = { ...freelancer, [e?.target?.name]: e?.target?.value }
-    setFreelancer(newFreelancer)
-  }
-
   return (
     <div className="profile-container lg:-mt-8">
       <div className="banner">
@@ -280,21 +245,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
               {
                 isEditMode
                   ? (
-                    <div className="w-full">
-                      <h3 className="text-lg mb-2">Your Location</h3>
-                      <div className="country-picker flex flex-wrap gap-2">
-                        <CountryDropdown
-                          classes="bg-transparent border border-light-white px-3 py-4 rounded-xl max-w-full"
-                          value={country}
-                          onChange={(val) => setCountry(val)} />
-                        <RegionDropdown
-                          classes="bg-transparent border border-light-white px-3 py-4 rounded-xl max-w-full"
-                          country={country}
-                          value={region}
-                          onChange={(val) => setRegion(val)} />
-                      </div>
-                    </div>
-
+                    <CountrySelector/>
                   )
                   : (
                     <div className="flex justify-center gap-[12px]">
@@ -364,36 +315,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
               <span className="h-4 w-4 flex justify-center items-center rounded-full bg-gray-500 text-black">?</span>
             </div>
 
-            <div className="grid grid-cols-2 px-[30px] lg:px-[40px] justify-center md:grid-cols-3 gap-5 w-full">
-              {
-                clients?.map((client) => (
-                  <div key={client.id}
-                    onClick={() => removeClient(client.id)}
-                    className="flex items-center gap-3 w-fit mx-auto">
-                    <Badge className="client-badge" color="error" overlap="circular" badgeContent="-" invisible={!isEditMode}>
-                      <div>
-                        <Image className="rounded-lg" height={40} width={40} src={client.icon} alt={client.name} />
-                        <p>{client.name}</p>
-                      </div>
-                    </Badge>
-                  </div>
-                ))
-              }
-              {
-                isEditMode && (
-                  <ToggleButton
-                    className="w-11 h-11 my-auto borde border-light-white mx-auto"
-                    value="check"
-                    selected={openAddClient}
-                    onChange={() => {
-                      addAClient()
-                    }}
-                  >
-                    <span className="text-2xl text-white">+</span>
-                  </ToggleButton>
-                )
-              }
-            </div>
+            <Clients {...{setFreelancer, isEditMode}}/>
 
             <hr className="separator" />
 
@@ -489,30 +411,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
 
                 <hr className="separator" />
 
-                <div className="mx-[30px] lg:mx-[40px]">
-                  <div className="header-editable">
-                    <h5>Skills</h5>
-                  </div>
-                  {
-                    isEditMode
-                      ? (
-                        <EditSkills {...{ skills, setSkills }} />
-                      )
-                      : (
-                        <div className="flex flex-wrap gap-[20px] mt-[24px]">
-                          {freelancer?.skills?.map?.((skill: any, skillIndex: string) => (
-                            <p
-                              className={`pill-button capitalize`}
-                              key={skillIndex}
-                            >
-                              {skill?.name}
-                            </p>
-                          ))}
-                        </div>
-                      )
-                  }
-
-                </div>
+                <Skills {...{isEditMode, setFreelancer, freelancer, skills, setSkills}}/>
 
                 <hr className="separator" />
                 {/* TODO: Implement */}
