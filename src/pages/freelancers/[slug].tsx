@@ -36,6 +36,10 @@ import CountrySelector from "@/components/Profile/CountrySelector";
 import Clients from "@/components/Profile/Clients";
 import Skills from "@/components/Profile/Skills";
 import UploadImage from "@/components/Profile/UploadImage";
+import AccountChoice from "@/components/AccountChoice";
+import { WalletAccount } from "@talismn/connect-wallets";
+import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
+import { SignerResult } from "@polkadot/api/types";
 
 
 export type ProfileProps = {
@@ -53,6 +57,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const isCurrentFreelancer = browsingUser && browsingUser.id == freelancer?.user_id;
   const [skills, setSkills] = useState<string[]>(freelancer?.skills?.map((skill: { id: number, name: string }) => skill?.name?.charAt(0).toUpperCase() + skill?.name?.slice(1)));
+  const [openAccountChoice, setOpenAccountChoice] = useState<boolean>(false)
 
   function urlify(text: string) {
     var urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -102,6 +107,21 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
     const newFreelancer = { ...freelancer, [e?.target?.name]: e?.target?.value }
     setFreelancer(newFreelancer)
   }
+
+  const accountSelected = async (
+    account: WalletAccount
+  ): Promise<any> => {
+    try {
+      const result = await getAccountAndSign(account);
+      const resp = await authorise(result?.signature as SignerResult, result?.challenge!, account);
+      if (resp.ok) {
+        setFreelancer({...freelancer, web3_address:account.address})
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+  };
 
   const socials = [
     {
@@ -188,6 +208,8 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
     },
 
   ]
+
+  console.log(freelancer);
 
   return (
     <div className="profile-container lg:-mt-8">
@@ -302,11 +324,20 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
             <div className="w-full px-[30px] lg:px-[40px]">
               <p className="text-xl">Wallet Address</p>
               <div className="mt-3 border break-words p-3 rounded-md bg-black">
-                0x524c3d9e935649A448FA33666048C
+                {freelancer.web3_address}
               </div>
             </div>
 
-            {isEditMode && <button className="primary-btn in-dark w-2/3">Connect wallet</button>}
+            {isEditMode && <button onClick={()=>setOpenAccountChoice(true)} className="primary-btn in-dark w-2/3">Connect wallet</button>}
+
+            <AccountChoice 
+              accountSelected={(account: WalletAccount) =>
+                accountSelected(account)
+              }
+              visible={openAccountChoice}
+              setVisible={setOpenAccountChoice}
+            />
+
             <hr className="separator" />
 
             <div className="w-full px-[30px] lg:px-[40px]">
