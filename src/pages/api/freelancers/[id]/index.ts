@@ -51,19 +51,25 @@ const getFreelancerDetails = (
         .select("*")
         .from("freelancer_profile_image")
         .where({ freelancer_id: freelancer.id });
-      freelancer.profile_image = freelancer_profile[0].profile_image;
+      if (freelancer_profile[0]) {
+        freelancer.profile_image = freelancer_profile[0].profile_image;
+      }
 
       const country = await tx
         .select("*")
         .from("freelancer_country")
         .where({ freelancer_id: freelancer.id });
-      freelancer.country = country[0].country;
+      if (country[0]) {
+        freelancer.country = country[0].country;
+      }
 
       const region = await tx
         .select("*")
         .from("freelancer_country")
         .where({ freelancer_id: freelancer.id });
-      freelancer.region = region[0].region;
+      if (region[0]) {
+        freelancer.region = region[0].region;
+      }
 
       return res.status(200).json(freelancer);
     } catch (e) {
