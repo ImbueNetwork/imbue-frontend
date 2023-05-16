@@ -58,7 +58,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
     var urlRegex = /(https?:\/\/[^\s]+)/g;
     if (!urlRegex.test(text)) {
       const finalUrl = new URL(`https://${text}`);
-      return finalUrl.origin;
+      return finalUrl.href;
     }
     return text;
   }
@@ -70,7 +70,6 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
       setTargetUser(await fetchUser(freelancer?.user_id));
     }
   };
-
     setup();
   }, [freelancer]);
 
@@ -206,7 +205,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
 
         <div className="flex flex-col lg:items-center gap-[20px] lg:gap-[70px] lg:w-[40%]">
           <div className="w-full flex flex-col items-center gap-[16px] pb-[30px] bg-theme-grey-dark rounded-xl border border-light-white">
-            <UploadImage {...{isEditMode}}/>
+            <UploadImage {...{isEditMode, setFreelancer, freelancer}}/>
             <div className="w-full flex flex-col gap-[16px] -mt-11 px-[30px] lg:px-[40px]">
               {
                 isEditMode
@@ -237,20 +236,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
 
                 </div>
               </div>
-              {
-                isEditMode
-                  ? (
-                    <CountrySelector/>
-                  )
-                  : (
-                    <div className="flex justify-center gap-[12px]">
-                      <ReactCountryFlag countryCode="US" />
-                      <p className="text-[16px] leading-[1.2] text-[#ebeae2]">
-                        Los Angeles, United States
-                      </p>
-                    </div>
-                  )
-              }
+              <CountrySelector {...{freelancer, setFreelancer, isEditMode}}/>
 
               {/* TODO: Implement reviews */}
 
@@ -584,7 +570,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                       {line}
                     </p>
                   ))} */}
-                {freelancer.education}
+                {freelancer.education || "No Education Data Found"}
               </div>
             </>
             )}
