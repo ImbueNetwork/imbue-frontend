@@ -155,6 +155,9 @@ export type Freelancer = {
   user_id: number;
   rating?: number;
   num_ratings: number;
+  country?: string;
+  region?: string;
+  profile_image?: string;
 };
 
 export type BriefSqlFilter = {
@@ -884,7 +887,10 @@ export const updateFreelancerDetails =
     skill_ids: number[],
     language_ids: number[],
     client_ids: number[],
-    service_ids: number[]
+    service_ids: number[],
+    profile_image: string,
+    country: string,
+    region: string
   ) =>
   async (tx: Knex.Transaction) =>
     await tx<Freelancer>("freelancers")
@@ -909,6 +915,30 @@ export const updateFreelancerDetails =
           await tx("users").where({ id: userId }).update({
             display_name: f.display_name,
           });
+        }
+
+        if (userId && country && region) {
+          await tx("freelancer_country").where({ user_id: userId }).delete();
+
+          await tx("freelancer_country").where({ user_id: userId }).insert({
+            country: country,
+            region: region,
+            freelancer_id: ids[0],
+            user_id: userId,
+          });
+        }
+        if (userId && profile_image) {
+          await tx("freelancer_profile_image")
+            .where({ user_id: userId })
+            .delete();
+
+          await tx("freelancer_profile_image")
+            .where({ user_id: userId })
+            .insert({
+              profile_image: profile_image,
+              freelancer_id: ids[0],
+              user_id: userId,
+            });
         }
 
         if (skill_ids) {

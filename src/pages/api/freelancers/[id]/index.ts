@@ -47,6 +47,24 @@ const getFreelancerDetails = (
           "services"
         )(tx)),
       ]);
+      const freelancer_profile = await tx
+        .select("*")
+        .from("freelancer_profile_image")
+        .where({ freelancer_id: freelancer.id });
+      freelancer.profile_image = freelancer_profile[0].profile_image;
+
+      const country = await tx
+        .select("*")
+        .from("freelancer_country")
+        .where({ freelancer_id: freelancer.id });
+      freelancer.country = country[0].country;
+
+      const region = await tx
+        .select("*")
+        .from("freelancer_country")
+        .where({ freelancer_id: freelancer.id });
+      freelancer.region = region[0].region;
+
       return res.status(200).json(freelancer);
     } catch (e) {
       new Error(`Failed to fetch freelancer details by username: ${username}`, {
@@ -86,13 +104,20 @@ const updateFreelancerDetailsProfile = async (
         )(tx);
       }
 
+      const profile_image = freelancer.profile_image;
+      const country = freelancer.country;
+      const region = freelancer.region;
+
       const freelancer_id = await models.updateFreelancerDetails(
         freelancer.user_id,
         freelancer,
         skill_ids,
         language_ids,
         client_ids,
-        services_ids
+        services_ids,
+        profile_image,
+        country,
+        region
       )(tx);
 
       if (!freelancer_id) {
