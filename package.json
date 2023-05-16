@@ -29,7 +29,6 @@
     "@types/react-dom": "18.0.11",
     "bcryptjs": "^2.4.3",
     "cookies-next": "^2.1.1",
-    "country-data": "^0.0.31",
     "country-list": "^2.3.0",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",

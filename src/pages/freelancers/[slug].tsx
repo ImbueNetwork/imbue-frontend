@@ -64,7 +64,6 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   }
 
   useEffect(() => {
-
   const setup = async () => {
     if (freelancer) {
       setTargetUser(await fetchUser(freelancer?.user_id));
