@@ -113,6 +113,9 @@ const updateFreelancerDetailsProfile = async (
       const profile_image = freelancer.profile_image;
       const country = freelancer.country;
       const region = freelancer.region;
+      const web3_address = freelancer.web3_address;
+      const web3_type = freelancer.web3_type;
+      const web3_challenge = freelancer.web3_challenge;
 
       const freelancer_id = await models.updateFreelancerDetails(
         freelancer.user_id,
@@ -123,7 +126,10 @@ const updateFreelancerDetailsProfile = async (
         services_ids,
         profile_image,
         country,
-        region
+        region,
+        web3_address,
+        web3_type,
+        web3_challenge
       )(tx);
 
       if (!freelancer_id) {

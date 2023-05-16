@@ -890,7 +890,10 @@ export const updateFreelancerDetails =
     service_ids: number[],
     profile_image: string,
     country: string,
-    region: string
+    region: string,
+    web3_address: string,
+    web3_type: string,
+    web3_challenge: string
   ) =>
   async (tx: Knex.Transaction) =>
     await tx<Freelancer>("freelancers")
@@ -924,6 +927,16 @@ export const updateFreelancerDetails =
             country: country,
             region: region,
             freelancer_id: ids[0],
+            user_id: userId,
+          });
+        }
+        if (userId && web3_address && web3_type && web3_challenge) {
+          await tx("web3_accounts").where({ user_id: userId }).delete();
+
+          await tx("web3_accounts").where({ user_id: userId }).insert({
+            address: web3_address,
+            type: web3_type,
+            challenge: web3_challenge,
             user_id: userId,
           });
         }
