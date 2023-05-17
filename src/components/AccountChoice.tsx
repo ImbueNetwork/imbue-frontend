@@ -1,12 +1,8 @@
-import { getWeb3Accounts } from "@/utils/polkadot";
 import * as React from "react";
-import { Dialogue } from "./Dialogue";
-import { Dialog, DialogContent, DialogTitle } from "@mui/material";
 import { WalletSelect } from "@talismn/connect-components";
-import { Wallet, WalletAccount } from "@talismn/connect-wallets";
-import { PolkadotjsWallet, SubWallet, TalismanWallet, EnkryptWallet } from "@talismn/connect-wallets"
+import { WalletAccount } from "@talismn/connect-wallets";
+import { PolkadotjsWallet, SubWallet, TalismanWallet } from "@talismn/connect-wallets"
 import { truncateMiddle } from '@talismn/connect-ui';
-import { title } from "process";
 
 type AccountChoiceProps = {
   accountSelected: (account: WalletAccount) => void;

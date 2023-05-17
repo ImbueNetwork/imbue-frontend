@@ -27,7 +27,7 @@ const UploadImage = ({ isEditMode, setFreelancer, freelancer }: UploadImageProps
     }
 
     return (
-        <div className="h-[160px] w-[160px] bg-[#2c2c2c] rounded-[100%] p-12 relative mt-[-120px] unset mx-auto">
+        <div className="h-40 w-40 bg-theme-grey-dark rounded-full p-12 relative -mt-32 unset mx-auto">
             <Image
                 src={image || require("@/assets/images/profile-image.png")}
                 alt="profile image"

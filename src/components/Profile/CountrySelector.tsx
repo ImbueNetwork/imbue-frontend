@@ -46,12 +46,12 @@ const CountrySelector = ({ setFreelancer, freelancer, isEditMode }: CountrySelec
             </div>
           )
           : (
-            <div className="flex justify-center gap-[12px]">
+            <div className="flex justify-center gap-3">
               {
                 country && (
                   <>
                     <ReactCountryFlag countryCode={getCode(country) || ""} />
-                    <p className="text-[16px] leading-[1.2] text-[#ebeae2]">
+                    <p className="text-base leading-[1.2]">
                       {region}, {country}
                     </p>
                   </>

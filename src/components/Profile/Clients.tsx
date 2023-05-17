@@ -21,18 +21,13 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
     const addAClient = () => {
         const newClients = [...clients, { id: Number(clients.length) + 1, name: "Imbue", icon: ImbueIcon }]
         setClients(newClients)
-        setFreelancer((prev: Freelancer) => {
-            return { ...prev, clients: newClients.map((c) => c.name) }
-        })
-        console.log(newClients);
+        setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients.map((c) => c.name) }))
     }
 
     const removeClient = (id: number) => {
         const newClients = clients.filter((client) => client.id !== id)
         setClients(newClients)
-        setFreelancer((prev: Freelancer) => {
-            return { ...prev, clients: newClients.map((c) => c.name) }
-        })
+        setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients.map((c) => c.name) }))
     }
 
     return (
@@ -54,7 +49,7 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
             {
                 isEditMode && (
                     <ToggleButton
-                        className="w-11 h-11 my-auto borde border-light-white mx-auto"
+                        className="w-11 h-11 my-auto border-light-white mx-auto"
                         value="check"
                         selected={openAddClient}
                         onChange={() => {

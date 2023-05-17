@@ -11,7 +11,7 @@ type SkillsCompProps = {
 
 const Skills = ({isEditMode, setFreelancer, freelancer, skills, setSkills}:SkillsCompProps) => {
   useEffect(() => {
-    setFreelancer({ ...freelancer, skills: skills.map((skill) => { return { name: skill } }) })
+    setFreelancer({ ...freelancer, skills: skills.map((skill) => ({ name: skill })) })
   }, [skills])
 
     return (
@@ -25,7 +25,7 @@ const Skills = ({isEditMode, setFreelancer, freelancer, skills, setSkills}:Skill
               <EditSkills {...{ skills, setSkills }} />
             )
             : (
-              <div className="flex flex-wrap gap-[20px] mt-[24px]">
+              <div className="flex flex-wrap gap-5 mt-6">
                 {freelancer?.skills?.map?.((skill: any, skillIndex: string) => (
                   <p
                     className={`pill-button capitalize`}
