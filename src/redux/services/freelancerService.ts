@@ -9,16 +9,15 @@ export async function createFreelancingProfile(freelancer: any) {
       checkEnvironment().concat(`${config.apiBase}freelancers/`),
       {
         headers: config.postAPIHeaders,
-        method: "post",
+        method: "put",
         body: JSON.stringify({ freelancer }),
       }
     );
 
-    return resp
+    return resp;
   } catch (error) {
     console.log(error);
   }
-  
 }
 
 export const getAllFreelancers = async () => {
@@ -32,8 +31,8 @@ export const getAllFreelancers = async () => {
   if (resp.ok) {
     return (await resp.json()) as Array<Freelancer>;
   } else {
-    console.log(new Error("Failed to get all briefs. status:" + resp.status))
-    return []
+    console.log(new Error("Failed to get all briefs. status:" + resp.status));
+    return [];
   }
 };
 
@@ -81,7 +80,7 @@ export async function updateFreelancer(freelancer: Freelancer) {
   if (resp.ok) {
     return (await resp.json()) as Freelancer;
   } else {
-    console.log("Failed to update freelancer profile. status:" + resp.status)
+    console.log("Failed to update freelancer profile. status:" + resp.status);
   }
 }
 

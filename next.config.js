@@ -33,6 +33,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "getstream.io",
       },
+      {
+        protocol: "http",
+        hostname: "res.cloudinary.com",
+      },
     ],
   },
 };
