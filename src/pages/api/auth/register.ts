@@ -1,12 +1,10 @@
 
-import next, { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from 'next-connect'
 import db from "../db";
 import { updateFederatedLoginUser, getOrCreateFederatedUser, fetchUserOrEmail, User } from "../models";
 import { ensureParams, jwtOptions } from "./common";
 import jwt from 'jsonwebtoken';
-import config from "../config";
-import { serialize } from 'cookie';
 import { setTokenCookie } from "../auth-cookies";
 
 export default nextConnect()
@@ -16,7 +14,7 @@ export default nextConnect()
             email,
             password
         } = req.body;
-        ensureParams(req.body, next, ["username", "email", "password"]);
+        ensureParams(req.body, ["username", "email", "password"]);
         db.transaction(async tx => {
             const usernameExists = await fetchUserOrEmail(username)(tx);
             const emailExists = await fetchUserOrEmail(email)(tx);

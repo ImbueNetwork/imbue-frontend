@@ -9,7 +9,6 @@ import { getTokenCookie } from '../auth-cookies';
 
 export const ensureParams = (
   record: Record<string, any>,
-  next: CallableFunction,
   params: string[]
 ) => {
    try {
@@ -19,7 +18,7 @@ export const ensureParams = (
            }
        }
    } catch (e) {
-       next(e);
+       console.error(e);
    }
 }
 
