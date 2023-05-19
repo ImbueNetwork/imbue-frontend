@@ -279,6 +279,8 @@ const Freelancers = (): JSX.Element => {
 
   if(loading) return <LoadingFreelancers/>
 
+  console.log(freelancers);
+
   return (
     <div className="px-[15px] lg:px-[40px]">
       <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>

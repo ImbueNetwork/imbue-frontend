@@ -7,6 +7,7 @@ const nextConfig = {
     RELAY_CHAIN_WEBSOCK_ADDR: "wss://rococo-rpc.polkadot.io",
     GETSTREAM_API_KEY: process.env.GETSTREAM_API_KEY,
     GETSTREAM_SECRET_KEY: process.env.GETSTREAM_SECRET_KEY,
+    CLOUD_NAME: process.env.CLOUD_NAME,
   },
   images: {
     remotePatterns: [
