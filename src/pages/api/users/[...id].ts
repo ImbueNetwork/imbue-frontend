@@ -1,56 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import next from "next";
 import db from "../db";
 import * as models from "../models";
 import { User } from "@/model";
 import nextConnect from "next-connect";
 
-export default nextConnect()
-  .put(async (req: NextApiRequest, res: NextApiResponse) => {
+export default nextConnect().put(
+  async (req: NextApiRequest, res: NextApiResponse) => {
     const { query } = req;
 
     const id: string[] = query.id as string[];
     const name = query.name as string;
     res.status(200).json({ name: name || `User ${id}` });
-  })
-  .get(async (req: NextApiRequest, res: NextApiResponse) => {
-    const { query } = req;
-
-    const id: string[] = query.id as string[];
-
-    const resp = await handleGet(id);
-    if (resp) {
-      res.status(200).json(resp);
-    } else {
-      res.status(404).end();
-    }
-  });
-
-export async function handleGet(routes: string[]) {
-  const userId = routes[0];
-  switch (routes.length) {
-    case 3:
-      switch (
-        routes[1]
-        // case "briefs":
-        //   const briefId = routes[2];
-        //   return await fetchUserBriefApplications(userId, briefId);
-        // case "applications":
-        //   const projectId = routes[2];
-        //   return await fetchProject(projectId);
-      ) {
-      }
-    case 2:
-      switch (routes[1]) {
-        // case "briefs":
-        //   return await fetchAllUserBriefs(userId);
-        // case "byid":
-        //   return await fetchUserById(userId);
-        case "byusernameoremail":
-          return await fetchUserByUsernameOrEmail(userId);
-      }
   }
-}
+);
 
 export async function fetchProject(projectId: string) {
   let response;
