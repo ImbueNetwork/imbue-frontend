@@ -355,12 +355,14 @@ const Freelancers = (): JSX.Element => {
           <div className={`${styles.freelancers} max-width-750px:!px-0`}>
             { freelancers?.length && freelancers
               .slice(0, 10)
-              .map(({ title, username, display_name, skills }, index) => (
+              .map(({ title, username, display_name, skills, profile_image}, index) => (
                 <div className={styles.freelancer} key={index}>
                   <div className={styles.freelancerImageContainer}>
                     <Image
-                      src={profilePic}
+                      src={profile_image[0].profile_image}
                       className={styles.freelancerProfilePic}
+                      height={300}
+                      width={300}
                       alt=""
                     />
                     <div className="dark-layer" />

@@ -5,7 +5,7 @@ export const uploadPhoto = async (image: File) => {
     
     let data;
 	try {
-		data = await fetch(`https://api.cloudinary.com/v1_1/dzmn0ipe3/image/upload`, {
+		data = await fetch(`https://api.cloudinary.com/v1_1/${process.env.CLOUD_NAME}/image/upload`, {
 			method: 'POST',
 			body: formData,
 		}).then((res) => res.json());

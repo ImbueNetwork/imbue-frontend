@@ -142,7 +142,7 @@ export type Freelancer = {
   user_id: number;
   rating?: number;
   num_ratings: number;
-  profileImageUrl: string;
+  profile_image: [{profile_image:string}];
 };
 
 export function getDefaultFreelancer(): Freelancer {
@@ -169,7 +169,7 @@ export function getDefaultFreelancer(): Freelancer {
     user_id: 0,
     rating: 3,
     num_ratings: 0,
-    profileImageUrl: "default",
+    profile_image: [{profile_image:"default"}],
   };
 }
 

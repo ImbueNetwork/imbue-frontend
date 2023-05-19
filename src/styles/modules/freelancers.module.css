@@ -25,6 +25,8 @@
 .freelancerProfilePic {
   width: 50%;
   height: 80%;
+  border-radius: 50%;
+  overflow: hidden;
 }
 
 .freelancerInfo {
@@ -42,6 +44,7 @@
   justify-content: center;
   align-items: center;
 }
+
 .freelancersView {
   display: flex;
   flex-direction: column;
