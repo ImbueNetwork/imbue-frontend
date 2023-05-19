@@ -13,6 +13,8 @@ const UploadImage = ({ isEditMode, setFreelancer, freelancer }: UploadImageProps
     const [image, setImage] = useState<any>(freelancer?.profile_image)
     const [loading, setLoading] = useState<boolean>(false)
 
+    console.log(freelancer);
+
     const handleUpload = async (files: FileList | null) => {
         if (files?.length) {
             setLoading(true)
