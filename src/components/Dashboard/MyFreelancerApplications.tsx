@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import React from "react";
-import { Freelancer, Project, OffchainProjectState, User } from "@/model";
+import { Freelancer, Project, OffchainProjectState, User, displayState } from "@/model";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 TimeAgo.addLocale(en);
@@ -16,6 +16,8 @@ const MyFreelancerApplications = ({
 }: FreelancerApplicationsType): JSX.Element => {
   const router = useRouter();
   const redirectToApplication = (application: Project) => {
+
+      let test = OffchainProjectState[application.status_id];
     //TODO: redirect to projects page if accepted
     // if (application.status_id === ProjectStatus?.Accepted) {
     //   router.push(`/project/${application?.id}`);
@@ -63,7 +65,8 @@ const MyFreelancerApplications = ({
                 OffchainProjectState[application.status_id]
               }-button `}
             >
-              {OffchainProjectState[application.status_id]}
+
+              {displayState(application.status_id)}
             </div>
           </div>
         </div>
