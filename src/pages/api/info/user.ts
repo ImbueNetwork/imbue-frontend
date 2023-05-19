@@ -4,12 +4,10 @@ import config from '../config'
 
 import db from "../db";
 import * as models from "../models";
-import { ensureParams, jwtOptions } from "../auth/common"
+import {  jwtOptions } from "../auth/common"
 // @ts-ignore
 import * as passportJwt from "passport-jwt"
 // @ts-ignore
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs'
 import { fetchUser } from '../models';
 import passport from 'passport'
 import nextConnect from 'next-connect'
