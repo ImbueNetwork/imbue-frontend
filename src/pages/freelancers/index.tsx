@@ -279,6 +279,8 @@ const Freelancers = (): JSX.Element => {
 
   if(loading) return <LoadingFreelancers/>
 
+  console.log(freelancers);
+
   return (
     <div className="px-[15px] lg:px-[40px]">
       <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
@@ -355,12 +357,14 @@ const Freelancers = (): JSX.Element => {
           <div className={`${styles.freelancers} max-width-750px:!px-0`}>
             { freelancers?.length && freelancers
               .slice(0, 10)
-              .map(({ title, username, display_name, skills }, index) => (
+              .map(({ title, username, display_name, skills, profile_image}, index) => (
                 <div className={styles.freelancer} key={index}>
                   <div className={styles.freelancerImageContainer}>
                     <Image
-                      src={profilePic}
+                      src={profile_image[0].profile_image}
                       className={styles.freelancerProfilePic}
+                      height={300}
+                      width={300}
                       alt=""
                     />
                     <div className="dark-layer" />
