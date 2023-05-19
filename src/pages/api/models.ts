@@ -520,6 +520,10 @@ export const fetchItems =
   (ids: number[], tableName: string) => async (tx: Knex.Transaction) =>
     tx(tableName).select("id", "name").whereIn(`id`, ids);
 
+export const fetchProfileImages =
+  (id: number, tableName: string) => async (tx: Knex.Transaction) =>
+    tx(tableName).select("profile_image").where({ user_id: id });
+
 // Insert a brief and their respective skill and industry_ids.
 export const insertBrief =
   (

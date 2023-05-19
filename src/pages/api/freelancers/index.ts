@@ -4,12 +4,13 @@ import {
   Freelancer,
   fetchAllFreelancers,
   fetchItems,
+  fetchProfileImages,
   insertFreelancerDetails,
   upsertItems,
 } from "../models";
 import { verifyUserIdFromJwt } from "../auth/common";
 
-import nextConnect from 'next-connect'
+import nextConnect from "next-connect";
 
 export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
@@ -36,6 +37,10 @@ export default nextConnect()
                 freelancer.service_ids,
                 "services"
               )(tx);
+              freelancer.profile_image = await fetchProfileImages(
+                freelancer.user_id,
+                "freelancer_profile_image"
+              )(tx);
             }),
           ]);
           res.send(freelancers);
@@ -44,9 +49,8 @@ export default nextConnect()
         new Error(`Failed to fetch all freelancers`, { cause: e as Error });
       }
     });
-
-  }).put(async (req: NextApiRequest, res: NextApiResponse) => {
-
+  })
+  .put(async (req: NextApiRequest, res: NextApiResponse) => {
     const { body, method } = req;
     const freelancer = body.freelancer;
 
@@ -76,10 +80,9 @@ export default nextConnect()
         )(tx);
 
         if (!freelancer_id) {
-
           return res.status(401).send({
             status: "Failed",
-            error: new Error("Failed to insert freelancer details.")
+            error: new Error("Failed to insert freelancer details."),
           });
         }
 
@@ -92,7 +95,7 @@ export default nextConnect()
           status: "Failed",
           error: new Error(`Failed to insert freelancer details .`, {
             cause: cause as Error,
-          })
+          }),
         });
       }
     });
