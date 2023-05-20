@@ -801,12 +801,11 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
     })
 
     // order and group by many-many selects
-    .orderBy("freelancers.created", "desc")
+    .orderBy("freelancers.modified", "desc")
     .groupBy("freelancers.id")
     .groupBy("users.username")
     .groupBy("users.display_name")
     .groupBy("address")
-    .orderBy("freelancers.id", "desc")
     // TODO Add limit until we have spinning loading icon in freelancers page
     .limit(100);
 
