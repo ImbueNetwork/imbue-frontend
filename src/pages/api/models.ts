@@ -522,7 +522,7 @@ export const fetchItems =
 
 export const fetchProfileImages =
   (id: number, tableName: string) => async (tx: Knex.Transaction) =>
-    tx(tableName).select("profile_image").where({ user_id: id });
+    tx(tableName).select("profile_image").where({ user_id: id }).first();
 
 // Insert a brief and their respective skill and industry_ids.
 export const insertBrief =
@@ -745,6 +745,7 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
       "bio",
       "freelancers.user_id",
       "username",
+      "profile_image",
       "display_name",
       "web3_accounts.address as web3_address",
       "freelancers.created",
@@ -780,6 +781,9 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
       "freelancers.id": "freelancer_clients.freelancer_id",
     })
     .leftJoin("clients", { "freelancer_clients.client_id": "clients.id" })
+    .leftJoin("freelancer_profile_image", {
+      "freelancers.id": "freelancer_profile_image.freelancer_id",
+    })
     // Join skills and many to many
     .leftJoin("freelancer_skills", {
       "freelancers.id": "freelancer_skills.freelancer_id",
@@ -799,13 +803,14 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
     .leftJoin("web3_accounts", {
       "freelancers.user_id": "web3_accounts.user_id",
     })
-
     // order and group by many-many selects
+    .orderBy("profile_image", "asc")
     .orderBy("freelancers.modified", "desc")
     .groupBy("freelancers.id")
     .groupBy("users.username")
     .groupBy("users.display_name")
     .groupBy("address")
+    .groupBy("profile_image")
     // TODO Add limit until we have spinning loading icon in freelancers page
     .limit(100);
 

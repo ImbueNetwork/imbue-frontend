@@ -359,7 +359,7 @@ const Freelancers = (): JSX.Element => {
                 <div className={styles.freelancer} key={index}>
                   <div className={styles.freelancerImageContainer}>
                     <Image
-                      src={ profile_image.length > 0 ? profile_image[0].profile_image : require("@/assets/images/profile-image.png")}
+                      src={ profile_image ?? require("@/assets/images/profile-image.png")}
                       className={styles.freelancerProfilePic}
                       height={300}
                       width={300}

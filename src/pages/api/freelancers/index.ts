@@ -37,10 +37,6 @@ export default nextConnect()
                 freelancer.service_ids,
                 "services"
               )(tx);
-              freelancer.profile_image = await fetchProfileImages(
-                freelancer.user_id,
-                "freelancer_profile_image"
-              )(tx);
             }),
           ]);
           res.send(freelancers);
