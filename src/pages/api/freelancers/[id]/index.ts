@@ -2,25 +2,14 @@ import { NextApiRequest, NextApiResponse } from "next";
 import db from "../../db";
 import * as models from "../../models";
 import { fetchFreelancerDetailsByUsername, fetchItems } from "../../models";
+import nextConnect from "next-connect";
 
-export default async function freelancerHandler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default nextConnect()
+.get(async(req: NextApiRequest, res: NextApiResponse) =>{
   const { id: username } = req.query;
-  const { method, body } = req;
-  if (!username) return;
-  if (method === "PUT") {
-    updateFreelancerDetailsProfile(body, res);
-  } else if (method === "GET") {
-    getFreelancerDetails(username, res);
-  }
-}
 
-const getFreelancerDetails = (
-  username: string | string[],
-  res: NextApiResponse
-) => {
+  if(!username) return res.status(404).end();
+
   db.transaction(async (tx) => {
     try {
       const freelancer = await fetchFreelancerDetailsByUsername(username)(tx);
@@ -78,13 +67,9 @@ const getFreelancerDetails = (
       });
     }
   });
-};
-
-const updateFreelancerDetailsProfile = async (
-  body: any,
-  res: NextApiResponse
-) => {
-  const freelancer: models.Freelancer | any = body.freelancer;
+})
+.put(async(req: NextApiRequest, res: NextApiResponse) =>{
+  const freelancer: models.Freelancer | any = req.body.freelancer;
 
   let response;
   await db.transaction(async (tx: any) => {
@@ -151,4 +136,4 @@ const updateFreelancerDetailsProfile = async (
     }
   });
   return response;
-};
+})

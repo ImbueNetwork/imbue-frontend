@@ -100,3 +100,9 @@ export default nextConnect()
       }
     });
   });
+
+  export const config = {
+    api: {
+      externalResolver: true,
+    },
+  }
