@@ -44,9 +44,12 @@ export async function getFreelancerProfile(username: string) {
       method: "get",
     }
   );
-  if (resp.ok) {
-    return (await resp.json()) as Freelancer;
+
+  if (resp.status === 200) {
+    const res = await resp.json()
+    return res as Freelancer;
   }
+  else return {}
 }
 
 export async function freelancerExists(username: string): Promise<boolean> {
