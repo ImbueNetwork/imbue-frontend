@@ -15,6 +15,18 @@ export enum OffchainProjectState {
   Accepted = 4,
 }
 
+export function displayState(state: OffchainProjectState) {
+  switch (state) {
+    case OffchainProjectState.PendingReview:
+      return "Pending Review";
+    case OffchainProjectState.ChangesRequested:
+      return "Changes Requested";
+    default:
+      return OffchainProjectState[state];
+  }
+}
+
+
 // ONCHAIN PROJECT STATE
 export enum OnchainProjectState {
   PendingProjectApproval = 0,
@@ -142,7 +154,7 @@ export type Freelancer = {
   user_id: number;
   rating?: number;
   num_ratings: number;
-  profile_image: [{profile_image:string}];
+  profile_image: [{ profile_image: string }];
 };
 
 export function getDefaultFreelancer(): Freelancer {
@@ -169,7 +181,7 @@ export function getDefaultFreelancer(): Freelancer {
     user_id: 0,
     rating: 3,
     num_ratings: 0,
-    profile_image: [{profile_image:"default"}],
+    profile_image: [{ profile_image: "default" }],
   };
 }
 

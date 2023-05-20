@@ -12,9 +12,8 @@ export type BadRoute =
 export function redirect(path: string, returnUrl?: string) {
   if (returnUrl) {
     window.location.href = `${window.location.origin}/${path}?redirect=${returnUrl}`;
-  }
-  else {
-    window.location.href = `${window.location.origin}/${path}`
+  } else {
+    window.location.href = `${window.location.origin}/${path}`;
   }
 }
 
@@ -39,7 +38,8 @@ export const validProjectId = (candidate: any) => {
 export const getCurrentUser = async () => {
   try {
     const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}info/user`));
+      checkEnvironment().concat(`${config.apiBase}info/user`)
+    );
     if (resp.ok) {
       return resp.json();
     }
@@ -76,23 +76,13 @@ export const fetchProject = async (projectId: string | number | null) => {
   }
 };
 
-export const fetchUserOrEmail = async (userOrEmail: string) => {
-  const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}users/${userOrEmail}`), {
-    headers: config.getAPIHeaders,
-    method: "get",
-  });
-  if (resp.ok) {
-    const user = await resp.json();
-    return user;
-  }
-};
-
 export const fetchUser = async (id: number) => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}users/byid/${id}`), {
-    headers: config.getAPIHeaders,
-  });
+    checkEnvironment().concat(`${config.apiBase}users/byid/${id}`),
+    {
+      headers: config.getAPIHeaders,
+    }
+  );
   if (resp.ok) {
     const user = await resp.json();
     return user;
@@ -118,8 +108,9 @@ export function validateForm(form: HTMLFormElement): boolean {
 
 export const getStreamChat = async () => {
   const { imbueNetworkWebsockAddr, relayChainWebsockAddr, getstreamApiKey } =
-    await fetch(
-      checkEnvironment().concat(`${config.apiBase}info`)).then((resp) => resp.json());
+    await fetch(checkEnvironment().concat(`${config.apiBase}info`)).then(
+      (resp) => resp.json()
+    );
   return new StreamChat(getstreamApiKey);
 };
 

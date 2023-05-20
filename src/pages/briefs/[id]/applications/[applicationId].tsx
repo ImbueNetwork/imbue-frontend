@@ -35,8 +35,6 @@ export type ApplicationPreviewProps = {
 	freelancer: Freelancer;
 };
 
-const applicationStatusId = ['Draft', 'Pending Review', 'Changes Requested', 'Rejected', 'Accepted'];
-
 const ApplicationPreview = (): JSX.Element => {
 	const [brief, setBrief] = useState<Brief | any>();
 	const [user, setUser] = useState<User | any>();

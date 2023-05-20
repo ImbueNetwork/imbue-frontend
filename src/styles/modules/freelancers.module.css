@@ -27,6 +27,7 @@
   height: 80%;
   border-radius: 50%;
   overflow: hidden;
+  object-fit: cover;
 }
 
 .freelancerInfo {
@@ -175,14 +176,13 @@
   margin-left: 8px;
 }
 
-
-.freelancerProfileSection{
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    background: var(--theme-grey-dark);
-    border-radius: .75rem;
-    border: 1px solid var(--theme-light-white)
+.freelancerProfileSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--theme-grey-dark);
+  border-radius: 0.75rem;
+  border: 1px solid var(--theme-light-white);
 }
 
 .whiteIcon path {
@@ -190,27 +190,26 @@
 }
 
 @media (max-width: 750px) {
-    .filterPanel {
-      position: fixed;
-      width: 100% !important;
-      top: 0;
-      background-color: black;
-      z-index: 10;
-      padding-left: 20px;
-      padding-right: 20px;
-      padding-top: 20px;
-      overflow-y: scroll;
-    }
+  .filterPanel {
+    position: fixed;
+    width: 100% !important;
+    top: 0;
+    background-color: black;
+    z-index: 10;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 20px;
+    overflow-y: scroll;
+  }
 }
 
-
 @media (max-width: 500px) {
-    .freelancers {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-    .freelancer {
-        width: 100%;
-    }
+  .freelancers {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .freelancer {
+    width: 100%;
+  }
 }
