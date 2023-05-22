@@ -84,6 +84,12 @@ export const SubmitProposal = (): JSX.Element => {
     setMilestones([...milestones, { name: "", amount: undefined }]);
   };
 
+  const onRemoveMilestone = (index: number) => {
+    const newMilestones = [...milestones]
+    newMilestones.splice(index, 1)
+    setMilestones(newMilestones);
+  };
+
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setCurrencyId(Number(event.target.value));
   };
@@ -180,9 +186,9 @@ export const SubmitProposal = (): JSX.Element => {
   const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
 
   return (
-    <div className="flex flex-col gap-10 text-base leading-[1.5] hq-layout">
+    <div className="flex flex-col gap-10 text-base leading-[1.5] hq-layout !mx-3 lg:!mx-auto">
       <div>
-        <h3 className="ml-8 mb-2 text-xl leading-[1.5] font-bold m-0 p-0  flex">
+        <h3 className="ml-4 lg:ml-8 mb-2 text-xl leading-[1.5] font-bold m-0 p-0  flex">
           Job description
         </h3>
         {brief && <BriefInsights brief={brief} />}
@@ -202,17 +208,22 @@ export const SubmitProposal = (): JSX.Element => {
           <p className="mx-5 lg:mx-14 text-base lg:text-lg font-bold">
             How many milestone do you want to include?
           </p>
-          <div className="milestone-list mx-5 lg:mx-14">
+          <div className="milestone-list !gap-0">
             {milestones.map(({ name, amount }, index) => {
               const percent = Number(
                 ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
               );
               return (
-                <div className="milestone-row !p-0" key={index}>
+                <div className="milestone-row !px-4 !py-7 !m-0 lg:!px-14 relative border-t border-light-white" key={index}>
+                  <span
+                    onClick={() => onRemoveMilestone(index)}
+                    className="absolute top-1 right-2 lg:right-4 text-sm lg:text-xl text-light-grey font-bold hover:border-red-500 hover:text-red-500 cursor-pointer">
+                    x
+                  </span>
                   <div className="text-base mr-4 lg:mr-9">{index + 1}.</div>
                   <div className="flex flex-row justify-between w-full">
-                    <div className="w-3/5 lg:w-1/2">
-                      <h3 className="mb-2 lg:mb-5 text-lg lg:text-xl font-bold m-0 p-0">
+                    <div className="w-3/5">
+                      <h3 className="mb-2 lg:mb-5 text-base lg:text-xl font-bold m-0 p-0">
                         Description
                       </h3>
                       <textarea
@@ -230,8 +241,8 @@ export const SubmitProposal = (): JSX.Element => {
                         }
                       />
                     </div>
-                    <div className="flex flex-col w-1/3 lg:items-end">
-                      <h3 className="mb-5 text-xl font-bold m-0 p-0">
+                    <div className="flex flex-col w-4/12 lg:items-end">
+                      <h3 className="mb-2 lg:mb-5 text-right text-base lg:text-xl font-bold m-0 p-0">
                         Amount
                       </h3>
                       <input

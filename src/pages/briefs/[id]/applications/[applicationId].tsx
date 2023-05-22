@@ -149,6 +149,12 @@ const ApplicationPreview = (): JSX.Element => {
 		setMilestones([...milestones, { name: '', amount: undefined }]);
 	};
 
+	const onRemoveMilestone = (index: number) => {
+		const newMilestones = [...milestones]
+		newMilestones.splice(index, 1)
+		setMilestones(newMilestones);
+	  };
+
 	const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
 		setCurrencyId(Number(event.target.value));
 	};
@@ -263,11 +269,16 @@ const ApplicationPreview = (): JSX.Element => {
 							{milestones?.map?.(({ name, amount }, index) => {
 								const percent = Number(((100 * (amount ?? 0)) / totalCostWithoutFee)?.toFixed?.(0));
 								return (
-									<div className="flex flex-row items-start w-full border-b border-b-light-white last:border-b-0 px-5 pb-9 lg:px-14" key={index}>
+									<div className="flex flex-row items-start w-full border-t border-t-light-white last:border-b-0 px-5 py-9 lg:px-14 relative" key={index}>
+										<span
+											onClick={() => onRemoveMilestone(index)}
+											className="absolute top-1 right-2 lg:right-4 text-sm lg:text-xl text-light-grey font-bold hover:border-red-500 hover:text-red-500 cursor-pointer">
+											x
+										</span>
 										<div className="mr-4 lg:mr-9 text-lg">{index + 1}.</div>
 										<div className="flex flex-row justify-between w-full">
 											<div className="w-3/5 lg:w-1/2">
-												<h3 className="mb-2 text-lg lg:mb-5 lg:text-xl font-bold m-0 p-0">Description</h3>
+												<h3 className="mb-2 lg:mb-5 text-base lg:text-xl font-bold m-0 p-0">Description</h3>
 												{isEditingBio ? (
 													<textarea
 														className="input-description"
@@ -289,7 +300,7 @@ const ApplicationPreview = (): JSX.Element => {
 												)}
 											</div>
 											<div className="flex flex-col w-1/3 lg:w-1/5 items-end">
-												<h3 className="mb-2 text-lg lg:mb-5 lg:text-xl font-bold m-0 p-0">Amount</h3>
+												<h3 className="mb-2 lg:mb-5 text-right text-base lg:text-xl font-bold m-0 p-0">Amount</h3>
 												{isEditingBio ? (
 													<input
 														type="number"
