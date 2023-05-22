@@ -1,4 +1,4 @@
-import { Item } from "@/model";
+import { Brief, Item } from "@/model";
 
 export type FilterOption = {
   interiorIndex: number;
@@ -32,4 +32,9 @@ export type BriefInfo = {
   budget: bigint | undefined;
   user_id?: number | undefined;
   brief_id?: number | undefined;
+};
+
+export type BriefStepProps = {
+  currentBriefs: Brief[];
+  paginate: (page: number) => void;
 };

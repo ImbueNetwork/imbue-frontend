@@ -1,32 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { Freelancer, FreelancerSqlFilter, Item } from "../../model";
-import * as utils from "../../utils";
-import styles from '@/styles/modules/freelancers.module.css'
+import styles from "@/styles/modules/freelancers.module.css";
 import {
   callSearchFreelancers,
   getAllFreelancers,
 } from "../../redux/services/freelancerService";
-import {
-  FreelancerFilterOption,
-  FilterOption,
-} from "../../types/freelancerTypes";
+import { FreelancerFilterOption } from "../../types/freelancerTypes";
 import FreelancerFilter from "../../components/Freelancers/FreelancerFilter";
 import Image from "next/image";
-import profilePic from "../../assets/images/profile-image.png";
 import { useRouter } from "next/router";
 import { strToIntRange } from "../briefs";
 import { useWindowSize } from "@/hooks";
 import { FiFilter } from "react-icons/fi";
-import { GetServerSidePropsContext } from "next";
 import LoadingFreelancers from "../../components/Freelancers/FreelancersLoading";
+import { FreelancerStepProps } from "@/types/proposalsTypes";
+import Pagination from "rc-pagination";
 
 const Freelancers = (): JSX.Element => {
-  const [freelancers, setFreelancers] = useState<Freelancer[] | undefined>();
+  const [freelancers, setFreelancers] = useState<
+    Freelancer[] | undefined | any
+  >();
+  const [currentPage, setCurrentPage] = useState(1);
   const [skills, setSkills] = useState<Item[]>();
   const [services, setServices] = useState<Item[]>();
   const [languages, setLanguages] = useState<Item[]>();
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true)
+  const [loading, setLoading] = useState<boolean>(true);
 
   const router = useRouter();
   const size = useWindowSize();
@@ -50,8 +49,7 @@ const Freelancers = (): JSX.Element => {
 
   useEffect(() => {
     const setFilters = async () => {
-
-      const data : Freelancer[] = await getAllFreelancers();
+      const data: Freelancer[] = await getAllFreelancers();
 
       let combinedSkills = Array.prototype.concat.apply(
         [],
@@ -74,13 +72,12 @@ const Freelancers = (): JSX.Element => {
       setSkills(dedupedSkills);
       setServices(dedupedServices);
       setLanguages(dedupedLanguages);
-      setFreelancers(data)
-      setLoading(false)
-    }
+      setFreelancers(data);
+      setLoading(false);
+    };
 
-    setFilters()
-  }, [])
-
+    setFilters();
+  }, []);
 
   const skillsFilter = {
     filterType: FreelancerFilterOption.Services,
@@ -238,7 +235,7 @@ const Freelancers = (): JSX.Element => {
             default:
               console.log(
                 "Invalid filter option selected or unimplemented. type:" +
-                filterType
+                  filterType
               );
           }
         }
@@ -277,7 +274,37 @@ const Freelancers = (): JSX.Element => {
     setFilterVisible(!filterVisble);
   };
 
-  if(loading) return <LoadingFreelancers/>
+  const paginatedFreelancers = (): FreelancerStepProps => {
+    const freelancersPerPage = 3;
+    const indexOfLastFreelancer = currentPage * freelancersPerPage;
+    const indexOfFirstFreelancer = indexOfLastFreelancer - freelancersPerPage;
+    const currentFreelancers = freelancers?.slice?.(
+      indexOfFirstFreelancer,
+      indexOfLastFreelancer
+    );
+    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+    return { currentFreelancers, paginate };
+  };
+
+  const PageItem = (props: any) => {
+    return (
+      <div
+        className={`h-[32px] rounded-[4px] hover:bg-[--theme-primary] hover:text-black border border-primary w-[32px] cursor-pointer pt-1 items-center text-center text-sm !font-bold mr-6 ${
+          currentPage === parseInt(props.page) ? "text-black" : "text-white"
+        }
+        ${
+          currentPage === parseInt(props.page)
+            ? "bg-[--theme-primary]"
+            : "bg-transparent"
+        }
+        `}
+      >
+        {props.page}
+      </div>
+    );
+  };
+
+  if (loading) return <LoadingFreelancers />;
 
   return (
     <div className="px-[15px] lg:px-[40px]">
@@ -353,40 +380,83 @@ const Freelancers = (): JSX.Element => {
             </div>
           </div>
           <div className={`${styles.freelancers} max-width-750px:!px-0`}>
-            { freelancers?.length && freelancers
-              .slice(0, 10)
-              .map(({ title, username, display_name, skills, profile_image}, index) => (
-                <div className={styles.freelancer} key={index}>
-                  <div className={styles.freelancerImageContainer}>
-                    <Image
-                      src={ profile_image ?? require("@/assets/images/profile-image.png")}
-                      className={styles.freelancerProfilePic}
-                      height={300}
-                      width={300}
-                      alt=""
-                    />
-                    <div className="dark-layer" />
-                  </div>
-                  <div className={styles.freelancerInfo}>
-                    <h3>{display_name}</h3>
-                    <h5>{title}</h5>
-                    <div className={styles.skills}>
-                      {skills?.slice(0, 3).map((skill, index) => (
-                        <p className={styles.skill} key={index}>
-                          {skill.name}
-                        </p>
-                      ))}
+            {freelancers?.length &&
+              paginatedFreelancers?.()
+                ?.currentFreelancers?.slice?.(0, 10)
+                ?.map?.(
+                  (
+                    { title, username, display_name, skills, profile_image },
+                    index
+                  ) => (
+                    <div className={styles.freelancer} key={index}>
+                      <div className={styles.freelancerImageContainer}>
+                        <Image
+                          src={
+                            profile_image ??
+                            require("@/assets/images/profile-image.png")
+                          }
+                          className={styles.freelancerProfilePic}
+                          height={300}
+                          width={300}
+                          alt=""
+                        />
+                        <div className="dark-layer" />
+                      </div>
+                      <div className={styles.freelancerInfo}>
+                        <h3>{display_name}</h3>
+                        <h5>{title}</h5>
+                        <div className={styles.skills}>
+                          {skills?.slice(0, 3).map((skill, index) => (
+                            <p className={styles.skill} key={index}>
+                              {skill.name}
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                      <button
+                        className={`${styles.primaryButton} w-2/3`}
+                        onClick={() => redirectToProfile(username)}
+                      >
+                        View
+                      </button>
                     </div>
-                  </div>
-                  <button
-                    className={`${styles.primaryButton} w-2/3`}
-                    onClick={() => redirectToProfile(username)}
-                  >
-                    View
-                  </button>
-                </div>
-              ))}
+                  )
+                )}
           </div>
+          <Pagination
+            pageSize={3}
+            total={freelancers.length}
+            onChange={(page: number, pageSize: number) =>
+              paginatedFreelancers()?.paginate(page)
+            }
+            className="flex flex-row items-center my-10 px-10"
+            itemRender={(page, type, originalElement) => {
+              if (type === "page") {
+                return <PageItem page={page} />;
+              }
+              return originalElement;
+            }}
+            prevIcon={
+              <div className="h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary">
+                {"<"}
+              </div>
+            }
+            nextIcon={
+              <div className="h-[32px] hover:bg-[--theme-primary]  hover:text-black mr-6  cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary">
+                {">"}
+              </div>
+            }
+            jumpNextIcon={
+              <div className="h-[32px] hover:bg-[--theme-primary]  hover:text-black mr-6  rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary ">
+                {">>"}
+              </div>
+            }
+            jumpPrevIcon={
+              <div className="h-[32px] hover:bg-[--theme-primary]  hover:text-black  mr-6  rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary">
+                {"<<"}
+              </div>
+            }
+          />
         </div>
       </div>
     </div>

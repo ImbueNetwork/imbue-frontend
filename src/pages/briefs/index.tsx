@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import BriefFilter from "@/components/BriefFilter";
 import { Brief, BriefSqlFilter } from "@/model";
 import { callSearchBriefs, getAllBriefs } from "@/redux/services/briefService";
-import { BriefFilterOption } from "@/types/briefTypes";
+import { BriefFilterOption, BriefStepProps } from "@/types/briefTypes";
 import { useRouter } from "next/router";
 import { FiFilter } from "react-icons/fi";
 import { useWindowSize } from "@/hooks";
+import Pagination from "rc-pagination";
 
 export const strToIntRange = (strList: any) => {
   return Array.isArray(strList)
@@ -15,6 +16,7 @@ export const strToIntRange = (strList: any) => {
 
 const Briefs = (): JSX.Element => {
   const [briefs, setBriefs] = useState<Brief[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const router = useRouter();
   const size = useWindowSize();
@@ -338,6 +340,33 @@ const Briefs = (): JSX.Element => {
     setFilterVisible(!filterVisble);
   };
 
+  const paginatedBriefs = (): BriefStepProps => {
+    const briefsPerPage = 3;
+    const indexOfLastBrief = currentPage * briefsPerPage;
+    const indexOfFirstBrief = indexOfLastBrief - briefsPerPage;
+    const currentBriefs = briefs.slice(indexOfFirstBrief, indexOfLastBrief);
+    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+    return { currentBriefs, paginate };
+  };
+
+  const PageItem = (props: any) => {
+    return (
+      <div
+        className={`h-[32px] rounded-[4px] hover:bg-[--theme-primary] hover:text-black border border-primary w-[32px] cursor-pointer pt-1 items-center text-center text-sm !font-bold mr-6 ${
+          currentPage === parseInt(props.page) ? "text-black" : "text-white"
+        }
+        ${
+          currentPage === parseInt(props.page)
+            ? "bg-[--theme-primary]"
+            : "bg-transparent"
+        }
+        `}
+      >
+        {props.page}
+      </div>
+    );
+  };
+
   return (
     <div className="search-briefs-container px-[15px] lg:px-[40px]">
       <div
@@ -420,7 +449,7 @@ const Briefs = (): JSX.Element => {
           </div>
         </div>
         <div className="briefs-list">
-          {briefs.map((item, itemIndex) => (
+          {paginatedBriefs()?.currentBriefs?.map((item, itemIndex) => (
             <div
               className="brief-item"
               key={itemIndex}
@@ -449,6 +478,40 @@ const Briefs = (): JSX.Element => {
             </div>
           ))}
         </div>
+        <Pagination
+          pageSize={3}
+          total={briefs.length}
+          onChange={(page: number, pageSize: number) =>
+            paginatedBriefs()?.paginate(page)
+          }
+          className="flex flex-row items-center my-10 px-10"
+          itemRender={(page, type, originalElement) => {
+            if (type === "page") {
+              return <PageItem page={page} />;
+            }
+            return originalElement;
+          }}
+          prevIcon={
+            <div className="h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary">
+              {"<"}
+            </div>
+          }
+          nextIcon={
+            <div className="h-[32px] hover:bg-[--theme-primary]  hover:text-black mr-6  cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary">
+              {">"}
+            </div>
+          }
+          jumpNextIcon={
+            <div className="h-[32px] hover:bg-[--theme-primary]  hover:text-black mr-6  rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary ">
+              {">>"}
+            </div>
+          }
+          jumpPrevIcon={
+            <div className="h-[32px] hover:bg-[--theme-primary]  hover:text-black  mr-6  rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary">
+              {"<<"}
+            </div>
+          }
+        />
       </div>
     </div>
   );
