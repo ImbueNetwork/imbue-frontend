@@ -16,7 +16,7 @@ import {
 import * as config from "@/config";
 import { BriefInfo, BriefProps } from "@/types/briefTypes";
 import { getServerSideProps } from "@/utils/serverSideProps";
-import styles from '../../styles/modules/newBrief.module.css'
+import styles from "../../styles/modules/newBrief.module.css";
 
 const getAPIHeaders = {
   accept: "application/json",
@@ -92,9 +92,12 @@ const NewBrief = (props: BriefProps): JSX.Element => {
 
   const DescriptionPanel = (
     <div className={styles.descriptionPanel}>
-      <p className={styles.fieldName}>Describe your project in a few sentences</p>
+      <p className={styles.fieldName}>
+        Describe your project in a few sentences
+      </p>
       <div className={styles.descriptionContainer}>
         <TextArea
+          data-testid="description-input"
           value={description}
           name="description"
           maxLength={5000}
@@ -176,6 +179,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
           className={styles.briefDetailFieldInput}
           style={{ paddingLeft: "24px", height: "auto" }}
           type="number"
+          data-testid="budget-input"
           value={budget || ""}
           onChange={(e) => setBudget(Number(e.target.value))}
         />
@@ -305,6 +309,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
               <button
                 className="primary-btn in-dark w-button !mt-0"
                 disabled={!validate()}
+                data-testid="submit-button"
                 onClick={() => onReviewPost()}
               >
                 Submit
@@ -323,7 +328,6 @@ const NewBrief = (props: BriefProps): JSX.Element => {
         </div>
       </div>
     </div>
-
   );
 };
 
