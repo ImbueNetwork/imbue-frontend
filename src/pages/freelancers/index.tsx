@@ -426,7 +426,7 @@ const Freelancers = (): JSX.Element => {
                 )}
           </div>
           <Pagination
-            pageSize={3}
+            pageSize={itemsPerPage}
             total={freelancers.length}
             onChange={(page: number, pageSize: number) =>
               paginatedFreelancers()?.paginate(page)

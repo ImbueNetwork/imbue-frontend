@@ -482,7 +482,7 @@ const Briefs = (): JSX.Element => {
           ))}
         </div>
         <Pagination
-          pageSize={3}
+          pageSize={itemsPerPage}
           total={briefs.length}
           onChange={(page: number, pageSize: number) =>
             paginatedBriefs()?.paginate(page)
