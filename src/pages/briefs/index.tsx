@@ -20,6 +20,7 @@ const Briefs = (): JSX.Element => {
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const router = useRouter();
   const size = useWindowSize();
+  const itemsPerPage = 3;
 
   const {
     expRange,
@@ -341,9 +342,8 @@ const Briefs = (): JSX.Element => {
   };
 
   const paginatedBriefs = (): BriefStepProps => {
-    const briefsPerPage = 3;
-    const indexOfLastBrief = currentPage * briefsPerPage;
-    const indexOfFirstBrief = indexOfLastBrief - briefsPerPage;
+    const indexOfLastBrief = currentPage * itemsPerPage;
+    const indexOfFirstBrief = indexOfLastBrief - itemsPerPage;
     const currentBriefs = briefs.slice(indexOfFirstBrief, indexOfLastBrief);
     const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
     return { currentBriefs, paginate };
@@ -366,6 +366,9 @@ const Briefs = (): JSX.Element => {
       </div>
     );
   };
+
+  const pageinationIconClassName =
+    "h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary";
 
   return (
     <div className="search-briefs-container px-[15px] lg:px-[40px]">
@@ -491,26 +494,10 @@ const Briefs = (): JSX.Element => {
             }
             return originalElement;
           }}
-          prevIcon={
-            <div className="h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary">
-              {"<"}
-            </div>
-          }
-          nextIcon={
-            <div className="h-[32px] hover:bg-[--theme-primary]  hover:text-black mr-6  cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary">
-              {">"}
-            </div>
-          }
-          jumpNextIcon={
-            <div className="h-[32px] hover:bg-[--theme-primary]  hover:text-black mr-6  rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary ">
-              {">>"}
-            </div>
-          }
-          jumpPrevIcon={
-            <div className="h-[32px] hover:bg-[--theme-primary]  hover:text-black  mr-6  rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary">
-              {"<<"}
-            </div>
-          }
+          prevIcon={<div className={pageinationIconClassName}>{"<"}</div>}
+          nextIcon={<div className={pageinationIconClassName}>{">"}</div>}
+          jumpNextIcon={<div className={pageinationIconClassName}>{">>"}</div>}
+          jumpPrevIcon={<div className={pageinationIconClassName}>{"<<"}</div>}
         />
       </div>
     </div>

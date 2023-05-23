@@ -26,6 +26,7 @@ const Freelancers = (): JSX.Element => {
   const [languages, setLanguages] = useState<Item[]>();
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const itemsPerPage = 6;
 
   const router = useRouter();
   const size = useWindowSize();
@@ -118,6 +119,9 @@ const Freelancers = (): JSX.Element => {
       return filter;
     }),
   };
+
+  const pageinationIconClassName =
+    "h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary";
 
   useEffect(() => {
     const fetchAndSetBriefs = async () => {
@@ -275,9 +279,8 @@ const Freelancers = (): JSX.Element => {
   };
 
   const paginatedFreelancers = (): FreelancerStepProps => {
-    const freelancersPerPage = 3;
-    const indexOfLastFreelancer = currentPage * freelancersPerPage;
-    const indexOfFirstFreelancer = indexOfLastFreelancer - freelancersPerPage;
+    const indexOfLastFreelancer = currentPage * itemsPerPage;
+    const indexOfFirstFreelancer = indexOfLastFreelancer - itemsPerPage;
     const currentFreelancers = freelancers?.slice?.(
       indexOfFirstFreelancer,
       indexOfLastFreelancer
@@ -316,7 +319,6 @@ const Freelancers = (): JSX.Element => {
               size?.width <= 750 ? (filterVisble ? "block" : "none") : "block",
           }}
         >
-          {/* <h1 className="mb-5">Freelancers</h1> */}
           <div className={styles.filterHeading}>Filter By</div>
           <FreelancerFilter
             label={skillsFilter.label}
@@ -436,25 +438,13 @@ const Freelancers = (): JSX.Element => {
               }
               return originalElement;
             }}
-            prevIcon={
-              <div className="h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary">
-                {"<"}
-              </div>
-            }
-            nextIcon={
-              <div className="h-[32px] hover:bg-[--theme-primary]  hover:text-black mr-6  cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary">
-                {">"}
-              </div>
-            }
+            prevIcon={<div className={pageinationIconClassName}>{"<"}</div>}
+            nextIcon={<div className={pageinationIconClassName}>{">"}</div>}
             jumpNextIcon={
-              <div className="h-[32px] hover:bg-[--theme-primary]  hover:text-black mr-6  rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary ">
-                {">>"}
-              </div>
+              <div className={pageinationIconClassName}>{">>"}</div>
             }
             jumpPrevIcon={
-              <div className="h-[32px] hover:bg-[--theme-primary]  hover:text-black  mr-6  rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary">
-                {"<<"}
-              </div>
+              <div className={pageinationIconClassName}>{"<<"}</div>
             }
           />
         </div>
