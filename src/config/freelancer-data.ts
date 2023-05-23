@@ -191,7 +191,7 @@ export const suggestedServices = [
 ];
 
 export const freelancerData = {
-  id: 1,
+  id: 2,
   freelanced_before:
     "I've freelanced before however, i may need some extra help.",
   freelancing_goal: "To make a little extra money on the side",
@@ -202,51 +202,36 @@ export const freelancerData = {
   twitter_link: "",
   telegram_link: "",
   discord_link: "",
-  profileImageUrl: "",
-  title: "Senior Frontend Developer",
-  bio: "The best life ever",
-  user_id: 5,
-  username: "mike",
-  display_name: "mike",
+  title: "sfkj nfv sflvj ",
+  bio: "sfck jnfs isdy honimsd ",
+  user_id: 6,
+  username: "tegararuvwe@gmailcom",
+  profile_image:
+    "http://res.cloudinary.com/dzmn0ipe3/image/upload/v1684487446/Imbue-Freelancer-Profile/o04jyfswih6iznopgnez.png",
+  display_name: "Tega Oboraruvwe",
   web3_address: "5GRHPcY3zEgJezesmYHQyuo7YouwXVjnDR8ZcX9CQuFJadaL",
-  created: "2023-04-08T15:38:29.157Z",
+  created: "2023-05-16T13:04:57.796Z",
   skills: [
     {
-      id: 5,
-      name: "javascript",
-    },
-  ],
-  skill_ids: ["5"],
-  languages: [
-    {
-      id: 8,
-      name: "english",
-    },
-  ],
-  language_ids: ["8"],
-  services: [
-    {
       id: 1,
-      name: "web development",
+      name: "substrate",
     },
     {
       id: 2,
-      name: "web design",
-    },
-    {
-      id: 3,
-      name: "mobile (android/ios)",
-    },
-    {
-      id: 5,
-      name: "smart contracts",
+      name: "rust",
     },
   ],
-  service_ids: ["1", "2", "3", "5"],
+  skill_ids: ["1", "2"],
+  languages: [],
+  language_ids: [],
+  services: [],
+  service_ids: [],
   clients: [],
   client_ids: [],
   client_images: [],
   client_image_ids: [],
-  rating: 0,
+  rating: undefined,
   num_ratings: 0,
+  country: "Åland Islands",
+  region: "Eckerö",
 };

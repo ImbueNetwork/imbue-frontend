@@ -15,19 +15,6 @@ function setUp() {
   render(<Freelancers user={user} />);
 }
 
-const customTextMatcher = (text: string) => {
-  const elements = screen.queryAllByText((content, element: any) => {
-    const elementText = element.textContent || element.innerText || "";
-    return elementText.includes(text);
-  });
-
-  if (elements.length === 0) {
-    throw new Error(`Unable to find an element with the text: ${text}`);
-  }
-
-  return elements[0];
-};
-
 test("test Freelancer rendering", () => {
   expect(
     render(
