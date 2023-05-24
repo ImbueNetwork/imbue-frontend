@@ -20,6 +20,7 @@ const Freelancers = (): JSX.Element => {
   const [freelancers, setFreelancers] = useState<
     Freelancer[] | undefined | any
   >();
+  const [freelancers_total, setFreelancersTotal] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [skills, setSkills] = useState<Item[]>();
   const [services, setServices] = useState<Item[]>();
@@ -50,35 +51,38 @@ const Freelancers = (): JSX.Element => {
 
   useEffect(() => {
     const setFilters = async () => {
-      const data: Freelancer[] = await getAllFreelancers();
+      const data:
+        | { currentData: Freelancer[]; totalFreelancers: number }
+        | any = await getAllFreelancers(itemsPerPage, currentPage);
 
       let combinedSkills = Array.prototype.concat.apply(
         [],
-        data.map((x) => x.skills)
+        data?.currentData?.map((x: any) => x.skills)
       ) as Item[];
       const dedupedSkills = await dedupeArray(combinedSkills);
 
       var combinedServices = Array.prototype.concat.apply(
         [],
-        data.map((x) => x.services)
+        data?.currentData?.map((x: any) => x.services)
       ) as Item[];
       const dedupedServices = await dedupeArray(combinedServices);
 
       var combinedLanguages = Array.prototype.concat.apply(
         [],
-        data.map((x) => x.languages)
+        data?.currentData?.map((x: any) => x.languages)
       ) as Item[];
       const dedupedLanguages = await dedupeArray(combinedLanguages);
 
       setSkills(dedupedSkills);
       setServices(dedupedServices);
       setLanguages(dedupedLanguages);
-      setFreelancers(data);
+      setFreelancers(data?.currentData);
+      setFreelancersTotal(data?.totalFreelancers);
       setLoading(false);
     };
 
     setFilters();
-  }, []);
+  }, [currentPage]);
 
   const skillsFilter = {
     filterType: FreelancerFilterOption.Services,
@@ -264,29 +268,25 @@ const Freelancers = (): JSX.Element => {
         services_range: servicesRange,
         languages_range: languagesRange,
         search_input: search_value,
+        items_per_page: itemsPerPage,
+        page: currentPage,
       };
 
-      const filteredFreelancers = await callSearchFreelancers(filter);
-      setFreelancers(filteredFreelancers);
+      const filteredFreelancers: any = await callSearchFreelancers(filter);
+      setFreelancers(filteredFreelancers?.currentData);
+      setFreelancersTotal(filteredFreelancers?.totalFreelancers);
     } else {
-      const allFreelancers = await getAllFreelancers();
-      setFreelancers(allFreelancers);
+      const allFreelancers: any = await getAllFreelancers(
+        itemsPerPage,
+        currentPage
+      );
+      setFreelancers(allFreelancers?.currentData);
+      setFreelancersTotal(allFreelancers?.totalFreelancers);
     }
   };
 
   const toggleFilter = () => {
     setFilterVisible(!filterVisble);
-  };
-
-  const paginatedFreelancers = (): FreelancerStepProps => {
-    const indexOfLastFreelancer = currentPage * itemsPerPage;
-    const indexOfFirstFreelancer = indexOfLastFreelancer - itemsPerPage;
-    const currentFreelancers = freelancers?.slice?.(
-      indexOfFirstFreelancer,
-      indexOfLastFreelancer
-    );
-    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-    return { currentFreelancers, paginate };
   };
 
   const PageItem = (props: any) => {
@@ -377,18 +377,24 @@ const Freelancers = (): JSX.Element => {
               placeholder="Search"
             />
             <div className="search-result">
-              <span className="result-count">{freelancers?.length}</span>
+              <span className="result-count">{freelancers_total}</span>
               <span> freelancers found</span>
             </div>
           </div>
           <div className={`${styles.freelancers} max-width-750px:!px-0`}>
             {freelancers?.length &&
-              paginatedFreelancers?.()
-                ?.currentFreelancers?.slice?.(0, 10)
+              freelancers
+                ?.slice?.(0, 10)
                 ?.map?.(
                   (
-                    { title, username, display_name, skills, profile_image },
-                    index
+                    {
+                      title,
+                      username,
+                      display_name,
+                      skills,
+                      profile_image,
+                    }: any,
+                    index: number
                   ) => (
                     <div className={styles.freelancer} key={index}>
                       <div className={styles.freelancerImageContainer}>
@@ -408,11 +414,13 @@ const Freelancers = (): JSX.Element => {
                         <h3>{display_name}</h3>
                         <h5>{title}</h5>
                         <div className={styles.skills}>
-                          {skills?.slice(0, 3).map((skill, index) => (
-                            <p className={styles.skill} key={index}>
-                              {skill.name}
-                            </p>
-                          ))}
+                          {skills
+                            ?.slice(0, 3)
+                            .map((skill: any, index: number) => (
+                              <p className={styles.skill} key={index}>
+                                {skill.name}
+                              </p>
+                            ))}
                         </div>
                       </div>
                       <button
@@ -427,10 +435,8 @@ const Freelancers = (): JSX.Element => {
           </div>
           <Pagination
             pageSize={itemsPerPage}
-            total={freelancers.length}
-            onChange={(page: number, pageSize: number) =>
-              paginatedFreelancers()?.paginate(page)
-            }
+            total={freelancers_total}
+            onChange={(page: number, pageSize: number) => setCurrentPage(page)}
             className="flex flex-row items-center my-10 px-10"
             itemRender={(page, type, originalElement) => {
               if (type === "page") {

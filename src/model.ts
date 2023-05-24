@@ -225,6 +225,8 @@ export type FreelancerSqlFilter = {
   services_range: Array<number>;
   languages_range: Array<number>;
   search_input: string | string[];
+  items_per_page?: number;
+  page?: number;
 };
 export type ApplicationData = {
   brief_id: number;
