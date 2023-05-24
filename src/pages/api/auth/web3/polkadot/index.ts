@@ -3,7 +3,7 @@ import nextConnect from 'next-connect'
 import { decodeAddress, encodeAddress } from "@polkadot/keyring";
 import { hexToU8a, isHex } from '@polkadot/util';
 
-import db from "../../../db";
+import db from "@/db";
 import * as models from "../../../models";
 import { fetchWeb3AccountByAddress, User } from "../../../models";
 import { jwtOptions, verifyUserIdFromJwt } from "../../common";

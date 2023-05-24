@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import db from "../db";
+import db from "@/db";
 import * as models from "../models";
 import { authenticate } from "../info/user";
 
