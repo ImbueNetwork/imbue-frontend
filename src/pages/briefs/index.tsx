@@ -16,11 +16,12 @@ export const strToIntRange = (strList: any) => {
 
 const Briefs = (): JSX.Element => {
   const [briefs, setBriefs] = useState<Brief[]>([]);
+  const [briefs_total, setBriefsTotal] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const router = useRouter();
   const size = useWindowSize();
-  const itemsPerPage = 3;
+  const itemsPerPage = 5;
 
   const {
     expRange,
@@ -169,7 +170,9 @@ const Briefs = (): JSX.Element => {
   useEffect(() => {
     const fetchAndSetBriefs = async () => {
       if (!Object.keys(router?.query).length) {
-        setBriefs(await getAllBriefs());
+        const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
+        setBriefs(briefs_all?.currentData);
+        setBriefsTotal(briefs_all?.totalBriefs);
       } else {
         let filter: BriefSqlFilter = {
           experience_range: [],
@@ -178,6 +181,8 @@ const Briefs = (): JSX.Element => {
           length_range: [],
           length_is_max: false,
           search_input: "",
+          items_per_page: itemsPerPage,
+          page: currentPage,
         };
 
         if (expRange) {
@@ -225,13 +230,14 @@ const Briefs = (): JSX.Element => {
           });
           filter = { ...filter, length_range: strToIntRange(lengthRange) };
         }
-        const result = await callSearchBriefs(filter);
-        setBriefs(result);
+        const result: any = await callSearchBriefs(filter);
+        setBriefs(result?.currentData);
+        setBriefsTotal(result?.totalBriefs);
       }
     };
 
     router.isReady && fetchAndSetBriefs();
-  }, [expRange, heading, lengthRange, router, submitRange]);
+  }, [expRange, heading, lengthRange, router, submitRange, currentPage]);
 
   // Here we have to get all the checked boxes and try and construct a query out of it...
   const onSearch = async () => {
@@ -325,13 +331,17 @@ const Briefs = (): JSX.Element => {
         length_range,
         length_is_max,
         search_input: search_value,
+        items_per_page: itemsPerPage,
+        page: currentPage,
       };
 
-      const briefs_filtered = await callSearchBriefs(filter);
-      setBriefs(briefs_filtered);
+      const briefs_filtered: any = await callSearchBriefs(filter);
+      setBriefs(briefs_filtered?.currentData);
+      setBriefsTotal(briefs_filtered?.totalBriefs);
     } else {
-      const briefs_all = await getAllBriefs();
-      setBriefs(briefs_all);
+      const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
+      setBriefs(briefs_all?.currentData);
+      setBriefsTotal(briefs_all?.totalBriefs);
     }
   };
 
@@ -339,14 +349,6 @@ const Briefs = (): JSX.Element => {
 
   const toggleFilter = () => {
     setFilterVisible(!filterVisble);
-  };
-
-  const paginatedBriefs = (): BriefStepProps => {
-    const indexOfLastBrief = currentPage * itemsPerPage;
-    const indexOfFirstBrief = indexOfLastBrief - itemsPerPage;
-    const currentBriefs = briefs.slice(indexOfFirstBrief, indexOfLastBrief);
-    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-    return { currentBriefs, paginate };
   };
 
   const PageItem = (props: any) => {
@@ -447,12 +449,12 @@ const Briefs = (): JSX.Element => {
             placeholder="Search"
           />
           <div className="search-result">
-            <span className="result-count">{briefs.length}</span>
+            <span className="result-count">{briefs_total}</span>
             <span> briefs found</span>
           </div>
         </div>
         <div className="briefs-list">
-          {paginatedBriefs()?.currentBriefs?.map((item, itemIndex) => (
+          {briefs?.map((item, itemIndex) => (
             <div
               className="brief-item"
               key={itemIndex}
@@ -483,10 +485,8 @@ const Briefs = (): JSX.Element => {
         </div>
         <Pagination
           pageSize={itemsPerPage}
-          total={briefs.length}
-          onChange={(page: number, pageSize: number) =>
-            paginatedBriefs()?.paginate(page)
-          }
+          total={briefs_total}
+          onChange={(page: number, pageSize: number) => setCurrentPage(page)}
           className="flex flex-row items-center my-10 px-10"
           itemRender={(page, type, originalElement) => {
             if (type === "page") {

@@ -14,6 +14,7 @@ import { Brief } from "@/model";
 
 export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
+    const data = req.query;
     await db.transaction(async (tx: any) => {
       try {
         await fetchAllBriefs()(tx).then(async (briefs: any) => {
@@ -27,7 +28,12 @@ export default nextConnect()
               )(tx);
             }),
           ]);
-          res.status(200).json(briefs);
+          const { currentData, totalItems } = await models.paginatedData(
+            Number(data.page),
+            Number(data.items_per_page),
+            briefs
+          );
+          res.status(200).json({ currentData, totalBriefs: totalItems });
         });
       } catch (e) {
         new Error(`Failed to fetch all briefs`, { cause: e as Error });

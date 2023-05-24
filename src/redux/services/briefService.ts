@@ -34,11 +34,16 @@ export const callSearchBriefs = async (filter: BriefSqlFilter) => {
   }
 };
 
-export const getAllBriefs = async () => {
+export const getAllBriefs = async (
+  itemsPerPage: number,
+  currentPage: number
+) => {
   // return dumyBriefs as Array<Brief>;
   //:TODO implement api for getting briefs
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}briefs/`),
+    checkEnvironment().concat(
+      `${config.apiBase}briefs?items_per_page=${itemsPerPage}&page=${currentPage}`
+    ),
     {
       headers: postAPIHeaders,
       method: "get",

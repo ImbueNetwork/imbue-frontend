@@ -45,7 +45,13 @@ export default nextConnect()
           }),
         ]);
 
-        res.status(200).json(briefs);
+        const { currentData, totalItems } = await models.paginatedData(
+          data.page,
+          data.items_per_page,
+          briefs
+        );
+
+        res.status(200).json({ currentData, totalBriefs: totalItems });
       } catch (e) {
         new Error(`Failed to search for briefs ${data}`, { cause: e as Error });
       }

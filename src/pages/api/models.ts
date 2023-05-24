@@ -167,6 +167,8 @@ export type BriefSqlFilter = {
   length_range: number[];
   length_is_max: boolean;
   search_input: string;
+  items_per_page: number;
+  page: number;
 };
 
 export type FreelancerSqlFilter = {
@@ -174,6 +176,11 @@ export type FreelancerSqlFilter = {
   services_range: Array<number>;
   languages_range: Array<number>;
   search_input: string;
+};
+
+export type PagerProps = {
+  currentData: unknown[];
+  totalItems: number;
 };
 
 export const fetchWeb3AccountByAddress =
@@ -1063,6 +1070,17 @@ export const searchBriefs = async (
       }
     })
     .where("headline", "ilike", "%" + filter.search_input + "%");
+
+export const paginatedData = (
+  currentPage: number,
+  itemsPerPage: number,
+  data: any[]
+): PagerProps => {
+  const indexOfLastBrief = currentPage * itemsPerPage;
+  const indexOfFirstBrief = indexOfLastBrief - itemsPerPage;
+  const currentData = data.slice(indexOfFirstBrief, indexOfLastBrief);
+  return { currentData, totalItems: data.length };
+};
 
 export const searchFreelancers = async (
   tx: Knex.Transaction,

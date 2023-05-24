@@ -26,7 +26,6 @@ export function displayState(state: OffchainProjectState) {
   }
 }
 
-
 // ONCHAIN PROJECT STATE
 export enum OnchainProjectState {
   PendingProjectApproval = 0,
@@ -217,6 +216,8 @@ export type BriefSqlFilter = {
   length_range: Array<number>;
   length_is_max: boolean;
   search_input: string | string[];
+  items_per_page?: number;
+  page?: number;
 };
 
 export type FreelancerSqlFilter = {
