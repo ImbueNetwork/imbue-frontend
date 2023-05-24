@@ -27,7 +27,7 @@ const Freelancers = (): JSX.Element => {
   const [languages, setLanguages] = useState<Item[]>();
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const itemsPerPage = 6;
+  const [itemsPerPage, setNumItemsPerPage] = useState<number>(6);
 
   const router = useRouter();
   const size = useWindowSize();
@@ -82,7 +82,7 @@ const Freelancers = (): JSX.Element => {
     };
 
     setFilters();
-  }, [currentPage]);
+  }, [currentPage, itemsPerPage]);
 
   const skillsFilter = {
     filterType: FreelancerFilterOption.Services,
@@ -307,6 +307,14 @@ const Freelancers = (): JSX.Element => {
     );
   };
 
+  const arrayMultipleOfFiveWithin100 = () => {
+    let arr = [];
+    for (let i = 5; i <= 100; i += 5) {
+      arr.push(i);
+    }
+    return arr;
+  };
+
   if (loading) return <LoadingFreelancers />;
 
   return (
@@ -379,6 +387,23 @@ const Freelancers = (): JSX.Element => {
             <div className="search-result">
               <span className="result-count">{freelancers_total}</span>
               <span> freelancers found</span>
+
+              <span className="ml-8">
+                number of freelancers per page
+                <select
+                  className="ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none"
+                  onChange={(e) => {
+                    setNumItemsPerPage(parseInt(e.target.value));
+                  }}
+                  value={itemsPerPage}
+                >
+                  {arrayMultipleOfFiveWithin100()?.map((item, itemIndex) => (
+                    <option key={itemIndex} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </span>
             </div>
           </div>
           <div className={`${styles.freelancers} max-width-750px:!px-0`}>

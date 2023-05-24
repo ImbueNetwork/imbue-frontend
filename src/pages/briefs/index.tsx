@@ -21,7 +21,7 @@ const Briefs = (): JSX.Element => {
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const router = useRouter();
   const size = useWindowSize();
-  const itemsPerPage = 5;
+  const [itemsPerPage, setNumItemsPerPage] = useState<number>(5);
 
   const {
     expRange,
@@ -237,7 +237,15 @@ const Briefs = (): JSX.Element => {
     };
 
     router.isReady && fetchAndSetBriefs();
-  }, [expRange, heading, lengthRange, router, submitRange, currentPage]);
+  }, [
+    expRange,
+    heading,
+    lengthRange,
+    router,
+    submitRange,
+    currentPage,
+    itemsPerPage,
+  ]);
 
   // Here we have to get all the checked boxes and try and construct a query out of it...
   const onSearch = async () => {
@@ -369,6 +377,14 @@ const Briefs = (): JSX.Element => {
     );
   };
 
+  const arrayMultipleOfFiveWithin100 = () => {
+    let arr = [];
+    for (let i = 5; i <= 100; i += 5) {
+      arr.push(i);
+    }
+    return arr;
+  };
+
   const pageinationIconClassName =
     "h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary";
 
@@ -451,6 +467,23 @@ const Briefs = (): JSX.Element => {
           <div className="search-result">
             <span className="result-count">{briefs_total}</span>
             <span> briefs found</span>
+
+            <span className="ml-8">
+              number of briefs per page
+              <select
+                className="ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none"
+                onChange={(e) => {
+                  setNumItemsPerPage(parseInt(e.target.value));
+                }}
+                value={itemsPerPage}
+              >
+                {arrayMultipleOfFiveWithin100()?.map((item, itemIndex) => (
+                  <option key={itemIndex} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </span>
           </div>
         </div>
         <div className="briefs-list">
