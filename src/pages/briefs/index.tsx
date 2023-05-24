@@ -32,7 +32,7 @@ const Briefs = (): JSX.Element => {
     hpw_max,
     hpw_is_max,
     heading,
-  } = router.query;
+  } = router?.query;
 
   // The thing with this implentation is that the interior order must stay totally ordered.
   // The interior index is used to specify which entry will be used in the search brief.

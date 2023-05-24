@@ -4,7 +4,7 @@ import {
   dumyBriefs,
 } from "@/config/briefs-data";
 import { Brief, BriefSqlFilter, OffchainProjectState } from "@/model";
-import { BriefInfo } from "@/types/briefTypes";
+import { BriefInfo, PaginatedResponse } from "@/types/briefTypes";
 import { checkEnvironment } from "@/utils";
 
 const getAPIHeaders = {
@@ -28,7 +28,7 @@ export const callSearchBriefs = async (filter: BriefSqlFilter) => {
     }
   );
   if (resp.ok) {
-    return (await resp.json()) as Array<Brief>;
+    return (await resp.json()) as PaginatedResponse;
   } else {
     throw new Error("Failed to search briefs. status:" + resp.status);
   }
@@ -51,7 +51,7 @@ export const getAllBriefs = async (
   );
 
   if (resp.ok) {
-    return (await resp.json()) as Array<Brief>;
+    return (await resp.json()) as PaginatedResponse;
   } else {
     throw new Error("Failed to get all briefs. status:" + resp.status);
   }
