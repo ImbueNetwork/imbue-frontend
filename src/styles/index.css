@@ -636,7 +636,7 @@ input[type='radio'] {
 	right: 4px;
 	top: 6px;
 	bottom: 6px;
-	z-index: 10;
+	z-index: 1;
 }
 
 .selected-tags {

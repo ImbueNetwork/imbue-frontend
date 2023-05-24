@@ -68,8 +68,7 @@ const BriefApplications = () => {
 
             <div className="w-full ml-auto flex items-center justify-between mt-6">
                     <h3 className={styles.sectionTitle }>All applicants</h3>
-                    <StyledEngineProvider injectFirst>
-                        <FormControl>
+                    <FormControl>
                             <InputLabel id="demo-simple-select-helper-label">Sort</InputLabel>
                             <Select
                                 labelId="demo-simple-select-helper-label"
@@ -82,7 +81,6 @@ const BriefApplications = () => {
                                 <MenuItem value='budget'>Budget</MenuItem>
                             </Select>
                         </FormControl>
-                    </StyledEngineProvider>
                 </div>
 
             <div className={styles.section}>

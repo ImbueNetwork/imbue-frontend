@@ -17,7 +17,6 @@ import MyFreelancerApplications from '@/components/Dashboard/MyFreelancerApplica
 import MyClientBriefsView from '@/components/Dashboard/MyClientBriefsView';
 import DashboardChatBox from '@/components/Dashboard/MyChatBox';
 import { Brief } from '@/model';
-import { ApplicationData } from '@/model';
 import FullScreenLoader from '@/components/FullScreenLoader';
 
 export type DashboardProps = {
