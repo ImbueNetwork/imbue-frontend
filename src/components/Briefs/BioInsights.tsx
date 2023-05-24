@@ -85,7 +85,7 @@ const BioInsights = ({
       <div className="subsection">
         <div className="brief-insights-stat">
           <div>
-            Currently Interviewing:
+            Applications:
             <span className="primary-text font-bold ml-2">2</span>
           </div>
         </div>
