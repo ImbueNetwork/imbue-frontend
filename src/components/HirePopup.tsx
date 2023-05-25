@@ -15,6 +15,8 @@ import { useRouter } from "next/router";
 import { WalletAccount } from "@talismn/connect-wallets";
 import AccountChoice from "./AccountChoice";
 import { useMediaQuery } from "@mui/material";
+import ErrorScreen from "./ErrorScreen";
+import SuccessScreen from "./SuccessScreen";
 
 export const HirePopup = ({
   openPopup: openHirePopup,
@@ -30,6 +32,10 @@ export const HirePopup = ({
 }: any) => {
   const [popupStage, setstage] = useState<number>(0);
   const mobileView = useMediaQuery('(max-width:480px)');
+
+  const [success, setSuccess] = useState<boolean>(false)
+  const [error, setError] = useState<any>()
+  const router = useRouter()
 
   const modalStyle = {
     position: "absolute" as "absolute",
@@ -78,6 +84,7 @@ export const HirePopup = ({
       if (result.status || result.txError) {
         if (result.status) {
           console.log("***** success");
+          setSuccess(true)
           const briefId = brief.id;
           await changeBriefApplicationStatus(
             briefId!,
@@ -90,6 +97,7 @@ export const HirePopup = ({
           console.log(result.errorMessage);
 
           // TODO, SHOW ERROR POPUP
+          setError({ message: result.errorMessage })
         }
         break;
       }
@@ -245,6 +253,39 @@ export const HirePopup = ({
           </Box>
         </Fade>
       </Modal>
+
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'>
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
+
+      <SuccessScreen
+        title={`You have successfully hired ${freelancer?.display_name} as a freelacer for your brief`}
+        open={success}
+        setOpen={setSuccess}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => router.push(`/briefs`)}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            Go to Project
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'>
+            Go to Dashboard
+          </button>
+        </div>
+      </SuccessScreen>
     </>
   );
 };
