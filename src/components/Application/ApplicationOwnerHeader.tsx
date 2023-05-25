@@ -9,6 +9,8 @@ import ChainService from '@/redux/services/chainService';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { WalletAccount } from '@talismn/connect-wallets';
 import { useRouter } from 'next/router';
+import ErrorScreen from '../ErrorScreen';
+import SuccessScreen from '../SuccessScreen';
 
 type ApplicationOwnerProps = {
     briefOwner: any;
@@ -34,12 +36,15 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
     } = props
 
     const [openPopup, setOpenPopup] = useState(false)
-    const mobileView = useMediaQuery('(max-width:480px)');
-
+    const [success, setSuccess] = useState<boolean>(false)
+    const [error, setError] = useState<any>()
+    const [projectId, setProjectId] = useState<string>()    
+    
     const router = useRouter();
     const { applicationId }: any = router.query;
-
+    
     const applicationStatusId = ['Draft', 'Pending Review', 'Changes Requested', 'Rejected', 'Accepted'];
+    const mobileView = useMediaQuery('(max-width:480px)');
 
     const startWork = async (account: WalletAccount) => {
         setLoading(true);
@@ -52,18 +57,21 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
             if (result.status || result.txError) {
                 if (result.status) {
                     console.log('***** success');
+                    setSuccess(true)
                     const projectId = parseInt(result.eventData[2]);
                     while (true) {
                         const projectIsOnChain = await chainService.getProjectOnChain(projectId);
                         if (projectIsOnChain) {
                             await updateProject(projectId);
-                            router.push(`/projects/${applicationId}`);
+                            // router.push(`/projects/${applicationId}`);
+                            setProjectId(applicationId)
                             break;
                         }
                         await new Promise((f) => setTimeout(f, 1000));
                     }
                 } else if (result.txError) {
                     console.log('***** failed');
+                    setError({message:result.errorMessage})
                     console.log(result.errorMessage);
                 }
                 break;
@@ -104,6 +112,38 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
                 )}
             </div>
             <AccountChoice accountSelected={(account) => startWork(account)} visible={openPopup} setVisible={setOpenPopup} initiatorAddress={application?.initiator} filterByInitiator />
+            <ErrorScreen {...{ error, setError }}>
+                <div className='flex flex-col gap-4 w-1/2'>
+                    <button
+                        onClick={() => setError(null)}
+                        className='primary-btn in-dark w-button w-full !m-0'>
+                        Try Again
+                    </button>
+                    <button
+                        onClick={() => router.push(`/dashboard`)}
+                        className='underline text-xs lg:text-base font-bold'>
+                        Go to Dashboard
+                    </button>
+                </div>
+            </ErrorScreen>
+
+            <SuccessScreen
+                title={`You have successfully hired ${freelancer?.display_name} as a freelacer for your brief`}
+                open={success}
+                setOpen={setSuccess}>
+                <div className='flex flex-col gap-4 w-1/2'>
+                    <button
+                        onClick={() => router.push(`/projects/${projectId}`)}
+                        className='primary-btn in-dark w-button w-full !m-0'>
+                        See Project
+                    </button>
+                    <button
+                        onClick={() => setSuccess(false)}
+                        className='underline text-xs lg:text-base font-bold'>
+                        Continue
+                    </button>
+                </div>
+            </SuccessScreen>
         </div>
     );
 };
