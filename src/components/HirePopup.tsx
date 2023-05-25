@@ -62,6 +62,7 @@ export const HirePopup = ({
     const freelancerAddress: string = freelancer.web3_address;
     const budget: bigint = BigInt(totalCost * 1e12);
     const initialContribution: bigint = BigInt(totalCost * 1e12);
+    application.status_id = OffchainProjectState.Accepted;
     delete application.modified;
     const briefHash = blake2AsHex(JSON.stringify(application));
     const currencyId = application.currency_id;
@@ -86,20 +87,19 @@ export const HirePopup = ({
           console.log("***** success");
           setSuccess(true)
           const briefId = brief.id;
-          const resp =  await changeBriefApplicationStatus(
+          const resp = await changeBriefApplicationStatus(
             briefId!,
             application.id,
             OffchainProjectState.Accepted
           );
           setProjectId(resp.project_id);
-          application.status_id = OffchainProjectState.Accepted;
           console.log(result.eventData);
         } else if (result.txError) {
           console.log("***** failed");
-          console.log(result.errorMessage);
 
           // TODO, SHOW ERROR POPUP
           setError({ message: result.errorMessage })
+          application.status_id = OffchainProjectState.PendingReview;
         }
         break;
       }

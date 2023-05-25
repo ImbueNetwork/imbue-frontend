@@ -38,11 +38,13 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
     const [openPopup, setOpenPopup] = useState(false)
     const [success, setSuccess] = useState<boolean>(false)
     const [error, setError] = useState<any>()
-    const [projectId, setProjectId] = useState<string>()    
-    
+    const [projectId, setProjectId] = useState<string>()
+
+    console.log(projectId);
+
     const router = useRouter();
     const { applicationId }: any = router.query;
-    
+
     const applicationStatusId = ['Draft', 'Pending Review', 'Changes Requested', 'Rejected', 'Accepted'];
     const mobileView = useMediaQuery('(max-width:480px)');
 
@@ -53,25 +55,25 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         delete application.modified;
         const briefHash = blake2AsHex(JSON.stringify(application));
         const result = await chainService?.commenceWork(account, briefHash);
+
         while (true) {
             if (result.status || result.txError) {
                 if (result.status) {
                     console.log('***** success');
-                    setSuccess(true)
                     const projectId = parseInt(result.eventData[2]);
                     while (true) {
                         const projectIsOnChain = await chainService.getProjectOnChain(projectId);
                         if (projectIsOnChain) {
                             await updateProject(projectId);
-                            // router.push(`/projects/${applicationId}`);
                             setProjectId(applicationId)
+                            setSuccess(true)
                             break;
                         }
                         await new Promise((f) => setTimeout(f, 1000));
                     }
                 } else if (result.txError) {
                     console.log('***** failed');
-                    setError({message:result.errorMessage})
+                    setError({ message: result.errorMessage })
                     console.log(result.errorMessage);
                 }
                 break;
