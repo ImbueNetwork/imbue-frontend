@@ -35,6 +35,7 @@ export const HirePopup = ({
 
   const [success, setSuccess] = useState<boolean>(false)
   const [error, setError] = useState<any>()
+  const [projectId, setProjectId] = useState<string>()
   const router = useRouter()
 
   const modalStyle = {
@@ -57,12 +58,10 @@ export const HirePopup = ({
     const imbueApi = await initImbueAPIInfo();
     const user: User | any = await getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
-
     const briefOwners: string[] = [user?.web3_address];
     const freelancerAddress: string = freelancer.web3_address;
     const budget: bigint = BigInt(totalCost * 1e12);
     const initialContribution: bigint = BigInt(totalCost * 1e12);
-    application.status_id = OffchainProjectState.Accepted;
     delete application.modified;
     const briefHash = blake2AsHex(JSON.stringify(application));
     const currencyId = application.currency_id;
@@ -80,17 +79,20 @@ export const HirePopup = ({
       currencyId,
       milestones
     );
+
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
           console.log("***** success");
           setSuccess(true)
           const briefId = brief.id;
-          await changeBriefApplicationStatus(
+          const resp =  await changeBriefApplicationStatus(
             briefId!,
             application.id,
             OffchainProjectState.Accepted
           );
+          setProjectId(resp.project_id);
+          application.status_id = OffchainProjectState.Accepted;
           console.log(result.eventData);
         } else if (result.txError) {
           console.log("***** failed");
@@ -275,14 +277,14 @@ export const HirePopup = ({
         setOpen={setSuccess}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button
-            onClick={() => router.push(`/briefs`)}
+            onClick={() => router.push(`/projects/${projectId}`)}
             className='primary-btn in-dark w-button w-full !m-0'>
-            Go to Project
+            See Project
           </button>
           <button
-            onClick={() => router.push(`/dashboard`)}
+            onClick={() => setSuccess(false)}
             className='underline text-xs lg:text-base font-bold'>
-            Go to Dashboard
+            Continue
           </button>
         </div>
       </SuccessScreen>

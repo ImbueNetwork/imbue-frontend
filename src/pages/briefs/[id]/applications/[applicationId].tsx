@@ -47,18 +47,18 @@ const ApplicationPreview = (): JSX.Element => {
 	const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
 	const [targetUser, setTargetUser] = useState<User | null>(null);
 	const [briefOwner, setBriefOwner] = useState<any>();
-	const applicationStatus = OffchainProjectState[application?.status_id];
-	const isApplicationOwner = user?.id == application?.user_id;
-	const isBriefOwner = user?.id == brief?.user_id;
 	const [loading, setLoading] = useState<boolean>(false);
+
+	const applicationStatus = OffchainProjectState[application?.status_id];
+	const isApplicationOwner = user && application && user?.id == application?.user_id;
+	const isBriefOwner = user && brief && user?.id == brief?.user_id;
 
 	const router = useRouter();
 	const { id: briefId, applicationId }: any = router.query;
 
-	const mobileView = useMediaQuery('(max-width:480px)');
-
 	useEffect(() => {
 		const getSetUpData = async () => {
+			setLoading(true)
 			const applicationResponse = await fetchProject(applicationId);
 			const freelancerUser = await fetchUser(Number(applicationResponse?.user_id));
 			const freelancerResponse = await getFreelancerProfile(freelancerUser?.username);
@@ -66,6 +66,7 @@ const ApplicationPreview = (): JSX.Element => {
 			const brief: Brief | undefined = await getBrief(briefId);
 			const userResponse = await getCurrentUser();
 
+			setLoading(false)
 			setFreelancer(freelancerResponse);
 			setBrief(brief);
 			setApplication(applicationResponse);
@@ -80,7 +81,9 @@ const ApplicationPreview = (): JSX.Element => {
 	useEffect(() => {
 		async function setup() {
 			if (brief) {
+				setLoading(true)
 				const briefOwner: User = await fetchUser(brief?.user_id);
+				setLoading(false)
 				setBriefOwner(briefOwner);
 			}
 		}
@@ -153,7 +156,7 @@ const ApplicationPreview = (): JSX.Element => {
 		const newMilestones = [...milestones]
 		newMilestones.splice(index, 1)
 		setMilestones(newMilestones);
-	  };
+	};
 
 	const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
 		setCurrencyId(Number(event.target.value));
@@ -251,9 +254,9 @@ const ApplicationPreview = (): JSX.Element => {
 					</div>
 				}
 				<div>
-					<div className="w-full flex flex-col gap-[20px] bg-theme-grey-dark border border-light-white rounded-[20px] py-4 lg:py-[20px] ">
-						<div className="flex flex-row justify-between mx-5 lg:mx-14 -mb-3">
-							<h3 className="flex text-lg lg:text-xl leading-[1.5] font-bold m-0 p-0">
+					<div className="w-full flex flex-col bg-theme-grey-dark border border-light-white rounded-2xl py-4 lg:py-5 ">
+						<div className="flex flex-row justify-between mx-5 lg:mx-14">
+							<h3 className="flex text-lg lg:text-xl leading-[1.5] font-bold m-0 p-0 mb-5">
 								Milestones
 								{!isEditingBio && isApplicationOwner && (
 									<div className="ml-[10px] relative top-[-2px]" onClick={() => setIsEditingBio(true)}>
@@ -263,18 +266,20 @@ const ApplicationPreview = (): JSX.Element => {
 							</h3>
 							<h3 className="flex text-lg lg:text-xl leading-[1.5] font-bold m-0 p-0">Client&apos;s budget: ${Number(brief?.budget).toLocaleString()}</h3>
 						</div>
-						<hr className="separator" />
-						{isEditingBio && <p className="mx-5 lg:mx-14 lg:text-xl font-bold">How many milestone do you want to include?</p>}
+
+						{isEditingBio && <p className="px-5 lg:px-14 lg:text-xl font-bold border-t border-t-light-white py-5">How many milestone do you want to include?</p>}
 						<div className="milestone-list lg:mb-5">
 							{milestones?.map?.(({ name, amount }, index) => {
 								const percent = Number(((100 * (amount ?? 0)) / totalCostWithoutFee)?.toFixed?.(0));
 								return (
 									<div className="flex flex-row items-start w-full border-t border-t-light-white last:border-b-0 px-5 py-9 lg:px-14 relative" key={index}>
-										<span
-											onClick={() => onRemoveMilestone(index)}
-											className="absolute top-1 right-2 lg:right-4 text-sm lg:text-xl text-light-grey font-bold hover:border-red-500 hover:text-red-500 cursor-pointer">
-											x
-										</span>
+										{
+											isEditingBio && <span
+												onClick={() => onRemoveMilestone(index)}
+												className="absolute top-1 right-2 lg:right-4 text-sm lg:text-xl text-light-grey font-bold hover:border-red-500 hover:text-red-500 cursor-pointer">
+												x
+											</span>
+										}
 										<div className="mr-4 lg:mr-9 text-lg">{index + 1}.</div>
 										<div className="flex flex-row justify-between w-full">
 											<div className="w-3/5 lg:w-1/2">
