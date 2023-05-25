@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { FiFilter } from "react-icons/fi";
 import { useWindowSize } from "@/hooks";
 import Pagination from "rc-pagination";
+import FullScreenLoader from "@/components/FullScreenLoader";
 
 export const strToIntRange = (strList: any) => {
   return Array.isArray(strList)
@@ -18,6 +19,7 @@ const Briefs = (): JSX.Element => {
   const [briefs, setBriefs] = useState<Brief[]>([]);
   const [briefs_total, setBriefsTotal] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState<boolean>(false);
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const router = useRouter();
   const size = useWindowSize();
@@ -170,7 +172,9 @@ const Briefs = (): JSX.Element => {
   useEffect(() => {
     const fetchAndSetBriefs = async () => {
       if (!Object.keys(router?.query).length) {
+        setLoading(true);
         const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
+        setLoading(false);
         setBriefs(briefs_all?.currentData);
         setBriefsTotal(briefs_all?.totalBriefs);
       } else {
@@ -230,7 +234,9 @@ const Briefs = (): JSX.Element => {
           });
           filter = { ...filter, length_range: strToIntRange(lengthRange) };
         }
+        setLoading(true);
         const result: any = await callSearchBriefs(filter);
+        setLoading(false);
         setBriefs(result?.currentData);
         setBriefsTotal(result?.totalBriefs);
       }
@@ -342,12 +348,15 @@ const Briefs = (): JSX.Element => {
         items_per_page: itemsPerPage,
         page: currentPage,
       };
-
+      setLoading(true);
       const briefs_filtered: any = await callSearchBriefs(filter);
+      setLoading(false);
       setBriefs(briefs_filtered?.currentData);
       setBriefsTotal(briefs_filtered?.totalBriefs);
     } else {
+      setLoading(true);
       const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
+      setLoading(false);
       setBriefs(briefs_all?.currentData);
       setBriefsTotal(briefs_all?.totalBriefs);
     }
@@ -388,6 +397,7 @@ const Briefs = (): JSX.Element => {
   const pageinationIconClassName =
     "h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary";
 
+  if (loading) return <FullScreenLoader />;
   return (
     <div className="search-briefs-container px-[15px] lg:px-[40px]">
       <div

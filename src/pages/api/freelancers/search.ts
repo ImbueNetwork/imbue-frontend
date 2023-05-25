@@ -39,8 +39,8 @@ export default nextConnect().post(
         ]);
 
         const { currentData, totalItems } = await models.paginatedData(
-          filter?.page,
-          filter?.items_per_page,
+          filter?.page || 1,
+          filter?.items_per_page || 5,
           freelancers
         );
 

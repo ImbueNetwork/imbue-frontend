@@ -27,7 +27,7 @@ const Freelancers = (): JSX.Element => {
   const [languages, setLanguages] = useState<Item[]>();
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const [itemsPerPage, setNumItemsPerPage] = useState<number>(6);
+  const [itemsPerPage, setNumItemsPerPage] = useState<number>(5);
 
   const router = useRouter();
   const size = useWindowSize();
@@ -51,10 +51,11 @@ const Freelancers = (): JSX.Element => {
 
   useEffect(() => {
     const setFilters = async () => {
+      setLoading(true);
       const data:
         | { currentData: Freelancer[]; totalFreelancers: number }
         | any = await getAllFreelancers(itemsPerPage, currentPage);
-
+      setLoading(false);
       let combinedSkills = Array.prototype.concat.apply(
         [],
         data?.currentData?.map((x: any) => x.skills)
@@ -271,15 +272,18 @@ const Freelancers = (): JSX.Element => {
         items_per_page: itemsPerPage,
         page: currentPage,
       };
-
+      setLoading(true);
       const filteredFreelancers: any = await callSearchFreelancers(filter);
+      setLoading(false);
       setFreelancers(filteredFreelancers?.currentData);
       setFreelancersTotal(filteredFreelancers?.totalFreelancers);
     } else {
+      setLoading(true);
       const allFreelancers: any = await getAllFreelancers(
         itemsPerPage,
         currentPage
       );
+      setLoading(false);
       setFreelancers(allFreelancers?.currentData);
       setFreelancersTotal(allFreelancers?.totalFreelancers);
     }

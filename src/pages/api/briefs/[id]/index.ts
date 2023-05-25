@@ -46,8 +46,8 @@ export default nextConnect()
         ]);
 
         const { currentData, totalItems } = await models.paginatedData(
-          data.page,
-          data.items_per_page,
+          data?.page || 1,
+          data.items_per_page || 5,
           briefs
         );
 

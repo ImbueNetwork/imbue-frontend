@@ -42,8 +42,8 @@ export default nextConnect()
             }),
           ]);
           const { currentData, totalItems } = await paginatedData(
-            Number(data.page),
-            Number(data.items_per_page),
+            Number(data?.page || 1),
+            Number(data?.items_per_page || 5),
             freelancers
           );
 
