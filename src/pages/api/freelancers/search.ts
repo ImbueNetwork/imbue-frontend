@@ -3,22 +3,28 @@ import db from "../db";
 import * as models from "../models";
 import { Freelancer, fetchItems, searchFreelancers } from "../models";
 
+import nextConnect from "next-connect";
 
-import nextConnect from 'next-connect'
-
-export default nextConnect()
-  .put(async (req: NextApiRequest, res: NextApiResponse) => {
+export default nextConnect().post(
+  async (req: NextApiRequest, res: NextApiResponse) => {
     const { method } = req;
+
     db.transaction(async (tx) => {
       try {
         const filter: models.FreelancerSqlFilter = req.body;
-        console.log(filter);
         const freelancers: Array<Freelancer> = await searchFreelancers(
           tx,
           filter
         );
+
+        const { currentData, totalItems } = await models.paginatedData(
+          filter?.page || 1,
+          filter?.items_per_page || 5,
+          freelancers
+        );
+
         await Promise.all([
-          ...freelancers.map(async (freelancer: any) => {
+          ...currentData.map(async (freelancer: any) => {
             freelancer.skills = await fetchItems(
               freelancer.skill_ids,
               "skills"
@@ -38,9 +44,10 @@ export default nextConnect()
           }),
         ]);
 
-        res.send(freelancers);
+        res.status(200).json({ currentData, totalFreelancers: totalItems });
       } catch (e) {
         new Error(`Failed to search all freelancers`, { cause: e as Error });
       }
     });
-  });
+  }
+);
