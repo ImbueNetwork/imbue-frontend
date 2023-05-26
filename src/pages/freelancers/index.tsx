@@ -272,18 +272,14 @@ const Freelancers = (): JSX.Element => {
         items_per_page: itemsPerPage,
         page: currentPage,
       };
-      setLoading(true);
       const filteredFreelancers: any = await callSearchFreelancers(filter);
-      setLoading(false);
       setFreelancers(filteredFreelancers?.currentData);
       setFreelancersTotal(filteredFreelancers?.totalFreelancers);
     } else {
-      setLoading(true);
       const allFreelancers: any = await getAllFreelancers(
         itemsPerPage,
         currentPage
       );
-      setLoading(false);
       setFreelancers(allFreelancers?.currentData);
       setFreelancersTotal(allFreelancers?.totalFreelancers);
     }

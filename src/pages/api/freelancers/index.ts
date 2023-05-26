@@ -21,8 +21,13 @@ export default nextConnect()
     db.transaction(async (tx) => {
       try {
         await fetchAllFreelancers()(tx).then(async (freelancers: any) => {
+          const { currentData, totalItems } = await paginatedData(
+            Number(data?.page || 1),
+            Number(data?.items_per_page || 5),
+            freelancers
+          );
           await Promise.all([
-            ...freelancers.map(async (freelancer: any) => {
+            ...currentData.map(async (freelancer: any) => {
               freelancer.skills = await fetchItems(
                 freelancer.skill_ids,
                 "skills"
@@ -41,11 +46,6 @@ export default nextConnect()
               )(tx);
             }),
           ]);
-          const { currentData, totalItems } = await paginatedData(
-            Number(data?.page || 1),
-            Number(data?.items_per_page || 5),
-            freelancers
-          );
 
           res.status(200).json({ currentData, totalFreelancers: totalItems });
         });

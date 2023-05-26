@@ -60,13 +60,16 @@ describe("Briefs component", () => {
     | ((arg0: string) => any[]);
 
   beforeEach(async () => {
-    briefsComponent = await act(async () => render(<Briefs />));
-    const { container, queryAllByTestId, getAllByText } = await act(async () =>
-      render(<Briefs />)
-    );
-    appContainer = container;
-    appGetAllByText = getAllByText;
-    appQueryAllByTestId = queryAllByTestId;
+    await act(async () => {
+      await waitFor(() => {
+        briefsComponent = render(<Briefs />);
+      });
+    });
+
+    appContainer = briefsComponent.container;
+    appGetAllByText = briefsComponent.getAllByText;
+    appQueryAllByTestId = briefsComponent.queryAllByTestId;
+
     await waitFor(() =>
       expect(appContainer.getElementsByClassName("brief-title")).toHaveLength(3)
     );

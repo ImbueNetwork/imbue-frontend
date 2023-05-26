@@ -34,9 +34,15 @@ export default nextConnect()
       try {
         const briefs: Array<Brief> = await models.searchBriefs(tx, data);
 
+        const { currentData, totalItems } = await models.paginatedData(
+          Number(data?.page || 1),
+          Number(data?.items_per_page || 5),
+          briefs
+        );
+
         await Promise.all([
-          briefs,
-          ...briefs.map(async (brief: any) => {
+          currentData,
+          ...currentData.map(async (brief: any) => {
             brief.skills = await fetchItems(brief.skill_ids, "skills")(tx);
             brief.industries = await fetchItems(
               brief.industry_ids,
@@ -44,12 +50,6 @@ export default nextConnect()
             )(tx);
           }),
         ]);
-
-        const { currentData, totalItems } = await models.paginatedData(
-          data?.page || 1,
-          data.items_per_page || 5,
-          briefs
-        );
 
         res.status(200).json({ currentData, totalBriefs: totalItems });
       } catch (e) {

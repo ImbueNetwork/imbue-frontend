@@ -17,8 +17,14 @@ export default nextConnect().post(
           filter
         );
 
+        const { currentData, totalItems } = await models.paginatedData(
+          filter?.page || 1,
+          filter?.items_per_page || 5,
+          freelancers
+        );
+
         await Promise.all([
-          ...freelancers.map(async (freelancer: any) => {
+          ...currentData.map(async (freelancer: any) => {
             freelancer.skills = await fetchItems(
               freelancer.skill_ids,
               "skills"
@@ -37,12 +43,6 @@ export default nextConnect().post(
             )(tx);
           }),
         ]);
-
-        const { currentData, totalItems } = await models.paginatedData(
-          filter?.page || 1,
-          filter?.items_per_page || 5,
-          freelancers
-        );
 
         res.status(200).json({ currentData, totalFreelancers: totalItems });
       } catch (e) {

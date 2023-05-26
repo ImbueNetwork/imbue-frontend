@@ -172,9 +172,7 @@ const Briefs = (): JSX.Element => {
   useEffect(() => {
     const fetchAndSetBriefs = async () => {
       if (!Object.keys(router?.query).length) {
-        setLoading(true);
         const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
-        setLoading(false);
         setBriefs(briefs_all?.currentData);
         setBriefsTotal(briefs_all?.totalBriefs);
       } else {
@@ -234,9 +232,7 @@ const Briefs = (): JSX.Element => {
           });
           filter = { ...filter, length_range: strToIntRange(lengthRange) };
         }
-        setLoading(true);
         const result: any = await callSearchBriefs(filter);
-        setLoading(false);
         setBriefs(result?.currentData);
         setBriefsTotal(result?.totalBriefs);
       }
@@ -348,15 +344,14 @@ const Briefs = (): JSX.Element => {
         items_per_page: itemsPerPage,
         page: currentPage,
       };
-      setLoading(true);
+
       const briefs_filtered: any = await callSearchBriefs(filter);
-      setLoading(false);
+
       setBriefs(briefs_filtered?.currentData);
       setBriefsTotal(briefs_filtered?.totalBriefs);
     } else {
-      setLoading(true);
       const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
-      setLoading(false);
+
       setBriefs(briefs_all?.currentData);
       setBriefsTotal(briefs_all?.totalBriefs);
     }
