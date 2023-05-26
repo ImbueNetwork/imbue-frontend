@@ -1,32 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { Freelancer, FreelancerSqlFilter, Item } from "../../model";
-import * as utils from "../../utils";
-import styles from '@/styles/modules/freelancers.module.css'
+import styles from "@/styles/modules/freelancers.module.css";
 import {
   callSearchFreelancers,
   getAllFreelancers,
 } from "../../redux/services/freelancerService";
-import {
-  FreelancerFilterOption,
-  FilterOption,
-} from "../../types/freelancerTypes";
+import { FreelancerFilterOption } from "../../types/freelancerTypes";
 import FreelancerFilter from "../../components/Freelancers/FreelancerFilter";
 import Image from "next/image";
-import profilePic from "../../assets/images/profile-image.png";
 import { useRouter } from "next/router";
 import { strToIntRange } from "../briefs";
 import { useWindowSize } from "@/hooks";
 import { FiFilter } from "react-icons/fi";
-import { GetServerSidePropsContext } from "next";
 import LoadingFreelancers from "../../components/Freelancers/FreelancersLoading";
+import { FreelancerStepProps } from "@/types/proposalsTypes";
+import Pagination from "rc-pagination";
 
 const Freelancers = (): JSX.Element => {
-  const [freelancers, setFreelancers] = useState<Freelancer[] | undefined>();
+  const [freelancers, setFreelancers] = useState<
+    Freelancer[] | undefined | any
+  >();
+  const [freelancers_total, setFreelancersTotal] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [skills, setSkills] = useState<Item[]>();
   const [services, setServices] = useState<Item[]>();
   const [languages, setLanguages] = useState<Item[]>();
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true)
+  const [loading, setLoading] = useState<boolean>(true);
+  const [itemsPerPage, setNumItemsPerPage] = useState<number>(5);
 
   const router = useRouter();
   const size = useWindowSize();
@@ -50,37 +51,39 @@ const Freelancers = (): JSX.Element => {
 
   useEffect(() => {
     const setFilters = async () => {
-
-      const data : Freelancer[] = await getAllFreelancers();
-
+      setLoading(true);
+      const data:
+        | { currentData: Freelancer[]; totalFreelancers: number }
+        | any = await getAllFreelancers(itemsPerPage, currentPage);
+      setLoading(false);
       let combinedSkills = Array.prototype.concat.apply(
         [],
-        data.map((x) => x.skills)
+        data?.currentData?.map((x: any) => x.skills)
       ) as Item[];
       const dedupedSkills = await dedupeArray(combinedSkills);
 
       var combinedServices = Array.prototype.concat.apply(
         [],
-        data.map((x) => x.services)
+        data?.currentData?.map((x: any) => x.services)
       ) as Item[];
       const dedupedServices = await dedupeArray(combinedServices);
 
       var combinedLanguages = Array.prototype.concat.apply(
         [],
-        data.map((x) => x.languages)
+        data?.currentData?.map((x: any) => x.languages)
       ) as Item[];
       const dedupedLanguages = await dedupeArray(combinedLanguages);
 
       setSkills(dedupedSkills);
       setServices(dedupedServices);
       setLanguages(dedupedLanguages);
-      setFreelancers(data)
-      setLoading(false)
-    }
+      setFreelancers(data?.currentData);
+      setFreelancersTotal(data?.totalFreelancers);
+      setLoading(false);
+    };
 
-    setFilters()
-  }, [])
-
+    setFilters();
+  }, [currentPage, itemsPerPage]);
 
   const skillsFilter = {
     filterType: FreelancerFilterOption.Services,
@@ -121,6 +124,9 @@ const Freelancers = (): JSX.Element => {
       return filter;
     }),
   };
+
+  const pageinationIconClassName =
+    "h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary";
 
   useEffect(() => {
     const fetchAndSetBriefs = async () => {
@@ -238,7 +244,7 @@ const Freelancers = (): JSX.Element => {
             default:
               console.log(
                 "Invalid filter option selected or unimplemented. type:" +
-                filterType
+                  filterType
               );
           }
         }
@@ -263,13 +269,19 @@ const Freelancers = (): JSX.Element => {
         services_range: servicesRange,
         languages_range: languagesRange,
         search_input: search_value,
+        items_per_page: itemsPerPage,
+        page: currentPage,
       };
-
-      const filteredFreelancers = await callSearchFreelancers(filter);
-      setFreelancers(filteredFreelancers);
+      const filteredFreelancers: any = await callSearchFreelancers(filter);
+      setFreelancers(filteredFreelancers?.currentData);
+      setFreelancersTotal(filteredFreelancers?.totalFreelancers);
     } else {
-      const allFreelancers = await getAllFreelancers();
-      setFreelancers(allFreelancers);
+      const allFreelancers: any = await getAllFreelancers(
+        itemsPerPage,
+        currentPage
+      );
+      setFreelancers(allFreelancers?.currentData);
+      setFreelancersTotal(allFreelancers?.totalFreelancers);
     }
   };
 
@@ -277,7 +289,33 @@ const Freelancers = (): JSX.Element => {
     setFilterVisible(!filterVisble);
   };
 
-  if(loading) return <LoadingFreelancers/>
+  const PageItem = (props: any) => {
+    return (
+      <div
+        className={`h-[32px] rounded-[4px] hover:bg-[--theme-primary] hover:text-black border border-primary w-[32px] cursor-pointer pt-1 items-center text-center text-sm !font-bold mr-6 ${
+          currentPage === parseInt(props.page) ? "text-black" : "text-white"
+        }
+        ${
+          currentPage === parseInt(props.page)
+            ? "bg-[--theme-primary]"
+            : "bg-transparent"
+        }
+        `}
+      >
+        {props.page}
+      </div>
+    );
+  };
+
+  const arrayMultipleOfFiveWithin100 = () => {
+    let arr = [];
+    for (let i = 5; i <= 100; i += 5) {
+      arr.push(i);
+    }
+    return arr;
+  };
+
+  if (loading) return <LoadingFreelancers />;
 
   return (
     <div className="px-[15px] lg:px-[40px]">
@@ -289,7 +327,6 @@ const Freelancers = (): JSX.Element => {
               size?.width <= 750 ? (filterVisble ? "block" : "none") : "block",
           }}
         >
-          {/* <h1 className="mb-5">Freelancers</h1> */}
           <div className={styles.filterHeading}>Filter By</div>
           <FreelancerFilter
             label={skillsFilter.label}
@@ -348,45 +385,99 @@ const Freelancers = (): JSX.Element => {
               placeholder="Search"
             />
             <div className="search-result">
-              <span className="result-count">{freelancers?.length}</span>
+              <span className="result-count">{freelancers_total}</span>
               <span> freelancers found</span>
+
+              <span className="ml-8">
+                number of freelancers per page
+                <select
+                  className="ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none"
+                  onChange={(e) => {
+                    setNumItemsPerPage(parseInt(e.target.value));
+                  }}
+                  value={itemsPerPage}
+                >
+                  {arrayMultipleOfFiveWithin100()?.map((item, itemIndex) => (
+                    <option key={itemIndex} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </span>
             </div>
           </div>
           <div className={`${styles.freelancers} max-width-750px:!px-0`}>
-            { freelancers?.length && freelancers
-              .slice(0, 10)
-              .map(({ title, username, display_name, skills, profile_image}, index) => (
-                <div className={styles.freelancer} key={index}>
-                  <div className={styles.freelancerImageContainer}>
-                    <Image
-                      src={ profile_image ?? require("@/assets/images/profile-image.png")}
-                      className={styles.freelancerProfilePic}
-                      height={300}
-                      width={300}
-                      alt=""
-                    />
-                    <div className="dark-layer" />
-                  </div>
-                  <div className={styles.freelancerInfo}>
-                    <h3>{display_name}</h3>
-                    <h5>{title}</h5>
-                    <div className={styles.skills}>
-                      {skills?.slice(0, 3).map((skill, index) => (
-                        <p className={styles.skill} key={index}>
-                          {skill.name}
-                        </p>
-                      ))}
+            {freelancers?.length &&
+              freelancers
+                ?.slice?.(0, 10)
+                ?.map?.(
+                  (
+                    {
+                      title,
+                      username,
+                      display_name,
+                      skills,
+                      profile_image,
+                    }: any,
+                    index: number
+                  ) => (
+                    <div className={styles.freelancer} key={index}>
+                      <div className={styles.freelancerImageContainer}>
+                        <Image
+                          src={
+                            profile_image ??
+                            require("@/assets/images/profile-image.png")
+                          }
+                          className={styles.freelancerProfilePic}
+                          height={300}
+                          width={300}
+                          alt=""
+                        />
+                        <div className="dark-layer" />
+                      </div>
+                      <div className={styles.freelancerInfo}>
+                        <h3>{display_name}</h3>
+                        <h5>{title}</h5>
+                        <div className={styles.skills}>
+                          {skills
+                            ?.slice(0, 3)
+                            .map((skill: any, index: number) => (
+                              <p className={styles.skill} key={index}>
+                                {skill.name}
+                              </p>
+                            ))}
+                        </div>
+                      </div>
+                      <button
+                        className={`${styles.primaryButton} w-2/3`}
+                        onClick={() => redirectToProfile(username)}
+                      >
+                        View
+                      </button>
                     </div>
-                  </div>
-                  <button
-                    className={`${styles.primaryButton} w-2/3`}
-                    onClick={() => redirectToProfile(username)}
-                  >
-                    View
-                  </button>
-                </div>
-              ))}
+                  )
+                )}
           </div>
+          <Pagination
+            pageSize={itemsPerPage}
+            total={freelancers_total}
+            onChange={(page: number, pageSize: number) => setCurrentPage(page)}
+            className="flex flex-row items-center my-10 px-10"
+            itemRender={(page, type, originalElement) => {
+              if (type === "page") {
+                return <PageItem page={page} />;
+              }
+              return originalElement;
+            }}
+            prevIcon={<div className={pageinationIconClassName}>{"<"}</div>}
+            nextIcon={<div className={pageinationIconClassName}>{">"}</div>}
+            jumpNextIcon={
+              <div className={pageinationIconClassName}>{">>"}</div>
+            }
+            jumpPrevIcon={
+              <div className={pageinationIconClassName}>{"<<"}</div>
+            }
+          />
         </div>
       </div>
     </div>

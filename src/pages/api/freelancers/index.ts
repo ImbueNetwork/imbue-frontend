@@ -6,6 +6,7 @@ import {
   fetchItems,
   fetchProfileImages,
   insertFreelancerDetails,
+  paginatedData,
   upsertItems,
 } from "../models";
 import { verifyUserIdFromJwt } from "../auth/common";
@@ -14,13 +15,19 @@ import nextConnect from "next-connect";
 
 export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
-    const { body, method } = req;
+    const { body, method, query } = req;
+    const data = query;
     const freelancer = body.freelancer;
     db.transaction(async (tx) => {
       try {
         await fetchAllFreelancers()(tx).then(async (freelancers: any) => {
+          const { currentData, totalItems } = await paginatedData(
+            Number(data?.page || 1),
+            Number(data?.items_per_page || 5),
+            freelancers
+          );
           await Promise.all([
-            ...freelancers.map(async (freelancer: any) => {
+            ...currentData.map(async (freelancer: any) => {
               freelancer.skills = await fetchItems(
                 freelancer.skill_ids,
                 "skills"
@@ -39,7 +46,8 @@ export default nextConnect()
               )(tx);
             }),
           ]);
-          res.send(freelancers);
+
+          res.status(200).json({ currentData, totalFreelancers: totalItems });
         });
       } catch (e) {
         new Error(`Failed to fetch all freelancers`, { cause: e as Error });
