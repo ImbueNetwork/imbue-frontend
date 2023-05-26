@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import React, { useState } from 'react';
-import { Brief, Freelancer, Project, OffchainProjectState} from '@/model';
+import { Brief, Freelancer, Project, OffchainProjectState } from '@/model';
 import { Badge, Menu, MenuItem, useMediaQuery } from '@mui/material';
 import { useRouter } from 'next/router';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -22,6 +22,7 @@ type BriefOwnerHeaderProps = {
     imbueFee: number;
     totalCost: number;
     setLoading: Function;
+    balance: string | undefined;
 }
 
 const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
@@ -36,6 +37,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         imbueFee,
         totalCost,
         setLoading,
+        balance
     } = props
 
     const [openPopup, setOpenPopup] = useState<boolean>(false);
@@ -60,14 +62,19 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                     src={require('@/assets/images/profile-image.png')}
                     priority
                     alt="profileImage" />
-                <Badge badgeContent={"Hired"} color="primary" invisible={!(application?.status_id === OffchainProjectState.Accepted)}>
-                    <p className="text-2xl font-bold">{freelancer?.display_name}</p>
-                </Badge>
+                <div>
+                    <Badge badgeContent={"Hired"} color="primary" invisible={!(application?.status_id === OffchainProjectState.Accepted)}>
+                        <p className="text-2xl font-bold capitalize">{freelancer?.display_name}</p>
+                    </Badge>
+                    <p className='text-sm mt-2'>
+                        Balance : {balance}
+                    </p>
+                </div>
             </div>
             {
                 <p className="text-base text-primary max-w-[50%] break-words">@
                     {(mobileView && freelancer?.username?.length > 16)
-                        ? `${freelancer?.username.substr(0, 16)}...`
+                        ? `${freelancer?.username?.substr(0, 16)}...`
                         : freelancer?.username
                     }
                 </p>

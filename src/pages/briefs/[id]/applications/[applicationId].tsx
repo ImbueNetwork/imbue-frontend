@@ -22,6 +22,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import BriefOwnerHeader from '@/components/Application/BriefOwnerHeader';
 import ApplicationOwnerHeader from '@/components/Application/ApplicationOwnerHeader';
+import SuccessScreen from '@/components/SuccessScreen';
+import ErrorScreen from '@/components/ErrorScreen';
 
 interface MilestoneItem {
 	name: string;
@@ -48,10 +50,14 @@ const ApplicationPreview = (): JSX.Element => {
 	const [targetUser, setTargetUser] = useState<User | null>(null);
 	const [briefOwner, setBriefOwner] = useState<any>();
 	const [loading, setLoading] = useState<boolean>(false);
+	const [balance, setBalance] = useState<string>()
 
 	const applicationStatus = OffchainProjectState[application?.status_id];
 	const isApplicationOwner = user && application && user?.id == application?.user_id;
 	const isBriefOwner = user && brief && user?.id == brief?.user_id;
+
+	const [error, setError] = useState<any>()
+	const [success, setSuccess] = useState<boolean>(false)
 
 	const router = useRouter();
 	const { id: briefId, applicationId }: any = router.query;
@@ -65,6 +71,23 @@ const ApplicationPreview = (): JSX.Element => {
 
 			const brief: Brief | undefined = await getBrief(briefId);
 			const userResponse = await getCurrentUser();
+
+
+			const imbueApi = await initImbueAPIInfo();
+			const chainService = new ChainService(imbueApi, user);
+
+			console.log({
+				web3: userResponse.web3_address,
+				currencyId: applicationResponse?.currency_id
+			})
+
+			if (!userResponse.web3_address) {
+				setBalance("No Wallet Found")
+			}
+			else if (applicationResponse?.currency_id !== undefined) {
+				const balance: any = await chainService.getBalance(userResponse.web3_address, applicationResponse?.currency_id)
+				setBalance(balance);
+			}
 
 			setLoading(false)
 			setFreelancer(freelancerResponse);
@@ -96,32 +119,45 @@ const ApplicationPreview = (): JSX.Element => {
 
 	const updateProject = async (chainProjectId?: number) => {
 		setLoading(true);
-		const resp = await fetch(`${config.apiBase}/project/${application.id}`, {
-			headers: config.postAPIHeaders,
-			method: 'put',
-			body: JSON.stringify({
-				user_id: user.id,
-				name: `${brief.headline}`,
-				total_cost_without_fee: totalCostWithoutFee,
-				imbue_fee: imbueFee,
-				currency_id: currencyId,
-				milestones: milestones
-					.filter((m) => m.amount !== undefined)
-					.map((m) => {
-						return {
-							name: m.name,
-							amount: m.amount,
-							percentage_to_unlock: (((m.amount ?? 0) / totalCostWithoutFee) * 100).toFixed(0),
-						};
-					}),
-				required_funds: totalCost,
-				chain_project_id: chainProjectId,
-			}),
-		});
+		try {
+			const resp = await fetch(`${config.apiBase}/project/${application.id}`, {
+				headers: config.postAPIHeaders,
+				method: 'put',
+				body: JSON.stringify({
+					user_id: user.id,
+					name: `${brief.headline}`,
+					total_cost_without_fee: totalCostWithoutFee,
+					imbue_fee: imbueFee,
+					currency_id: currencyId,
+					milestones: milestones
+						.filter((m) => m.amount !== undefined)
+						.map((m) => {
+							return {
+								name: m.name,
+								amount: m.amount,
+								percentage_to_unlock: (((m.amount ?? 0) / totalCostWithoutFee) * 100).toFixed(0),
+							};
+						}),
+					required_funds: totalCost,
+					chain_project_id: chainProjectId,
+				}),
+			});
 
-		if (resp.ok) {
+			console.log(resp);
+
+			if (resp.status === 201 || resp.status === 200) {
+				setSuccess(true)
+				setIsEditingBio(false);
+			}
+			else {
+				setError({ message: `${resp.status} ${resp.statusText}` })
+			}
+		} catch (error) {
+			setError(error)
+			console.log(error);
+		}
+		finally {
 			setLoading(false);
-			setIsEditingBio(false);
 		}
 	};
 
@@ -222,6 +258,7 @@ const ApplicationPreview = (): JSX.Element => {
 						imbueFee,
 						totalCost,
 						setLoading,
+						balance
 					}} />
 				)}
 
@@ -442,6 +479,40 @@ const ApplicationPreview = (): JSX.Element => {
 				}}
 				redirectUrl={router.pathname}
 			/>
+
+			<SuccessScreen
+				title={"You have successfully updated this brief"}
+				open={success}
+				setOpen={() => setSuccess(false)}
+			>
+				<div className='flex flex-col gap-4 w-1/2'>
+					<button
+						onClick={() => setSuccess(false)}
+						className='primary-btn in-dark w-button w-full !m-0'>
+						Continue
+					</button>
+					<button
+						onClick={() => router.push(`/dashboard`)}
+						className='underline text-xs lg:text-base font-bold'>
+						Go to Dashboard
+					</button>
+				</div>
+			</SuccessScreen>
+
+			<ErrorScreen {...{ error, setError }}>
+				<div className='flex flex-col gap-4 w-1/2'>
+					<button
+						onClick={() => setError(null)}
+						className='primary-btn in-dark w-button w-full !m-0'>
+						Try Again
+					</button>
+					<button
+						onClick={() => router.push(`/dashboard`)}
+						className='underline text-xs lg:text-base font-bold'>
+						Go to Dashboard
+					</button>
+				</div>
+			</ErrorScreen>
 		</div>
 	);
 };

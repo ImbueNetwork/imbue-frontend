@@ -40,8 +40,6 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
     const [error, setError] = useState<any>()
     const [projectId, setProjectId] = useState<string>()
 
-    console.log(projectId);
-
     const router = useRouter();
     const { applicationId }: any = router.query;
 
