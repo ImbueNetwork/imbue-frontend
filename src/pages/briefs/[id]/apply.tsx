@@ -48,8 +48,8 @@ export const SubmitProposal = (): JSX.Element => {
   const getUserAndFreelancer = async () => {
     const userResponse = await getCurrentUser();
     setUser(userResponse);
-    const freelancer = await getFreelancerProfile(userResponse?.username);
-    if (!freelancer) {
+    const freelancer: any = await getFreelancerProfile(userResponse?.username);
+    if (!freelancer?.id) {
       router.push(`/freelancers/new`);
     }
   };
@@ -100,11 +100,18 @@ export const SubmitProposal = (): JSX.Element => {
   };
 
   const handleSelectAccount = async (account: WalletAccount) => {
-    setLoading(true);
-    await selectAccount(account);
-    setLoading(false);
-    setShowPolkadotAccounts(false);
-    await insertProject();
+    try {
+      setLoading(true);
+      await selectAccount(account);
+      await insertProject();
+    } catch (error) {
+      setError(error)
+      console.log(error);
+    }
+    finally {
+      setLoading(false);
+      setShowPolkadotAccounts(false);
+    }
   };
 
   async function handleSubmit() {

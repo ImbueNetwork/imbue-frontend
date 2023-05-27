@@ -24,6 +24,9 @@ import BriefOwnerHeader from '@/components/Application/BriefOwnerHeader';
 import ApplicationOwnerHeader from '@/components/Application/ApplicationOwnerHeader';
 import SuccessScreen from '@/components/SuccessScreen';
 import ErrorScreen from '@/components/ErrorScreen';
+import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
+import { SignerResult } from "@polkadot/api/types";
+
 
 interface MilestoneItem {
 	name: string;
@@ -58,42 +61,69 @@ const ApplicationPreview = (): JSX.Element => {
 
 	const [error, setError] = useState<any>()
 	const [success, setSuccess] = useState<boolean>(false)
+	const [openAccountChoice, setOpenAccountChoice] = useState<boolean>(false);
+
+	const accountSelected = async (account: WalletAccount): Promise<any> => {
+		try {
+			const result = await getAccountAndSign(account);
+			const resp = await authorise(
+				result?.signature as SignerResult,
+				result?.challenge!,
+				account
+			);
+			if (resp.status === 200 || resp.status === 201) {
+				setBalance(await getBalance(account.address, application.currency_id))
+			}
+			else {
+				setError({ message: "Could not connect wallet. Please Try again" })
+			}
+		} catch (error) {
+			setError(error)
+			console.log(error);
+		}
+	};
 
 	const router = useRouter();
 	const { id: briefId, applicationId }: any = router.query;
 
-	useEffect(() => {
-		const getSetUpData = async () => {
-			setLoading(true)
-			const applicationResponse = await fetchProject(applicationId);
-			const freelancerUser = await fetchUser(Number(applicationResponse?.user_id));
-			const freelancerResponse = await getFreelancerProfile(freelancerUser?.username);
-
-			const brief: Brief | undefined = await getBrief(briefId);
-			const userResponse = await getCurrentUser();
-
-
+	const getBalance = async (walletAddress: string, currency_id: number) => {
+		try {
 			const imbueApi = await initImbueAPIInfo();
 			const chainService = new ChainService(imbueApi, user);
 
-			console.log({
-				web3: userResponse.web3_address,
-				currencyId: applicationResponse?.currency_id
-			})
+			if (!walletAddress) return "No Wallet Found"
+			const balance: any = await chainService.getBalance(walletAddress, currency_id)
+			return balance
 
-			if (!userResponse.web3_address) {
-				setBalance("No Wallet Found")
-			}
-			else if (applicationResponse?.currency_id !== undefined) {
-				const balance: any = await chainService.getBalance(userResponse.web3_address, applicationResponse?.currency_id)
-				setBalance(balance);
-			}
+		} catch (error) {
+			setError(error)
+			console.log(error);
+		}
+	}
 
-			setLoading(false)
-			setFreelancer(freelancerResponse);
-			setBrief(brief);
-			setApplication(applicationResponse);
-			setUser(userResponse);
+	useEffect(() => {
+		const getSetUpData = async () => {
+			setLoading(true)
+			try {
+				const applicationResponse = await fetchProject(applicationId);
+				const freelancerUser = await fetchUser(Number(applicationResponse?.user_id));
+				const freelancerResponse = await getFreelancerProfile(freelancerUser?.username);
+				const brief: Brief | undefined = await getBrief(briefId);
+				const userResponse = await getCurrentUser();
+				const balance = await getBalance(userResponse.web3_address, applicationResponse?.currency_id ?? 0)
+
+				setBalance(balance)
+				setFreelancer(freelancerResponse);
+				setBrief(brief);
+				setApplication(applicationResponse);
+				setUser(userResponse);
+			} catch (error) {
+				setError(error)
+				console.log(error);
+			}
+			finally {
+				setLoading(false)
+			}
 		};
 
 		if (briefId && applicationId) {
@@ -142,8 +172,6 @@ const ApplicationPreview = (): JSX.Element => {
 					chain_project_id: chainProjectId,
 				}),
 			});
-
-			console.log(resp);
 
 			if (resp.status === 201 || resp.status === 200) {
 				setSuccess(true)
@@ -225,7 +253,6 @@ const ApplicationPreview = (): JSX.Element => {
 				return false;
 			}
 		}
-
 		return true;
 	};
 
@@ -258,7 +285,9 @@ const ApplicationPreview = (): JSX.Element => {
 						imbueFee,
 						totalCost,
 						setLoading,
-						balance
+						balance,
+						openAccountChoice,
+						setOpenAccountChoice
 					}} />
 				)}
 
@@ -478,6 +507,14 @@ const ApplicationPreview = (): JSX.Element => {
 					setLoginModal(val);
 				}}
 				redirectUrl={router.pathname}
+			/>
+
+			<AccountChoice
+				accountSelected={(account: WalletAccount) =>
+					accountSelected(account)
+				}
+				visible={openAccountChoice}
+				setVisible={setOpenAccountChoice}
 			/>
 
 			<SuccessScreen
