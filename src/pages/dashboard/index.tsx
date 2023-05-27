@@ -26,7 +26,7 @@ export type DashboardProps = {
   myApplicationsResponse: Project[];
 };
 
-const Dashboard = ({ user, isAuthenticated, myBriefs, myApplicationsResponse  }: DashboardProps): JSX.Element => {
+const Dashboard = ({ user, isAuthenticated, myBriefs, myApplicationsResponse }: DashboardProps): JSX.Element => {
   const [loginModal, setLoginModal] = useState<boolean>(!isAuthenticated);
   const [client, setClient] = useState<StreamChat>();
   const filters = { members: { $in: [user?.username] } };
@@ -37,10 +37,10 @@ const Dashboard = ({ user, isAuthenticated, myBriefs, myApplicationsResponse  }:
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [myApplications, setMyApplications] = useState<Project[]>(myApplicationsResponse);
-  const [loadingStreamChat, setLoadingStreamChat]= useState<boolean>(true)
-  
-  const router = useRouter();  
-  const {briefId} = router.query
+  const [loadingStreamChat, setLoadingStreamChat] = useState<boolean>(true)
+
+  const router = useRouter();
+  const { briefId } = router.query
 
   const handleMessageBoxClick = async (user_id: number, freelancer: Freelancer) => {
     if (user_id) {
@@ -82,7 +82,7 @@ const Dashboard = ({ user, isAuthenticated, myBriefs, myApplicationsResponse  }:
     }
   }, [client, user?.getstream_token, user?.username]);
 
-  if(loadingStreamChat) return <FullScreenLoader/>
+  if (loadingStreamChat) return <FullScreenLoader />
 
   return client ? (
     <div className="lg:-mt-8 hq-layout px-[15px]">
@@ -105,7 +105,11 @@ const Dashboard = ({ user, isAuthenticated, myBriefs, myApplicationsResponse  }:
 
       {user && showMessageBox && <ChatPopup showMessageBox={showMessageBox} setShowMessageBox={setShowMessageBox} targetUser={targetUser} browsingUser={user} />}
 
-      <Login visible={loginModal} setVisible={setLoginModal} redirectUrl="/dashboard" />
+      <Login
+        visible={loginModal}
+        setVisible={setLoginModal}
+        redirectUrl="/dashboard"
+      />
     </div>
   ) : (
     <p>GETSTREAM_API_KEY not found</p>
@@ -115,16 +119,18 @@ const Dashboard = ({ user, isAuthenticated, myBriefs, myApplicationsResponse  }:
 export const getServerSideProps = async (context: any) => {
   const { req, res } = context;
   try {
-    const user:any = await authenticate("jwt", req, res);
+    const user: any = await authenticate("jwt", req, res);
     if (user) {
       const myBriefs = await getUserBriefs(user?.id)
       const myApplicationsResponse = await getFreelancerApplications(user?.id);
-      return { props: { 
-        isAuthenticated: true, 
-        user,
-        myBriefs,
-        myApplicationsResponse 
-      } };
+      return {
+        props: {
+          isAuthenticated: true,
+          user,
+          myBriefs,
+          myApplicationsResponse
+        }
+      };
     }
   } catch (error: any) {
     console.error(error);

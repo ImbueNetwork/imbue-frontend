@@ -8,6 +8,7 @@ import { FiFilter } from "react-icons/fi";
 import { useWindowSize } from "@/hooks";
 import Pagination from "rc-pagination";
 import FullScreenLoader from "@/components/FullScreenLoader";
+import ErrorScreen from "@/components/ErrorScreen";
 
 export const strToIntRange = (strList: any) => {
   return Array.isArray(strList)
@@ -24,6 +25,8 @@ const Briefs = (): JSX.Element => {
   const router = useRouter();
   const size = useWindowSize();
   const [itemsPerPage, setNumItemsPerPage] = useState<number>(5);
+
+  const [error, setError] = useState<any>()
 
   const {
     expRange,
@@ -333,28 +336,32 @@ const Briefs = (): JSX.Element => {
       : [];
     router.push(router, undefined, { shallow: true });
 
-    if (is_search) {
-      const filter: BriefSqlFilter = {
-        experience_range: exp_range,
-        submitted_range,
-        submitted_is_max,
-        length_range,
-        length_is_max,
-        search_input: search_value,
-        items_per_page: itemsPerPage,
-        page: currentPage,
-      };
-
-      const briefs_filtered: any = await callSearchBriefs(filter);
-
-      setBriefs(briefs_filtered?.currentData);
-      setBriefsTotal(briefs_filtered?.totalBriefs);
-    } else {
-      const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
-
-      setBriefs(briefs_all?.currentData);
-      setBriefsTotal(briefs_all?.totalBriefs);
-    }
+    try {
+      if (is_search) {
+        const filter: BriefSqlFilter = {
+          experience_range: exp_range,
+          submitted_range,
+          submitted_is_max,
+          length_range,
+          length_is_max,
+          search_input: search_value,
+          items_per_page: itemsPerPage,
+          page: currentPage,
+        };
+  
+        const briefs_filtered: any = await callSearchBriefs(filter);
+  
+        setBriefs(briefs_filtered?.currentData);
+        setBriefsTotal(briefs_filtered?.totalBriefs);
+      } else {
+        const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
+  
+        setBriefs(briefs_all?.currentData);
+        setBriefsTotal(briefs_all?.totalBriefs);
+      }
+    } catch (error) {
+      setError(error)
+    }    
   };
 
   const onSavedBriefs = () => {};
@@ -538,6 +545,21 @@ const Briefs = (): JSX.Element => {
           jumpPrevIcon={<div className={pageinationIconClassName}>{"<<"}</div>}
         />
       </div>
+
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'>
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
     </div>
   );
 };
