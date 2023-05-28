@@ -17,7 +17,6 @@ import { WalletAccount } from "@talismn/connect-wallets";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { useGoogleLogin, GoogleLogin } from '@react-oauth/google';
 import jwt from 'jsonwebtoken';
-import { StyledEngineProvider } from "@mui/material/styles";
 import * as utils from "@/utils";
 
 
@@ -136,8 +135,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
 
   return (
     <>
-      <StyledEngineProvider injectFirst>
-        <Dialog
+      <Dialog
           open={visible}
           onClose={() => setVisible(false)}
           aria-labelledby="responsive-dialog-title"
@@ -245,7 +243,6 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
 
           }
         </Dialog>
-      </StyledEngineProvider>
 
       <AccountChoice
         accountSelected={(account: WalletAccount) =>

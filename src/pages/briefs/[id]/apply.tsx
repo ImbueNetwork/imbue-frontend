@@ -14,6 +14,8 @@ import { selectAccount } from "@/redux/services/polkadotService";
 import { useRouter } from "next/router";
 import FullScreenLoader from "@/components/FullScreenLoader";
 import { WalletAccount } from "@talismn/connect-wallets";
+import SuccessScreen from "@/components/SuccessScreen";
+import ErrorScreen from "@/components/ErrorScreen";
 
 interface MilestoneItem {
   name: string;
@@ -32,6 +34,9 @@ export const SubmitProposal = (): JSX.Element => {
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
 
+  const [applicationId, setapplicationId] = useState()
+  const [error, setError] = useState<any>()
+
   useEffect(() => {
     getUserAndFreelancer();
   }, [briefId]);
@@ -43,8 +48,8 @@ export const SubmitProposal = (): JSX.Element => {
   const getUserAndFreelancer = async () => {
     const userResponse = await getCurrentUser();
     setUser(userResponse);
-    const freelancer = await getFreelancerProfile(userResponse?.username);
-    if (!freelancer) {
+    const freelancer: any = await getFreelancerProfile(userResponse?.username);
+    if (!freelancer?.id) {
       router.push(`/freelancers/new`);
     }
   };
@@ -95,11 +100,18 @@ export const SubmitProposal = (): JSX.Element => {
   };
 
   const handleSelectAccount = async (account: WalletAccount) => {
-    setLoading(true);
-    await selectAccount(account);
-    setLoading(false);
-    setShowPolkadotAccounts(false);
-    await insertProject();
+    try {
+      setLoading(true);
+      await selectAccount(account);
+      await insertProject();
+    } catch (error) {
+      setError(error)
+      console.log(error);
+    }
+    finally {
+      setLoading(false);
+      setShowPolkadotAccounts(false);
+    }
   };
 
   async function handleSubmit() {
@@ -113,49 +125,52 @@ export const SubmitProposal = (): JSX.Element => {
   async function insertProject() {
     //TODO: validate all milestone sum up to 100%
     setLoading(true);
-    const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}/project`),
-      {
-        headers: config.postAPIHeaders,
-        method: "post",
-        body: JSON.stringify({
-          user_id: user?.id,
-          name: `Brief Application: ${brief?.headline}`,
-          brief_id: brief?.id,
-          total_cost_without_fee: totalCostWithoutFee,
-          imbue_fee: imbueFee,
-          currency_id: currencyId,
-          milestones: milestones
-            .filter((m) => m.amount !== undefined)
-            .map((m) => {
-              return {
-                name: m.name,
-                amount: m.amount,
-                percentage_to_unlock: (
-                  ((m.amount ?? 0) / totalCostWithoutFee) *
-                  100
-                ).toFixed(0),
-              };
-            }),
-          required_funds: totalCost,
-        }),
+    try {
+      const resp = await fetch(
+        checkEnvironment().concat(`${config.apiBase}/project`),
+        {
+          headers: config.postAPIHeaders,
+          method: "post",
+          body: JSON.stringify({
+            user_id: user?.id,
+            name: `Brief Application: ${brief?.headline}`,
+            brief_id: brief?.id,
+            total_cost_without_fee: totalCostWithoutFee,
+            imbue_fee: imbueFee,
+            currency_id: currencyId,
+            milestones: milestones
+              .filter((m) => m.amount !== undefined)
+              .map((m) => {
+                return {
+                  name: m.name,
+                  amount: m.amount,
+                  percentage_to_unlock: (
+                    ((m.amount ?? 0) / totalCostWithoutFee) *
+                    100
+                  ).toFixed(0),
+                };
+              }),
+            required_funds: totalCost,
+          }),
+        }
+      );
+
+      if (resp.ok) {
+        const applicationId = (await resp.json()).id;
+        applicationId && setapplicationId(applicationId)
+      } else {
+        console.log("Failed to submit the brief");
+        setError({ message: "Failed to submit the brief" })
       }
-    );
-    if (resp.ok) {
-      const applicationId = (await resp.json()).id;
-      applicationId &&
-        router.push(`/briefs/${brief?.id}/applications/${applicationId}/`);
-    } else {
-      console.log("Failed to submit the brief");
+
+    } catch (error) {
+      setError(error)
+      console.log(error);
     }
-    setLoading(false);
+    finally {
+      setLoading(false);
+    }
   }
-
-  const renderPolkadotJSModal = (
-    <div>
-
-    </div>
-  );
 
   const totalPercent = milestones.reduce((sum, { amount }) => {
     const percent = Number(
@@ -394,6 +409,38 @@ export const SubmitProposal = (): JSX.Element => {
 
       />
       {loading && <FullScreenLoader />}
+      <SuccessScreen
+        title={"You have successfully applied for this brief"}
+        open={applicationId ? true : false}
+        setOpen={setapplicationId}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => router.push(`/briefs/${brief?.id}/applications/${applicationId}/`)}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            See Application
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'>
+            Go to Dashboard
+          </button>
+        </div>
+      </SuccessScreen>
+
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'>
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
     </div>
   );
 };

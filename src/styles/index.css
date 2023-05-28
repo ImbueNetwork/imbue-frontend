@@ -630,14 +630,14 @@ input[type="radio"] {
 }
 
 .progress-bar-progress {
-  position: absolute;
-  height: 6px;
-  background: var(--theme-primary);
-  left: 4px;
-  right: 4px;
-  top: 6px;
-  bottom: 6px;
-  z-index: 10;
+	position: absolute;
+	height: 6px;
+	background: var(--theme-primary);
+	left: 4px;
+	right: 4px;
+	top: 6px;
+	bottom: 6px;
+	z-index: 1;
 }
 
 .selected-tags {

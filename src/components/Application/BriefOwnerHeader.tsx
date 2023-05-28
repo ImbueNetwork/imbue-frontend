@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import React, { useState } from 'react';
-import { Brief, Freelancer, Project, OffchainProjectState} from '@/model';
+import { Brief, Freelancer, Project, OffchainProjectState } from '@/model';
 import { Badge, Menu, MenuItem, useMediaQuery } from '@mui/material';
 import { useRouter } from 'next/router';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -22,6 +22,9 @@ type BriefOwnerHeaderProps = {
     imbueFee: number;
     totalCost: number;
     setLoading: Function;
+    balance: string | undefined;
+    openAccountChoice: boolean;
+	setOpenAccountChoice : Function
 }
 
 const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
@@ -36,6 +39,9 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         imbueFee,
         totalCost,
         setLoading,
+        balance,
+        openAccountChoice, 
+		setOpenAccountChoice
     } = props
 
     const [openPopup, setOpenPopup] = useState<boolean>(false);
@@ -52,7 +58,6 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
 
     const mobileView = useMediaQuery('(max-width:480px)');
 
-
     return (
         <div className="flex items-center w-full md:justify-between lg:px-10 flex-wrap gap-4">
             <div className="flex gap-5 items-center">
@@ -60,14 +65,19 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                     src={require('@/assets/images/profile-image.png')}
                     priority
                     alt="profileImage" />
-                <Badge badgeContent={"Hired"} color="primary" invisible={!(application?.status_id === OffchainProjectState.Accepted)}>
-                    <p className="text-2xl font-bold">{freelancer?.display_name}</p>
-                </Badge>
+                <div>
+                    <Badge badgeContent={"Hired"} color="primary" invisible={!(application?.status_id === OffchainProjectState.Accepted)}>
+                        <p className="text-2xl font-bold capitalize">{freelancer?.display_name}</p>
+                    </Badge>
+                    <p className='text-sm mt-2'>
+                       {balance === "No Wallet Found" ? balance : `Balance: ${balance}`}
+                    </p>
+                </div>
             </div>
             {
                 <p className="text-base text-primary max-w-[50%] break-words">@
                     {(mobileView && freelancer?.username?.length > 16)
-                        ? `${freelancer?.username.substr(0, 16)}...`
+                        ? `${freelancer?.username?.substr(0, 16)}...`
                         : freelancer?.username
                     }
                 </p>
@@ -82,17 +92,27 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                     Message
                 </button>
 
-                <button
-                    id="demo-customized-button"
-                    aria-controls={open ? 'demo-customized-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? 'true' : undefined}
-                    onClick={handleOptionsClick}
-                    className='primary-btn in-dark w-button !text-xs lg:!text-base'
-                >
-                    Options
-                    <KeyboardArrowDownIcon fontSize='small' className='ml-2' />
-                </button>
+                {
+                    // balance === 'No Wallet Found'
+                    true
+                        ? <button
+                            onClick={()=>setOpenAccountChoice(true)}
+                            className='primary-btn in-dark w-button !text-xs lg:!text-base'
+                        >
+                            Connect Wallet
+                        </button>
+                        : <button
+                            id="demo-customized-button"
+                            aria-controls={open ? 'demo-customized-menu' : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={open ? 'true' : undefined}
+                            onClick={handleOptionsClick}
+                            className='primary-btn in-dark w-button !text-xs lg:!text-base'
+                        >
+                            Options
+                            <KeyboardArrowDownIcon fontSize='small' className='ml-2' />
+                        </button>
+                }
                 <Menu
                     id="basic-menu"
                     anchorEl={anchorEl}
