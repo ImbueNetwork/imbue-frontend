@@ -95,7 +95,9 @@ const ApplicationPreview = (): JSX.Element => {
 	useEffect(() => {
 		async function setup() {
 			if (brief) {
+				setLoading(true)
 				const briefOwner: User = await fetchUser(brief?.user_id);
+				setLoading(false)
 				setBriefOwner(briefOwner);
 			}
 		}
