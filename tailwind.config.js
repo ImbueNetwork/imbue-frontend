@@ -25,7 +25,8 @@ module.exports = {
         "light-white": "rgba(255, 255, 255, 0.25)",
         "light-grey": "rgba(235, 234, 226, 0.5)",
         primary: "#b2ff0b",
-        'dark-black': "#1E1E1E"
+        "dark-black": "#1E1E1E",
+        "imbue-purple": "#3B27C1",
       },
       screens: {
         "max-width-1800px": { raw: "(max-width: 1800px)" },
@@ -43,13 +44,13 @@ module.exports = {
       },
     },
   },
-  
+
   plugins: [
-    require('postcss-import'),
-    require('tailwindcss/nesting')(require('postcss-nesting')),
-    require('autoprefixer'),
-    require('tailwindcss'),
-    ]
+    require("postcss-import"),
+    require("tailwindcss/nesting")(require("postcss-nesting")),
+    require("autoprefixer"),
+    require("tailwindcss"),
+  ],
 };
 
 //base-transition: all 200ms ease-in-out
