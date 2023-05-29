@@ -9,10 +9,8 @@ import { BriefInsights } from '@/components/Briefs/BriefInsights';
 import { fetchProject, fetchUser, getCurrentUser, redirect } from '@/utils';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import ChatPopup from '@/components/ChatPopup';
-import ChainService from '@/redux/services/chainService';
-import { getWeb3Accounts, initImbueAPIInfo } from '@/utils/polkadot';
 import { blake2AsHex } from '@polkadot/util-crypto';
-import { Backdrop, Badge, Button, CircularProgress, IconButton, Menu, MenuItem, useMediaQuery } from '@mui/material';
+import { Backdrop, Badge, Button, CircularProgress, IconButton, Menu, MenuItem, Skeleton, useMediaQuery } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import Login from '@/components/Login';
@@ -24,8 +22,6 @@ import BriefOwnerHeader from '@/components/Application/BriefOwnerHeader';
 import ApplicationOwnerHeader from '@/components/Application/ApplicationOwnerHeader';
 import SuccessScreen from '@/components/SuccessScreen';
 import ErrorScreen from '@/components/ErrorScreen';
-import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
-import { SignerResult } from "@polkadot/api/types";
 
 
 interface MilestoneItem {
@@ -52,7 +48,7 @@ const ApplicationPreview = (): JSX.Element => {
 	const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
 	const [targetUser, setTargetUser] = useState<User | null>(null);
 	const [briefOwner, setBriefOwner] = useState<any>();
-	const [loading, setLoading] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(true);
 	const [balance, setBalance] = useState<string>()
 
 	const applicationStatus = OffchainProjectState[application?.status_id];
@@ -63,60 +59,25 @@ const ApplicationPreview = (): JSX.Element => {
 	const [success, setSuccess] = useState<boolean>(false)
 	const [openAccountChoice, setOpenAccountChoice] = useState<boolean>(false);
 
-	const accountSelected = async (account: WalletAccount): Promise<any> => {
-		try {
-			const result = await getAccountAndSign(account);
-			const resp = await authorise(
-				result?.signature as SignerResult,
-				result?.challenge!,
-				account
-			);
-			if (resp.status === 200 || resp.status === 201) {
-				setBalance(await getBalance(account.address, application.currency_id))
-			}
-			else {
-				setError({ message: "Could not connect wallet. Please Try again" })
-			}
-		} catch (error) {
-			setError(error)
-			console.log(error);
-		}
-	};
-
 	const router = useRouter();
 	const { id: briefId, applicationId }: any = router.query;
 
-	const getBalance = async (walletAddress: string, currency_id: number) => {
-		try {
-			const imbueApi = await initImbueAPIInfo();
-			const chainService = new ChainService(imbueApi, user);
-
-			if (!walletAddress) return "No Wallet Found"
-			const balance: any = await chainService.getBalance(walletAddress, currency_id)
-			return balance
-
-		} catch (error) {
-			setError(error)
-			console.log(error);
-		}
-	}
-
 	useEffect(() => {
 		const getSetUpData = async () => {
-			setLoading(true)
 			try {
+				const brief: Brief | undefined = await getBrief(briefId);
 				const applicationResponse = await fetchProject(applicationId);
+
 				const freelancerUser = await fetchUser(Number(applicationResponse?.user_id));
 				const freelancerResponse = await getFreelancerProfile(freelancerUser?.username);
-				const brief: Brief | undefined = await getBrief(briefId);
 				const userResponse = await getCurrentUser();
-				const balance = await getBalance(userResponse.web3_address, applicationResponse?.currency_id ?? 0)
 
-				setBalance(balance)
-				setFreelancer(freelancerResponse);
 				setBrief(brief);
 				setApplication(applicationResponse);
+				setBalance(balance)
+				setFreelancer(freelancerResponse);
 				setUser(userResponse);
+
 			} catch (error) {
 				setError(error)
 				console.log(error);
@@ -134,9 +95,7 @@ const ApplicationPreview = (): JSX.Element => {
 	useEffect(() => {
 		async function setup() {
 			if (brief) {
-				setLoading(true)
 				const briefOwner: User = await fetchUser(brief?.user_id);
-				setLoading(false)
 				setBriefOwner(briefOwner);
 			}
 		}
@@ -272,24 +231,28 @@ const ApplicationPreview = (): JSX.Element => {
 					/>
 				)}
 
-				{isBriefOwner && (
-					<BriefOwnerHeader {...{
-						brief,
-						freelancer,
-						application,
-						handleMessageBoxClick,
-						setOpenPopup,
-						updateApplicationState,
-						milestones,
-						totalCostWithoutFee,
-						imbueFee,
-						totalCost,
-						setLoading,
-						balance,
-						openAccountChoice,
-						setOpenAccountChoice
-					}} />
-				)}
+				{
+					isBriefOwner &&
+					(
+						<BriefOwnerHeader {...{
+							brief,
+							freelancer,
+							application,
+							handleMessageBoxClick,
+							setOpenPopup,
+							updateApplicationState,
+							milestones,
+							totalCostWithoutFee,
+							imbueFee,
+							totalCost,
+							setLoading,
+							openAccountChoice,
+							setOpenAccountChoice,
+							user,
+						}} />
+
+					)
+				}
 
 				{isApplicationOwner && (
 					<ApplicationOwnerHeader {...{
@@ -509,14 +472,6 @@ const ApplicationPreview = (): JSX.Element => {
 				redirectUrl={router.pathname}
 			/>
 
-			<AccountChoice
-				accountSelected={(account: WalletAccount) =>
-					accountSelected(account)
-				}
-				visible={openAccountChoice}
-				setVisible={setOpenAccountChoice}
-			/>
-
 			<SuccessScreen
 				title={"You have successfully updated this brief"}
 				open={success}
@@ -553,5 +508,6 @@ const ApplicationPreview = (): JSX.Element => {
 		</div>
 	);
 };
+
 
 export default ApplicationPreview;

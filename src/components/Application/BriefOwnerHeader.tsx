@@ -1,10 +1,18 @@
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Brief, Freelancer, Project, OffchainProjectState } from '@/model';
 import { Badge, Menu, MenuItem, useMediaQuery } from '@mui/material';
 import { useRouter } from 'next/router';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { HirePopup } from '../HirePopup';
+import ErrorScreen from '../ErrorScreen';
+import { WalletAccount } from '@talismn/connect-wallets';
+import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
+import { SignerResult } from "@polkadot/api/types";
+import AccountChoice from '../AccountChoice';
+import { getWeb3Accounts, initImbueAPIInfo } from '@/utils/polkadot';
+import ChainService from '@/redux/services/chainService';
+
 
 interface MilestoneItem {
     name: string;
@@ -22,9 +30,9 @@ type BriefOwnerHeaderProps = {
     imbueFee: number;
     totalCost: number;
     setLoading: Function;
-    balance: string | undefined;
     openAccountChoice: boolean;
-	setOpenAccountChoice : Function
+    setOpenAccountChoice: Function;
+    user: any
 }
 
 const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
@@ -39,10 +47,14 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         imbueFee,
         totalCost,
         setLoading,
-        balance,
-        openAccountChoice, 
-		setOpenAccountChoice
+        openAccountChoice,
+        setOpenAccountChoice,
+        user
     } = props
+
+    const [balance, setBalance] = useState<string>();
+    const [laodingWallet, setLoadingWallet] = useState<any>({ balance: true });
+    const [error, setError] = useState<any>()
 
     const [openPopup, setOpenPopup] = useState<boolean>(false);
     const router = useRouter();
@@ -55,6 +67,55 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
     const handleOptionsClose = () => {
         setAnchorEl(null);
     };
+
+    const getBalance = useCallback(async (walletAddress: string, currency_id: number) => {
+        try {
+            const imbueApi = await initImbueAPIInfo();
+            const chainService = new ChainService(imbueApi, user);
+
+            if (!walletAddress) return "No Wallet Found"
+            const balance: any = await chainService.getBalance(walletAddress, currency_id)
+            return balance
+
+        } catch (error) {
+            setError(error)
+            console.log(error);
+        }
+    }, [user])
+
+    const accountSelected = async (account: WalletAccount): Promise<any> => {
+        try {
+            setLoadingWallet((prev: any) => ({ ...prev, connecting: true }))
+            const result = await getAccountAndSign(account);
+            const resp = await authorise(
+                result?.signature as SignerResult,
+                result?.challenge!,
+                account
+            );
+            if (resp.status === 200 || resp.status === 201) {
+                setBalance(await getBalance(account.address, application.currency_id))
+            }
+            else {
+                setError({ message: "Could not connect wallet. Please Try again" })
+            }
+        } catch (error) {
+            setError(error)
+            console.log(error);
+        }
+        finally {
+            setLoadingWallet((prev: any) => ({ ...prev, connecting: false }))
+        }
+    };
+
+    useEffect(() => {
+        const showBalance = async () => {
+            setLoadingWallet((prev: any) => ({ ...prev, balance: true }))
+            const balance = await getBalance(user?.web3_address, application?.currency_id ?? 0)
+            setBalance(balance);
+            setLoadingWallet((prev: any) => ({ ...prev, balance: false }))
+        }
+        showBalance()
+    }, [user?.web3_address, application?.currency_id, getBalance])
 
     const mobileView = useMediaQuery('(max-width:480px)');
 
@@ -70,7 +131,14 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                         <p className="text-2xl font-bold capitalize">{freelancer?.display_name}</p>
                     </Badge>
                     <p className='text-sm mt-2'>
-                       {balance === "No Wallet Found" ? balance : `Balance: ${balance}`}
+                        {laodingWallet?.balance && "Loading Wallet..."}
+                        {laodingWallet?.connecting && "Connecting Wallet..."}
+                        {
+                            !laodingWallet?.balance && !laodingWallet?.connecting &&
+                            (balance === "No Wallet Found"
+                                ? balance
+                                : `Balance: ${balance}`)
+                        }
                     </p>
                 </div>
             </div>
@@ -83,7 +151,6 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                 </p>
             }
 
-
             <div className='relative flex gap-3'>
 
                 <button
@@ -93,10 +160,9 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                 </button>
 
                 {
-                    // balance === 'No Wallet Found'
-                    true
+                    balance === 'No Wallet Found'
                         ? <button
-                            onClick={()=>setOpenAccountChoice(true)}
+                            onClick={() => setOpenAccountChoice(true)}
                             className='primary-btn in-dark w-button !text-xs lg:!text-base'
                         >
                             Connect Wallet
@@ -108,9 +174,16 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                             aria-expanded={open ? 'true' : undefined}
                             onClick={handleOptionsClick}
                             className='primary-btn in-dark w-button !text-xs lg:!text-base'
+                            disabled={laodingWallet?.balance || laodingWallet?.connecting}
                         >
-                            Options
-                            <KeyboardArrowDownIcon fontSize='small' className='ml-2' />
+                            {
+                                laodingWallet?.balance || laodingWallet?.connecting
+                                    ? "Please Wait..."
+                                    : (<>
+                                        Options
+                                        <KeyboardArrowDownIcon fontSize='small' className='ml-2' />
+                                    </>)
+                            }
                         </button>
                 }
                 <Menu
@@ -170,6 +243,29 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                     setLoading,
                 }}
             />
+
+            <AccountChoice
+                accountSelected={(account: WalletAccount) =>
+                    accountSelected(account)
+                }
+                visible={openAccountChoice}
+                setVisible={setOpenAccountChoice}
+            />
+
+            <ErrorScreen {...{ error, setError }}>
+                <div className='flex flex-col gap-4 w-1/2'>
+                    <button
+                        onClick={() => setError(null)}
+                        className='primary-btn in-dark w-button w-full !m-0'>
+                        Try Again
+                    </button>
+                    <button
+                        onClick={() => router.push(`/dashboard`)}
+                        className='underline text-xs lg:text-base font-bold'>
+                        Go to Dashboard
+                    </button>
+                </div>
+            </ErrorScreen>
         </div>
     );
 };

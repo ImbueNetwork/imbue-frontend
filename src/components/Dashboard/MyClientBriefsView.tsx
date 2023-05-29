@@ -5,7 +5,6 @@ import { Brief, Freelancer, Project } from "@/model";
 import { BriefLists } from "../Briefs/BriefsList";
 import { useRouter } from "next/router";
 import { getBriefApplications } from "@/redux/services/briefService";
-import FullScreenLoader from "../FullScreenLoader";
 import { Skeleton } from "@mui/material";
 
 type ClientViewProps = {
@@ -30,10 +29,17 @@ const MyClientBriefsView = (props: ClientViewProps) => {
 
   useEffect(() => {
     const getApplications = async (id: string | number) => {
-      setBriefApplications(await getBriefApplications(id));
+      try {
+        setLoadingApplications(true)
+        setBriefApplications(await getBriefApplications(id));
+      } catch (error) {
+        console.log(error);
+      }
+      finally{
+        setLoadingApplications(false)
+      }
     };
     briefId && getApplications(briefId.toString());
-    setLoadingApplications(false)
   }, [briefId]);
 
 
@@ -96,14 +102,18 @@ export function ApplicationSkeleton() {
       {
         [1, 2].map((v, i) => (
           <div key={i} className="w-full px-5 py-3 lg:px-10 lg:py-8 border-b last:border-b-0 border-b-light-white">
-            <div className="flex justify-between">
-              <Skeleton className="w-1/6" animation="wave" variant="text" sx={{ fontSize: '1rem' }} />
-              <Skeleton className="w-1/6" animation="wave" variant="text" sx={{ fontSize: '1rem' }} />
+            <div className="flex justify-between items-center">
+              <div className="flex w-full items-center gap-4">
+                <Skeleton className="w-16 h-16" animation="wave" variant="circular" sx={{ fontSize: '1rem' }} />
+                <Skeleton className="w-1/6 h-7" animation="wave" variant="text" sx={{ fontSize: '1rem' }} />
+              </div>
+              <Skeleton className="w-1/6 h-7" animation="wave" variant="text" sx={{ fontSize: '1rem' }} />
             </div>
             <div className="flex justify-between">
-              <Skeleton className="w-1/2" animation="wave" variant="text" sx={{ fontSize: '1rem' }} />
+              <Skeleton className="w-5/6" animation="wave" variant="text" sx={{ fontSize: '1rem' }} />
               <Skeleton className="w-1/12" animation="wave" variant="text" sx={{ fontSize: '1rem' }} />
             </div>
+            <Skeleton className="w-3/5" animation="wave" variant="text" sx={{ fontSize: '1rem' }} />
             <Skeleton className="w-1/12" animation="wave" variant="text" sx={{ fontSize: '1rem' }} />
           </div>
         ))
