@@ -347,10 +347,10 @@ const Freelancers = (): JSX.Element => {
         onClose={handleClose}
         className="flex justify-center items-center flex-wrap bg-black bg-opacity-50 top-0 left-0 w-full h-full z-[100] fixed"
       >
-        <div className="bg-[#1B1B1B] rounded-2xl px-12 py-10 h-[434px] w-[60%] self-center relative">
+        <div className="bg-[#1B1B1B] rounded-2xl md:px-12 px-8 md:py-10 py-5  h-[434px]md:w-[60%] w-[95vw] self-center relative min-h-[300px]">
           <p className="font-normal text-base text-white !mb-9">Filter</p>
 
-          <div className="grid grid-cols-3 gap-10">
+          <div className="grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5">
             {customDropdownConfigs
               ?.filter(
                 (item) => item?.filterOptions && item?.filterOptions?.length > 0
@@ -369,7 +369,7 @@ const Freelancers = (): JSX.Element => {
 
           <button
             onClick={onSearch}
-            className="h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 absolute bottom-10 right-10"
+            className="h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 absolute md:bottom-10 bottom-5 right-10"
           >
             Apply
           </button>
@@ -400,20 +400,6 @@ const Freelancers = (): JSX.Element => {
                     className="h-[14px] w-[14px] ml-2"
                   />
                 </button>
-
-                <div
-                  className={`tab-item text-right min-width-750px:hidden`}
-                  onClick={toggleFilter}
-                >
-                  <FiFilter color="#fff" />
-                </div>
-              </div>
-
-              <div
-                className={`tab-item text-right min-width-750px:hidden`}
-                onClick={toggleFilter}
-              >
-                <FiFilter color="#fff" />
               </div>
             </div>
             <input
@@ -421,11 +407,13 @@ const Freelancers = (): JSX.Element => {
               className={`search-input`}
               placeholder="Search"
             />
-            <div className="search-result">
-              <span className="result-count">{freelancers_total}</span>
-              <span> freelancers found</span>
+            <div className="search-result flex flex-col">
+              <div>
+                <span className="result-count">{freelancers_total}</span>
+                <span> freelancers found</span>
+              </div>
 
-              <span className="ml-8">
+              <span className="md:ml-8">
                 number of freelancers per page
                 <select
                   className="ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none"

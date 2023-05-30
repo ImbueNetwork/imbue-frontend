@@ -23,17 +23,20 @@ const CustomDropDown = React.memo(
     ids,
   }: CustomDropDownProps): JSX.Element => {
     const [isHovered, setIsHovered] = useState(false);
+    const showRef = React.useRef(true);
 
     const handleHover = useCallback(() => {
+      showRef.current = true;
       setIsHovered(true);
     }, []);
 
     const handleLeave = useCallback(() => {
       setIsHovered(false);
+      showRef.current = false;
     }, []);
 
     return (
-      <div className="relative mb-8">
+      <div className="relative md:mb-8 mb-4">
         <div
           onMouseEnter={handleHover}
           onMouseLeave={handleLeave}
@@ -47,7 +50,7 @@ const CustomDropDown = React.memo(
             className="h-[12px] w-[12px]"
           />
         </div>
-        {isHovered && (
+        {isHovered && showRef.current && (
           <div
             onMouseEnter={handleHover}
             onMouseLeave={handleLeave}
