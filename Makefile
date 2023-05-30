@@ -1,4 +1,4 @@
-DBDIR := "./src/pages/api/db"
+DBDIR := "./src/db"
 
 
 all: clean_build

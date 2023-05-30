@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from 'next-connect'
 import * as models from "../models";
-import db from "../db";
+import db from "@/db";
 import { generateGetStreamToken, updateUserGetStreamToken } from "../models";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";

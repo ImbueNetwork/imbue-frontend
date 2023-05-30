@@ -2,8 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import nextConnect from 'next-connect';
 import passport from 'passport';
-import { authenticate } from '../../../info/user';
-import db from '../../../db';
+import db from '@/db';
 import * as models from "../../../models";
 
 export default nextConnect()
@@ -12,7 +11,7 @@ export default nextConnect()
         let response
         const projectId = req.query.applicationID
         console.log(projectId);
-        if(!projectId) return
+        if (!projectId) return
 
         await db.transaction(async tx => {
             try {
