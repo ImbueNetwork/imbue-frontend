@@ -400,6 +400,7 @@ const Briefs = (): JSX.Element => {
     "h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary";
 
   if (loading) return <FullScreenLoader />;
+
   return (
     <div className="search-briefs-container px-[15px] lg:px-[40px]">
       <div
@@ -499,7 +500,7 @@ const Briefs = (): JSX.Element => {
           </div>
         </div>
         <div className="briefs-list">
-          {briefs?.map((item, itemIndex) => (
+          {briefs?.map((item, itemIndex) => !item?.project_id && (
             <div
               className="brief-item"
               key={itemIndex}

@@ -46,7 +46,7 @@ const BioPanel = ({
                 router.push(`/briefs/${brief?.id}/edit`);
               }}
             >
-              Edit Proposal
+              Edit Brief
               <FiEdit size={16} />
             </button>
           )}
