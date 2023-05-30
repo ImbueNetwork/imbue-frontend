@@ -4,11 +4,12 @@ import Image from "next/image";
 import React, { useCallback, useState } from "react";
 import BriefFilter from "./BriefFilter";
 import { BriefFilterOption, FilterOption } from "@/types/briefTypes";
+import { FreelancerFilterOption } from "@/types/freelancerTypes";
 
 interface CustomDropDownProps {
   name?: string;
-  filterType: BriefFilterOption;
-  filterOptions: Array<FilterOption>;
+  filterType: BriefFilterOption | FreelancerFilterOption;
+  filterOptions: Array<FilterOption> | undefined | any;
   setId?: (id: string | string[]) => void;
   ids?: Array<string>;
 }

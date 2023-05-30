@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { Freelancer, FreelancerSqlFilter, Item } from "../../model";
 import styles from "@/styles/modules/freelancers.module.css";
@@ -15,6 +16,14 @@ import { FiFilter } from "react-icons/fi";
 import LoadingFreelancers from "../../components/Freelancers/FreelancersLoading";
 import { FreelancerStepProps } from "@/types/proposalsTypes";
 import Pagination from "rc-pagination";
+import CustomModal from "@/components/CustomModal";
+import CustomDropDown from "@/components/CustomDropDown";
+import { filterIcon } from "@/assets/svgs";
+
+interface FilterModalProps {
+  open: boolean;
+  handleClose: () => void;
+}
 
 const Freelancers = (): JSX.Element => {
   const [freelancers, setFreelancers] = useState<
@@ -28,6 +37,8 @@ const Freelancers = (): JSX.Element => {
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [itemsPerPage, setNumItemsPerPage] = useState<number>(5);
+
+  const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
 
   const router = useRouter();
   const size = useWindowSize();
@@ -125,6 +136,32 @@ const Freelancers = (): JSX.Element => {
     }),
   };
 
+  const handleSetId = (id: string | string[]) => {
+    if (Array.isArray(id)) {
+      setSlectedFilterIds([...id]);
+    } else {
+      setSlectedFilterIds([...selectedFilterIds, id]);
+    }
+  };
+
+  const customDropdownConfigs = [
+    {
+      name: skillsFilter.label,
+      filterType: FreelancerFilterOption.Skills,
+      filterOptions: skillsFilter.options,
+    },
+    {
+      name: servicesFilter.label,
+      filterType: FreelancerFilterOption.Services,
+      filterOptions: servicesFilter.options,
+    },
+    {
+      name: languagesFilter.label,
+      filterType: FreelancerFilterOption.Languages,
+      filterOptions: languagesFilter.options,
+    },
+  ];
+
   const pageinationIconClassName =
     "h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary";
 
@@ -149,21 +186,16 @@ const Freelancers = (): JSX.Element => {
         if (skillsRangeProps) {
           const range = strToIntRange(skillsRangeProps);
           range.forEach((v: any) => {
-            const checkbox = document.getElementById(
-              `0-${v}`
-            ) as HTMLInputElement;
-            if (checkbox) checkbox.checked = true;
+            setSlectedFilterIds([...selectedFilterIds, `0-${v}`]);
           });
           filter = { ...filter, skills_range: strToIntRange(skillsRangeProps) };
         }
 
         if (servicesRangeProps) {
           const range = strToIntRange(servicesRangeProps);
+
           range.forEach((v: any) => {
-            const checkbox = document.getElementById(
-              `1-${v}`
-            ) as HTMLInputElement;
-            if (checkbox) checkbox.checked = true;
+            setSlectedFilterIds([...selectedFilterIds, `1-${v}`]);
           });
           filter = {
             ...filter,
@@ -174,10 +206,7 @@ const Freelancers = (): JSX.Element => {
         if (languagesRangeProps) {
           const range = strToIntRange(languagesRangeProps);
           range.forEach((v: any) => {
-            const checkbox = document.getElementById(
-              `2-${v}`
-            ) as HTMLInputElement;
-            if (checkbox) checkbox.checked = true;
+            setSlectedFilterIds([...selectedFilterIds, `2-${v}`]);
           });
           filter = {
             ...filter,
@@ -185,8 +214,8 @@ const Freelancers = (): JSX.Element => {
           };
         }
 
-        const filteredFreelancers = await callSearchFreelancers(filter);
-        setFreelancers(filteredFreelancers);
+        const filteredFreelancers: any = await callSearchFreelancers(filter);
+        setFreelancers(filteredFreelancers?.currentData);
       }
     };
 
@@ -203,10 +232,6 @@ const Freelancers = (): JSX.Element => {
   ]);
 
   const onSearch = async () => {
-    const elements = document.getElementsByClassName(
-      "filtercheckbox"
-    ) as HTMLCollectionOf<HTMLInputElement>;
-
     // The filter initially should return all values
     let is_search: boolean = false;
 
@@ -222,10 +247,10 @@ const Freelancers = (): JSX.Element => {
       is_search = true;
     }
 
-    for (let i = 0; i < elements.length; i++) {
-      if (elements[i].checked) {
+    for (let i = 0; i < selectedFilterIds.length; i++) {
+      if (selectedFilterIds[i] !== "") {
         is_search = true;
-        const id = elements[i].getAttribute("id");
+        const id = selectedFilterIds[i];
         if (id != null) {
           const [filterType, interiorIndex] = id.split("-");
           // Here we are trying to build teh paramaters required to build the query
@@ -315,61 +340,73 @@ const Freelancers = (): JSX.Element => {
     return arr;
   };
 
+  const FilterModal = ({ open, handleClose }: FilterModalProps) => {
+    return (
+      <CustomModal
+        open={open}
+        onClose={handleClose}
+        className="flex justify-center items-center flex-wrap bg-black bg-opacity-50 top-0 left-0 w-full h-full z-[100] fixed"
+      >
+        <div className="bg-[#1B1B1B] rounded-2xl px-12 py-10 h-[434px] w-[60%] self-center relative">
+          <p className="font-normal text-base text-white !mb-9">Filter</p>
+
+          <div className="grid grid-cols-3 gap-10">
+            {customDropdownConfigs
+              ?.filter(
+                (item) => item?.filterOptions && item?.filterOptions?.length > 0
+              )
+              ?.map(({ name, filterType, filterOptions }) => (
+                <CustomDropDown
+                  key={name}
+                  name={name}
+                  filterType={filterType}
+                  filterOptions={filterOptions}
+                  setId={handleSetId}
+                  ids={selectedFilterIds}
+                />
+              ))}
+          </div>
+
+          <button
+            onClick={onSearch}
+            className="h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 absolute bottom-10 right-10"
+          >
+            Apply
+          </button>
+        </div>
+      </CustomModal>
+    );
+  };
+
   if (loading) return <LoadingFreelancers />;
 
   return (
     <div className="px-[15px] lg:px-[40px]">
       <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
-        <div
-          className={`${styles.filterPanel}`}
-          style={{
-            display:
-              size?.width <= 750 ? (filterVisble ? "block" : "none") : "block",
-          }}
-        >
-          <div className={styles.filterHeading}>Filter By</div>
-          <FreelancerFilter
-            label={skillsFilter.label}
-            filter_type={FreelancerFilterOption.Skills}
-            filter_options={skillsFilter.options}
-          ></FreelancerFilter>
-          <FreelancerFilter
-            label={servicesFilter.label}
-            filter_type={FreelancerFilterOption.Services}
-            filter_options={servicesFilter.options}
-          ></FreelancerFilter>
-          <FreelancerFilter
-            label={languagesFilter.label}
-            filter_type={FreelancerFilterOption.Languages}
-            filter_options={languagesFilter.options}
-          ></FreelancerFilter>
-
-          <div className="tab-section mb-10 min-width-500px:!hidden">
-            <button
-              onClick={() => {
-                onSearch();
-                toggleFilter();
-              }}
-              className="rounded-full text-black bg-white px-10 py-2"
-            >
-              Search
-            </button>
-            <button
-              onClick={() => {
-                setFilterVisible(false);
-              }}
-              className="rounded-full text-black bg-white px-10 py-2 ml-5"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
+        <FilterModal open={filterVisble} handleClose={() => toggleFilter()} />
 
         <div className={`${styles.freelancersView} max-width-750px:!w-full`}>
           <div className={`${styles.searchHeading} max-width-750px:!mx-0`}>
             <div className={`${styles.tabSection} w-full justify-between`}>
-              <div className={styles.tabItem} onClick={onSearch}>
-                Search
+              <div className="tab-section">
+                <button
+                  onClick={toggleFilter}
+                  className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105"
+                >
+                  Filter
+                  <Image
+                    src={filterIcon}
+                    alt={"filter-icon"}
+                    className="h-[14px] w-[14px] ml-2"
+                  />
+                </button>
+
+                <div
+                  className={`tab-item text-right min-width-750px:hidden`}
+                  onClick={toggleFilter}
+                >
+                  <FiFilter color="#fff" />
+                </div>
               </div>
 
               <div

@@ -1,11 +1,12 @@
 /* eslint-disable react/display-name */
 import React from "react";
 import { BriefFilterOption, FilterOption } from "@/types/briefTypes";
+import { FreelancerFilterOption } from "@/types/freelancerTypes";
 
 type BriefFilterProps = {
   label: string;
   filter_options: Array<FilterOption>;
-  filter_type: BriefFilterOption;
+  filter_type: BriefFilterOption | FreelancerFilterOption;
   setId?: (id: string | string[]) => void;
   ids?: Array<string>;
 };

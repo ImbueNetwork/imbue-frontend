@@ -1,9 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
-import BriefFilter from "@/components/BriefFilter";
-import Slider from "@mui/material/Slider";
 import { Brief, BriefSqlFilter } from "@/model";
 import { callSearchBriefs, getAllBriefs } from "@/redux/services/briefService";
-import { BriefFilterOption, BriefStepProps } from "@/types/briefTypes";
+import { BriefFilterOption } from "@/types/briefTypes";
 import { useRouter } from "next/router";
 import { FiFilter } from "react-icons/fi";
 import { useWindowSize } from "@/hooks";
@@ -236,29 +235,22 @@ const Briefs = (): JSX.Element => {
         if (expRange) {
           const range = strToIntRange(expRange);
           range.forEach((v: any) => {
-            // const checkbox = document.getElementById(
-            //   `0-${v - 1}`
-            // ) as HTMLInputElement;
-            // if (checkbox) checkbox.checked = true;
+            selectedFilterIds.push(`0-${v - 1}`);
           });
+
           filter = { ...filter, experience_range: strToIntRange(expRange) };
         }
         if (submitRange) {
-          // const range = strToIntRange(submitRange);
-          // range.forEach((v: any) => {
-          //   if (v > 0 && v < 5)
-          //     (document.getElementById(`1-${0}`) as HTMLInputElement).checked =
-          //       true;
-          //   if (v >= 5 && v < 10)
-          //     (document.getElementById(`1-${1}`) as HTMLInputElement).checked =
-          //       true;
-          //   if (v >= 10 && v < 15)
-          //     (document.getElementById(`1-${2}`) as HTMLInputElement).checked =
-          //       true;
-          //   if (v > 15)
-          //     (document.getElementById(`1-${3}`) as HTMLInputElement).checked =
-          //       true;
-          // });
+          const range = strToIntRange(submitRange);
+          range.forEach((v: any) => {
+            if (v > 0 && v < 5) selectedFilterIds.push(`1-${0}`);
+
+            if (v >= 5 && v < 10) selectedFilterIds.push(`1-${1}`);
+
+            if (v >= 10 && v < 15) selectedFilterIds.push(`1-${2}`);
+
+            if (v > 15) selectedFilterIds.push(`1-${3}`);
+          });
           filter = { ...filter, submitted_range: strToIntRange(submitRange) };
         }
         if (heading) {
@@ -269,13 +261,10 @@ const Briefs = (): JSX.Element => {
           if (input) input.value = heading.toString();
         }
         if (lengthRange) {
-          // const range = strToIntRange(lengthRange);
-          // range.forEach((v: any) => {
-          //   const checkbox = document.getElementById(
-          //     `2-${v - 1}`
-          //   ) as HTMLInputElement;
-          //   if (checkbox) checkbox.checked = true;
-          // });
+          const range = strToIntRange(lengthRange);
+          range.forEach((v: any) => {
+            selectedFilterIds.push(`2-${v - 1}`);
+          });
           filter = { ...filter, length_range: strToIntRange(lengthRange) };
         }
         const result: any = await callSearchBriefs(filter);
@@ -446,8 +435,11 @@ const Briefs = (): JSX.Element => {
           <p className="font-normal text-base text-white mb-9">Filter</p>
 
           <div className="grid grid-cols-3 gap-10">
-            {customDropdownConfigs.map(
-              ({ name, filterType, filterOptions }) => (
+            {customDropdownConfigs
+              ?.filter(
+                (item) => item?.filterOptions && item?.filterOptions?.length > 0
+              )
+              ?.map?.(({ name, filterType, filterOptions }) => (
                 <CustomDropDown
                   key={name}
                   name={name}
@@ -456,8 +448,7 @@ const Briefs = (): JSX.Element => {
                   setId={handleSetId}
                   ids={selectedFilterIds}
                 />
-              )
-            )}
+              ))}
           </div>
 
           <button
@@ -477,60 +468,6 @@ const Briefs = (): JSX.Element => {
   if (loading) return <FullScreenLoader />;
   return (
     <div className="search-briefs-container px-[15px] lg:px-[80px]">
-      {/* <div
-        className={`filter-panel
-      max-width-750px:fixed
-      max-width-750px:w-full
-      max-width-750px:top-0
-      max-width-750px:bg-black
-      max-width-750px:z-10
-      max-width-750px:px-[20px]
-      max-width-750px:pt-[20px]
-      h-full
-      max-width-750px:overflow-y-scroll
-      `}
-        style={{
-          display:
-            size?.width <= 750 ? (filterVisble ? "block" : "none") : "block",
-        }}
-      >
-        <div className="filter-heading">Filter By</div>
-        <BriefFilter
-          label={expfilter.label}
-          filter_type={BriefFilterOption.ExpLevel}
-          filter_options={expfilter.options}
-        ></BriefFilter>
-        <BriefFilter
-          label={submittedFilters.label}
-          filter_type={BriefFilterOption.AmountSubmitted}
-          filter_options={submittedFilters.options}
-        ></BriefFilter>
-        <BriefFilter
-          label={lengthFilters.label}
-          filter_type={BriefFilterOption.Length}
-          filter_options={lengthFilters.options}
-        ></BriefFilter>
-        <div className="tab-section mb-10 min-width-500px:!hidden">
-          <button
-            onClick={() => {
-              onSearch();
-              toggleFilter();
-            }}
-            className="rounded-full text-black bg-white px-10 py-2"
-          >
-            Search
-          </button>
-          <button
-            onClick={() => {
-              setFilterVisible(false);
-            }}
-            className="rounded-full text-black bg-white px-10 py-2 ml-5"
-          >
-            Cancel
-          </button>
-        </div>
-      </div> */}
-
       <FilterModal open={filterVisble} handleClose={() => toggleFilter()} />
 
       <div className="briefs-section  max-width-750px:overflow-hidden">
