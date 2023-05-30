@@ -23,7 +23,7 @@ const BriefApplications = () => {
     const [sortValue, setSortValue] = useState<string>('match');
     const [brief, setBrief] = useState<Brief>()
     const [browsingUser, setBrowsingUser] = useState<User>()
-    
+
     const router = useRouter()
     const { id: briefID } = router.query;
 
@@ -42,12 +42,16 @@ const BriefApplications = () => {
 
     useEffect(() => {
         async function setup(id: string | string[]) {
-            setBrowsingUser(await getCurrentUser());
-            const briefData = await getBrief(id);
-            setBrief(briefData)
+            try {
+                setBrowsingUser(await getCurrentUser());
+                const briefData = await getBrief(id);
+                setBrief(briefData)
 
-            if (briefData?.id) {
-                setBriefApplications(await getBriefApplications(briefData?.id))
+                if (briefData?.id) {
+                    setBriefApplications(await getBriefApplications(briefData?.id))
+                }
+            } catch (error) {
+                console.log(error);
             }
         }
         briefID && setup(briefID);
@@ -63,27 +67,25 @@ const BriefApplications = () => {
         <div className="page-wrapper applicationList hq-layout">
             {browsingUser && showMessageBox && <ChatPopup {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser }} />}
             <p className={styles.sectionTitle + " mb-4"}>Review proposals</p>
-            
+
             <BriefInsights brief={brief} />
 
             <div className="w-full ml-auto flex items-center justify-between mt-6">
-                    <h3 className={styles.sectionTitle }>All applicants</h3>
-                    <StyledEngineProvider injectFirst>
-                        <FormControl>
-                            <InputLabel id="demo-simple-select-helper-label">Sort</InputLabel>
-                            <Select
-                                labelId="demo-simple-select-helper-label"
-                                id="demo-simple-select-helper"
-                                value={sortValue}
-                                label="Sort"
-                                onChange={(e) => setSortValue(e.target.value)}>
-                                <MenuItem value="match">Best Match</MenuItem>
-                                <MenuItem value='ratings'>Ratings</MenuItem>
-                                <MenuItem value='budget'>Budget</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </StyledEngineProvider>
-                </div>
+                <h3 className={styles.sectionTitle}>All applicants</h3>
+                <FormControl>
+                    <InputLabel id="demo-simple-select-helper-label">Sort</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-helper-label"
+                        id="demo-simple-select-helper"
+                        value={sortValue}
+                        label="Sort"
+                        onChange={(e) => setSortValue(e.target.value)}>
+                        <MenuItem value="match">Best Match</MenuItem>
+                        <MenuItem value='ratings'>Ratings</MenuItem>
+                        <MenuItem value='budget'>Budget</MenuItem>
+                    </Select>
+                </FormControl>
+            </div>
 
             <div className={styles.section}>
                 {
@@ -95,8 +97,6 @@ const BriefApplications = () => {
                         </div>
                         : <h3>No Application for this brief</h3>
                 }
-
-                {/* TODO Display empty if no applications */}
             </div>
         </div>
     );

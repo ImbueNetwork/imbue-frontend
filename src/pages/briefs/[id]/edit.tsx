@@ -19,6 +19,8 @@ import { TextArea } from "@/components/Briefs/TextArea";
 import { Option } from "@/components/Option";
 import styled from "@emotion/styled";
 import { postAPIHeaders } from "@/config";
+import SuccessScreen from "@/components/SuccessScreen";
+import ErrorScreen from "@/components/ErrorScreen";
 
 const SpacedRow = styled.div`
   display: flex;
@@ -48,44 +50,56 @@ export const EditProposal = (): JSX.Element => {
   const [scopeId, setScopeId] = useState<number>();
   const [durationId, setDurationId] = useState<number>();
   const [budget, setBudget] = useState<number | bigint | any>();
-  const [loading, setLoading] = useState<boolean>(false);
+
+
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<any>()
+  const [success, setSuccess] = useState<boolean>(false)
 
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
   const [skills, setSkills] = useState<string[]>([]);
   useEffect(() => {
-    getCurrentUserBrief();
+    router.isReady && getCurrentUserBrief();
   }, [briefId]);
 
   const getCurrentUserBrief = async () => {
-    const userResponse = await getCurrentUser();
-    setUser(userResponse);
-    const briefResponse: Brief | undefined = await getBrief(briefId);
-    const userOwnsBriefs = briefResponse?.user_id == userResponse?.id;
-    if (briefResponse && userResponse && userOwnsBriefs) {
-      const skillNames = briefResponse?.skills?.map?.((item) => item?.name);
-      const industryNames = briefResponse?.industries?.map?.(
-        (item) => item?.name
-      );
-      const projectHeadline: any = briefResponse?.headline;
-      const projectBudget: any = briefResponse?.budget;
-      const projectDescription = briefResponse?.description;
-      const projectScope = briefResponse?.scope_id;
-      const projectExperience = briefResponse?.experience_id;
-      const projectDuration = briefResponse?.duration_id;
+    try {
+      const userResponse = await getCurrentUser();
+      setUser(userResponse);
+      const briefResponse: Brief | undefined = await getBrief(briefId);
+      const userOwnsBriefs = briefResponse?.user_id == userResponse?.id;
+      if (briefResponse && userResponse && userOwnsBriefs) {
+        const skillNames = briefResponse?.skills?.map?.((item) => item?.name);
+        const industryNames = briefResponse?.industries?.map?.(
+          (item) => item?.name
+        );
+        const projectHeadline: any = briefResponse?.headline;
+        const projectBudget: any = briefResponse?.budget;
+        const projectDescription = briefResponse?.description;
+        const projectScope = briefResponse?.scope_id;
+        const projectExperience = briefResponse?.experience_id;
+        const projectDuration = briefResponse?.duration_id;
 
-      setBrief(briefResponse);
-      setSkills(skillNames);
-      setIndustries(industryNames);
-      setBudget(projectBudget);
-      setDescription(projectDescription);
-      setScopeId(projectScope);
-      setExpId(projectExperience);
-      setDurationId(projectDuration);
-      setHeadline(projectHeadline);
-    } else {
-      router.push(`/briefs/${briefId}`);
+        setBrief(briefResponse);
+        setSkills(skillNames);
+        setIndustries(industryNames);
+        setBudget(projectBudget);
+        setDescription(projectDescription);
+        setScopeId(projectScope);
+        setExpId(projectExperience);
+        setDurationId(projectDuration);
+        setHeadline(projectHeadline);
+      } else {
+        router.push(`/briefs/${briefId}`);
+      }
+    } catch (error) {
+      console.log(error);
     }
+    finally {
+      setLoading(false)
+    }
+
   };
 
   async function handleSubmit() {
@@ -93,23 +107,32 @@ export const EditProposal = (): JSX.Element => {
   }
 
   async function editProject() {
-    setLoading(true);
-    const updateBriefResponse = await updateBriefById({
-      description,
-      headline: headline,
-      industries,
-      scope_id: scopeId,
-      skills,
-      duration_id: durationId,
-      experience_id: expId,
-      budget,
-      brief_id: briefId,
-    });
-    setLoading(false);
-
-    if (updateBriefResponse) {
-      router.push(`/briefs/${briefId}`);
+    try {
+      setLoading(true);
+      const updateBriefResponse = await updateBriefById({
+        description,
+        headline: headline,
+        industries,
+        scope_id: scopeId,
+        skills,
+        duration_id: durationId,
+        experience_id: expId,
+        budget,
+        brief_id: briefId,
+      });
+      if (updateBriefResponse) {
+        setSuccess(true);
+      }
+      else {
+        setError({ message: "Could not update brief. Please try again" })
+      }
+    } catch (error) {
+      setError({ message: "Could not update brief. Please try again" })
     }
+    finally {
+      setLoading(false);
+    }
+
   }
 
   function filterStrings(arr1: string[], arr2: string[]): string[] {
@@ -267,6 +290,39 @@ export const EditProposal = (): JSX.Element => {
       </div>
 
       {loading && <FullScreenLoader />}
+
+      <SuccessScreen
+        title={"Your have successfully updated this brief"}
+        open={success}
+        setOpen={setSuccess}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => router.push(`/briefs/${briefId}/`)}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            See Updated Brief
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'>
+            Go to Dashboard
+          </button>
+        </div>
+      </SuccessScreen>
+
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'>
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
     </div>
   );
 };

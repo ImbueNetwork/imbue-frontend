@@ -11,8 +11,9 @@ import "@/styles/brief-details.css";
 import "@/styles/submit-proposal.css";
 import "@/styles/muiGlobal.css"
 import "@/styles/stream-chat.css"
+import "@/styles/animation.css"
 import { ThemeProvider, createTheme } from "@mui/material";
-
+import { StyledEngineProvider } from '@mui/material/styles';
 
 export default function App({ Component, pageProps }: AppProps) {
   const theme = createTheme({
@@ -30,7 +31,9 @@ export default function App({ Component, pageProps }: AppProps) {
       <Head><title>Imbue</title></Head>
       <Layout>
         <ThemeProvider theme={theme}>
-          <Component {...pageProps} />
+          <StyledEngineProvider injectFirst>
+            <Component {...pageProps} />
+          </StyledEngineProvider>
         </ThemeProvider>
       </Layout>
     </>

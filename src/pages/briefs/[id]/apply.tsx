@@ -14,6 +14,8 @@ import { selectAccount } from "@/redux/services/polkadotService";
 import { useRouter } from "next/router";
 import FullScreenLoader from "@/components/FullScreenLoader";
 import { WalletAccount } from "@talismn/connect-wallets";
+import SuccessScreen from "@/components/SuccessScreen";
+import ErrorScreen from "@/components/ErrorScreen";
 
 interface MilestoneItem {
   name: string;
@@ -32,6 +34,9 @@ export const SubmitProposal = (): JSX.Element => {
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
 
+  const [applicationId, setapplicationId] = useState()
+  const [error, setError] = useState<any>()
+
   useEffect(() => {
     getUserAndFreelancer();
   }, [briefId]);
@@ -43,8 +48,8 @@ export const SubmitProposal = (): JSX.Element => {
   const getUserAndFreelancer = async () => {
     const userResponse = await getCurrentUser();
     setUser(userResponse);
-    const freelancer = await getFreelancerProfile(userResponse?.username);
-    if (!freelancer) {
+    const freelancer: any = await getFreelancerProfile(userResponse?.username);
+    if (!freelancer?.id) {
       router.push(`/freelancers/new`);
     }
   };
@@ -84,16 +89,29 @@ export const SubmitProposal = (): JSX.Element => {
     setMilestones([...milestones, { name: "", amount: undefined }]);
   };
 
+  const onRemoveMilestone = (index: number) => {
+    const newMilestones = [...milestones]
+    newMilestones.splice(index, 1)
+    setMilestones(newMilestones);
+  };
+
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setCurrencyId(Number(event.target.value));
   };
 
   const handleSelectAccount = async (account: WalletAccount) => {
-    setLoading(true);
-    await selectAccount(account);
-    setLoading(false);
-    setShowPolkadotAccounts(false);
-    await insertProject();
+    try {
+      setLoading(true);
+      await selectAccount(account);
+      await insertProject();
+    } catch (error) {
+      setError(error)
+      console.log(error);
+    }
+    finally {
+      setLoading(false);
+      setShowPolkadotAccounts(false);
+    }
   };
 
   async function handleSubmit() {
@@ -107,49 +125,52 @@ export const SubmitProposal = (): JSX.Element => {
   async function insertProject() {
     //TODO: validate all milestone sum up to 100%
     setLoading(true);
-    const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}/project`),
-      {
-        headers: config.postAPIHeaders,
-        method: "post",
-        body: JSON.stringify({
-          user_id: user?.id,
-          name: `Brief Application: ${brief?.headline}`,
-          brief_id: brief?.id,
-          total_cost_without_fee: totalCostWithoutFee,
-          imbue_fee: imbueFee,
-          currency_id: currencyId,
-          milestones: milestones
-            .filter((m) => m.amount !== undefined)
-            .map((m) => {
-              return {
-                name: m.name,
-                amount: m.amount,
-                percentage_to_unlock: (
-                  ((m.amount ?? 0) / totalCostWithoutFee) *
-                  100
-                ).toFixed(0),
-              };
-            }),
-          required_funds: totalCost,
-        }),
+    try {
+      const resp = await fetch(
+        checkEnvironment().concat(`${config.apiBase}/project`),
+        {
+          headers: config.postAPIHeaders,
+          method: "post",
+          body: JSON.stringify({
+            user_id: user?.id,
+            name: `Brief Application: ${brief?.headline}`,
+            brief_id: brief?.id,
+            total_cost_without_fee: totalCostWithoutFee,
+            imbue_fee: imbueFee,
+            currency_id: currencyId,
+            milestones: milestones
+              .filter((m) => m.amount !== undefined)
+              .map((m) => {
+                return {
+                  name: m.name,
+                  amount: m.amount,
+                  percentage_to_unlock: (
+                    ((m.amount ?? 0) / totalCostWithoutFee) *
+                    100
+                  ).toFixed(0),
+                };
+              }),
+            required_funds: totalCost,
+          }),
+        }
+      );
+
+      if (resp.ok) {
+        const applicationId = (await resp.json()).id;
+        applicationId && setapplicationId(applicationId)
+      } else {
+        console.log("Failed to submit the brief");
+        setError({ message: "Failed to submit the brief" })
       }
-    );
-    if (resp.ok) {
-      const applicationId = (await resp.json()).id;
-      applicationId &&
-        router.push(`/briefs/${brief?.id}/applications/${applicationId}/`);
-    } else {
-      console.log("Failed to submit the brief");
+
+    } catch (error) {
+      setError(error)
+      console.log(error);
     }
-    setLoading(false);
+    finally {
+      setLoading(false);
+    }
   }
-
-  const renderPolkadotJSModal = (
-    <div>
-
-    </div>
-  );
 
   const totalPercent = milestones.reduce((sum, { amount }) => {
     const percent = Number(
@@ -180,9 +201,9 @@ export const SubmitProposal = (): JSX.Element => {
   const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
 
   return (
-    <div className="flex flex-col gap-10 text-base leading-[1.5] hq-layout">
+    <div className="flex flex-col gap-10 text-base leading-[1.5] hq-layout !mx-3 lg:!mx-auto">
       <div>
-        <h3 className="ml-8 mb-2 text-xl leading-[1.5] font-bold m-0 p-0  flex">
+        <h3 className="ml-4 lg:ml-8 mb-2 text-xl leading-[1.5] font-bold m-0 p-0  flex">
           Job description
         </h3>
         {brief && <BriefInsights brief={brief} />}
@@ -202,17 +223,22 @@ export const SubmitProposal = (): JSX.Element => {
           <p className="mx-5 lg:mx-14 text-base lg:text-lg font-bold">
             How many milestone do you want to include?
           </p>
-          <div className="milestone-list mx-5 lg:mx-14">
+          <div className="milestone-list !gap-0">
             {milestones.map(({ name, amount }, index) => {
               const percent = Number(
                 ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
               );
               return (
-                <div className="milestone-row !p-0" key={index}>
+                <div className="milestone-row !px-4 !py-7 !m-0 lg:!px-14 relative border-t border-light-white" key={index}>
+                  <span
+                    onClick={() => onRemoveMilestone(index)}
+                    className="absolute top-1 right-2 lg:right-4 text-sm lg:text-xl text-light-grey font-bold hover:border-red-500 hover:text-red-500 cursor-pointer">
+                    x
+                  </span>
                   <div className="text-base mr-4 lg:mr-9">{index + 1}.</div>
                   <div className="flex flex-row justify-between w-full">
-                    <div className="w-3/5 lg:w-1/2">
-                      <h3 className="mb-2 lg:mb-5 text-lg lg:text-xl font-bold m-0 p-0">
+                    <div className="w-3/5">
+                      <h3 className="mb-2 lg:mb-5 text-base lg:text-xl font-bold m-0 p-0">
                         Description
                       </h3>
                       <textarea
@@ -230,8 +256,8 @@ export const SubmitProposal = (): JSX.Element => {
                         }
                       />
                     </div>
-                    <div className="flex flex-col w-1/3 lg:items-end">
-                      <h3 className="mb-5 text-xl font-bold m-0 p-0">
+                    <div className="flex flex-col w-4/12 lg:items-end">
+                      <h3 className="mb-2 lg:mb-5 text-right text-base lg:text-xl font-bold m-0 p-0">
                         Amount
                       </h3>
                       <input
@@ -383,6 +409,38 @@ export const SubmitProposal = (): JSX.Element => {
 
       />
       {loading && <FullScreenLoader />}
+      <SuccessScreen
+        title={"You have successfully applied for this brief"}
+        open={applicationId ? true : false}
+        setOpen={setapplicationId}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => router.push(`/briefs/${brief?.id}/applications/${applicationId}/`)}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            See Application
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'>
+            Go to Dashboard
+          </button>
+        </div>
+      </SuccessScreen>
+
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'>
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
     </div>
   );
 };

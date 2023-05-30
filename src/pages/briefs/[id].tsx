@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 import BioPanel from "@/components/Briefs/BioPanel";
 import BioInsights from "@/components/Briefs/BioInsights";
 import { getServerSideProps } from "@/utils/serverSideProps";
+import ErrorScreen from "@/components/ErrorScreen";
 
 TimeAgo.addLocale(en);
 
@@ -61,7 +62,7 @@ const BriefDetails = (): JSX.Element => {
         setBrowsingUser(await getCurrentUser());
         setTargetUser(targetUser);
       } else {
-        briefData !== undefined && setError(briefData);
+        setError({message:"No Brief Found"});
       }
     }
   };
@@ -176,8 +177,6 @@ const BriefDetails = (): JSX.Element => {
     </div>
   );
 
-  if (error) return <h2>{error.message}</h2>;
-
   return (
     <div className="brief-details-container hq-layout px-[15px] lg:px-[40px]">
       <div className="brief-info max-width-750px:!flex-col">
@@ -200,6 +199,20 @@ const BriefDetails = (): JSX.Element => {
       </div>
       {ClientHistory}
       {SimilarProjects}
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => router.push('/briefs')}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            Seach Brief
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'>
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
     </div>
   );
 };

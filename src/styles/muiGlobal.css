@@ -95,6 +95,16 @@
 }
 
 
+/* error screen */
+
+.errorDialogue .MuiDialog-paper{
+    min-height: 300px;
+    width: 100%;
+    border-radius: 20px;
+    background-color: #1E1E1E;
+}
+
+
 @media screen and (max-width: 470px) {
     .MuiBottomNavigation-root{
         height: 46px;

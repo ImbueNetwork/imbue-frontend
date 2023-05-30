@@ -1,7 +1,7 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from 'next-connect'
-import db from "../db";
+import db from "@/db";
 import { updateFederatedLoginUser, getOrCreateFederatedUser, fetchUserOrEmail, User } from "../models";
 import { ensureParams, jwtOptions } from "./common";
 import jwt from 'jsonwebtoken';
@@ -38,7 +38,7 @@ export default nextConnect()
                             const payload = { id: user.id };
                             const token = await jwt.sign(payload, jwtOptions.secretOrKey);
 
-                            await setTokenCookie(res,token);
+                            await setTokenCookie(res, token);
                             res.send({ id: user.id, display_name: user.display_name });
                         } catch (e) {
                             tx.rollback();
@@ -46,7 +46,7 @@ export default nextConnect()
                         }
                     });
                 };
-    
+
                 getOrCreateFederatedUser(
                     "Imbue Network",
                     username.toLowerCase(),

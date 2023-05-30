@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import db from "../db";
+import db from "@/db";
 import * as models from "../models";
 import { User } from "@/model";
 import nextConnect from "next-connect";

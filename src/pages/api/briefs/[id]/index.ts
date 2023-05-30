@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import db from "../../db";
+import db from "@/db";
 import * as models from "../../models";
 import { Brief, BriefSqlFilter, fetchItems } from "../../models";
 import nextConnect from "next-connect";
@@ -34,9 +34,15 @@ export default nextConnect()
       try {
         const briefs: Array<Brief> = await models.searchBriefs(tx, data);
 
+        const { currentData, totalItems } = await models.paginatedData(
+          Number(data?.page || 1),
+          Number(data?.items_per_page || 5),
+          briefs
+        );
+
         await Promise.all([
-          briefs,
-          ...briefs.map(async (brief: any) => {
+          currentData,
+          ...currentData.map(async (brief: any) => {
             brief.skills = await fetchItems(brief.skill_ids, "skills")(tx);
             brief.industries = await fetchItems(
               brief.industry_ids,
@@ -45,7 +51,7 @@ export default nextConnect()
           }),
         ]);
 
-        res.status(200).json(briefs);
+        res.status(200).json({ currentData, totalBriefs: totalItems });
       } catch (e) {
         new Error(`Failed to search for briefs ${data}`, { cause: e as Error });
       }

@@ -15,6 +15,8 @@ import { useRouter } from "next/router";
 import { WalletAccount } from "@talismn/connect-wallets";
 import AccountChoice from "./AccountChoice";
 import { useMediaQuery } from "@mui/material";
+import ErrorScreen from "./ErrorScreen";
+import SuccessScreen from "./SuccessScreen";
 
 export const HirePopup = ({
   openPopup: openHirePopup,
@@ -30,6 +32,11 @@ export const HirePopup = ({
 }: any) => {
   const [popupStage, setstage] = useState<number>(0);
   const mobileView = useMediaQuery('(max-width:480px)');
+
+  const [success, setSuccess] = useState<boolean>(false)
+  const [error, setError] = useState<any>()
+  const [projectId, setProjectId] = useState<string>()
+  const router = useRouter()
 
   const modalStyle = {
     position: "absolute" as "absolute",
@@ -51,7 +58,6 @@ export const HirePopup = ({
     const imbueApi = await initImbueAPIInfo();
     const user: User | any = await getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
-
     const briefOwners: string[] = [user?.web3_address];
     const freelancerAddress: string = freelancer.web3_address;
     const budget: bigint = BigInt(totalCost * 1e12);
@@ -74,22 +80,26 @@ export const HirePopup = ({
       currencyId,
       milestones
     );
+
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
           console.log("***** success");
+          setSuccess(true)
           const briefId = brief.id;
-          await changeBriefApplicationStatus(
+          const resp = await changeBriefApplicationStatus(
             briefId!,
             application.id,
             OffchainProjectState.Accepted
           );
+          setProjectId(resp.project_id);
           console.log(result.eventData);
         } else if (result.txError) {
           console.log("***** failed");
-          console.log(result.errorMessage);
 
           // TODO, SHOW ERROR POPUP
+          setError({ message: result.errorMessage })
+          application.status_id = OffchainProjectState.PendingReview;
         }
         break;
       }
@@ -245,6 +255,39 @@ export const HirePopup = ({
           </Box>
         </Fade>
       </Modal>
+
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'>
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
+
+      <SuccessScreen
+        title={`You have successfully hired ${freelancer?.display_name} as a freelacer for your brief`}
+        open={success}
+        setOpen={setSuccess}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => router.push(`/projects/${projectId}`)}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            See Project
+          </button>
+          <button
+            onClick={() => setSuccess(false)}
+            className='underline text-xs lg:text-base font-bold'>
+            Continue
+          </button>
+        </div>
+      </SuccessScreen>
     </>
   );
 };

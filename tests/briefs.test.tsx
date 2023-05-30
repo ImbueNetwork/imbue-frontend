@@ -28,13 +28,19 @@ jest.mock("../src/redux/services/briefService", () => ({
   callSearchBriefs: jest.fn(),
 }));
 
+jest.mock("next/router");
+
 describe("Briefs component", () => {
   beforeAll(() => {
+    const mockBriefs = {
+      currentData: briefsData,
+      totalBriefs: 3,
+    };
     // Mock the briefsService.getAllBriefs method to return a fixed array of briefs
     const mockGetAllBriefs = getAllBriefs as jest.MockedFunction<
       typeof getAllBriefs
     >;
-    mockGetAllBriefs.mockResolvedValue(briefsData);
+    mockGetAllBriefs.mockResolvedValue(mockBriefs);
   });
 
   let briefsComponent: RenderResult<
@@ -54,13 +60,15 @@ describe("Briefs component", () => {
     | ((arg0: string) => any[]);
 
   beforeEach(async () => {
-    briefsComponent = await act(async () => render(<Briefs />));
-    const { container, queryAllByTestId, getAllByText } = await act(async () =>
-      render(<Briefs />)
-    );
-    appContainer = container;
-    appGetAllByText = getAllByText;
-    appQueryAllByTestId = queryAllByTestId;
+    await act(async () => {
+      await waitFor(() => {
+        briefsComponent = render(<Briefs />);
+      });
+    });
+
+    appContainer = briefsComponent.container;
+    appGetAllByText = briefsComponent.getAllByText;
+    appQueryAllByTestId = briefsComponent.queryAllByTestId;
 
     await waitFor(() =>
       expect(appContainer.getElementsByClassName("brief-title")).toHaveLength(3)
@@ -82,6 +90,10 @@ describe("Briefs component", () => {
     const mockCallSearchBriefs = callSearchBriefs as jest.MockedFunction<
       typeof callSearchBriefs
     >;
+    const mockCallSearchResponse = {
+      currentData: intermediateExpData,
+      totalBriefs: 1,
+    };
 
     // get intermidiate checkbox
     const intermidiateCheckBox = await waitFor(
@@ -93,7 +105,7 @@ describe("Briefs component", () => {
     if (appContainer) {
       fireEvent.click(intermidiateCheckBox);
 
-      mockCallSearchBriefs.mockResolvedValue(intermediateExpData);
+      mockCallSearchBriefs.mockResolvedValue(mockCallSearchResponse);
       // search for intermidiate briefs
       await waitFor(() =>
         fireEvent.click(appContainer.getElementsByClassName("tab-item")[0])
@@ -111,6 +123,10 @@ describe("Briefs component", () => {
     const mockCallSearchBriefs = callSearchBriefs as jest.MockedFunction<
       typeof callSearchBriefs
     >;
+    const mockCallSearchResponse = {
+      currentData: amountOfBriefsSubmitted,
+      totalBriefs: 2,
+    };
 
     const amountSubmittedCheckBox = await waitFor(
       () => appQueryAllByTestId("1-2")[0]
@@ -121,7 +137,7 @@ describe("Briefs component", () => {
     if (appContainer) {
       fireEvent.click(amountSubmittedCheckBox);
 
-      mockCallSearchBriefs.mockResolvedValue(amountOfBriefsSubmitted);
+      mockCallSearchBriefs.mockResolvedValue(mockCallSearchResponse);
 
       await waitFor(() =>
         fireEvent.click(appContainer.getElementsByClassName("tab-item")[0])
@@ -139,6 +155,10 @@ describe("Briefs component", () => {
     const mockCallSearchBriefs = callSearchBriefs as jest.MockedFunction<
       typeof callSearchBriefs
     >;
+    const mockCallSearchResponse = {
+      currentData: projectLengthData,
+      totalBriefs: 1,
+    };
 
     const projectLengthCheckBox = await waitFor(
       () => appQueryAllByTestId("2-0")[0]
@@ -149,7 +169,7 @@ describe("Briefs component", () => {
     if (appContainer) {
       fireEvent.click(projectLengthCheckBox);
 
-      mockCallSearchBriefs.mockResolvedValue(projectLengthData);
+      mockCallSearchBriefs.mockResolvedValue(mockCallSearchResponse);
 
       await waitFor(() =>
         fireEvent.click(appContainer.getElementsByClassName("tab-item")[0])
@@ -172,6 +192,10 @@ describe("Briefs component", () => {
     const mockCallSearchBriefs = callSearchBriefs as jest.MockedFunction<
       typeof callSearchBriefs
     >;
+    const mockCallSearchResponse = {
+      currentData: searchMockResponse,
+      totalBriefs: 1,
+    };
 
     const experienceCheckBox = await waitFor(
       () => appQueryAllByTestId("0-1")[0]
@@ -196,7 +220,7 @@ describe("Briefs component", () => {
         target: { value: "briefThree" },
       });
 
-      mockCallSearchBriefs.mockResolvedValue(searchMockResponse);
+      mockCallSearchBriefs.mockResolvedValue(mockCallSearchResponse);
       // search for input brief
       await waitFor(() =>
         fireEvent.click(appContainer.getElementsByClassName("tab-item")[0])

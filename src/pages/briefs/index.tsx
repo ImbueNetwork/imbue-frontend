@@ -2,10 +2,13 @@ import React, { useEffect, useState } from "react";
 import BriefFilter from "@/components/BriefFilter";
 import { Brief, BriefSqlFilter } from "@/model";
 import { callSearchBriefs, getAllBriefs } from "@/redux/services/briefService";
-import { BriefFilterOption } from "@/types/briefTypes";
+import { BriefFilterOption, BriefStepProps } from "@/types/briefTypes";
 import { useRouter } from "next/router";
 import { FiFilter } from "react-icons/fi";
 import { useWindowSize } from "@/hooks";
+import Pagination from "rc-pagination";
+import FullScreenLoader from "@/components/FullScreenLoader";
+import ErrorScreen from "@/components/ErrorScreen";
 
 export const strToIntRange = (strList: any) => {
   return Array.isArray(strList)
@@ -15,9 +18,15 @@ export const strToIntRange = (strList: any) => {
 
 const Briefs = (): JSX.Element => {
   const [briefs, setBriefs] = useState<Brief[]>([]);
+  const [briefs_total, setBriefsTotal] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState<boolean>(false);
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const router = useRouter();
   const size = useWindowSize();
+  const [itemsPerPage, setNumItemsPerPage] = useState<number>(5);
+
+  const [error, setError] = useState<any>()
 
   const {
     expRange,
@@ -28,7 +37,7 @@ const Briefs = (): JSX.Element => {
     hpw_max,
     hpw_is_max,
     heading,
-  } = router.query;
+  } = router?.query;
 
   // The thing with this implentation is that the interior order must stay totally ordered.
   // The interior index is used to specify which entry will be used in the search brief.
@@ -166,7 +175,9 @@ const Briefs = (): JSX.Element => {
   useEffect(() => {
     const fetchAndSetBriefs = async () => {
       if (!Object.keys(router?.query).length) {
-        setBriefs(await getAllBriefs());
+        const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
+        setBriefs(briefs_all?.currentData);
+        setBriefsTotal(briefs_all?.totalBriefs);
       } else {
         let filter: BriefSqlFilter = {
           experience_range: [],
@@ -175,6 +186,8 @@ const Briefs = (): JSX.Element => {
           length_range: [],
           length_is_max: false,
           search_input: "",
+          items_per_page: itemsPerPage,
+          page: currentPage,
         };
 
         if (expRange) {
@@ -222,13 +235,22 @@ const Briefs = (): JSX.Element => {
           });
           filter = { ...filter, length_range: strToIntRange(lengthRange) };
         }
-        const result = await callSearchBriefs(filter);
-        setBriefs(result);
+        const result: any = await callSearchBriefs(filter);
+        setBriefs(result?.currentData);
+        setBriefsTotal(result?.totalBriefs);
       }
     };
 
     router.isReady && fetchAndSetBriefs();
-  }, [expRange, heading, lengthRange, router, submitRange]);
+  }, [
+    expRange,
+    heading,
+    lengthRange,
+    router,
+    submitRange,
+    currentPage,
+    itemsPerPage,
+  ]);
 
   // Here we have to get all the checked boxes and try and construct a query out of it...
   const onSearch = async () => {
@@ -314,22 +336,32 @@ const Briefs = (): JSX.Element => {
       : [];
     router.push(router, undefined, { shallow: true });
 
-    if (is_search) {
-      const filter: BriefSqlFilter = {
-        experience_range: exp_range,
-        submitted_range,
-        submitted_is_max,
-        length_range,
-        length_is_max,
-        search_input: search_value,
-      };
-
-      const briefs_filtered = await callSearchBriefs(filter);
-      setBriefs(briefs_filtered);
-    } else {
-      const briefs_all = await getAllBriefs();
-      setBriefs(briefs_all);
-    }
+    try {
+      if (is_search) {
+        const filter: BriefSqlFilter = {
+          experience_range: exp_range,
+          submitted_range,
+          submitted_is_max,
+          length_range,
+          length_is_max,
+          search_input: search_value,
+          items_per_page: itemsPerPage,
+          page: currentPage,
+        };
+  
+        const briefs_filtered: any = await callSearchBriefs(filter);
+  
+        setBriefs(briefs_filtered?.currentData);
+        setBriefsTotal(briefs_filtered?.totalBriefs);
+      } else {
+        const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
+  
+        setBriefs(briefs_all?.currentData);
+        setBriefsTotal(briefs_all?.totalBriefs);
+      }
+    } catch (error) {
+      setError(error)
+    }    
   };
 
   const onSavedBriefs = () => {};
@@ -337,6 +369,37 @@ const Briefs = (): JSX.Element => {
   const toggleFilter = () => {
     setFilterVisible(!filterVisble);
   };
+
+  const PageItem = (props: any) => {
+    return (
+      <div
+        className={`h-[32px] rounded-[4px] hover:bg-[--theme-primary] hover:text-black border border-primary w-[32px] cursor-pointer pt-1 items-center text-center text-sm !font-bold mr-6 ${
+          currentPage === parseInt(props.page) ? "text-black" : "text-white"
+        }
+        ${
+          currentPage === parseInt(props.page)
+            ? "bg-[--theme-primary]"
+            : "bg-transparent"
+        }
+        `}
+      >
+        {props.page}
+      </div>
+    );
+  };
+
+  const arrayMultipleOfFiveWithin100 = () => {
+    let arr = [];
+    for (let i = 5; i <= 100; i += 5) {
+      arr.push(i);
+    }
+    return arr;
+  };
+
+  const pageinationIconClassName =
+    "h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary";
+
+  if (loading) return <FullScreenLoader />;
 
   return (
     <div className="search-briefs-container px-[15px] lg:px-[40px]">
@@ -415,12 +478,29 @@ const Briefs = (): JSX.Element => {
             placeholder="Search"
           />
           <div className="search-result">
-            <span className="result-count">{briefs.length}</span>
+            <span className="result-count">{briefs_total}</span>
             <span> briefs found</span>
+
+            <span className="ml-8">
+              number of briefs per page
+              <select
+                className="ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none"
+                onChange={(e) => {
+                  setNumItemsPerPage(parseInt(e.target.value));
+                }}
+                value={itemsPerPage}
+              >
+                {arrayMultipleOfFiveWithin100()?.map((item, itemIndex) => (
+                  <option key={itemIndex} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </span>
           </div>
         </div>
         <div className="briefs-list">
-          {briefs.map((item, itemIndex) => (
+          {briefs?.map((item, itemIndex) => !item?.project_id && (
             <div
               className="brief-item"
               key={itemIndex}
@@ -449,7 +529,38 @@ const Briefs = (): JSX.Element => {
             </div>
           ))}
         </div>
+        <Pagination
+          pageSize={itemsPerPage}
+          total={briefs_total}
+          onChange={(page: number, pageSize: number) => setCurrentPage(page)}
+          className="flex flex-row items-center my-10 px-10"
+          itemRender={(page, type, originalElement) => {
+            if (type === "page") {
+              return <PageItem page={page} />;
+            }
+            return originalElement;
+          }}
+          prevIcon={<div className={pageinationIconClassName}>{"<"}</div>}
+          nextIcon={<div className={pageinationIconClassName}>{">"}</div>}
+          jumpNextIcon={<div className={pageinationIconClassName}>{">>"}</div>}
+          jumpPrevIcon={<div className={pageinationIconClassName}>{"<<"}</div>}
+        />
       </div>
+
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'>
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
     </div>
   );
 };

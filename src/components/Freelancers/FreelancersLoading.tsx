@@ -1,22 +1,15 @@
 import React, { useState } from 'react';
 import styles from '@/styles/modules/freelancers.module.css'
 import { useWindowSize } from "@/hooks";
-import Image from 'next/image';
-import profilePic from "../../assets/images/profile-image.png";
-import FreelancerFilter from '@/components/Freelancers/FreelancerFilter';
-import { FiFilter } from 'react-icons/fi';
 import { Skeleton } from '@mui/material';
-import { StyledEngineProvider } from "@mui/system";
 
 
 export default function LoadingFreelancers() {
     const size = useWindowSize();
-    const [filterVisble, setFilterVisible] = useState<boolean>(false);
 
     return (
         <div className="px-[15px] lg:px-[40px] freelancer">
-            <StyledEngineProvider>
-                <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
+            <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
                     <div
                         className={`${styles.filterPanel}`}
                         style={{
@@ -87,7 +80,6 @@ export default function LoadingFreelancers() {
                         </div>
                     </div>
                 </div>
-            </StyledEngineProvider>
         </div>
     )
 }

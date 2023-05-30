@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from 'next-connect'
-import db from "../../db";
+import db from "@/db";
 import * as models from "../../models";
 import { fetchUserOrEmail, fetchWeb3AccountByAddress, updateFederatedLoginUser } from "../../models";
 import { jwtOptions } from "../common";

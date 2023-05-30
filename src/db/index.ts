@@ -1,6 +1,6 @@
 import knex from "knex";
 import knexfile from "./knexfile";
-import config from "../config";
+import config from "../pages/api/config";
 
 
 const validEnvironments = ["development", "staging", "production"];

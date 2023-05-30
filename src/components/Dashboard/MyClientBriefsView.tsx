@@ -5,7 +5,7 @@ import { Brief, Freelancer, Project } from "@/model";
 import { BriefLists } from "../Briefs/BriefsList";
 import { useRouter } from "next/router";
 import { getBriefApplications } from "@/redux/services/briefService";
-import FullScreenLoader from "../FullScreenLoader";
+import { Skeleton } from "@mui/material";
 
 type ClientViewProps = {
   briefId: string | string[] | undefined;
@@ -29,19 +29,24 @@ const MyClientBriefsView = (props: ClientViewProps) => {
 
   useEffect(() => {
     const getApplications = async (id: string | number) => {
-      setBriefApplications(await getBriefApplications(id));
+      try {
+        setLoadingApplications(true)
+        setBriefApplications(await getBriefApplications(id));
+      } catch (error) {
+        console.log(error);
+      }
+      finally{
+        setLoadingApplications(false)
+      }
     };
     briefId && getApplications(briefId.toString());
-    setLoadingApplications(false)
   }, [briefId]);
 
 
-  const goBack = () =>{
+  const goBack = () => {
     router.query.briefId = []
-    router.replace(router, undefined, {shallow:true})
+    router.replace(router, undefined, { shallow: true })
   }
-
-  if(loadingApplications) return <FullScreenLoader/>
 
   return (
     <div>
@@ -53,16 +58,23 @@ const MyClientBriefsView = (props: ClientViewProps) => {
           >
             <ArrowBackIcon />
           </div>
-          {briefApplications?.map((application: any, index: any) => {
-            return (
-              <ApplicationContainer
-                application={application}
-                handleMessageBoxClick={handleMessageBoxClick}
-                redirectToApplication={redirectToBriefApplications}
-                key={index}
-              />
-            );
-          })}
+          {
+            loadingApplications
+              ? <ApplicationSkeleton />
+              : <>
+                {briefApplications?.map((application: any, index: any) => {
+                  return (
+                    <ApplicationContainer
+                      application={application}
+                      handleMessageBoxClick={handleMessageBoxClick}
+                      redirectToApplication={redirectToBriefApplications}
+                      key={index}
+                    />
+                  );
+                })}
+              </>
+          }
+
         </div>
       ) : (
         <div>
@@ -71,15 +83,44 @@ const MyClientBriefsView = (props: ClientViewProps) => {
             briefs={briefs?.briefsUnderReview}
             showNewBriefButton={true}
           />
+
           <h2 className="text-base lg:text-xl font-bold mb-3 mt-4 lg:mt-10">Projects</h2>
           <BriefLists
             briefs={briefs?.acceptedBriefs}
             areAcceptedBriefs={true}
           />
+
         </div>
       )}
     </div>
   );
 };
+
+export function ApplicationSkeleton() {
+  return (
+    <div className="bg-theme-grey-dark border border-light-white overflow-hidden rounded-xl">
+      {
+        [1, 2].map((v, i) => (
+          <div key={i} className="w-full px-5 py-3 lg:px-10 lg:py-8 border-b last:border-b-0 border-b-light-white">
+            <div className="flex justify-between items-center">
+              <div className="flex w-full items-center gap-4">
+                <Skeleton className="w-16 h-16" animation="wave" variant="circular" sx={{ fontSize: '1rem' }} />
+                <Skeleton className="w-1/6 h-7" animation="wave" variant="text" sx={{ fontSize: '1rem' }} />
+              </div>
+              <Skeleton className="w-1/6 h-7" animation="wave" variant="text" sx={{ fontSize: '1rem' }} />
+            </div>
+            <div className="flex justify-between">
+              <Skeleton className="w-5/6" animation="wave" variant="text" sx={{ fontSize: '1rem' }} />
+              <Skeleton className="w-1/12" animation="wave" variant="text" sx={{ fontSize: '1rem' }} />
+            </div>
+            <Skeleton className="w-3/5" animation="wave" variant="text" sx={{ fontSize: '1rem' }} />
+            <Skeleton className="w-1/12" animation="wave" variant="text" sx={{ fontSize: '1rem' }} />
+          </div>
+        ))
+      }
+
+    </div>
+  )
+}
 
 export default MyClientBriefsView;
