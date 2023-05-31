@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import db from "../db";
+import db from "@/db";
 import * as models from "../models";
 import nextConnect from 'next-connect'
 
@@ -17,16 +17,16 @@ export default nextConnect()
     db.transaction(async (tx) => {
       try {
         const project = await models.fetchProject(id)(tx);
-  
+
         if (!project) {
           return res.status(404).end();
         }
-  
+
         const pkg: ProjectPkg = {
           ...project,
           milestones: await models.fetchProjectMilestones(id)(tx),
         };
-  
+
         return res.send(pkg);
       } catch (e) {
         new Error(`Failed to fetch project by id: ${id}`, {
@@ -57,15 +57,15 @@ export default nextConnect()
       try {
         // ensure the project exists first
         const exists = await models.fetchProject(id)(tx);
-  
+
         if (!exists) {
           return res.status(404).end();
         }
-  
+
         if (exists.user_id !== user_id) {
           return res.status(403).end();
         }
-  
+
         const project = await models.updateProject(id, {
           name,
           logo,
@@ -79,19 +79,19 @@ export default nextConnect()
           total_cost_without_fee,
           imbue_fee,
         })(tx);
-  
+
         if (!project.id) {
           return new Error("Cannot update milestones: `project_id` missing.");
         }
-  
+
         // drop then recreate
         await models.deleteMilestones(id)(tx);
-  
+
         const pkg: ProjectPkg = {
           ...project,
           milestones: await models.insertMilestones(milestones, project.id)(tx),
         };
-  
+
         return res.status(200).send(pkg);
       } catch (cause) {
         new Error(`Failed to update project.`, { cause: cause as Error });

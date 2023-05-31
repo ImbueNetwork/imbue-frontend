@@ -17,6 +17,9 @@ import * as config from "@/config";
 import { BriefInfo, BriefProps } from "@/types/briefTypes";
 import { getServerSideProps } from "@/utils/serverSideProps";
 import styles from '../../styles/modules/newBrief.module.css'
+import ErrorScreen from "@/components/ErrorScreen";
+import FullScreenLoader from "@/components/FullScreenLoader";
+import { useRouter } from "next/router";
 
 const getAPIHeaders = {
   accept: "application/json",
@@ -51,6 +54,11 @@ const NewBrief = (props: BriefProps): JSX.Element => {
   const [scopeId, setScopeId] = useState<number>();
   const [durationId, setDurationId] = useState<number>();
   const [budget, setBudget] = useState<number>();
+
+  const [error, setError] = useState<any>()
+  const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
+
 
   const NamePanel = (
     <>
@@ -237,6 +245,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
 
   const onReviewPost = async () => {
     //TODO: implement api call
+    setLoading(true)
     try {
       const user_id = (await utils.getCurrentUser())?.id;
       const resp = await fetch(`${config.apiBase}/briefs/`, {
@@ -254,19 +263,21 @@ const NewBrief = (props: BriefProps): JSX.Element => {
           user_id,
         }),
       });
-      if (resp.ok) {
-        // could be 200 or 201
-        // Brief API successfully invoked
+      if (resp.status === 200 || resp.status === 201) {
         console.log("Brief created successfully via Brief REST API");
+        setStep(step + 1);
       } else {
         console.log("Failed to submit the brief");
+        setError({ message: "Failed to submit the brief" })
       }
     } catch (error) {
+      setError(error)
       console.log(error);
     }
-    setStep(step + 1);
+    finally {
+      setLoading(false)
+    }
   };
-
   return (
     <div className="h-[90%] flex">
       <div className={`${styles.newBriefContainer} hq-layout`}>
@@ -322,6 +333,21 @@ const NewBrief = (props: BriefProps): JSX.Element => {
           </div>
         </div>
       </div>
+      {loading && <FullScreenLoader />}
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => router.push(`/briefs`)}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            Discover Briefs
+          </button>
+          <button
+            onClick={() => setError(null)}
+            className='underline text-xs lg:text-base font-bold'>
+            Try Again
+          </button>
+        </div>
+      </ErrorScreen>
     </div>
 
   );

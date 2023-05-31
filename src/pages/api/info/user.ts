@@ -2,9 +2,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import config from '../config'
 
-import db from "../db";
+import db from "@/db";
 import * as models from "../models";
-import {  jwtOptions } from "../auth/common"
+import { jwtOptions } from "../auth/common"
 // @ts-ignore
 import * as passportJwt from "passport-jwt"
 // @ts-ignore

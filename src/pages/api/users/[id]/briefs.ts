@@ -2,7 +2,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import nextConnect from 'next-connect';
 import passport from 'passport';
-import db from '../../db';
+import db from '@/db';
+
 import { fetchBriefApplications, fetchProject, fetchProjectMilestones, fetchUserBriefApplications, fetchUserBriefs } from '../../models';
 
 

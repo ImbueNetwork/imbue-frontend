@@ -4,7 +4,7 @@ import {
   dumyBriefs,
 } from "@/config/briefs-data";
 import { Brief, BriefSqlFilter, OffchainProjectState } from "@/model";
-import { BriefInfo } from "@/types/briefTypes";
+import { BriefInfo, PaginatedResponse } from "@/types/briefTypes";
 import { checkEnvironment } from "@/utils";
 
 const getAPIHeaders = {
@@ -28,17 +28,22 @@ export const callSearchBriefs = async (filter: BriefSqlFilter) => {
     }
   );
   if (resp.ok) {
-    return (await resp.json()) as Array<Brief>;
+    return (await resp.json()) as PaginatedResponse;
   } else {
     throw new Error("Failed to search briefs. status:" + resp.status);
   }
 };
 
-export const getAllBriefs = async () => {
+export const getAllBriefs = async (
+  itemsPerPage: number,
+  currentPage: number
+) => {
   // return dumyBriefs as Array<Brief>;
   //:TODO implement api for getting briefs
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}briefs/`),
+    checkEnvironment().concat(
+      `${config.apiBase}briefs?items_per_page=${itemsPerPage}&page=${currentPage}`
+    ),
     {
       headers: postAPIHeaders,
       method: "get",
@@ -46,7 +51,7 @@ export const getAllBriefs = async () => {
   );
 
   if (resp.ok) {
-    return (await resp.json()) as Array<Brief>;
+    return (await resp.json()) as PaginatedResponse;
   } else {
     throw new Error("Failed to get all briefs. status:" + resp.status);
   }

@@ -20,9 +20,14 @@ export async function createFreelancingProfile(freelancer: any) {
   }
 }
 
-export const getAllFreelancers = async () => {
+export const getAllFreelancers = async (
+  itemsPerPage: number,
+  currentPage: number
+) => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}freelancers/`),
+    checkEnvironment().concat(
+      `${config.apiBase}freelancers?items_per_page=${itemsPerPage}&page=${currentPage}`
+    ),
     {
       headers: config.postAPIHeaders,
       method: "get",
@@ -46,10 +51,9 @@ export async function getFreelancerProfile(username: string) {
   );
 
   if (resp.status === 200) {
-    const res = await resp.json()
+    const res = await resp.json();
     return res as Freelancer;
-  }
-  else return {}
+  } else return {};
 }
 
 export async function freelancerExists(username: string): Promise<boolean> {

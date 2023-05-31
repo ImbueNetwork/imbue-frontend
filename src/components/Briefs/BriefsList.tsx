@@ -49,12 +49,12 @@ export const BriefLists = ({
     return <h2 className="text-[16px]">Nothing to show</h2>;
 
   return (
-    <div className="bg-[#2c2c2c] mb-8 border border-light-white overflow-hidden rounded-[0.75rem]">
+    <div className="bg-theme-grey-dark mb-8 border border-light-white overflow-hidden rounded-xl">
       {briefs?.map((brief, index) => (
         <div
           key={index}
           onClick={() => handleItemClick(brief)}
-          className={`flex cursor-pointer hover:bg-secondary-dark-hover px-5 py-3 lg:px-[2.5rem] lg:py-[2rem] justify-between border-b border-b-light-white last:border-b-0`}
+          className={`flex cursor-pointer hover:bg-secondary-dark-hover px-5 py-3 lg:px-10 lg:py-8 justify-between border-b border-b-light-white last:border-b-0`}
         >
           <div className="flex flex-col gap-1 lg:gap-3">
             <h3 className="text-sm lg:text-xl font-bold">{brief.headline}</h3>

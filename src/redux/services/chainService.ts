@@ -541,6 +541,20 @@ class ChainService {
     ).toHuman();
     return projectOnChain;
   }
+
+  public async getBalance(accountAddress:string, currencyId: number){
+    
+    switch(currencyId){
+      case 0:
+        const balance : any = await this.imbueApi.imbue.api.query.system.account(accountAddress)
+        const imbueBalance = balance?.data?.free/1e12
+        return `${imbueBalance.toFixed(2)} IMBU`
+      case 1:
+        const ksmResponse : any = await this.imbueApi.imbue.api.query.ormlTokens.accounts(accountAddress,currencyId)
+        const ksmBalance = ksmResponse.free/1e12;
+        return `${ksmBalance.toFixed(2)} KSM`
+    }
+  }
 }
 
 export default ChainService;

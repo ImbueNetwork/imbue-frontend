@@ -1,3 +1,5 @@
+import { Freelancer } from "@/model";
+
 export type DraftMilestone = {
   name: string;
   percentage_to_unlock: number;
@@ -50,3 +52,8 @@ export enum NumberOfItemsPerList {
   ONE = 1,
   TWO = 2,
 }
+
+export type FreelancerStepProps = {
+  currentFreelancers: Freelancer[];
+  paginate: (page: number) => void;
+};

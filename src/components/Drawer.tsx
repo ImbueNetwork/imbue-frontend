@@ -78,6 +78,7 @@ const Drawer = ({ visible, setSideBarIsVisible }: DrawerProps): JSX.Element => {
 
   const navigateToPage = async (link: string, needAuthentication: boolean) => {
     if (needAuthentication && !authenticated) {
+      setRedirectURL(router.asPath)
       setLoginModal(true);
     }
     else {
