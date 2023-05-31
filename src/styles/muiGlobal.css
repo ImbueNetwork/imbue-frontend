@@ -1,125 +1,127 @@
+/* navbar */
+.menuItems .MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.MuiMenuItem-root.MuiMenuItem-gutters:hover {
+	background: rgba(128, 128, 128, 0.30);
+}
+
 /* brief-details */
 .chat-popup.MuiBox-root {
-    position: fixed;
-    right: 150px;
-    bottom: 0;
-    width: 400px;
-    height: 480px;
-    background-color: var(--theme-grey-dark);
+	position: fixed;
+	right: 150px;
+	bottom: 0;
+	width: 400px;
+	height: 480px;
+	background-color: var(--theme-grey-dark);
 }
 
 /* common.css */
 .MuiBottomNavigation-root {
-    background: var(--theme-grey-dark);
-    border-radius: 10px;
-    border: 1px solid var(--theme-light-white);
-    margin-bottom: 36px;
-    overflow: hidden;
+	background: var(--theme-grey-dark);
+	border-radius: 10px;
+	border: 1px solid var(--theme-light-white);
+	margin-bottom: 36px;
+	overflow: hidden;
 }
 
 .MuiButtonBase-root.MuiBottomNavigationAction-root.Mui-selected {
-    background-color: var(--theme-primary);
-    color: black;
+	background-color: var(--theme-primary);
+	color: black;
 }
 
 .MuiButtonBase-root.MuiBottomNavigationAction-root {
-    max-width: 33.34%;
-    color: white;
+	max-width: 33.34%;
+	color: white;
 }
 
 .MuiBottomNavigationAction-label,
 .MuiBottomNavigationAction-label.Mui-selected {
-    font-size: 18px;
+	font-size: 18px;
 }
 
 /* -------------- */
 
 .MuiFormControl-root {
-    margin-bottom: 24px;
+	margin-bottom: 24px;
 }
 
 #demo-simple-select-helper-label,
 #demo-simple-select-helper,
 .MuiSvgIcon-root.MuiSvgIcon-fontSizeMedium.MuiSelect-icon.MuiSelect-iconOutlined {
-    color: #fff;
+	color: #fff;
 }
 
 .MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl:hover .MuiOutlinedInput-notchedOutline {
-    border: 1px solid white;
+	border: 1px solid white;
 }
 
 .MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation1.MuiPaper-root.MuiMenu-paper.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation8.MuiPopover-paper {
-    background-color: var(--theme-grey-dark);
-    color: white;
+	background-color: var(--theme-grey-dark);
+	color: white;
 }
 
 .MuiOutlinedInput-notchedOutline {
-    border-color: var(--theme-light-white);
+	border-color: var(--theme-light-white);
 }
 
 .applicationList .MuiFormControl-root {
-    width: 140px;
-    cursor: pointer;
+	width: 140px;
+	cursor: pointer;
 }
 
 .MuiPaper-root.MuiMenu-paper.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation8.MuiPopover-paper {
-    background: var(--theme-grey-dark);
-    color: white;
+	background: var(--theme-grey-dark);
+	color: white;
 }
 
 .MuiFormLabel-root,
 .MuiInputBase-input,
 .MuiSvgIcon-root.MuiSvgIcon-fontSizeMedium.MuiSelect-icon.MuiSelect-iconStandard,
 .MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiInput-input {
-    color: white;
+	color: white;
 }
 
 .profile-container .MuiInputAdornment-root.MuiInputAdornment-positionEnd.MuiInputAdornment-outlined.MuiInputAdornment-sizeMedium {
-    color: white;
-    cursor: pointer;
+	color: white;
+	cursor: pointer;
 }
 
 .MuiDialog-paper {
-    background-color: var(--theme-grey-dark);
-    color: white;
-    margin: 7px auto;
+	background-color: var(--theme-grey-dark);
+	color: white;
+	margin: 7px auto;
 }
 
-
-.freelancer .MuiSkeleton-root{
-    background-color: #ffffff1c;
+.freelancer .MuiSkeleton-root {
+	background-color: #ffffff1c;
 }
 
-.client-badge .MuiBadge-badge{
-    cursor: pointer;
+.client-badge .MuiBadge-badge {
+	cursor: pointer;
 }
-
 
 /* error screen */
 
-.errorDialogue .MuiDialog-paper{
-    min-height: 300px;
-    width: 100%;
-    border-radius: 20px;
-    background-color: #1E1E1E;
+.errorDialogue .MuiDialog-paper {
+	min-height: 300px;
+	width: 100%;
+	border-radius: 20px;
+	background-color: #1e1e1e;
 }
 
-
 @media screen and (max-width: 470px) {
-    .MuiBottomNavigation-root{
-        height: 46px;
-        margin-bottom: 18px;
-    }
+	.MuiBottomNavigation-root {
+		height: 46px;
+		margin-bottom: 18px;
+	}
 
-    .MuiBottomNavigationAction-label,
-    .MuiBottomNavigationAction-label.Mui-selected {
-        font-size: 12px;
-    }
-    
-    .chat-popup.MuiBox-root {
-        position: fixed;
-        right: 10px;
-        margin: 0 auto;
-        width: 300px;
-    }
+	.MuiBottomNavigationAction-label,
+	.MuiBottomNavigationAction-label.Mui-selected {
+		font-size: 12px;
+	}
+
+	.chat-popup.MuiBox-root {
+		position: fixed;
+		right: 10px;
+		margin: 0 auto;
+		width: 300px;
+	}
 }

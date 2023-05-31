@@ -224,7 +224,7 @@ div#layout {
 #header-wrapper {
   position: relative;
   top: 0;
-  background: rgba(0, 0, 0, 0);
+  background: #0F0F0F;
   transition: background 200ms ease-in-out, box-shadow 200ms ease-in-out,
     padding 200ms ease-in-out;
 }
@@ -273,6 +273,7 @@ div#layout {
 #main-header {
   display: flex;
   z-index: 1;
+  align-items: center;
   justify-content: space-between;
   line-height: 1.15rem;
   padding: 0 30px;
