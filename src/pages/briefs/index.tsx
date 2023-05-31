@@ -38,7 +38,7 @@ const Briefs = (): JSX.Element => {
   const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
 
   const [error, setError] = useState<any>();
-
+  const { pathname } = router;
   const {
     expRange,
     submitRange,
@@ -416,13 +416,7 @@ const Briefs = (): JSX.Element => {
     );
   };
 
-  const arrayMultipleOfFiveWithin100 = () => {
-    let arr = [];
-    for (let i = 5; i <= 100; i += 5) {
-      arr.push(i);
-    }
-    return arr;
-  };
+  const dropDownValues = [5, 10, 20, 50];
 
   const FilterModal = ({ open, handleClose }: FilterModalProps) => {
     return (
@@ -431,7 +425,12 @@ const Briefs = (): JSX.Element => {
         onClose={handleClose}
         className="flex justify-center items-center flex-wrap bg-black bg-opacity-50 top-0 left-0 w-full h-full z-[100] fixed"
       >
-        <div className="bg-[#1B1B1B] rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative">
+        <div
+          onClick={(e: any) => {
+            e?.stopPropagation();
+          }}
+          className="bg-[#1B1B1B] rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative"
+        >
           <p className="font-normal text-base text-white mb-9">Filter</p>
 
           <div className="grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5">
@@ -484,6 +483,21 @@ const Briefs = (): JSX.Element => {
                 className="h-[14px] w-[14px] ml-2"
               />
             </button>
+            {selectedFilterIds?.length > 0 && (
+              <button
+                onClick={async () => {
+                  await router.push({
+                    pathname,
+                    query: {},
+                  });
+                  await setSlectedFilterIds([]);
+                }}
+                className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]"
+              >
+                Reset Filter X
+              </button>
+            )}
+
             <button
               onClick={onSavedBriefs}
               className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]"
@@ -508,13 +522,13 @@ const Briefs = (): JSX.Element => {
             <span className="ml-8">
               number of briefs per page
               <select
-                className="ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none"
+                className="ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none focus:outline-none focus:outline-white"
                 onChange={(e) => {
                   setNumItemsPerPage(parseInt(e.target.value));
                 }}
                 value={itemsPerPage}
               >
-                {arrayMultipleOfFiveWithin100()?.map((item, itemIndex) => (
+                {dropDownValues?.map((item, itemIndex) => (
                   <option key={itemIndex} value={item}>
                     {item}
                   </option>

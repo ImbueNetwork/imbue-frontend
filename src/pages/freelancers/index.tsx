@@ -46,6 +46,8 @@ const Freelancers = (): JSX.Element => {
   const { skillsRangeProps, servicesRangeProps, languagesRangeProps, heading } =
     router.query;
 
+  const { pathname } = router;
+
   const redirectToProfile = (username: any) => {
     router.push(`/freelancers/${username}/`);
   };
@@ -332,13 +334,7 @@ const Freelancers = (): JSX.Element => {
     );
   };
 
-  const arrayMultipleOfFiveWithin100 = () => {
-    let arr = [];
-    for (let i = 5; i <= 100; i += 5) {
-      arr.push(i);
-    }
-    return arr;
-  };
+  const dropDownValues = [5, 10, 20, 50];
 
   const FilterModal = ({ open, handleClose }: FilterModalProps) => {
     return (
@@ -347,7 +343,12 @@ const Freelancers = (): JSX.Element => {
         onClose={handleClose}
         className="flex justify-center items-center flex-wrap bg-black bg-opacity-50 top-0 left-0 w-full h-full z-[100] fixed"
       >
-        <div className="bg-[#1B1B1B] rounded-2xl md:px-12 px-8 md:py-10 py-5  h-[434px]md:w-[60%] w-[95vw] self-center relative min-h-[300px]">
+        <div
+          onClick={(e: any) => {
+            e?.stopPropagation();
+          }}
+          className="bg-[#1B1B1B] rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative"
+        >
           <p className="font-normal text-base text-white !mb-9">Filter</p>
 
           <div className="grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5">
@@ -378,6 +379,20 @@ const Freelancers = (): JSX.Element => {
     );
   };
 
+  const reset = async () => {
+    await router.push({
+      pathname,
+      query: {},
+    });
+    const allFreelancers: any = await getAllFreelancers(
+      itemsPerPage,
+      currentPage
+    );
+    await setSlectedFilterIds([]);
+    setFreelancers(allFreelancers?.currentData);
+    setFreelancersTotal(allFreelancers?.totalFreelancers);
+  };
+
   if (loading) return <LoadingFreelancers />;
 
   return (
@@ -400,6 +415,15 @@ const Freelancers = (): JSX.Element => {
                     className="h-[14px] w-[14px] ml-2"
                   />
                 </button>
+
+                {selectedFilterIds?.length > 0 && (
+                  <button
+                    onClick={reset}
+                    className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]"
+                  >
+                    Reset Filter X
+                  </button>
+                )}
               </div>
             </div>
             <input
@@ -413,16 +437,16 @@ const Freelancers = (): JSX.Element => {
                 <span> freelancers found</span>
               </div>
 
-              <span className="md:ml-8">
+              <span className="max-width-500px:ml-8">
                 number of freelancers per page
                 <select
-                  className="ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none"
+                  className="ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none focus:outline-none focus:outline-white"
                   onChange={(e) => {
                     setNumItemsPerPage(parseInt(e.target.value));
                   }}
                   value={itemsPerPage}
                 >
-                  {arrayMultipleOfFiveWithin100()?.map((item, itemIndex) => (
+                  {dropDownValues.map((item, itemIndex) => (
                     <option key={itemIndex} value={item}>
                       {item}
                     </option>
