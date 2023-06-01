@@ -813,6 +813,7 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
       "freelancers.user_id": "web3_accounts.user_id",
     })
     // order and group by many-many selects
+    .where("freelancers.verified", true)
     .orderBy("profile_image", "asc")
     .orderBy("freelancers.modified", "desc")
     .groupBy("freelancers.id")
