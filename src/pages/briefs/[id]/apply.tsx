@@ -161,8 +161,7 @@ export const SubmitProposal = (): JSX.Element => {
         const applicationId = (await resp.json()).id;
         applicationId && setapplicationId(applicationId)
       } else {
-        console.log("Failed to submit the brief");
-        setError({ message: "Failed to submit the brief" })
+        setError({ message: "Failed to submit the proposal" })
       }
 
     } catch (error) {
