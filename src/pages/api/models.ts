@@ -178,6 +178,7 @@ export type FreelancerSqlFilter = {
   search_input: string;
   items_per_page: number;
   page: number;
+  verified: boolean;
 };
 
 export type PagerProps = {
@@ -758,6 +759,7 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
       "display_name",
       "web3_accounts.address as web3_address",
       "freelancers.created",
+      "verified",
       tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
       tx.raw("ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids"),
 
@@ -1105,6 +1107,11 @@ export const searchFreelancers = async (
           "freelancer_languages.language_id",
           filter.languages_range
         );
+      }
+    })
+    .where(function () {
+      if (filter.verified) {
+        this.where("verified", true);
       }
     })
     .where("username", "ilike", "%" + filter.search_input + "%")

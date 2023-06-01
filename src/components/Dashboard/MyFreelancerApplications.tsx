@@ -17,7 +17,7 @@ const MyFreelancerApplications = ({
   const router = useRouter();
   const redirectToApplication = (application: Project) => {
 
-      let test = OffchainProjectState[application.status_id];
+    let test = OffchainProjectState[application.status_id];
     //TODO: redirect to projects page if accepted
     // if (application.status_id === ProjectStatus?.Accepted) {
     //   router.push(`/project/${application?.id}`);
@@ -35,16 +35,16 @@ const MyFreelancerApplications = ({
   if (myApplications?.length === 0)
     return (
       <div className="w-full flex justify-center mt-6">
-      <button
-        onClick={() => {
-          redirectToDiscoverBriefs();
-        }}
-        className="primary-btn in-dark w-button lg:w-1/3"
-        style={{ textAlign: "center" }}
+        <button
+          onClick={() => {
+            redirectToDiscoverBriefs();
+          }}
+          className="primary-btn in-dark w-button lg:w-1/3"
+          style={{ textAlign: "center" }}
         >
-        Discover Briefs
-      </button>
-        </div>
+          Discover Briefs
+        </button>
+      </div>
     );
 
   return (
@@ -61,9 +61,8 @@ const MyFreelancerApplications = ({
           <div className="flex flex-col gap-2 justify-evenly items-center ml-auto">
             <span className="text-xs lg:text-base">{timeAgo?.format(new Date(application?.created))}</span>
             <div
-              className={`px-4 py-2 w-fit rounded-full text-xs lg:text-base ${
-                OffchainProjectState[application.status_id]
-              }-button `}
+              className={`px-4 py-2 w-fit rounded-full text-xs lg:text-base ${OffchainProjectState[application.status_id]
+                }-button `}
             >
 
               {displayState(application.status_id)}

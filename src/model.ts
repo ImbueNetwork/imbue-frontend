@@ -154,7 +154,13 @@ export type Freelancer = {
 	rating?: number;
 	num_ratings: number;
 	profile_image: string;
+	verified: boolean;
 };
+
+export type FreelancerResponse = {
+	currentData: Array<Freelancer>;
+	totalFreelancers: number;
+}
 
 export function getDefaultFreelancer(): Freelancer {
 	return {
@@ -181,6 +187,7 @@ export function getDefaultFreelancer(): Freelancer {
 		rating: 3,
 		num_ratings: 0,
 		profile_image: '',
+		verified: false,
 	};
 }
 
@@ -228,6 +235,7 @@ export type FreelancerSqlFilter = {
 	search_input: string | string[];
 	items_per_page?: number;
 	page?: number;
+	verified?: boolean;
 };
 export type ApplicationData = {
 	brief_id: number;

@@ -1,6 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
-import { Freelancer, FreelancerSqlFilter, Item } from "../../model";
+import VerifiedIcon from "@mui/icons-material/Verified";
+import {
+  Freelancer,
+  FreelancerResponse,
+  FreelancerSqlFilter,
+  Item,
+} from "../../model";
 import styles from "@/styles/modules/freelancers.module.css";
 import {
   callSearchFreelancers,
@@ -14,7 +20,6 @@ import { strToIntRange } from "../briefs";
 import { useWindowSize } from "@/hooks";
 import { FiFilter } from "react-icons/fi";
 import LoadingFreelancers from "../../components/Freelancers/FreelancersLoading";
-import { FreelancerStepProps } from "@/types/proposalsTypes";
 import Pagination from "rc-pagination";
 import CustomModal from "@/components/CustomModal";
 import CustomDropDown from "@/components/CustomDropDown";
@@ -43,8 +48,13 @@ const Freelancers = (): JSX.Element => {
   const router = useRouter();
   const size = useWindowSize();
 
-  const { skillsRangeProps, servicesRangeProps, languagesRangeProps, heading } =
-    router.query;
+  const {
+    skillsRangeProps,
+    servicesRangeProps,
+    languagesRangeProps,
+    freelancerInfoProps,
+    heading,
+  } = router.query;
 
   const { pathname } = router;
 
@@ -65,9 +75,10 @@ const Freelancers = (): JSX.Element => {
   useEffect(() => {
     const setFilters = async () => {
       setLoading(true);
-      const data:
-        | { currentData: Freelancer[]; totalFreelancers: number }
-        | any = await getAllFreelancers(itemsPerPage, currentPage);
+      const data: FreelancerResponse = await getAllFreelancers(
+        itemsPerPage,
+        currentPage
+      );
       setLoading(false);
       let combinedSkills = Array.prototype.concat.apply(
         [],
@@ -99,43 +110,47 @@ const Freelancers = (): JSX.Element => {
   }, [currentPage, itemsPerPage]);
 
   const skillsFilter = {
-    filterType: FreelancerFilterOption.Services,
+    filterType: FreelancerFilterOption.Skills,
     label: "Skills",
-    options: skills?.map((item) => {
-      let filter = {
-        interiorIndex: item.id,
-        value: item.name,
-      };
-      return filter;
-    }),
+    options: skills?.map(({ id, name }) => (
+      {
+        interiorIndex: id,
+        value: name,
+      })
+    ),
   };
 
   const servicesFilter = {
-    // This is a field associated with the User.
-    // since its a range i need the
     filterType: FreelancerFilterOption.Services,
     label: "Services",
-    options: services?.map((item) => {
-      let filter = {
-        interiorIndex: item.id,
-        value: item.name,
-      };
-      return filter;
-    }),
+    options: services?.map(({ id, name }) => (
+      {
+        interiorIndex: id,
+        value: name,
+      }
+    )),
   };
 
   const languagesFilter = {
-    // Should be a field in the database, WILL BE IN DAYS.
-    // Again i need the high and low values.
     filterType: FreelancerFilterOption.Languages,
     label: "Languages",
-    options: languages?.map((item) => {
-      let filter = {
-        interiorIndex: item.id,
-        value: item.name,
-      };
-      return filter;
-    }),
+    options: languages?.map(({ id, name }) => (
+      {
+        interiorIndex: id,
+        value: name,
+      }
+    )),
+  };
+
+  const freelancerInfoFilter = {
+    filterType: FreelancerFilterOption.FreelancerInfo,
+    label: "Freelancer Info",
+    options: [
+      {
+        interiorIndex: 0,
+        value: "Verified",
+      },
+    ],
   };
 
   const handleSetId = (id: string | string[]) => {
@@ -147,21 +162,10 @@ const Freelancers = (): JSX.Element => {
   };
 
   const customDropdownConfigs = [
-    {
-      name: skillsFilter.label,
-      filterType: FreelancerFilterOption.Skills,
-      filterOptions: skillsFilter.options,
-    },
-    {
-      name: servicesFilter.label,
-      filterType: FreelancerFilterOption.Services,
-      filterOptions: servicesFilter.options,
-    },
-    {
-      name: languagesFilter.label,
-      filterType: FreelancerFilterOption.Languages,
-      filterOptions: languagesFilter.options,
-    },
+    skillsFilter,
+    servicesFilter,
+    languagesFilter,
+    freelancerInfoFilter
   ];
 
   const pageinationIconClassName =
@@ -216,8 +220,18 @@ const Freelancers = (): JSX.Element => {
           };
         }
 
-        const filteredFreelancers: any = await callSearchFreelancers(filter);
-        setFreelancers(filteredFreelancers?.currentData);
+        if (freelancerInfoProps) {
+          const data = JSON.parse(freelancerInfoProps as string);
+          const { verified } = data;
+          if (verified) {
+            filter = { ...filter, verified: true };
+            setSlectedFilterIds([...selectedFilterIds, '3-0']); // FIXME:
+          }
+        }
+
+        const { currentData, totalFreelancers } = await callSearchFreelancers(filter);
+        setFreelancers(currentData);
+        setFreelancersTotal(totalFreelancers)
       }
     };
 
@@ -231,6 +245,7 @@ const Freelancers = (): JSX.Element => {
     heading,
     languagesRangeProps,
     servicesRangeProps,
+    freelancerInfoProps,
   ]);
 
   const onSearch = async () => {
@@ -241,6 +256,7 @@ const Freelancers = (): JSX.Element => {
     let skillsRange: number[] = [];
     let servicesRange: number[] = [];
     let languagesRange: number[] = [];
+    let freelancerInfo: any = {};
 
     let search_input = document.getElementById(
       "search-input"
@@ -259,20 +275,25 @@ const Freelancers = (): JSX.Element => {
           // Here we are trying to build teh paramaters required to build the query
           // We build an array for each to get the values we want through concat.
           // and also specify if we want more than using the is_max field.
+          const index = parseInt(interiorIndex);
           switch (parseInt(filterType) as FreelancerFilterOption) {
             case FreelancerFilterOption.Skills:
-              skillsRange = [...skillsRange, parseInt(interiorIndex)];
+              skillsRange = [...skillsRange, index];
               break;
             case FreelancerFilterOption.Services:
-              servicesRange = [...servicesRange, parseInt(interiorIndex)];
+              servicesRange = [...servicesRange, index];
               break;
             case FreelancerFilterOption.Languages:
-              languagesRange = [...languagesRange, parseInt(interiorIndex)];
+              languagesRange = [...languagesRange, index];
+              break;
+            case FreelancerFilterOption.FreelancerInfo:
+              if (index === 0)
+                freelancerInfo.verified = true;
               break;
             default:
               console.log(
                 "Invalid filter option selected or unimplemented. type:" +
-                  filterType
+                filterType
               );
           }
         }
@@ -289,6 +310,11 @@ const Freelancers = (): JSX.Element => {
     router.query.languagesRangeProps = languagesRange.length
       ? languagesRange.toString()
       : [];
+    if (Object.keys(freelancerInfo).length)
+      router.query.freelancerInfoProps = JSON.stringify(freelancerInfo);
+    else {
+      delete router.query.freelancerInfoProps;
+    }
     router.push(router, undefined, { shallow: true });
 
     if (is_search) {
@@ -299,6 +325,7 @@ const Freelancers = (): JSX.Element => {
         search_input: search_value,
         items_per_page: itemsPerPage,
         page: currentPage,
+        verified: freelancerInfo.verified,
       };
       const filteredFreelancers: any = await callSearchFreelancers(filter);
       setFreelancers(filteredFreelancers?.currentData);
@@ -320,14 +347,12 @@ const Freelancers = (): JSX.Element => {
   const PageItem = (props: any) => {
     return (
       <div
-        className={`h-[32px] rounded-[4px] hover:bg-[--theme-primary] hover:text-black border border-primary w-[32px] cursor-pointer pt-1 items-center text-center text-sm !font-bold mr-6 ${
-          currentPage === parseInt(props.page) ? "text-black" : "text-white"
-        }
-        ${
-          currentPage === parseInt(props.page)
+        className={`h-[32px] rounded-[4px] hover:bg-[--theme-primary] hover:text-black border border-primary w-[32px] cursor-pointer pt-1 items-center text-center text-sm !font-bold mr-6 ${currentPage === parseInt(props.page) ? "text-black" : "text-white"
+          }
+        ${currentPage === parseInt(props.page)
             ? "bg-[--theme-primary]"
             : "bg-transparent"
-        }
+          }
         `}
       >
         {props.page}
@@ -355,14 +380,14 @@ const Freelancers = (): JSX.Element => {
           <div className="grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5">
             {customDropdownConfigs
               ?.filter(
-                (item) => item?.filterOptions && item?.filterOptions?.length > 0
+                ({ options }) => options && options.length > 0
               )
-              ?.map(({ name, filterType, filterOptions }) => (
+              ?.map(({ label, filterType, options }) => (
                 <CustomDropDown
-                  key={name}
-                  name={name}
+                  key={label}
+                  name={label}
                   filterType={filterType}
-                  filterOptions={filterOptions}
+                  filterOptions={options}
                   setId={handleSetId}
                   ids={selectedFilterIds}
                 />
@@ -400,7 +425,6 @@ const Freelancers = (): JSX.Element => {
     <div className="px-[15px] lg:px-[40px]">
       <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
         <FilterModal open={filterVisble} handleClose={() => toggleFilter()} />
-
         <div className={`${styles.freelancersView} max-width-750px:!w-full`}>
           <div className={`${styles.searchHeading} max-width-750px:!mx-0`}>
             <div className={`${styles.tabSection} w-full justify-between`}>
@@ -468,7 +492,8 @@ const Freelancers = (): JSX.Element => {
                       display_name,
                       skills,
                       profile_image,
-                    }: any,
+                      verified,
+                    }: Freelancer,
                     index: number
                   ) => (
                     <div className={styles.freelancer} key={index}>
@@ -483,6 +508,7 @@ const Freelancers = (): JSX.Element => {
                           width={300}
                           alt=""
                         />
+                        {verified && <VerifiedIcon className={styles.verifiedIcon} />}
                         <div className="dark-layer" />
                       </div>
                       <div className={styles.freelancerInfo}>
