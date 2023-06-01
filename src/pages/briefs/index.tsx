@@ -234,7 +234,7 @@ const Briefs = (): JSX.Element => {
 
         if (expRange) {
           const range = strToIntRange(expRange);
-          range.forEach((v: any) => {
+          range?.forEach?.((v: any) => {
             selectedFilterIds.push(`0-${v - 1}`);
           });
 
@@ -242,7 +242,7 @@ const Briefs = (): JSX.Element => {
         }
         if (submitRange) {
           const range = strToIntRange(submitRange);
-          range.forEach((v: any) => {
+          range?.forEach?.((v: any) => {
             if (v > 0 && v < 5) selectedFilterIds.push(`1-${0}`);
 
             if (v >= 5 && v < 10) selectedFilterIds.push(`1-${1}`);
@@ -262,7 +262,7 @@ const Briefs = (): JSX.Element => {
         }
         if (lengthRange) {
           const range = strToIntRange(lengthRange);
-          range.forEach((v: any) => {
+          range?.forEach?.((v: any) => {
             selectedFilterIds.push(`2-${v - 1}`);
           });
           filter = { ...filter, length_range: strToIntRange(lengthRange) };
@@ -287,6 +287,7 @@ const Briefs = (): JSX.Element => {
   // Here we have to get all the checked boxes and try and construct a query out of it...
   const onSearch = async () => {
     // The filter initially should return all values
+    setFilterVisible(!filterVisble);
     let is_search: boolean = false;
 
     let exp_range: number[] = [];

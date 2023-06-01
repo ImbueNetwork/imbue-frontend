@@ -187,7 +187,7 @@ const Freelancers = (): JSX.Element => {
 
         if (skillsRangeProps) {
           const range = strToIntRange(skillsRangeProps);
-          range.forEach((v: any) => {
+          range?.forEach?.((v: any) => {
             setSlectedFilterIds([...selectedFilterIds, `0-${v}`]);
           });
           filter = { ...filter, skills_range: strToIntRange(skillsRangeProps) };
@@ -196,7 +196,7 @@ const Freelancers = (): JSX.Element => {
         if (servicesRangeProps) {
           const range = strToIntRange(servicesRangeProps);
 
-          range.forEach((v: any) => {
+          range?.forEach?.((v: any) => {
             setSlectedFilterIds([...selectedFilterIds, `1-${v}`]);
           });
           filter = {
@@ -207,7 +207,7 @@ const Freelancers = (): JSX.Element => {
 
         if (languagesRangeProps) {
           const range = strToIntRange(languagesRangeProps);
-          range.forEach((v: any) => {
+          range?.forEach?.((v: any) => {
             setSlectedFilterIds([...selectedFilterIds, `2-${v}`]);
           });
           filter = {
@@ -234,6 +234,7 @@ const Freelancers = (): JSX.Element => {
   ]);
 
   const onSearch = async () => {
+    setFilterVisible(!filterVisble);
     // The filter initially should return all values
     let is_search: boolean = false;
 
