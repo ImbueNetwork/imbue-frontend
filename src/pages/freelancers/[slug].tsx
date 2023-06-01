@@ -13,6 +13,7 @@ import {
 } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
 import { IoPeople } from "react-icons/io5";
+import VerifiedIcon from "@mui/icons-material/Verified";
 import { Freelancer, User } from "@/model";
 import {
   getFreelancerProfile,
@@ -292,9 +293,14 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                   defaultValue={freelancer?.display_name}
                 />
               ) : (
-                <h3 className="!text-2xl font-bold text-center z-[1]">
-                  {freelancer?.display_name}
-                </h3>
+                <div className='flex gap-2 items-center justify-center mt-8'>
+                  <h3 className="!text-2xl font-bold text-center z-[1]">
+                    {freelancer?.display_name}
+                  </h3>
+                  {
+                    initFreelancer?.verified && <VerifiedIcon color='primary' />
+                  }
+                </div>
               )}
 
               <div className="flex gap-[15px] items-center justify-center flex-wrap">
