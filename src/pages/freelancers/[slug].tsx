@@ -835,7 +835,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         />
       )}
 
-      {loading && <FullScreenLoader/>}
+      {loading && <FullScreenLoader />}
 
       <SuccessScreen
         title={"You have successfully updated your profile"}

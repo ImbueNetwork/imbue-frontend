@@ -4,7 +4,7 @@ import { FiPlusCircle } from "react-icons/fi";
 import MilestoneItem from "@/components/Briefs/MilestoneItem";
 import { timeData } from "@/config/briefs-data";
 import * as config from "@/config";
-import { Brief, Currency, User } from "@/model";
+import { Brief, Currency, Freelancer, User } from "@/model";
 import { getBrief, getFreelancerBrief } from "@/redux/services/briefService";
 import { BriefInsights } from "@/components/Briefs/BriefInsights";
 import AccountChoice from "@/components/AccountChoice";
@@ -26,6 +26,7 @@ export const SubmitProposal = (): JSX.Element => {
   const [currencyId, setCurrencyId] = useState(0);
   const [brief, setBrief] = useState<Brief | any>();
   const [user, setUser] = useState<User>();
+  const [freelancer, setFreelancer] = useState<Freelancer>();
   // const userHasWeb3Addresss = !!user?.web3_address;
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
@@ -48,10 +49,11 @@ export const SubmitProposal = (): JSX.Element => {
   const getUserAndFreelancer = async () => {
     const userResponse = await getCurrentUser();
     setUser(userResponse);
-    const freelancer: any = await getFreelancerProfile(userResponse?.username);
+    const freelancer = await getFreelancerProfile(userResponse?.username);
     if (!freelancer?.id) {
       router.push(`/freelancers/new`);
     }
+    setFreelancer(freelancer);
   };
 
   const getCurrentUserBrief = async () => {

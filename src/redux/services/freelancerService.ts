@@ -1,4 +1,9 @@
-import { Freelancer, FreelancerResponse, FreelancerSqlFilter, Project } from "@/model";
+import {
+  Freelancer,
+  FreelancerResponse,
+  FreelancerSqlFilter,
+  Project,
+} from "@/model";
 import * as config from "@/config";
 import { checkEnvironment } from "@/utils";
 
@@ -41,7 +46,9 @@ export const getAllFreelancers = async (
   }
 };
 
-export async function getFreelancerProfile(username: string) {
+export async function getFreelancerProfile(
+  username: string
+): Promise<Freelancer | undefined> {
   const resp = await fetch(
     checkEnvironment().concat(`${config.apiBase}freelancers/${username}`),
     {
@@ -53,7 +60,9 @@ export async function getFreelancerProfile(username: string) {
   if (resp.status === 200) {
     const res = await resp.json();
     return res as Freelancer;
-  } else return {};
+  } else {
+    return undefined;
+  }
 }
 
 export async function freelancerExists(username: string): Promise<boolean> {
@@ -91,7 +100,9 @@ export async function updateFreelancer(freelancer: Freelancer) {
   }
 }
 
-export const callSearchFreelancers = async (filter: FreelancerSqlFilter): Promise<FreelancerResponse> => {
+export const callSearchFreelancers = async (
+  filter: FreelancerSqlFilter
+): Promise<FreelancerResponse> => {
   const resp = await fetch(
     checkEnvironment().concat(`${config.apiBase}freelancers/search`),
     {
