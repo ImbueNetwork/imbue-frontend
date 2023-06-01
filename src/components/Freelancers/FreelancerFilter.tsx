@@ -4,23 +4,23 @@ import styles from "@/styles/modules/freelancers.module.css"
 
 type FreelancerFilterProps = {
     label: string;
-    filter_options: Array<FilterOption> | undefined;
-    filter_type: FreelancerFilterOption;
+    options: Array<FilterOption> | undefined;
+    filterType: FreelancerFilterOption;
 };
 
-export const FreelancerFilter = ({ label, filter_options, filter_type }: FreelancerFilterProps): JSX.Element => {
+export const FreelancerFilter = ({ label, options, filterType }: FreelancerFilterProps): JSX.Element => {
     return (
         <div className="filter-section">
             <div className={styles.filterLabel}>{label}</div>
             <div className={styles.filterOptionList}>
-                {filter_options?.map(
+                {options?.map(
                     ({ value, interiorIndex }) => (
                         <div className={styles.filterOption} key={value}>
                             <input
                                 type="checkbox"
                                 className="filtercheckbox"
                                 id={
-                                    filter_type.toString() +
+                                    filterType.toString() +
                                     "-" +
                                     interiorIndex
                                 }

@@ -133,10 +133,11 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         account
       );
       if (resp.ok) {
-        setFreelancer({ ...freelancer,
-           web3_address: account.address,
-           web3_type:account.source,
-          });
+        setFreelancer({
+          ...freelancer,
+          web3_address: account.address,
+          web3_type: account.source,
+        });
       }
     } catch (error) {
       console.log(error);

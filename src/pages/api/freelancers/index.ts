@@ -53,7 +53,7 @@ export default nextConnect()
     });
   })
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
-    const { body, method } = req;
+    const { body } = req;
     const freelancer = body.freelancer;
 
     verifyUserIdFromJwt(req, res, freelancer.user_id);
