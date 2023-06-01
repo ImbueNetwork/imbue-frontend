@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { Freelancer, FreelancerSqlFilter, Item } from "../../model";
 import styles from "@/styles/modules/freelancers.module.css";
@@ -15,6 +16,14 @@ import { FiFilter } from "react-icons/fi";
 import LoadingFreelancers from "../../components/Freelancers/FreelancersLoading";
 import { FreelancerStepProps } from "@/types/proposalsTypes";
 import Pagination from "rc-pagination";
+import CustomModal from "@/components/CustomModal";
+import CustomDropDown from "@/components/CustomDropDown";
+import { filterIcon } from "@/assets/svgs";
+
+interface FilterModalProps {
+  open: boolean;
+  handleClose: () => void;
+}
 
 const Freelancers = (): JSX.Element => {
   const [freelancers, setFreelancers] = useState<
@@ -29,11 +38,15 @@ const Freelancers = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(true);
   const [itemsPerPage, setNumItemsPerPage] = useState<number>(5);
 
+  const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
+
   const router = useRouter();
   const size = useWindowSize();
 
   const { skillsRangeProps, servicesRangeProps, languagesRangeProps, heading } =
     router.query;
+
+  const { pathname } = router;
 
   const redirectToProfile = (username: any) => {
     router.push(`/freelancers/${username}/`);
@@ -125,6 +138,32 @@ const Freelancers = (): JSX.Element => {
     }),
   };
 
+  const handleSetId = (id: string | string[]) => {
+    if (Array.isArray(id)) {
+      setSlectedFilterIds([...id]);
+    } else {
+      setSlectedFilterIds([...selectedFilterIds, id]);
+    }
+  };
+
+  const customDropdownConfigs = [
+    {
+      name: skillsFilter.label,
+      filterType: FreelancerFilterOption.Skills,
+      filterOptions: skillsFilter.options,
+    },
+    {
+      name: servicesFilter.label,
+      filterType: FreelancerFilterOption.Services,
+      filterOptions: servicesFilter.options,
+    },
+    {
+      name: languagesFilter.label,
+      filterType: FreelancerFilterOption.Languages,
+      filterOptions: languagesFilter.options,
+    },
+  ];
+
   const pageinationIconClassName =
     "h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary";
 
@@ -148,22 +187,17 @@ const Freelancers = (): JSX.Element => {
 
         if (skillsRangeProps) {
           const range = strToIntRange(skillsRangeProps);
-          range.forEach((v: any) => {
-            const checkbox = document.getElementById(
-              `0-${v}`
-            ) as HTMLInputElement;
-            if (checkbox) checkbox.checked = true;
+          range?.forEach?.((v: any) => {
+            setSlectedFilterIds([...selectedFilterIds, `0-${v}`]);
           });
           filter = { ...filter, skills_range: strToIntRange(skillsRangeProps) };
         }
 
         if (servicesRangeProps) {
           const range = strToIntRange(servicesRangeProps);
-          range.forEach((v: any) => {
-            const checkbox = document.getElementById(
-              `1-${v}`
-            ) as HTMLInputElement;
-            if (checkbox) checkbox.checked = true;
+
+          range?.forEach?.((v: any) => {
+            setSlectedFilterIds([...selectedFilterIds, `1-${v}`]);
           });
           filter = {
             ...filter,
@@ -173,11 +207,8 @@ const Freelancers = (): JSX.Element => {
 
         if (languagesRangeProps) {
           const range = strToIntRange(languagesRangeProps);
-          range.forEach((v: any) => {
-            const checkbox = document.getElementById(
-              `2-${v}`
-            ) as HTMLInputElement;
-            if (checkbox) checkbox.checked = true;
+          range?.forEach?.((v: any) => {
+            setSlectedFilterIds([...selectedFilterIds, `2-${v}`]);
           });
           filter = {
             ...filter,
@@ -185,8 +216,8 @@ const Freelancers = (): JSX.Element => {
           };
         }
 
-        const filteredFreelancers = await callSearchFreelancers(filter);
-        setFreelancers(filteredFreelancers);
+        const filteredFreelancers: any = await callSearchFreelancers(filter);
+        setFreelancers(filteredFreelancers?.currentData);
       }
     };
 
@@ -203,10 +234,7 @@ const Freelancers = (): JSX.Element => {
   ]);
 
   const onSearch = async () => {
-    const elements = document.getElementsByClassName(
-      "filtercheckbox"
-    ) as HTMLCollectionOf<HTMLInputElement>;
-
+    setFilterVisible(!filterVisble);
     // The filter initially should return all values
     let is_search: boolean = false;
 
@@ -222,10 +250,10 @@ const Freelancers = (): JSX.Element => {
       is_search = true;
     }
 
-    for (let i = 0; i < elements.length; i++) {
-      if (elements[i].checked) {
+    for (let i = 0; i < selectedFilterIds.length; i++) {
+      if (selectedFilterIds[i] !== "") {
         is_search = true;
-        const id = elements[i].getAttribute("id");
+        const id = selectedFilterIds[i];
         if (id != null) {
           const [filterType, interiorIndex] = id.split("-");
           // Here we are trying to build teh paramaters required to build the query
@@ -307,12 +335,63 @@ const Freelancers = (): JSX.Element => {
     );
   };
 
-  const arrayMultipleOfFiveWithin100 = () => {
-    let arr = [];
-    for (let i = 5; i <= 100; i += 5) {
-      arr.push(i);
-    }
-    return arr;
+  const dropDownValues = [5, 10, 20, 50];
+
+  const FilterModal = ({ open, handleClose }: FilterModalProps) => {
+    return (
+      <CustomModal
+        open={open}
+        onClose={handleClose}
+        className="flex justify-center items-center flex-wrap bg-black bg-opacity-50 top-0 left-0 w-full h-full z-[100] fixed"
+      >
+        <div
+          onClick={(e: any) => {
+            e?.stopPropagation();
+          }}
+          className="bg-[#1B1B1B] rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative"
+        >
+          <p className="font-normal text-base text-white !mb-9">Filter</p>
+
+          <div className="grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5">
+            {customDropdownConfigs
+              ?.filter(
+                (item) => item?.filterOptions && item?.filterOptions?.length > 0
+              )
+              ?.map(({ name, filterType, filterOptions }) => (
+                <CustomDropDown
+                  key={name}
+                  name={name}
+                  filterType={filterType}
+                  filterOptions={filterOptions}
+                  setId={handleSetId}
+                  ids={selectedFilterIds}
+                />
+              ))}
+          </div>
+
+          <button
+            onClick={onSearch}
+            className="h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 absolute md:bottom-10 bottom-5 right-10"
+          >
+            Apply
+          </button>
+        </div>
+      </CustomModal>
+    );
+  };
+
+  const reset = async () => {
+    await router.push({
+      pathname,
+      query: {},
+    });
+    const allFreelancers: any = await getAllFreelancers(
+      itemsPerPage,
+      currentPage
+    );
+    await setSlectedFilterIds([]);
+    setFreelancers(allFreelancers?.currentData);
+    setFreelancersTotal(allFreelancers?.totalFreelancers);
   };
 
   if (loading) return <LoadingFreelancers />;
@@ -320,63 +399,32 @@ const Freelancers = (): JSX.Element => {
   return (
     <div className="px-[15px] lg:px-[40px]">
       <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
-        <div
-          className={`${styles.filterPanel}`}
-          style={{
-            display:
-              size?.width <= 750 ? (filterVisble ? "block" : "none") : "block",
-          }}
-        >
-          <div className={styles.filterHeading}>Filter By</div>
-          <FreelancerFilter
-            label={skillsFilter.label}
-            filter_type={FreelancerFilterOption.Skills}
-            filter_options={skillsFilter.options}
-          ></FreelancerFilter>
-          <FreelancerFilter
-            label={servicesFilter.label}
-            filter_type={FreelancerFilterOption.Services}
-            filter_options={servicesFilter.options}
-          ></FreelancerFilter>
-          <FreelancerFilter
-            label={languagesFilter.label}
-            filter_type={FreelancerFilterOption.Languages}
-            filter_options={languagesFilter.options}
-          ></FreelancerFilter>
-
-          <div className="tab-section mb-10 min-width-500px:!hidden">
-            <button
-              onClick={() => {
-                onSearch();
-                toggleFilter();
-              }}
-              className="rounded-full text-black bg-white px-10 py-2"
-            >
-              Search
-            </button>
-            <button
-              onClick={() => {
-                setFilterVisible(false);
-              }}
-              className="rounded-full text-black bg-white px-10 py-2 ml-5"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
+        <FilterModal open={filterVisble} handleClose={() => toggleFilter()} />
 
         <div className={`${styles.freelancersView} max-width-750px:!w-full`}>
           <div className={`${styles.searchHeading} max-width-750px:!mx-0`}>
             <div className={`${styles.tabSection} w-full justify-between`}>
-              <div className={styles.tabItem} onClick={onSearch}>
-                Search
-              </div>
+              <div className="tab-section">
+                <button
+                  onClick={toggleFilter}
+                  className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105"
+                >
+                  Filter
+                  <Image
+                    src={filterIcon}
+                    alt={"filter-icon"}
+                    className="h-[14px] w-[14px] ml-2"
+                  />
+                </button>
 
-              <div
-                className={`tab-item text-right min-width-750px:hidden`}
-                onClick={toggleFilter}
-              >
-                <FiFilter color="#fff" />
+                {selectedFilterIds?.length > 0 && (
+                  <button
+                    onClick={reset}
+                    className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]"
+                  >
+                    Reset Filter X
+                  </button>
+                )}
               </div>
             </div>
             <input
@@ -384,20 +432,22 @@ const Freelancers = (): JSX.Element => {
               className={`search-input`}
               placeholder="Search"
             />
-            <div className="search-result">
-              <span className="result-count">{freelancers_total}</span>
-              <span> freelancers found</span>
+            <div className="search-result flex flex-col">
+              <div>
+                <span className="result-count">{freelancers_total}</span>
+                <span> freelancers found</span>
+              </div>
 
-              <span className="ml-8">
+              <span className="max-width-500px:ml-8">
                 number of freelancers per page
                 <select
-                  className="ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none"
+                  className="ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none focus:outline-none focus:outline-white"
                   onChange={(e) => {
                     setNumItemsPerPage(parseInt(e.target.value));
                   }}
                   value={itemsPerPage}
                 >
-                  {arrayMultipleOfFiveWithin100()?.map((item, itemIndex) => (
+                  {dropDownValues.map((item, itemIndex) => (
                     <option key={itemIndex} value={item}>
                       {item}
                     </option>
