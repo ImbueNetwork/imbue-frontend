@@ -1,12 +1,12 @@
 .freelancersContainer {
   margin: 0 72px;
-  display: flex;
+  /* display: flex; */
   flex-direction: row;
 }
 
 .freelancers {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   grid-column-gap: 20px;
   grid-row-gap: 20px;
   padding-left: 20px;
@@ -54,9 +54,9 @@
 }
 
 .freelancersView {
-  display: flex;
+  /* display: flex; */
   flex-direction: column;
-  width: 70%;
+  /* width: 70%; */
 }
 
 .primaryButton {

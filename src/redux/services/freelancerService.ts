@@ -1,4 +1,3 @@
-import { FreelancerResponse } from './../../model';
 import { Freelancer, FreelancerResponse, FreelancerSqlFilter, Project } from "@/model";
 import * as config from "@/config";
 import { checkEnvironment } from "@/utils";
