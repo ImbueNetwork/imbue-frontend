@@ -21,11 +21,12 @@ module.exports = {
         "theme-grey-dark": "#2c2c2c",
         "theme-secondary": "#411dc9",
         "theme-coral": "#FC6760",
+        "theme-black-text" : "#0f0f0f",
         "secondary-dark-hover": "#121c7f",
         "light-white": "rgba(255, 255, 255, 0.25)",
         "light-grey": "rgba(235, 234, 226, 0.5)",
+        'dark-black': "#1E1E1E",
         primary: "#b2ff0b",
-        'dark-black': "#1E1E1E"
       },
       screens: {
         "max-width-1800px": { raw: "(max-width: 1800px)" },

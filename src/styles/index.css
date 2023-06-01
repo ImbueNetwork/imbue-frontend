@@ -222,9 +222,10 @@ div#layout {
 }
 
 #header-wrapper {
-  position: relative;
+  position: fixed;
+  width: 100%;
+  z-index: 10;
   top: 0;
-  background: #0F0F0F;
   transition: background 200ms ease-in-out, box-shadow 200ms ease-in-out,
     padding 200ms ease-in-out;
 }

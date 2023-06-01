@@ -16,11 +16,18 @@ import Login from "./Login";
 
 const logoStyle = { height: "100%", width: "100%" };
 
-function Navbar() {
+type NavbarProps = {
+  setGaveFeedback: Function;
+  gaveFeedback: boolean;
+}
+
+function Navbar({ setGaveFeedback, gaveFeedback }: NavbarProps) {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [redirectURL, setRedirectURL] = useState<string>();
   const [freelancerProfile, setFreelancerProfile] = useState<any>()
   const [user, setUser] = useState<User>()
+
+  const [solidNav, setSolidNav] = useState<boolean>(true)
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -43,11 +50,33 @@ function Navbar() {
     setup();
   }, []);
 
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     const isScrolled = window.scrollY > 50
+
+  //     if (isScrolled) setSolidNav(true)
+  //     else setSolidNav(false)
+  //   }
+
+  //   document.addEventListener('scroll', handleScroll)
+  //   return () => {
+  //     document.removeEventListener('scroll', handleScroll)
+  //   }
+  // }, [])
+
 
   return (
     <>
-      <header className="py-3 navBar" id="header-wrapper">
-        <div id="main-header" className="flex justify-between">
+      <header className={`navBar ${solidNav ? "bg-theme-black-text" : "bg-transparent"}`} id="header-wrapper">
+        {
+          !gaveFeedback && (
+            <div className="text-center w-full bg-primary text-black py-1">
+              Thanks for trying the beta version of Imbue. Please let us know what we should work on to make it better! Submit your feedback
+              <span onClick={() => setGaveFeedback(true)} className="underline cursor-pointer ml-1">here</span>
+            </div>
+          )
+        }
+        <div id="main-header" className="flex justify-between !py-2">
           <h1 className="main-title">
             <Link href="/">
               <div id="logo">
@@ -64,8 +93,10 @@ function Navbar() {
           </div> */}
 
           <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-            <Typography sx={{ minWidth: 100 }}>Contact</Typography>
-            <Typography sx={{ minWidth: 100 }}>Profile</Typography>
+            <Typography className="mx-5" sx={{ minWidth: 100 }}>Start a Project</Typography>
+            <Typography className="mx-5" sx={{ minWidth: 100 }}>Fund a Project</Typography>
+            <Typography className="mx-5" sx={{ minWidth: 100 }}>Why Imbue?</Typography>
+            <Typography className="mx-5" sx={{ minWidth: 100 }}>Find a Team</Typography>
             <Tooltip title="Account settings">
               <IconButton
                 onClick={handleClick}
@@ -83,46 +114,19 @@ function Navbar() {
           </Box>
         </div>
         <Menu
+          disableScrollLock={true}
+          id="basic-menu"
           anchorEl={anchorEl}
-          id="account-menu"
           open={open}
           onClose={handleClose}
-          onClick={handleClose}
-          className="navBar"
-          PaperProps={{
-            elevation: 0,
-            sx: {
-              overflow: 'visible',
-              bgcolor: "#0F0F0F",
-              color: "white",
-              filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-              mt: 1.5,
-              '& .MuiAvatar-root': {
-                width: 32,
-                height: 32,
-                ml: -0.5,
-                mr: 1,
-              },
-              '&:before': {
-                content: '""',
-                display: 'block',
-                position: 'absolute',
-                top: 0,
-                right: 14,
-                width: 10,
-                height: 10,
-                bgcolor: '#0F0F0F',
-                transform: 'translateY(-50%) rotate(45deg)',
-                zIndex: 0,
-              },
-            },
+          MenuListProps={{
+            'aria-labelledby': 'basic-button',
           }}
-          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          className="navBar"
         >
           <MenuItems
             isFreelancer={freelancerProfile?.id ? true : false}
-            {...{ user, setLoginModal }}
+            {...{ user, setLoginModal, handleClose }}
           />
         </Menu>
       </header>

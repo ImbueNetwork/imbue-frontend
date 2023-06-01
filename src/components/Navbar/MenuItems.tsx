@@ -5,7 +5,7 @@ import PersonAdd from '@mui/icons-material/PersonAdd';
 import Login from '../Login';
 
 
-const MenuItems = ({ user, isFreelancer, setLoginModal }: any) => {
+const MenuItems = ({ user, isFreelancer, setLoginModal,handleClose }: any) => {
     const router = useRouter();
     const [redirectURL, setRedirectURL] = useState<string>();
 
@@ -55,6 +55,7 @@ const MenuItems = ({ user, isFreelancer, setLoginModal }: any) => {
     ];
 
     const navigateToPage = async (link: string, needAuthentication: boolean) => {
+        handleClose()
         if (needAuthentication && !user?.username) {
             setRedirectURL(router.asPath)
             setLoginModal(true);
