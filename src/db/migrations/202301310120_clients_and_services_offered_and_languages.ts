@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { auditFields, onUpdateTrigger } from "../utils";
+import { auditFields } from "../utils";
 
 export async function up(knex: Knex): Promise<void> {
 
@@ -14,11 +14,11 @@ export async function up(knex: Knex): Promise<void> {
             builder.increments("id", { primaryKey: true });
             builder.integer("client_id");
             builder.integer("freelancer_id");
-            builder.foreign("client_id").references("clients.id"); 
-            builder.foreign("freelancer_id").references("freelancers.id"); 
+            builder.foreign("client_id").references("clients.id");
+            builder.foreign("freelancer_id").references("freelancers.id");
             auditFields(knex, builder);
         });
-    }); 
+    });
 
     //builder.specificType("services_ids", "integer[]");
     await knex.schema.createTable("services", (builder) => {
@@ -30,12 +30,12 @@ export async function up(knex: Knex): Promise<void> {
             builder.increments("id", { primaryKey: true });
             builder.integer("service_id");
             builder.integer("freelancer_id");
-            builder.foreign("service_id").references("services.id"); 
-            builder.foreign("freelancer_id").references("freelancers.id"); 
+            builder.foreign("service_id").references("services.id");
+            builder.foreign("freelancer_id").references("freelancers.id");
             auditFields(knex, builder);
         });
 
-    }); 
+    });
 
     //builder.specificType("language_ids", "integer[]");
     await knex.schema.createTable("languages", (builder) => {
@@ -47,11 +47,11 @@ export async function up(knex: Knex): Promise<void> {
             builder.increments("id", { primaryKey: true });
             builder.integer("language_id");
             builder.integer("freelancer_id");
-            builder.foreign("language_id").references("languages.id"); 
-            builder.foreign("freelancer_id").references("freelancers.id"); 
+            builder.foreign("language_id").references("languages.id");
+            builder.foreign("freelancer_id").references("freelancers.id");
             auditFields(knex, builder);
-        });     
-    }); 
+        });
+    });
 
 
 };

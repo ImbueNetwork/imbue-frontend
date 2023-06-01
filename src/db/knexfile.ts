@@ -1,6 +1,5 @@
 // Update with your config settings.
-export default {
-
+const config = {
   development: {
     client: "postgresql",
     connection: {
@@ -15,7 +14,7 @@ export default {
       max: 10
     },
     migrations: {
-      tableName: "knex_migrations"
+      tableName: "knex_migrations",
     }
   },
 
@@ -57,3 +56,5 @@ export default {
   }
 
 };
+
+export default config;
