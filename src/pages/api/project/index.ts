@@ -11,7 +11,6 @@ import nextConnect from 'next-connect'
 
 export default nextConnect()
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
-    const { method } = req;
     const {
       name,
       logo,
