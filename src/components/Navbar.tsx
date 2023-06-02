@@ -15,6 +15,7 @@ import MenuItems from "./Navbar/MenuItems";
 import Login from "./Login";
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
+import { useRouter } from "next/router";
 
 function Navbar() {
   const [loginModal, setLoginModal] = useState<boolean>(false);
@@ -23,6 +24,8 @@ function Navbar() {
   const [user, setUser] = useState<User>()
 
   const [solidNav, setSolidNav] = useState<boolean>(false)
+
+  const router = useRouter()
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -62,7 +65,14 @@ function Navbar() {
     }
   }, [])
 
-
+  const navigaeToPage = () =>{
+    if(user?.username){
+      router.push("/briefs/new")
+    }
+    else{
+      setLoginModal(true)
+    }
+  }
 
 
   return (
@@ -89,10 +99,9 @@ function Navbar() {
           </div> */}
 
           <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-            <Link className="mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline" href="/briefs/new">Start a Project</Link>
-            <Link className="mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline" href="/briefs/">Fund a Project</Link>
-            <Link className="mx-1 lg:mx-5 text-xs lg:text-sm cursor-pointer hover:underline" href="">Why Imbue?</Link>
-            <Link className="mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline" href="/freelancers">Find a Team</Link>
+            <span className="mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline" onClick={navigaeToPage}>Submit a Brief</span>
+            <Link className="mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline" href="/briefs/">Discover Briefs</Link>
+            <Link className="mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline" href="/freelancers">Discover Freelancers</Link>
             <Tooltip title="Account settings">
               <IconButton
                 onClick={handleClick}
@@ -115,7 +124,6 @@ function Navbar() {
                       }
                     </div>
                 }
-
               </IconButton>
             </Tooltip>
           </Box>

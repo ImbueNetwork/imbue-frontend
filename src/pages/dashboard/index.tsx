@@ -84,6 +84,8 @@ const Dashboard = ({ user, isAuthenticated, myBriefs, myApplicationsResponse }: 
 
   if (loadingStreamChat) return <FullScreenLoader />
 
+  console.log(user);
+
   return client ? (
     <div className="hq-layout px-[15px]">
       <StyledEngineProvider injectFirst>
