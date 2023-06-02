@@ -31,10 +31,10 @@ export const BriefFilter = React.memo(
     return (
       <div className="filter-section">
         <div className="filter-label">{label}</div>
-        <div className="filter-option-list">
+        <div className="filter-option-list !mb-0 !gap-0">
           {filter_options.map(({ value, interiorIndex }) => (
             <div
-              className="filter-option flex items-center justify-between w-full"
+              className="filter-option flex items-center justify-between w-full hover:bg-slate-800 px-4 py-2"
               key={value}
             >
               <label className="font-normal text-base text-white flex justify-between w-full cursor-pointer">

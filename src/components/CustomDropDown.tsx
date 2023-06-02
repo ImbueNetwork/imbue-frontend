@@ -12,6 +12,7 @@ interface CustomDropDownProps {
   filterOptions: Array<FilterOption> | undefined | any;
   setId?: (id: string | string[]) => void;
   ids?: Array<string>;
+  setOpenDropDown?: (val: string) => void | undefined;
 }
 
 const CustomDropDown = React.memo(
@@ -21,6 +22,7 @@ const CustomDropDown = React.memo(
     filterOptions,
     setId,
     ids,
+    setOpenDropDown,
   }: CustomDropDownProps): JSX.Element => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -38,7 +40,7 @@ const CustomDropDown = React.memo(
       } else {
         localStorage.setItem(name, "true");
       }
-
+      setOpenDropDown && setOpenDropDown(name);
       setIsOpen(!isOpen);
     };
 
@@ -57,7 +59,7 @@ const CustomDropDown = React.memo(
           />
         </div>
         {isOpen && (
-          <div className="w-[221px] bg-[#1B1B1B] p-4 rounded-[10px] z-50 absolute transition-all duration-300 ease-in-out">
+          <div className="w-full bg-[#1B1B1B] rounded-[10px] rounded-t-none z-50 absolute  transition-all duration-300 ease-in-out shadow-md shadow-slate-800 !overflow-hidden">
             <BriefFilter
               label=""
               filter_type={filterType}
