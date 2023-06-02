@@ -11,7 +11,6 @@ import nextConnect from 'next-connect'
 
 export default nextConnect()
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
-    const { method } = req;
     const {
       name,
       logo,
@@ -29,7 +28,14 @@ export default nextConnect()
 
     db.transaction(async (tx) => {
       try {
-        const user = await authenticate("jwt", req, res);
+        const user: any = await authenticate("jwt", req, res);
+        const freelancer: any = await models.fetchFreelancerDetailsByUserID(
+          user.id
+        )(tx);
+
+        if (!freelancer?.verified) {
+          return res.status(401).send("Only verified freelancers can apply for a brief");
+        }
 
         const project = await models.insertProject({
           name,
@@ -40,7 +46,7 @@ export default nextConnect()
           required_funds,
           currency_id,
           owner,
-          user_id: (user as any).id,
+          user_id: user.id,
           brief_id,
           total_cost_without_fee,
           imbue_fee,
@@ -48,7 +54,7 @@ export default nextConnect()
 
         if (!project?.id) {
           return new Error(
-            "Failed to insert milestones: `project_id` missing."
+            "project_id missing."
           );
         }
 
@@ -57,11 +63,9 @@ export default nextConnect()
           milestones: await models.insertMilestones(milestones, project.id)(tx),
         };
 
-        res.status(201).json(pkg);
+        return res.status(201).json(pkg);
       } catch (cause) {
-        return new Error(`Failed to insert project.`, {
-          cause: cause as Error,
-        });
+        return res.status(500).send("Failed to insert project");
       }
     });
 

@@ -123,6 +123,7 @@
     --talisman-connect-control-background
   );
   --talisman-connect-button-foreground: var(--theme-white);
+  --talisman-connect-modal-max-height: 90%;
 }
 
 .primary-btn:disabled {
@@ -167,7 +168,7 @@
 }
 
 .modal-body,
-.modal-footer{
+.modal-footer {
   background: #262626 !important;
 }
 .ctas-container button {
@@ -184,7 +185,7 @@
 
 .ChangesRequested-button {
   background-color: yellow;
-  color:black;
+  color: black;
 }
 
 .PendingReview-button {
@@ -232,7 +233,7 @@ select.round {
   min-width: 150px;
 }
 
-.pill-button{
+.pill-button {
   padding: 12px 24px;
   border: 1px solid white;
   border-radius: 8px;
@@ -240,33 +241,45 @@ select.round {
   width: fit-content;
 }
 
-.pill-button:hover{
+.pill-button:hover {
   background: white;
   color: black;
 }
 
-.pill-button.primary{
+.pill-button.primary {
   background: #202124;
   color: white;
   border: 0;
 }
 
-.pill-button.primary:hover{
+.pill-button.primary:hover {
   background: var(--talisman-connect-active-background, #d2d2d2);
   border-color: var(--talisman-connect-active-background, #d2d2d2);
 }
 
-.Modal header div{
+.Modal header div {
   color: white;
 }
 
-.button-group button:hover{
+.button-group button:hover {
   background-color: var(--theme-secondary-hover);
   color: white;
   transition: all;
   transition-duration: 300ms;
 }
 
-.country-picker option{
+.country-picker option {
   background: var(--theme-black-text);
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
 }

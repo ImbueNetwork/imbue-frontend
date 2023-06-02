@@ -19,6 +19,7 @@ import {
 import { useRouter } from "next/router";
 import { FreelancerProps } from "@/types/freelancerTypes";
 import styles from "../../styles/modules/Freelancers/new-Freelancer.module.css";
+import ErrorScreen from "@/components/ErrorScreen";
 
 const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
   const router = useRouter();
@@ -32,6 +33,9 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
   const [skills, setSkills] = useState<string[]>([]);
   const [bio, setBio] = useState("");
   const [services, setServices] = useState<string[]>([]);
+
+  const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<any>()
 
   const HelloPanel = (
     <div className={styles.helloPanel}>
@@ -59,9 +63,8 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-xp-${index}`}
-            className={`${styles.freelanceXpItem} ${
-              freelancingBefore === value ? styles.active : ""
-            }`}
+            className={`${styles.freelanceXpItem} ${freelancingBefore === value ? styles.active : ""
+              }`}
             onClick={() => setFreelancingBefore(value)}
           >
             {label}
@@ -83,9 +86,8 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-goal-${index}`}
-            className={`${styles.freelanceXpItem} ${
-              goal === value ? styles.active : ""
-            }`}
+            className={`${styles.freelanceXpItem} ${goal === value ? styles.active : ""
+              }`}
             onClick={() => setGoal(value)}
           >
             {label}
@@ -107,9 +109,8 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
         {importInformation.map(({ label, value }, index) => (
           <div
             key={index}
-            className={`${styles.freelanceXpItem} ${
-              resume === value ? styles.active : ""
-            }`}
+            className={`${styles.freelanceXpItem} ${resume === value ? styles.active : ""
+              }`}
             onClick={() => setResume(value)}
           >
             {label}
@@ -284,6 +285,7 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
 
   async function createProfile() {
     try {
+      setLoading(true)
       const response: any = await createFreelancingProfile({
         id: 0,
         bio,
@@ -312,8 +314,16 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
       if (response.status === 201) {
         setStep(step + 1);
       }
+      else{
+        console.log(response);
+        setError({message:`Could not update freelancer Profile ${response.status} (${response.statusText})`})
+      }
     } catch (error) {
+      setError(error)
       console.log(error);
+    }
+    finally {
+      setLoading(false)
     }
   }
 
@@ -372,6 +382,20 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
           )}
         </div>
       </div>
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'>
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
     </div>
   );
 };

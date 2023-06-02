@@ -1,4 +1,9 @@
-import { Freelancer, FreelancerSqlFilter, Project } from "@/model";
+import {
+  Freelancer,
+  FreelancerResponse,
+  FreelancerSqlFilter,
+  Project,
+} from "@/model";
 import * as config from "@/config";
 import { checkEnvironment } from "@/utils";
 
@@ -23,7 +28,7 @@ export async function createFreelancingProfile(freelancer: any) {
 export const getAllFreelancers = async (
   itemsPerPage: number,
   currentPage: number
-) => {
+): Promise<FreelancerResponse> => {
   const resp = await fetch(
     checkEnvironment().concat(
       `${config.apiBase}freelancers?items_per_page=${itemsPerPage}&page=${currentPage}`
@@ -34,14 +39,16 @@ export const getAllFreelancers = async (
     }
   );
   if (resp.ok) {
-    return (await resp.json()) as Array<Freelancer>;
+    return (await resp.json()) as FreelancerResponse;
   } else {
     console.log(new Error("Failed to get all briefs. status:" + resp.status));
-    return [];
+    return { currentData: [], totalFreelancers: 0 };
   }
 };
 
-export async function getFreelancerProfile(username: string) {
+export async function getFreelancerProfile(
+  username: string
+): Promise<Freelancer | undefined> {
   const resp = await fetch(
     checkEnvironment().concat(`${config.apiBase}freelancers/${username}`),
     {
@@ -53,7 +60,9 @@ export async function getFreelancerProfile(username: string) {
   if (resp.status === 200) {
     const res = await resp.json();
     return res as Freelancer;
-  } else return {};
+  } else {
+    return undefined;
+  }
 }
 
 export async function freelancerExists(username: string): Promise<boolean> {
@@ -91,7 +100,9 @@ export async function updateFreelancer(freelancer: Freelancer) {
   }
 }
 
-export const callSearchFreelancers = async (filter: FreelancerSqlFilter) => {
+export const callSearchFreelancers = async (
+  filter: FreelancerSqlFilter
+): Promise<FreelancerResponse> => {
   const resp = await fetch(
     checkEnvironment().concat(`${config.apiBase}freelancers/search`),
     {
@@ -101,7 +112,8 @@ export const callSearchFreelancers = async (filter: FreelancerSqlFilter) => {
     }
   );
   if (resp.ok) {
-    return (await resp.json()) as Array<Freelancer>;
+    const data: FreelancerResponse = await resp.json();
+    return data;
   } else {
     throw new Error("Failed to search freelancers. status:" + resp.status);
   }

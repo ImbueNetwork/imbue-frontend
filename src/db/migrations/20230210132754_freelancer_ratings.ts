@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { auditFields, onUpdateTrigger } from "../utils";
+import { auditFields } from "../utils";
 
 export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable("freelancer_ratings", (builder) => {
@@ -8,10 +8,9 @@ export async function up(knex: Knex): Promise<void> {
         builder.foreign("freelancer_id").references("freelancers.id");
         builder.integer("rating");
         auditFields(knex, builder);
-    }
-    )
-};
+    });
+}
 
 export async function down(knex: Knex): Promise<void> {
     await knex.schema.dropTableIfExists("freelancer_ratings");
-};
+}

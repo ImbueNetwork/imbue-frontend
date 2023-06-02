@@ -19,4 +19,5 @@ export enum FreelancerFilterOption {
   Skills = 0,
   Services = 1,
   Languages = 2,
+  FreelancerInfo = 3,
 }

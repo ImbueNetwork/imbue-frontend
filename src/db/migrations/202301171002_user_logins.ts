@@ -1,5 +1,5 @@
 import type { Knex } from "knex";
-import { auditFields, DROP_ON_UPDATE_TIMESTAMP_FUNCTION, onUpdateTrigger, ON_UPDATE_TIMESTAMP_FUNCTION } from "../utils";
+import { ON_UPDATE_TIMESTAMP_FUNCTION } from "../utils";
 
 export async function up(knex: Knex): Promise<void> {
     await knex.raw(ON_UPDATE_TIMESTAMP_FUNCTION);

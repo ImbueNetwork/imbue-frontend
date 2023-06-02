@@ -5,8 +5,8 @@ import { Freelancer } from '@/model';
 import { Badge, ToggleButton } from '@mui/material';
 import Image from 'next/image';
 
-type ClientsProps ={
-    setFreelancer : Function; 
+type ClientsProps = {
+    setFreelancer: Function;
     isEditMode: boolean;
 }
 

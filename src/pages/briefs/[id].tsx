@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
-import { Brief, User } from "@/model";
+import { Brief, Freelancer, User } from "@/model";
 import { getBrief } from "@/redux/services/briefService";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
@@ -12,6 +12,7 @@ import BioPanel from "@/components/Briefs/BioPanel";
 import BioInsights from "@/components/Briefs/BioInsights";
 import { getServerSideProps } from "@/utils/serverSideProps";
 import ErrorScreen from "@/components/ErrorScreen";
+import { getFreelancerProfile } from "@/redux/services/freelancerService";
 
 TimeAgo.addLocale(en);
 
@@ -41,6 +42,7 @@ const BriefDetails = (): JSX.Element => {
   });
 
   const [browsingUser, setBrowsingUser] = useState<User | null>(null);
+  const [freelancer, setFreelancer] = useState<Freelancer>();
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const isOwnerOfBrief = browsingUser && browsingUser.id == brief.user_id;
@@ -59,10 +61,13 @@ const BriefDetails = (): JSX.Element => {
       if (briefData?.id) {
         const targetUser = await fetchUser(briefData.user_id);
         setBrief(briefData);
-        setBrowsingUser(await getCurrentUser());
+        const currentUser = await getCurrentUser();
+        const _freelancer = await getFreelancerProfile(currentUser.username);
+        setBrowsingUser(currentUser);
         setTargetUser(targetUser);
+        setFreelancer(_freelancer);
       } else {
-        setError({message:"No Brief Found"});
+        setError({ message: "No Brief Found" });
       }
     }
   };
@@ -89,9 +94,8 @@ const BriefDetails = (): JSX.Element => {
       <div className="flex justify-between w-full">
         <h3>Client Contact History (4)</h3>
         <div
-          className={`transition transform ease-in-out duration-600 ${
-            showClientHistory && "rotate-180"
-          } cursor-pointer`}
+          className={`transition transform ease-in-out duration-600 ${showClientHistory && "rotate-180"
+            } cursor-pointer`}
         >
           <ArrowIcon
             onClick={() => setShowClientHistory(!showClientHistory)}
@@ -138,9 +142,8 @@ const BriefDetails = (): JSX.Element => {
       <div className="flex justify-between w-full">
         <h3>Similar projects on Imbue</h3>
         <div
-          className={`transition transform ease-in-out duration-600 ${
-            showSimilarBrief && "rotate-180"
-          } cursor-pointer`}
+          className={`transition transform ease-in-out duration-600 ${showSimilarBrief && "rotate-180"
+            } cursor-pointer`}
         >
           <ArrowIcon
             onClick={() => setShowSimilarBrief(!showSimilarBrief)}
@@ -195,6 +198,7 @@ const BriefDetails = (): JSX.Element => {
           setShowMessageBox={setShowMessageBox}
           targetUser={targetUser}
           browsingUser={browsingUser}
+          canSubmitProposal={freelancer?.verified ?? false}
         />
       </div>
       {ClientHistory}

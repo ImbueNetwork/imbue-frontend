@@ -13,6 +13,7 @@ import {
 } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
 import { IoPeople } from "react-icons/io5";
+import VerifiedIcon from "@mui/icons-material/Verified";
 import { Freelancer, User } from "@/model";
 import {
   getFreelancerProfile,
@@ -49,6 +50,9 @@ import AccountChoice from "@/components/AccountChoice";
 import { WalletAccount } from "@talismn/connect-wallets";
 import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
 import { SignerResult } from "@polkadot/api/types";
+import SuccessScreen from "@/components/SuccessScreen";
+import ErrorScreen from "@/components/ErrorScreen";
+import FullScreenLoader from "@/components/FullScreenLoader";
 
 export type ProfileProps = {
   initFreelancer: Freelancer;
@@ -63,15 +67,19 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const [browsingUser, setBrowsingUser] = useState<User>(user);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
-  const isCurrentFreelancer =
-    browsingUser && browsingUser.id == freelancer?.user_id;
+  const isCurrentFreelancer = browsingUser && browsingUser.id == freelancer?.user_id;
+
   const [skills, setSkills] = useState<string[]>(
     freelancer?.skills?.map(
       (skill: { id: number; name: string }) =>
         skill?.name?.charAt(0).toUpperCase() + skill?.name?.slice(1)
     )
   );
+
   const [openAccountChoice, setOpenAccountChoice] = useState<boolean>(false);
+  const [error, setError] = useState<any>()
+  const [success, setSuccess] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
 
   function urlify(text: string) {
     var urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -93,16 +101,24 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
 
   //The fields must be pre populated correctly.
   const onSave = async () => {
-    if (freelancer) {
-      let data = freelancer;
-      data = {
-        ...data,
-        skills: skills,
-        clients: [],
-      };
+    try {
+      if (freelancer) {
+        setLoading(true)
+        let data = freelancer;
+        data = {
+          ...data,
+          skills: skills,
+          clients: [],
+        };
 
-      await updateFreelancer(data);
-      flipEdit();
+        await updateFreelancer(data);
+        setSuccess(true)
+      }
+    } catch (error) {
+      setError(error)
+    }
+    finally {
+      setLoading(false)
     }
   };
 
@@ -133,12 +149,14 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         account
       );
       if (resp.ok) {
-        setFreelancer({ ...freelancer,
-           web3_address: account.address,
-           web3_type:account.source,
-          });
+        setFreelancer({
+          ...freelancer,
+          web3_address: account.address,
+          web3_type: account.source,
+        });
       }
     } catch (error) {
+      setError(error)
       console.log(error);
     }
   };
@@ -275,9 +293,14 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                   defaultValue={freelancer?.display_name}
                 />
               ) : (
-                <h3 className="!text-2xl font-bold text-center z-[1]">
-                  {freelancer?.display_name}
-                </h3>
+                <div className='flex gap-2 items-center justify-center mt-8'>
+                  <h3 className="!text-2xl font-bold text-center z-[1]">
+                    {freelancer?.display_name}
+                  </h3>
+                  {
+                    initFreelancer?.verified && <VerifiedIcon color='primary' />
+                  }
+                </div>
               )}
 
               <div className="flex gap-[15px] items-center justify-center flex-wrap">
@@ -817,6 +840,41 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
           {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser }}
         />
       )}
+
+      {loading && <FullScreenLoader />}
+
+      <SuccessScreen
+        title={"You have successfully updated your profile"}
+        open={success}
+        setOpen={setSuccess}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => { flipEdit(), setSuccess(false) }}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            See Profile
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'>
+            Go to Dashboard
+          </button>
+        </div>
+      </SuccessScreen>
+
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'>
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
     </div>
   );
 };

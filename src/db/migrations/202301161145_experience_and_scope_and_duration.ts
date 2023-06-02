@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { auditFields, onUpdateTrigger } from "../utils";
+import { auditFields } from "../utils";
 
 export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable("experience", (builder) => {
@@ -7,7 +7,7 @@ export async function up(knex: Knex): Promise<void> {
         builder.string("experience_level");
         auditFields(knex, builder);
 
-    }).then(function() {
+    }).then(function () {
         return knex.schema.alterTable("briefs", (table) => {
             table.foreign("experience_id").references("experience.id");
         })
@@ -18,7 +18,7 @@ export async function up(knex: Knex): Promise<void> {
         builder.string("scope_level");
         auditFields(knex, builder);
 
-    }).then(function() {
+    }).then(function () {
         return knex.schema.alterTable("briefs", (table) => {
             table.foreign("scope_id").references("scope.id");
         })
@@ -29,7 +29,7 @@ export async function up(knex: Knex): Promise<void> {
         builder.string("duration");
         auditFields(knex, builder);
 
-    }).then(function() {
+    }).then(function () {
         return knex.schema.alterTable("briefs", (table) => {
             table.foreign("duration_id").references("duration.id");
         })

@@ -44,13 +44,13 @@ module.exports = {
       },
     },
   },
-  
+
   plugins: [
-    require('postcss-import'),
-    require('tailwindcss/nesting')(require('postcss-nesting')),
-    require('autoprefixer'),
-    require('tailwindcss'),
-    ]
+    require("postcss-import"),
+    require("tailwindcss/nesting")(require("postcss-nesting")),
+    require("autoprefixer"),
+    require("tailwindcss"),
+  ],
 };
 
 //base-transition: all 200ms ease-in-out

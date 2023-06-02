@@ -16,6 +16,7 @@ type BioInsightsProps = {
   setShowMessageBox: (val: boolean) => void;
   targetUser: User | null;
   browsingUser: User | null;
+  canSubmitProposal: boolean;
 };
 
 const BioInsights = ({
@@ -27,6 +28,7 @@ const BioInsights = ({
   showMessageBox,
   setShowMessageBox,
   targetUser,
+  canSubmitProposal
 }: BioInsightsProps) => {
   return (
     <div
@@ -51,6 +53,7 @@ const BioInsights = ({
               gap-2
               "
               onClick={() => redirectToApply()}
+              disabled={!canSubmitProposal}
             >
               Submit a Proposal <FaRegShareSquare />
             </button>

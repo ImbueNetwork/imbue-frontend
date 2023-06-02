@@ -1,19 +1,29 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
-import BriefFilter from "@/components/BriefFilter";
 import { Brief, BriefSqlFilter } from "@/model";
 import { callSearchBriefs, getAllBriefs } from "@/redux/services/briefService";
-import { BriefFilterOption, BriefStepProps } from "@/types/briefTypes";
+import { BriefFilterOption } from "@/types/briefTypes";
 import { useRouter } from "next/router";
 import { FiFilter } from "react-icons/fi";
 import { useWindowSize } from "@/hooks";
 import Pagination from "rc-pagination";
 import FullScreenLoader from "@/components/FullScreenLoader";
 import ErrorScreen from "@/components/ErrorScreen";
+import { filterIcon, savedIcon } from "@/assets/svgs";
+import Image from "next/image";
+import CustomDropDown from "@/components/CustomDropDown";
+import CustomModal from "@/components/CustomModal";
+import search from "../api/freelancers/search";
+
+interface FilterModalProps {
+  open: boolean;
+  handleClose: () => void;
+}
 
 export const strToIntRange = (strList: any) => {
   return Array.isArray(strList)
-    ? strList[0].split(",").map((v: any) => Number(v))
-    : strList?.split(",").map((v: any) => Number(v));
+    ? strList?.[0]?.split?.(",")?.map?.((v: any) => Number(v))
+    : strList?.split?.(",")?.map((v: any) => Number(v));
 };
 
 const Briefs = (): JSX.Element => {
@@ -23,11 +33,12 @@ const Briefs = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const router = useRouter();
-  const size = useWindowSize();
   const [itemsPerPage, setNumItemsPerPage] = useState<number>(5);
 
-  const [error, setError] = useState<any>()
+  const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
 
+  const [error, setError] = useState<any>();
+  const { pathname } = router;
   const {
     expRange,
     submitRange,
@@ -172,6 +183,37 @@ const Briefs = (): JSX.Element => {
     ],
   };
 
+  const customDropdownConfigs = [
+    {
+      name: "Project Length",
+      filterType: BriefFilterOption.Length,
+      filterOptions: lengthFilters.options,
+    },
+    {
+      name: "Proposal Submitted",
+      filterType: BriefFilterOption.AmountSubmitted,
+      filterOptions: submittedFilters.options,
+    },
+    {
+      name: "Experience Level",
+      filterType: BriefFilterOption.ExpLevel,
+      filterOptions: expfilter.options,
+    },
+    {
+      name: "Hours Per Week",
+      filterType: BriefFilterOption.HoursPerWeek,
+      filterOptions: hoursPwFilter.options,
+    },
+  ];
+
+  const handleSetId = (id: string | string[]) => {
+    if (Array.isArray(id)) {
+      setSlectedFilterIds([...id]);
+    } else {
+      setSlectedFilterIds([...selectedFilterIds, id]);
+    }
+  };
+
   useEffect(() => {
     const fetchAndSetBriefs = async () => {
       if (!Object.keys(router?.query).length) {
@@ -192,29 +234,22 @@ const Briefs = (): JSX.Element => {
 
         if (expRange) {
           const range = strToIntRange(expRange);
-          range.forEach((v: any) => {
-            const checkbox = document.getElementById(
-              `0-${v - 1}`
-            ) as HTMLInputElement;
-            if (checkbox) checkbox.checked = true;
+          range?.forEach?.((v: any) => {
+            selectedFilterIds.push(`0-${v - 1}`);
           });
+
           filter = { ...filter, experience_range: strToIntRange(expRange) };
         }
         if (submitRange) {
           const range = strToIntRange(submitRange);
-          range.forEach((v: any) => {
-            if (v > 0 && v < 5)
-              (document.getElementById(`1-${0}`) as HTMLInputElement).checked =
-                true;
-            if (v >= 5 && v < 10)
-              (document.getElementById(`1-${1}`) as HTMLInputElement).checked =
-                true;
-            if (v >= 10 && v < 15)
-              (document.getElementById(`1-${2}`) as HTMLInputElement).checked =
-                true;
-            if (v > 15)
-              (document.getElementById(`1-${3}`) as HTMLInputElement).checked =
-                true;
+          range?.forEach?.((v: any) => {
+            if (v > 0 && v < 5) selectedFilterIds.push(`1-${0}`);
+
+            if (v >= 5 && v < 10) selectedFilterIds.push(`1-${1}`);
+
+            if (v >= 10 && v < 15) selectedFilterIds.push(`1-${2}`);
+
+            if (v > 15) selectedFilterIds.push(`1-${3}`);
           });
           filter = { ...filter, submitted_range: strToIntRange(submitRange) };
         }
@@ -227,11 +262,8 @@ const Briefs = (): JSX.Element => {
         }
         if (lengthRange) {
           const range = strToIntRange(lengthRange);
-          range.forEach((v: any) => {
-            const checkbox = document.getElementById(
-              `2-${v - 1}`
-            ) as HTMLInputElement;
-            if (checkbox) checkbox.checked = true;
+          range?.forEach?.((v: any) => {
+            selectedFilterIds.push(`2-${v - 1}`);
           });
           filter = { ...filter, length_range: strToIntRange(lengthRange) };
         }
@@ -254,11 +286,8 @@ const Briefs = (): JSX.Element => {
 
   // Here we have to get all the checked boxes and try and construct a query out of it...
   const onSearch = async () => {
-    const elements = document.getElementsByClassName(
-      "filtercheckbox"
-    ) as HTMLCollectionOf<HTMLInputElement>;
-
     // The filter initially should return all values
+    setFilterVisible(!filterVisble);
     let is_search: boolean = false;
 
     let exp_range: number[] = [];
@@ -279,10 +308,10 @@ const Briefs = (): JSX.Element => {
       is_search = true;
     }
 
-    for (let i = 0; i < elements.length; i++) {
-      if (elements[i].checked) {
+    for (let i = 0; i < selectedFilterIds.length; i++) {
+      if (selectedFilterIds[i] !== "") {
         is_search = true;
-        const id = elements[i].getAttribute("id");
+        const id = selectedFilterIds[i];
         if (id != null) {
           const [filterType, interiorIndex] = id.split("-");
           // Here we are trying to build teh paramaters required to build the query
@@ -348,20 +377,20 @@ const Briefs = (): JSX.Element => {
           items_per_page: itemsPerPage,
           page: currentPage,
         };
-  
+
         const briefs_filtered: any = await callSearchBriefs(filter);
-  
+
         setBriefs(briefs_filtered?.currentData);
         setBriefsTotal(briefs_filtered?.totalBriefs);
       } else {
         const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
-  
+
         setBriefs(briefs_all?.currentData);
         setBriefsTotal(briefs_all?.totalBriefs);
       }
     } catch (error) {
-      setError(error)
-    }    
+      setError(error);
+    }
   };
 
   const onSavedBriefs = () => {};
@@ -388,12 +417,49 @@ const Briefs = (): JSX.Element => {
     );
   };
 
-  const arrayMultipleOfFiveWithin100 = () => {
-    let arr = [];
-    for (let i = 5; i <= 100; i += 5) {
-      arr.push(i);
-    }
-    return arr;
+  const dropDownValues = [5, 10, 20, 50];
+
+  const FilterModal = ({ open, handleClose }: FilterModalProps) => {
+    return (
+      <CustomModal
+        open={open}
+        onClose={handleClose}
+        className="flex justify-center items-center flex-wrap bg-black bg-opacity-50 top-0 left-0 w-full h-full z-[100] fixed"
+      >
+        <div
+          onClick={(e: any) => {
+            e?.stopPropagation();
+          }}
+          className="bg-[#1B1B1B] rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative"
+        >
+          <p className="font-normal text-base text-white mb-9">Filter</p>
+
+          <div className="grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5">
+            {customDropdownConfigs
+              ?.filter(
+                (item) => item?.filterOptions && item?.filterOptions?.length > 0
+              )
+              ?.map?.(({ name, filterType, filterOptions }) => (
+                <CustomDropDown
+                  key={name}
+                  name={name}
+                  filterType={filterType}
+                  filterOptions={filterOptions}
+                  setId={handleSetId}
+                  ids={selectedFilterIds}
+                />
+              ))}
+          </div>
+
+          <button
+            onClick={onSearch}
+            className="h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 absolute md:bottom-10 bottom-5 right-10"
+          >
+            Apply
+          </button>
+        </div>
+      </CustomModal>
+    );
   };
 
   const pageinationIconClassName =
@@ -402,79 +468,53 @@ const Briefs = (): JSX.Element => {
   if (loading) return <FullScreenLoader />;
 
   return (
-    <div className="search-briefs-container px-[15px] lg:px-[40px]">
-      <div
-        className={`filter-panel
-      max-width-750px:fixed
-      max-width-750px:w-full
-      max-width-750px:top-0
-      max-width-750px:bg-black
-      max-width-750px:z-10
-      max-width-750px:px-[20px]
-      max-width-750px:pt-[20px]
-      h-full
-      max-width-750px:overflow-y-scroll
-      `}
-        style={{
-          display:
-            size?.width <= 750 ? (filterVisble ? "block" : "none") : "block",
-        }}
-      >
-        <div className="filter-heading">Filter By</div>
-        <BriefFilter
-          label={expfilter.label}
-          filter_type={BriefFilterOption.ExpLevel}
-          filter_options={expfilter.options}
-        ></BriefFilter>
-        <BriefFilter
-          label={submittedFilters.label}
-          filter_type={BriefFilterOption.AmountSubmitted}
-          filter_options={submittedFilters.options}
-        ></BriefFilter>
-        <BriefFilter
-          label={lengthFilters.label}
-          filter_type={BriefFilterOption.Length}
-          filter_options={lengthFilters.options}
-        ></BriefFilter>
-        <div className="tab-section mb-10 min-width-500px:!hidden">
-          <button
-            onClick={() => {
-              onSearch();
-              toggleFilter();
-            }}
-            className="rounded-full text-black bg-white px-10 py-2"
-          >
-            Search
-          </button>
-          <button
-            onClick={() => {
-              setFilterVisible(false);
-            }}
-            className="rounded-full text-black bg-white px-10 py-2 ml-5"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
+    <div className="search-briefs-container px-[15px] lg:px-[80px]">
+      <FilterModal open={filterVisble} handleClose={() => toggleFilter()} />
+
       <div className="briefs-section  max-width-750px:overflow-hidden">
         <div className="briefs-heading">
           <div className="tab-section">
-            <div className="tab-item" onClick={onSearch}>
-              Search
-            </div>
-            <div className="tab-item" onClick={onSavedBriefs}>
-              Saved Briefs
-            </div>
-            <div
-              className={`tab-item text-right min-width-750px:hidden`}
+            <button
               onClick={toggleFilter}
+              className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105"
             >
-              <FiFilter color="#fff" />
-            </div>
+              Filter
+              <Image
+                src={filterIcon}
+                alt={"filter-icon"}
+                className="h-[14px] w-[14px] ml-2"
+              />
+            </button>
+            {selectedFilterIds?.length > 0 && (
+              <button
+                onClick={async () => {
+                  await router.push({
+                    pathname,
+                    query: {},
+                  });
+                  await setSlectedFilterIds([]);
+                }}
+                className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]"
+              >
+                Reset Filter X
+              </button>
+            )}
+
+            <button
+              onClick={onSavedBriefs}
+              className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]"
+            >
+              Saved Briefs
+              <Image
+                src={savedIcon}
+                alt={"filter-icon"}
+                className="h-[20px] w-[20px] ml-2"
+              />
+            </button>
           </div>
           <input
             id="search-input"
-            className="search-input px-[12px]"
+            className="search-input px-[12px] !w-full"
             placeholder="Search"
           />
           <div className="search-result">
@@ -484,13 +524,13 @@ const Briefs = (): JSX.Element => {
             <span className="ml-8">
               number of briefs per page
               <select
-                className="ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none"
+                className="ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none focus:outline-none focus:outline-white"
                 onChange={(e) => {
                   setNumItemsPerPage(parseInt(e.target.value));
                 }}
                 value={itemsPerPage}
               >
-                {arrayMultipleOfFiveWithin100()?.map((item, itemIndex) => (
+                {dropDownValues?.map((item, itemIndex) => (
                   <option key={itemIndex} value={item}>
                     {item}
                   </option>
@@ -548,15 +588,17 @@ const Briefs = (): JSX.Element => {
       </div>
 
       <ErrorScreen {...{ error, setError }}>
-        <div className='flex flex-col gap-4 w-1/2'>
+        <div className="flex flex-col gap-4 w-1/2">
           <button
             onClick={() => setError(null)}
-            className='primary-btn in-dark w-button w-full !m-0'>
+            className="primary-btn in-dark w-button w-full !m-0"
+          >
             Try Again
           </button>
           <button
             onClick={() => router.push(`/dashboard`)}
-            className='underline text-xs lg:text-base font-bold'>
+            className="underline text-xs lg:text-base font-bold"
+          >
             Go to Dashboard
           </button>
         </div>
