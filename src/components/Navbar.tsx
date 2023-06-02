@@ -70,7 +70,7 @@ function Navbar() {
   return (
     <>
       <header className={`navBar ${solidNav ? "bg-theme-black-text" : "bg-transparent"}`} id="header-wrapper">
-        <div className="text-center w-full bg-primary text-black py-1">
+        <div className="text-center w-full bg-primary text-black py-1 text-xs lg:text-sm">
           Thanks for trying the beta version of Imbue. Please let us know what we should work on to make it better! Submit your feedback
           <a href="https://pfljr3ser45.typeform.com/to/bv00pviH" target="_blank" className="underline cursor-pointer ml-1">here</a>
         </div>
@@ -91,10 +91,10 @@ function Navbar() {
           </div> */}
 
           <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-            <Typography className="mx-5" sx={{ minWidth: 100 }}>Start a Project</Typography>
-            <Typography className="mx-5" sx={{ minWidth: 100 }}>Fund a Project</Typography>
-            <Typography className="mx-5" sx={{ minWidth: 100 }}>Why Imbue?</Typography>
-            <Typography className="mx-5" sx={{ minWidth: 100 }}>Find a Team</Typography>
+            <Typography className="mx-1 lg:mx-5 text-xs lg:text-sm" sx={{ minWidth: 100 }}>Start a Project</Typography>
+            <Typography className="mx-1 lg:mx-5 text-xs lg:text-sm" sx={{ minWidth: 100 }}>Fund a Project</Typography>
+            <Typography className="mx-1 lg:mx-5 text-xs lg:text-sm" sx={{ minWidth: 100 }}>Why Imbue?</Typography>
+            <Typography className="mx-1 lg:mx-5 text-xs lg:text-sm" sx={{ minWidth: 100 }}>Find a Team</Typography>
             <Tooltip title="Account settings">
               <IconButton
                 onClick={handleClick}
