@@ -16,8 +16,6 @@ import Login from "./Login";
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 
-const logoStyle = { height: "100%", width: "100%" };
-
 function Navbar() {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [redirectURL, setRedirectURL] = useState<string>();
@@ -74,11 +72,11 @@ function Navbar() {
           Thanks for trying the beta version of Imbue. Please let us know what we should work on to make it better! Submit your feedback
           <a href="https://pfljr3ser45.typeform.com/to/bv00pviH" target="_blank" className="underline cursor-pointer ml-1">here</a>
         </div>
-        <div id="main-header" className="flex justify-between !py-2">
+        <div id="main-header" className="flex justify-between items-center px-4 lg:px-8 py-2">
           <h1 className="main-title">
             <Link href="/">
               <div id="logo">
-                <Image src={appLogo} alt={"app logo"} style={logoStyle} />
+                <Image src={appLogo} alt={"app logo"} className="w-2/3 lg:w-full" />
               </div>
             </Link>
           </h1>
@@ -91,10 +89,10 @@ function Navbar() {
           </div> */}
 
           <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-            <Typography className="mx-1 lg:mx-5 text-xs lg:text-sm" sx={{ minWidth: 100 }}>Start a Project</Typography>
-            <Typography className="mx-1 lg:mx-5 text-xs lg:text-sm" sx={{ minWidth: 100 }}>Fund a Project</Typography>
-            <Typography className="mx-1 lg:mx-5 text-xs lg:text-sm" sx={{ minWidth: 100 }}>Why Imbue?</Typography>
-            <Typography className="mx-1 lg:mx-5 text-xs lg:text-sm" sx={{ minWidth: 100 }}>Find a Team</Typography>
+            <Link className="mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline" href="/briefs/new">Start a Project</Link>
+            <Link className="mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline" href="/briefs/">Fund a Project</Link>
+            <Link className="mx-1 lg:mx-5 text-xs lg:text-sm cursor-pointer hover:underline" href="">Why Imbue?</Link>
+            <Link className="mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline" href="/freelancers">Find a Team</Link>
             <Tooltip title="Account settings">
               <IconButton
                 onClick={handleClick}
@@ -106,7 +104,7 @@ function Navbar() {
               >
                 {
                   user?.id
-                    ? <Avatar sx={{ width: 40, height: 40 }}>
+                    ? <Avatar className="w-8 h-8 lg:w-10 lg:h-10">
                       <Image src={freelancerProfile?.profile_image || defaultProfile} width={40} height={40} alt="profile" />
                     </Avatar>
                     : <div onClick={() => setOpenMenu(!openMenu)}>

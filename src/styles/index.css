@@ -1,6 +1,3 @@
-.hidden {
-  display: none !important;
-}
 
 h1 {
   font-size: var(--theme-h1-size);
@@ -277,7 +274,6 @@ div#layout {
   align-items: center;
   justify-content: space-between;
   line-height: 1.15rem;
-  padding: 0 30px;
 }
 
 #main-header h1 {
@@ -291,9 +287,8 @@ div#layout {
 }
 
 .main-title {
-  display: block;
-  margin: 0 0 0 0.5rem;
-  margin: 0;
+  display: flex;
+  align-items: center;
   width: 160px;
   height: 43px;
 }
