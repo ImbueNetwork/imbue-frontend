@@ -12,9 +12,6 @@ function Layout({ children }: LayoutProps) {
   const [progress, setProgress] = useState(0)
   const router = useRouter()
 
-  const [gaveFeedback, setGaveFeedback] = useState<boolean>(false)
-
-
   useEffect(() => {
     router.events.on("routeChangeStart", () => setProgress(35))
     router.events.on("routeChangeComplete", () => setProgress(100))
@@ -35,8 +32,8 @@ function Layout({ children }: LayoutProps) {
         onLoaderFinished={() => setProgress(0)}
         waitingTime={200}
       />}
-      <Navbar {...{gaveFeedback,setGaveFeedback}} />
-      <main className={`padded lg:!px-[var(--hq-layout-padding)] ${gaveFeedback ? "!pt-28" : "!pt-32"}`} id="main-content">
+      <Navbar/>
+      <main className={`padded lg:!px-[var(--hq-layout-padding)] !pt-32`} id="main-content">
         {children}
       </main>
     </React.Fragment>
