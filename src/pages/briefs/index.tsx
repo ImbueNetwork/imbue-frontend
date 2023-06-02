@@ -36,6 +36,7 @@ const Briefs = (): JSX.Element => {
   const [itemsPerPage, setNumItemsPerPage] = useState<number>(5);
 
   const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
+  const [openDropDown, setOpenDropDown] = useState<string>("");
 
   const [error, setError] = useState<any>();
   const { pathname } = router;
@@ -417,6 +418,16 @@ const Briefs = (): JSX.Element => {
     );
   };
 
+  // const closeFilterDropDowns = () => { // looking for a better solution
+  //   const itemsToClear = customDropdownConfigs
+  //     ?.filter((item) => item?.filterOptions && item?.filterOptions?.length > 0)
+  //     ?.map?.(({ name }) => name);
+
+  //   itemsToClear?.forEach?.((item) => {
+  //     localStorage.removeItem(item);
+  //   }, []);
+  // };
+
   const dropDownValues = [5, 10, 20, 50];
 
   const FilterModal = ({ open, handleClose }: FilterModalProps) => {
@@ -447,6 +458,7 @@ const Briefs = (): JSX.Element => {
                   filterOptions={filterOptions}
                   setId={handleSetId}
                   ids={selectedFilterIds}
+                  setOpenDropDown={setOpenDropDown}
                 />
               ))}
           </div>
@@ -540,34 +552,39 @@ const Briefs = (): JSX.Element => {
           </div>
         </div>
         <div className="briefs-list">
-          {briefs?.map((item, itemIndex) => !item?.project_id && (
-            <div
-              className="brief-item"
-              key={itemIndex}
-              onClick={() => router.push(`/briefs/${item?.id}/`)}
-            >
-              <div className="brief-title">{item.headline}</div>
-              <div className="brief-time-info">
-                {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
-              </div>
-              <div className="brief-description">{item.description}</div>
-
-              <div className="brief-tags">
-                {item.skills.map((skill: any, skillIndex: any) => (
-                  <div className="tag-item" key={skillIndex}>
-                    {skill.name}
+          {briefs?.map(
+            (item, itemIndex) =>
+              !item?.project_id && (
+                <div
+                  className="brief-item"
+                  key={itemIndex}
+                  onClick={() => router.push(`/briefs/${item?.id}/`)}
+                >
+                  <div className="brief-title">{item.headline}</div>
+                  <div className="brief-time-info">
+                    {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
                   </div>
-                ))}
-              </div>
+                  <div className="brief-description">{item.description}</div>
 
-              <div className="brief-proposals">
-                <span className="proposals-heading">Proposals Submitted: </span>
-                <span className="proposals-count">
-                  {item.number_of_briefs_submitted}
-                </span>
-              </div>
-            </div>
-          ))}
+                  <div className="brief-tags">
+                    {item.skills.map((skill: any, skillIndex: any) => (
+                      <div className="tag-item" key={skillIndex}>
+                        {skill.name}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="brief-proposals">
+                    <span className="proposals-heading">
+                      Proposals Submitted:{" "}
+                    </span>
+                    <span className="proposals-count">
+                      {item.number_of_briefs_submitted}
+                    </span>
+                  </div>
+                </div>
+              )
+          )}
         </div>
         <Pagination
           pageSize={itemsPerPage}
