@@ -32,7 +32,7 @@ function Layout({ children }: LayoutProps) {
         onLoaderFinished={() => setProgress(0)}
         waitingTime={200}
       />}
-      <Navbar/>
+      <Navbar />
       <main className={`padded lg:!px-[var(--hq-layout-padding)] !pt-32`} id="main-content">
         {children}
       </main>
