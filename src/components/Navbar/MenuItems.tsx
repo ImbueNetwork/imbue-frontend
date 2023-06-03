@@ -15,49 +15,49 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
             text: "Dashboard",
             link: "/dashboard",
             needAuthentication: true,
-            hideDeskView: false,
+            duplicate: false,
         },
         {
             icon: "work",
             text: "Submit A Brief",
             link: "/briefs/new",
             needAuthentication: true,
-            hideDeskView: true,
+            duplicate: true,
         },
         {
             icon: "search",
             text: "Discover Briefs",
             link: "/briefs",
             needAuthentication: false,
-            hideDeskView: true,
+            duplicate: true,
         },
         {
             icon: "groups",
             text: "Discover Freelancers",
             link: `/freelancers`,
             needAuthentication: false,
-            hideDeskView: true,
+            duplicate: true,
         },
         {
             icon: isFreelancer ? "account_circle" : "group_add",
             text: isFreelancer ? "Freelancer Profile" : "Join The Freelancers",
             link: isFreelancer ? `/freelancers/${user?.username}/` : "/freelancers/new",
             needAuthentication: true,
-            hideDeskView: false,
+            duplicate: false,
         },
         {
             icon: "money",
             text: "Transfer Funds",
             link: "/relay",
             needAuthentication: false,
-            hideDeskView: false,
+            duplicate: false,
         },
         {
             icon: "logout",
             text: user?.username ? "Sign Out" : "Sign In",
             link: user?.username ? "/logout" : "/login",
             needAuthentication: true,
-            hideDeskView: false,
+            duplicate: false,
         },
     ];
 
@@ -76,7 +76,7 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
             <div className='menuItems flex flex-col gap-2'>
                 {
                     linkItems.map((item, index) => (
-                        <MenuItem className={`${item.hideDeskView? "lg:hidden" :"sm:hidden lg:flex"}`} key={index} onClick={() => navigateToPage(item.link, item.needAuthentication)}>
+                        <MenuItem className={`${item.duplicate &&"lg:hidden"}`} key={index} onClick={() => navigateToPage(item.link, item.needAuthentication)}>
                             <ListItemIcon>
                                 <i
                                     className="material-icons relative top-[4px] text-white"

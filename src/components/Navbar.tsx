@@ -41,7 +41,7 @@ function Navbar() {
 
   useEffect(() => {
     const setup = async () => {
-      const user = await getCurrentUser() || false;
+      const user = await getCurrentUser();
       if (user) {
         const res = await getFreelancerProfile(user.username)
         setFreelancerProfile(res);
@@ -65,15 +65,14 @@ function Navbar() {
     }
   }, [])
 
-  const navigaeToPage = () =>{
-    if(user?.username){
+  const navigaeToPage = () => {
+    if (user?.username) {
       router.push("/briefs/new")
     }
-    else{
+    else {
       setLoginModal(true)
     }
   }
-
 
   return (
     <>
