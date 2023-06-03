@@ -849,7 +849,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         setOpen={setSuccess}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button
-            onClick={() => { flipEdit(), setSuccess(false) }}
+            onClick={() => { flipEdit(), setSuccess(false), window.location.reload() }}
             className='primary-btn in-dark w-button w-full !m-0'>
             See Profile
           </button>
