@@ -1,6 +1,3 @@
-.hidden {
-  display: none !important;
-}
 
 h1 {
   font-size: var(--theme-h1-size);
@@ -222,9 +219,10 @@ div#layout {
 }
 
 #header-wrapper {
-  position: relative;
+  position: fixed;
+  width: 100%;
+  z-index: 10;
   top: 0;
-  background: rgba(0, 0, 0, 0);
   transition: background 200ms ease-in-out, box-shadow 200ms ease-in-out,
     padding 200ms ease-in-out;
 }
@@ -273,9 +271,9 @@ div#layout {
 #main-header {
   display: flex;
   z-index: 1;
+  align-items: center;
   justify-content: space-between;
   line-height: 1.15rem;
-  padding: 0 30px;
 }
 
 #main-header h1 {
@@ -289,9 +287,8 @@ div#layout {
 }
 
 .main-title {
-  display: block;
-  margin: 0 0 0 0.5rem;
-  margin: 0;
+  display: flex;
+  align-items: center;
   width: 160px;
   height: 43px;
 }

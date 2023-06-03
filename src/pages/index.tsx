@@ -4,35 +4,49 @@ import { getCurrentUser } from "@/utils";
 import { User } from "stream-chat";
 import { useRouter } from "next/router";
 import Login from "@/components/Login";
+import FullScreenLoader from "@/components/FullScreenLoader";
 
 export default function Home() {
   const router = useRouter();
-  const [loginModal, setLoginModal] = useState<boolean>(true)
+  const [loginModal, setLoginModal] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     getLogedInUser();
   }, []);
 
   const getLogedInUser = async () => {
-    const userResponse = await getCurrentUser();
-    if (userResponse) {
-      const userAuth = {
-        isAuthenticated: true,
-        user: userResponse,
-      };
-      // localStorage.setItem("userAuth", JSON.stringify(userAuth));
-      router.push("/dashboard");
+    try {
+      const userResponse = await getCurrentUser();
+      if (userResponse) {
+        const userAuth = {
+          isAuthenticated: true,
+          user: userResponse,
+        };
+        // localStorage.setItem("userAuth", JSON.stringify(userAuth));
+        router.push("/dashboard");
+      }
+      else{
+        setLoginModal(true)
+      }
+    } catch (error) {
+      console.log(error);
     }
+    finally {
+      setLoading(false)
+    }
+
   };
-  
+
+  if (loading) return <FullScreenLoader />
 
   return (
     <Login
-        visible={loginModal}
-        setVisible={(val) => {
-          setLoginModal(val);
-        }}
-        redirectUrl={"/dashboard"}
-      />
+      visible={loginModal && !loading}
+      setVisible={(val) => {
+        setLoginModal(val);
+      }}
+      redirectUrl={"/dashboard"}
+    />
   );
 }
