@@ -187,12 +187,15 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                             }
                         </button>
 
-                        :  <button
-                        onClick={() => setOpenAccountChoice(true)}
-                        className='primary-btn in-dark w-button !text-xs lg:!text-base'
-                    >
-                        Connect Wallet
-                    </button>
+                        : <button
+                            onClick={() => setOpenAccountChoice(true)}
+                            className='primary-btn in-dark w-button !text-xs lg:!text-base'>
+                            {
+                                loadingWallet?.balance || loadingWallet?.connecting
+                                    ? "Please Wait..."
+                                    : <>Connect Wallet</>
+                            }
+                        </button>
                 }
                 <Menu
                     id="basic-menu"

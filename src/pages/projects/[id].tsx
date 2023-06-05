@@ -25,6 +25,8 @@ import ChatPopup from "@/components/ChatPopup";
 import Login from "@/components/Login";
 import { ProjectStatus } from "../api/models";
 import { WalletAccount } from "@talismn/connect-wallets";
+import ErrorScreen from "@/components/ErrorScreen";
+import SuccessScreen from "@/components/SuccessScreen";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -85,6 +87,10 @@ function Project() {
   const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
   const [isApplicant, setIsApplicant] = useState<boolean>();
 
+  const [error, setError] = useState<any>()
+  const [sucessTitle, setSuccessTitle] = useState<any>("")
+
+
   // fetching the project data from api and from chain
   useEffect(() => {
     if (projectId) {
@@ -137,67 +143,93 @@ function Project() {
   // voting on a mile stone
   const voteOnMilestone = async (account: WalletAccount, vote: boolean) => {
     setLoading(true);
-    const imbueApi = await initImbueAPIInfo();
-    const userRes: User | any = await utils.getCurrentUser();
-    const chainService = new ChainService(imbueApi, userRes);
-    const voteResponse = await chainService.voteOnMilestone(
-      account,
-      onChainProject,
-      milestoneKeyInView,
-      vote
-    );
-    setLoading(false);
-    console.log({ voteResponse });
+    try {
+      const imbueApi = await initImbueAPIInfo();
+      const userRes: User | any = await utils.getCurrentUser();
+      const chainService = new ChainService(imbueApi, userRes);
+      const voteResponse = await chainService.voteOnMilestone(
+        account,
+        onChainProject,
+        milestoneKeyInView,
+        vote
+      );
+      setSuccessTitle("Your have successfully voted for this Milestone")
+      console.log({ voteResponse });
+    } catch (error) {
+      setError(error)
+      console.log(error);
+    }
+    finally {
+      setLoading(false);
+    }
+
   };
 
   // submitting a milestone
   const submitMilestone = async (account: WalletAccount) => {
     setLoading(true);
-    const imbueApi = await initImbueAPIInfo();
-    const user: User | any = await utils.getCurrentUser();
-    const chainService = new ChainService(imbueApi, user);
-    const result = await chainService.submitMilestone(
-      account,
-      onChainProject,
-      milestoneKeyInView
-    );
-    while (true) {
-      if (result.status || result.txError) {
-        if (result.status) {
-          console.log("***** success");
-          console.log(result.eventData);
-        } else if (result.txError) {
-          console.log("***** failed");
-          console.log(result.errorMessage);
+    try {
+      const imbueApi = await initImbueAPIInfo();
+      const user: User | any = await utils.getCurrentUser();
+      const chainService = new ChainService(imbueApi, user);
+      const result = await chainService.submitMilestone(
+        account,
+        onChainProject,
+        milestoneKeyInView
+      );
+      while (true) {
+        if (result.status || result.txError) {
+          if (result.status) {
+            console.log("***** success");
+            setSuccessTitle("Your have successfully submitted this milestone")
+            console.log(result.eventData);
+          } else if (result.txError) {
+            console.log("***** failed");
+            console.log(result.errorMessage);
+          }
+          break;
         }
-        break;
+        await new Promise((f) => setTimeout(f, 1000));
       }
-      await new Promise((f) => setTimeout(f, 1000));
+    } catch (error) {
+      setError(error)
+      console.log(error);
     }
-    setLoading(false);
+    finally {
+      setLoading(false);
+    }
   };
 
-  // submitting a milestone
+  // submitting a m
   const withdraw = async (account: WalletAccount) => {
     setLoading(true);
-    const imbueApi = await initImbueAPIInfo();
-    const user: User | any = await utils.getCurrentUser();
-    const chainService = new ChainService(imbueApi, user);
-    const result = await chainService.withdraw(account, onChainProject);
-    while (true) {
-      if (result.status || result.txError) {
-        if (result.status) {
-          console.log("***** success");
-          console.log(result.eventData);
-        } else if (result.txError) {
-          console.log("***** failed");
-          console.log(result.errorMessage);
+    try {
+      const imbueApi = await initImbueAPIInfo();
+      const user: User | any = await utils.getCurrentUser();
+      const chainService = new ChainService(imbueApi, user);
+      const result = await chainService.withdraw(account, onChainProject);
+      while (true) {
+        if (result.status || result.txError) {
+          if (result.status) {
+            console.log("***** success");
+            console.log(result.eventData);
+            setSuccessTitle("Your withdraw for this milestone was successfull")
+          } else if (result.txError) {
+            console.log("***** failed");
+            setError({ message: result.errorMessage })
+            console.log(result.errorMessage);
+          }
+          break;
         }
-        break;
+        await new Promise((f) => setTimeout(f, 1000));
       }
-      await new Promise((f) => setTimeout(f, 1000));
+    } catch (error) {
+      setError(error)
+      console.log(error);
     }
-    setLoading(false);
+    finally {
+      setLoading(false);
+    }
   };
 
   const renderPolkadotJSModal = (
@@ -328,8 +360,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, "Completed")
               : milestone?.milestone_key == milestoneBeingVotedOn
-              ? openForVotingTag()
-              : projectStateTag(modified, "Not Started")}
+                ? openForVotingTag()
+                : projectStateTag(modified, "Not Started")}
 
             <Image
               src={require(expanded
@@ -382,7 +414,7 @@ function Project() {
 
           {isApplicant &&
             onChainProject?.projectState !==
-              OnchainProjectState.OpenForVoting && (
+            OnchainProjectState.OpenForVoting && (
               <button
                 className="primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8"
                 data-testid="next-button"
@@ -518,13 +550,12 @@ function Project() {
             <div className="w-48 bg-[#1C2608] mt-5 h-1 relative my-auto">
               <div
                 style={{
-                  width: `${
-                    (onChainProject?.milestones?.filter?.(
-                      (m: any) => m?.is_approved
-                    )?.length /
-                      onChainProject?.milestones?.length) *
+                  width: `${(onChainProject?.milestones?.filter?.(
+                    (m: any) => m?.is_approved
+                  )?.length /
+                    onChainProject?.milestones?.length) *
                     100
-                  }%`,
+                    }%`,
                 }}
                 className="h-full rounded-xl Accepted-button absolute"
               ></div>
@@ -532,9 +563,8 @@ function Project() {
                 {onChainProject?.milestones?.map((m: any, i: number) => (
                   <div
                     key={i}
-                    className={`h-4 w-4 ${
-                      m.is_approved ? "Accepted-button" : "bg-[#1C2608]"
-                    } rounded-full -mt-1.5`}
+                    className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"
+                      } rounded-full -mt-1.5`}
                   ></div>
                 ))}
               </div>
@@ -623,6 +653,39 @@ function Project() {
         }}
         redirectUrl={`/project/${projectId}/`}
       />
+
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'>
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
+
+      <SuccessScreen
+        title={sucessTitle}
+        open={sucessTitle ? true : false}
+        setOpen={setSuccessTitle}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setSuccessTitle(false)}
+            className='primary-btn in-dark w-button w-full !m-0'>
+            Continue
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'>
+            Go to Dashboard
+          </button>
+        </div>
+      </SuccessScreen>
     </div>
   );
 }

@@ -6,19 +6,12 @@ import Drawer from "@/components/Drawer";
 import {
   Avatar,
   Box,
-  Divider,
   IconButton,
-  ListItemIcon,
   Menu,
-  MenuItem,
   Tooltip,
-  Typography,
 } from "@mui/material";
-import Settings from "@mui/icons-material/Settings";
-import Logout from "@mui/icons-material/Logout";
 import { getCurrentUser } from "@/utils";
 import { User } from "@/model";
-import { freelancerExists } from "@/redux/services/freelancerService";
 import { getFreelancerProfile } from "@/redux/services/freelancerService";
 import defaultProfile from "../assets/images/profile-image.png";
 import MenuItems from "./Navbar/MenuItems";
@@ -36,6 +29,8 @@ function Navbar() {
   const [solidNav, setSolidNav] = useState<boolean>(false);
 
   const router = useRouter();
+
+  const feedbackLink = "https://pfljr3ser45.typeform.com/to/bv00pviH";
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -94,7 +89,7 @@ function Navbar() {
           Thanks for trying the beta version of Imbue. Please let us know what
           we should work on to make it better! Submit your feedback
           <a
-            href="https://pfljr3ser45.typeform.com/to/bv00pviH"
+            href={feedbackLink}
             target="_blank"
             className="underline cursor-pointer ml-1"
           >

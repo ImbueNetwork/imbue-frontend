@@ -90,14 +90,12 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
                     alt="profileImage" />
                 <p className="text-2xl font-bold">{briefOwner?.display_name}</p>
             </div>
-            {
-                <p className="text-base text-primary break-words text-center ml-3">@
-                    {(mobileView && briefOwner?.username?.length > 16)
-                        ? `${briefOwner?.username.substr(0, 16)}...`
-                        : briefOwner?.username
-                    }
-                </p>
-            }
+            <p className="text-base text-primary break-words text-center ml-3">@
+                {(mobileView && briefOwner?.username?.length > 16)
+                    ? `${briefOwner?.username.substr(0, 16)}...`
+                    : briefOwner?.username
+                }
+            </p>
 
             <div className='ml-auto lg:ml-0'>
                 <button className="primary-btn in-dark w-button !text-xs lg:!text-base" onClick={() => brief && handleMessageBoxClick(brief?.user_id, freelancer?.username)}>
@@ -107,9 +105,8 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
                     <button className="Accepted-btn text-black in-dark text-xs lg:text-base rounded-full py-[7px] px-3 ml-3 lg:ml-0 lg:px-6 md:py-[14px]" onClick={() => brief?.project_id && setOpenPopup(true)} >
                         Start Work
                     </button>
-                ) : (
-                    <button className={`${applicationStatusId[application?.status_id]}-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[14px]`}>{applicationStatusId[application?.status_id]}</button>
-                )}
+                ) : <button className={`${applicationStatusId[application?.status_id]}-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[14px]`}>{applicationStatusId[application?.status_id]}</button>
+                }
             </div>
             <AccountChoice accountSelected={(account) => startWork(account)} visible={openPopup} setVisible={setOpenPopup} initiatorAddress={application?.initiator} filterByInitiator />
             <ErrorScreen {...{ error, setError }}>
@@ -128,7 +125,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
             </ErrorScreen>
 
             <SuccessScreen
-                title={`You have successfully hired ${freelancer?.display_name} as a freelacer for your brief`}
+                title={`Transaction is successfull`}
                 open={success}
                 setOpen={setSuccess}>
                 <div className='flex flex-col gap-4 w-1/2'>
