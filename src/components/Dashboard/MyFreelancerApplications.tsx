@@ -48,29 +48,59 @@ const MyFreelancerApplications = ({
     );
 
   return (
-    <div className="bg-[#2c2c2c] border border-light-white relative rounded-[0.75rem] overflow-hidden">
-      {myApplications?.map((application: Project, index: number) => (
-        <div
-          key={index}
-          onClick={() => redirectToApplication(application)}
-          className="hover:bg-secondary-dark-hover min-h-[100px] border-b border-b-light-white last:border-b-0 flex px-5 py-3 lg:px-[2.5rem] lg:py-[2rem] cursor-pointer gap-[2rem]"
-        >
-          <div className="w-4/5 flex items-center">
-            <h3 className="text-sm lg:text-xl font-bold mb-3">{application?.name}</h3>
-          </div>
-          <div className="flex flex-col gap-2 justify-evenly items-center ml-auto">
-            <span className="text-xs lg:text-base">{timeAgo?.format(new Date(application?.created))}</span>
-            <div
-              className={`px-4 py-2 w-fit rounded-full text-xs lg:text-base ${OffchainProjectState[application.status_id]
-                }-button `}
-            >
+    <>
+      <h3 className="mb-3">Applied Briefs</h3>
+      <div className="bg-[#2c2c2c] border border-light-white relative rounded-[0.75rem] overflow-hidden">
+        
+        {myApplications?.map((application: Project, index: number) => !application?.chain_project_id && (
+          <div
+            key={index}
+            onClick={() => redirectToApplication(application)}
+            className="hover:bg-secondary-dark-hover min-h-[100px] border-b border-b-light-white last:border-b-0 flex px-5 py-3 lg:px-[2.5rem] lg:py-[2rem] cursor-pointer gap-[2rem]"
+          >
+            <div className="w-4/5 flex items-center">
+              <h3 className="text-sm lg:text-xl font-bold mb-3">{application?.name}</h3>
+            </div>
+            <div className="flex flex-col gap-2 justify-evenly items-center ml-auto">
+              <span className="text-xs lg:text-base">{timeAgo?.format(new Date(application?.created))}</span>
+              <div
+                className={`px-4 py-2 w-fit rounded-full text-xs lg:text-base ${OffchainProjectState[application.status_id]
+                  }-button `}
+              >
 
-              {displayState(application.status_id)}
+                {displayState(application.status_id)}
+              </div>
             </div>
           </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+      
+      <h3 className="mb-3 mt-10">Current Projects</h3>
+      <div className="bg-[#2c2c2c] border border-light-white relative rounded-[0.75rem] overflow-hidden">
+        {myApplications?.map((application: Project, index: number) => application?.chain_project_id && (
+          <div
+            key={index}
+            onClick={() => router.push(`/projects/${application?.id}`)}
+            className="hover:bg-secondary-dark-hover min-h-[100px] border-b border-b-light-white last:border-b-0 flex px-5 py-3 lg:px-[2.5rem] lg:py-[2rem] cursor-pointer gap-[2rem]"
+          >
+            <div className="w-4/5 flex items-center">
+              <h3 className="text-sm lg:text-xl font-bold mb-3">{application?.name}</h3>
+            </div>
+            <div className="flex flex-col gap-2 justify-evenly items-center ml-auto">
+              <span className="text-xs lg:text-base">{timeAgo?.format(new Date(application?.created))}</span>
+              <div
+                className={`px-4 py-2 w-fit rounded-full text-xs lg:text-base ${OffchainProjectState[application.status_id]
+                  }-button `}
+              >
+
+                {displayState(application.status_id)}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+
   );
 };
 
