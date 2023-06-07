@@ -591,13 +591,7 @@ export const insertSavedBrief =
         if (ids.length === 0) {
           return await tx("saved_briefs")
             .insert({
-              headline: brief.headline,
-              description: brief.description,
-              duration_id: duration_id,
-              scope_id: scope_id,
               user_id: user_id,
-              budget: brief.budget,
-              experience_id: brief.experience_id,
               brief_id: brief.id,
             })
             .returning("saved_briefs.id")
