@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "./Navbar";
+import Navbar from "./Navbar/Navbar";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import LoadingBar from "react-top-loading-bar";

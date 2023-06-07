@@ -11,7 +11,7 @@ type SkillsCompProps = {
 
 const Skills = ({isEditMode, setFreelancer, freelancer, skills, setSkills}:SkillsCompProps) => {
   useEffect(() => {
-    setFreelancer({ ...freelancer, skills: skills.map((skill) => ({ name: skill })) })
+    setFreelancer({ ...freelancer, skills: skills?.map((skill) => ({ name: skill })) })
   }, [skills])
 
     return (

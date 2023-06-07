@@ -2,7 +2,6 @@ import { appLogo } from "@/assets/svgs";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import Drawer from "@/components/Drawer";
 import {
   Avatar,
   Box,
@@ -13,9 +12,9 @@ import {
 import { getCurrentUser } from "@/utils";
 import { User } from "@/model";
 import { getFreelancerProfile } from "@/redux/services/freelancerService";
-import defaultProfile from "../assets/images/profile-image.png";
-import MenuItems from "./Navbar/MenuItems";
-import Login from "./Login";
+import defaultProfile from "../../assets/images/profile-image.png";
+import MenuItems from "./MenuItems";
+import Login from "../Login";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { useRouter } from "next/router";

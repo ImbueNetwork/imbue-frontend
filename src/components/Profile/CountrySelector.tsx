@@ -2,27 +2,35 @@ import React, { useState } from 'react';
 import { CountryDropdown, RegionDropdown, CountryRegionData } from 'react-country-region-selector';
 import { countries } from 'country-data';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import { getCode, getName } from "country-list";
+import { getCode, getData, getName, getNameList, getNames } from "country-list";
 import ReactCountryFlag from 'react-country-flag';
 
+
 type CountrySelectorProps = {
-  freelancer: any;
-  setFreelancer: Function;
+  user: any;
+  setUser: Function;
   isEditMode: boolean;
 }
 
-const CountrySelector = ({ setFreelancer, freelancer, isEditMode }: CountrySelectorProps) => {
-  const [country, setCountry] = useState<string>(freelancer.country || "");
-  const [region, setRegion] = useState(freelancer.region || '');
-  
+const CountrySelector = ({ setUser, user, isEditMode }: CountrySelectorProps) => {
+  const [country, setCountry] = useState<string>(user?.country || "");
+  const [region, setRegion] = useState(user?.region || '');
+
   const handleCountry = (countryName: string) => {
     setCountry(countryName)
-    setFreelancer({ ...freelancer, country: countryName })
+    setUser({ ...user, country: countryName })
   }
 
   const handleRegion = (regionName: string) => {
     setRegion(regionName)
-    setFreelancer({ ...freelancer, region: regionName })
+    setUser({ ...user, region: regionName })
+  }
+
+  const findFlag = () => {
+    if (country === "United States") return getCode("United States of America")
+    if (country === "United Kingdom") return "UK"
+
+    else return getCode(country)
   }
 
   return (
@@ -46,11 +54,11 @@ const CountrySelector = ({ setFreelancer, freelancer, isEditMode }: CountrySelec
             </div>
           )
           : (
-            <div className="flex justify-center gap-3">
+            <div className="flex gap-3 mx-auto">
               {
                 country && (
                   <>
-                    <ReactCountryFlag countryCode={getCode(country) || ""} />
+                    <ReactCountryFlag countryCode={findFlag() || ""} />
                     <p className="text-base leading-[1.2]">
                       {region}, {country}
                     </p>

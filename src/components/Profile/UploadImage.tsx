@@ -5,12 +5,12 @@ import React, { useState } from 'react';
 
 type UploadImageProps = {
     isEditMode: boolean;
-    setFreelancer: Function;
-    freelancer: any;
+    setUser: Function;
+    user: any;
 }
 
-const UploadImage = ({ isEditMode, setFreelancer, freelancer }: UploadImageProps) => {
-    const [image, setImage] = useState<any>(freelancer?.profile_image)
+const UploadImage = ({ isEditMode, setUser, user }: UploadImageProps) => {
+    const [image, setImage] = useState<any>(user?.profile_image)
     const [loading, setLoading] = useState<boolean>(false)
 
     const handleUpload = async (files: FileList | null) => {
@@ -19,7 +19,7 @@ const UploadImage = ({ isEditMode, setFreelancer, freelancer }: UploadImageProps
             const data = await uploadPhoto(files[0])
             if (data.url) {
                 setImage(data.url)
-                setFreelancer((prev: any) => {
+                setUser((prev: any) => {
                     return { ...prev, profile_image: data.url }
                 })
             }
@@ -27,7 +27,7 @@ const UploadImage = ({ isEditMode, setFreelancer, freelancer }: UploadImageProps
     }
 
     return (
-        <div className="h-40 w-40 bg-theme-grey-dark rounded-full p-12 relative -mt-32 unset mx-auto">
+        <div className="h-40 w-40 bg-theme-grey-dark rounded-full p-12 relative -mt-32 unset mx-auto border border-light-white">
             <Image
                 src={image || require("@/assets/images/profile-image.png")}
                 alt="profile image"
