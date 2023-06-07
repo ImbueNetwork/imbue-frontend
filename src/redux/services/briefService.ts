@@ -57,6 +57,31 @@ export const getAllBriefs = async (
   }
 };
 
+export const getAllSavedBriefs = async (
+  itemsPerPage: number,
+  currentPage: number,
+  user_id: string | number
+) => {
+  // return dumyBriefs as Array<Brief>;
+  //:TODO implement api for getting briefs
+  const resp = await fetch(
+    checkEnvironment().concat(
+      `${config.apiBase}briefs/save?items_per_page=${itemsPerPage}&page=${currentPage}&user_id=${user_id}`
+    ),
+    {
+      headers: postAPIHeaders,
+      method: "get",
+    }
+  );
+
+  console.log({ resp });
+  if (resp.ok) {
+    return (await resp.json()) as PaginatedResponse;
+  } else {
+    throw new Error("Failed to get all briefs. status:" + resp.status);
+  }
+};
+
 export const getBrief = async (briefId: number | string | string[]) => {
   try {
     const resp = await fetch(
@@ -200,5 +225,25 @@ export const updateBriefById = async (params: BriefInfo) => {
   } catch (error) {
     console.log(error);
     return false;
+  }
+};
+
+export const saveBriefData = async (brief: Brief) => {
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}briefs/save`),
+    {
+      headers: postAPIHeaders,
+      method: "post",
+      body: JSON.stringify(brief),
+    }
+  );
+  if (resp.ok) {
+    return (await resp.json()) as {
+      status: string;
+      brief_id?: number;
+      message?: string;
+    };
+  } else {
+    throw new Error("Failed to save briefs ..... status:" + resp.status);
   }
 };

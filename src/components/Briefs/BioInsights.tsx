@@ -12,6 +12,7 @@ type BioInsightsProps = {
   brief: Brief;
   isOwnerOfBrief: boolean | null;
   handleMessageBoxClick: () => void;
+  saveBrief?: () => void;
   showMessageBox: boolean;
   setShowMessageBox: (val: boolean) => void;
   targetUser: User | null;
@@ -28,7 +29,8 @@ const BioInsights = ({
   showMessageBox,
   setShowMessageBox,
   targetUser,
-  canSubmitProposal
+  canSubmitProposal,
+  saveBrief,
 }: BioInsightsProps) => {
   return (
     <div
@@ -57,7 +59,10 @@ const BioInsights = ({
             >
               Submit a Proposal <FaRegShareSquare />
             </button>
-            <button className="primary-btn primary-btn-outlined max-width-1100px:w-full max-width-500px:w-auto">
+            <button
+              onClick={() => saveBrief && saveBrief?.()}
+              className="primary-btn primary-btn-outlined max-width-1100px:w-full max-width-500px:w-auto"
+            >
               Save
             </button>
           </div>
