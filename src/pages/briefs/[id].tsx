@@ -1,7 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { Brief, Freelancer, User } from "@/model";
-import { getBrief, saveBriefData } from "@/redux/services/briefService";
+import {
+  checkIfBriefSaved,
+  getBrief,
+  saveBriefData,
+} from "@/redux/services/briefService";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import { fetchUser, getCurrentUser } from "../../utils";
@@ -45,6 +49,7 @@ const BriefDetails = (): JSX.Element => {
   });
 
   const [browsingUser, setBrowsingUser] = useState<User | null>(null);
+  const [isSavedBrief, setIsSavedBrief] = useState<boolean>(false);
   const [freelancer, setFreelancer] = useState<Freelancer>();
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
@@ -66,6 +71,12 @@ const BriefDetails = (): JSX.Element => {
         setBrief(briefData);
         const currentUser = await getCurrentUser();
         const _freelancer = await getFreelancerProfile(currentUser.username);
+        const briefIsSaved = await checkIfBriefSaved(
+          briefData?.id,
+          currentUser?.id
+        );
+        console.log({ briefIsSaved });
+        setIsSavedBrief(briefIsSaved.isSaved);
         setBrowsingUser(currentUser);
         setTargetUser(targetUser);
         setFreelancer(_freelancer);
@@ -211,6 +222,7 @@ const BriefDetails = (): JSX.Element => {
           redirectToApply={redirectToApply}
           brief={brief}
           saveBrief={saveBrief}
+          isSavedBrief={isSavedBrief}
           isOwnerOfBrief={isOwnerOfBrief}
           handleMessageBoxClick={handleMessageBoxClick}
           showMessageBox={showMessageBox}

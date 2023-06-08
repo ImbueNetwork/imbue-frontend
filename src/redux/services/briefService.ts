@@ -82,6 +82,26 @@ export const getAllSavedBriefs = async (
   }
 };
 
+export const checkIfBriefSaved = async (
+  briefId: string | number,
+  userId: string
+) => {
+  const resp = await fetch(
+    checkEnvironment().concat(
+      `${config.apiBase}briefs/save/${briefId}?user_id=${userId}`
+    ),
+    {
+      headers: postAPIHeaders,
+      method: "get",
+    }
+  );
+  if (resp.ok) {
+    return (await resp.json()) as { isSaved: boolean };
+  } else {
+    throw new Error("Failed to get saved brief status:" + resp.status);
+  }
+};
+
 export const getBrief = async (briefId: number | string | string[]) => {
   try {
     const resp = await fetch(
