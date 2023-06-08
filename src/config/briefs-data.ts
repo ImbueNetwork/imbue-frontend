@@ -2,33 +2,32 @@ export const stepData = [
   {
     heading: "First, let's start with a clear name",
     content: `This helps your brief post stand out to the right candidates.
-    It’s the first thing they’ll see, so make it count!`,
+    It's the first thing they'll see, so make it count!`,
     progress: 0,
   },
   {
     heading: "Great! What industry does your project fall under?",
-    content: `This helps your brief post stand out to the right candidates.
-    It’s the first thing they’ll see, so make it count!`,
+    content: '',
     progress: 0.5,
   },
   {
     heading: "Describe the project you are envisioning.",
-    content: `This is how imbuers figure out what you need and why you’re great to work with!
-    Include your expectations about the task or deliverable, what you’re looking for in a work relationship, and anything unique about your project, team, or company.`,
+    content: `This is how imbuers figure out what you need and why you're great to work with!
+    Include your expectations about the task or deliverable, what you're looking for in a work relationship, and anything unique about your project, team, or company.`,
     next: "Skills",
     progress: 0.5,
   },
   {
     heading: "What skills do you require?",
     content: `This helps your brief post stand out to the right candidates.
-    It’s the first thing they’ll see, so make it count!`,
-    next: "Skills",
+    It's the first thing they'll see, so make it count!`,
+    next: "Experience",
     progress: 1.0,
   },
   {
     heading: "Experience?",
     content: `This is how imbuers figure out who should apply to this brief! 
-    The more experienced they are the bigger you should set your budget`,
+    The more experienced they are, the bigger you should set your budget`,
     next: "Scope",
     progress: 1.5,
   },
