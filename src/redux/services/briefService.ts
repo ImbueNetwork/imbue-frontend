@@ -74,11 +74,30 @@ export const getAllSavedBriefs = async (
     }
   );
 
-  console.log({ resp });
   if (resp.ok) {
     return (await resp.json()) as PaginatedResponse;
   } else {
     throw new Error("Failed to get all briefs. status:" + resp.status);
+  }
+};
+
+export const checkIfBriefSaved = async (
+  briefId: string | number,
+  userId: string
+) => {
+  const resp = await fetch(
+    checkEnvironment().concat(
+      `${config.apiBase}briefs/save/${briefId}?user_id=${userId}`
+    ),
+    {
+      headers: postAPIHeaders,
+      method: "get",
+    }
+  );
+  if (resp.ok) {
+    return (await resp.json()) as { isSaved: boolean };
+  } else {
+    throw new Error("Failed to get saved brief status:" + resp.status);
   }
 };
 
@@ -216,10 +235,8 @@ export const updateBriefById = async (params: BriefInfo) => {
     if (resp.ok) {
       // could be 200 or 201
       // Brief update API successfully invoked
-      console.log("Brief Updated successfully via Brief REST API");
       return true;
     } else {
-      console.log("Failed to submit the brief");
       return false;
     }
   } catch (error) {

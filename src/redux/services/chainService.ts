@@ -244,8 +244,6 @@ class ChainService {
     } catch (error) {
       if (error instanceof Error) {
         transactionState.errorMessage = error.message;
-        console.log("*********** error");
-        console.log(error.message);
       }
       transactionState.txError = true;
     } finally {
@@ -339,7 +337,7 @@ class ChainService {
   }
 
   async convertToOnChainProject(project: Project) {
-    if(!project.chain_project_id)
+    if (!project.chain_project_id)
       return;
 
     const projectOnChain: any = await this.getProjectOnChain(project.chain_project_id!);
@@ -442,18 +440,18 @@ class ChainService {
       milestones: milestones,
       contributions: Object.keys(projectOnChain.contributions).map(
         (accountId: string) =>
-          ({
-            value: BigInt(
-              projectOnChain.contributions[accountId].value.replaceAll(",", "")
-            ),
-            accountId: accountId,
-            timestamp: BigInt(
-              projectOnChain.contributions[accountId].timestamp.replaceAll(
-                ",",
-                ""
-              )
-            ),
-          } as Contribution)
+        ({
+          value: BigInt(
+            projectOnChain.contributions[accountId].value.replaceAll(",", "")
+          ),
+          accountId: accountId,
+          timestamp: BigInt(
+            projectOnChain.contributions[accountId].timestamp.replaceAll(
+              ",",
+              ""
+            )
+          ),
+        } as Contribution)
       ),
       initiator: projectOnChain.initiator,
       createBlockNumber: BigInt(
@@ -477,16 +475,16 @@ class ChainService {
       .map((milestoneItem: any) => projectOnChain.milestones[milestoneItem])
       .map(
         (milestone: any) =>
-          ({
-            project_id: projectOffChain.id,
-            project_chain_id: Number(milestone.projectKey),
-            milestone_key: Number(milestone.milestoneKey),
-            name: projectOffChain.milestones[milestone.milestoneKey].name,
-            modified: projectOffChain.milestones[milestone.milestoneKey].modified,
-            percentage_to_unlock: Number(milestone.percentageToUnlock),
-            amount: Number(projectOffChain.milestones[milestone.milestoneKey].amount),
-            is_approved: milestone.isApproved,
-          } as Milestone)
+        ({
+          project_id: projectOffChain.id,
+          project_chain_id: Number(milestone.projectKey),
+          milestone_key: Number(milestone.milestoneKey),
+          name: projectOffChain.milestones[milestone.milestoneKey].name,
+          modified: projectOffChain.milestones[milestone.milestoneKey].modified,
+          percentage_to_unlock: Number(milestone.percentageToUnlock),
+          amount: Number(projectOffChain.milestones[milestone.milestoneKey].amount),
+          is_approved: milestone.isApproved,
+        } as Milestone)
       );
 
     return milestones;
@@ -542,16 +540,16 @@ class ChainService {
     return projectOnChain;
   }
 
-  public async getBalance(accountAddress:string, currencyId: number){
-    
-    switch(currencyId){
+  public async getBalance(accountAddress: string, currencyId: number) {
+
+    switch (currencyId) {
       case 0:
-        const balance : any = await this.imbueApi.imbue.api.query.system.account(accountAddress)
-        const imbueBalance = balance?.data?.free/1e12
+        const balance: any = await this.imbueApi.imbue.api.query.system.account(accountAddress)
+        const imbueBalance = balance?.data?.free / 1e12
         return `${imbueBalance.toFixed(2)} IMBU`
       case 1:
-        const ksmResponse : any = await this.imbueApi.imbue.api.query.ormlTokens.accounts(accountAddress,currencyId)
-        const ksmBalance = ksmResponse.free/1e12;
+        const ksmResponse: any = await this.imbueApi.imbue.api.query.ormlTokens.accounts(accountAddress, currencyId)
+        const ksmBalance = ksmResponse.free / 1e12;
         return `${ksmBalance.toFixed(2)} KSM`
     }
   }

@@ -41,7 +41,8 @@ export const getAllFreelancers = async (
   if (resp.ok) {
     return (await resp.json()) as FreelancerResponse;
   } else {
-    console.log(new Error("Failed to get all briefs. status:" + resp.status));
+    // TODO:
+    // console.log(new Error("Failed to get all briefs. status:" + resp.status));
     return { currentData: [], totalFreelancers: 0 };
   }
 };
@@ -96,7 +97,8 @@ export async function updateFreelancer(freelancer: Freelancer) {
   if (resp.ok) {
     return (await resp.json()) as Freelancer;
   } else {
-    console.log("Failed to update freelancer profile. status:" + resp.status);
+    // TODO: 
+    // console.log("Failed to update freelancer profile. status:" + resp.status);
   }
 }
 
