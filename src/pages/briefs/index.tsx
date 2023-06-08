@@ -1,7 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { Brief, BriefSqlFilter } from "@/model";
-import { callSearchBriefs, getAllBriefs } from "@/redux/services/briefService";
+import {
+  callSearchBriefs,
+  getAllBriefs,
+  getAllSavedBriefs,
+} from "@/redux/services/briefService";
 import { BriefFilterOption } from "@/types/briefTypes";
 import { useRouter } from "next/router";
 import { FiFilter } from "react-icons/fi";
@@ -14,6 +18,8 @@ import Image from "next/image";
 import CustomDropDown from "@/components/CustomDropDown";
 import CustomModal from "@/components/CustomModal";
 import search from "../api/freelancers/search";
+import user from "../api/info/user";
+import { getCurrentUser } from "@/utils";
 
 interface FilterModalProps {
   open: boolean;
@@ -394,7 +400,16 @@ const Briefs = (): JSX.Element => {
     }
   };
 
-  const onSavedBriefs = () => {};
+  const onSavedBriefs = async () => {
+    const currentUser = await getCurrentUser();
+    const briefs_all: any = await getAllSavedBriefs(
+      itemsPerPage,
+      currentPage,
+      currentUser?.id
+    );
+    setBriefs(briefs_all?.currentData);
+    setBriefsTotal(briefs_all?.totalBriefs);
+  };
 
   const toggleFilter = () => {
     setFilterVisible(!filterVisble);
@@ -513,7 +528,9 @@ const Briefs = (): JSX.Element => {
             )}
 
             <button
-              onClick={onSavedBriefs}
+              onClick={() => {
+                onSavedBriefs();
+              }}
               className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]"
             >
               Saved Briefs

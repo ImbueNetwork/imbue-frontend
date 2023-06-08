@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { Brief, Freelancer, User } from "@/model";
-import { getBrief } from "@/redux/services/briefService";
+import { getBrief, saveBriefData } from "@/redux/services/briefService";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import { fetchUser, getCurrentUser } from "../../utils";
@@ -13,6 +13,7 @@ import BioInsights from "@/components/Briefs/BioInsights";
 import { getServerSideProps } from "@/utils/serverSideProps";
 import ErrorScreen from "@/components/ErrorScreen";
 import { getFreelancerProfile } from "@/redux/services/freelancerService";
+import SuccessScreen from "@/components/SuccessScreen";
 
 TimeAgo.addLocale(en);
 
@@ -22,6 +23,8 @@ export type BriefProps = {
 
 const BriefDetails = (): JSX.Element => {
   const router = useRouter();
+  const [success, setSuccess] = useState<boolean>(false);
+  const [successTitle, setSuccessTitle] = useState<string>("");
   const [brief, setBrief] = useState<Brief>({
     id: "",
     headline: "",
@@ -89,13 +92,27 @@ const BriefDetails = (): JSX.Element => {
     }
   };
 
+  const saveBrief = async () => {
+    const resp = await saveBriefData({
+      ...brief,
+      currentUserId: browsingUser?.id,
+    });
+    if (resp?.brief_id) {
+      setSuccessTitle("Brief Saved Successfully");
+      setSuccess(true);
+    } else {
+      setError({ message: "Brief already Saved" });
+    }
+  };
+
   const ClientHistory = (
     <div className="transparent-conatainer relative max-width-750px:!px-3">
       <div className="flex justify-between w-full">
         <h3>Client Contact History (4)</h3>
         <div
-          className={`transition transform ease-in-out duration-600 ${showClientHistory && "rotate-180"
-            } cursor-pointer`}
+          className={`transition transform ease-in-out duration-600 ${
+            showClientHistory && "rotate-180"
+          } cursor-pointer`}
         >
           <ArrowIcon
             onClick={() => setShowClientHistory(!showClientHistory)}
@@ -142,8 +159,9 @@ const BriefDetails = (): JSX.Element => {
       <div className="flex justify-between w-full">
         <h3>Similar projects on Imbue</h3>
         <div
-          className={`transition transform ease-in-out duration-600 ${showSimilarBrief && "rotate-180"
-            } cursor-pointer`}
+          className={`transition transform ease-in-out duration-600 ${
+            showSimilarBrief && "rotate-180"
+          } cursor-pointer`}
         >
           <ArrowIcon
             onClick={() => setShowSimilarBrief(!showSimilarBrief)}
@@ -192,6 +210,7 @@ const BriefDetails = (): JSX.Element => {
         <BioInsights
           redirectToApply={redirectToApply}
           brief={brief}
+          saveBrief={saveBrief}
           isOwnerOfBrief={isOwnerOfBrief}
           handleMessageBoxClick={handleMessageBoxClick}
           showMessageBox={showMessageBox}
@@ -204,19 +223,34 @@ const BriefDetails = (): JSX.Element => {
       {ClientHistory}
       {SimilarProjects}
       <ErrorScreen {...{ error, setError }}>
-        <div className='flex flex-col gap-4 w-1/2'>
+        <div className="flex flex-col gap-4 w-1/2">
           <button
-            onClick={() => router.push('/briefs')}
-            className='primary-btn in-dark w-button w-full !m-0'>
+            onClick={() => router.push("/briefs")}
+            className="primary-btn in-dark w-button w-full !m-0"
+          >
             Seach Brief
           </button>
           <button
             onClick={() => router.push(`/dashboard`)}
-            className='underline text-xs lg:text-base font-bold'>
+            className="underline text-xs lg:text-base font-bold"
+          >
             Go to Dashboard
           </button>
         </div>
       </ErrorScreen>
+
+      <SuccessScreen title={successTitle} open={success} setOpen={setSuccess}>
+        <div className="flex flex-col gap-4 w-1/2">
+          <button
+            onClick={() => {
+              setSuccess(false);
+            }}
+            className="primary-btn in-dark w-button w-full !m-0"
+          >
+            Done
+          </button>
+        </div>
+      </SuccessScreen>
     </div>
   );
 };
