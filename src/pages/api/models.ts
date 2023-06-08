@@ -623,6 +623,7 @@ export const getSavedBriefs =
     return saved_brief_data;
   };
 
+<<<<<<< HEAD
 export const findSavedBriefById =
   (brief_id: string, userId: string) => async (tx: Knex.Transaction) =>
     await tx("saved_briefs")
@@ -635,6 +636,11 @@ export const deleteSavedBrief =
       .where({ brief_id: brief_id, user_id: userId })
       .delete()
       .returning("*");
+=======
+export const deleteSavedBrief =
+  (brief_id: number | string) => async (tx: Knex.Transaction) =>
+    await tx("saved_briefs").where({ id: brief_id }).delete().returning("*");
+>>>>>>> 586377dd7b32499987ef7085fa01344a055305df
 
 export const updateBrief =
   (

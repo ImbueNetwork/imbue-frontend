@@ -82,6 +82,7 @@ export const getAllSavedBriefs = async (
   }
 };
 
+<<<<<<< HEAD
 export const checkIfBriefSaved = async (
   briefId: string | number,
   userId: string
@@ -102,6 +103,8 @@ export const checkIfBriefSaved = async (
   }
 };
 
+=======
+>>>>>>> 586377dd7b32499987ef7085fa01344a055305df
 export const getBrief = async (briefId: number | string | string[]) => {
   try {
     const resp = await fetch(
