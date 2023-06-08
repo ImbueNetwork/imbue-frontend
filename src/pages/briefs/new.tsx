@@ -264,15 +264,12 @@ const NewBrief = (props: BriefProps): JSX.Element => {
         }),
       });
       if (resp.status === 200 || resp.status === 201) {
-        console.log("Brief created successfully via Brief REST API");
         setStep(step + 1);
       } else {
-        console.log("Failed to submit the brief");
         setError({ message: "Failed to submit the brief" })
       }
     } catch (error) {
       setError(error)
-      console.log(error);
     }
     finally {
       setLoading(false)

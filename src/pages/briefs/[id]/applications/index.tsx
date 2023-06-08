@@ -29,9 +29,7 @@ const BriefApplications = () => {
 
     const handleMessageBoxClick = async (user_id: any) => {
         if (browsingUser) {
-            console.log(user_id);
             const tg = (await fetchUser(user_id));
-            console.log(tg);
             setTargetUser(tg)
             setShowMessageBox(true);
         } else {

@@ -314,9 +314,8 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
       if (response.status === 201) {
         setStep(step + 1);
       }
-      else{
-        console.log(response);
-        setError({message:`Could not update freelancer Profile ${response.status} (${response.statusText})`})
+      else {
+        setError({ message: `Could not update freelancer Profile ${response.status} (${response.statusText})` })
       }
     } catch (error) {
       setError(error)

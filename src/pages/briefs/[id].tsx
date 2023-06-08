@@ -58,7 +58,6 @@ const BriefDetails = (): JSX.Element => {
   const [showClientHistory, setShowClientHistory] = useState<boolean>(false);
   const [error, setError] = useState<any>();
 
-  // TODO: need to get project category array from the brief
   const projectCategories = brief?.industries?.map?.((item) => item?.name);
 
   const id: any = router?.query?.id || 0;
@@ -75,7 +74,6 @@ const BriefDetails = (): JSX.Element => {
           briefData?.id,
           currentUser?.id
         );
-        console.log({ briefIsSaved });
         setIsSavedBrief(briefIsSaved.isSaved);
         setBrowsingUser(currentUser);
         setTargetUser(targetUser);
@@ -91,7 +89,6 @@ const BriefDetails = (): JSX.Element => {
   }, [id]);
 
   const redirectToApply = () => {
-    //TODO: redirect to apply for brief
     router.push(`/briefs/${brief.id}/apply`);
   };
 
@@ -110,6 +107,7 @@ const BriefDetails = (): JSX.Element => {
     });
     if (resp?.brief_id) {
       setSuccessTitle("Brief Saved Successfully");
+      setIsSavedBrief(true);
       setSuccess(true);
     } else {
       setError({ message: "Brief already Saved" });
@@ -121,9 +119,8 @@ const BriefDetails = (): JSX.Element => {
       <div className="flex justify-between w-full">
         <h3>Client Contact History (4)</h3>
         <div
-          className={`transition transform ease-in-out duration-600 ${
-            showClientHistory && "rotate-180"
-          } cursor-pointer`}
+          className={`transition transform ease-in-out duration-600 ${showClientHistory && "rotate-180"
+            } cursor-pointer`}
         >
           <ArrowIcon
             onClick={() => setShowClientHistory(!showClientHistory)}
@@ -170,9 +167,8 @@ const BriefDetails = (): JSX.Element => {
       <div className="flex justify-between w-full">
         <h3>Similar projects on Imbue</h3>
         <div
-          className={`transition transform ease-in-out duration-600 ${
-            showSimilarBrief && "rotate-180"
-          } cursor-pointer`}
+          className={`transition transform ease-in-out duration-600 ${showSimilarBrief && "rotate-180"
+            } cursor-pointer`}
         >
           <ArrowIcon
             onClick={() => setShowSimilarBrief(!showSimilarBrief)}
@@ -184,7 +180,6 @@ const BriefDetails = (): JSX.Element => {
       <div className={`${!showSimilarBrief && "hidden"} my-6`}>
         <hr className="separator" />
         {/* TODO: Need an object for the list of similar projects */}
-        {/* FIXME: missing {key} */}
         {/* FIXME: replace dummy array with similar projects data*/}
         {[3, 3, 3].map((history, index) => (
           <div key={`${index}-sim-brief`} className="similar-brief">

@@ -54,6 +54,7 @@ export const selectAccount = async (account: WalletAccount) => {
   if (result?.signature) {
     await authorise(result?.signature as SignerResult, result?.challenge!, account);
   } else {
-    console.log("Unable to get Account and Sign");
+    // TODO:
+    // console.log("Unable to get Account and Sign");
   }
 };

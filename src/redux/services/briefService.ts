@@ -74,7 +74,6 @@ export const getAllSavedBriefs = async (
     }
   );
 
-  console.log({ resp });
   if (resp.ok) {
     return (await resp.json()) as PaginatedResponse;
   } else {
@@ -236,10 +235,8 @@ export const updateBriefById = async (params: BriefInfo) => {
     if (resp.ok) {
       // could be 200 or 201
       // Brief update API successfully invoked
-      console.log("Brief Updated successfully via Brief REST API");
       return true;
     } else {
-      console.log("Failed to submit the brief");
       return false;
     }
   } catch (error) {
