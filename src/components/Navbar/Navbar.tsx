@@ -7,6 +7,7 @@ import {
   Box,
   IconButton,
   Menu,
+  Skeleton,
   Tooltip,
 } from "@mui/material";
 import { getCurrentUser } from "@/utils";
@@ -24,6 +25,7 @@ function Navbar() {
   const [redirectURL, setRedirectURL] = useState<string>();
   const [freelancerProfile, setFreelancerProfile] = useState<any>();
   const [user, setUser] = useState<User>();
+  const [loading, setLoading] = useState<boolean>(true)
 
   const [solidNav, setSolidNav] = useState<boolean>(false);
 
@@ -45,11 +47,18 @@ function Navbar() {
 
   useEffect(() => {
     const setup = async () => {
-      const user = await getCurrentUser();
-      if (user) {
-        const res = await getFreelancerProfile(user.username);
-        setFreelancerProfile(res);
-        setUser(user);
+      try {
+        const user = await getCurrentUser();
+        if (user) {
+          const res = await getFreelancerProfile(user.username);
+          setFreelancerProfile(res);
+          setUser(user);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      finally {
+        setLoading(false)
       }
     };
     setup();
@@ -58,7 +67,6 @@ function Navbar() {
   useEffect(() => {
     const handleScroll = () => {
       const isScrolled: boolean = window.scrollY > 50;
-
       setSolidNav(isScrolled);
     };
 
@@ -139,35 +147,42 @@ function Navbar() {
             >
               Discover Freelancers
             </Link>
-            <Tooltip title="Account settings">
-              <IconButton
-                onClick={handleClick}
-                size="small"
-                sx={{ ml: 2 }}
-                aria-controls={open ? "account-menu" : undefined}
-                aria-haspopup="true"
-                aria-expanded={open ? "true" : undefined}
-              >
-                {user?.id ? (
-                  <Avatar className="w-8 h-8 lg:w-10 lg:h-10">
-                    <Image
-                      src={freelancerProfile?.profile_image || defaultProfile}
-                      width={40}
-                      height={40}
-                      alt="profile"
-                    />
-                  </Avatar>
-                ) : (
-                  <div onClick={() => setOpenMenu(!openMenu)}>
-                    {openMenu ? (
-                      <CloseIcon htmlColor="white" />
+            <Tooltip title={loading ? "Loading User Info" : "Menu Options"}>
+              {
+                loading
+                  ? <Skeleton className="bg-theme-grey-dark cursor-pointer ml-2" variant="circular" width={40} height={40} />
+                  :
+                  <IconButton
+                    onClick={handleClick}
+                    size="small"
+                    sx={{ ml: 2 }}
+                    aria-controls={open ? "account-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? "true" : undefined}
+                  >
+                    {user?.username ? (
+                      <Avatar className="w-8 h-8 lg:w-10 lg:h-10">
+                        <Image
+                          src={freelancerProfile?.profile_image || defaultProfile}
+                          width={40}
+                          height={40}
+                          alt="profile"
+                        />
+                      </Avatar>
                     ) : (
-                      <MenuIcon htmlColor="white" />
+                      <div onClick={() => setOpenMenu(!openMenu)}>
+                        {openMenu ? (
+                          <CloseIcon htmlColor="white" />
+                        ) : (
+                          <MenuIcon htmlColor="white" />
+                        )}
+                      </div>
                     )}
-                  </div>
-                )}
-              </IconButton>
+
+                  </IconButton>
+              }
             </Tooltip>
+
           </Box>
         </div>
         <Menu
