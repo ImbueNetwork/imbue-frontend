@@ -24,10 +24,12 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
         setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients.map((c) => c.name) }))
     }
 
-    const removeClient = (id: number) => {
-        const newClients = clients.filter((client) => client.id !== id)
-        setClients(newClients)
-        setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients.map((c) => c.name) }))
+    const removeClient = (e: any, id: number) => {
+        if ((e.target as HTMLElement).nodeName == "SPAN") {
+            const newClients = clients.filter((client) => client.id !== id)
+            setClients(newClients)
+            setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients.map((c) => c.name) }))
+        }
     }
 
     return (
@@ -35,9 +37,8 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
             {
                 clients?.map((client) => (
                     <div key={client.id}
-                        onClick={() => removeClient(client.id)}
                         className="flex items-center gap-3 w-fit mx-auto">
-                        <Badge className="client-badge" color="error" overlap="circular" badgeContent="-" invisible={!isEditMode}>
+                        <Badge onClick={(e) => removeClient(e, client.id)} className="client-badge" color="error" overlap="circular" badgeContent="-" invisible={!isEditMode}>
                             <div>
                                 <Image className="rounded-lg" height={40} width={40} src={client.icon} alt={client.name} />
                                 <p>{client.name}</p>

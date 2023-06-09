@@ -140,6 +140,11 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
     setFreelancer(newFreelancer);
   };
 
+  const cancelEdit = async () => {
+    setFreelancer(initFreelancer)
+    setIsEditMode(false)
+  }
+
   const accountSelected = async (account: WalletAccount): Promise<any> => {
     try {
       const result = await getAccountAndSign(account);
@@ -359,7 +364,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
               </div>
 
               <div className="connect-buttons flex justify-center gap-[24px] mb-[20px]">
-                {!isCurrentFreelancer && (
+                {/* {!isCurrentFreelancer && (
                   <>
                     <button
                       onClick={() => handleMessageBoxClick()}
@@ -369,21 +374,62 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                     </button>
                   </>
                 )}
-                {!isEditMode && isCurrentFreelancer && (
-                  <button onClick={() => flipEdit()} className="message">
-                    Edit Profile <FiEdit />
-                  </button>
-                )}
-                {isEditMode && isCurrentFreelancer && (
-                  <button onClick={() => onSave()} className="message">
-                    Save Changes <FiEdit />
-                  </button>
-                )}
+                */}
 
-                <button className="share">
-                  <FaRegShareSquare color="white" />
-                  Share Profile
-                </button>
+                {isCurrentFreelancer
+                  ? (
+                    <>
+                      {
+                        isEditMode
+                          ? (
+                            <button onClick={() => onSave()} className="message">
+                              Save Changes <FiEdit />
+                            </button>
+                          )
+                          : (
+                            <button onClick={() => flipEdit()} className="message">
+                              Edit Profile <FiEdit />
+                            </button>
+                          )
+                      }
+                    </>
+                  )
+                  : (
+                    <>
+                      <button
+                        onClick={() => handleMessageBoxClick()}
+                        className=" message"
+                      >
+                        Message
+                      </button>
+                    </>
+                  )
+                    ? (
+                      <button onClick={() => flipEdit()} className="message">
+                        Edit Profile <FiEdit />
+                      </button>
+                    )
+                    : (
+                      <button onClick={() => onSave()} className="message">
+                        Save Changes <FiEdit />
+                      </button>
+                    )
+                }
+
+                {(!isEditMode && isCurrentFreelancer)
+                  ? (
+                    <button className="share">
+                      <FaRegShareSquare color="white" />
+                      Share Profile
+                    </button>
+                  )
+                  : (
+                    <button onClick={() => cancelEdit()} className="message !bg-red-600">
+                      Cancel
+                    </button>
+                  )
+                }
+
               </div>
               {/* TODO: Implement */}
               {/* <div className="divider"></div>
@@ -408,7 +454,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
             <div className="w-full px-[30px] lg:px-[40px]">
               <p className="text-xl">Wallet Address</p>
               <div className="mt-3 border break-words p-3 rounded-md bg-black">
-                {freelancer.web3_address}
+                {freelancer?.web3_address}
               </div>
             </div>
 
@@ -690,7 +736,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                       {line}
                     </p>
                   ))} */}
-                  {freelancer.education || "No Education Data Found"}
+                  {freelancer?.education || "No Education Data Found"}
                 </div>
               </>
             )}
