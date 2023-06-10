@@ -39,12 +39,20 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
             duplicate: true,
         },
         {
+            icon: "person",
+            text: "Profile",
+            link: `/profile/${user?.id}/`,
+            needAuthentication: false,
+            duplicate: false,
+        },
+        {
             icon: isFreelancer ? "account_circle" : "group_add",
             text: isFreelancer ? "Freelancer Profile" : "Join The Freelancers",
             link: isFreelancer ? `/freelancers/${user?.username}/` : "/freelancers/new",
             needAuthentication: true,
             duplicate: false,
         },
+        
         {
             icon: "money",
             text: "Transfer Funds",
@@ -76,7 +84,7 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
             <div className='menuItems flex flex-col gap-2'>
                 {
                     linkItems.map((item, index) => (
-                        <MenuItem className={`${item.duplicate &&"lg:hidden"}`} key={index} onClick={() => navigateToPage(item.link, item.needAuthentication)}>
+                        <MenuItem className={`${item.duplicate && "lg:hidden"}`} key={index} onClick={() => navigateToPage(item.link, item.needAuthentication)}>
                             <ListItemIcon>
                                 <i
                                     className="material-icons relative top-[4px] text-white"

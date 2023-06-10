@@ -44,28 +44,28 @@ const Profile = ({ initUser, browsingUser }: any) => {
         getBriefs()
     }, [user?.id])
 
-    //The fields must be pre populated correctly.
     const onSave = async () => {
-        // try {
-        //     if (freelancer) {
-        //         setLoading(true)
-        //         let data = freelancer;
-        //         data = {
-        //             ...data,
-        //             skills: skills,
-        //             clients: [],
-        //         };
+        try {
+            if (user) {
+                setLoading(true)
+                let data = user;
 
-        //         await updateFreelancer(data);
-        //         setSuccess(true)
-        //     }
-        // } catch (error) {
-        //     setError(error)
-        // }
-        // finally {
-        //     setLoading(false)
-        // }
+                console.log(data);
+                // TODO: need api endpoint here
+                setSuccess(true)
+            }
+        } catch (error) {
+            setError(error)
+        }
+        finally {
+            setLoading(false)
+        }
     };
+
+    const cancelEdit = () => {
+        setUser(initUser)
+        setIsEditMode(false)
+    }
 
     const handleMessageBoxClick = () => {
         if (browsingUser) {
@@ -152,13 +152,17 @@ const Profile = ({ initUser, browsingUser }: any) => {
                             )}
 
                             <div className='flex justify-between'>
-
                                 <div className='w-1/3'>
                                     <CountrySelector user={{ ...user, country: "United States", region: "California" }} setUser={setUser} {...{ isEditMode }} />
-                                    <div className='mt-5'>
-                                        <button className='primary-btn in-dark w-button'>View Website</button>
-                                        <button className='primary-btn in-dark w-button'>Follow</button>
-                                    </div>
+                                    {
+                                        !isEditMode && (
+                                            <div className='mt-5'>
+                                                <button className='primary-btn in-dark w-button'>View Website</button>
+                                                <button className='primary-btn in-dark w-button'>Follow</button>
+                                            </div>
+                                        )
+                                    }
+
                                 </div>
                                 {/* TODO: Implement reviews */}
 
@@ -280,35 +284,11 @@ const Profile = ({ initUser, browsingUser }: any) => {
                         </div>
                         <div className='flex gap-14 items-center'>
                             <p className='w-24 font-bold text-xl'>Member :</p>
-                            {
-                                isEditMode
-                                    ? <div
-                                        className="h-auto w-full lg:w-2/3 flex justify-between items-center"
-                                    >
-                                        <OutlinedInput
-                                            name='website'
-                                            onChange={(e) => handleChange(e)}
-                                            className='w-full' />
-                                    </div>
-                                    : <span className='text-primary'>Mar-12-2023</span>
-
-                            }
+                            <span className='text-primary'>Mar-12-2023</span>
                         </div>
                         <div className='flex gap-14 items-center'>
                             <p className='w-24 font-bold text-xl'>Hired :</p>
-                            {
-                                isEditMode
-                                    ? <div
-                                        className="h-auto w-full lg:w-2/3 flex justify-between items-center"
-                                    >
-                                        <OutlinedInput
-                                            name='website'
-                                            onChange={(e) => handleChange(e)}
-                                            className='w-full' />
-                                    </div>
-                                    : <span className='text-primary'>58</span>
-
-                            }
+                            <span className='text-primary'>58</span>
                         </div>
                     </div>
 
@@ -357,6 +337,15 @@ const Profile = ({ initUser, browsingUser }: any) => {
                     {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser }}
                 />
             )}
+
+            {
+                isEditMode && (
+                    <div className='mt-5'>
+                        <button onClick={onSave} className='primary-btn in-dark w-button'>Save Changes</button>
+                        <button onClick={cancelEdit} className='primary-btn in-dark w-button !bg-red-600'>Cancel</button>
+                    </div>
+                )
+            }
 
             {loading && <FullScreenLoader />}
 
