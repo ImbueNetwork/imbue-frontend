@@ -7,7 +7,7 @@ import { jwtOptions } from "../../auth/common";
 // @ts-ignore
 import * as passportJwt from "passport-jwt";
 // @ts-ignore
-import { fetchUser } from "../models";
+import { fetchUser } from "../../models";
 import passport from "passport";
 import nextConnect from "next-connect";
 const JwtStrategy = passportJwt.Strategy;
@@ -30,6 +30,12 @@ export const imbueStrategy = new JwtStrategy(jwtOptions, async function (
           getstream_token: user.getstream_token,
           display_name: user.display_name,
           web3_address: web3Account?.address || null,
+          profile_photo: user.profile_photo,
+          country: user.country,
+          region: user.region,
+          about: user.about,
+          website: user.website,
+          industry: user.industry,
         });
       }
     });
