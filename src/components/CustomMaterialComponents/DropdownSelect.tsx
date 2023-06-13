@@ -1,14 +1,15 @@
-import React, { useRef, useState } from "react";
-import styled from "@emotion/styled";
+import styled from '@emotion/styled';
+import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import React, { useRef, useState } from 'react';
+
 import {
   DropdownSelectData,
   NumberOfItemsPerList,
-} from "@/types/proposalsTypes";
-import FormControl from "@mui/material/FormControl";
-import FormHelperText from "@mui/material/FormHelperText";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+} from '@/types/proposalsTypes';
 
 type DropdownSelectProps = {
   error: boolean;
@@ -22,7 +23,7 @@ type DropdownSelectProps = {
 type DropdownItemsProps = {
   data?: DropdownSelectData[];
   selected?: DropdownSelectData;
-  onSelect: (val: DropdownSelectData) => void;
+  onSelect: (_val: DropdownSelectData) => void;
   noOfItemsPerList: NumberOfItemsPerList;
 };
 
@@ -45,7 +46,7 @@ const Container = styled.div`
 
 const Item = styled.div<{ noOfItemsPerList: NumberOfItemsPerList }>`
   height: ${({ noOfItemsPerList }) =>
-    noOfItemsPerList === 1 ? "var(--mdc-menu-item-height, 48px)" : "72px"};
+    noOfItemsPerList === 1 ? 'var(--mdc-menu-item-height, 48px)' : '72px'};
   padding-left: 16px;
   padding-right: 16px;
   overflow: hidden;
@@ -94,17 +95,17 @@ const ItemBody = styled.span`
 `;
 
 const SelectInput = styled(Select)(({ error }: SelectInputProps) => ({
-  "&": {
-    position: "relative",
-    maxWidth: "100%",
-    overflow: "hidden",
+  '&': {
+    position: 'relative',
+    maxWidth: '100%',
+    overflow: 'hidden',
     height: 58,
   },
-  "&:after": {
-    borderBottom: error ? "1px solid #ff5a58" : "1px solid #b2ff0b",
+  '&:after': {
+    borderBottom: error ? '1px solid #ff5a58' : '1px solid #b2ff0b',
   },
-  "& .Mui-focused": {
-    borderBottom: error ? "1px solid #ff5a58" : "1px solid #000",
+  '& .Mui-focused': {
+    borderBottom: error ? '1px solid #ff5a58' : '1px solid #000',
   },
 }));
 
@@ -126,8 +127,8 @@ const DropdownItems = ({
             style={{
               backgroundColor:
                 selected?.value === item?.value
-                  ? "rgba(178, 255, 11,0.1)"
-                  : "none",
+                  ? 'rgba(178, 255, 11,0.1)'
+                  : 'none',
             }}
             noOfItemsPerList={noOfItemsPerList}
           >
@@ -146,13 +147,13 @@ const DropdownSelect = ({
   widthPercent,
   data,
   placeholder,
-  message = "",
+  message = '',
   noOfItemsPerList = 1,
 }: DropdownSelectProps): JSX.Element => {
   const [selected, setSelected] = React.useState<DropdownSelectData>({
-    label: "",
-    body: "",
-    value: "",
+    label: '',
+    body: '',
+    value: '',
   });
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>();
@@ -160,27 +161,27 @@ const DropdownSelect = ({
   return (
     <React.Fragment>
       <FormControl
-        variant="filled"
-        style={{ width: widthPercent ? `${widthPercent}%` : "100%" }}
-        className="text-input-container"
+        variant='filled'
+        style={{ width: widthPercent ? `${widthPercent}%` : '100%' }}
+        className='text-input-container'
       >
         <InputLabel
-          htmlFor="component-filled"
-          id="demo-simple-select-filled-label"
+          htmlFor='component-filled'
+          id='demo-simple-select-filled-label'
           className={
             error
-              ? "text-input-label-error"
+              ? 'text-input-label-error'
               : focused
-              ? "text-input-label-focused"
-              : "text-input-label"
+              ? 'text-input-label-focused'
+              : 'text-input-label'
           }
         >
           {placeholder}
         </InputLabel>
         <SelectInput
-          labelId="demo-simple-select-filled-label"
-          id="demo-simple-select-filled select-container"
-          className="select-input-field"
+          labelId='demo-simple-select-filled-label'
+          id='demo-simple-select-filled select-container'
+          className='select-input-field'
           value={selected.value}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
@@ -207,9 +208,9 @@ const DropdownSelect = ({
         )}
       </FormControl>
       <FormHelperText
-        className={error ? "text-input-field-error" : "text-input-field-help"}
+        className={error ? 'text-input-field-error' : 'text-input-field-help'}
       >
-        {focused ? `${message || " "}` : " "}
+        {focused ? `${message || ' '}` : ' '}
       </FormHelperText>
     </React.Fragment>
   );

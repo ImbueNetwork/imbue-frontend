@@ -1,17 +1,21 @@
-import * as React from "react";
-import { WalletSelect } from "@talismn/connect-components";
-import { WalletAccount } from "@talismn/connect-wallets";
-import { PolkadotjsWallet, SubWallet, TalismanWallet } from "@talismn/connect-wallets"
+import { WalletSelect } from '@talismn/connect-components';
 import { truncateMiddle } from '@talismn/connect-ui';
+import { WalletAccount } from '@talismn/connect-wallets';
+import {
+  PolkadotjsWallet,
+  SubWallet,
+  TalismanWallet,
+} from '@talismn/connect-wallets';
+import * as React from 'react';
 
 type AccountChoiceProps = {
-  accountSelected: (account: WalletAccount) => void;
-  setVisible: Function;
+  accountSelected: (_account: WalletAccount) => void;
+  setVisible: (_visible: boolean) => void;
   visible: boolean;
   filterByInitiator?: boolean;
   initiatorAddress?: string;
   title?: string;
-}
+};
 
 const AccountChoice = ({
   accountSelected,
@@ -19,14 +23,15 @@ const AccountChoice = ({
   setVisible,
   filterByInitiator,
   initiatorAddress,
-  title
+  title,
 }: AccountChoiceProps): JSX.Element => {
-
-  const header = filterByInitiator ? `Connect with ${truncateMiddle(initiatorAddress)}` : "Connect wallet";
+  const header = filterByInitiator
+    ? `Connect with ${truncateMiddle(initiatorAddress)}`
+    : 'Connect wallet';
   return (
     <>
       <WalletSelect
-        dappName={"Imbue"}
+        dappName={'Imbue'}
         open={visible}
         walletList={[
           new TalismanWallet(),

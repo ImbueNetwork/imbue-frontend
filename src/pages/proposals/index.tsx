@@ -1,5 +1,6 @@
-import React from "react";
-import ProposalsComponent from "@/components/Proposals";
+import React from 'react';
+
+import ProposalsComponent from '@/components/Proposals';
 
 const Proposals = () => {
   return <ProposalsComponent />;

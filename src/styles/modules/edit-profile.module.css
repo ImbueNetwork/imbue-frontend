@@ -1,37 +1,35 @@
 .basicInfo,
-.infoSection{
-    width: 85%;
-    margin: auto;
-    background: var(--theme-grey-dark);
-    border-radius: 20px;
-    margin-bottom: 33px;
+.infoSection {
+  width: 85%;
+  margin: auto;
+  background: var(--theme-grey-dark);
+  border-radius: 20px;
+  margin-bottom: 33px;
 }
 
-.basicInfo{
-    padding: 66px 56px;
+.basicInfo {
+  padding: 66px 56px;
 }
 
-.infoSection{
-    padding: 0px 56px;
+.infoSection {
+  padding: 0px 56px;
 }
 
-
-.walletAddress{
-    font-size: 14px;
-    word-wrap: break-word;
+.walletAddress {
+  font-size: 14px;
+  word-wrap: break-word;
 }
 
 @media screen and (max-width: 500px) {
+  .walletAddress {
+    max-width: 85%;
+  }
 
-    .walletAddress{
-        max-width: 85%;
-    }
+  .basicInfo {
+    padding: 35px 30px;
+  }
 
-    .basicInfo{
-        padding: 35px 30px;
-    }
-    
-    .infoSection{
-        padding: 0px 30px;
-    }
+  .infoSection {
+    padding: 0px 30px;
+  }
 }

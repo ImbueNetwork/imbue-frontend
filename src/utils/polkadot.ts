@@ -1,17 +1,14 @@
-import type {
-  InjectedExtension,
-} from "@polkadot/extension-inject/types";
-import type { DispatchError } from "@polkadot/types/interfaces";
-import { ApiPromise, WsProvider } from "@polkadot/api";
-import { Keyring } from "@polkadot/keyring";
-import { stringToHex } from "@polkadot/util";
-import * as config from "../config";
-export const imbueNetwork = "Imbue Network";
-import dynamic from "next/dynamic";
-import { checkEnvironment } from ".";
-import { WalletAccount } from "@talismn/connect-wallets";
+import { ApiPromise, WsProvider } from '@polkadot/api';
+import type { InjectedExtension } from '@polkadot/extension-inject/types';
+import type { DispatchError } from '@polkadot/types/interfaces';
+import { stringToHex } from '@polkadot/util';
 
-const sr25519Keyring = new Keyring({ type: "sr25519", ss58Format: 2 });
+import * as config from '../config';
+export const imbueNetwork = 'Imbue Network';
+import { web3Enable } from '@polkadot/extension-dapp';
+import { WalletAccount } from '@talismn/connect-wallets';
+
+import { checkEnvironment } from '.';
 
 export type PolkadotJsApiInfo = {
   api: ApiPromise;
@@ -39,22 +36,22 @@ export const initImbueAPIInfo = async () => {
 };
 
 function showLoading(): void {
-  const modal = document.getElementById("modal");
-  const loading = document.getElementById("loading");
+  const modal = document.getElementById('modal');
+  const loading = document.getElementById('loading');
 
   if (modal && loading) {
     loading.hidden = false;
-    modal.classList.add("show");
+    modal.classList.add('show');
   }
 }
 
 function hideLoading(): void {
-  const modal = document.getElementById("modal");
-  const loading = document.getElementById("loading");
+  const modal = document.getElementById('modal');
+  const loading = document.getElementById('loading');
 
   if (modal && loading) {
     loading.hidden = true;
-    modal.classList.remove("show");
+    modal.classList.remove('show');
   }
 }
 
@@ -62,17 +59,17 @@ async function initPolkadotJSAPI(
   webSockAddr: string
 ): Promise<PolkadotJsApiInfo> {
   const provider = new WsProvider(webSockAddr);
-  provider.on("error", (e) => {
+  provider.on('error', (e) => {
     errorNotification(e);
     console.log(e);
   });
 
-  provider.on("disconnected", (e) => {
+  provider.on('disconnected', (e) => {
     console.log(e);
   });
 
-  provider.on("connected", (e) => {
-    console.log("Polkadot JS connected", e);
+  provider.on('connected', (e) => {
+    console.log('Polkadot JS connected', e);
   });
 
   try {
@@ -85,9 +82,7 @@ async function initPolkadotJSAPI(
       webSockAddr,
     };
   } catch (e) {
-    const cause = e as Error;
-
-    throw new Error("Unable to initialize PolkadotJS API");
+    throw new Error('Unable to initialize PolkadotJS API');
   }
 }
 
@@ -106,14 +101,13 @@ export function errorNotification(e: Error) {
   );
 }
 
-export const enableAppForExtension = (
+export const enableAppForExtension = async (
   appName: string,
-  attempts: number = 10
+  attempts = 10
 ): Promise<InjectedExtension[]> => {
-  return new Promise(async (resolve, reject) => {
-    const { web3Enable } = await import("@polkadot/extension-dapp");
+  const extensions = await web3Enable(appName);
 
-    const extensions = await web3Enable(appName);
+  return new Promise((resolve, reject) => {
     if (!extensions.length) {
       // this.status("Error", web3Error("No extensions found."));
       if (attempts > 0) {
@@ -122,7 +116,7 @@ export const enableAppForExtension = (
         }, 2000);
       } else {
         // this.dismissStatus();
-        reject(new Error("Unable to enable any web3 extension."));
+        reject(new Error('Unable to enable any web3 extension.'));
       }
     } else {
       // this.dismissStatus();
@@ -132,11 +126,11 @@ export const enableAppForExtension = (
 };
 
 export const getWeb3Accounts = async () => {
-  const { web3Accounts } = await import("@polkadot/extension-dapp");
+  const { web3Accounts } = await import('@polkadot/extension-dapp');
   try {
     const extensions = await enableAppForExtension(imbueNetwork);
     if (!extensions.length) {
-      console.log("No extensions found.");
+      console.log('No extensions found.');
       return [];
     } else {
       return web3Accounts();
@@ -155,9 +149,9 @@ export const signWeb3Challenge = async (
   const signature = await signer.signRaw({
     address: account.address,
     data: stringToHex(challenge),
-    type: "bytes",
+    type: 'bytes',
   });
-  return signature
+  return signature;
 };
 
 export function getDispatchError(dispatchError: DispatchError): string {

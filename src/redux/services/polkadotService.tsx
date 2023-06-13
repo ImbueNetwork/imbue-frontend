@@ -1,17 +1,17 @@
-import * as config from "@/config";
-import { checkEnvironment, getCurrentUser } from "@/utils";
-import { signWeb3Challenge } from "@/utils/polkadot";
-import { SignerResult } from "@polkadot/api/types";
-import { v4 as uuid } from "uuid";
-import { Wallet, WalletAccount } from "@talismn/connect-wallets";
+import { SignerResult } from '@polkadot/api/types';
+import { WalletAccount } from '@talismn/connect-wallets';
+import { v4 as uuid } from 'uuid';
+
+import { checkEnvironment, getCurrentUser } from '@/utils';
+import { signWeb3Challenge } from '@/utils/polkadot';
 
 const getAPIHeaders = {
-  accept: "application/json",
+  accept: 'application/json',
 };
 
 const postAPIHeaders = {
   ...getAPIHeaders,
-  "content-type": "application/json",
+  'content-type': 'application/json',
 };
 
 export async function getAccountAndSign(account: WalletAccount) {
@@ -35,24 +35,29 @@ export async function authorise(
   const existingUser = await getCurrentUser();
 
   const resp = await fetch(
-    checkEnvironment().concat(`/api/auth/web3/polkadot`), {
-
-    headers: postAPIHeaders,
-    method: "post",
-    body: JSON.stringify({
-      signature: signature.signature,
-      challenge,
-      account,
-      logged_in_user: existingUser,
-    }),
-  });
+    checkEnvironment().concat(`/api/auth/web3/polkadot`),
+    {
+      headers: postAPIHeaders,
+      method: 'post',
+      body: JSON.stringify({
+        signature: signature.signature,
+        challenge,
+        account,
+        logged_in_user: existingUser,
+      }),
+    }
+  );
   return resp;
 }
 
 export const selectAccount = async (account: WalletAccount) => {
   const result = await getAccountAndSign(account);
   if (result?.signature) {
-    await authorise(result?.signature as SignerResult, result?.challenge!, account);
+    await authorise(
+      result?.signature as SignerResult,
+      result?.challenge as string,
+      account
+    );
   } else {
     // TODO:
     // console.log("Unable to get Account and Sign");

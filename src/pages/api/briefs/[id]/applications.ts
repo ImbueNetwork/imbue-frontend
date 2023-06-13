@@ -1,11 +1,12 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import db from "@/db";
-import * as models from "../../models";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nextConnect from 'next-connect';
 
-import nextConnect from 'next-connect'
+import db from '@/db';
 
-export default nextConnect()
-  .get(async (req: NextApiRequest, res: NextApiResponse) => {
+import * as models from '../../models';
+
+export default nextConnect().get(
+  async (req: NextApiRequest, res: NextApiResponse) => {
     const { query } = req;
 
     const id: any = query.id as string[];
@@ -35,5 +36,5 @@ export default nextConnect()
         });
       }
     });
-
-  });
+  }
+);

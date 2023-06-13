@@ -1,24 +1,24 @@
 const buttonType = {
   outline: {
     style: {
-      "&": {
-        border: "var(--secondary-button-border)",
+      '&': {
+        border: 'var(--secondary-button-border)',
       },
-      "&:hover": {
-        backgroundColor: "var(--secondary-button-background-hover-color)",
-        border: "var(--secondary-button-border)",
+      '&:hover': {
+        backgroundColor: 'var(--secondary-button-background-hover-color)',
+        border: 'var(--secondary-button-border)',
       },
     },
     text: {
-      color: "white",
+      color: 'white',
     },
   },
   contained: {},
 };
 
 export enum Buttons {
-  CONTAINED = "contained",
-  OUTLINED = "outlined",
+  CONTAINED = 'contained',
+  OUTLINED = 'outlined',
 }
 
 export const buttonStyleBasedOnVariantPassed = (

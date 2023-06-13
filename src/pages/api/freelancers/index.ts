@@ -1,17 +1,16 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import db from "@/db";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nextConnect from 'next-connect';
+
+import db from '@/db';
+
+import { verifyUserIdFromJwt } from '../auth/common';
 import {
-  Freelancer,
   fetchAllFreelancers,
   fetchItems,
-  fetchProfileImages,
   insertFreelancerDetails,
   paginatedData,
   upsertItems,
-} from "../models";
-import { verifyUserIdFromJwt } from "../auth/common";
-
-import nextConnect from "next-connect";
+} from '../models';
 
 export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
@@ -28,19 +27,19 @@ export default nextConnect()
             ...currentData.map(async (freelancer: any) => {
               freelancer.skills = await fetchItems(
                 freelancer.skill_ids,
-                "skills"
+                'skills'
               )(tx);
               freelancer.client_images = await fetchItems(
                 freelancer.client_ids,
-                "clients"
+                'clients'
               )(tx);
               freelancer.languages = await fetchItems(
                 freelancer.language_ids,
-                "languages"
+                'languages'
               )(tx);
               freelancer.services = await fetchItems(
                 freelancer.service_ids,
-                "services"
+                'services'
               )(tx);
             }),
           ]);
@@ -59,19 +58,19 @@ export default nextConnect()
     verifyUserIdFromJwt(req, res, freelancer.user_id);
     db.transaction(async (tx) => {
       try {
-        const skill_ids = await upsertItems(freelancer.skills, "skills")(tx);
+        const skill_ids = await upsertItems(freelancer.skills, 'skills')(tx);
         const language_ids = await upsertItems(
           freelancer.languages,
-          "languages"
+          'languages'
         )(tx);
         const services_ids = await upsertItems(
           freelancer.services,
-          "services"
+          'services'
         )(tx);
         let client_ids: number[] = [];
 
         if (freelancer.clients) {
-          client_ids = await upsertItems(freelancer.clients, "services")(tx);
+          client_ids = await upsertItems(freelancer.clients, 'services')(tx);
         }
         const freelancer_id = await insertFreelancerDetails(
           freelancer,
@@ -83,18 +82,18 @@ export default nextConnect()
 
         if (!freelancer_id) {
           return res.status(401).send({
-            status: "Failed",
-            error: new Error("Failed to insert freelancer details."),
+            status: 'Failed',
+            error: new Error('Failed to insert freelancer details.'),
           });
         }
 
         return res.status(201).send({
-          status: "Successful",
+          status: 'Successful',
           freelancer_id: freelancer_id,
         });
       } catch (cause) {
         return res.status(401).send({
-          status: "Failed",
+          status: 'Failed',
           error: new Error(`Failed to insert freelancer details .`, {
             cause: cause as Error,
           }),

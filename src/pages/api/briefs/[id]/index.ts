@@ -1,8 +1,10 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import db from "@/db";
-import * as models from "../../models";
-import { Brief, BriefSqlFilter, fetchItems } from "../../models";
-import nextConnect from "next-connect";
+import { NextApiRequest, NextApiResponse } from 'next';
+import nextConnect from 'next-connect';
+
+import db from '@/db';
+
+import * as models from '../../models';
+import { Brief, BriefSqlFilter, fetchItems } from '../../models';
 
 export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
@@ -13,10 +15,10 @@ export default nextConnect()
       try {
         const brief = await models.fetchBrief(id)(tx);
         await Promise.all([
-          (brief.skills = await fetchItems(brief.skill_ids, "skills")(tx)),
+          (brief.skills = await fetchItems(brief.skill_ids, 'skills')(tx)),
           (brief.industries = await fetchItems(
             brief.industry_ids,
-            "industries"
+            'industries'
           )(tx)),
         ]);
         response = brief;
@@ -43,10 +45,10 @@ export default nextConnect()
         await Promise.all([
           currentData,
           ...currentData.map(async (brief: any) => {
-            brief.skills = await fetchItems(brief.skill_ids, "skills")(tx);
+            brief.skills = await fetchItems(brief.skill_ids, 'skills')(tx);
             brief.industries = await fetchItems(
               brief.industry_ids,
-              "industries"
+              'industries'
             )(tx);
           }),
         ]);
