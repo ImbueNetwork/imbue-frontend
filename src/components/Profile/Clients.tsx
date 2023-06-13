@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
-import fiverrIcon from "@/assets/images/fiverr.png"
-import ImbueIcon from "@/assets/svgs/loader.svg"
+import React, { ChangeEvent, useState } from 'react';
 import { Freelancer } from '@/model';
-import { Badge, Box, Modal, TextField, ToggleButton } from '@mui/material';
+import { Badge, Box, CircularProgress, Modal, TextField, ToggleButton, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import { uploadPhoto } from '@/utils/imageUpload';
+import SuccessScreen from '../SuccessScreen';
+import ErrorScreen from '../ErrorScreen';
+import { useRouter } from 'next/router';
 
 type ClientsProps = {
     setFreelancer: Function;
     isEditMode: boolean;
+    setIsEditMode: Function;
+    clients: any;
+    setClients: Function
 }
 
 const style = {
@@ -21,61 +25,77 @@ const style = {
     boxShadow: 24,
     p: 4,
     display: "flex",
-    flexDirection: "column"
+    flexDirection: "column",
+    outline: 'none'
 };
 
-const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
-    const [clients, setClients] = useState([
-        { id: 1, name: "Fiverr", icon: fiverrIcon, link: "fiverr.com" },
-        { id: 2, name: "Imbue", icon: ImbueIcon, link: "fiverr.com" },
-    ])
+const Clients = ({ setFreelancer, isEditMode, setIsEditMode, clients, setClients }: ClientsProps) => {
+
+
+    const [newClient, setNewClient] = useState<any>({})
 
     const [open, setOpen] = React.useState(false);
     const [loading, setLoading] = useState<boolean>(false)
-    const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
     const [openAddClient, setOpenAddClient] = useState<boolean>(false)
 
-    const addAClient = () => {
-        const newClients = [...clients, { id: Number(clients.length) + 1, name: "Imbue", icon: ImbueIcon, link: "fiverr.com" }]
-        setClients(newClients)
-        setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients.map((c) => c.name) }))
-    }
-
     const removeClient = (e: any, id: number) => {
         if ((e.target as HTMLElement).nodeName == "SPAN") {
-            const newClients = clients.filter((client) => client.id !== id)
+            const newClients = clients.filter((client: any) => client.id !== id)
             setClients(newClients)
-            setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients.map((c) => c.name) }))
+            setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients.map((c: any) => c.name) }))
         }
     }
 
-    const handleLogoUpload = async (files : FileList) => {
+    const handleLogoUpload = async (files: FileList | null) => {
         if (files?.length) {
             setLoading(true)
-            const data = await uploadPhoto(files[0])
-            // if (data.url) {
-            //     setImage(data.url)
-            //     setFreelancer((prev: any) => {
-            //         return { ...prev, profile_image: data.url }
-            //     })
-            // }
+            try {
+                const data = await uploadPhoto(files[0])
+                if (data.url) {
+                    setNewClient((prev: any) => {
+                        return { ...prev, logo: data.url }
+                    })
+                }
+            } catch (error) {
+                console.log(error);
+            }
+            finally {
+                setLoading(false)
+            }
         }
     }
+
+    const handleNewClientData = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const clientData = { ...newClient, [e.target.name]: e.target.value }
+        setNewClient(clientData)
+    }
+
+    const handleSubmit = () => {
+        const newClients = [...clients, newClient]
+        setClients(newClients)
+        setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients.map((c) => c.name) }))
+        setOpen(false)
+    }
+
 
     return (
         <div className="grid grid-cols-2 px-[30px] lg:px-[40px] justify-center md:grid-cols-3 gap-5 w-full">
             {
-                clients?.map((client) => (
-                    <div key={client.id}
-                        className="flex items-center gap-3 w-fit mx-auto">
-                        <Badge onClick={(e) => removeClient(e, client.id)} className="client-badge" color="error" overlap="circular" badgeContent="-" invisible={!isEditMode}>
-                            <div>
-                                <Image className="rounded-lg" height={40} width={40} src={client.icon} alt={client.name} />
+                clients?.map((client: any) => (
+                    <div key={client.id}>
+                        <Tooltip title={client.website} placement="top" arrow>
+                            <div className="flex flex-col items-center gap-3 w-fit mx-auto">
+                                <Badge onClick={(e) => removeClient(e, client.id)} className="client-badge" color="error" overlap="circular" badgeContent="-" invisible={!isEditMode}>
+                                    <div>
+                                        <Image className="rounded-lg" height={40} width={40} src={client.logo} alt={client.name} />
+                                    </div>
+                                </Badge>
                                 <p>{client.name}</p>
                             </div>
-                        </Badge>
+                        </Tooltip>
+
                     </div>
                 ))
             }
@@ -102,26 +122,39 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
-                    {/* <ToggleButton
-                        className="w-32 h-32 mb-5 rounded-full my-auto border-light-white mx-auto hover:bg-light-grey"
-                        value="check"
-                        selected={openAddClient}
-                        onChange={() => {
-                            // setOpen(true)
-                            // addAClient()
-                        }}
-                    >
-                        <span className="text-2xl text-white capitalize">Add Logo</span>
-                    </ToggleButton> */}
-                    <label
-                        className="w-32 h-32 mb-5 rounded-full my-auto text-white border border-light-white mx-auto hover:border-primary hover:text-primary flex items-center justify-center cursor-pointer"
-                        htmlFor="client-logo"
-                    >
-                        Add Logo
-                    </label>
-                    <input className='hidden' id='client-logo' type="file" />
-                    <TextField id="outlined-basic" label="Client Name" variant="outlined" />
-                    <TextField id="outlined-basic" label="Website Link" variant="outlined" />
+                    {
+                        newClient?.logo
+                            ? (
+                                <label
+                                    htmlFor="client-logo"
+                                    className='w-32 h-32 mx-auto overflow-hidden rounded-xl mb-5 cursor-pointer relative group'
+                                >
+                                    <div className='bg-black absolute left-0 right-0 top-0 bottom-0 bg-opacity-50 hidden group-hover:flex justify-center items-center '>
+                                        <span className='text-white font-bold'>Change Photo</span>
+                                    </div>
+
+                                    <Image className='w-full object-cover' src={newClient.logo} width={180} height={180} alt='' />
+                                </label>
+                            )
+                            : (
+                                <label
+                                    className="w-32 h-32 mb-5 rounded-xl my-auto text-white border border-light-white mx-auto hover:border-primary hover:text-primary flex items-center justify-center cursor-pointer"
+                                    htmlFor="client-logo"
+                                >
+                                    {
+                                        loading
+                                            ? <CircularProgress color="primary" />
+                                            : <span>Add Logo</span>
+                                    }
+                                </label>
+                            )
+                    }
+
+
+                    <input onChange={(e) => handleLogoUpload(e.target.files)} className='hidden' id='client-logo' type="file" />
+                    <TextField onChange={(e) => handleNewClientData(e)} id="outlined-basic" label="Client Name" variant="outlined" name='name' />
+                    <TextField onChange={(e) => handleNewClientData(e)} id="outlined-basic" label="Website Link" variant="outlined" name='website' />
+                    <button onClick={handleSubmit} className='primary-btn in-dark w-button'>Submit</button>
 
                 </Box>
             </Modal>

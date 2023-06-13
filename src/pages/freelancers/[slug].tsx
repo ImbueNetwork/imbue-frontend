@@ -19,7 +19,7 @@ import {
   getFreelancerProfile,
   updateFreelancer,
 } from "@/redux/services/freelancerService";
-import { fetchUser } from "../../utils";
+import { checkEnvironment, fetchUser } from "../../utils";
 import ChatPopup from "@/components/ChatPopup";
 import Image from "next/image";
 import { TextArea } from "@/components/Briefs/TextArea";
@@ -31,6 +31,7 @@ import { ImStack } from "react-icons/im";
 import styles from "@/styles/modules/freelancers.module.css";
 import { authenticate } from "@/pages/api/info/user";
 import {
+  Alert,
   Badge,
   Box,
   FormControl,
@@ -55,6 +56,8 @@ import { SignerResult } from "@polkadot/api/types";
 import SuccessScreen from "@/components/SuccessScreen";
 import ErrorScreen from "@/components/ErrorScreen";
 import FullScreenLoader from "@/components/FullScreenLoader";
+import fiverrIcon from "@/assets/images/fiverr.png"
+import ImbueIcon from "@/assets/svgs/loader.svg"
 
 export type ProfileProps = {
   initFreelancer: Freelancer;
@@ -82,6 +85,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const [error, setError] = useState<any>()
   const [success, setSuccess] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
+  const [copied, setCopied] = useState<boolean>(false)
 
   function urlify(text: string) {
     var urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -145,6 +149,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const cancelEdit = async () => {
     setFreelancer(initFreelancer)
     setIsEditMode(false)
+    setClients(clinetsData)
   }
 
   const accountSelected = async (account: WalletAccount): Promise<any> => {
@@ -274,8 +279,25 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
     },
   ];
 
+  const clinetsData = [
+    { id: 1, name: "Fiverr", logo: fiverrIcon, website: "fiverr.com" },
+    { id: 2, name: "Imbue", logo: ImbueIcon, website: "fiverr.com" },
+  ]
+
+  const [clients, setClients] = useState<any>(clinetsData)
+
+  const copyProfile = () => {
+    const webSiteURL = checkEnvironment().concat(`${router.asPath}`)
+    navigator.clipboard.writeText(webSiteURL)
+    setCopied(true)
+
+    setTimeout(() => {
+      setCopied(false)
+    }, 3000);
+  }
+
   return (
-    <div className="profile-container lg:-mt-8">
+    <div className="profile-container lg:-mt-8 overflow-x-hidden relative">
       <div className="banner">
         <Image
           src={require("@/assets/images/profile-banner.png")}
@@ -420,7 +442,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
 
                 {(!isEditMode && isCurrentFreelancer)
                   ? (
-                    <button className="share">
+                    <button onClick={copyProfile} className="share">
                       <FaRegShareSquare color="white" />
                       Share Profile
                     </button>
@@ -449,7 +471,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
               </span>
             </div>
 
-            <Clients {...{ setFreelancer, isEditMode }} />
+            <Clients {...{ setFreelancer, isEditMode, setIsEditMode, clients, setClients }} />
 
             <hr className="separator" />
 
@@ -897,7 +919,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         setOpen={setSuccess}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button
-            onClick={() => { flipEdit(), setSuccess(false), window.location.reload() }}
+            onClick={() => { flipEdit(), setSuccess(false) }}
             className='primary-btn in-dark w-button w-full !m-0'>
             See Profile
           </button>
@@ -923,6 +945,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
           </button>
         </div>
       </ErrorScreen>
+      <Alert className={`absolute top-2 z-10 transform duration-300 transition-all ${copied ? "right-5" :"-right-full"}`} severity="success">Profile Link Copied to clipboard</Alert>
     </div>
   );
 };
