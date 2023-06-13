@@ -32,10 +32,12 @@ import styles from "@/styles/modules/freelancers.module.css";
 import { authenticate } from "@/pages/api/info/user";
 import {
   Badge,
+  Box,
   FormControl,
   InputAdornment,
   InputLabel,
   MenuItem,
+  Modal,
   Select,
   TextField,
   ToggleButton,
