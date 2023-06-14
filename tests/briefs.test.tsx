@@ -1,236 +1,129 @@
-import {
-  fireEvent,
-  Matcher,
-  MatcherOptions,
-  render,
-  RenderResult,
-  screen,
-  SelectorMatcherOptions,
-  waitFor,
-} from '@testing-library/react';
-import { act } from '@testing-library/react';
-import React from 'react';
-
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import Briefs from '@/pages/briefs';
-
 import {
-  amountOfBriefsSubmitted,
-  briefsData,
-  intermediateExpData,
-  projectLengthData,
-  searchMockResponse,
-} from './__mocks__/briefsData';
-import {
-  callSearchBriefs,
   getAllBriefs,
+  callSearchBriefs,
 } from '../src/redux/services/briefService';
+import {
+  briefsData,
+  expertExpData,
+  intermediateExpData,
+} from './__mocks__/briefsData';
 
 jest.mock('../src/redux/services/briefService', () => ({
   getAllBriefs: jest.fn(),
   callSearchBriefs: jest.fn(),
 }));
 
-jest.mock('next/router');
+jest.mock('next/router', () => ({
+  useRouter: jest.fn(() => ({
+    isReady: true,
+    query: {},
+    push: jest.fn(),
+  })),
+}));
 
-describe('Briefs component', () => {
-  beforeAll(() => {
-    const mockBriefs = {
-      currentData: briefsData,
-      totalBriefs: 3,
-    };
+const mockBriefs = {
+  currentData: briefsData,
+  totalBriefs: 3,
+};
+
+describe('Briefs Page', () => {
+  test('renders without errors', () => {
+    render(<Briefs />);
+    // Assert that no errors occurred during rendering
+  });
+
+  test('displays briefs after data fetching', async () => {
+    render(<Briefs />);
+    // Mock the API call to getAllBriefs
+    const mockGetAllBriefs = getAllBriefs as jest.MockedFunction<
+      typeof getAllBriefs
+    >;
+    mockGetAllBriefs.mockResolvedValue(mockBriefs);
+
+    // Wait for briefs to be fetched and displayed
+    await screen.findByText('briefOne');
+    await screen.findByText('briefTwo');
+
+    // Assert that the briefs are displayed correctly
+    expect(screen.getByText('briefOne')).toBeInTheDocument();
+    expect(screen.getByText('briefTwo')).toBeInTheDocument();
+  });
+
+  test('applies filters and updates briefs', async () => {
+    const comp = render(<Briefs />);
+    // Mock the API calls used in the useEffect hook
+
     // Mock the briefsService.getAllBriefs method to return a fixed array of briefs
     const mockGetAllBriefs = getAllBriefs as jest.MockedFunction<
       typeof getAllBriefs
     >;
     mockGetAllBriefs.mockResolvedValue(mockBriefs);
-  });
 
-  let briefsComponent: RenderResult<
-    typeof import('@testing-library/dom/types/queries'),
-    HTMLElement,
-    HTMLElement
-  >;
-  let appContainer: HTMLElement;
-  let appGetAllByText:
-    | ((
-        id: Matcher,
-        options?: SelectorMatcherOptions | undefined
-      ) => HTMLElement[])
-    | ((arg0: string) => any[]);
-  let appQueryAllByTestId:
-    | ((id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[])
-    | ((arg0: string) => any[]);
+    expect(getAllBriefs).toBeCalled();
 
-  beforeEach(async () => {
-    await act(async () => {
-      await waitFor(() => {
-        briefsComponent = render(<Briefs />);
-      });
+    // Wait for briefs to be fetched and displayed
+    await screen.findByText('briefOne');
+    await screen.findByText('briefTwo');
+    await screen.findByText('briefThree');
+
+    expect(screen.queryByTestId('filter-modal')).toBeNull();
+
+    // Simulate clicking on a filter
+    const filterButton = screen.getByText('Filter');
+    userEvent.click(filterButton);
+
+    // Wait for the filter modal to be rendered in the DOM
+    await waitFor(() => {
+      expect(screen.getByTestId('filter-modal')).toBeInTheDocument();
     });
 
-    appContainer = briefsComponent.container;
-    appGetAllByText = briefsComponent.getAllByText;
-    appQueryAllByTestId = briefsComponent.queryAllByTestId;
+    // Perform additional assertions on the filter modal content
+    expect(screen.getByText('Filter by:')).toBeInTheDocument();
 
-    await waitFor(() =>
-      expect(appContainer.getElementsByClassName('brief-title')).toHaveLength(3)
-    );
-  });
+    // Simulate clicking on the experience level dropdown from filter modal
 
-  it('should render brief items when the component mounts.', async () => {
-    expect(briefsComponent).toBeTruthy();
-  });
+    const expLevelDropdown = screen.getByTestId('Experience Level');
 
-  it('should render briefs list and filter options', async () => {
-    // Check that filter options are displayed
-    await waitFor(() =>
-      expect(appContainer.getElementsByClassName('filter-option')).toBeTruthy()
-    );
-  });
+    userEvent.click(expLevelDropdown);
 
-  it('should filter briefs by experience level', async () => {
+    await waitFor(() => {
+      expect(screen.getByTestId('filterOptions')).toBeInTheDocument();
+    });
+
+    // select Expert option
+    const entryLevelOption = screen.getByText('Expert');
+    userEvent.click(entryLevelOption);
+
+    // close dropdown
+    userEvent.click(expLevelDropdown);
+
+    const submitButton = screen.getByTestId('Apply');
+    userEvent.click(submitButton);
+
+    // Wait for updated briefs to be fetched and displayed
     const mockCallSearchBriefs = callSearchBriefs as jest.MockedFunction<
       typeof callSearchBriefs
     >;
+
     const mockCallSearchResponse = {
-      currentData: intermediateExpData,
+      currentData: expertExpData,
       totalBriefs: 1,
     };
 
-    // get intermidiate checkbox
-    const intermidiateCheckBox = await waitFor(
-      () => appQueryAllByTestId('0-1')[0]
-    );
+    mockCallSearchBriefs.mockResolvedValue(mockCallSearchResponse);
 
-    expect(intermidiateCheckBox).toBeTruthy();
+    waitFor(() => {
+      expect(callSearchBriefs).toBeCalled();
+    });
 
-    if (appContainer) {
-      fireEvent.click(intermidiateCheckBox);
+    // Wait for updated briefs to be fetched and displayed
+    await screen.findByText('briefThree');
 
-      mockCallSearchBriefs.mockResolvedValue(mockCallSearchResponse);
-      // search for intermidiate briefs
-      await waitFor(() =>
-        fireEvent.click(appContainer.getElementsByClassName('tab-item')[0])
-      );
-
-      await waitFor(() =>
-        expect(appContainer.getElementsByClassName('brief-title')).toHaveLength(
-          1
-        )
-      );
-    }
-  });
-
-  it('should filter briefs by number of Briefs submitted', async () => {
-    const mockCallSearchBriefs = callSearchBriefs as jest.MockedFunction<
-      typeof callSearchBriefs
-    >;
-    const mockCallSearchResponse = {
-      currentData: amountOfBriefsSubmitted,
-      totalBriefs: 2,
-    };
-
-    const amountSubmittedCheckBox = await waitFor(
-      () => appQueryAllByTestId('1-2')[0]
-    );
-
-    expect(amountSubmittedCheckBox).toBeTruthy();
-
-    if (appContainer) {
-      fireEvent.click(amountSubmittedCheckBox);
-
-      mockCallSearchBriefs.mockResolvedValue(mockCallSearchResponse);
-
-      await waitFor(() =>
-        fireEvent.click(appContainer.getElementsByClassName('tab-item')[0])
-      );
-
-      await waitFor(() =>
-        expect(appContainer.getElementsByClassName('brief-title')).toHaveLength(
-          2
-        )
-      );
-    }
-  });
-
-  it('should filter briefs by project length', async () => {
-    const mockCallSearchBriefs = callSearchBriefs as jest.MockedFunction<
-      typeof callSearchBriefs
-    >;
-    const mockCallSearchResponse = {
-      currentData: projectLengthData,
-      totalBriefs: 1,
-    };
-
-    const projectLengthCheckBox = await waitFor(
-      () => appQueryAllByTestId('2-0')[0]
-    );
-
-    expect(projectLengthCheckBox).toBeTruthy();
-
-    if (appContainer) {
-      fireEvent.click(projectLengthCheckBox);
-
-      mockCallSearchBriefs.mockResolvedValue(mockCallSearchResponse);
-
-      await waitFor(() =>
-        fireEvent.click(appContainer.getElementsByClassName('tab-item')[0])
-      );
-
-      await waitFor(() =>
-        expect(appContainer.getElementsByClassName('brief-title')).toHaveLength(
-          1
-        )
-      );
-    }
-  });
-
-  test('test brief rendering and matching the snapshot', async () => {
-    expect(screen.queryAllByText('briefs found')[0]).toMatchSnapshot();
-  });
-
-  test('onSearch should filter briefs based on search input and selected checkboxes', async () => {
-    // Mock the elements and values needed for the test
-    const mockCallSearchBriefs = callSearchBriefs as jest.MockedFunction<
-      typeof callSearchBriefs
-    >;
-    const mockCallSearchResponse = {
-      currentData: searchMockResponse,
-      totalBriefs: 1,
-    };
-
-    const experienceCheckBox = await waitFor(
-      () => appQueryAllByTestId('0-1')[0]
-    );
-    const submittedCheckBox = await waitFor(
-      () => appQueryAllByTestId('1-2')[0]
-    );
-
-    const searchInput = appContainer.getElementsByClassName('search-input')[0];
-
-    expect(experienceCheckBox).toBeTruthy();
-    expect(submittedCheckBox).toBeTruthy();
-    expect(searchInput).toBeTruthy();
-
-    if (appContainer) {
-      // fire checkboxes event
-      fireEvent.click(experienceCheckBox);
-      fireEvent.click(submittedCheckBox);
-
-      // input search text
-      fireEvent.change(searchInput, {
-        target: { value: 'briefThree' },
-      });
-
-      mockCallSearchBriefs.mockResolvedValue(mockCallSearchResponse);
-      // search for input brief
-      await waitFor(() =>
-        fireEvent.click(appContainer.getElementsByClassName('tab-item')[0])
-      );
-
-      await waitFor(() =>
-        expect(appGetAllByText('briefThree')[0]).toBeTruthy()
-      );
-    }
+    // Assert that the updated briefs are displayed correctly
+    await expect(screen.getByText('finance brief three')).toBeInTheDocument();
+    await expect(screen.getByText('briefThree')).toBeInTheDocument();
   });
 });

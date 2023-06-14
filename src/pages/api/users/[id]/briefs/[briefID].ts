@@ -34,13 +34,11 @@ export default nextConnect()
           ),
         };
       } catch (e) {
-        res
-          .status(401)
-          .send(
-            new Error(`Failed to fetch projects for user id: ${userId}`, {
-              cause: e as Error,
-            })
-          );
+        res.status(401).send(
+          new Error(`Failed to fetch projects for user id: ${userId}`, {
+            cause: e as Error,
+          })
+        );
       }
     });
     res.status(201).json(response);

@@ -52,6 +52,7 @@ const CustomDropDown = React.memo(
         <div
           onClick={handleToggle}
           typeof='button'
+          data-testid={name}
           className='h-[39px] w-full border border-[#EBEAE2] rounded-xl flex justify-between items-center text-white font-normal text-sm p-3 cursor-pointer'
         >
           {name}
@@ -62,7 +63,10 @@ const CustomDropDown = React.memo(
           />
         </div>
         {isOpen && (
-          <div className='w-full bg-[#1B1B1B] rounded-[10px] rounded-t-none z-50 absolute  transition-all duration-300 ease-in-out shadow-md shadow-slate-800 !overflow-hidden'>
+          <div
+            data-testid='filterOptions'
+            className='w-full bg-[#1B1B1B] rounded-[10px] rounded-t-none z-50 absolute  transition-all duration-300 ease-in-out shadow-md shadow-slate-800 !overflow-hidden'
+          >
             <BriefFilter
               label=''
               filter_type={filterType}
