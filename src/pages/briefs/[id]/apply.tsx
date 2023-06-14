@@ -8,7 +8,7 @@ import { Brief, Currency, Freelancer, User } from "@/model";
 import { getBrief, getFreelancerBrief } from "@/redux/services/briefService";
 import { BriefInsights } from "@/components/Briefs/BriefInsights";
 import AccountChoice from "@/components/AccountChoice";
-import { checkEnvironment, getCurrentUser, redirect } from "@/utils";
+import { getCurrentUser, redirect } from "@/utils";
 import { getFreelancerProfile } from "@/redux/services/freelancerService";
 import { selectAccount } from "@/redux/services/polkadotService";
 import { useRouter } from "next/router";
@@ -129,7 +129,7 @@ export const SubmitProposal = (): JSX.Element => {
     setLoading(true);
     try {
       const resp = await fetch(
-        checkEnvironment().concat(`${config.apiBase}/project`),
+        `${config.apiBase}/project`,
         {
           headers: config.postAPIHeaders,
           method: "post",
