@@ -16,7 +16,7 @@ type BioInsightsProps = {
   handleMessageBoxClick: () => void;
   saveBrief?: () => void;
   showMessageBox: boolean;
-  setShowMessageBox: () => void;
+  setShowMessageBox: (_: boolean) => void;
   targetUser: User | null;
   browsingUser: User | null;
   canSubmitProposal: boolean;

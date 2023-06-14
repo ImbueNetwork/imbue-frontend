@@ -5,7 +5,6 @@ import { stringToHex } from '@polkadot/util';
 
 import * as config from '../config';
 export const imbueNetwork = 'Imbue Network';
-import { web3Enable } from '@polkadot/extension-dapp';
 import { WalletAccount } from '@talismn/connect-wallets';
 
 import { checkEnvironment } from '.';
@@ -105,6 +104,7 @@ export const enableAppForExtension = async (
   appName: string,
   attempts = 10
 ): Promise<InjectedExtension[]> => {
+  const { web3Enable } = await import('@polkadot/extension-dapp');
   const extensions = await web3Enable(appName);
 
   return new Promise((resolve, reject) => {

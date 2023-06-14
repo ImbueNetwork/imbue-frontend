@@ -23,9 +23,11 @@ module.exports = {
       },
     ],
     'no-console': 'warn',
+    'no-constant-condition': 'warn',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-var-requires': 'off',
+    '@typescript-eslint/ban-ts-comment': 'warn',
     'react/display-name': 'off',
     '@typescript-eslint/no-unused-vars': 'warn',
     //#region  //*=========== Unused Import ===========

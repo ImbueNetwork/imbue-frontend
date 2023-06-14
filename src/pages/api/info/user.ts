@@ -11,6 +11,7 @@ import * as models from '../models';
 import { fetchUser } from '../models';
 const JwtStrategy = passportJwt.Strategy;
 
+//@ts-ignore
 export const imbueStrategy = new JwtStrategy(jwtOptions, async function (
   jwt_payload: any,
   next: (...args: any[]) => void
