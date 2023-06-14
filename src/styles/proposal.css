@@ -2,10 +2,6 @@
   font-family: var(--theme-font-family);
 }
 
-.hidden {
-  display: none;
-}
-
 .form {
   display: flex;
   justify-content: space-evenly;

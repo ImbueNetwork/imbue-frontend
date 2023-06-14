@@ -53,7 +53,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
     } = props
 
     const [balance, setBalance] = useState<string>();
-    const [laodingWallet, setLoadingWallet] = useState<any>({ balance: true });
+    const [loadingWallet, setLoadingWallet] = useState<any>();
     const [error, setError] = useState<any>()
 
     const [openPopup, setOpenPopup] = useState<boolean>(false);
@@ -68,20 +68,20 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         setAnchorEl(null);
     };
 
-    const getBalance = useCallback(async (walletAddress: string, currency_id: number) => {
+    const getBalance = async (walletAddress: string, currency_id: number) => {
         try {
             const imbueApi = await initImbueAPIInfo();
             const chainService = new ChainService(imbueApi, user);
 
-            if (!walletAddress) return "No Wallet Found"
+            if (!walletAddress) return
             const balance: any = await chainService.getBalance(walletAddress, currency_id)
             return balance
 
         } catch (error) {
-            setError(error)
+            setError({ message: `An error occured while fetching balance.` })
             console.log(error);
         }
-    }, [user])
+    }
 
     const accountSelected = async (account: WalletAccount): Promise<any> => {
         try {
@@ -93,7 +93,8 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                 account
             );
             if (resp.status === 200 || resp.status === 201) {
-                setBalance(await getBalance(account.address, application.currency_id))
+                const bl = await getBalance(account.address, application.currency_id)
+                setBalance(bl)
             }
             else {
                 setError({ message: "Could not connect wallet. Please Try again" })
@@ -109,13 +110,19 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
 
     useEffect(() => {
         const showBalance = async () => {
-            setLoadingWallet((prev: any) => ({ ...prev, balance: true }))
-            const balance = await getBalance(user?.web3_address, application?.currency_id ?? 0)
-            setBalance(balance);
-            setLoadingWallet((prev: any) => ({ ...prev, balance: false }))
+            try {
+                setLoadingWallet((prev: any) => ({ ...prev, balance: true }))
+                const balance = await getBalance(user?.web3_address, application?.currency_id ?? 0)
+                setBalance(balance);
+            } catch (error) {
+                console.log(error);
+            }
+            finally {
+                setLoadingWallet((prev: any) => ({ ...prev, balance: false }))
+            }
         }
-        showBalance()
-    }, [user?.web3_address, application?.currency_id, getBalance])
+        user?.web3_address && showBalance()
+    }, [user?.web3_address, application?.currency_id])
 
     const mobileView = useMediaQuery('(max-width:480px)');
 
@@ -131,12 +138,12 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                         <p className="text-2xl font-bold capitalize">{freelancer?.display_name}</p>
                     </Badge>
                     <p className='text-sm mt-2'>
-                        {laodingWallet?.balance && "Loading Wallet..."}
-                        {laodingWallet?.connecting && "Connecting Wallet..."}
+                        {loadingWallet?.balance && "Loading Wallet..."}
+                        {loadingWallet?.connecting && "Connecting Wallet..."}
                         {
-                            !laodingWallet?.balance && !laodingWallet?.connecting &&
-                            (balance === "No Wallet Found"
-                                ? balance
+                            !loadingWallet?.balance && !loadingWallet?.connecting &&
+                            (balance === undefined
+                                ? "No wallet found"
                                 : `Balance: ${balance}`)
                         }
                     </p>
@@ -160,24 +167,18 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                 </button>
 
                 {
-                    balance === 'No Wallet Found'
+                    balance !== undefined
                         ? <button
-                            onClick={() => setOpenAccountChoice(true)}
-                            className='primary-btn in-dark w-button !text-xs lg:!text-base'
-                        >
-                            Connect Wallet
-                        </button>
-                        : <button
                             id="demo-customized-button"
                             aria-controls={open ? 'demo-customized-menu' : undefined}
                             aria-haspopup="true"
                             aria-expanded={open ? 'true' : undefined}
                             onClick={handleOptionsClick}
                             className='primary-btn in-dark w-button !text-xs lg:!text-base'
-                            disabled={laodingWallet?.balance || laodingWallet?.connecting}
+                            disabled={loadingWallet?.balance || loadingWallet?.connecting}
                         >
                             {
-                                laodingWallet?.balance || laodingWallet?.connecting
+                                loadingWallet?.balance || loadingWallet?.connecting
                                     ? "Please Wait..."
                                     : (<>
                                         Options
@@ -185,6 +186,13 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                                     </>)
                             }
                         </button>
+
+                        :  <button
+                        onClick={() => setOpenAccountChoice(true)}
+                        className='primary-btn in-dark w-button !text-xs lg:!text-base'
+                    >
+                        Connect Wallet
+                    </button>
                 }
                 <Menu
                     id="basic-menu"

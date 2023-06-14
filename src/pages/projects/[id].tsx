@@ -106,7 +106,6 @@ function Project() {
       }
 
       setIsApplicant(isApplicant);
-      console.log(OnchainProjectState[onChainProjectRes.projectState]);
       if (onChainProjectRes.projectState == OnchainProjectState.OpenForVoting) {
         const firstPendingMilestone =
           await chainService.findFirstPendingMilestone(
@@ -147,7 +146,6 @@ function Project() {
       vote
     );
     setLoading(false);
-    console.log({ voteResponse });
   };
 
   // submitting a milestone
@@ -164,10 +162,9 @@ function Project() {
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
-          console.log("***** success");
-          console.log(result.eventData);
+          // TODO: show Success screen
         } else if (result.txError) {
-          console.log("***** failed");
+          // TODO: show error screen
           console.log(result.errorMessage);
         }
         break;
@@ -187,10 +184,9 @@ function Project() {
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
-          console.log("***** success");
-          console.log(result.eventData);
+          // TODO: show success screen
         } else if (result.txError) {
-          console.log("***** failed");
+          // TODO: show error screen
           console.log(result.errorMessage);
         }
         break;
@@ -328,8 +324,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, "Completed")
               : milestone?.milestone_key == milestoneBeingVotedOn
-              ? openForVotingTag()
-              : projectStateTag(modified, "Not Started")}
+                ? openForVotingTag()
+                : projectStateTag(modified, "Not Started")}
 
             <Image
               src={require(expanded
@@ -382,7 +378,7 @@ function Project() {
 
           {isApplicant &&
             onChainProject?.projectState !==
-              OnchainProjectState.OpenForVoting && (
+            OnchainProjectState.OpenForVoting && (
               <button
                 className="primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8"
                 data-testid="next-button"
@@ -518,13 +514,12 @@ function Project() {
             <div className="w-48 bg-[#1C2608] mt-5 h-1 relative my-auto">
               <div
                 style={{
-                  width: `${
-                    (onChainProject?.milestones?.filter?.(
-                      (m: any) => m?.is_approved
-                    )?.length /
-                      onChainProject?.milestones?.length) *
+                  width: `${(onChainProject?.milestones?.filter?.(
+                    (m: any) => m?.is_approved
+                  )?.length /
+                    onChainProject?.milestones?.length) *
                     100
-                  }%`,
+                    }%`,
                 }}
                 className="h-full rounded-xl Accepted-button absolute"
               ></div>
@@ -532,9 +527,8 @@ function Project() {
                 {onChainProject?.milestones?.map((m: any, i: number) => (
                   <div
                     key={i}
-                    className={`h-4 w-4 ${
-                      m.is_approved ? "Accepted-button" : "bg-[#1C2608]"
-                    } rounded-full -mt-1.5`}
+                    className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"
+                      } rounded-full -mt-1.5`}
                   ></div>
                 ))}
               </div>

@@ -12,10 +12,13 @@ type BioInsightsProps = {
   brief: Brief;
   isOwnerOfBrief: boolean | null;
   handleMessageBoxClick: () => void;
+  saveBrief?: () => void;
   showMessageBox: boolean;
   setShowMessageBox: (val: boolean) => void;
   targetUser: User | null;
   browsingUser: User | null;
+  canSubmitProposal: boolean;
+  isSavedBrief?: boolean;
 };
 
 const BioInsights = ({
@@ -27,6 +30,9 @@ const BioInsights = ({
   showMessageBox,
   setShowMessageBox,
   targetUser,
+  canSubmitProposal,
+  saveBrief,
+  isSavedBrief,
 }: BioInsightsProps) => {
   return (
     <div
@@ -51,10 +57,19 @@ const BioInsights = ({
               gap-2
               "
               onClick={() => redirectToApply()}
+              disabled={!canSubmitProposal}
             >
               Submit a Proposal <FaRegShareSquare />
             </button>
-            <button className="primary-btn primary-btn-outlined max-width-1100px:w-full max-width-500px:w-auto">
+            <button
+              disabled={isSavedBrief}
+              onClick={() => saveBrief && saveBrief?.()}
+              className={`primary-btn primary-btn-outlined max-width-1100px:w-full max-width-500px:w-auto ${
+                isSavedBrief
+                  ? "hover:!bg-[#676767] !border-[#676767] hover:!border-[#676767] !text-white"
+                  : ""
+              }`}
+            >
               Save
             </button>
           </div>

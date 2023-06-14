@@ -84,7 +84,6 @@ export const HirePopup = ({
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
-          console.log("***** success");
           setSuccess(true)
           const briefId = brief.id;
           const resp = await changeBriefApplicationStatus(
@@ -93,9 +92,7 @@ export const HirePopup = ({
             OffchainProjectState.Accepted
           );
           setProjectId(resp.project_id);
-          console.log(result.eventData);
         } else if (result.txError) {
-          console.log("***** failed");
 
           // TODO, SHOW ERROR POPUP
           setError({ message: result.errorMessage })

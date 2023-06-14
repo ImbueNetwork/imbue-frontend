@@ -6,7 +6,7 @@ import nextConnect from 'next-connect'
 
 export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
-    const { query, method } = req;
+    const { query } = req;
 
     const id: any = query.id as string[];
 

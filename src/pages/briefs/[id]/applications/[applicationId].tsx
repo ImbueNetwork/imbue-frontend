@@ -49,7 +49,6 @@ const ApplicationPreview = (): JSX.Element => {
 	const [targetUser, setTargetUser] = useState<User | null>(null);
 	const [briefOwner, setBriefOwner] = useState<any>();
 	const [loading, setLoading] = useState<boolean>(true);
-	const [balance, setBalance] = useState<string>()
 
 	const applicationStatus = OffchainProjectState[application?.status_id];
 	const isApplicationOwner = user && application && user?.id == application?.user_id;
@@ -74,7 +73,6 @@ const ApplicationPreview = (): JSX.Element => {
 
 				setBrief(brief);
 				setApplication(applicationResponse);
-				setBalance(balance)
 				setFreelancer(freelancerResponse);
 				setUser(userResponse);
 

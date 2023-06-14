@@ -33,7 +33,7 @@ function Layout({ children }: LayoutProps) {
         waitingTime={200}
       />}
       <Navbar />
-      <main className="padded lg:!p-[var(--hq-layout-padding)]" id="main-content">
+      <main className={`padded lg:!px-[var(--hq-layout-padding)] !pt-32`} id="main-content">
         {children}
       </main>
     </React.Fragment>

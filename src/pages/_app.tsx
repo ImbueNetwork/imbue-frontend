@@ -29,13 +29,13 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head><title>Imbue</title></Head>
-      <Layout>
-        <ThemeProvider theme={theme}>
-          <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={theme}>
+        <StyledEngineProvider injectFirst>
+          <Layout>
             <Component {...pageProps} />
-          </StyledEngineProvider>
-        </ThemeProvider>
-      </Layout>
+          </Layout>
+        </StyledEngineProvider>
+      </ThemeProvider>
     </>
   );
 }

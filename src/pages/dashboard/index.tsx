@@ -85,7 +85,7 @@ const Dashboard = ({ user, isAuthenticated, myBriefs, myApplicationsResponse }: 
   if (loadingStreamChat) return <FullScreenLoader />
 
   return client ? (
-    <div className="lg:-mt-8 hq-layout px-[15px]">
+    <div className="hq-layout px-[15px]">
       <StyledEngineProvider injectFirst>
         <BottomNavigation
           showLabels
