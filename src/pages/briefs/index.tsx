@@ -23,7 +23,6 @@ import { getCurrentUser } from "@/utils";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 
-
 TimeAgo.addLocale(en);
 
 const timeAgo = new TimeAgo("en-US");
@@ -63,8 +62,6 @@ const Briefs = (): JSX.Element => {
     hpw_is_max,
     heading,
   } = router?.query;
-
-  
 
   // The thing with this implentation is that the interior order must stay totally ordered.
   // The interior index is used to specify which entry will be used in the search brief.
@@ -361,7 +358,7 @@ const Briefs = (): JSX.Element => {
             default:
               console.log(
                 "Invalid filter option selected or unimplemented. type:" +
-                filterType
+                  filterType
               );
           }
         }
@@ -427,12 +424,14 @@ const Briefs = (): JSX.Element => {
   const PageItem = (props: any) => {
     return (
       <div
-        className={`h-[32px] rounded-[4px] hover:bg-[--theme-primary] hover:text-black border border-primary w-[32px] cursor-pointer pt-1 items-center text-center text-sm !font-bold mr-6 ${currentPage === parseInt(props.page) ? "text-black" : "text-white"
-          }
-        ${currentPage === parseInt(props.page)
+        className={`h-[32px] rounded-[4px] hover:bg-[--theme-primary] hover:text-black border border-primary w-[32px] cursor-pointer pt-1 items-center text-center text-sm !font-bold mr-6 ${
+          currentPage === parseInt(props.page) ? "text-black" : "text-white"
+        }
+        ${
+          currentPage === parseInt(props.page)
             ? "bg-[--theme-primary]"
             : "bg-transparent"
-          }
+        }
         `}
       >
         {props.page}
@@ -600,7 +599,7 @@ const Briefs = (): JSX.Element => {
                     ))}
                   </div>
 
-                  <div className="flex justify-between">
+                  <div className="flex justify-between w-[400px] items-center">
                     <div className="brief-proposals">
                       <span className="proposals-heading">
                         Proposals Submitted:{" "}
@@ -610,9 +609,10 @@ const Briefs = (): JSX.Element => {
                       </span>
                     </div>
 
-                    <span>{timeAgo.format(new Date(item?.created))}</span>
+                    <div className="leading-none">
+                      {timeAgo.format(new Date(item?.created))}
+                    </div>
                   </div>
-
                 </div>
               )
           )}
