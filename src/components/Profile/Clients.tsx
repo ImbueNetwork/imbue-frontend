@@ -66,7 +66,6 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
               <p>{client.name}</p>
             </div>
           </Badge>
-
         </div>
       ))}
       {isEditMode && (
