@@ -114,8 +114,9 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         data = {
           ...data,
           skills: skills,
-          clients: [],
         };
+
+        console.log(freelancer);
 
         await updateFreelancer(data);
         setSuccess(true)
@@ -280,11 +281,11 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   ];
 
   const clinetsData = [
-    { id: 1, name: "Fiverr", logo: fiverrIcon, website: "fiverr.com" },
-    { id: 2, name: "Imbue", logo: ImbueIcon, website: "fiverr.com" },
+    { name: "Fiverr", logo: "https://res.cloudinary.com/ssani7/image/upload/v1686857275/imbue/loader_mrgfrj.svg", website: "fiverr.com" },
+    { name: "Imbue", logo: "https://res.cloudinary.com/ssani7/image/upload/v1686857275/imbue/loader_mrgfrj.svg", website: "imbue.com" },
   ]
 
-  const [clients, setClients] = useState<any>(clinetsData)
+  const [clients, setClients] = useState<any>(freelancer?.clients[0] ? freelancer.clients : [])
 
   const copyProfile = () => {
     const webSiteURL = checkEnvironment().concat(`${router.asPath}`)
@@ -311,7 +312,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         <div className="flex flex-col lg:items-center gap-[20px] lg:gap-[70px] lg:w-[40%]">
           <div className="w-full flex flex-col items-center gap-[16px] pb-[30px] bg-theme-grey-dark rounded-xl border border-light-white">
             <UploadImage {...{ isEditMode, setFreelancer, freelancer }} />
-            <div className="w-full flex flex-col gap-[16px] -mt-11 px-[30px] lg:px-[40px]">
+            <div className="w-full flex flex-col gap-[16px] -mt-7 px-[30px] lg:px-[40px]">
               {isEditMode ? (
                 <TextField
                   onChange={(e) => handleUpdateState(e)}

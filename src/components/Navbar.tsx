@@ -147,9 +147,7 @@ function Navbar() {
             </Link>
             <Tooltip title="Account settings">
               <IconButton
-                onClick={() =>
-                  user?.id ? handleClick : () => setOpenMenu(!openMenu)
-                }
+                onClick={(e) =>handleClick(e)}
                 size="small"
                 sx={{ ml: 2 }}
                 aria-controls={open ? "account-menu" : undefined}

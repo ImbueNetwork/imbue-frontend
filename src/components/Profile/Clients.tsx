@@ -31,7 +31,6 @@ const style = {
 
 const Clients = ({ setFreelancer, isEditMode, setIsEditMode, clients, setClients }: ClientsProps) => {
 
-
     const [newClient, setNewClient] = useState<any>({})
 
     const [open, setOpen] = React.useState(false);
@@ -75,7 +74,7 @@ const Clients = ({ setFreelancer, isEditMode, setIsEditMode, clients, setClients
     const handleSubmit = () => {
         const newClients = [...clients, newClient]
         setClients(newClients)
-        setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients.map((c) => c.name) }))
+        setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients }))
         setOpen(false)
     }
 
@@ -83,16 +82,16 @@ const Clients = ({ setFreelancer, isEditMode, setIsEditMode, clients, setClients
     return (
         <div className="grid grid-cols-2 px-[30px] lg:px-[40px] justify-center md:grid-cols-3 gap-5 w-full">
             {
-                clients?.map((client: any) => (
-                    <div key={client.id}>
-                        <Tooltip title={client.website} placement="top" arrow>
+                clients[0] && clients?.map((client: any) => (
+                    <div key={client?.id}>
+                        <Tooltip title={client?.website} placement="top" arrow>
                             <div className="flex flex-col items-center gap-3 w-fit mx-auto">
                                 <Badge onClick={(e) => removeClient(e, client.id)} className="client-badge" color="error" overlap="circular" badgeContent="-" invisible={!isEditMode}>
                                     <div>
-                                        <Image className="rounded-lg" height={40} width={40} src={client.logo} alt={client.name} />
+                                        <Image className="rounded-lg" height={40} width={40} src={client?.logo} alt={client?.name} />
                                     </div>
                                 </Badge>
-                                <p>{client.name}</p>
+                                <p>{client?.name}</p>
                             </div>
                         </Tooltip>
 
