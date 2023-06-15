@@ -6,19 +6,23 @@ import { Dialogue } from "@/components/Dialogue";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { postAPIHeaders } from "@/config";
-import { Dialog, DialogContent, DialogTitle, TextField, useMediaQuery } from "@mui/material";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  useMediaQuery,
+} from "@mui/material";
 import * as config from "@/config";
 import Link from "next/link";
 import styled from "@emotion/styled";
-import { checkEnvironment } from "@/utils";
 import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
-import { useTheme } from '@mui/material/styles';
+import { useTheme } from "@mui/material/styles";
 import { WalletAccount } from "@talismn/connect-wallets";
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { useGoogleLogin, GoogleLogin } from '@react-oauth/google';
-import jwt from 'jsonwebtoken';
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { useGoogleLogin, GoogleLogin } from "@react-oauth/google";
+import jwt from "jsonwebtoken";
 import * as utils from "@/utils";
-
 
 const logoStyle = { height: "100%", width: "100%" };
 
@@ -82,7 +86,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     event.preventDefault();
 
     const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}auth/imbue/`), {
+      `${config.apiBase}auth/imbue/`, {
       headers: postAPIHeaders,
       method: "post",
       body: JSON.stringify({
@@ -105,7 +109,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
 
   const googleLogin = async (response: any) => {
     const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}auth/google/`), {
+      `${config.apiBase}auth/google/`, {
       headers: postAPIHeaders,
       method: "post",
       body: JSON.stringify(response),
@@ -116,31 +120,33 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     } else {
       setErrorMessage("incorrect username or password");
     }
-  }
+  };
 
-  const accountSelected = async (
-    account: WalletAccount
-  ): Promise<any> => {
+  const accountSelected = async (account: WalletAccount): Promise<any> => {
     try {
       const result = await getAccountAndSign(account);
-      const resp = await authorise(result?.signature as SignerResult, result?.challenge!, account);
+      const resp = await authorise(
+        result?.signature as SignerResult,
+        result?.challenge!,
+        account
+      );
       if (resp.ok) {
         utils.redirect(redirectUrl);
       }
     } catch (error) {
       console.log(error);
     }
-
   };
 
   return (
     <>
       <Dialog
-          open={visible}
-          onClose={() => setVisible(false)}
-          aria-labelledby="responsive-dialog-title"
-        >
-          {<div className="lg:min-w-[450px] py-2">
+        open={visible}
+        onClose={() => setVisible(false)}
+        aria-labelledby="responsive-dialog-title"
+      >
+        {
+          <div className="lg:min-w-[450px] py-2">
             <DialogTitle className="text-center" id="responsive-dialog-title">
               {"You must be signed in to continue"}
             </DialogTitle>
@@ -206,7 +212,6 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                 </form>
 
                 <div className="login justify-center items-center w-full flex flex-col">
-
                   <li className="lg:max-w-[65%] mt-1 mb-2">
                     <GoogleOAuthProvider clientId={config.googleClientId}>
                       <GoogleLogin
@@ -215,7 +220,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                         useOneTap={true}
                         onSuccess={(creds: any) => googleLogin(creds)}
                         onError={() => {
-                          console.log('Login Failed');
+                          console.log("Login Failed");
                         }}
                       />
                     </GoogleOAuthProvider>
@@ -223,36 +228,30 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                 </div>
 
                 <div className="login justify-center items-center w-full flex flex-col">
-
                   <li
                     className="mt-4 flex flex-row items-center cursor-pointer"
                     tabIndex={0}
                     data-mdc-dialog-action="web3"
                     onClick={() => closeModal()}
                   >
-                    <button className="pill-button primary">{"Sign in with a wallet"}</button>
+                    <button className="pill-button primary">
+                      {"Sign in with a wallet"}
+                    </button>
                   </li>
                 </div>
-
-
-
               </div>
-
             </DialogContent>
           </div>
-
-          }
-        </Dialog>
+        }
+      </Dialog>
 
       <AccountChoice
-        accountSelected={(account: WalletAccount) =>
-          accountSelected(account)
-        }
+        accountSelected={(account: WalletAccount) => accountSelected(account)}
         visible={polkadotAccountsVisible}
         setVisible={showPolkadotAccounts}
       />
     </>
-  )
+  );
 };
 
 export default Login;

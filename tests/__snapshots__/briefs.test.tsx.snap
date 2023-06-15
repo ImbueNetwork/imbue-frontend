@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Briefs component test brief rendering and matching the snapshot 1`] = `
-<span>
-   briefs found
-</span>
-`;
