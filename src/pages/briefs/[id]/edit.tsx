@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { timeData } from "@/config/briefs-data";
 import { Brief, User } from "@/model";
 import { getBrief, updateBriefById } from "@/redux/services/briefService";
-import { checkEnvironment, getCurrentUser } from "@/utils";
+import { getCurrentUser } from "@/utils";
 import { getFreelancerProfile } from "@/redux/services/freelancerService";
 import { useRouter } from "next/router";
 import FullScreenLoader from "@/components/FullScreenLoader";
