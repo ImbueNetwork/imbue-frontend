@@ -10,7 +10,6 @@ export default nextConnect()
     .get(async (req: NextApiRequest, res: NextApiResponse) => {
         let response
         const projectId = req.query.applicationID
-        console.log(projectId);
         if (!projectId) return
 
         await db.transaction(async tx => {

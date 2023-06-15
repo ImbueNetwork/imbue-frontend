@@ -15,7 +15,7 @@ type CountrySelectorProps = {
 const CountrySelector = ({ setUser, user, isEditMode }: CountrySelectorProps) => {
   const [country, setCountry] = useState<string>(user?.country || "");
   const [region, setRegion] = useState(user?.region || '');
-
+  
   const handleCountry = (countryName: string) => {
     setCountry(countryName)
     setUser({ ...user, country: countryName })

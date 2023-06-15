@@ -78,12 +78,13 @@ function Navbar() {
 
   const navigateToPage = () => {
     if (user?.username) {
-      router.push("/briefs/new")
+      router.push("/briefs/new");
+    } else {
+      setLoginModal(true);
     }
-    else {
-      setLoginModal(true)
-    }
-  }
+  };
+
+  console.log(user);
 
   return (
     <>
@@ -147,28 +148,30 @@ function Navbar() {
             >
               Discover Freelancers
             </Link>
-            <Tooltip title={loading ? "Loading User Info" : "Menu Options"}>
-              {
-                loading
-                  ? <Skeleton className="bg-theme-grey-dark cursor-pointer ml-2" variant="circular" width={40} height={40} />
-                  :
-                  <IconButton
-                    onClick={handleClick}
-                    size="small"
-                    sx={{ ml: 2 }}
-                    aria-controls={open ? "account-menu" : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? "true" : undefined}
-                  >
-                    {user?.username ? (
-                      <Avatar className="w-8 h-8 lg:w-10 lg:h-10">
-                        <Image
-                          src={freelancerProfile?.profile_image || defaultProfile}
-                          width={40}
-                          height={40}
-                          alt="profile"
-                        />
-                      </Avatar>
+            <Tooltip title="Account settings">
+              <IconButton
+                onClick={(event) =>
+                  user?.username ? handleClick(event) : () => setOpenMenu(!openMenu)
+                }
+                size="small"
+                sx={{ ml: 2 }}
+                aria-controls={open ? "account-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? "true" : undefined}
+              >
+                {user?.username ? (
+                  <Avatar className="w-8 h-8 lg:w-10 lg:h-10">
+                    <Image
+                      src={freelancerProfile?.profile_image || defaultProfile}
+                      width={40}
+                      height={40}
+                      alt="profile"
+                    />
+                  </Avatar>
+                ) : (
+                  <div>
+                    {openMenu ? (
+                      <CloseIcon htmlColor="white" />
                     ) : (
                       <div onClick={() => setOpenMenu(!openMenu)}>
                         {openMenu ? (
@@ -178,9 +181,10 @@ function Navbar() {
                         )}
                       </div>
                     )}
-
-                  </IconButton>
-              }
+                  </div>
+                )
+                }
+              </IconButton>
             </Tooltip>
 
           </Box>

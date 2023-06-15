@@ -591,6 +591,62 @@ export const insertBrief =
         return ids[0];
       });
 
+// save a brief
+export const insertSavedBrief =
+  (brief: any, scope_id: number, duration_id: number, user_id: number) =>
+    async (tx: Knex.Transaction) => {
+      return await tx("saved_briefs")
+        .select("*")
+        .where({ user_id: user_id, brief_id: brief.id })
+        .then(async (ids) => {
+          if (ids.length === 0) {
+            return await tx("saved_briefs")
+              .insert({
+                user_id: user_id,
+                brief_id: brief.id,
+              })
+              .returning("saved_briefs.id")
+              .then(async (ids) => {
+                return ids[0];
+              });
+          } else {
+            return {
+              status: "Brief already saved",
+            };
+          }
+        });
+    };
+
+export const getSavedBriefs =
+  (user_id: string) => async (tx: Knex.Transaction) => {
+    const briefs = await fetchAllBriefs()(tx);
+    const saved_briefs = await tx("saved_briefs").select("*");
+
+    const saved_brief_data = await briefs.filter((brief) => {
+      return saved_briefs.some((saved_brief) => {
+        return (
+          brief.id === saved_brief.brief_id &&
+          parseInt(saved_brief.user_id) === parseInt(user_id, 10)
+        );
+      });
+    });
+
+    return saved_brief_data;
+  };
+
+export const findSavedBriefById =
+  (brief_id: string, userId: string) => async (tx: Knex.Transaction) =>
+    await tx("saved_briefs")
+      .where({ brief_id: brief_id, user_id: userId })
+      .first();
+
+export const deleteSavedBrief =
+  (brief_id: string, userId: string) => async (tx: Knex.Transaction) =>
+    await tx("saved_briefs")
+      .where({ brief_id: brief_id, user_id: userId })
+      .delete()
+      .returning("*");
+
 export const updateBrief =
   (
     headline: string,

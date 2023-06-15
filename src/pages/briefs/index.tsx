@@ -1,7 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { Brief, BriefSqlFilter } from "@/model";
-import { callSearchBriefs, getAllBriefs } from "@/redux/services/briefService";
+import {
+  callSearchBriefs,
+  getAllBriefs,
+  getAllSavedBriefs,
+} from "@/redux/services/briefService";
 import { BriefFilterOption } from "@/types/briefTypes";
 import { useRouter } from "next/router";
 import { FiFilter } from "react-icons/fi";
@@ -14,6 +18,8 @@ import Image from "next/image";
 import CustomDropDown from "@/components/CustomDropDown";
 import CustomModal from "@/components/CustomModal";
 import search from "../api/freelancers/search";
+import user from "../api/info/user";
+import { getCurrentUser } from "@/utils";
 
 interface FilterModalProps {
   open: boolean;
@@ -394,7 +400,16 @@ const Briefs = (): JSX.Element => {
     }
   };
 
-  const onSavedBriefs = () => {};
+  const onSavedBriefs = async () => {
+    const currentUser = await getCurrentUser();
+    const briefs_all: any = await getAllSavedBriefs(
+      itemsPerPage,
+      currentPage,
+      currentUser?.id
+    );
+    setBriefs(briefs_all?.currentData);
+    setBriefsTotal(briefs_all?.totalBriefs);
+  };
 
   const toggleFilter = () => {
     setFilterVisible(!filterVisble);
@@ -443,7 +458,7 @@ const Briefs = (): JSX.Element => {
           }}
           className="bg-[#1B1B1B] rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative"
         >
-          <p className="font-normal text-base text-white mb-9">Filter</p>
+          <p className="font-normal text-base text-white mb-9">Filter by:</p>
 
           <div className="grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5">
             {customDropdownConfigs
@@ -465,6 +480,7 @@ const Briefs = (): JSX.Element => {
 
           <button
             onClick={onSearch}
+            data-testid="Apply"
             className="h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 absolute md:bottom-10 bottom-5 right-10"
           >
             Apply
@@ -488,6 +504,7 @@ const Briefs = (): JSX.Element => {
           <div className="tab-section">
             <button
               onClick={toggleFilter}
+              test-id="filter-button"
               className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105"
             >
               Filter
@@ -513,7 +530,9 @@ const Briefs = (): JSX.Element => {
             )}
 
             <button
-              onClick={onSavedBriefs}
+              onClick={() => {
+                onSavedBriefs();
+              }}
               className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]"
             >
               Saved Briefs

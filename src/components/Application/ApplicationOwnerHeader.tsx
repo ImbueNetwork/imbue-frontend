@@ -57,7 +57,6 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         while (true) {
             if (result.status || result.txError) {
                 if (result.status) {
-                    console.log('***** success');
                     const projectId = parseInt(result.eventData[2]);
                     while (true) {
                         const projectIsOnChain = await chainService.getProjectOnChain(projectId);
@@ -70,9 +69,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
                         await new Promise((f) => setTimeout(f, 1000));
                     }
                 } else if (result.txError) {
-                    console.log('***** failed');
                     setError({ message: result.errorMessage })
-                    console.log(result.errorMessage);
                 }
                 break;
             }

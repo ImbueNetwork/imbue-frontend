@@ -120,14 +120,6 @@ export type User = {
   password?: string;
   getstream_token: string;
   web3_address?: string;
-  email: string;
-  briefs_submitted: number;
-  profile_photo?: string;
-  country?: string;
-  region?: string;
-  about?: string;
-  website?: string;
-  industry?: string;
 };
 export interface BasicTxResponse {
   errorMessage: string | null;
@@ -223,6 +215,7 @@ export type Brief = {
   number_of_briefs_submitted: number;
   user_id: number;
   project_id?: number;
+  currentUserId?: number;
 };
 
 export type BriefSqlFilter = {

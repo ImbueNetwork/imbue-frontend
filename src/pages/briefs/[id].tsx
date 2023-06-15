@@ -1,7 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { Brief, Freelancer, User } from "@/model";
-import { getBrief } from "@/redux/services/briefService";
+import {
+  checkIfBriefSaved,
+  getBrief,
+  saveBriefData,
+} from "@/redux/services/briefService";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import { fetchUser, getCurrentUser } from "../../utils";
@@ -13,6 +17,7 @@ import BioInsights from "@/components/Briefs/BioInsights";
 import { getServerSideProps } from "@/utils/serverSideProps";
 import ErrorScreen from "@/components/ErrorScreen";
 import { getFreelancerProfile } from "@/redux/services/freelancerService";
+import SuccessScreen from "@/components/SuccessScreen";
 
 TimeAgo.addLocale(en);
 
@@ -22,6 +27,8 @@ export type BriefProps = {
 
 const BriefDetails = (): JSX.Element => {
   const router = useRouter();
+  const [success, setSuccess] = useState<boolean>(false);
+  const [successTitle, setSuccessTitle] = useState<string>("");
   const [brief, setBrief] = useState<Brief>({
     id: "",
     headline: "",
@@ -42,6 +49,7 @@ const BriefDetails = (): JSX.Element => {
   });
 
   const [browsingUser, setBrowsingUser] = useState<User | null>(null);
+  const [isSavedBrief, setIsSavedBrief] = useState<boolean>(false);
   const [freelancer, setFreelancer] = useState<Freelancer>();
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
@@ -50,7 +58,6 @@ const BriefDetails = (): JSX.Element => {
   const [showClientHistory, setShowClientHistory] = useState<boolean>(false);
   const [error, setError] = useState<any>();
 
-  // TODO: need to get project category array from the brief
   const projectCategories = brief?.industries?.map?.((item) => item?.name);
 
   const id: any = router?.query?.id || 0;
@@ -63,6 +70,11 @@ const BriefDetails = (): JSX.Element => {
         setBrief(briefData);
         const currentUser = await getCurrentUser();
         const _freelancer = await getFreelancerProfile(currentUser.username);
+        const briefIsSaved = await checkIfBriefSaved(
+          briefData?.id,
+          currentUser?.id
+        );
+        setIsSavedBrief(briefIsSaved.isSaved);
         setBrowsingUser(currentUser);
         setTargetUser(targetUser);
         setFreelancer(_freelancer);
@@ -77,7 +89,6 @@ const BriefDetails = (): JSX.Element => {
   }, [id]);
 
   const redirectToApply = () => {
-    //TODO: redirect to apply for brief
     router.push(`/briefs/${brief.id}/apply`);
   };
 
@@ -86,6 +97,20 @@ const BriefDetails = (): JSX.Element => {
       setShowMessageBox(true);
     } else {
       // redirect("login", `/dapp/briefs/${brief.id}/`);
+    }
+  };
+
+  const saveBrief = async () => {
+    const resp = await saveBriefData({
+      ...brief,
+      currentUserId: browsingUser?.id,
+    });
+    if (resp?.brief_id) {
+      setSuccessTitle("Brief Saved Successfully");
+      setIsSavedBrief(true);
+      setSuccess(true);
+    } else {
+      setError({ message: "Brief already Saved" });
     }
   };
 
@@ -155,7 +180,6 @@ const BriefDetails = (): JSX.Element => {
       <div className={`${!showSimilarBrief && "hidden"} my-6`}>
         <hr className="separator" />
         {/* TODO: Need an object for the list of similar projects */}
-        {/* FIXME: missing {key} */}
         {/* FIXME: replace dummy array with similar projects data*/}
         {[3, 3, 3].map((history, index) => (
           <div key={`${index}-sim-brief`} className="similar-brief">
@@ -192,6 +216,8 @@ const BriefDetails = (): JSX.Element => {
         <BioInsights
           redirectToApply={redirectToApply}
           brief={brief}
+          saveBrief={saveBrief}
+          isSavedBrief={isSavedBrief}
           isOwnerOfBrief={isOwnerOfBrief}
           handleMessageBoxClick={handleMessageBoxClick}
           showMessageBox={showMessageBox}
@@ -204,19 +230,34 @@ const BriefDetails = (): JSX.Element => {
       {ClientHistory}
       {SimilarProjects}
       <ErrorScreen {...{ error, setError }}>
-        <div className='flex flex-col gap-4 w-1/2'>
+        <div className="flex flex-col gap-4 w-1/2">
           <button
-            onClick={() => router.push('/briefs')}
-            className='primary-btn in-dark w-button w-full !m-0'>
+            onClick={() => router.push("/briefs")}
+            className="primary-btn in-dark w-button w-full !m-0"
+          >
             Seach Brief
           </button>
           <button
             onClick={() => router.push(`/dashboard`)}
-            className='underline text-xs lg:text-base font-bold'>
+            className="underline text-xs lg:text-base font-bold"
+          >
             Go to Dashboard
           </button>
         </div>
       </ErrorScreen>
+
+      <SuccessScreen title={successTitle} open={success} setOpen={setSuccess}>
+        <div className="flex flex-col gap-4 w-1/2">
+          <button
+            onClick={() => {
+              setSuccess(false);
+            }}
+            className="primary-btn in-dark w-button w-full !m-0"
+          >
+            Done
+          </button>
+        </div>
+      </SuccessScreen>
     </div>
   );
 };
