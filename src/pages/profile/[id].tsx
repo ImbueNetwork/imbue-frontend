@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { Brief, User } from "@/model";
-import { fetchUser } from "../../utils";
+import { fetchUser, updateUser } from "../../utils";
 import { WalletAccount } from "@talismn/connect-wallets";
 import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
 import { SignerResult } from "@polkadot/api/types";
@@ -20,6 +20,8 @@ import ErrorScreen from "@/components/ErrorScreen";
 import { authenticate } from "@/pages/api/info/user";
 import { getUserBriefs } from "@/redux/services/briefService";
 import { BiEdit } from "react-icons/bi";
+import * as config from "@/config";
+
 
 const Profile = ({ initUser, browsingUser }: any) => {
   const router = useRouter();
@@ -47,13 +49,17 @@ const Profile = ({ initUser, browsingUser }: any) => {
   const onSave = async () => {
     try {
       if (user) {
+        console.log(user);
         setLoading(true);
-        let data = user;
+        const userResponse: any = await updateUser({ ...user })
+        console.log(userResponse);
 
-        console.log(data);
-        // TODO: need api endpoint here
-        // /info/user put request
-        setSuccess(true);
+        if (userResponse.status === "Successful") {
+          setSuccess(true);
+        }
+        else {
+          setError(userResponse.message)
+        }
       }
     } catch (error) {
       setError(error);
@@ -158,11 +164,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
               <div className="flex justify-between">
                 <div className="w-1/3">
                   <CountrySelector
-                    user={{
-                      ...user,
-                      country: "United States",
-                      region: "California",
-                    }}
+                    user={user}
                     setUser={setUser}
                     {...{ isEditMode }}
                   />
@@ -243,18 +245,20 @@ const Profile = ({ initUser, browsingUser }: any) => {
                     if (user) {
                       setUser({
                         ...user,
-                        bio: e.target.value,
+                        about: e.target.value,
                       });
                     }
                   }}
                   rows={8}
                   className="bio-inpu px-4 py-2 bg-theme-grey-dark text-white border border-light-white"
                   id="bio-input-id"
+                  defaultValue={user?.about}
                 />
               </>
             ) : (
               <>
                 <div className="bio">
+                  {user?.about}
                   {/* {user?.bio
                                         ?.split?.("\n")
                                         ?.map?.((line: any, index: number) => (
@@ -262,7 +266,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                                                 {line}
                                             </p>
                                         ))} */}
-                  Welcome to a vibrant and multiple award-winning
+                  {/* Welcome to a vibrant and multiple award-winning
                   telecommunications service provider. Our aim is to bring
                   people and businesses together in what we do best, by offering
                   mobile and fixed services, broadband connectivity and IPTV
@@ -272,7 +276,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                   can be tough | Cryptocurrency | Blockchain | Ethereum | Web3 |
                   Smart Contract | DApps | DeFi | Solidity | Hyperledger |
                   Polkadot Rust | C | C ++ | C# | Python | Golang | Java |
-                  Javascript | Scala | Simplicity | Haskell |
+                  Javascript | Scala | Simplicity | Haskell | */}
                 </div>
               </>
             )}
@@ -289,7 +293,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                 </div>
               ) : (
                 <span className="text-primary">
-                  https://www.behance.net/abbioty
+                  {user?.website}
                 </span>
               )}
             </div>
@@ -304,7 +308,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                   />
                 </div>
               ) : (
-                <span className="text-primary">Foalad L.T.D</span>
+                <span className="text-primary">{user?.industry}</span>
               )}
             </div>
             <div className="flex gap-14 items-center">
@@ -389,7 +393,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
         <div className="flex flex-col gap-4 w-1/2">
           <button
             onClick={() => {
-              flipEdit(), setSuccess(false), window.location.reload();
+              flipEdit(), setSuccess(false);
             }}
             className="primary-btn in-dark w-button w-full !m-0"
           >

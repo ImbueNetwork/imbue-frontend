@@ -158,14 +158,14 @@ function Project() {
   const submitMilestone = async (account: WalletAccount) => {
     setLoading(true);
     try {
-    const imbueApi = await initImbueAPIInfo();
-    const user: User | any = await utils.getCurrentUser();
-    const chainService = new ChainService(imbueApi, user);
-    const result = await chainService.submitMilestone(
-      account,
-      onChainProject,
-      milestoneKeyInView
-    );
+      const imbueApi = await initImbueAPIInfo();
+      const user: User | any = await utils.getCurrentUser();
+      const chainService = new ChainService(imbueApi, user);
+      const result = await chainService.submitMilestone(
+        account,
+        onChainProject,
+        milestoneKeyInView
+      );
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
@@ -189,10 +189,10 @@ function Project() {
     const withdraw = async (account: WalletAccount) => {
       setLoading(true);
       try {
-      const imbueApi = await initImbueAPIInfo();
-      const user: User | any = await utils.getCurrentUser();
-      const chainService = new ChainService(imbueApi, user);
-      const result = await chainService.withdraw(account, onChainProject);
+        const imbueApi = await initImbueAPIInfo();
+        const user: User | any = await utils.getCurrentUser();
+        const chainService = new ChainService(imbueApi, user);
+        const result = await chainService.withdraw(account, onChainProject);
         while (true) {
           if (result.status || result.txError) {
             if (result.status) {
@@ -669,5 +669,7 @@ function Project() {
         </div>
       );
     }
+  }
+}
 
-    export default Project;
+export default Project;

@@ -150,8 +150,7 @@ function Navbar() {
             </Link>
             <Tooltip title="Account settings">
               <IconButton
-                onClick={(event) =>
-                  user?.username ? handleClick(event) : () => setOpenMenu(!openMenu)
+                onClick={(event) => handleClick(event)
                 }
                 size="small"
                 sx={{ ml: 2 }}
