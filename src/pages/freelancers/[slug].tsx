@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import SearchIcon from '@mui/icons-material/Search';
 import VerifiedIcon from '@mui/icons-material/Verified';
-import VerifiedIcon from '@mui/icons-material/Verified';
 import {
   Alert,
   FormControl,
@@ -15,23 +14,10 @@ import { StyledEngineProvider } from '@mui/system';
 import { SignerResult } from '@polkadot/api/types';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
-import Image from 'next/image';
-import { useRouter } from 'next/router';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import ReactCountryFlag from 'react-country-flag';
 import { AiOutlineUser } from 'react-icons/ai';
-import { AiOutlineUser } from 'react-icons/ai';
-import {
-  FaDiscord,
-  FaFacebook,
-  FaRegShareSquare,
-  FaRegThumbsDown,
-  FaRegThumbsUp,
-  FaStar,
-  FaTelegram,
-  FaTwitter,
-} from 'react-icons/fa';
 import {
   FaDiscord,
   FaFacebook,
@@ -43,20 +29,13 @@ import {
   FaTwitter,
 } from 'react-icons/fa';
 import { FiEdit } from 'react-icons/fi';
-import { FiEdit } from 'react-icons/fi';
-import { GrCertificate } from 'react-icons/gr';
 import { GrCertificate } from 'react-icons/gr';
 import { ImStack } from 'react-icons/im';
-import { ImStack } from 'react-icons/im';
 import { IoPeople } from 'react-icons/io5';
-import { IoPeople } from 'react-icons/io5';
-import { MdOutlineWatchLater } from 'react-icons/md';
 import { MdOutlineWatchLater } from 'react-icons/md';
 
 import AccountChoice from '@/components/AccountChoice';
 import { TextArea } from '@/components/Briefs/TextArea';
-import { TextArea } from '@/components/Briefs/TextArea';
-import ChatPopup from '@/components/ChatPopup';
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
@@ -66,24 +45,18 @@ import Skills from '@/components/Profile/Skills';
 import UploadImage from '@/components/Profile/UploadImage';
 import SuccessScreen from '@/components/SuccessScreen';
 
-import { Freelancer, User } from '@/model';
+import FiverrIcon from '@/assets/images/fiverr.png';
+import ImbueIcon from '@/assets/svgs/loader.svg';
 import { Freelancer, User } from '@/model';
 import { authenticate } from '@/pages/api/info/user';
-import { authenticate } from '@/pages/api/info/user';
-import {
-  getFreelancerProfile,
-  updateFreelancer,
-} from '@/redux/services/freelancerService';
 import {
   getFreelancerProfile,
   updateFreelancer,
 } from '@/redux/services/freelancerService';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 import styles from '@/styles/modules/freelancers.module.css';
-import styles from '@/styles/modules/freelancers.module.css';
 
 import { checkEnvironment, fetchUser } from '../../utils';
-import { fetchUser } from '../../utils';
 
 export type ProfileProps = {
   initFreelancer: Freelancer;
@@ -304,7 +277,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   ];
 
   const clinetsData = [
-    { id: 1, name: 'Fiverr', logo: fiverrIcon, website: 'fiverr.com' },
+    { id: 1, name: 'Fiverr', logo: FiverrIcon, website: 'fiverr.com' },
     { id: 2, name: 'Imbue', logo: ImbueIcon, website: 'fiverr.com' },
   ];
 
