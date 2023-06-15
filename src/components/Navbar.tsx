@@ -76,18 +76,18 @@ function Navbar() {
 
   const navigateToPage = () => {
     if (user?.username) {
-      router.push("/briefs/new")
+      router.push("/briefs/new");
+    } else {
+      setLoginModal(true);
     }
-    else {
-      setLoginModal(true)
-    }
-  }
+  };
 
   return (
     <>
       <header
-        className={`navBar ${solidNav ? "bg-theme-black-text" : "bg-transparent"
-          }`}
+        className={`navBar ${
+          solidNav ? "bg-theme-black-text" : "bg-transparent"
+        }`}
         id="header-wrapper"
       >
         <div className="text-center w-full bg-primary text-black py-1 text-xs lg:text-sm">
@@ -147,7 +147,9 @@ function Navbar() {
             </Link>
             <Tooltip title="Account settings">
               <IconButton
-                onClick={handleClick}
+                onClick={() =>
+                  user?.id ? handleClick : () => setOpenMenu(!openMenu)
+                }
                 size="small"
                 sx={{ ml: 2 }}
                 aria-controls={open ? "account-menu" : undefined}
@@ -164,7 +166,7 @@ function Navbar() {
                     />
                   </Avatar>
                 ) : (
-                  <div onClick={() => setOpenMenu(!openMenu)}>
+                  <div>
                     {openMenu ? (
                       <CloseIcon htmlColor="white" />
                     ) : (
