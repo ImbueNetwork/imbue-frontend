@@ -2,10 +2,43 @@
 import SearchIcon from '@mui/icons-material/Search';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import {
+  FaFacebook,
+  FaRegShareSquare,
+  FaTwitter,
+  FaTelegram,
+  FaDiscord,
+  FaStar,
+  FaRegThumbsUp,
+  FaRegThumbsDown,
+} from "react-icons/fa";
+import { FiEdit } from "react-icons/fi";
+import { IoPeople } from "react-icons/io5";
+import VerifiedIcon from "@mui/icons-material/Verified";
+import { Freelancer, User } from "@/model";
+import {
+  getFreelancerProfile,
+  updateFreelancer,
+} from "@/redux/services/freelancerService";
+import { checkEnvironment, fetchUser } from "../../utils";
+import ChatPopup from "@/components/ChatPopup";
+import Image from "next/image";
+import { TextArea } from "@/components/Briefs/TextArea";
+import { useRouter } from "next/router";
+import { GrCertificate } from "react-icons/gr";
+import { AiOutlineUser } from "react-icons/ai";
+import { MdOutlineWatchLater } from "react-icons/md";
+import { ImStack } from "react-icons/im";
+import styles from "@/styles/modules/freelancers.module.css";
+import { authenticate } from "@/pages/api/info/user";
+import {
+  Alert,
+  Badge,
+  Box,
   FormControl,
   InputAdornment,
   InputLabel,
   MenuItem,
+  Modal,
   Select,
   TextField,
 } from '@mui/material';
@@ -81,6 +114,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const [error, setError] = useState<any>();
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
 
   function urlify(text: string) {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -139,6 +173,12 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
     };
     setFreelancer(newFreelancer);
   };
+
+  const cancelEdit = async () => {
+    setFreelancer(initFreelancer)
+    setIsEditMode(false)
+    setClients(clinetsData)
+  }
 
   const accountSelected = async (account: WalletAccount): Promise<any> => {
     try {
@@ -266,9 +306,26 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
     },
   ];
 
+  const clinetsData = [
+    { id: 1, name: "Fiverr", logo: fiverrIcon, website: "fiverr.com" },
+    { id: 2, name: "Imbue", logo: ImbueIcon, website: "fiverr.com" },
+  ]
+
+  const [clients, setClients] = useState<any>(clinetsData)
+
+  const copyProfile = () => {
+    const webSiteURL = checkEnvironment().concat(`${router.asPath}`)
+    navigator.clipboard.writeText(webSiteURL)
+    setCopied(true)
+
+    setTimeout(() => {
+      setCopied(false)
+    }, 3000);
+  }
+
   return (
-    <div className='profile-container lg:-mt-8'>
-      <div className='banner'>
+    <div className="profile-container lg:-mt-8 overflow-x-hidden relative">
+      <div className="banner">
         <Image
           src={require('@/assets/images/profile-banner.png')}
           priority
@@ -355,8 +412,9 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                 </p>
               </div>
 
-              <div className='connect-buttons flex justify-center gap-[24px] mb-[20px]'>
-                {!isCurrentFreelancer && (
+
+              <div className="connect-buttons flex justify-center gap-[24px] mb-[20px]">
+                {/* {!isCurrentFreelancer && (
                   <>
                     <button
                       onClick={() => handleMessageBoxClick()}
@@ -366,21 +424,61 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                     </button>
                   </>
                 )}
-                {!isEditMode && isCurrentFreelancer && (
-                  <button onClick={() => flipEdit()} className='message'>
-                    Edit Profile <FiEdit />
-                  </button>
-                )}
-                {isEditMode && isCurrentFreelancer && (
-                  <button onClick={() => onSave()} className='message'>
-                    Save Changes <FiEdit />
-                  </button>
-                )}
+                */}
 
-                <button className='share'>
-                  <FaRegShareSquare color='white' />
-                  Share Profile
-                </button>
+                {isCurrentFreelancer
+                  ? (
+                    <>
+                      {
+                        isEditMode
+                          ? (
+                            <button onClick={() => onSave()} className="message">
+                              Save Changes <FiEdit />
+                            </button>
+                          )
+                          : (
+                            <button onClick={() => flipEdit()} className="message">
+                              Edit Profile <FiEdit />
+                            </button>
+                          )
+                      }
+                    </>
+                  )
+                  : (
+                    <>
+                      <button
+                        onClick={() => handleMessageBoxClick()}
+                        className=" message"
+                      >
+                        Message
+                      </button>
+                    </>
+                  )
+                    ? (
+                      <button onClick={() => flipEdit()} className="message">
+                        Edit Profile <FiEdit />
+                      </button>
+                    )
+                    : (
+                      <button onClick={() => onSave()} className="message">
+                        Save Changes <FiEdit />
+                      </button>
+                    )
+                }
+
+                {(!isEditMode && isCurrentFreelancer)
+                  ? (
+                    <button onClick={copyProfile} className="share">
+                      <FaRegShareSquare color="white" />
+                      Share Profile
+                    </button>
+                  )
+                  : (
+                    <button onClick={() => cancelEdit()} className="message !bg-red-600">
+                      Cancel
+                    </button>
+                  )
+                }
               </div>
               {/* TODO: Implement */}
               {/* <div className="divider"></div>
@@ -398,14 +496,13 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
               </span>
             </div>
 
-            <Clients {...{ setFreelancer, isEditMode }} />
+            <Clients {...{ setFreelancer, isEditMode, setIsEditMode, clients, setClients }} />
 
             <hr className='separator' />
-
-            <div className='w-full px-[30px] lg:px-[40px]'>
-              <p className='text-xl'>Wallet Address</p>
-              <div className='mt-3 border break-words p-3 rounded-md bg-black'>
-                {freelancer.web3_address}
+            <div className="w-full px-[30px] lg:px-[40px]">
+              <p className="text-xl">Wallet Address</p>
+              <div className="mt-3 border break-words p-3 rounded-md bg-black">
+                {freelancer?.web3_address}
               </div>
             </div>
 
@@ -687,7 +784,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                       {line}
                     </p>
                   ))} */}
-                  {freelancer.education || 'No Education Data Found'}
+                  {freelancer?.education || "No Education Data Found"}
                 </div>
               </>
             )}
@@ -847,11 +944,8 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
       >
         <div className='flex flex-col gap-4 w-1/2'>
           <button
-            onClick={() => {
-              flipEdit(), setSuccess(false), window.location.reload();
-            }}
-            className='primary-btn in-dark w-button w-full !m-0'
-          >
+            onClick={() => { flipEdit(), setSuccess(false) }}
+            className='primary-btn in-dark w-button w-full !m-0'>
             See Profile
           </button>
           <button
@@ -879,6 +973,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
           </button>
         </div>
       </ErrorScreen>
+      <Alert className={`absolute top-2 z-10 transform duration-300 transition-all ${copied ? "right-5" :"-right-full"}`} severity="success">Profile Link Copied to clipboard</Alert>
     </div>
   );
 };

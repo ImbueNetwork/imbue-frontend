@@ -16,7 +16,6 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
     { id: 1, name: 'Fiverr', icon: fiverrIcon },
     { id: 2, name: 'Imbue', icon: ImbueIcon },
   ]);
-
   const [openAddClient, setOpenAddClient] = useState<boolean>(false);
 
   const addAClient = () => {
@@ -67,6 +66,7 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
               <p>{client.name}</p>
             </div>
           </Badge>
+
         </div>
       ))}
       {isEditMode && (
