@@ -150,7 +150,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const cancelEdit = async () => {
     setFreelancer(initFreelancer);
     setIsEditMode(false);
-    setClients(clinetsData);
+    setClients(initFreelancer?.clients);
   };
 
   const accountSelected = async (account: WalletAccount): Promise<any> => {
@@ -422,13 +422,13 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                     )}
                   </>
                 ) : <>
-                    <button
-                      onClick={() => handleMessageBoxClick()}
-                      className=" message"
-                    >
-                      Message
-                    </button>
-                  </> ? (
+                  <button
+                    onClick={() => handleMessageBoxClick()}
+                    className=" message"
+                  >
+                    Message
+                  </button>
+                </> ? (
                   <button onClick={() => flipEdit()} className="message">
                     Edit Profile <FiEdit />
                   </button>
@@ -461,24 +461,29 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
             </div>
             <hr className="separator" />
 
-            <div className="flex items-center gap-3">
-              <p className="text-xl">Among my clients</p>
-              <span className="h-4 w-4 flex justify-center items-center rounded-full bg-gray-500 text-black">
-                ?
-              </span>
-            </div>
+            {
+              (clients[0] || isEditMode) && (
+                <>
+                  <div className="flex items-center gap-3">
+                    <p className="text-xl">Among my clients</p>
+                    <span className="h-4 w-4 flex justify-center items-center rounded-full bg-gray-500 text-black">
+                      ?
+                    </span>
+                  </div>
 
-            <Clients
-              {...{
-                setFreelancer,
-                isEditMode,
-                setIsEditMode,
-                clients,
-                setClients,
-              }}
-            />
-
-            <hr className="separator" />
+                  <Clients
+                    {...{
+                      setFreelancer,
+                      isEditMode,
+                      setIsEditMode,
+                      clients,
+                      setClients,
+                    }}
+                  />
+                  <hr className="separator" />
+                </>
+              )
+            }
 
             <div className="w-full px-[30px] lg:px-[40px]">
               <p className="text-xl">Wallet Address</p>
@@ -958,9 +963,8 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         </div>
       </ErrorScreen>
       <Alert
-        className={`absolute top-2 z-10 transform duration-300 transition-all ${
-          copied ? "right-5" : "-right-full"
-        }`}
+        className={`absolute top-2 z-10 transform duration-300 transition-all ${copied ? "right-5" : "-right-full"
+          }`}
         severity="success"
       >
         Profile Link Copied to clipboard

@@ -39,9 +39,9 @@ const Clients = ({ setFreelancer, isEditMode, setIsEditMode, clients, setClients
 
     const [openAddClient, setOpenAddClient] = useState<boolean>(false)
 
-    const removeClient = (e: any, id: number) => {
+    const removeClient = (e: any, logo: string) => {
         if ((e.target as HTMLElement).nodeName == "SPAN") {
-            const newClients = clients.filter((client: any) => client.id !== id)
+            const newClients = clients.filter((client: any) => client.logo !== logo)
             setClients(newClients)
             setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients.map((c: any) => c.name) }))
         }
@@ -76,17 +76,18 @@ const Clients = ({ setFreelancer, isEditMode, setIsEditMode, clients, setClients
         setClients(newClients)
         setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients }))
         setOpen(false)
+        setNewClient({})
     }
 
 
     return (
         <div className="grid grid-cols-2 px-[30px] lg:px-[40px] justify-center md:grid-cols-3 gap-5 w-full">
             {
-                clients[0] && clients?.map((client: any) => (
+                clients?.map((client: any) => (
                     <div key={client?.id}>
                         <Tooltip title={client?.website} placement="top" arrow>
                             <div className="flex flex-col items-center gap-3 w-fit mx-auto">
-                                <Badge onClick={(e) => removeClient(e, client.id)} className="client-badge" color="error" overlap="circular" badgeContent="-" invisible={!isEditMode}>
+                                <Badge onClick={(e) => removeClient(e, client?.logo)} className="client-badge" color="error" overlap="circular" badgeContent="-" invisible={!isEditMode}>
                                     <div>
                                         <Image className="rounded-lg" height={40} width={40} src={client?.logo} alt={client?.name} />
                                     </div>
