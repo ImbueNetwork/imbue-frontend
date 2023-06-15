@@ -12,7 +12,7 @@ export async function createFreelancingProfile(freelancer: any) {
   // Check that this user doesnt already have a freelancer profile.
   try {
     const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}freelancers/`),
+      `${config.apiBase}freelancers/`,
       {
         headers: config.postAPIHeaders,
         method: 'put',
@@ -30,10 +30,7 @@ export const getAllFreelancers = async (
   itemsPerPage: number,
   currentPage: number
 ): Promise<FreelancerResponse> => {
-  const resp = await fetch(
-    checkEnvironment().concat(
-      `${config.apiBase}freelancers?items_per_page=${itemsPerPage}&page=${currentPage}`
-    ),
+  const resp = await fetch(`${config.apiBase}freelancers?items_per_page=${itemsPerPage}&page=${currentPage}`,
     {
       headers: config.postAPIHeaders,
       method: 'get',
@@ -69,7 +66,7 @@ export async function getFreelancerProfile(
 
 export async function freelancerExists(username: string): Promise<boolean> {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}freelancers/${username}`),
+    `${config.apiBase}freelancers/${username}`,
     {
       headers: config.getAPIHeaders,
       method: 'get',
@@ -85,9 +82,7 @@ export async function freelancerExists(username: string): Promise<boolean> {
 
 export async function updateFreelancer(freelancer: Freelancer) {
   const resp = await fetch(
-    checkEnvironment().concat(
-      `${config.apiBase}freelancers/${freelancer.username}`
-    ),
+    `${config.apiBase}freelancers/${freelancer.username}`,
     {
       headers: config.postAPIHeaders,
       method: 'put',
@@ -107,7 +102,7 @@ export const callSearchFreelancers = async (
   filter: FreelancerSqlFilter
 ): Promise<FreelancerResponse> => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}freelancers/search`),
+    `${config.apiBase}freelancers/search`,
     {
       headers: config.postAPIHeaders,
       method: 'post',
@@ -124,9 +119,7 @@ export const callSearchFreelancers = async (
 
 export const getFreelancerApplications = async (userId: number) => {
   const resp = await fetch(
-    checkEnvironment().concat(
-      `${config.apiBase}freelancers/${userId}/applications`
-    ),
+    checkEnvironment().concat(`${config.apiBase}freelancers/${userId}/applications`),
     {
       headers: config.postAPIHeaders,
       method: 'get',

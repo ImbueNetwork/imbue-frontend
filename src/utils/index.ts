@@ -38,7 +38,7 @@ export const validProjectId = (candidate: any) => {
 export const getCurrentUser = async () => {
   try {
     const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}info/user`)
+      `${config.apiBase}info/user`
     );
     if (resp.ok) {
       return resp.json();
@@ -62,7 +62,7 @@ export const getProjectId = async () => {
 export const fetchProject = async (projectId: string | number | null) => {
   try {
     const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}project/${projectId}`),
+      `${config.apiBase}project/${projectId}`,
       {
         headers: config.getAPIHeaders,
         method: 'get',
@@ -78,7 +78,7 @@ export const fetchProject = async (projectId: string | number | null) => {
 
 export const fetchUser = async (id: number) => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}users/byid/${id}`),
+    `${config.apiBase}users/byid/${id}`,
     {
       headers: config.getAPIHeaders,
     }
@@ -107,9 +107,10 @@ export function validateForm(form: HTMLFormElement): boolean {
 }
 
 export const getStreamChat = async () => {
-  const { getstreamApiKey } = await fetch(
-    checkEnvironment().concat(`${config.apiBase}info`)
-  ).then((resp) => resp.json());
+  const { getstreamApiKey } =
+    await fetch(`${config.apiBase}info`).then(
+      (resp) => resp.json()
+    );
   return new StreamChat(getstreamApiKey);
 };
 

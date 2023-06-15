@@ -7,8 +7,6 @@ import * as config from '../config';
 export const imbueNetwork = 'Imbue Network';
 import { WalletAccount } from '@talismn/connect-wallets';
 
-import { checkEnvironment } from '.';
-
 export type PolkadotJsApiInfo = {
   api: ApiPromise;
   provider: WsProvider;
@@ -23,7 +21,7 @@ export type ImbueApiInfo = {
 export const initImbueAPIInfo = async () => {
   showLoading();
   const { imbueNetworkWebsockAddr, relayChainWebsockAddr } = await fetch(
-    checkEnvironment().concat(`${config.apiBase}info`)
+    `${config.apiBase}info`
   ).then((resp) => resp.json());
   const imbueApi = await initPolkadotJSAPI(imbueNetworkWebsockAddr);
   const relayChainApi = await initPolkadotJSAPI(relayChainWebsockAddr);

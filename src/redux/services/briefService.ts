@@ -18,7 +18,7 @@ export const callSearchBriefs = async (filter: BriefSqlFilter) => {
   // return [] as Array<Brief>;
   //:TODO implement api for callSearchBriefs
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}briefs/search`),
+    `${config.apiBase}briefs/search`,
     {
       headers: postAPIHeaders,
       method: 'post',
@@ -39,9 +39,7 @@ export const getAllBriefs = async (
   // return dumyBriefs as Array<Brief>;
   //:TODO implement api for getting briefs
   const resp = await fetch(
-    checkEnvironment().concat(
-      `${config.apiBase}briefs?items_per_page=${itemsPerPage}&page=${currentPage}`
-    ),
+    `${config.apiBase}briefs?items_per_page=${itemsPerPage}&page=${currentPage}`,
     {
       headers: postAPIHeaders,
       method: 'get',
@@ -63,9 +61,7 @@ export const getAllSavedBriefs = async (
   // return dumyBriefs as Array<Brief>;
   //:TODO implement api for getting briefs
   const resp = await fetch(
-    checkEnvironment().concat(
-      `${config.apiBase}briefs/save?items_per_page=${itemsPerPage}&page=${currentPage}&user_id=${user_id}`
-    ),
+    `${config.apiBase}briefs/save?items_per_page=${itemsPerPage}&page=${currentPage}&user_id=${user_id}`,
     {
       headers: postAPIHeaders,
       method: 'get',
@@ -84,9 +80,7 @@ export const checkIfBriefSaved = async (
   userId: string
 ) => {
   const resp = await fetch(
-    checkEnvironment().concat(
-      `${config.apiBase}briefs/save/${briefId}?user_id=${userId}`
-    ),
+    `${config.apiBase}briefs/save/${briefId}?user_id=${userId}`,
     {
       headers: postAPIHeaders,
       method: 'get',
@@ -102,7 +96,7 @@ export const checkIfBriefSaved = async (
 export const getBrief = async (briefId: number | string | string[]) => {
   try {
     const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}briefs/${briefId}`),
+      `${config.apiBase}briefs/${briefId}`,
       {
         headers: postAPIHeaders,
         method: 'get',
@@ -164,7 +158,7 @@ export const changeBriefApplicationStatus = async (
   status_id: OffchainProjectState
 ) => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}briefs/${briefId}/status`),
+    `${config.apiBase}briefs/${briefId}/status`,
     {
       headers: postAPIHeaders,
       method: 'put',
@@ -186,9 +180,7 @@ export const changeBriefApplicationStatus = async (
 
 export const getFreelancerBrief = async (userId: number, briefId: number) => {
   const resp = await fetch(
-    checkEnvironment().concat(
-      `${config.apiBase}users/${userId}/briefs/${briefId}`
-    ),
+    `${config.apiBase}users/${userId}/briefs/${briefId}`,
     {
       headers: postAPIHeaders,
       method: 'get',
@@ -201,7 +193,7 @@ export const getFreelancerBrief = async (userId: number, briefId: number) => {
 
 export const getProjectById = async (projectId: string | number) => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}project/${projectId}`),
+    `${config.apiBase}project/${projectId}`,
     {
       headers: postAPIHeaders,
       method: 'get',
@@ -248,7 +240,7 @@ export const updateBriefById = async (params: BriefInfo) => {
 
 export const saveBriefData = async (brief: Brief) => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}briefs/save`),
+    `${config.apiBase}briefs/save`,
     {
       headers: postAPIHeaders,
       method: 'post',

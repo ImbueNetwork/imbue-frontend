@@ -7,7 +7,6 @@ import { WalletAccount } from '@talismn/connect-wallets';
 import Link from 'next/link';
 import React, { useState } from 'react';
 
-import { checkEnvironment } from '@/utils';
 import * as utils from '@/utils';
 
 import AccountChoice from '@/components/AccountChoice';
@@ -15,7 +14,6 @@ import AccountChoice from '@/components/AccountChoice';
 import { postAPIHeaders } from '@/config';
 import * as config from '@/config';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
-
 type LoginProps = {
   visible: boolean;
   redirectUrl: string;
@@ -74,17 +72,14 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     setErrorMessage(undefined);
     event.preventDefault();
 
-    const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}auth/imbue/`),
-      {
-        headers: postAPIHeaders,
-        method: 'post',
-        body: JSON.stringify({
-          userOrEmail,
-          password,
-        }),
-      }
-    );
+    const resp = await fetch(`${config.apiBase}auth/imbue/`, {
+      headers: postAPIHeaders,
+      method: 'post',
+      body: JSON.stringify({
+        userOrEmail,
+        password,
+      }),
+    });
 
     if (resp.ok) {
       utils.redirect(redirectUrl);
@@ -99,14 +94,11 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   };
 
   const googleLogin = async (response: any) => {
-    const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}auth/google/`),
-      {
-        headers: postAPIHeaders,
-        method: 'post',
-        body: JSON.stringify(response),
-      }
-    );
+    const resp = await fetch(`${config.apiBase}auth/google/`, {
+      headers: postAPIHeaders,
+      method: 'post',
+      body: JSON.stringify(response),
+    });
 
     if (resp.ok) {
       utils.redirect(redirectUrl);

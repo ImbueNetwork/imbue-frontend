@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
 
-import { checkEnvironment, getCurrentUser } from '@/utils';
+import { getCurrentUser } from '@/utils';
 
 import AccountChoice from '@/components/AccountChoice';
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
@@ -135,34 +135,31 @@ export const SubmitProposal = (): JSX.Element => {
     //TODO: validate all milestone sum up to 100%
     setLoading(true);
     try {
-      const resp = await fetch(
-        checkEnvironment().concat(`${config.apiBase}/project`),
-        {
-          headers: config.postAPIHeaders,
-          method: 'post',
-          body: JSON.stringify({
-            user_id: user?.id,
-            name: `Brief Application: ${brief?.headline}`,
-            brief_id: brief?.id,
-            total_cost_without_fee: totalCostWithoutFee,
-            imbue_fee: imbueFee,
-            currency_id: currencyId,
-            milestones: milestones
-              .filter((m) => m.amount !== undefined)
-              .map((m) => {
-                return {
-                  name: m.name,
-                  amount: m.amount,
-                  percentage_to_unlock: (
-                    ((m.amount ?? 0) / totalCostWithoutFee) *
-                    100
-                  ).toFixed(0),
-                };
-              }),
-            required_funds: totalCost,
-          }),
-        }
-      );
+      const resp = await fetch(`${config.apiBase}/project`, {
+        headers: config.postAPIHeaders,
+        method: 'post',
+        body: JSON.stringify({
+          user_id: user?.id,
+          name: `Brief Application: ${brief?.headline}`,
+          brief_id: brief?.id,
+          total_cost_without_fee: totalCostWithoutFee,
+          imbue_fee: imbueFee,
+          currency_id: currencyId,
+          milestones: milestones
+            .filter((m) => m.amount !== undefined)
+            .map((m) => {
+              return {
+                name: m.name,
+                amount: m.amount,
+                percentage_to_unlock: (
+                  ((m.amount ?? 0) / totalCostWithoutFee) *
+                  100
+                ).toFixed(0),
+              };
+            }),
+          required_funds: totalCost,
+        }),
+      });
 
       if (resp.ok) {
         const applicationId = (await resp.json()).id;

@@ -2,7 +2,7 @@ import { SignerResult } from '@polkadot/api/types';
 import { WalletAccount } from '@talismn/connect-wallets';
 import { v4 as uuid } from 'uuid';
 
-import { checkEnvironment, getCurrentUser } from '@/utils';
+import { getCurrentUser } from '@/utils';
 import { signWeb3Challenge } from '@/utils/polkadot';
 
 const getAPIHeaders = {
@@ -34,19 +34,16 @@ export async function authorise(
 ) {
   const existingUser = await getCurrentUser();
 
-  const resp = await fetch(
-    checkEnvironment().concat(`/api/auth/web3/polkadot`),
-    {
-      headers: postAPIHeaders,
-      method: 'post',
-      body: JSON.stringify({
-        signature: signature.signature,
-        challenge,
-        account,
-        logged_in_user: existingUser,
-      }),
-    }
-  );
+  const resp = await fetch(`/api/auth/web3/polkadot`, {
+    headers: postAPIHeaders,
+    method: 'post',
+    body: JSON.stringify({
+      signature: signature.signature,
+      challenge,
+      account,
+      logged_in_user: existingUser,
+    }),
+  });
   return resp;
 }
 
