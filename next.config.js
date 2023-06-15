@@ -8,6 +8,7 @@ const nextConfig = {
     GETSTREAM_API_KEY: process.env.GETSTREAM_API_KEY,
     GETSTREAM_SECRET_KEY: process.env.GETSTREAM_SECRET_KEY,
     CLOUD_NAME: process.env.CLOUD_NAME,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   },
   images: {
     remotePatterns: [

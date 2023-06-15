@@ -12,7 +12,7 @@ export const postAPIHeaders = {
 export const grantProposalsURL = "/proposals";
 export const dashboardUrl = "/dashboard";
 
-export const googleClientId = "826260703449-jpjbjnm9v1669mm7n5hevgfuj5pbr705.apps.googleusercontent.com";
+export const googleClientId = process.env.GOOGLE_CLIENT_ID || "";
 
 export const proposalsDraftLocalDraftKey = "imbu-proposals-draft:local-draft";
 
@@ -191,14 +191,4 @@ export const categories = {
     "Miscellaneous",
     "Utility Companies",
   ],
-};
-
-export const dummyUser = {
-  id: 5,
-  username: "mike",
-  getstream_token:
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoibWlrZSJ9.oSxIRfDYQjN35KF0nx3tINBLh-mlnHKuqIWwxtU_Cnk",
-  display_name: "mike",
-  // web3_address: "5GRHPcY3zEgJezesmYHQyuo7YouwXVjnDR8ZcX9CQuFJadaL",
-  web3Accounts: [],
 };

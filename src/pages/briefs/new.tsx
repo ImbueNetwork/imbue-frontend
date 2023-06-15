@@ -16,7 +16,7 @@ import {
 import * as config from "@/config";
 import { BriefInfo, BriefProps } from "@/types/briefTypes";
 import { getServerSideProps } from "@/utils/serverSideProps";
-import styles from '../../styles/modules/newBrief.module.css'
+import styles from "../../styles/modules/newBrief.module.css";
 import ErrorScreen from "@/components/ErrorScreen";
 import FullScreenLoader from "@/components/FullScreenLoader";
 import { useRouter } from "next/router";
@@ -55,10 +55,9 @@ const NewBrief = (props: BriefProps): JSX.Element => {
   const [durationId, setDurationId] = useState<number>();
   const [budget, setBudget] = useState<number>();
 
-  const [error, setError] = useState<any>()
+  const [error, setError] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
-
 
   const NamePanel = (
     <>
@@ -100,9 +99,12 @@ const NewBrief = (props: BriefProps): JSX.Element => {
 
   const DescriptionPanel = (
     <div className={styles.descriptionPanel}>
-      <p className={styles.fieldName}>Describe your project in a few sentences</p>
+      <p className={styles.fieldName}>
+        Describe your project in a few sentences
+      </p>
       <div className={styles.descriptionContainer}>
         <TextArea
+          data-testid="description-input"
           value={description}
           name="description"
           maxLength={5000}
@@ -122,6 +124,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
         <TagsInput
           suggestData={suggestedSkills}
           tags={skills}
+          data-testid="skills-input"
           onChange={(tags: string[]) => setSkills(tags)}
         />
       </div>
@@ -184,6 +187,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
           className={styles.briefDetailFieldInput}
           style={{ paddingLeft: "24px", height: "auto" }}
           type="number"
+          data-testid="budget-input"
           value={budget || ""}
           onChange={(e) => setBudget(Number(e.target.value))}
         />
@@ -245,7 +249,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
 
   const onReviewPost = async () => {
     //TODO: implement api call
-    setLoading(true)
+    setLoading(true);
     try {
       const user_id = (await utils.getCurrentUser())?.id;
       const resp = await fetch(`${config.apiBase}/briefs/`, {
@@ -266,13 +270,12 @@ const NewBrief = (props: BriefProps): JSX.Element => {
       if (resp.status === 200 || resp.status === 201) {
         setStep(step + 1);
       } else {
-        setError({ message: "Failed to submit the brief" })
+        setError({ message: "Failed to submit the brief" });
       }
     } catch (error) {
-      setError(error)
-    }
-    finally {
-      setLoading(false)
+      setError(error);
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -313,6 +316,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
               <button
                 className="primary-btn in-dark w-button !mt-0"
                 disabled={!validate()}
+                data-testid="submit-button"
                 onClick={() => onReviewPost()}
               >
                 Submit
@@ -332,21 +336,22 @@ const NewBrief = (props: BriefProps): JSX.Element => {
       </div>
       {loading && <FullScreenLoader />}
       <ErrorScreen {...{ error, setError }}>
-        <div className='flex flex-col gap-4 w-1/2'>
+        <div className="flex flex-col gap-4 w-1/2">
           <button
             onClick={() => router.push(`/briefs`)}
-            className='primary-btn in-dark w-button w-full !m-0'>
+            className="primary-btn in-dark w-button w-full !m-0"
+          >
             Discover Briefs
           </button>
           <button
             onClick={() => setError(null)}
-            className='underline text-xs lg:text-base font-bold'>
+            className="underline text-xs lg:text-base font-bold"
+          >
             Try Again
           </button>
         </div>
       </ErrorScreen>
     </div>
-
   );
 };
 
