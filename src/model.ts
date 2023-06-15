@@ -120,6 +120,12 @@ export type User = {
   password?: string;
   getstream_token: string;
   web3_address?: string;
+  profile_photo?: string;
+  country?: string;
+  region?: string;
+  about?: string;
+  website?: string;
+  industry?: string;
 };
 export interface BasicTxResponse {
   errorMessage: string | null;
