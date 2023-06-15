@@ -19,10 +19,7 @@ import {
   stepData,
   suggestedIndustries,
   suggestedSkills,
-  timeData,
-} from '@/config/briefs-data';
-
-import styles from '../../styles/modules/newBrief.module.css';
+} from "@/config/briefs-data";
 
 const getAPIHeaders = {
   accept: 'application/json',
@@ -93,6 +90,7 @@ const NewBrief = (): JSX.Element => {
       </p>
       <div className={styles.descriptionContainer}>
         <TextArea
+          data-testid="description-input"
           value={description}
           name='description'
           maxLength={5000}
@@ -112,6 +110,7 @@ const NewBrief = (): JSX.Element => {
         <TagsInput
           suggestData={suggestedSkills}
           tags={skills}
+          data-testid="skills-input"
           onChange={(tags: string[]) => setSkills(tags)}
         />
       </div>
@@ -172,9 +171,10 @@ const NewBrief = (): JSX.Element => {
       <div className={styles.budgetInputContainer}>
         <input
           className={styles.briefDetailFieldInput}
-          style={{ paddingLeft: '24px', height: 'auto' }}
-          type='number'
-          value={budget || ''}
+          style={{ paddingLeft: "24px", height: "auto" }}
+          type="number"
+          data-testid="budget-input"
+          value={budget || ""}
           onChange={(e) => setBudget(Number(e.target.value))}
         />
         <div className={styles.budgetCurrencyContainer}>$</div>
@@ -256,7 +256,7 @@ const NewBrief = (): JSX.Element => {
       if (resp.status === 200 || resp.status === 201) {
         setStep(step + 1);
       } else {
-        setError({ message: 'Failed to submit the brief' });
+        setError({ message: "Failed to submit the brief" });
       }
     } catch (error) {
       setError(error);
@@ -302,6 +302,7 @@ const NewBrief = (): JSX.Element => {
               <button
                 className='primary-btn in-dark w-button !mt-0'
                 disabled={!validate()}
+                data-testid="submit-button"
                 onClick={() => onReviewPost()}
               >
                 Submit
@@ -321,16 +322,16 @@ const NewBrief = (): JSX.Element => {
       </div>
       {loading && <FullScreenLoader />}
       <ErrorScreen {...{ error, setError }}>
-        <div className='flex flex-col gap-4 w-1/2'>
+        <div className="flex flex-col gap-4 w-1/2">
           <button
             onClick={() => router.push(`/briefs`)}
-            className='primary-btn in-dark w-button w-full !m-0'
+            className="primary-btn in-dark w-button w-full !m-0"
           >
             Discover Briefs
           </button>
           <button
             onClick={() => setError(null)}
-            className='underline text-xs lg:text-base font-bold'
+            className="underline text-xs lg:text-base font-bold"
           >
             Try Again
           </button>
