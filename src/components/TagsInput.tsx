@@ -49,7 +49,9 @@ export const TagsInput = ({
             onClick={() => handleDelete(i)}
           >
             {tag}
-            <div className="unselect-tag">x</div>
+            <div data-testid="unselect-tag" className="unselect-tag">
+              x
+            </div>
           </div>
         ))}
         <input
