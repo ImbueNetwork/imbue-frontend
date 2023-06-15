@@ -20,6 +20,7 @@ import CustomModal from "@/components/CustomModal";
 import search from "../api/freelancers/search";
 import user from "../api/info/user";
 import { getCurrentUser } from "@/utils";
+import moment from "moment";
 
 interface FilterModalProps {
   open: boolean;
@@ -352,7 +353,7 @@ const Briefs = (): JSX.Element => {
             default:
               console.log(
                 "Invalid filter option selected or unimplemented. type:" +
-                  filterType
+                filterType
               );
           }
         }
@@ -418,14 +419,12 @@ const Briefs = (): JSX.Element => {
   const PageItem = (props: any) => {
     return (
       <div
-        className={`h-[32px] rounded-[4px] hover:bg-[--theme-primary] hover:text-black border border-primary w-[32px] cursor-pointer pt-1 items-center text-center text-sm !font-bold mr-6 ${
-          currentPage === parseInt(props.page) ? "text-black" : "text-white"
-        }
-        ${
-          currentPage === parseInt(props.page)
+        className={`h-[32px] rounded-[4px] hover:bg-[--theme-primary] hover:text-black border border-primary w-[32px] cursor-pointer pt-1 items-center text-center text-sm !font-bold mr-6 ${currentPage === parseInt(props.page) ? "text-black" : "text-white"
+          }
+        ${currentPage === parseInt(props.page)
             ? "bg-[--theme-primary]"
             : "bg-transparent"
-        }
+          }
         `}
       >
         {props.page}
@@ -593,14 +592,19 @@ const Briefs = (): JSX.Element => {
                     ))}
                   </div>
 
-                  <div className="brief-proposals">
-                    <span className="proposals-heading">
-                      Proposals Submitted:{" "}
-                    </span>
-                    <span className="proposals-count">
-                      {item.number_of_briefs_submitted}
-                    </span>
+                  <div className="flex justify-between">
+                    <div className="brief-proposals">
+                      <span className="proposals-heading">
+                        Proposals Submitted:{" "}
+                      </span>
+                      <span className="proposals-count">
+                        {item.number_of_briefs_submitted}
+                      </span>
+                    </div>
+
+                    <span>{moment(item?.created).fromNow()}</span>
                   </div>
+
                 </div>
               )
           )}

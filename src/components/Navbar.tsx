@@ -85,9 +85,8 @@ function Navbar() {
   return (
     <>
       <header
-        className={`navBar ${
-          solidNav ? "bg-theme-black-text" : "bg-transparent"
-        }`}
+        className={`navBar ${solidNav ? "bg-theme-black-text" : "bg-transparent"
+          }`}
         id="header-wrapper"
       >
         <div className="text-center w-full bg-primary text-black py-1 text-xs lg:text-sm">
@@ -147,9 +146,7 @@ function Navbar() {
             </Link>
             <Tooltip title="Account settings">
               <IconButton
-                onClick={() =>
-                  user?.id ? handleClick : () => setOpenMenu(!openMenu)
-                }
+                onClick={(e) => handleClick(e)}
                 size="small"
                 sx={{ ml: 2 }}
                 aria-controls={open ? "account-menu" : undefined}
