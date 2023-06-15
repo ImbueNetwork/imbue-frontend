@@ -115,7 +115,7 @@ export type Web3Account = {
 export type User = {
   id: number;
   display_name: string;
-  web3Accounts: Web3Account[];
+  web3Accounts?: Web3Account[];
   username: string;
   password?: string;
   getstream_token: string;

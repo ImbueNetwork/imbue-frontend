@@ -22,7 +22,6 @@ import { getUserBriefs } from "@/redux/services/briefService";
 import { BiEdit } from "react-icons/bi";
 import * as config from "@/config";
 
-
 const Profile = ({ initUser, browsingUser }: any) => {
   const router = useRouter();
   const slug = router.query.slug as string;
@@ -49,16 +48,27 @@ const Profile = ({ initUser, browsingUser }: any) => {
   const onSave = async () => {
     try {
       if (user) {
-        console.log(user);
+        const userData = {
+          id: user?.id,
+          display_name: user?.display_name,
+          username: user?.username,
+          getstream_token: user.getstream_token,
+          web3_address: user?.web3_address,
+          profile_photo: user?.profile_image,
+          country: user?.country,
+          region: user?.region,
+          about: user?.about,
+          website: user?.website,
+          industry: user?.industry,
+        };
         setLoading(true);
-        const userResponse: any = await updateUser({ ...user })
+        const userResponse: any = await updateUser(userData);
         console.log(userResponse);
 
         if (userResponse.status === "Successful") {
           setSuccess(true);
-        }
-        else {
-          setError(userResponse.message)
+        } else {
+          setError(userResponse.message);
         }
       }
     } catch (error) {
@@ -292,9 +302,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                   />
                 </div>
               ) : (
-                <span className="text-primary">
-                  {user?.website}
-                </span>
+                <span className="text-primary">{user?.website}</span>
               )}
             </div>
             <div className="flex gap-14 items-center">
