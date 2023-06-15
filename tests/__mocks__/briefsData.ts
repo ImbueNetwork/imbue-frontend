@@ -186,6 +186,38 @@ export const intermediateExpData = [
   },
 ];
 
+export const expertExpData = [
+  {
+    id: 3,
+    headline: "briefThree",
+    industries: [
+      {
+        id: 23,
+        name: "finance three",
+      },
+    ],
+    description: "finance brief three",
+    skills: [
+      {
+        id: 23,
+        name: "finance three",
+      },
+    ],
+    scope_id: 123,
+    scope_level: "average",
+    duration: "7 months",
+    duration_id: 1234,
+    budget: 123445,
+    created: new Date(),
+    created_by: "sandam three",
+    experience_level: "expert",
+    experience_id: 13,
+    document_url: "http://www.imbue.com",
+    number_of_briefs_submitted: 11,
+    user_id: 1234,
+  },
+];
+
 export const amountOfBriefsSubmitted = [
   {
     id: 1,

@@ -458,7 +458,7 @@ const Briefs = (): JSX.Element => {
           }}
           className="bg-[#1B1B1B] rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative"
         >
-          <p className="font-normal text-base text-white mb-9">Filter</p>
+          <p className="font-normal text-base text-white mb-9">Filter by:</p>
 
           <div className="grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5">
             {customDropdownConfigs
@@ -480,6 +480,7 @@ const Briefs = (): JSX.Element => {
 
           <button
             onClick={onSearch}
+            data-testid="Apply"
             className="h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 absolute md:bottom-10 bottom-5 right-10"
           >
             Apply
@@ -503,6 +504,7 @@ const Briefs = (): JSX.Element => {
           <div className="tab-section">
             <button
               onClick={toggleFilter}
+              test-id="filter-button"
               className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105"
             >
               Filter
