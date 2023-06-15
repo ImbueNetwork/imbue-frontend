@@ -56,8 +56,8 @@ import { SignerResult } from "@polkadot/api/types";
 import SuccessScreen from "@/components/SuccessScreen";
 import ErrorScreen from "@/components/ErrorScreen";
 import FullScreenLoader from "@/components/FullScreenLoader";
-import fiverrIcon from "@/assets/images/fiverr.png"
-import ImbueIcon from "@/assets/svgs/loader.svg"
+import fiverrIcon from "@/assets/images/fiverr.png";
+import ImbueIcon from "@/assets/svgs/loader.svg";
 
 export type ProfileProps = {
   initFreelancer: Freelancer;
@@ -72,7 +72,8 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const [browsingUser, setBrowsingUser] = useState<User>(user);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
-  const isCurrentFreelancer = browsingUser && browsingUser.id == freelancer?.user_id;
+  const isCurrentFreelancer =
+    browsingUser && browsingUser.id == freelancer?.user_id;
 
   const [skills, setSkills] = useState<string[]>(
     freelancer?.skills?.map(
@@ -82,10 +83,10 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   );
 
   const [openAccountChoice, setOpenAccountChoice] = useState<boolean>(false);
-  const [error, setError] = useState<any>()
-  const [success, setSuccess] = useState<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(false)
-  const [copied, setCopied] = useState<boolean>(false)
+  const [error, setError] = useState<any>();
+  const [success, setSuccess] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
 
   function urlify(text: string) {
     var urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -109,7 +110,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const onSave = async () => {
     try {
       if (freelancer) {
-        setLoading(true)
+        setLoading(true);
         let data = freelancer;
         data = {
           ...data,
@@ -118,13 +119,12 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         };
 
         await updateFreelancer(data);
-        setSuccess(true)
+        setSuccess(true);
       }
     } catch (error) {
-      setError(error)
-    }
-    finally {
-      setLoading(false)
+      setError(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -147,10 +147,10 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   };
 
   const cancelEdit = async () => {
-    setFreelancer(initFreelancer)
-    setIsEditMode(false)
-    setClients(clinetsData)
-  }
+    setFreelancer(initFreelancer);
+    setIsEditMode(false);
+    setClients(clinetsData);
+  };
 
   const accountSelected = async (account: WalletAccount): Promise<any> => {
     try {
@@ -168,7 +168,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         });
       }
     } catch (error) {
-      setError(error)
+      setError(error);
       console.log(error);
     }
   };
@@ -282,19 +282,19 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const clinetsData = [
     { id: 1, name: "Fiverr", logo: fiverrIcon, website: "fiverr.com" },
     { id: 2, name: "Imbue", logo: ImbueIcon, website: "fiverr.com" },
-  ]
+  ];
 
-  const [clients, setClients] = useState<any>(clinetsData)
+  const [clients, setClients] = useState<any>(clinetsData);
 
   const copyProfile = () => {
-    const webSiteURL = checkEnvironment().concat(`${router.asPath}`)
-    navigator.clipboard.writeText(webSiteURL)
-    setCopied(true)
+    const webSiteURL = checkEnvironment().concat(`${router.asPath}`);
+    navigator.clipboard.writeText(webSiteURL);
+    setCopied(true);
 
     setTimeout(() => {
-      setCopied(false)
+      setCopied(false);
     }, 3000);
-  }
+  };
 
   return (
     <div className="profile-container lg:-mt-8 overflow-x-hidden relative">
@@ -322,13 +322,11 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                   defaultValue={freelancer?.display_name}
                 />
               ) : (
-                <div className='flex gap-2 items-center justify-center mt-8'>
+                <div className="flex gap-2 items-center justify-center mt-8">
                   <h3 className="!text-2xl font-bold text-center z-[1]">
                     {freelancer?.display_name}
                   </h3>
-                  {
-                    initFreelancer?.verified && <VerifiedIcon color='primary' />
-                  }
+                  {initFreelancer?.verified && <VerifiedIcon color="primary" />}
                 </div>
               )}
 
@@ -400,60 +398,48 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                 )}
                 */}
 
-                {isCurrentFreelancer
-                  ? (
-                    <>
-                      {
-                        isEditMode
-                          ? (
-                            <button onClick={() => onSave()} className="message">
-                              Save Changes <FiEdit />
-                            </button>
-                          )
-                          : (
-                            <button onClick={() => flipEdit()} className="message">
-                              Edit Profile <FiEdit />
-                            </button>
-                          )
-                      }
-                    </>
-                  )
-                  : (
-                    <>
-                      <button
-                        onClick={() => handleMessageBoxClick()}
-                        className=" message"
-                      >
-                        Message
-                      </button>
-                    </>
-                  )
-                    ? (
-                      <button onClick={() => flipEdit()} className="message">
-                        Edit Profile <FiEdit />
-                      </button>
-                    )
-                    : (
+                {isCurrentFreelancer ? (
+                  <>
+                    {isEditMode ? (
                       <button onClick={() => onSave()} className="message">
                         Save Changes <FiEdit />
                       </button>
-                    )
-                }
-
-                {(!isEditMode && isCurrentFreelancer)
-                  ? (
-                    <button onClick={copyProfile} className="share">
-                      <FaRegShareSquare color="white" />
-                      Share Profile
+                    ) : (
+                      <button onClick={() => flipEdit()} className="message">
+                        Edit Profile <FiEdit />
+                      </button>
+                    )}
+                  </>
+                ) : <>
+                    <button
+                      onClick={() => handleMessageBoxClick()}
+                      className=" message"
+                    >
+                      Message
                     </button>
-                  )
-                  : (
-                    <button onClick={() => cancelEdit()} className="message !bg-red-600">
-                      Cancel
-                    </button>
-                  )
-                }
+                  </> ? (
+                  <button onClick={() => flipEdit()} className="message">
+                    Edit Profile <FiEdit />
+                  </button>
+                ) : (
+                  <button onClick={() => onSave()} className="message">
+                    Save Changes <FiEdit />
+                  </button>
+                )}
 
+                {!isEditMode && isCurrentFreelancer ? (
+                  <button onClick={copyProfile} className="share">
+                    <FaRegShareSquare color="white" />
+                    Share Profile
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => cancelEdit()}
+                    className="message !bg-red-600"
+                  >
+                    Cancel
+                  </button>
+                )}
               </div>
               {/* TODO: Implement */}
               {/* <div className="divider"></div>
@@ -471,7 +457,15 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
               </span>
             </div>
 
-            <Clients {...{ setFreelancer, isEditMode, setIsEditMode, clients, setClients }} />
+            <Clients
+              {...{
+                setFreelancer,
+                isEditMode,
+                setIsEditMode,
+                clients,
+                setClients,
+              }}
+            />
 
             <hr className="separator" />
 
@@ -916,36 +910,50 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
       <SuccessScreen
         title={"You have successfully updated your profile"}
         open={success}
-        setOpen={setSuccess}>
-        <div className='flex flex-col gap-4 w-1/2'>
+        setOpen={setSuccess}
+      >
+        <div className="flex flex-col gap-4 w-1/2">
           <button
-            onClick={() => { flipEdit(), setSuccess(false) }}
-            className='primary-btn in-dark w-button w-full !m-0'>
+            onClick={() => {
+              flipEdit(), setSuccess(false);
+            }}
+            className="primary-btn in-dark w-button w-full !m-0"
+          >
             See Profile
           </button>
           <button
             onClick={() => router.push(`/dashboard`)}
-            className='underline text-xs lg:text-base font-bold'>
+            className="underline text-xs lg:text-base font-bold"
+          >
             Go to Dashboard
           </button>
         </div>
       </SuccessScreen>
 
       <ErrorScreen {...{ error, setError }}>
-        <div className='flex flex-col gap-4 w-1/2'>
+        <div className="flex flex-col gap-4 w-1/2">
           <button
             onClick={() => setError(null)}
-            className='primary-btn in-dark w-button w-full !m-0'>
+            className="primary-btn in-dark w-button w-full !m-0"
+          >
             Try Again
           </button>
           <button
             onClick={() => router.push(`/dashboard`)}
-            className='underline text-xs lg:text-base font-bold'>
+            className="underline text-xs lg:text-base font-bold"
+          >
             Go to Dashboard
           </button>
         </div>
       </ErrorScreen>
-      <Alert className={`absolute top-2 z-10 transform duration-300 transition-all ${copied ? "right-5" :"-right-full"}`} severity="success">Profile Link Copied to clipboard</Alert>
+      <Alert
+        className={`absolute top-2 z-10 transform duration-300 transition-all ${
+          copied ? "right-5" : "-right-full"
+        }`}
+        severity="success"
+      >
+        Profile Link Copied to clipboard
+      </Alert>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import db from "@/db";
-import * as models from "../../models";
-import { Brief, BriefSqlFilter, fetchItems } from "../../models";
+import * as models from "@/lib/models";
+import { Brief, BriefSqlFilter, fetchItems } from "@/lib/models";
 import nextConnect from "next-connect";
 
 export default nextConnect()

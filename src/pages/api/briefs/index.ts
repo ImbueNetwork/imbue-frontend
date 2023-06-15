@@ -7,13 +7,14 @@ import {
   incrementUserBriefSubmissions,
   upsertItems,
   insertBrief,
-} from "../models";
+} from "@/lib/models";
 import { BriefSqlFilter } from "@/model";
-import * as models from "../models";
+import * as models from "@/lib/models";
 import { Brief } from "@/model";
 
 export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
+
     const data = req.query;
     await db.transaction(async (tx: any) => {
       try {

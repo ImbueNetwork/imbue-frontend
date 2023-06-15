@@ -1,11 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from 'next-connect'
 import db from "@/db";
-import * as models from "../../models";
-import { fetchUserOrEmail, fetchWeb3AccountByAddress, updateFederatedLoginUser } from "../../models";
+import * as models from "@/lib/models";
+import { fetchUserOrEmail, fetchWeb3AccountByAddress, updateFederatedLoginUser } from "@/lib/models";
 import { jwtOptions } from "../common";
 import jwt from 'jsonwebtoken';
-import { setTokenCookie } from "@/pages/api/auth-cookies";
+import { setTokenCookie } from "@/lib/auth-cookies";
 export default nextConnect()
     .post(async (req: NextApiRequest, res: NextApiResponse) => {
         const creds = req.body;

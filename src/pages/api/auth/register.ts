@@ -2,10 +2,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from 'next-connect'
 import db from "@/db";
-import { updateFederatedLoginUser, getOrCreateFederatedUser, fetchUserOrEmail, User } from "../models";
+import { updateFederatedLoginUser, getOrCreateFederatedUser, fetchUserOrEmail, User } from "@/lib/models";
 import { ensureParams, jwtOptions } from "./common";
 import jwt from 'jsonwebtoken';
-import { setTokenCookie } from "../auth-cookies";
+import { setTokenCookie } from "../../../lib/auth-cookies";
 
 export default nextConnect()
     .post(async (req: NextApiRequest, res: NextApiResponse) => {

@@ -4,7 +4,7 @@ import nextConnect from 'next-connect';
 import passport from 'passport';
 import db from '@/db';
 import { User } from '@/model';
-import * as models from "../../models";
+import * as models from "@/lib/models";
 
 export default nextConnect()
     .use(passport.initialize())

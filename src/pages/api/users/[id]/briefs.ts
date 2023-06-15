@@ -4,7 +4,7 @@ import nextConnect from 'next-connect';
 import passport from 'passport';
 import db from '@/db';
 
-import { fetchBriefApplications, fetchProject, fetchProjectMilestones, fetchUserBriefApplications, fetchUserBriefs } from '../../models';
+import { fetchBriefApplications, fetchProject, fetchProjectMilestones, fetchUserBriefApplications, fetchUserBriefs } from "@/lib/models";
 
 
 export default nextConnect()

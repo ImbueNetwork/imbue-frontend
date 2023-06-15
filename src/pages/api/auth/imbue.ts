@@ -1,14 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from 'next-connect'
-import * as models from "../models";
+import * as models from "@/lib/models";
 import db from "@/db";
-import { generateGetStreamToken, updateUserGetStreamToken } from "../models";
+import { generateGetStreamToken, updateUserGetStreamToken } from "@/lib/models";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { jwtOptions } from "./common";
-import config from "../config";
-import { setTokenCookie } from "../auth-cookies";
-
+import config from "@/lib/config";
+import { setTokenCookie } from "../../../lib/auth-cookies";
 
 export default nextConnect()
   .post(async (req: NextApiRequest, res: NextApiResponse) => {

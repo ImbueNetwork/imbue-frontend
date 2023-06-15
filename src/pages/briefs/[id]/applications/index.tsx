@@ -2,102 +2,117 @@ import React, { useEffect, useState } from "react";
 import ReactDOMClient from "react-dom/client";
 import ReactCountryFlag from "react-country-flag";
 import { FaPaperclip, FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
-import { Project, User } from "../../../api/models";
-import { getBrief, getBriefApplications } from "../../../../redux/services/briefService";
+import { Project, User } from "@/lib/models";
+import {
+  getBrief,
+  getBriefApplications,
+} from "../../../../redux/services/briefService";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { border, StyledEngineProvider } from "@mui/system";
-import ProfilePhoto from '../../../../assets/images/profile-image.png'
+import ProfilePhoto from "../../../../assets/images/profile-image.png";
 import Image from "next/image";
 import { fetchUser, getCurrentUser, redirect } from "@/utils";
 import { useRouter } from "next/router";
 import ChatPopup from "@/components/ChatPopup";
 import { BriefInsights } from "@/components/Briefs/BriefInsights";
 import { Brief } from "@/model";
-import styles from '@/styles/modules/brief-applications.module.css'
+import styles from "@/styles/modules/brief-applications.module.css";
 import { ApplicationContainer } from "@/components/Briefs/ApplicationContainer";
 
 const BriefApplications = () => {
-    const [briefApplications, setBriefApplications] = useState<any[]>();
-    const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
-    const [targetUser, setTargetUser] = useState<User | null>(null);
-    const [sortValue, setSortValue] = useState<string>('match');
-    const [brief, setBrief] = useState<Brief>()
-    const [browsingUser, setBrowsingUser] = useState<User>()
+  const [briefApplications, setBriefApplications] = useState<any[]>();
+  const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
+  const [targetUser, setTargetUser] = useState<User | null>(null);
+  const [sortValue, setSortValue] = useState<string>("match");
+  const [brief, setBrief] = useState<Brief>();
+  const [browsingUser, setBrowsingUser] = useState<User>();
 
-    const router = useRouter()
-    const { id: briefID } = router.query;
+  const router = useRouter();
+  const { id: briefID } = router.query;
 
-    const handleMessageBoxClick = async (user_id: any) => {
-        if (browsingUser) {
-            const tg = (await fetchUser(user_id));
-            setTargetUser(tg)
-            setShowMessageBox(true);
-        } else {
-            // router.push("login")
-            // redirect("login", `/dapp/briefs/${brief?.id}/`)
-        }
+  const handleMessageBoxClick = async (user_id: any) => {
+    if (browsingUser) {
+      const tg = await fetchUser(user_id);
+      setTargetUser(tg);
+      setShowMessageBox(true);
+    } else {
+      // router.push("login")
+      // redirect("login", `/dapp/briefs/${brief?.id}/`)
     }
+  };
 
-    useEffect(() => {
-        async function setup(id: string | string[]) {
-            try {
-                setBrowsingUser(await getCurrentUser());
-                const briefData = await getBrief(id);
-                setBrief(briefData)
+  useEffect(() => {
+    async function setup(id: string | string[]) {
+      try {
+        setBrowsingUser(await getCurrentUser());
+        const briefData = await getBrief(id);
+        setBrief(briefData);
 
-                if (briefData?.id) {
-                    setBriefApplications(await getBriefApplications(briefData?.id))
-                }
-            } catch (error) {
-                console.log(error);
-            }
+        if (briefData?.id) {
+          setBriefApplications(await getBriefApplications(briefData?.id));
         }
-        briefID && setup(briefID);
-    }, [briefID]);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    briefID && setup(briefID);
+  }, [briefID]);
 
-    const redirectToApplication = (applicationId: any) => {
-        router.push(`/briefs/${brief?.id}/applications/${applicationId}/`)
-    };
+  const redirectToApplication = (applicationId: any) => {
+    router.push(`/briefs/${brief?.id}/applications/${applicationId}/`);
+  };
 
-    if (!brief) return <h2>No brief found</h2>
+  if (!brief) return <h2>No brief found</h2>;
 
-    return (
-        <div className="page-wrapper applicationList hq-layout">
-            {browsingUser && showMessageBox && <ChatPopup {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser }} />}
-            <p className={styles.sectionTitle + " mb-4"}>Review proposals</p>
+  return (
+    <div className="page-wrapper applicationList hq-layout">
+      {browsingUser && showMessageBox && (
+        <ChatPopup
+          {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser }}
+        />
+      )}
+      <p className={styles.sectionTitle + " mb-4"}>Review proposals</p>
 
-            <BriefInsights brief={brief} />
+      <BriefInsights brief={brief} />
 
-            <div className="w-full ml-auto flex items-center justify-between mt-6">
-                <h3 className={styles.sectionTitle}>All applicants</h3>
-                <FormControl>
-                    <InputLabel id="demo-simple-select-helper-label">Sort</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-helper-label"
-                        id="demo-simple-select-helper"
-                        value={sortValue}
-                        label="Sort"
-                        onChange={(e) => setSortValue(e.target.value)}>
-                        <MenuItem value="match">Best Match</MenuItem>
-                        <MenuItem value='ratings'>Ratings</MenuItem>
-                        <MenuItem value='budget'>Budget</MenuItem>
-                    </Select>
-                </FormControl>
-            </div>
+      <div className="w-full ml-auto flex items-center justify-between mt-6">
+        <h3 className={styles.sectionTitle}>All applicants</h3>
+        <FormControl>
+          <InputLabel id="demo-simple-select-helper-label">Sort</InputLabel>
+          <Select
+            labelId="demo-simple-select-helper-label"
+            id="demo-simple-select-helper"
+            value={sortValue}
+            label="Sort"
+            onChange={(e) => setSortValue(e.target.value)}
+          >
+            <MenuItem value="match">Best Match</MenuItem>
+            <MenuItem value="ratings">Ratings</MenuItem>
+            <MenuItem value="budget">Budget</MenuItem>
+          </Select>
+        </FormControl>
+      </div>
 
-            <div className={styles.section}>
-                {
-                    briefApplications?.length
-                        ? <div className="applicants-list">
-                            {briefApplications?.map((application, index) => (
-                                <ApplicationContainer key={index} {...{ application, redirectToApplication, handleMessageBoxClick }} />
-                            ))}
-                        </div>
-                        : <h3>No Application for this brief</h3>
-                }
-            </div>
-        </div>
-    );
+      <div className={styles.section}>
+        {briefApplications?.length ? (
+          <div className="applicants-list">
+            {briefApplications?.map((application, index) => (
+              <ApplicationContainer
+                key={index}
+                {...{
+                  application,
+                  redirectToApplication,
+                  handleMessageBoxClick,
+                }}
+              />
+            ))}
+          </div>
+        ) : (
+          <h3>No Application for this brief</h3>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default BriefApplications;

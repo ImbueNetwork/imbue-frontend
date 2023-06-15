@@ -2,7 +2,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import nextConnect from 'next-connect';
 import passport from 'passport';
-import { authenticate } from '../../info/user';
 
 
 export default nextConnect()

@@ -4,8 +4,8 @@ import { decodeAddress, encodeAddress } from "@polkadot/keyring";
 import { hexToU8a, isHex } from '@polkadot/util';
 
 import db from "@/db";
-import * as models from "../../../models";
-import { fetchWeb3AccountByAddress, User } from "../../../models";
+import * as models from "@/lib/models";
+import { fetchWeb3AccountByAddress, User } from "@/lib/models";
 import { jwtOptions, verifyUserIdFromJwt } from "../../common";
 import { signatureVerify } from "@polkadot/util-crypto";
 
@@ -17,9 +17,9 @@ type Solution = {
 };
 
 import jwt from 'jsonwebtoken';
-import config from "../../../config"
+import config from "@/lib/config"
 import { serialize } from 'cookie';
-import { setTokenCookie } from "@/pages/api/auth-cookies";
+import { setTokenCookie } from "@/lib/auth-cookies";
 import { WalletAccount } from "@talismn/connect-wallets";
 import next from 'next';
 

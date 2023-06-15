@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "@/db";
-import * as models from "../models";
-import { Freelancer, fetchItems, searchFreelancers } from "../models";
+import * as models from "@/lib/models";
+import { Freelancer, fetchItems, searchFreelancers } from "@/lib/models";
 
 import nextConnect from "next-connect";
 

@@ -8,7 +8,7 @@ import {
   fetchProject,
   updateProject,
   acceptBriefApplication,
-} from "../../models";
+} from "@/lib/models";
 import { verifyUserIdFromJwt } from "../../auth/common";
 import nextConnect from 'next-connect'
 
