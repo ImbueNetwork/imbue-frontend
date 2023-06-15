@@ -20,7 +20,13 @@ import CustomModal from "@/components/CustomModal";
 import search from "../api/freelancers/search";
 import user from "../api/info/user";
 import { getCurrentUser } from "@/utils";
-import moment from "moment";
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en";
+
+
+TimeAgo.addLocale(en);
+
+const timeAgo = new TimeAgo("en-US");
 
 interface FilterModalProps {
   open: boolean;
@@ -57,6 +63,8 @@ const Briefs = (): JSX.Element => {
     hpw_is_max,
     heading,
   } = router?.query;
+
+  
 
   // The thing with this implentation is that the interior order must stay totally ordered.
   // The interior index is used to specify which entry will be used in the search brief.
@@ -602,7 +610,7 @@ const Briefs = (): JSX.Element => {
                       </span>
                     </div>
 
-                    <span>{moment(item?.created).fromNow()}</span>
+                    <span>{timeAgo.format(new Date(item?.created))}</span>
                   </div>
 
                 </div>
