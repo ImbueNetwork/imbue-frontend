@@ -452,12 +452,17 @@ const Freelancers = (): JSX.Element => {
             />
             <div className='search-result flex flex-col'>
               <div>
-                <span className='result-count'>{freelancers_total}</span>
-                <span> freelancers found</span>
+                <span className='result-count'>
+                  {Number(freelancers_total) === 0 ? 'No' : freelancers_total}
+                </span>
+                <span>
+                  {' '}
+                  freelancer{Number(freelancers_total) === 1 ? '' : 's'} found
+                </span>
               </div>
 
               <span className='max-width-500px:ml-8'>
-                number of freelancers per page
+                Freelancers per page
                 <select
                   className='ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none focus:outline-none focus:outline-white'
                   onChange={(e) => {

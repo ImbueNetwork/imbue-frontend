@@ -550,11 +550,13 @@ const Briefs = (): JSX.Element => {
             placeholder='Search'
           />
           <div className='search-result'>
-            <span className='result-count'>{briefs_total}</span>
-            <span> briefs found</span>
+            <span className='result-count'>
+              {Number(briefs_total) === 0 ? 'No' : briefs_total}
+            </span>
+            <span> brief{Number(briefs_total) === 1 ? '' : 's'} found</span>
 
             <span className='ml-8'>
-              number of briefs per page
+              Briefs per page
               <select
                 className='ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none focus:outline-none focus:outline-white'
                 onChange={(e) => {
