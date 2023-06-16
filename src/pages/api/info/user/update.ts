@@ -1,7 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import db from "@/db";
-import * as models from "../../models";
 import nextConnect from "next-connect";
+
+import db from "@/db";
+
+import * as models from "../../../../lib/models";
 
 export default nextConnect().put(
   async (req: NextApiRequest, res: NextApiResponse) => {

@@ -1,15 +1,16 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-
-import db from "@/db";
-import * as models from "../../models";
-import { jwtOptions } from "../../auth/common";
+import nextConnect from "next-connect";
+import passport from "passport";
 // @ts-ignore
 import * as passportJwt from "passport-jwt";
+
+import db from "@/db";
+
+import { jwtOptions } from "../../auth/common";
 // @ts-ignore
-import { fetchUser } from "../../models";
-import passport from "passport";
-import nextConnect from "next-connect";
+import { fetchUser } from "../../../../lib/models";
+import * as models from "../../../../lib/models";
 const JwtStrategy = passportJwt.Strategy;
 
 export const imbueStrategy = new JwtStrategy(jwtOptions, async function (

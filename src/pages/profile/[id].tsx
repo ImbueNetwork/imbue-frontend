@@ -1,34 +1,36 @@
-import UploadImage from "@/components/Profile/UploadImage";
+import { OutlinedInput, TextField } from "@mui/material";
+import { SignerResult } from "@polkadot/api/types";
+import { WalletAccount } from "@talismn/connect-wallets";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { Brief, User } from "@/model";
-import { fetchUser, updateUser } from "../../utils";
-import { WalletAccount } from "@talismn/connect-wallets";
-import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
-import { SignerResult } from "@polkadot/api/types";
+import { BiEdit } from "react-icons/bi";
 import { FaStar } from "react-icons/fa";
-import { OutlinedInput, TextField } from "@mui/material";
-import CountrySelector from "@/components/Profile/CountrySelector";
-import { TextArea } from "@/components/Briefs/TextArea";
+
 import AccountChoice from "@/components/AccountChoice";
-import styles from "@/styles/modules/freelancers.module.css";
+import { TextArea } from "@/components/Briefs/TextArea";
 import ChatPopup from "@/components/ChatPopup";
-import FullScreenLoader from "@/components/FullScreenLoader";
-import SuccessScreen from "@/components/SuccessScreen";
 import ErrorScreen from "@/components/ErrorScreen";
+import FullScreenLoader from "@/components/FullScreenLoader";
+import CountrySelector from "@/components/Profile/CountrySelector";
+import UploadImage from "@/components/Profile/UploadImage";
+import SuccessScreen from "@/components/SuccessScreen";
+
+import { Brief, User } from "@/model";
 import { authenticate } from "@/pages/api/info/user";
 import { getUserBriefs } from "@/redux/services/briefService";
-import { BiEdit } from "react-icons/bi";
-import * as config from "@/config";
+import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
+import styles from "@/styles/modules/freelancers.module.css";
+
+import { fetchUser, updateUser } from "../../utils";
 
 const Profile = ({ initUser, browsingUser }: any) => {
   const router = useRouter();
-  const slug = router.query.slug as string;
+  // const slug = router.query.slug as string;
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [user, setUser] = useState<any>(initUser);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
-  const [targetUser, setTargetUser] = useState<User | null>(null);
+  const [targetUser] = useState<User | null>(null);
   const [openBriefs, setOpenBriefs] = useState<Brief[]>([]);
 
   const [openAccountChoice, setOpenAccountChoice] = useState<boolean>(false);
@@ -83,11 +85,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
     setIsEditMode(false);
   };
 
-  const handleMessageBoxClick = () => {
-    if (browsingUser) {
-      setShowMessageBox(true);
-    }
-  };
+  // cs
 
   const flipEdit = () => {
     setIsEditMode(!isEditMode);
@@ -98,7 +96,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
       const result = await getAccountAndSign(account);
       const resp = await authorise(
         result?.signature as SignerResult,
-        result?.challenge!,
+        result?.challenge as string,
         account
       );
       if (resp.ok) {

@@ -125,3 +125,23 @@ export const checkEnvironment = () => {
   const base_url = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
   return base_url;
 };
+
+
+export const updateUser = async (user: User) => {
+	const resp = { status: 401, message: 'could not fetch' };
+	try {
+		const update = await fetch(`${config.apiBase}/info/user/update`, {
+			headers: config.postAPIHeaders,
+			method: 'put',
+			body: JSON.stringify(user),
+		});
+
+		if (update.status === 200) {
+			return update.json();
+		} else {
+			return resp;
+		}
+	} catch (error) {
+		return resp;
+	}
+};
