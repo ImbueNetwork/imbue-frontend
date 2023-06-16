@@ -1,7 +1,8 @@
-import { uploadPhoto } from '@/utils/imageUpload';
 import { CircularProgress } from '@mui/material';
 import Image from 'next/image';
 import React, { useState } from 'react';
+
+import { uploadPhoto } from '@/utils/imageUpload';
 
 type UploadImageProps = {
     isEditMode: boolean;
@@ -52,5 +53,6 @@ const UploadImage = ({ isEditMode, setUser, user }: UploadImageProps) => {
         </div>
     );
 };
+
 
 export default UploadImage;

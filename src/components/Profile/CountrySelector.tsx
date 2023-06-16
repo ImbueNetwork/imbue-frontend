@@ -1,16 +1,14 @@
+import { getCode } from 'country-list';
 import React, { useState } from 'react';
-import { CountryDropdown, RegionDropdown, CountryRegionData } from 'react-country-region-selector';
-import { countries } from 'country-data';
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import { getCode, getData, getName, getNameList, getNames } from "country-list";
 import ReactCountryFlag from 'react-country-flag';
+import { CountryDropdown, RegionDropdown } from 'react-country-region-selector';
 
 
 type CountrySelectorProps = {
   user: any;
   setUser: Function;
   isEditMode: boolean;
-}
+};
 
 const CountrySelector = ({ setUser, user, isEditMode }: CountrySelectorProps) => {
   const [country, setCountry] = useState<string>(user?.country || "");

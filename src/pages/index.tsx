@@ -1,15 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
-import { getCurrentUser } from "@/utils";
-import { User } from "stream-chat";
-import { useRouter } from "next/router";
-import Login from "@/components/Login";
-import FullScreenLoader from "@/components/FullScreenLoader";
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+
+import { getCurrentUser } from '@/utils';
+
+import FullScreenLoader from '@/components/FullScreenLoader';
+import Login from '@/components/Login';
 
 export default function Home() {
   const router = useRouter();
-  const [loginModal, setLoginModal] = useState<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(true)
+  const [loginModal, setLoginModal] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     getLogedInUser();
@@ -19,26 +20,25 @@ export default function Home() {
     try {
       const userResponse = await getCurrentUser();
       if (userResponse) {
-        const userAuth = {
-          isAuthenticated: true,
-          user: userResponse,
-        };
+        // FIXME:
+        // const userAuth = {
+        //   isAuthenticated: true,
+        //   user: userResponse,
+        // };
         // localStorage.setItem("userAuth", JSON.stringify(userAuth));
-        router.push("/dashboard");
-      }
-      else{
-        setLoginModal(true)
+        router.push('/dashboard');
+      } else {
+        setLoginModal(true);
       }
     } catch (error) {
+      // TODO: show error
       console.log(error);
+    } finally {
+      setLoading(false);
     }
-    finally {
-      setLoading(false)
-    }
-
   };
 
-  if (loading) return <FullScreenLoader />
+  if (loading) return <FullScreenLoader />;
 
   return (
     <Login
@@ -46,7 +46,7 @@ export default function Home() {
       setVisible={(val) => {
         setLoginModal(val);
       }}
-      redirectUrl={"/dashboard"}
+      redirectUrl={'/dashboard'}
     />
   );
 }

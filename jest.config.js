@@ -1,20 +1,20 @@
-const nextJest = require("next/jest");
+const nextJest = require('next/jest');
 
 const createJestConfig = nextJest({
   // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
-  dir: "./",
+  dir: './',
 });
 
 // Add any custom config to be passed to Jest
 const customJestConfig = {
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
-  testEnvironment: "jest-environment-jsdom",
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
-    "^next/router$": "<rootDir>/tests/__mocks__/next/router.js",
-    "^@components/(.*)$": "<rootDir>/src/components/$1",
-    "^@pages/(.*)$": "<rootDir>/src/pages/$1",
-    "^@redux/(.*)$": "<rootDir>/src/redux/$1",
-    "^@/(.*)$": "<rootDir>/src/$1",
+    '^next/router$': '<rootDir>/tests/__mocks__/next/router.js',
+    '^@components/(.*)$': '<rootDir>/src/components/$1',
+    '^@pages/(.*)$': '<rootDir>/src/pages/$1',
+    '^@redux/(.*)$': '<rootDir>/src/redux/$1',
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
 };
 

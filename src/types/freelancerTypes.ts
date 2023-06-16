@@ -1,4 +1,4 @@
-import { User, Freelancer } from "@/model";
+import { Freelancer, User } from '@/model';
 
 export type FreelancerProps = {
   user: User;

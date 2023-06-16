@@ -1,23 +1,23 @@
 .milestoneRow {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    width: 100%;
-  }
-  
-  .milestone-no {
-    margin-right: 36px;
-  }
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+}
 
-  .budgetDescription {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-  }
+.milestone-no {
+  margin-right: 36px;
+}
 
-  .budgetInfo {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    margin-bottom: 20px;
-  }
+.budgetDescription {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.budgetInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}

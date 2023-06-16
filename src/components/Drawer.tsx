@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from "react";
-import Login from "./Login";
-import { useRouter } from "next/router";
-import { freelancerExists } from "@/redux/services/freelancerService";
-import { User } from "@/model";
-import { getCurrentUser } from "@/utils";
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+
+import { getCurrentUser } from '@/utils';
+
+import { User } from '@/model';
+import { freelancerExists } from '@/redux/services/freelancerService';
+
+import Login from './Login';
 
 type DrawerProps = {
   visible: boolean;
-  setSideBarIsVisible: (value:boolean) => void;
+  setSideBarIsVisible: (_value: boolean) => void;
 };
 
 const Drawer = ({ visible, setSideBarIsVisible }: DrawerProps): JSX.Element => {
@@ -15,12 +18,12 @@ const Drawer = ({ visible, setSideBarIsVisible }: DrawerProps): JSX.Element => {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [authenticated, setAuthenticated] = useState<boolean>(false);
   const [redirectURL, setRedirectURL] = useState<string>();
-  const [isFreelancer, setIsFreelancer] = useState<any>(false)
-  const [user, setUser] = useState<User>()
+  const [isFreelancer, setIsFreelancer] = useState<any>(false);
+  const [user, setUser] = useState<User>();
 
   useEffect(() => {
     const setup = async () => {
-      const user = await getCurrentUser() || false;
+      const user = (await getCurrentUser()) || false;
       setAuthenticated(user !== false);
       if (user) {
         setIsFreelancer(await freelancerExists(user?.username));
@@ -30,83 +33,85 @@ const Drawer = ({ visible, setSideBarIsVisible }: DrawerProps): JSX.Element => {
     setup();
   }, [visible]);
 
-
   const linkItems = [
     {
-      icon: "face",
-      text: "Dashboard",
-      link: "/dashboard",
+      icon: 'face',
+      text: 'Dashboard',
+      link: '/dashboard',
       needAuthentication: true,
     },
     {
-      icon: "work",
-      text: "Submit A Brief",
-      link: "/briefs/new",
+      icon: 'work',
+      text: 'Submit A Brief',
+      link: '/briefs/new',
       needAuthentication: true,
     },
     {
-      icon: "search",
-      text: "Discover Briefs",
-      link: "/briefs",
+      icon: 'search',
+      text: 'Discover Briefs',
+      link: '/briefs',
       needAuthentication: false,
     },
     {
-      icon: "groups",
-      text: "Discover Freelancers",
+      icon: 'groups',
+      text: 'Discover Freelancers',
       link: `/freelancers`,
       needAuthentication: false,
     },
     {
-      icon: "group_add",
-      text: isFreelancer ? "Freelancer Profile" : "Join The Freelancers",
-      link: isFreelancer ? `/freelancers/${user?.username}/` : "/freelancers/new",
+      icon: 'group_add',
+      text: isFreelancer ? 'Freelancer Profile' : 'Join The Freelancers',
+      link: isFreelancer
+        ? `/freelancers/${user?.username}/`
+        : '/freelancers/new',
       needAuthentication: true,
     },
     {
-      icon: "money",
-      text: "Transfer Funds",
-      link: "/relay",
+      icon: 'money',
+      text: 'Transfer Funds',
+      link: '/relay',
       needAuthentication: false,
     },
     {
-      icon: "logout",
-      text: authenticated ? "Sign Out" : "Sign In",
-      link: authenticated ? "/logout" : "/login",
+      icon: 'logout',
+      text: authenticated ? 'Sign Out' : 'Sign In',
+      link: authenticated ? '/logout' : '/login',
       needAuthentication: true,
     },
   ];
 
   const navigateToPage = async (link: string, needAuthentication: boolean) => {
     if (needAuthentication && !authenticated) {
-      setRedirectURL(router.asPath)
+      setRedirectURL(router.asPath);
       setLoginModal(true);
-    }
-    else {
+    } else {
       router.push(link);
     }
-    setSideBarIsVisible(false)
+    setSideBarIsVisible(false);
   };
 
   return (
     <>
-      <div className={`drawer ${visible ? "open" : ""}`} id="right-drawer">
-        <nav id="nav">
-          <ul id="menu">
+      <div className={`drawer ${visible ? 'open' : ''}`} id='right-drawer'>
+        <nav id='nav'>
+          <ul id='menu'>
             {linkItems.map((item, index: number) => {
               return (
                 <li
                   key={`drawer-item-${index}`}
-                  className="menu-item"
-                  id="menu-item__account-dashboard"
+                  className='menu-item'
+                  id='menu-item__account-dashboard'
                 >
                   <p
-                    className="text-white dlex py-[12px] px-[20px]"
+                    className='text-white dlex py-[12px] px-[20px]'
                     title={item?.text}
-                    onClick={() => navigateToPage(item.link, item.needAuthentication)}
+                    onClick={() =>
+                      navigateToPage(item.link, item.needAuthentication)
+                    }
                   >
                     <i
-                      className="material-icons relative top-[4px]"
-                      aria-hidden="true"
+                      className='material-icons relative top-[4px]'
+                      aria-hidden='true'
                     >
                       {item?.icon}
                     </i>
@@ -124,7 +129,7 @@ const Drawer = ({ visible, setSideBarIsVisible }: DrawerProps): JSX.Element => {
           setLoginModal(val);
           setSideBarIsVisible(false);
         }}
-        redirectUrl={redirectURL || "/dashboard"}
+        redirectUrl={redirectURL || '/dashboard'}
       />
     </>
   );
