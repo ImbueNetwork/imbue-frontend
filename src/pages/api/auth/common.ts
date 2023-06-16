@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-import { getTokenCookie } from '../auth-cookies';
+import { getTokenCookie } from '@/lib/auth-cookies';
 
 export const ensureParams = (record: Record<string, any>, params: string[]) => {
   try {

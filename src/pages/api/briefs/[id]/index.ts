@@ -1,10 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
-import db from '@/db';
+import * as models from '@/lib/models';
+import { Brief, BriefSqlFilter, fetchItems } from '@/lib/models';
 
-import * as models from '../../models';
-import { Brief, BriefSqlFilter, fetchItems } from '../../models';
+import db from '@/db';
 
 export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {

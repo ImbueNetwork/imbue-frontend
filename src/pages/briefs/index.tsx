@@ -1,4 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import Pagination from 'rc-pagination';
@@ -20,6 +22,10 @@ import {
 } from '@/redux/services/briefService';
 
 import { BriefFilterOption } from '@/types/briefTypes';
+
+TimeAgo.addLocale(en);
+
+const timeAgo = new TimeAgo('en-US');
 
 interface FilterModalProps {
   open: boolean;
@@ -550,11 +556,13 @@ const Briefs = (): JSX.Element => {
             placeholder='Search'
           />
           <div className='search-result'>
-            <span className='result-count'>{briefs_total}</span>
-            <span> briefs found</span>
+            <span className='result-count'>
+              {Number(briefs_total) === 0 ? 'No' : briefs_total}
+            </span>
+            <span> brief{Number(briefs_total) === 1 ? '' : 's'} found</span>
 
             <span className='ml-8'>
-              number of briefs per page
+              Briefs per page
               <select
                 className='ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none focus:outline-none focus:outline-white'
                 onChange={(e) => {
@@ -594,13 +602,19 @@ const Briefs = (): JSX.Element => {
                     ))}
                   </div>
 
-                  <div className='brief-proposals'>
-                    <span className='proposals-heading'>
-                      Proposals Submitted:{' '}
-                    </span>
-                    <span className='proposals-count'>
-                      {item.number_of_briefs_submitted}
-                    </span>
+                  <div className='flex justify-between w-[400px] items-center'>
+                    <div className='brief-proposals'>
+                      <span className='proposals-heading'>
+                        Proposals Submitted:{' '}
+                      </span>
+                      <span className='proposals-count'>
+                        {item.number_of_briefs_submitted}
+                      </span>
+                    </div>
+
+                    <div className='leading-none'>
+                      {timeAgo.format(new Date(item?.created))}
+                    </div>
                   </div>
                 </div>
               )

@@ -1,16 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
-import db from '@/db';
-
-import { verifyUserIdFromJwt } from '../auth/common';
 import {
   fetchAllFreelancers,
   fetchItems,
   insertFreelancerDetails,
   paginatedData,
   upsertItems,
-} from '../models';
+} from '@/lib/models';
+
+import db from '@/db';
+
+import { verifyUserIdFromJwt } from '../auth/common';
 
 export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {

@@ -2,6 +2,7 @@ import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
+import { User } from '@/lib/models';
 import { fetchUser, getCurrentUser } from '@/utils';
 
 import { ApplicationContainer } from '@/components/Briefs/ApplicationContainer';
@@ -15,7 +16,6 @@ import {
   getBrief,
   getBriefApplications,
 } from '../../../../redux/services/briefService';
-import { User } from '../../../api/models';
 
 const BriefApplications = () => {
   const [briefApplications, setBriefApplications] = useState<any[]>();

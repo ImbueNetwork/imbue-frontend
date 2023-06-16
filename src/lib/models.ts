@@ -52,6 +52,13 @@ export type User = {
   password: string;
   briefs_submitted: number;
   getstream_token: string;
+  profile_photo?: string;
+  country?: string;
+  region?: string;
+  web3_address?: string;
+  about?: string;
+  website?: string;
+  industry?: string;
 };
 
 export type ProposedMilestone = {
@@ -204,6 +211,10 @@ export const fetchWeb3AccountsByUserId =
 export const fetchUser = (id: number) => (tx: Knex.Transaction) =>
   tx<User>("users").where({ id }).first();
 
+export const updateUserData =
+  (id: number, data: Partial<User>) => async (tx: Knex.Transaction) =>
+    (await tx<User>("users").update(data).where({ id }).returning("*"))[0];
+
 export const fetchUserOrEmail =
   (userOrEmail: string) => (tx: Knex.Transaction) =>
     tx<User>("users")
@@ -325,7 +336,7 @@ export const updateUserGetStreamToken =
     )[0];
 
 export const insertToTable =
-  <T>(item: string, table_name: string) =>
+  (item: string, table_name: string) =>
   async (tx: Knex.Transaction) =>
     (
       await tx(table_name)

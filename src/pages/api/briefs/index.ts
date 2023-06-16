@@ -1,17 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
-import db from '@/db';
-import { Brief } from '@/model';
-
 import {
   fetchAllBriefs,
   fetchItems,
   incrementUserBriefSubmissions,
   insertBrief,
   upsertItems,
-} from '../models';
-import * as models from '../models';
+} from '@/lib/models';
+import * as models from '@/lib/models';
+
+import db from '@/db';
+import { Brief } from '@/model';
 
 export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {

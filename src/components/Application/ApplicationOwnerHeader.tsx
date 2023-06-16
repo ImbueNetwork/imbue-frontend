@@ -5,10 +5,10 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
+import { Brief } from '@/lib/models';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import { Freelancer, Project, User } from '@/model';
-import { Brief } from '@/pages/api/models';
 import ChainService from '@/redux/services/chainService';
 
 import AccountChoice from '../AccountChoice';

@@ -3,12 +3,13 @@ import jwt from 'jsonwebtoken';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
+import { setTokenCookie } from '@/lib/auth-cookies';
+import * as models from '@/lib/models';
+import { generateGetStreamToken, updateUserGetStreamToken } from '@/lib/models';
+
 import db from '@/db';
 
 import { jwtOptions } from './common';
-import { setTokenCookie } from '../auth-cookies';
-import * as models from '../models';
-import { generateGetStreamToken, updateUserGetStreamToken } from '../models';
 
 export default nextConnect().post(
   async (req: NextApiRequest, res: NextApiResponse) => {

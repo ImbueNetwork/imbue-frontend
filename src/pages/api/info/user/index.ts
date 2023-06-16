@@ -1,21 +1,21 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nextConnect from 'next-connect';
-import passport from 'passport';
-import * as passportJwt from 'passport-jwt';
+import type { NextApiRequest, NextApiResponse } from "next";
+import nextConnect from "next-connect";
+import passport from "passport";
+import * as passportJwt from "passport-jwt";
 
-import * as models from '@/lib/models';
-import { fetchUser } from '@/lib/models';
+import db from "@/db";
 
-import db from '@/db';
-
-import { jwtOptions } from '../auth/common';
+import { jwtOptions } from "../../auth/common";
+import { fetchUser } from "../../../../lib/models";
+import * as models from "../../../../lib/models";
 const JwtStrategy = passportJwt.Strategy;
 
 //@ts-ignore
 export const imbueStrategy = new JwtStrategy(jwtOptions, async function (
   jwt_payload: any,
-  next: (...args: any[]) => void
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  next: Function
 ) {
   const id = jwt_payload.id;
   try {
@@ -31,6 +31,12 @@ export const imbueStrategy = new JwtStrategy(jwtOptions, async function (
           getstream_token: user.getstream_token,
           display_name: user.display_name,
           web3_address: web3Account?.address || null,
+          profile_photo: user.profile_photo,
+          country: user.country,
+          region: user.region,
+          about: user.about,
+          website: user.website,
+          industry: user.industry,
         });
       }
     });
@@ -64,7 +70,7 @@ export default nextConnect()
   .use(passport.initialize())
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
     try {
-      const user = await authenticate('jwt', req, res);
+      const user = await authenticate("jwt", req, res);
       res.status(200).send(user);
     } catch (error: any) {
       console.error(error);

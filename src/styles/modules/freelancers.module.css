@@ -186,7 +186,7 @@
 .freelancerProfileSection {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 26px;
   background: var(--theme-grey-dark);
   border-radius: 0.75rem;
   border: 1px solid var(--theme-light-white);

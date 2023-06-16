@@ -499,7 +499,7 @@ class ChainService {
     let userIsInitiator = false;
     const isLoggedIn = user && user.web3Accounts != null;
     if (isLoggedIn) {
-      user.web3Accounts.forEach((web3Account) => {
+      user?.web3Accounts?.forEach((web3Account) => {
         if (web3Account.address == projectOnChain.initiator) {
           userIsInitiator = true;
         }
