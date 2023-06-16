@@ -35,6 +35,13 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
       duplicate: true,
     },
     {
+        icon: "person",
+        text: "Profile",
+        link: `/profile/${user?.id}/`,
+        needAuthentication: false,
+        duplicate: false,
+    },
+    {
       icon: isFreelancer ? 'account_circle' : 'group_add',
       text: isFreelancer ? 'Freelancer Profile' : 'Join The Freelancers',
       link: isFreelancer

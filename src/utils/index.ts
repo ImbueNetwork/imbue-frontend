@@ -1,7 +1,7 @@
 import { StreamChat } from 'stream-chat';
 
 import * as config from '@/config';
-import { Project } from '@/model';
+import { Project, User } from '@/model';
 
 export type BadRoute =
   | 'not-found'
@@ -10,11 +10,11 @@ export type BadRoute =
   | 'bad-route';
 
 export function redirect(path: string, returnUrl?: string) {
-  if (returnUrl) {
-    window.location.href = `${window.location.origin}/${path}?redirect=${returnUrl}`;
-  } else {
-    window.location.href = `${window.location.origin}/${path}`;
-  }
+	if (returnUrl) {
+		window.location.href = `${window.location.origin}/${path}?redirect=${returnUrl}`;
+	} else {
+		window.location.href = `${window.location.origin}/${path}`;
+	}
 }
 
 export async function redirectBack() {
@@ -32,7 +32,7 @@ export async function redirectBack() {
 }
 
 export const validProjectId = (candidate: any) => {
-  return !!Number(String(candidate));
+	return !!Number(String(candidate));
 };
 
 export const getCurrentUser = async () => {
@@ -52,11 +52,11 @@ export const getCurrentUser = async () => {
 export const getProjectId = async () => {
   const candidate = window.location.pathname.split('/').pop();
 
-  if (validProjectId(candidate)) {
-    return candidate as string;
-  }
+	if (validProjectId(candidate)) {
+		return candidate as string;
+	}
 
-  return null;
+	return null;
 };
 
 export const fetchProject = async (projectId: string | number | null) => {
@@ -90,11 +90,11 @@ export const fetchUser = async (id: number) => {
 };
 
 export const badRouteEvent = (type: BadRoute) =>
-  new CustomEvent(config.event.badRoute, {
-    bubbles: true,
-    composed: true,
-    detail: type,
-  });
+	new CustomEvent(config.event.badRoute, {
+		bubbles: true,
+		composed: true,
+		detail: type,
+	});
 
 export function validateForm(form: HTMLFormElement): boolean {
   const fields: HTMLInputElement[] = Array.from(
@@ -102,8 +102,8 @@ export function validateForm(form: HTMLFormElement): boolean {
   );
   fields.forEach((input) => reportValidity(input, true));
 
-  const valid = fields.every(($input) => $input.checkValidity());
-  return valid;
+	const valid = fields.every(($input) => $input.checkValidity());
+	return valid;
 }
 
 export const getStreamChat = async () => {
@@ -124,4 +124,24 @@ function reportValidity(input: HTMLInputElement, _submitting = false) {
 export const checkEnvironment = () => {
   const base_url = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
   return base_url;
+};
+
+
+export const updateUser = async (user: User) => {
+	const resp = { status: 401, message: 'could not fetch' };
+	try {
+		const update = await fetch(`${config.apiBase}/info/user/update`, {
+			headers: config.postAPIHeaders,
+			method: 'put',
+			body: JSON.stringify(user),
+		});
+
+		if (update.status === 200) {
+			return update.json();
+		} else {
+			return resp;
+		}
+	} catch (error) {
+		return resp;
+	}
 };
