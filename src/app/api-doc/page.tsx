@@ -1,4 +1,5 @@
 import { getApiDocs } from "@/lib/swagger";
+
 import ReactSwagger from "./ReactSwagger";
 
 async function ApiDocPage() {

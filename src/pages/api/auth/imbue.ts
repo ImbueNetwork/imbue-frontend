@@ -1,16 +1,18 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import nextConnect from 'next-connect'
-import * as models from "@/lib/models";
-import db from "@/db";
-import { generateGetStreamToken, updateUserGetStreamToken } from "@/lib/models";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { jwtOptions } from "./common";
-import config from "@/lib/config";
-import { setTokenCookie } from "../../../lib/auth-cookies";
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nextConnect from 'next-connect';
 
-export default nextConnect()
-  .post(async (req: NextApiRequest, res: NextApiResponse) => {
+import { setTokenCookie } from '@/lib/auth-cookies';
+import * as models from '@/lib/models';
+import { generateGetStreamToken, updateUserGetStreamToken } from '@/lib/models';
+
+import db from '@/db';
+
+import { jwtOptions } from './common';
+
+export default nextConnect().post(
+  async (req: NextApiRequest, res: NextApiResponse) => {
     const { userOrEmail, password } = req.body;
     db.transaction(async (tx) => {
       try {
@@ -31,9 +33,9 @@ export default nextConnect()
         const token = await jwt.sign(payload, jwtOptions.secretOrKey);
         await setTokenCookie(res, token);
         return res.send({ id: user.id, display_name: user.display_name });
-
       } catch (e) {
         new Error(`Failed to fetch user ${userOrEmail}`, { cause: e as Error });
       }
     });
-  });
+  }
+);

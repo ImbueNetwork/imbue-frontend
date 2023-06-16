@@ -1,13 +1,15 @@
-import React from "react";
-import Box from "@mui/material/Box";
-import Slide from "@mui/material/Slide";
-import { ChatBox } from "@/components/Chat";
-import { User } from "@/model";
-import { StyledEngineProvider } from "@mui/material";
+import { StyledEngineProvider } from '@mui/material';
+import Box from '@mui/material/Box';
+import Slide from '@mui/material/Slide';
+import React from 'react';
+
+import { ChatBox } from '@/components/Chat';
+
+import { User } from '@/model';
 
 interface ChatPopupProps {
   showMessageBox: boolean;
-  setShowMessageBox: Function;
+  setShowMessageBox: (_visible: boolean) => void;
   browsingUser: User | null;
   targetUser: User | null;
 }
@@ -18,16 +20,16 @@ const ChatPopup = (props: ChatPopupProps) => {
   return (
     <StyledEngineProvider injectFirst>
       <Slide
-        direction="up"
-        className="z-10 chat-popup"
+        direction='up'
+        className='z-10 chat-popup'
         in={showMessageBox}
         mountOnEnter
         unmountOnExit
       >
         <Box>
-          <div className="relative h-full">
+          <div className='relative h-full'>
             <div
-              className="w-5 cursor-pointer absolute top-2 right-1 z-10 font-semibold"
+              className='w-5 cursor-pointer absolute top-2 right-1 z-10 font-semibold'
               onClick={() => setShowMessageBox(false)}
             >
               x

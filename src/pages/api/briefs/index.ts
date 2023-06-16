@@ -1,20 +1,20 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import db from "@/db";
-import nextConnect from "next-connect";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nextConnect from 'next-connect';
+
 import {
   fetchAllBriefs,
   fetchItems,
   incrementUserBriefSubmissions,
-  upsertItems,
   insertBrief,
-} from "@/lib/models";
-import { BriefSqlFilter } from "@/model";
-import * as models from "@/lib/models";
-import { Brief } from "@/model";
+  upsertItems,
+} from '@/lib/models';
+import * as models from '@/lib/models';
+
+import db from '@/db';
+import { Brief } from '@/model';
 
 export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
-
     const data = req.query;
     await db.transaction(async (tx: any) => {
       try {
@@ -28,10 +28,10 @@ export default nextConnect()
           await Promise.all([
             currentData,
             ...currentData.map(async (brief: any) => {
-              brief.skills = await fetchItems(brief.skill_ids, "skills")(tx);
+              brief.skills = await fetchItems(brief.skill_ids, 'skills')(tx);
               brief.industries = await fetchItems(
                 brief.industry_ids,
-                "industries"
+                'industries'
               )(tx);
             }),
           ]);
@@ -48,10 +48,10 @@ export default nextConnect()
     let response;
     await db.transaction(async (tx: any) => {
       try {
-        const skill_ids = await upsertItems(brief.skills, "skills")(tx);
+        const skill_ids = await upsertItems(brief.skills, 'skills')(tx);
         const industry_ids = await upsertItems(
           brief.industries,
-          "industries"
+          'industries'
         )(tx);
         const brief_id = await insertBrief(
           brief,
@@ -61,7 +61,7 @@ export default nextConnect()
           brief.duration_id
         )(tx);
         if (!brief_id) {
-          return new Error("Failed to create brief.");
+          return new Error('Failed to create brief.');
         }
         await incrementUserBriefSubmissions(brief.user_id)(tx);
 
@@ -75,7 +75,7 @@ export default nextConnect()
       }
     });
     res.status(200).json({
-      status: "Successful",
+      status: 'Successful',
       brief_id: response,
     });
   })
@@ -84,10 +84,10 @@ export default nextConnect()
     let response;
     await db.transaction(async (tx: any) => {
       try {
-        const skill_ids = await upsertItems(brief.skills, "skills")(tx);
+        const skill_ids = await upsertItems(brief.skills, 'skills')(tx);
         const industry_ids = await upsertItems(
           brief.industries,
-          "industries"
+          'industries'
         )(tx);
 
         const brief_id = await models.updateBrief(
@@ -103,7 +103,7 @@ export default nextConnect()
         )(tx);
 
         if (!brief_id) {
-          return new Error("Failed to update brief.");
+          return new Error('Failed to update brief.');
         }
 
         response = brief_id;
@@ -116,7 +116,7 @@ export default nextConnect()
       }
     });
     res.status(200).json({
-      status: "Successful",
+      status: 'Successful',
       brief_id: response,
     });
   });

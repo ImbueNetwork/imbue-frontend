@@ -313,25 +313,21 @@
   fill: var(--theme-secondary) !important;
 }
 
-
-
 @media screen and (max-width: 500px) {
-
-	.main-panel {
+  .main-panel {
     padding: 20px 24px;
     height: fit-content;
     min-height: 480px;
     margin: auto;
   }
 
-  .new-brief-details-container{
+  .new-brief-details-container {
     margin: auto auto;
     max-width: 380px;
     max-height: fit-content;
   }
-  
 
-  .brief-detail-field-input{
+  .brief-detail-field-input {
     height: 100%;
     font-size: 14px;
   }
@@ -345,61 +341,59 @@
     border-radius: 20px 0px 0px 20px;
   }
 
-  .right-panel{
+  .right-panel {
     width: 55%;
     border-radius: 0px 20px 20px 0px;
   }
-	
-  .progress-step-text{
+
+  .progress-step-text {
     font-size: 7px;
   }
 
-  .heading{
+  .heading {
     padding: 50px 0 20px 0;
     font-size: 20px;
   }
 
-  .name-panel-name-example{
+  .name-panel-name-example {
     font-size: 16px;
   }
 
-  .help{
+  .help {
     padding-right: 0;
     font-size: 16px;
   }
 
-  .progress-step-circle{
+  .progress-step-circle {
     height: 12px;
     width: 12px;
   }
 
   .progress-bar-back,
-  .progress-bar-progress{
+  .progress-bar-progress {
     height: 2px;
   }
 
-  .tag-suggestion{
+  .tag-suggestion {
     padding: 4px 8px;
     font-size: 12px;
   }
 
-  .selected-tag-item{
+  .selected-tag-item {
     font-size: 10px;
     padding: 0px 6px;
   }
-  
-  .selected-tags{
-    padding: 8px
+
+  .selected-tags {
+    padding: 8px;
   }
 
-  .new-tag-input{
+  .new-tag-input {
     padding: 0;
     width: 100%;
   }
-  
-  .primary-btn.in-dark{
+
+  .primary-btn.in-dark {
     margin-right: 0;
   }
 }
-
-

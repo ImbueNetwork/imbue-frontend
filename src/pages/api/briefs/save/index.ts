@@ -1,8 +1,10 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import db from "@/db";
-import nextConnect from "next-connect";
-import * as models from "@/lib/models";
-import { Brief } from "@/model";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nextConnect from 'next-connect';
+
+import * as models from '@/lib/models';
+
+import db from '@/db';
+import { Brief } from '@/model';
 
 export default nextConnect()
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
@@ -18,13 +20,13 @@ export default nextConnect()
         )(tx);
         if (saved_brief_id?.status) {
           response = saved_brief_id;
-          return new Error("Failed to save brief.");
+          return new Error('Failed to save brief.');
         } else {
           response = saved_brief_id;
         }
       } catch (e) {
         response = {
-          status: "Failed to save brief.",
+          status: 'Failed to save brief.',
         };
         new Error(
           `Failed to save brief for brief with name: ${brief.headline}`,
@@ -35,13 +37,13 @@ export default nextConnect()
     });
     if (response?.status) {
       res.status(200).json({
-        status: "Failed",
-        message: "Brief already exists.",
+        status: 'Failed',
+        message: 'Brief already exists.',
       });
       return;
     } else {
       res.status(200).json({
-        status: "Successful",
+        status: 'Successful',
         brief_id: response,
       });
     }
@@ -65,11 +67,11 @@ export default nextConnect()
               ...currentData.map(async (brief: any) => {
                 brief.skills = await models.fetchItems(
                   brief.skill_ids,
-                  "skills"
+                  'skills'
                 )(tx);
                 brief.industries = await models.fetchItems(
                   brief.industry_ids,
-                  "industries"
+                  'industries'
                 )(tx);
               }),
             ]);

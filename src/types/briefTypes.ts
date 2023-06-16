@@ -1,5 +1,4 @@
-import { Brief, Item } from "@/model";
-import exp from "constants";
+import { Brief, Item } from '@/model';
 
 export type FilterOption = {
   interiorIndex: number;
@@ -14,8 +13,6 @@ export enum BriefFilterOption {
   Length = 2,
   HoursPerWeek = 3,
 }
-
-export type BriefProps = {};
 
 export type BriefState = {
   step: number;
@@ -37,7 +34,7 @@ export type BriefInfo = {
 
 export type BriefStepProps = {
   currentBriefs: Brief[];
-  paginate: (page: number) => void;
+  paginate: (_page: number) => void;
 };
 
 export type PaginatedResponse = { currentData: unknown[]; totalBriefs: number };

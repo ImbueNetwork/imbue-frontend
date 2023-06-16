@@ -1,32 +1,26 @@
-import { serialize, parse } from "cookie";
-
-// @ts-ignore
-import * as passportJwt from "passport-jwt";
-// @ts-ignore
 import jwt from 'jsonwebtoken';
-import { NextApiResponse } from 'next';
-import { getTokenCookie } from '../../../lib/auth-cookies';
 
-export const ensureParams = (
-  record: Record<string, any>,
-  params: string[]
-) => {
+import { getTokenCookie } from '@/lib/auth-cookies';
+
+export const ensureParams = (record: Record<string, any>, params: string[]) => {
   try {
-    for (let name of params) {
+    for (const name of params) {
       if (!(record[name] && String(record[name]).trim())) {
         throw new Error(`Missing ${name} param.`);
       }
     }
   } catch (e) {
+    // FIXME: error handling
     console.error(e);
   }
-}
-
+};
 
 export function verifyUserIdFromJwt(req: any, res: any, user_id: number) {
   const token = getTokenCookie(req);
   if (!token) {
-    return res.status(401).send("You are not authorized to access this resource.");
+    return res
+      .status(401)
+      .send('You are not authorized to access this resource.');
   }
 
   try {
@@ -34,14 +28,16 @@ export function verifyUserIdFromJwt(req: any, res: any, user_id: number) {
     if (user_id == decoded.id) {
       return res;
     } else {
-      return res.status(401).send("You are not authorized to access this resource.");
+      return res
+        .status(401)
+        .send('You are not authorized to access this resource.');
     }
   } catch (error) {
-    return res.status(401).send("Invalid token.");
+    return res.status(401).send('Invalid token.');
   }
 }
 
 export const jwtOptions = {
   jwtFromRequest: getTokenCookie,
-  secretOrKey: process.env.JWTSecret ?? 'mysecretword'
+  secretOrKey: process.env.JWTSecret ?? 'mysecretword',
 };

@@ -1,25 +1,28 @@
-import { Freelancer, Project, User } from "@/model";
-import { Brief } from "@/lib/models";
-import { useMediaQuery } from "@mui/material";
-import Image from "next/image";
-import React, { useState } from "react";
-import AccountChoice from "../AccountChoice";
-import { initImbueAPIInfo } from "@/utils/polkadot";
-import ChainService from "@/redux/services/chainService";
-import { blake2AsHex } from "@polkadot/util-crypto";
-import { WalletAccount } from "@talismn/connect-wallets";
-import { useRouter } from "next/router";
-import ErrorScreen from "../ErrorScreen";
-import SuccessScreen from "../SuccessScreen";
+import { useMediaQuery } from '@mui/material';
+import { blake2AsHex } from '@polkadot/util-crypto';
+import { WalletAccount } from '@talismn/connect-wallets';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import React, { useState } from 'react';
+
+import { Brief } from '@/lib/models';
+import { initImbueAPIInfo } from '@/utils/polkadot';
+
+import { Freelancer, Project, User } from '@/model';
+import ChainService from '@/redux/services/chainService';
+
+import AccountChoice from '../AccountChoice';
+import ErrorScreen from '../ErrorScreen';
+import SuccessScreen from '../SuccessScreen';
 
 type ApplicationOwnerProps = {
   briefOwner: any;
   brief: Brief;
-  handleMessageBoxClick: Function;
+  handleMessageBoxClick: (_user_id: number, _freelancer: any) => Promise<void>;
   freelancer: Freelancer;
   application: Project | any;
-  setLoading: Function;
-  updateProject: (chainProjectId?: number) => void;
+  setLoading: (_loading: boolean) => void;
+  updateProject: (_chainProjectId?: number) => Promise<void>;
   user: User | any;
 };
 
@@ -44,13 +47,13 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
   const { applicationId }: any = router.query;
 
   const applicationStatusId = [
-    "Draft",
-    "Pending Review",
-    "Changes Requested",
-    "Rejected",
-    "Accepted",
+    'Draft',
+    'Pending Review',
+    'Changes Requested',
+    'Rejected',
+    'Accepted',
   ];
-  const mobileView = useMediaQuery("(max-width:480px)");
+  const mobileView = useMediaQuery('(max-width:480px)');
 
   const startWork = async (account: WalletAccount) => {
     setLoading(true);
@@ -87,18 +90,18 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
   };
 
   return (
-    <div className="flex items-center w-full lg:justify-between lg:px-10 flex-wrap">
-      <div className="flex gap-5 items-center">
+    <div className='flex items-center w-full lg:justify-between lg:px-10 flex-wrap'>
+      <div className='flex gap-5 items-center'>
         <Image
-          className="w-16 h-16 rounded-full object-cover cursor-pointer"
-          src={require("@/assets/images/profile-image.png")}
+          className='w-16 h-16 rounded-full object-cover cursor-pointer'
+          src={require('@/assets/images/profile-image.png')}
           priority
-          alt="profileImage"
+          alt='profileImage'
         />
-        <p className="text-2xl font-bold">{briefOwner?.display_name}</p>
+        <p className='text-2xl font-bold'>{briefOwner?.display_name}</p>
       </div>
       {
-        <p className="text-base text-primary break-words text-center ml-3">
+        <p className='text-base text-primary break-words text-center ml-3'>
           @
           {mobileView && briefOwner?.username?.length > 16
             ? `${briefOwner?.username.substr(0, 16)}...`
@@ -106,9 +109,9 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         </p>
       }
 
-      <div className="ml-auto lg:ml-0">
+      <div className='ml-auto lg:ml-0'>
         <button
-          className="primary-btn in-dark w-button !text-xs lg:!text-base"
+          className='primary-btn in-dark w-button !text-xs lg:!text-base'
           onClick={() =>
             brief && handleMessageBoxClick(brief?.user_id, freelancer?.username)
           }
@@ -117,7 +120,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         </button>
         {application?.status_id === 4 ? (
           <button
-            className="Accepted-btn text-black in-dark text-xs lg:text-base rounded-full py-[7px] px-3 ml-3 lg:ml-0 lg:px-6 md:py-[14px]"
+            className='Accepted-btn text-black in-dark text-xs lg:text-base rounded-full py-[7px] px-3 ml-3 lg:ml-0 lg:px-6 md:py-[14px]'
             onClick={() => brief?.project_id && setOpenPopup(true)}
           >
             Start Work
@@ -140,16 +143,16 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         filterByInitiator
       />
       <ErrorScreen {...{ error, setError }}>
-        <div className="flex flex-col gap-4 w-1/2">
+        <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => setError(null)}
-            className="primary-btn in-dark w-button w-full !m-0"
+            className='primary-btn in-dark w-button w-full !m-0'
           >
             Try Again
           </button>
           <button
             onClick={() => router.push(`/dashboard`)}
-            className="underline text-xs lg:text-base font-bold"
+            className='underline text-xs lg:text-base font-bold'
           >
             Go to Dashboard
           </button>
@@ -161,16 +164,16 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         open={success}
         setOpen={setSuccess}
       >
-        <div className="flex flex-col gap-4 w-1/2">
+        <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => router.push(`/projects/${projectId}`)}
-            className="primary-btn in-dark w-button w-full !m-0"
+            className='primary-btn in-dark w-button w-full !m-0'
           >
             See Project
           </button>
           <button
             onClick={() => setSuccess(false)}
-            className="underline text-xs lg:text-base font-bold"
+            className='underline text-xs lg:text-base font-bold'
           >
             Continue
           </button>

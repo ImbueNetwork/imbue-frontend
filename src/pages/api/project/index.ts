@@ -1,16 +1,19 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import db from "@/db";
-import * as models from "@/lib/models";
-import { authenticate } from "../info/user";
+import { NextApiRequest, NextApiResponse } from 'next';
+
+import * as models from '@/lib/models';
+
+import db from '@/db';
+
+import { authenticate } from '../info/user';
 
 type ProjectPkg = models.Project & {
   milestones: models.Milestone[];
 };
 
-import nextConnect from 'next-connect'
+import nextConnect from 'next-connect';
 
-export default nextConnect()
-  .post(async (req: NextApiRequest, res: NextApiResponse) => {
+export default nextConnect().post(
+  async (req: NextApiRequest, res: NextApiResponse) => {
     const {
       name,
       logo,
@@ -28,13 +31,15 @@ export default nextConnect()
 
     db.transaction(async (tx) => {
       try {
-        const user: any = await authenticate("jwt", req, res);
+        const user: any = await authenticate('jwt', req, res);
         const freelancer: any = await models.fetchFreelancerDetailsByUserID(
           user.id
         )(tx);
 
         if (!freelancer?.verified) {
-          return res.status(401).send("Only verified freelancers can apply for a brief");
+          return res
+            .status(401)
+            .send('Only verified freelancers can apply for a brief');
         }
 
         const project = await models.insertProject({
@@ -53,9 +58,7 @@ export default nextConnect()
         })(tx);
 
         if (!project?.id) {
-          return new Error(
-            "project_id missing."
-          );
+          return new Error('project_id missing.');
         }
 
         const pkg: ProjectPkg = {
@@ -65,8 +68,8 @@ export default nextConnect()
 
         return res.status(201).json(pkg);
       } catch (cause) {
-        return res.status(500).send("Failed to insert project");
+        return res.status(500).send('Failed to insert project');
       }
     });
-
-  });
+  }
+);

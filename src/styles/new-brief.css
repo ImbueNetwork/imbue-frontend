@@ -190,27 +190,27 @@ h1 {
     flex: 1;
   }
 
-  .buttons{
+  .buttons {
     width: 100%;
     gap: 0;
     justify-content: space-between;
     margin-top: 20px;
   }
 
-  .contents{
+  .contents {
     justify-content: flex-start;
   }
 
-  .experience-level-container{
+  .experience-level-container {
     gap: 30px;
     margin-top: 20px;
   }
 
-  .field-name{
+  .field-name {
     font-size: 18px;
   }
 
-  .right-panel input[type='radio']{
+  .right-panel input[type='radio'] {
     height: 12px;
     width: 12px;
   }

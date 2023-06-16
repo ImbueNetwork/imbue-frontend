@@ -1,25 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from "react";
-import { Brief, BriefSqlFilter } from "@/model";
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import Pagination from 'rc-pagination';
+import React, { useEffect, useState } from 'react';
+
+import { getCurrentUser } from '@/utils';
+
+import CustomDropDown from '@/components/CustomDropDown';
+import CustomModal from '@/components/CustomModal';
+import ErrorScreen from '@/components/ErrorScreen';
+import FullScreenLoader from '@/components/FullScreenLoader';
+
+import { filterIcon, savedIcon } from '@/assets/svgs';
+import { Brief, BriefSqlFilter } from '@/model';
 import {
   callSearchBriefs,
   getAllBriefs,
   getAllSavedBriefs,
-} from "@/redux/services/briefService";
-import { BriefFilterOption } from "@/types/briefTypes";
-import { useRouter } from "next/router";
-import { FiFilter } from "react-icons/fi";
-import { useWindowSize } from "@/hooks";
-import Pagination from "rc-pagination";
-import FullScreenLoader from "@/components/FullScreenLoader";
-import ErrorScreen from "@/components/ErrorScreen";
-import { filterIcon, savedIcon } from "@/assets/svgs";
-import Image from "next/image";
-import CustomDropDown from "@/components/CustomDropDown";
-import CustomModal from "@/components/CustomModal";
-import search from "../api/freelancers/search";
-import user from "../api/info/user";
-import { getCurrentUser } from "@/utils";
+} from '@/redux/services/briefService';
+
+import { BriefFilterOption } from '@/types/briefTypes';
 
 interface FilterModalProps {
   open: boolean;
@@ -28,34 +28,27 @@ interface FilterModalProps {
 
 export const strToIntRange = (strList: any) => {
   return Array.isArray(strList)
-    ? strList?.[0]?.split?.(",")?.map?.((v: any) => Number(v))
-    : strList?.split?.(",")?.map((v: any) => Number(v));
+    ? strList?.[0]?.split?.(',')?.map?.((v: any) => Number(v))
+    : strList?.split?.(',')?.map((v: any) => Number(v));
 };
 
 const Briefs = (): JSX.Element => {
   const [briefs, setBriefs] = useState<Brief[]>([]);
   const [briefs_total, setBriefsTotal] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState<boolean>(false);
+  // FIXME: setLoading
+  const [loading, _setLoading] = useState<boolean>(false);
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const router = useRouter();
   const [itemsPerPage, setNumItemsPerPage] = useState<number>(5);
 
   const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
-  const [openDropDown, setOpenDropDown] = useState<string>("");
+  // FIXME: openDropdown
+  const [_openDropDown, setOpenDropDown] = useState<string>('');
 
   const [error, setError] = useState<any>();
   const { pathname } = router;
-  const {
-    expRange,
-    submitRange,
-    submitted_is_max,
-    lengthRange,
-    length_is_max,
-    hpw_max,
-    hpw_is_max,
-    heading,
-  } = router?.query;
+  const { expRange, submitRange, lengthRange, heading } = router.query;
 
   // The thing with this implentation is that the interior order must stay totally ordered.
   // The interior index is used to specify which entry will be used in the search brief.
@@ -66,30 +59,30 @@ const Briefs = (): JSX.Element => {
     // This is a table named "experience"
     // If you change this you must remigrate the experience table and add the new field.
     filterType: BriefFilterOption.ExpLevel,
-    label: "Experience Level",
+    label: 'Experience Level',
     options: [
       {
         interiorIndex: 0,
         search_for: [1],
-        value: "Entry Level",
+        value: 'Entry Level',
         or_max: false,
       },
       {
         interiorIndex: 1,
         search_for: [2],
-        value: "Intermediate",
+        value: 'Intermediate',
         or_max: false,
       },
       {
         interiorIndex: 2,
         search_for: [3],
-        value: "Expert",
+        value: 'Expert',
         or_max: false,
       },
       {
         interiorIndex: 3,
         search_for: [4],
-        value: "Specialist",
+        value: 'Specialist',
         or_max: false,
       },
     ],
@@ -99,30 +92,30 @@ const Briefs = (): JSX.Element => {
     // This is a field associated with the User.
     // since its a range i need the
     filterType: BriefFilterOption.AmountSubmitted,
-    label: "Briefs Submitted",
+    label: 'Briefs Submitted',
     options: [
       {
         interiorIndex: 0,
         search_for: [1, 2, 3, 4],
-        value: "1-4",
+        value: '1-4',
         or_max: false,
       },
       {
         interiorIndex: 1,
         search_for: [5, 6, 7, 8, 9],
-        value: "5-9",
+        value: '5-9',
         or_max: false,
       },
       {
         interiorIndex: 2,
         search_for: [10, 11, 12, 13, 14],
-        value: "10-14",
+        value: '10-14',
         or_max: false,
       },
       {
         interiorIndex: 3,
         search_for: [15, 10000],
-        value: "15+",
+        value: '15+',
         or_max: true,
       },
     ],
@@ -133,58 +126,58 @@ const Briefs = (): JSX.Element => {
 
     // Again i need the high and low values.
     filterType: BriefFilterOption.Length,
-    label: "Project Length",
+    label: 'Project Length',
     options: [
       {
         interiorIndex: 0,
         search_for: [1],
-        value: "1-3 months",
+        value: '1-3 months',
         or_max: false,
       },
       {
         interiorIndex: 1,
         search_for: [2],
-        value: "3-6 months",
+        value: '3-6 months',
         or_max: false,
       },
       {
         interiorIndex: 2,
         search_for: [3],
-        value: "6-12 months",
+        value: '6-12 months',
         or_max: false,
       },
       {
         interiorIndex: 3,
         search_for: [12],
         or_max: true,
-        value: "1 year +",
+        value: '1 year +',
       },
       {
         // years * months
         interiorIndex: 4,
         search_for: [12 * 5],
         or_max: true,
-        value: "5 years +",
+        value: '5 years +',
       },
     ],
   };
 
   const hoursPwFilter = {
     filterType: BriefFilterOption.HoursPerWeek,
-    label: "Hours Per Week",
+    label: 'Hours Per Week',
     options: [
       {
         interiorIndex: 0,
         // This will be 0-30 as we actually use this as max value
         search_for: [30],
         or_max: false,
-        value: "30hrs/week",
+        value: '30hrs/week',
       },
       {
         interiorIndex: 1,
         // Same goes for this
         search_for: [50],
-        value: "50hrs/week",
+        value: '50hrs/week',
         or_max: true,
       },
     ],
@@ -192,22 +185,22 @@ const Briefs = (): JSX.Element => {
 
   const customDropdownConfigs = [
     {
-      name: "Project Length",
+      name: 'Project Length',
       filterType: BriefFilterOption.Length,
       filterOptions: lengthFilters.options,
     },
     {
-      name: "Proposal Submitted",
+      name: 'Proposal Submitted',
       filterType: BriefFilterOption.AmountSubmitted,
       filterOptions: submittedFilters.options,
     },
     {
-      name: "Experience Level",
+      name: 'Experience Level',
       filterType: BriefFilterOption.ExpLevel,
       filterOptions: expfilter.options,
     },
     {
-      name: "Hours Per Week",
+      name: 'Hours Per Week',
       filterType: BriefFilterOption.HoursPerWeek,
       filterOptions: hoursPwFilter.options,
     },
@@ -234,7 +227,7 @@ const Briefs = (): JSX.Element => {
           submitted_is_max: false,
           length_range: [],
           length_is_max: false,
-          search_input: "",
+          search_input: '',
           items_per_page: itemsPerPage,
           page: currentPage,
         };
@@ -263,7 +256,7 @@ const Briefs = (): JSX.Element => {
         if (heading) {
           filter = { ...filter, search_input: heading };
           const input = document.getElementById(
-            "search-input"
+            'search-input'
           ) as HTMLInputElement;
           if (input) input.value = heading.toString();
         }
@@ -295,63 +288,71 @@ const Briefs = (): JSX.Element => {
   const onSearch = async () => {
     // The filter initially should return all values
     setFilterVisible(!filterVisble);
-    let is_search: boolean = false;
+    let is_search = false;
 
     let exp_range: number[] = [];
     let submitted_range: number[] = [];
-    let submitted_is_max: boolean = false;
+    let submitted_is_max = false;
     let length_range: number[] = [];
-    let length_is_max: boolean = false;
+    let length_is_max = false;
     let length_range_prop: number[] = [];
 
     // default is max
-    let hpw_max: number = 50;
-    let hpw_is_max: boolean = false;
-    let search_input = document.getElementById(
-      "search-input"
+    // const hpw_max = 50;
+    // const hpw_is_max = false;
+    const search_input = document.getElementById(
+      'search-input'
     ) as HTMLInputElement;
-    let search_value = search_input.value;
-    if (search_value !== "") {
+    const search_value = search_input.value;
+    if (search_value !== '') {
       is_search = true;
     }
 
     for (let i = 0; i < selectedFilterIds.length; i++) {
-      if (selectedFilterIds[i] !== "") {
+      if (selectedFilterIds[i] !== '') {
         is_search = true;
         const id = selectedFilterIds[i];
         if (id != null) {
-          const [filterType, interiorIndex] = id.split("-");
+          const [filterType, interiorIndex] = id.split('-');
           // Here we are trying to build teh paramaters required to build the query
           // We build an array for each to get the values we want through concat.
           // and also specify if we want more than using the is_max field.
           switch (parseInt(filterType) as BriefFilterOption) {
             case BriefFilterOption.ExpLevel:
-              const o = expfilter.options[parseInt(interiorIndex)];
-              exp_range = [...exp_range, ...o.search_for.slice()];
+              {
+                const o = expfilter.options[parseInt(interiorIndex)];
+                exp_range = [...exp_range, ...o.search_for.slice()];
+              }
               break;
 
             case BriefFilterOption.AmountSubmitted:
-              const o1 = submittedFilters.options[parseInt(interiorIndex)];
-              submitted_range = [...submitted_range, ...o1.search_for.slice()];
-              submitted_is_max = o1.or_max;
+              {
+                const o1 = submittedFilters.options[parseInt(interiorIndex)];
+                submitted_range = [
+                  ...submitted_range,
+                  ...o1.search_for.slice(),
+                ];
+                submitted_is_max = o1.or_max;
+              }
               break;
 
             case BriefFilterOption.Length:
-              const o2 = lengthFilters.options[parseInt(interiorIndex)];
-              length_range = [...length_range, ...o2.search_for.slice()];
-              length_is_max = o2.or_max;
+              {
+                const o2 = lengthFilters.options[parseInt(interiorIndex)];
+                length_range = [...length_range, ...o2.search_for.slice()];
+                length_is_max = o2.or_max;
 
-              if (o2.search_for[0] === 12)
-                length_range_prop = [...length_range_prop, 4];
-              else if (o2.search_for[0] === 60)
-                length_range_prop = [...length_range_prop, 5];
-              else length_range_prop = length_range;
-
+                if (o2.search_for[0] === 12)
+                  length_range_prop = [...length_range_prop, 4];
+                else if (o2.search_for[0] === 60)
+                  length_range_prop = [...length_range_prop, 5];
+                else length_range_prop = length_range;
+              }
               break;
 
             default:
               console.log(
-                "Invalid filter option selected or unimplemented. type:" +
+                'Invalid filter option selected or unimplemented. type:' +
                   filterType
               );
           }
@@ -359,7 +360,7 @@ const Briefs = (): JSX.Element => {
       }
     }
 
-    router.query.heading = search_value !== "" ? search_value : [];
+    router.query.heading = search_value !== '' ? search_value : [];
     router.query.expRange = exp_range.length ? exp_range.toString() : [];
     router.query.submitRange = submitted_range.length
       ? submitted_range.toString()
@@ -419,12 +420,12 @@ const Briefs = (): JSX.Element => {
     return (
       <div
         className={`h-[32px] rounded-[4px] hover:bg-[--theme-primary] hover:text-black border border-primary w-[32px] cursor-pointer pt-1 items-center text-center text-sm !font-bold mr-6 ${
-          currentPage === parseInt(props.page) ? "text-black" : "text-white"
+          currentPage === parseInt(props.page) ? 'text-black' : 'text-white'
         }
         ${
           currentPage === parseInt(props.page)
-            ? "bg-[--theme-primary]"
-            : "bg-transparent"
+            ? 'bg-[--theme-primary]'
+            : 'bg-transparent'
         }
         `}
       >
@@ -450,17 +451,17 @@ const Briefs = (): JSX.Element => {
       <CustomModal
         open={open}
         onClose={handleClose}
-        className="flex justify-center items-center flex-wrap bg-black bg-opacity-50 top-0 left-0 w-full h-full z-[100] fixed"
+        className='flex justify-center items-center flex-wrap bg-black bg-opacity-50 top-0 left-0 w-full h-full z-[100] fixed'
       >
         <div
           onClick={(e: any) => {
             e?.stopPropagation();
           }}
-          className="bg-[#1B1B1B] rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative"
+          className='bg-[#1B1B1B] rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative'
         >
-          <p className="font-normal text-base text-white mb-9">Filter by:</p>
+          <p className='font-normal text-base text-white mb-9'>Filter by:</p>
 
-          <div className="grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5">
+          <div className='grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5'>
             {customDropdownConfigs
               ?.filter(
                 (item) => item?.filterOptions && item?.filterOptions?.length > 0
@@ -480,8 +481,8 @@ const Briefs = (): JSX.Element => {
 
           <button
             onClick={onSearch}
-            data-testid="Apply"
-            className="h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 absolute md:bottom-10 bottom-5 right-10"
+            data-testid='Apply'
+            className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 absolute md:bottom-10 bottom-5 right-10'
           >
             Apply
           </button>
@@ -491,27 +492,27 @@ const Briefs = (): JSX.Element => {
   };
 
   const pageinationIconClassName =
-    "h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary";
+    'h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary';
 
   if (loading) return <FullScreenLoader />;
 
   return (
-    <div className="search-briefs-container px-[15px] lg:px-[80px]">
+    <div className='search-briefs-container px-[15px] lg:px-[80px]'>
       <FilterModal open={filterVisble} handleClose={() => toggleFilter()} />
 
-      <div className="briefs-section  max-width-750px:overflow-hidden">
-        <div className="briefs-heading">
-          <div className="tab-section">
+      <div className='briefs-section  max-width-750px:overflow-hidden'>
+        <div className='briefs-heading'>
+          <div className='tab-section'>
             <button
               onClick={toggleFilter}
-              test-id="filter-button"
-              className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105"
+              test-id='filter-button'
+              className='h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105'
             >
               Filter
               <Image
                 src={filterIcon}
-                alt={"filter-icon"}
-                className="h-[14px] w-[14px] ml-2"
+                alt={'filter-icon'}
+                className='h-[14px] w-[14px] ml-2'
               />
             </button>
             {selectedFilterIds?.length > 0 && (
@@ -523,7 +524,7 @@ const Briefs = (): JSX.Element => {
                   });
                   await setSlectedFilterIds([]);
                 }}
-                className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]"
+                className='h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]'
               >
                 Reset Filter X
               </button>
@@ -533,29 +534,29 @@ const Briefs = (): JSX.Element => {
               onClick={() => {
                 onSavedBriefs();
               }}
-              className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]"
+              className='h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]'
             >
               Saved Briefs
               <Image
                 src={savedIcon}
-                alt={"filter-icon"}
-                className="h-[20px] w-[20px] ml-2"
+                alt={'filter-icon'}
+                className='h-[20px] w-[20px] ml-2'
               />
             </button>
           </div>
           <input
-            id="search-input"
-            className="search-input px-[12px] !w-full"
-            placeholder="Search"
+            id='search-input'
+            className='search-input px-[12px] !w-full'
+            placeholder='Search'
           />
-          <div className="search-result">
-            <span className="result-count">{briefs_total}</span>
+          <div className='search-result'>
+            <span className='result-count'>{briefs_total}</span>
             <span> briefs found</span>
 
-            <span className="ml-8">
+            <span className='ml-8'>
               number of briefs per page
               <select
-                className="ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none focus:outline-none focus:outline-white"
+                className='ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none focus:outline-none focus:outline-white'
                 onChange={(e) => {
                   setNumItemsPerPage(parseInt(e.target.value));
                 }}
@@ -570,34 +571,34 @@ const Briefs = (): JSX.Element => {
             </span>
           </div>
         </div>
-        <div className="briefs-list">
+        <div className='briefs-list'>
           {briefs?.map(
             (item, itemIndex) =>
               !item?.project_id && (
                 <div
-                  className="brief-item"
+                  className='brief-item'
                   key={itemIndex}
                   onClick={() => router.push(`/briefs/${item?.id}/`)}
                 >
-                  <div className="brief-title">{item.headline}</div>
-                  <div className="brief-time-info">
+                  <div className='brief-title'>{item.headline}</div>
+                  <div className='brief-time-info'>
                     {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
                   </div>
-                  <div className="brief-description">{item.description}</div>
+                  <div className='brief-description'>{item.description}</div>
 
-                  <div className="brief-tags">
+                  <div className='brief-tags'>
                     {item.skills.map((skill: any, skillIndex: any) => (
-                      <div className="tag-item" key={skillIndex}>
+                      <div className='tag-item' key={skillIndex}>
                         {skill.name}
                       </div>
                     ))}
                   </div>
 
-                  <div className="brief-proposals">
-                    <span className="proposals-heading">
-                      Proposals Submitted:{" "}
+                  <div className='brief-proposals'>
+                    <span className='proposals-heading'>
+                      Proposals Submitted:{' '}
                     </span>
-                    <span className="proposals-count">
+                    <span className='proposals-count'>
                       {item.number_of_briefs_submitted}
                     </span>
                   </div>
@@ -608,32 +609,32 @@ const Briefs = (): JSX.Element => {
         <Pagination
           pageSize={itemsPerPage}
           total={briefs_total}
-          onChange={(page: number, pageSize: number) => setCurrentPage(page)}
-          className="flex flex-row items-center my-10 px-10"
+          onChange={(page: number) => setCurrentPage(page)}
+          className='flex flex-row items-center my-10 px-10'
           itemRender={(page, type, originalElement) => {
-            if (type === "page") {
+            if (type === 'page') {
               return <PageItem page={page} />;
             }
             return originalElement;
           }}
-          prevIcon={<div className={pageinationIconClassName}>{"<"}</div>}
-          nextIcon={<div className={pageinationIconClassName}>{">"}</div>}
-          jumpNextIcon={<div className={pageinationIconClassName}>{">>"}</div>}
-          jumpPrevIcon={<div className={pageinationIconClassName}>{"<<"}</div>}
+          prevIcon={<div className={pageinationIconClassName}>{'<'}</div>}
+          nextIcon={<div className={pageinationIconClassName}>{'>'}</div>}
+          jumpNextIcon={<div className={pageinationIconClassName}>{'>>'}</div>}
+          jumpPrevIcon={<div className={pageinationIconClassName}>{'<<'}</div>}
         />
       </div>
 
       <ErrorScreen {...{ error, setError }}>
-        <div className="flex flex-col gap-4 w-1/2">
+        <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => setError(null)}
-            className="primary-btn in-dark w-button w-full !m-0"
+            className='primary-btn in-dark w-button w-full !m-0'
           >
             Try Again
           </button>
           <button
             onClick={() => router.push(`/dashboard`)}
-            className="underline text-xs lg:text-base font-bold"
+            className='underline text-xs lg:text-base font-bold'
           >
             Go to Dashboard
           </button>

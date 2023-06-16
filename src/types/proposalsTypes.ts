@@ -1,4 +1,4 @@
-import { Freelancer } from "@/model";
+import { Freelancer } from '@/model';
 
 export type DraftMilestone = {
   name: string;
@@ -55,5 +55,5 @@ export enum NumberOfItemsPerList {
 
 export type FreelancerStepProps = {
   currentFreelancers: Freelancer[];
-  paginate: (page: number) => void;
+  paginate: (_page: number) => void;
 };

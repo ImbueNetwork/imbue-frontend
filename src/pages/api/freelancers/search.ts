@@ -1,14 +1,13 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import db from "@/db";
-import * as models from "@/lib/models";
-import { Freelancer, fetchItems, searchFreelancers } from "@/lib/models";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nextConnect from 'next-connect';
 
-import nextConnect from "next-connect";
+import * as models from '@/lib/models';
+import { fetchItems, Freelancer, searchFreelancers } from '@/lib/models';
+
+import db from '@/db';
 
 export default nextConnect().post(
   async (req: NextApiRequest, res: NextApiResponse) => {
-    const { method } = req;
-
     db.transaction(async (tx) => {
       try {
         const filter: models.FreelancerSqlFilter = req.body;
@@ -27,19 +26,19 @@ export default nextConnect().post(
           ...currentData.map(async (freelancer: any) => {
             freelancer.skills = await fetchItems(
               freelancer.skill_ids,
-              "skills"
+              'skills'
             )(tx);
             freelancer.client_images = await fetchItems(
               freelancer.client_ids,
-              "clients"
+              'clients'
             )(tx);
             freelancer.languages = await fetchItems(
               freelancer.language_ids,
-              "languages"
+              'languages'
             )(tx);
             freelancer.services = await fetchItems(
               freelancer.service_ids,
-              "services"
+              'services'
             )(tx);
           }),
         ]);
