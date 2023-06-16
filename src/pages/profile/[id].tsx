@@ -16,13 +16,15 @@ import CountrySelector from "@/components/Profile/CountrySelector";
 import UploadImage from "@/components/Profile/UploadImage";
 import SuccessScreen from "@/components/SuccessScreen";
 
+import * as config from '@/config';
 import { Brief, User } from "@/model";
 import { authenticate } from "@/pages/api/info/user";
 import { getUserBriefs } from "@/redux/services/briefService";
 import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
 import styles from "@/styles/modules/freelancers.module.css";
 
-import { fetchUser, updateUser } from "../../utils";
+import { checkEnvironment, updateUser } from "../../utils";
+
 
 const Profile = ({ initUser, browsingUser }: any) => {
   const router = useRouter();
@@ -438,8 +440,16 @@ export const getServerSideProps = async (context: any) => {
   const { req, res, query } = context;
 
   try {
-    const initUser = await fetchUser(query?.id);
+    const resp = await fetch(
+      checkEnvironment().concat(`${config.apiBase}users/byid/${query?.id}`),
+      {
+        headers: config.getAPIHeaders,
+      }
+    );
+    const initUser = await resp.json();
+        
     const browsingUser = await authenticate("jwt", req, res);
+
     if (browsingUser) {
       return {
         props: {
@@ -454,11 +464,19 @@ export const getServerSideProps = async (context: any) => {
   }
 
   return {
-    redirect: {
-      destination: "/",
-      permanent: false,
+    props: {
+      isAuthenticated: true,
+      browsingUser : {},
+      initUser: {},
     },
   };
+
+  // return {
+  //   redirect: {
+  //     destination: "/",
+  //     permanent: false,
+  //   },
+  // };
 };
 
 export default Profile;
