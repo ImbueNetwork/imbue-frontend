@@ -4,11 +4,12 @@ import { signatureVerify } from '@polkadot/util-crypto';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
+import * as models from '@/lib/models';
+import { fetchWeb3AccountByAddress, User } from '@/lib/models';
+
 import db from '@/db';
 
 import { jwtOptions, verifyUserIdFromJwt } from '../../common';
-import * as models from '../../../models';
-import { fetchWeb3AccountByAddress, User } from '../../../models';
 
 type Solution = {
   signature: string;
@@ -19,7 +20,7 @@ type Solution = {
 
 import jwt from 'jsonwebtoken';
 
-import { setTokenCookie } from '@/pages/api/auth-cookies';
+import { setTokenCookie } from '@/lib/auth-cookies';
 
 export default nextConnect().post(
   async (req: NextApiRequest, res: NextApiResponse) => {

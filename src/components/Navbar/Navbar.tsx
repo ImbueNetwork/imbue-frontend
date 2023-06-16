@@ -12,8 +12,8 @@ import { appLogo } from '@/assets/svgs';
 import { User } from '@/model';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 
-import Login from '../Login';
 import MenuItems from './MenuItems';
+import Login from '../Login';
 import defaultProfile from '../../assets/images/profile-image.png';
 
 function Navbar() {
@@ -78,8 +78,6 @@ function Navbar() {
       setLoginModal(true);
     }
   };
-
-  console.log(user);
 
   return (
     <>
@@ -146,9 +144,8 @@ function Navbar() {
             </Link>
             <Tooltip title='Account settings'>
               <IconButton
-                onClick={(event) => handleClick(event)
-                }
-                size='small'
+                onClick={(e) => handleClick(e)}
+                size="small"
                 sx={{ ml: 2 }}
                 aria-controls={open ? 'account-menu' : undefined}
                 aria-haspopup='true'

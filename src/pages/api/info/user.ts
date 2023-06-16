@@ -4,11 +4,12 @@ import nextConnect from 'next-connect';
 import passport from 'passport';
 import * as passportJwt from 'passport-jwt';
 
+import * as models from '@/lib/models';
+import { fetchUser } from '@/lib/models';
+
 import db from '@/db';
 
 import { jwtOptions } from '../auth/common';
-import * as models from '../models';
-import { fetchUser } from '../models';
 const JwtStrategy = passportJwt.Strategy;
 
 //@ts-ignore

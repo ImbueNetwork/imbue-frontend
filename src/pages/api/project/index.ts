@@ -1,9 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
+import * as models from '@/lib/models';
+
 import db from '@/db';
 
 import { authenticate } from '../info/user';
-import * as models from '../models';
 
 type ProjectPkg = models.Project & {
   milestones: models.Milestone[];

@@ -1,9 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
-import db from '@/db';
-
-import { verifyUserIdFromJwt } from '../../auth/common';
 import {
   acceptBriefApplication,
   Brief,
@@ -12,7 +9,11 @@ import {
   fetchUser,
   updateProject,
   User,
-} from '../../models';
+} from '@/lib/models';
+
+import db from '@/db';
+
+import { verifyUserIdFromJwt } from '../../auth/common';
 
 export default nextConnect().put(
   async (req: NextApiRequest, res: NextApiResponse) => {

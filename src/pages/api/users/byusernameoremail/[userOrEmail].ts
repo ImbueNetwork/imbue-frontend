@@ -3,10 +3,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import passport from 'passport';
 
+import * as models from '@/lib/models';
+
 import db from '@/db';
 import { User } from '@/model';
-
-import * as models from '../../models';
 
 export default nextConnect()
   .use(passport.initialize())
