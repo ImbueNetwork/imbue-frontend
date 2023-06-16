@@ -9,7 +9,7 @@
   --theme-background: #1a1a19;
   --theme-title-color: #fff;
   --theme-ink-color: #ebeae2;
-  --theme-font-family: "Aeonik", sans-serif;
+  --theme-font-family: 'Aeonik', sans-serif;
   --theme-grey-text: #a6a6a6;
   --theme-black-text: #0f0f0f;
   --theme-imbue-purple: #3b27c1;
@@ -138,8 +138,8 @@
 }
 
 @font-face {
-  font-family: "Aeonik";
-  src: url("AeonikTRIAL-Regular.otf") format("opentype");
+  font-family: 'Aeonik';
+  src: url('AeonikTRIAL-Regular.otf') format('opentype');
 }
 
 .mdc-dialog .mdc-dialog__title,
@@ -280,6 +280,6 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type="number"] {
+input[type='number'] {
   -moz-appearance: textfield;
 }

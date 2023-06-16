@@ -1,9 +1,10 @@
-import { Proposal, ProposalItemProps } from "@/types/proposalsTypes";
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
-import * as config from "../config";
+import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
+
+import { Proposal, ProposalItemProps } from '@/types/proposalsTypes';
 
 const fetchProjects = async () => {
+  // TODO:
   return [];
   // const resp = await fetch(`${config.apiBase}/projects/`, {
   //   headers: config.getAPIHeaders,
@@ -23,12 +24,12 @@ const ProposalItem = ({
   name,
 }: ProposalItemProps): JSX.Element => {
   return (
-    <div className="block mb-[30px] border border-solid border-[#007] shadow-lg shadow-[#333]">
-      <li className="no-underline block border border-solid border-[#007] shadow-sm shadow-[#333] w-full">
+    <div className='block mb-[30px] border border-solid border-[#007] shadow-lg shadow-[#333]'>
+      <li className='no-underline block border border-solid border-[#007] shadow-sm shadow-[#333] w-full'>
         <a
-          id="contribute"
+          id='contribute'
           href={`/projects/${projectId}`}
-          className="
+          className='
           block 
           no-underline 
           hover:bg-[--theme-primary]
@@ -41,25 +42,25 @@ const ProposalItem = ({
           px-[10px] 
           text-white 
           text-[16px] 
-          font-normal"
+          font-normal'
         >
           <Image
             height={200}
             width={200}
-            id="img"
-            alt="proposalItemImage"
+            id='img'
+            alt='proposalItemImage'
             src={imageSrc}
           />
           <div
-            id="name"
-            className="
+            id='name'
+            className='
             text-white 
             default-family 
             no-underline 
             text-[22px] 
             p-[20px] 
             font-normal 
-            leading-[1.2]"
+            leading-[1.2]'
           >
             {name}
           </div>
@@ -81,7 +82,7 @@ const Proposals = (): JSX.Element => {
     <div>
       <h1>Discover Proposals</h1>
       <ol
-        className="
+        className='
       flex 
       flex-wrap 
       flex-1 
@@ -93,7 +94,7 @@ const Proposals = (): JSX.Element => {
       max-width-750px:grid-48
       max-width-500px:flex
       max-width-500px:grid-none
-      "
+      '
       >
         {projectsList &&
           projectsList.map(({ name, id, logo }) => (

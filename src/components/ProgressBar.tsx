@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export type ProgressBarProps = {
   titleArray: Array<string>;
@@ -10,30 +10,30 @@ export const ProgressBar = ({
   currentValue,
 }: ProgressBarProps): JSX.Element => {
   return (
-    <div className="progressbar-container">
+    <div className='progressbar-container'>
       {titleArray?.map((title, index) => (
         <div key={index} style={{ zIndex: 1 }}>
           <div
             className={`progress-step-circle ${
-              currentValue >= index ? "active" : "disabled"
+              currentValue >= index ? 'active' : 'disabled'
             }`}
           ></div>
           <p
             className={`progress-step-text ${
               index > 0 && index < titleArray.length - 1
-                ? "center"
+                ? 'center'
                 : index === titleArray.length - 1
-                ? "right"
-                : ""
+                ? 'right'
+                : ''
             }`}
           >
             {title}
           </p>
         </div>
       ))}
-      <div className="progress-bar-back"></div>
+      <div className='progress-bar-back'></div>
       <div
-        className="progress-bar-progress"
+        className='progress-bar-progress'
         style={{
           width: `calc((100% - .5rem) * ${currentValue} / ${
             titleArray.length - 1

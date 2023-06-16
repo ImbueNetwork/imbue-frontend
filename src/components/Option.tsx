@@ -1,5 +1,6 @@
-import React from "react";
-import styles from "../styles/modules/newBrief.module.css";
+import React from 'react';
+
+import styles from '../styles/modules/newBrief.module.css';
 
 export type OptionProps = {
   label: string;
@@ -19,10 +20,10 @@ export const Option = ({
   textclass,
 }: OptionProps): JSX.Element => {
   return (
-    <div className="option-container" onClick={onSelect}>
-      <div className="option-inner">
+    <div className='option-container' onClick={onSelect}>
+      <div className='option-inner'>
         <input
-          type="radio"
+          type='radio'
           value={value}
           checked={checked}
           onChange={(e) => {
@@ -31,7 +32,7 @@ export const Option = ({
         />
         <p className={`${styles.fieldName} ${textclass}`}>{label}</p>
       </div>
-      <div className="option-children-container">{children}</div>
+      <div className='option-children-container'>{children}</div>
     </div>
   );
 };

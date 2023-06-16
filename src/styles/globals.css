@@ -1,22 +1,24 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 body {
   margin: 0;
   padding: 0;
   background-color: #000;
-  background-image: url("background.png");
+  background-image: url('background.png');
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: scroll;
   font-family: var(--theme-font-family);
 }
 
-h1,h2,h3{
+h1,
+h2,
+h3 {
   font-weight: 700;
 }
-h3{
+h3 {
   font-size: 20px;
 }
 
@@ -32,8 +34,8 @@ h3{
 }
 
 @font-face {
-  font-family: "Aeonik";
-  src: url("AeonikTRIAL-Regular.otf") format("opentype");
+  font-family: 'Aeonik';
+  src: url('AeonikTRIAL-Regular.otf') format('opentype');
 }
 
 .mdc-dialog .mdc-dialog__title,

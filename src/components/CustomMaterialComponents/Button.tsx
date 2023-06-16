@@ -1,7 +1,8 @@
-import { Buttons, buttonStyleBasedOnVariantPassed } from "@/utils/helper";
-import styled from "@emotion/styled";
-import { Button } from "@mui/material";
-import React from "react";
+import styled from '@emotion/styled';
+import { Button } from '@mui/material';
+import React from 'react';
+
+import { Buttons, buttonStyleBasedOnVariantPassed } from '@/utils/helper';
 
 type ButtonProps = {
   customstyle?: React.CSSProperties;
@@ -22,16 +23,16 @@ const CustomButton = ({
   textStyle,
   variant = Buttons.OUTLINED,
   hoverStyle,
-  onClick = () => {},
+  onClick,
 }: CustomButtonProps): JSX.Element => {
   const buttonDefaultStyle = buttonStyleBasedOnVariantPassed(variant);
 
   const ButtonWrap = styled(Button)(({ customstyle }: ButtonProps) => ({
     ...buttonDefaultStyle.style,
-    "&": {
+    '&': {
       ...customstyle,
     },
-    ":hover": {
+    ':hover': {
       ...hoverStyle,
     },
   }));
@@ -41,10 +42,10 @@ const CustomButton = ({
       variant={variant}
       customstyle={btnWrapStyle}
       disableRipple
-      className="button-container"
+      className='button-container'
       onClick={onClick}
     >
-      <p className="button-label" style={{ ...textStyle }}>
+      <p className='button-label' style={{ ...textStyle }}>
         {text}
       </p>
     </ButtonWrap>

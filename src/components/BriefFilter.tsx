@@ -1,13 +1,14 @@
 /* eslint-disable react/display-name */
-import React from "react";
-import { BriefFilterOption, FilterOption } from "@/types/briefTypes";
-import { FreelancerFilterOption } from "@/types/freelancerTypes";
+import React from 'react';
+
+import { BriefFilterOption, FilterOption } from '@/types/briefTypes';
+import { FreelancerFilterOption } from '@/types/freelancerTypes';
 
 type BriefFilterProps = {
   label: string;
   filter_options: Array<FilterOption>;
   filter_type: BriefFilterOption | FreelancerFilterOption;
-  setId?: (id: string | string[]) => void;
+  setId?: (_id: string | string[]) => void;
   ids?: Array<string>;
 };
 
@@ -29,19 +30,19 @@ export const BriefFilter = React.memo(
     };
 
     return (
-      <div className="filter-section">
-        <div className="filter-label">{label}</div>
-        <div className="filter-option-list !mb-0 !gap-0">
+      <div className='filter-section'>
+        <div className='filter-label'>{label}</div>
+        <div className='filter-option-list !mb-0 !gap-0'>
           {filter_options.map(({ value, interiorIndex }) => (
             <div
-              className="filter-option flex items-center justify-between w-full hover:bg-slate-800 px-4 py-2"
+              className='filter-option flex items-center justify-between w-full hover:bg-slate-800 px-4 py-2'
               key={value}
             >
-              <label className="font-normal text-base text-white flex justify-between w-full cursor-pointer">
+              <label className='font-normal text-base text-white flex justify-between w-full cursor-pointer'>
                 {value}
                 <input
-                  type="checkbox"
-                  className="filtercheckbox"
+                  type='checkbox'
+                  className='filtercheckbox'
                   id={`${filter_type.toString()}-${interiorIndex}`}
                   data-testid={`${filter_type.toString()}-${interiorIndex}`}
                   checked={ids.includes(

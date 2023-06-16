@@ -1,13 +1,13 @@
-import * as config from "@/config";
-import { dummyApplicationProject } from "@/config/briefs-data";
-import { Project } from "@/model";
-import { StreamChat } from "stream-chat";
+import { StreamChat } from 'stream-chat';
+
+import * as config from '@/config';
+import { Project } from '@/model';
 
 export type BadRoute =
-  | "not-found"
-  | "not-implemented"
-  | "server-error"
-  | "bad-route";
+  | 'not-found'
+  | 'not-implemented'
+  | 'server-error'
+  | 'bad-route';
 
 export function redirect(path: string, returnUrl?: string) {
   if (returnUrl) {
@@ -19,7 +19,7 @@ export function redirect(path: string, returnUrl?: string) {
 
 export async function redirectBack() {
   const redirect =
-    new URLSearchParams(window.location.search).get("redirect") || "/";
+    new URLSearchParams(window.location.search).get('redirect') || '/';
   const isRelative =
     new URL(document.baseURI).origin ===
     new URL(redirect, document.baseURI).origin;
@@ -27,7 +27,7 @@ export async function redirectBack() {
   if (isRelative) {
     location.replace(redirect);
   } else {
-    location.replace("/");
+    location.replace('/');
   }
 }
 
@@ -38,7 +38,7 @@ export const validProjectId = (candidate: any) => {
 export const getCurrentUser = async () => {
   try {
     const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}info/user`)
+      `${config.apiBase}info/user`
     );
     if (resp.ok) {
       return resp.json();
@@ -50,7 +50,7 @@ export const getCurrentUser = async () => {
 };
 
 export const getProjectId = async () => {
-  const candidate = window.location.pathname.split("/").pop();
+  const candidate = window.location.pathname.split('/').pop();
 
   if (validProjectId(candidate)) {
     return candidate as string;
@@ -62,10 +62,10 @@ export const getProjectId = async () => {
 export const fetchProject = async (projectId: string | number | null) => {
   try {
     const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}project/${projectId}`),
+      `${config.apiBase}project/${projectId}`,
       {
         headers: config.getAPIHeaders,
-        method: "get",
+        method: 'get',
       }
     );
     if (resp.ok) {
@@ -78,7 +78,7 @@ export const fetchProject = async (projectId: string | number | null) => {
 
 export const fetchUser = async (id: number) => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}users/byid/${id}`),
+    `${config.apiBase}users/byid/${id}`,
     {
       headers: config.getAPIHeaders,
     }
@@ -98,7 +98,7 @@ export const badRouteEvent = (type: BadRoute) =>
 
 export function validateForm(form: HTMLFormElement): boolean {
   const fields: HTMLInputElement[] = Array.from(
-    form.querySelectorAll(".input-field")
+    form.querySelectorAll('.input-field')
   );
   fields.forEach((input) => reportValidity(input, true));
 
@@ -107,21 +107,21 @@ export function validateForm(form: HTMLFormElement): boolean {
 }
 
 export const getStreamChat = async () => {
-  const { imbueNetworkWebsockAddr, relayChainWebsockAddr, getstreamApiKey } =
-    await fetch(checkEnvironment().concat(`${config.apiBase}info`)).then(
+  const { getstreamApiKey } =
+    await fetch(`${config.apiBase}info`).then(
       (resp) => resp.json()
     );
   return new StreamChat(getstreamApiKey);
 };
 
-function reportValidity(input: HTMLInputElement, submitting: boolean = false) {
+function reportValidity(input: HTMLInputElement, _submitting = false) {
   if (input.validity.valueMissing) {
-    input.setAttribute("validationmessage", "This field is required.");
+    input.setAttribute('validationmessage', 'This field is required.');
   }
   input.reportValidity();
 }
 
 export const checkEnvironment = () => {
-  let base_url = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+  const base_url = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
   return base_url;
 };

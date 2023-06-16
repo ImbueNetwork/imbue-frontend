@@ -258,9 +258,9 @@ ul.project-details li {
 }
 
 .progress-dot {
-  display: "flex";
-  align-items: "center";
-  justify-content: "center";
+  display: 'flex';
+  align-items: 'center';
+  justify-content: 'center';
   border-radius: 50%;
   width: 20px;
   height: 20px;

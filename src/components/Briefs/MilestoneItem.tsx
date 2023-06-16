@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { AiFillPlusCircle, AiFillMinusCircle } from "react-icons/ai";
-import { BsCircleFill } from "react-icons/bs";
-import { Currency, Milestone, ProjectOnChain } from "@/model";
+import React, { useEffect, useState } from 'react';
+import { AiFillMinusCircle, AiFillPlusCircle } from 'react-icons/ai';
+import { BsCircleFill } from 'react-icons/bs';
+
+import { Currency, Milestone, ProjectOnChain } from '@/model';
 
 export type MilestonesItemProps = {
   milestone: Milestone;
   projectOnChain: ProjectOnChain;
-  toggleMilestone: (milestoneKey: number) => void;
+  toggleMilestone: (_milestoneKey: number) => void;
   isInVotingRound: boolean;
   toggleActive: boolean;
 };
@@ -18,7 +19,7 @@ const MilestoneItem = ({
   toggleMilestone,
   isInVotingRound,
 }: MilestonesItemProps): JSX.Element => {
-  const [formattedMilestoneValue, setFormattedMilestoneValue] = useState("0");
+  const [formattedMilestoneValue, setFormattedMilestoneValue] = useState('0');
 
   useEffect(() => {
     if (milestone) {
@@ -35,18 +36,18 @@ const MilestoneItem = ({
       if (toggleActive) {
         return (
           <div>
-            {" "}
-            <BsCircleFill className="milestone-status-icon" />{" "}
-            <span className="milestone-status approved"> Approved </span>{" "}
+            {' '}
+            <BsCircleFill className='milestone-status-icon' />{' '}
+            <span className='milestone-status approved'> Approved </span>{' '}
             <AiFillMinusCircle />
           </div>
         );
       } else {
         return (
           <div>
-            {" "}
-            <BsCircleFill className="milestone-status-icon" />{" "}
-            <span className="milestone-status approved"> Approved </span>{" "}
+            {' '}
+            <BsCircleFill className='milestone-status-icon' />{' '}
+            <span className='milestone-status approved'> Approved </span>{' '}
             <AiFillPlusCircle />
           </div>
         );
@@ -55,18 +56,18 @@ const MilestoneItem = ({
       if (toggleActive) {
         return (
           <div>
-            {" "}
-            <BsCircleFill className="milestone-status-icon active" />{" "}
-            <span className="milestone-status active"> Active </span>{" "}
+            {' '}
+            <BsCircleFill className='milestone-status-icon active' />{' '}
+            <span className='milestone-status active'> Active </span>{' '}
             <AiFillMinusCircle />
           </div>
         );
       } else {
         return (
           <div>
-            {" "}
-            <BsCircleFill className="milestone-status-icon active" />{" "}
-            <span className="milestone-status active"> Active </span>{" "}
+            {' '}
+            <BsCircleFill className='milestone-status-icon active' />{' '}
+            <span className='milestone-status active'> Active </span>{' '}
             <AiFillPlusCircle />
           </div>
         );
@@ -75,18 +76,18 @@ const MilestoneItem = ({
       if (toggleActive) {
         return (
           <div>
-            {" "}
-            <span className="milestone-status not-started">
-              Not Started{" "}
-            </span>{" "}
+            {' '}
+            <span className='milestone-status not-started'>
+              Not Started{' '}
+            </span>{' '}
             <AiFillMinusCircle />
           </div>
         );
       } else {
         return (
           <div>
-            {" "}
-            <span className="milestone-status not-started">Not Started </span>
+            {' '}
+            <span className='milestone-status not-started'>Not Started </span>
             <AiFillPlusCircle />
           </div>
         );
@@ -95,9 +96,9 @@ const MilestoneItem = ({
   };
 
   return (
-    <div className="main">
+    <div className='main'>
       <div
-        className="milestone-row"
+        className='milestone-row'
         onClick={() => {
           toggleMilestone(milestone.milestone_key);
         }}
@@ -105,18 +106,18 @@ const MilestoneItem = ({
         <span>{milestone.name}</span>
         {displayMilestoneToggle()}
       </div>
-      <div className={toggleActive ? "content show" : "content hide"}>
-        <div className="milestone-details-info">
+      <div className={toggleActive ? 'content show' : 'content hide'}>
+        <div className='milestone-details-info'>
           <div>
-            <span className="detail-label">Percentage of funds released</span>
-            <span className="funds-required">
+            <span className='detail-label'>Percentage of funds released</span>
+            <span className='funds-required'>
               {milestone.percentage_to_unlock}%
             </span>
           </div>
 
           <div>
-            <span className="detail-label">Funding Released</span>
-            <span className="funds-required">
+            <span className='detail-label'>Funding Released</span>
+            <span className='funds-required'>
               {formattedMilestoneValue} ${projectOnChain.currencyId as Currency}
             </span>
           </div>
