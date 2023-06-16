@@ -22,7 +22,7 @@ const Skills = ({
       ...freelancer,
       skills: skills.map((skill) => ({ name: skill })),
     });
-  }, [freelancer, skills, setFreelancer]);
+  }, [skills]);
 
   return (
     <div className='mx-[30px] lg:mx-[40px]'>

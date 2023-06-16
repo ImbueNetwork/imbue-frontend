@@ -10,6 +10,9 @@ import { uploadPhoto } from '@/utils/imageUpload';
 type ClientsProps = {
   setFreelancer: (_freelancer: any) => void; // FIXME:
   isEditMode: boolean;
+  setIsEditMode: (isEditMode: boolean) => void;
+  clients: any;
+  setClients: (clinet: any) => void;
 };
 
 const style = {
@@ -26,12 +29,7 @@ const style = {
   outline: 'none'
 };
 
-const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
-  const [clients, setClients] = useState([
-    { id: 1, name: 'Fiverr', icon: fiverrIcon },
-    { id: 2, name: 'Imbue', icon: ImbueIcon },
-  ]);
-
+const Clients = ({ setFreelancer, isEditMode, clients, setClients }: ClientsProps) => {
   const [newClient, setNewClient] = useState<any>({})
 
   const [open, setOpen] = React.useState(false);
@@ -44,7 +42,7 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
     if ((e.target as HTMLElement).nodeName == "SPAN") {
       const newClients = clients.filter((client: any) => client.logo !== logo)
       setClients(newClients)
-      setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients.map((c: any) => c.name) }))
+      setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients }))
     }
   }
 
@@ -74,6 +72,7 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
 
   const handleSubmit = () => {
     const newClients = [...clients, newClient]
+    console.log(newClients)
     setClients(newClients)
     setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients }))
     setOpen(false)
@@ -84,8 +83,8 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
   return (
     <div className="grid grid-cols-2 px-[30px] lg:px-[40px] justify-center md:grid-cols-3 gap-5 w-full">
       {
-        clients?.map((client: any) => (
-          <div key={client?.id}>
+        clients?.map((client: any, index:string) => (
+          <div key={index}>
             <Tooltip title={client?.website} placement="top" arrow>
               <div className="flex flex-col items-center gap-3 w-fit mx-auto">
                 <Badge onClick={(e) => removeClient(e, client?.logo)} className="client-badge" color="error" overlap="circular" badgeContent="-" invisible={!isEditMode}>
@@ -93,7 +92,7 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
                     <Image className="rounded-lg" height={40} width={40} src={client?.logo} alt={client?.name} />
                   </div>
                 </Badge>
-                <p>{client?.name}</p>
+                <p className='text-center'>{client?.name}</p>
               </div>
             </Tooltip>
 
@@ -160,20 +159,6 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
         </Box>
       </Modal>
     </div>
-    {
-      isEditMode && (
-        <ToggleButton
-          className='w-11 h-11 my-auto border-light-white mx-auto'
-          value='check'
-          selected={openAddClient}
-          onChange={() => {
-            addAClient();
-          }}
-        >
-          <span className='text-2xl text-white'>+</span>
-        </ToggleButton>
-      )
-    }
   )
 }
 

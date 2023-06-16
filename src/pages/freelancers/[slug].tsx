@@ -80,6 +80,11 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
 
+
+  const [clients, setClients] = useState<any>(
+    freelancer?.clients[0] ? freelancer.clients : []
+  );
+
   function urlify(text: string) {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     if (!urlRegex.test(text)) {
@@ -98,6 +103,8 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
     setup();
   }, [freelancer]);
 
+  console.log({freelancer, clients})
+
   //The fields must be pre populated correctly.
   const onSave = async () => {
     try {
@@ -107,9 +114,8 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         data = {
           ...data,
           skills: skills,
+          clients: clients
         };
-
-        console.log(freelancer);
 
         await updateFreelancer(data);
         setSuccess(true);
@@ -285,9 +291,6 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
     },
   ];
 
-  const [clients, setClients] = useState<any>(
-    freelancer?.clients[0] ? freelancer.clients : []
-  );
 
   const copyProfile = () => {
     const webSiteURL = checkEnvironment().concat(`${router.asPath}`);
@@ -453,29 +456,23 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
             </div>
             <hr className='separator' />
 
-            {
-              (clients[0] || isEditMode) && (
-                <>
-                  <div className="flex items-center gap-3">
-                    <p className="text-xl">Among my clients</p>
-                    <span className="h-4 w-4 flex justify-center items-center rounded-full bg-gray-500 text-black">
-                      ?
-                    </span>
-                  </div>
+            <div className="flex items-center gap-3">
+              <p className="text-xl">Among my clients</p>
+              <span className="h-4 w-4 flex justify-center items-center rounded-full bg-gray-500 text-black">
+                ?
+              </span>
+            </div>
 
-                  <Clients
-                    {...{
-                      setFreelancer,
-                      isEditMode,
-                      setIsEditMode,
-                      clients,
-                      setClients,
-                    }}
-                  />
-                  <hr className="separator" />
-                </>
-              )
-            }
+            <Clients
+              {...{
+                setFreelancer,
+                isEditMode,
+                setIsEditMode,
+                clients,
+                setClients,
+              }}
+            />
+            <hr className="separator" />
 
             <div className="w-full px-[30px] lg:px-[40px]">
               <p className="text-xl">Wallet Address</p>
@@ -955,9 +952,8 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         </div>
       </ErrorScreen>
       <Alert
-        className={`absolute top-2 z-10 transform duration-300 transition-all ${
-          copied ? 'right-5' : '-right-full'
-        }`}
+        className={`absolute top-2 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
+          }`}
         severity='success'
       >
         Profile Link Copied to clipboard
