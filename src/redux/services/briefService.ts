@@ -1,19 +1,17 @@
-import * as config from "@/config";
-import {
-  dummyDashboardBriefApplications,
-  dumyBriefs,
-} from "@/config/briefs-data";
-import { Brief, BriefSqlFilter, OffchainProjectState } from "@/model";
-import { BriefInfo, PaginatedResponse } from "@/types/briefTypes";
-import { checkEnvironment } from "@/utils";
+import { checkEnvironment } from '@/utils';
+
+import * as config from '@/config';
+import { Brief, BriefSqlFilter, OffchainProjectState } from '@/model';
+
+import { BriefInfo, PaginatedResponse } from '@/types/briefTypes';
 
 const getAPIHeaders = {
-  accept: "application/json",
+  accept: 'application/json',
 };
 
 const postAPIHeaders = {
   ...getAPIHeaders,
-  "content-type": "application/json",
+  'content-type': 'application/json',
 };
 
 export const callSearchBriefs = async (filter: BriefSqlFilter) => {
@@ -23,14 +21,14 @@ export const callSearchBriefs = async (filter: BriefSqlFilter) => {
     `${config.apiBase}briefs/search`,
     {
       headers: postAPIHeaders,
-      method: "post",
+      method: 'post',
       body: JSON.stringify(filter),
     }
   );
   if (resp.ok) {
     return (await resp.json()) as PaginatedResponse;
   } else {
-    throw new Error("Failed to search briefs. status:" + resp.status);
+    throw new Error('Failed to search briefs. status:' + resp.status);
   }
 };
 
@@ -44,14 +42,14 @@ export const getAllBriefs = async (
     `${config.apiBase}briefs?items_per_page=${itemsPerPage}&page=${currentPage}`,
     {
       headers: postAPIHeaders,
-      method: "get",
+      method: 'get',
     }
   );
 
   if (resp.ok) {
     return (await resp.json()) as PaginatedResponse;
   } else {
-    throw new Error("Failed to get all briefs. status:" + resp.status);
+    throw new Error('Failed to get all briefs. status:' + resp.status);
   }
 };
 
@@ -66,14 +64,14 @@ export const getAllSavedBriefs = async (
     `${config.apiBase}briefs/save?items_per_page=${itemsPerPage}&page=${currentPage}&user_id=${user_id}`,
     {
       headers: postAPIHeaders,
-      method: "get",
+      method: 'get',
     }
   );
 
   if (resp.ok) {
     return (await resp.json()) as PaginatedResponse;
   } else {
-    throw new Error("Failed to get all briefs. status:" + resp.status);
+    throw new Error('Failed to get all briefs. status:' + resp.status);
   }
 };
 
@@ -85,13 +83,13 @@ export const checkIfBriefSaved = async (
     `${config.apiBase}briefs/save/${briefId}?user_id=${userId}`,
     {
       headers: postAPIHeaders,
-      method: "get",
+      method: 'get',
     }
   );
   if (resp.ok) {
     return (await resp.json()) as { isSaved: boolean };
   } else {
-    throw new Error("Failed to get saved brief status:" + resp.status);
+    throw new Error('Failed to get saved brief status:' + resp.status);
   }
 };
 
@@ -101,16 +99,17 @@ export const getBrief = async (briefId: number | string | string[]) => {
       `${config.apiBase}briefs/${briefId}`,
       {
         headers: postAPIHeaders,
-        method: "get",
+        method: 'get',
       }
     );
 
     if (resp.ok) {
       return (await resp.json()) as Brief;
     } else {
-      throw new Error("Failed to get all briefs. status:" + resp.status);
+      throw new Error('Failed to get all briefs. status:' + resp.status);
     }
   } catch (error) {
+    // FIXME: error handling
     console.log(error);
   }
 };
@@ -120,7 +119,7 @@ export const getUserBriefs = async (user_id: string | number) => {
     checkEnvironment().concat(`${config.apiBase}users/${user_id}/briefs/`),
     {
       headers: postAPIHeaders,
-      method: "get",
+      method: 'get',
     }
   );
   if (resp.ok) {
@@ -129,6 +128,7 @@ export const getUserBriefs = async (user_id: string | number) => {
     const error = new Error(
       `Failed to get all briefs for user ${user_id}. status: ${resp.status}`
     );
+    // FIXME: error handling
     console.log(error);
     return [];
   }
@@ -139,7 +139,7 @@ export const getBriefApplications = async (brifId: string | number) => {
     checkEnvironment().concat(`${config.apiBase}briefs/${brifId}/applications`),
     {
       headers: postAPIHeaders,
-      method: "get",
+      method: 'get',
     }
   );
 
@@ -147,7 +147,7 @@ export const getBriefApplications = async (brifId: string | number) => {
     return await resp.json();
   } else {
     throw new Error(
-      "Failed to get all brief applications. status:" + resp.status
+      'Failed to get all brief applications. status:' + resp.status
     );
   }
 };
@@ -161,7 +161,7 @@ export const changeBriefApplicationStatus = async (
     `${config.apiBase}briefs/${briefId}/status`,
     {
       headers: postAPIHeaders,
-      method: "put",
+      method: 'put',
       body: JSON.stringify({
         project_id: projectId,
         status_id,
@@ -183,7 +183,7 @@ export const getFreelancerBrief = async (userId: number, briefId: number) => {
     `${config.apiBase}users/${userId}/briefs/${briefId}`,
     {
       headers: postAPIHeaders,
-      method: "get",
+      method: 'get',
     }
   );
   if (resp.ok) {
@@ -196,14 +196,14 @@ export const getProjectById = async (projectId: string | number) => {
     `${config.apiBase}project/${projectId}`,
     {
       headers: postAPIHeaders,
-      method: "get",
+      method: 'get',
     }
   );
 
   if (resp.ok) {
     return await resp.json();
   } else {
-    new Error("Failed to get project. status:" + resp.status);
+    new Error('Failed to get project. status:' + resp.status);
   }
 };
 
@@ -211,7 +211,7 @@ export const updateBriefById = async (params: BriefInfo) => {
   try {
     const resp = await fetch(`${config.apiBase}/briefs/`, {
       headers: postAPIHeaders,
-      method: "put",
+      method: 'put',
       body: JSON.stringify({
         headline: params.headline,
         industries: params.industries,
@@ -232,6 +232,7 @@ export const updateBriefById = async (params: BriefInfo) => {
       return false;
     }
   } catch (error) {
+    // FIXME: error handling
     console.log(error);
     return false;
   }
@@ -242,7 +243,7 @@ export const saveBriefData = async (brief: Brief) => {
     `${config.apiBase}briefs/save`,
     {
       headers: postAPIHeaders,
-      method: "post",
+      method: 'post',
       body: JSON.stringify(brief),
     }
   );
@@ -253,6 +254,6 @@ export const saveBriefData = async (brief: Brief) => {
       message?: string;
     };
   } else {
-    throw new Error("Failed to save briefs ..... status:" + resp.status);
+    throw new Error('Failed to save briefs ..... status:' + resp.status);
   }
 };

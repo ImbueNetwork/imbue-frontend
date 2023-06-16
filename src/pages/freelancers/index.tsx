@@ -1,29 +1,29 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from "react";
-import VerifiedIcon from "@mui/icons-material/Verified";
+import VerifiedIcon from '@mui/icons-material/Verified';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import Pagination from 'rc-pagination';
+import React, { useEffect, useState } from 'react';
+
+import CustomDropDown from '@/components/CustomDropDown';
+import CustomModal from '@/components/CustomModal';
+
+import { filterIcon } from '@/assets/svgs';
+import styles from '@/styles/modules/freelancers.module.css';
+
+import { strToIntRange } from '../briefs';
+import LoadingFreelancers from '../../components/Freelancers/FreelancersLoading';
 import {
   Freelancer,
   FreelancerResponse,
   FreelancerSqlFilter,
   Item,
-} from "../../model";
-import styles from "@/styles/modules/freelancers.module.css";
+} from '../../model';
 import {
   callSearchFreelancers,
   getAllFreelancers,
-} from "../../redux/services/freelancerService";
-import { FreelancerFilterOption } from "../../types/freelancerTypes";
-import FreelancerFilter from "../../components/Freelancers/FreelancerFilter";
-import Image from "next/image";
-import { useRouter } from "next/router";
-import { strToIntRange } from "../briefs";
-import { useWindowSize } from "@/hooks";
-import { FiFilter } from "react-icons/fi";
-import LoadingFreelancers from "../../components/Freelancers/FreelancersLoading";
-import Pagination from "rc-pagination";
-import CustomModal from "@/components/CustomModal";
-import CustomDropDown from "@/components/CustomDropDown";
-import { filterIcon } from "@/assets/svgs";
+} from '../../redux/services/freelancerService';
+import { FreelancerFilterOption } from '../../types/freelancerTypes';
 
 interface FilterModalProps {
   open: boolean;
@@ -46,7 +46,6 @@ const Freelancers = (): JSX.Element => {
   const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
 
   const router = useRouter();
-  const size = useWindowSize();
 
   const {
     skillsRangeProps,
@@ -80,19 +79,19 @@ const Freelancers = (): JSX.Element => {
         currentPage
       );
       setLoading(false);
-      let combinedSkills = Array.prototype.concat.apply(
+      const combinedSkills = Array.prototype.concat.apply(
         [],
         data?.currentData?.map((x: any) => x.skills)
       ) as Item[];
       const dedupedSkills = await dedupeArray(combinedSkills);
 
-      var combinedServices = Array.prototype.concat.apply(
+      const combinedServices = Array.prototype.concat.apply(
         [],
         data?.currentData?.map((x: any) => x.services)
       ) as Item[];
       const dedupedServices = await dedupeArray(combinedServices);
 
-      var combinedLanguages = Array.prototype.concat.apply(
+      const combinedLanguages = Array.prototype.concat.apply(
         [],
         data?.currentData?.map((x: any) => x.languages)
       ) as Item[];
@@ -111,44 +110,38 @@ const Freelancers = (): JSX.Element => {
 
   const skillsFilter = {
     filterType: FreelancerFilterOption.Skills,
-    label: "Skills",
-    options: skills?.map(({ id, name }) => (
-      {
-        interiorIndex: id,
-        value: name,
-      })
-    ),
+    label: 'Skills',
+    options: skills?.map(({ id, name }) => ({
+      interiorIndex: id,
+      value: name,
+    })),
   };
 
   const servicesFilter = {
     filterType: FreelancerFilterOption.Services,
-    label: "Services",
-    options: services?.map(({ id, name }) => (
-      {
-        interiorIndex: id,
-        value: name,
-      }
-    )),
+    label: 'Services',
+    options: services?.map(({ id, name }) => ({
+      interiorIndex: id,
+      value: name,
+    })),
   };
 
   const languagesFilter = {
     filterType: FreelancerFilterOption.Languages,
-    label: "Languages",
-    options: languages?.map(({ id, name }) => (
-      {
-        interiorIndex: id,
-        value: name,
-      }
-    )),
+    label: 'Languages',
+    options: languages?.map(({ id, name }) => ({
+      interiorIndex: id,
+      value: name,
+    })),
   };
 
   const freelancerInfoFilter = {
     filterType: FreelancerFilterOption.FreelancerInfo,
-    label: "Freelancer Info",
+    label: 'Freelancer Info',
     options: [
       {
         interiorIndex: 0,
-        value: "Verified",
+        value: 'Verified',
       },
     ],
   };
@@ -165,11 +158,11 @@ const Freelancers = (): JSX.Element => {
     skillsFilter,
     servicesFilter,
     languagesFilter,
-    freelancerInfoFilter
+    freelancerInfoFilter,
   ];
 
   const pageinationIconClassName =
-    "h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary";
+    'h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary';
 
   useEffect(() => {
     const fetchAndSetBriefs = async () => {
@@ -178,13 +171,13 @@ const Freelancers = (): JSX.Element => {
           skills_range: [],
           services_range: [],
           languages_range: [],
-          search_input: "",
+          search_input: '',
         };
 
         if (heading) {
           filter = { ...filter, search_input: heading };
           const input = document.getElementById(
-            "search-input"
+            'search-input'
           ) as HTMLInputElement;
           if (input) input.value = heading.toString();
         }
@@ -229,9 +222,11 @@ const Freelancers = (): JSX.Element => {
           }
         }
 
-        const { currentData, totalFreelancers } = await callSearchFreelancers(filter);
+        const { currentData, totalFreelancers } = await callSearchFreelancers(
+          filter
+        );
         setFreelancers(currentData);
-        setFreelancersTotal(totalFreelancers)
+        setFreelancersTotal(totalFreelancers);
       }
     };
 
@@ -251,27 +246,27 @@ const Freelancers = (): JSX.Element => {
   const onSearch = async () => {
     setFilterVisible(!filterVisble);
     // The filter initially should return all values
-    let is_search: boolean = false;
+    let is_search = false;
 
     let skillsRange: number[] = [];
     let servicesRange: number[] = [];
     let languagesRange: number[] = [];
-    let freelancerInfo: any = {};
+    const freelancerInfo: any = {};
 
-    let search_input = document.getElementById(
-      "search-input"
+    const search_input = document.getElementById(
+      'search-input'
     ) as HTMLInputElement;
-    let search_value = search_input.value;
-    if (search_value !== "") {
+    const search_value = search_input.value;
+    if (search_value !== '') {
       is_search = true;
     }
 
     for (let i = 0; i < selectedFilterIds.length; i++) {
-      if (selectedFilterIds[i] !== "") {
+      if (selectedFilterIds[i] !== '') {
         is_search = true;
         const id = selectedFilterIds[i];
         if (id != null) {
-          const [filterType, interiorIndex] = id.split("-");
+          const [filterType, interiorIndex] = id.split('-');
           // Here we are trying to build teh paramaters required to build the query
           // We build an array for each to get the values we want through concat.
           // and also specify if we want more than using the is_max field.
@@ -287,20 +282,19 @@ const Freelancers = (): JSX.Element => {
               languagesRange = [...languagesRange, index];
               break;
             case FreelancerFilterOption.FreelancerInfo:
-              if (index === 0)
-                freelancerInfo.verified = true;
+              if (index === 0) freelancerInfo.verified = true;
               break;
             default:
               console.log(
-                "Invalid filter option selected or unimplemented. type:" +
-                filterType
+                'Invalid filter option selected or unimplemented. type:' +
+                  filterType
               );
           }
         }
       }
     }
 
-    router.query.heading = search_value !== "" ? search_value : [];
+    router.query.heading = search_value !== '' ? search_value : [];
     router.query.skillsRangeProps = skillsRange.length
       ? skillsRange.toString()
       : [];
@@ -347,12 +341,14 @@ const Freelancers = (): JSX.Element => {
   const PageItem = (props: any) => {
     return (
       <div
-        className={`h-[32px] rounded-[4px] hover:bg-[--theme-primary] hover:text-black border border-primary w-[32px] cursor-pointer pt-1 items-center text-center text-sm !font-bold mr-6 ${currentPage === parseInt(props.page) ? "text-black" : "text-white"
-          }
-        ${currentPage === parseInt(props.page)
-            ? "bg-[--theme-primary]"
-            : "bg-transparent"
-          }
+        className={`h-[32px] rounded-[4px] hover:bg-[--theme-primary] hover:text-black border border-primary w-[32px] cursor-pointer pt-1 items-center text-center text-sm !font-bold mr-6 ${
+          currentPage === parseInt(props.page) ? 'text-black' : 'text-white'
+        }
+        ${
+          currentPage === parseInt(props.page)
+            ? 'bg-[--theme-primary]'
+            : 'bg-transparent'
+        }
         `}
       >
         {props.page}
@@ -367,21 +363,19 @@ const Freelancers = (): JSX.Element => {
       <CustomModal
         open={open}
         onClose={handleClose}
-        className="flex justify-center items-center flex-wrap bg-black bg-opacity-50 top-0 left-0 w-full h-full z-[100] fixed"
+        className='flex justify-center items-center flex-wrap bg-black bg-opacity-50 top-0 left-0 w-full h-full z-[100] fixed'
       >
         <div
           onClick={(e: any) => {
             e?.stopPropagation();
           }}
-          className="bg-[#1B1B1B] rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative"
+          className='bg-[#1B1B1B] rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative'
         >
-          <p className="font-normal text-base text-white !mb-9">Filter</p>
+          <p className='font-normal text-base text-white !mb-9'>Filter</p>
 
-          <div className="grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5">
+          <div className='grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5'>
             {customDropdownConfigs
-              ?.filter(
-                ({ options }) => options && options.length > 0
-              )
+              ?.filter(({ options }) => options && options.length > 0)
               ?.map(({ label, filterType, options }) => (
                 <CustomDropDown
                   key={label}
@@ -396,7 +390,7 @@ const Freelancers = (): JSX.Element => {
 
           <button
             onClick={onSearch}
-            className="h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 absolute md:bottom-10 bottom-5 right-10"
+            className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 absolute md:bottom-10 bottom-5 right-10'
           >
             Apply
           </button>
@@ -422,29 +416,29 @@ const Freelancers = (): JSX.Element => {
   if (loading) return <LoadingFreelancers />;
 
   return (
-    <div className="px-[15px] lg:px-[40px]">
+    <div className='px-[15px] lg:px-[40px]'>
       <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
         <FilterModal open={filterVisble} handleClose={() => toggleFilter()} />
         <div className={`${styles.freelancersView} max-width-750px:!w-full`}>
           <div className={`${styles.searchHeading} max-width-750px:!mx-0`}>
             <div className={`${styles.tabSection} w-full justify-between`}>
-              <div className="tab-section">
+              <div className='tab-section'>
                 <button
                   onClick={toggleFilter}
-                  className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105"
+                  className='h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105'
                 >
                   Filter
                   <Image
                     src={filterIcon}
-                    alt={"filter-icon"}
-                    className="h-[14px] w-[14px] ml-2"
+                    alt={'filter-icon'}
+                    className='h-[14px] w-[14px] ml-2'
                   />
                 </button>
 
                 {selectedFilterIds?.length > 0 && (
                   <button
                     onClick={reset}
-                    className="h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]"
+                    className='h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]'
                   >
                     Reset Filter X
                   </button>
@@ -452,20 +446,20 @@ const Freelancers = (): JSX.Element => {
               </div>
             </div>
             <input
-              id="search-input"
+              id='search-input'
               className={`search-input`}
-              placeholder="Search"
+              placeholder='Search'
             />
-            <div className="search-result flex flex-col">
+            <div className='search-result flex flex-col'>
               <div>
-                <span className="result-count">{freelancers_total}</span>
+                <span className='result-count'>{freelancers_total}</span>
                 <span> freelancers found</span>
               </div>
 
-              <span className="max-width-500px:ml-8">
+              <span className='max-width-500px:ml-8'>
                 number of freelancers per page
                 <select
-                  className="ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none focus:outline-none focus:outline-white"
+                  className='ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none focus:outline-none focus:outline-white'
                   onChange={(e) => {
                     setNumItemsPerPage(parseInt(e.target.value));
                   }}
@@ -501,15 +495,17 @@ const Freelancers = (): JSX.Element => {
                         <Image
                           src={
                             profile_image ??
-                            require("@/assets/images/profile-image.png")
+                            require('@/assets/images/profile-image.png')
                           }
                           className={styles.freelancerProfilePic}
                           height={300}
                           width={300}
-                          alt=""
+                          alt=''
                         />
-                        {verified && <VerifiedIcon className={styles.verifiedIcon} />}
-                        <div className="dark-layer" />
+                        {verified && (
+                          <VerifiedIcon className={styles.verifiedIcon} />
+                        )}
+                        <div className='dark-layer' />
                       </div>
                       <div className={styles.freelancerInfo}>
                         <h3>{display_name}</h3>
@@ -537,21 +533,21 @@ const Freelancers = (): JSX.Element => {
           <Pagination
             pageSize={itemsPerPage}
             total={freelancers_total}
-            onChange={(page: number, pageSize: number) => setCurrentPage(page)}
-            className="flex flex-row items-center my-10 px-10"
+            onChange={(page: number) => setCurrentPage(page)}
+            className='flex flex-row items-center my-10 px-10'
             itemRender={(page, type, originalElement) => {
-              if (type === "page") {
+              if (type === 'page') {
                 return <PageItem page={page} />;
               }
               return originalElement;
             }}
-            prevIcon={<div className={pageinationIconClassName}>{"<"}</div>}
-            nextIcon={<div className={pageinationIconClassName}>{">"}</div>}
+            prevIcon={<div className={pageinationIconClassName}>{'<'}</div>}
+            nextIcon={<div className={pageinationIconClassName}>{'>'}</div>}
             jumpNextIcon={
-              <div className={pageinationIconClassName}>{">>"}</div>
+              <div className={pageinationIconClassName}>{'>>'}</div>
             }
             jumpPrevIcon={
-              <div className={pageinationIconClassName}>{"<<"}</div>
+              <div className={pageinationIconClassName}>{'<<'}</div>
             }
           />
         </div>

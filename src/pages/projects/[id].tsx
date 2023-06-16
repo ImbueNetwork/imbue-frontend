@@ -1,30 +1,32 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { WalletAccount } from '@talismn/connect-wallets';
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
+import moment from 'moment';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+
+import * as utils from '@/utils';
+import { initImbueAPIInfo } from '@/utils/polkadot';
+
+import AccountChoice from '@/components/AccountChoice';
+import ChatPopup from '@/components/ChatPopup';
+import { Dialogue } from '@/components/Dialogue';
+import FullScreenLoader from '@/components/FullScreenLoader';
+import Login from '@/components/Login';
+
 import {
   Freelancer,
   Milestone,
+  OnchainProjectState,
   Project,
   ProjectOnChain,
-  OnchainProjectState,
   User,
-} from "@/model";
-import { getProjectById } from "@/redux/services/briefService";
-import Image from "next/image";
-import { useRouter } from "next/router";
-import React, { useCallback, useEffect, useState } from "react";
-import TimeAgo from "javascript-time-ago";
-import en from "javascript-time-ago/locale/en";
-import { getFreelancerProfile } from "@/redux/services/freelancerService";
-import * as utils from "@/utils";
-import { initImbueAPIInfo } from "@/utils/polkadot";
-import ChainService from "@/redux/services/chainService";
-import FullScreenLoader from "@/components/FullScreenLoader";
-import moment from "moment";
-import AccountChoice from "@/components/AccountChoice";
-import { Dialogue } from "@/components/Dialogue";
-import ChatPopup from "@/components/ChatPopup";
-import Login from "@/components/Login";
-import { ProjectStatus } from "../api/models";
-import { WalletAccount } from "@talismn/connect-wallets";
+} from '@/model';
+import { getProjectById } from '@/redux/services/briefService';
+import ChainService from '@/redux/services/chainService';
+import { getFreelancerProfile } from '@/redux/services/freelancerService';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -39,9 +41,9 @@ type ExpandableDropDownsProps = {
 
 const openForVotingTag = (): JSX.Element => {
   return (
-    <div className="flex flex-row items-center">
-      <div className="h-[15px] w-[15px] rounded-[7.5px] bg-[#BAFF36]" />
-      <p className="text-xl font-normal leading-[23px] text-[#BAFF36] mr-[27px] ml-[14px]">
+    <div className='flex flex-row items-center'>
+      <div className='h-[15px] w-[15px] rounded-[7.5px] bg-[#BAFF36]' />
+      <p className='text-xl font-normal leading-[23px] text-[#BAFF36] mr-[27px] ml-[14px]'>
         Open for Voting
       </p>
     </div>
@@ -50,11 +52,11 @@ const openForVotingTag = (): JSX.Element => {
 
 const projectStateTag = (dateCreated: Date, text: string): JSX.Element => {
   return (
-    <div className="flex flex-row items-center">
-      <p className="text-[14px] font-normal leading-[16px] text-white">
-        {moment(dateCreated)?.format("DD MMM YYYY")}
+    <div className='flex flex-row items-center'>
+      <p className='text-[14px] font-normal leading-[16px] text-white'>
+        {moment(dateCreated)?.format('DD MMM YYYY')}
       </p>
-      <p className="text-xl font-normal leading-[23px] text-[#411DC9] mr-[27px] ml-[14px]">
+      <p className='text-xl font-normal leading-[23px] text-[#411DC9] mr-[27px] ml-[14px]'>
         {text}
       </p>
     </div>
@@ -139,7 +141,7 @@ function Project() {
     const imbueApi = await initImbueAPIInfo();
     const userRes: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, userRes);
-    const voteResponse = await chainService.voteOnMilestone(
+    await chainService.voteOnMilestone(
       account,
       onChainProject,
       milestoneKeyInView,
@@ -217,23 +219,15 @@ function Project() {
     </div>
   );
 
-  const showAccountChoice = (vote: boolean) => {
-    <AccountChoice
-      accountSelected={(account) => voteOnMilestone(account, vote)}
-      visible={true}
-      setVisible={setShowVotingModal}
-    />;
-  };
-
   const renderVotingModal = (
     <Dialogue
-      title="Want to appove milestone?"
+      title='Want to appove milestone?'
       closeDialouge={() => setShowVotingModal(false)}
       actionList={
         <>
-          <li className="button-container !bg-transparent !hover:bg-gray-950  !border !border-solid !border-white">
+          <li className='button-container !bg-transparent !hover:bg-gray-950  !border !border-solid !border-white'>
             <button
-              className="primary !bg-transparent !hover:bg-transparent"
+              className='primary !bg-transparent !hover:bg-transparent'
               onClick={() => {
                 voteOnMilestone(votingWalletAccount, true);
                 setShowVotingModal(false);
@@ -242,9 +236,9 @@ function Project() {
               Yes
             </button>
           </li>
-          <li className="button-container !bg-transparent !hover:bg-transparent  !border !border-solid !border-white">
+          <li className='button-container !bg-transparent !hover:bg-transparent  !border !border-solid !border-white'>
             <button
-              className="primary !bg-transparent !hover:bg-transparent"
+              className='primary !bg-transparent !hover:bg-transparent'
               onClick={() => {
                 voteOnMilestone(votingWalletAccount, false);
                 setShowVotingModal(false);
@@ -262,12 +256,12 @@ function Project() {
     (milstone: Milestone) => milstone?.is_approved === true
   );
 
-  const timeAgo = new TimeAgo("en-US");
+  const timeAgo = new TimeAgo('en-US');
   const timePosted = project?.created
     ? timeAgo.format(new Date(project?.created))
     : 0;
 
-  const handleMessageBoxClick = async (user_id: number, freelancer: any) => {
+  const handleMessageBoxClick = async (user_id: number) => {
     if (user_id) {
       setShowMessageBox(true);
       setChatTargetUser(await utils.fetchUser(user_id));
@@ -288,7 +282,7 @@ function Project() {
 
     return (
       <div
-        className="
+        className='
       transparent-conatainer 
       relative 
       !bg-[#2c2c2c] 
@@ -298,61 +292,61 @@ function Project() {
       rounded-[20px]
       max-lg:!px-[20px]
       max-width-750px:!pb-[30px]
-      "
+      '
       >
         <div
           onClick={() => {
             setExpanded(!expanded);
           }}
-          className="
+          className='
           flex 
           justify-between 
           w-full 
           items-center 
           max-width-750px:flex-col 
-          max-width-750px:flex"
+          max-width-750px:flex'
         >
-          <div className="flex flex-row max-width-750px:w-full">
-            <h3 className="text-[39px] max-width-750px:text-[24px] font-normal leading-[60px]">
+          <div className='flex flex-row max-width-750px:w-full'>
+            <h3 className='text-[39px] max-width-750px:text-[24px] font-normal leading-[60px]'>
               Milestone {index + 1}
             </h3>
-            <h3 className="text-[24px] ml-[32px] font-normal leading-[60px]">
+            <h3 className='text-[24px] ml-[32px] font-normal leading-[60px]'>
               {milestone?.name}
             </h3>
           </div>
-          <div className="flex flex-row items-center max-width-750px:w-full max-width-750px:justify-between">
+          <div className='flex flex-row items-center max-width-750px:w-full max-width-750px:justify-between'>
             {milestone?.is_approved
-              ? projectStateTag(modified, "Completed")
+              ? projectStateTag(modified, 'Completed')
               : milestone?.milestone_key == milestoneBeingVotedOn
-                ? openForVotingTag()
-                : projectStateTag(modified, "Not Started")}
+              ? openForVotingTag()
+              : projectStateTag(modified, 'Not Started')}
 
             <Image
               src={require(expanded
-                ? "@/assets/svgs/minus_btn.svg"
-                : "@/assets/svgs/plus_btn.svg")}
+                ? '@/assets/svgs/minus_btn.svg'
+                : '@/assets/svgs/plus_btn.svg')}
               height={25}
               width={25}
-              alt="dropdownstate"
+              alt='dropdownstate'
             />
           </div>
         </div>
 
-        <div className={`${!expanded && "hidden"} my-6`}>
-          <p className="text-[14px] font-normal text-white">
-            Percentage of funds to be released{" "}
-            <span className="text-[#BAFF36]">
+        <div className={`${!expanded && 'hidden'} my-6`}>
+          <p className='text-[14px] font-normal text-white'>
+            Percentage of funds to be released{' '}
+            <span className='text-[#BAFF36]'>
               {milestone?.percentage_to_unlock}%
             </span>
           </p>
-          <p className="text-[14px] font-normal text-white">
-            Funding to be released{" "}
-            <span className="text-[#BAFF36]">
+          <p className='text-[14px] font-normal text-white'>
+            Funding to be released{' '}
+            <span className='text-[#BAFF36]'>
               {Number(milestone?.amount)?.toLocaleString?.()} $IMBU
             </span>
           </p>
 
-          <p className=" text-base font-normal text-[#a6a6a6] leading-[178.15%] mt-[23px] w-[80%]">
+          <p className=' text-base font-normal text-[#a6a6a6] leading-[178.15%] mt-[23px] w-[80%]'>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
             purus sit amet luctus venenatis, lectus magna fringilla urna,
             porttitor rhoncus dolor purus non enim praesent elementum facilisis
@@ -368,8 +362,8 @@ function Project() {
 
           {!isApplicant && milestone.milestone_key == milestoneBeingVotedOn && (
             <button
-              className="primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8"
-              data-testid="next-button"
+              className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
+              data-testid='next-button'
               onClick={() => vote()}
             >
               Vote
@@ -378,10 +372,10 @@ function Project() {
 
           {isApplicant &&
             onChainProject?.projectState !==
-            OnchainProjectState.OpenForVoting && (
+              OnchainProjectState.OpenForVoting && (
               <button
-                className="primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8"
-                data-testid="next-button"
+                className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
+                data-testid='next-button'
                 onClick={() => submitMilestone()}
               >
                 Submit
@@ -390,8 +384,8 @@ function Project() {
 
           {isApplicant && milestone.is_approved && (
             <button
-              className="primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8"
-              data-testid="next-button"
+              className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
+              data-testid='next-button'
               onClick={() => withdraw()}
             >
               Withdraw
@@ -403,7 +397,7 @@ function Project() {
   };
 
   return (
-    <div className="max-lg:p-[var(--hq-layout-padding)]">
+    <div className='max-lg:p-[var(--hq-layout-padding)]'>
       {loading && <FullScreenLoader />}
       {user && showMessageBox && (
         <ChatPopup
@@ -416,7 +410,7 @@ function Project() {
         />
       )}
       <div
-        className="flex 
+        className='flex 
       flex-row
        bg-[#2c2c2c] 
        border 
@@ -426,53 +420,51 @@ function Project() {
        p-12
        max-lg:p-5
        max-lg:flex-col
-       "
+       '
       >
-        <div className="flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] max-lg:basis-[60%] mr-[5%]  max-lg:mr-0">
-          <div className="brief-title">
-            <h3 className="text-[32px] max-lg:text-[24px] leading-[1.5] font-normal m-0 p-0">
+        <div className='flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] max-lg:basis-[60%] mr-[5%]  max-lg:mr-0'>
+          <div className='brief-title'>
+            <h3 className='text-[32px] max-lg:text-[24px] leading-[1.5] font-normal m-0 p-0'>
               {project?.name}
             </h3>
             <span
               onClick={() => {
                 // project?.brief_id
               }}
-              className="text-[#b2ff0b] cursor-pointer text-[20px]  max-lg: text-base  font-normal !m-0 !p-0 relative top-4"
+              className='text-[#b2ff0b] cursor-pointer text-[20px]  max-lg: text-base  font-normal !m-0 !p-0 relative top-4'
             >
               View full brief
             </span>
           </div>
-          <div className="text-inactive w-[80%]">
-            <p className=" text-base font-normal leading-[178.15%]">
+          <div className='text-inactive w-[80%]'>
+            <p className=' text-base font-normal leading-[178.15%]'>
               {project?.description}
             </p>
           </div>
-          <p className="text-inactive  text-base font-normal leading-[1.5] m-0 p-0">
+          <p className='text-inactive  text-base font-normal leading-[1.5] m-0 p-0'>
             Posted {timePosted}
           </p>
 
-          <p className="text-white text-xl font-normal leading-[1.5] mt-[16px] p-0">
+          <p className='text-white text-xl font-normal leading-[1.5] mt-[16px] p-0'>
             Freelancer hired
           </p>
 
-          <div className="flex flex-row items-center max-lg:flex-wrap mt-5">
+          <div className='flex flex-row items-center max-lg:flex-wrap mt-5'>
             <Image
-              src={require("@/assets/images/profile-image.png")}
-              alt="freelaner-icon"
+              src={require('@/assets/images/profile-image.png')}
+              alt='freelaner-icon'
               height={50}
               width={50}
-              className="border border-solid border-white rounded-[25px]"
+              className='border border-solid border-white rounded-[25px]'
             />
 
-            <p className="text-white text-[20px] font-normal leading-[1.5] p-0 mx-7">
+            <p className='text-white text-[20px] font-normal leading-[1.5] p-0 mx-7'>
               {freelancer?.display_name}
             </p>
 
             <button
-              onClick={() =>
-                handleMessageBoxClick(project?.user_id, freelancer?.username)
-              }
-              className="primary-btn 
+              onClick={() => handleMessageBoxClick(project?.user_id)}
+              className='primary-btn 
               in-dark w-button 
               !mt-0 
               font-normal 
@@ -486,87 +478,89 @@ function Project() {
               !py-0 ml-[40px] 
               px-8
               max-lg:!mr-0
-              "
-              data-testid="next-button"
+              '
+              data-testid='next-button'
             >
               Message
             </button>
           </div>
         </div>
-        <div className="flex flex-col gap-[50px] flex-grow flex-shrink-0 basis-[20%]  max-lg:mt-10">
-          <div className="flex flex-col">
-            <div className="flex flex-row">
+        <div className='flex flex-col gap-[50px] flex-grow flex-shrink-0 basis-[20%]  max-lg:mt-10'>
+          <div className='flex flex-col'>
+            <div className='flex flex-row'>
               <Image
-                src={require("@/assets/svgs/shield.svg")}
+                src={require('@/assets/svgs/shield.svg')}
                 height={24}
                 width={24}
-                alt={"shieldIcon"}
+                alt={'shieldIcon'}
               />
 
-              <h3 className="text-xl leading-[1.5] ml-6  font-normal m-0 p-0">
-                Milestone{" "}
-                <span className="text-[#BAFF36]">
+              <h3 className='text-xl leading-[1.5] ml-6  font-normal m-0 p-0'>
+                Milestone{' '}
+                <span className='text-[#BAFF36]'>
                   {approvedMilestones?.length}/{project?.milestones?.length}
                 </span>
               </h3>
             </div>
             {/* mile stone step indicator */}
-            <div className="w-48 bg-[#1C2608] mt-5 h-1 relative my-auto">
+            <div className='w-48 bg-[#1C2608] mt-5 h-1 relative my-auto'>
               <div
                 style={{
-                  width: `${(onChainProject?.milestones?.filter?.(
-                    (m: any) => m?.is_approved
-                  )?.length /
-                    onChainProject?.milestones?.length) *
+                  width: `${
+                    (onChainProject?.milestones?.filter?.(
+                      (m: any) => m?.is_approved
+                    )?.length /
+                      onChainProject?.milestones?.length) *
                     100
-                    }%`,
+                  }%`,
                 }}
-                className="h-full rounded-xl Accepted-button absolute"
+                className='h-full rounded-xl Accepted-button absolute'
               ></div>
-              <div className="flex justify-evenly">
+              <div className='flex justify-evenly'>
                 {onChainProject?.milestones?.map((m: any, i: number) => (
                   <div
                     key={i}
-                    className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"
-                      } rounded-full -mt-1.5`}
+                    className={`h-4 w-4 ${
+                      m.is_approved ? 'Accepted-button' : 'bg-[#1C2608]'
+                    } rounded-full -mt-1.5`}
                   ></div>
                 ))}
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col">
-            <div className="flex flex-row">
+          <div className='flex flex-col'>
+            <div className='flex flex-row'>
               <Image
-                src={require("@/assets/svgs/dollar_sign.svg")}
+                src={require('@/assets/svgs/dollar_sign.svg')}
                 height={24}
                 width={24}
-                alt={"dollarSign"}
+                alt={'dollarSign'}
               />
-              <h3 className="text-xl leading-[1.5] ml-6 font-normal m-0 p-0">
-                {Number(project?.total_cost_without_fee)?.toLocaleString()}{" "}
+              <h3 className='text-xl leading-[1.5] ml-6 font-normal m-0 p-0'>
+                {Number(project?.total_cost_without_fee)?.toLocaleString()}{' '}
                 $IMBU
               </h3>
             </div>
 
-            <div className="text-inactive ml-[20%] mt-2">Budget - Fixed</div>
+            <div className='text-inactive ml-[20%] mt-2'>Budget - Fixed</div>
           </div>
 
-          <div className="flex flex-col">
-            <div className="flex flex-row ">
+          <div className='flex flex-col'>
+            <div className='flex flex-row '>
               <Image
-                src={require("@/assets/svgs/calendar_icon.svg")}
+                src={require('@/assets/svgs/calendar_icon.svg')}
                 height={24}
                 width={24}
-                alt={"calenderIcon"}
+                alt={'calenderIcon'}
               />
 
-              <h3 className="text-xl leading-[1.5] ml-6 font-normal m-0 p-0">
+              <h3 className='text-xl leading-[1.5] ml-6 font-normal m-0 p-0'>
                 1 to 3 months
               </h3>
             </div>
 
-            <div className="text-inactive  ml-[20%] mt-2">Timeline</div>
+            <div className='text-inactive  ml-[20%] mt-2'>Timeline</div>
           </div>
         </div>
       </div>
@@ -578,7 +572,7 @@ function Project() {
               key={`${index}-milestone`}
               index={index}
               milestone={milestone}
-              modified={milestone?.modified!}
+              modified={milestone?.modified as Date}
               vote={async () => {
                 // show polkadot account modal
                 await setShowPolkadotAccounts(true);

@@ -18,9 +18,9 @@ export enum OffchainProjectState {
 export function displayState(state: OffchainProjectState) {
   switch (state) {
     case OffchainProjectState.PendingReview:
-      return "Pending Review";
+      return 'Pending Review';
     case OffchainProjectState.ChangesRequested:
-      return "Changes Requested";
+      return 'Changes Requested';
     default:
       return OffchainProjectState[state];
   }
@@ -165,28 +165,28 @@ export type FreelancerResponse = {
 export function getDefaultFreelancer(): Freelancer {
   return {
     id: 0,
-    bio: "",
-    education: "",
-    experience: "",
-    facebook_link: "",
-    twitter_link: "",
-    telegram_link: "",
-    discord_link: "",
-    freelanced_before: "",
-    freelancing_goal: "",
-    work_type: "",
-    title: "",
+    bio: '',
+    education: '',
+    experience: '',
+    facebook_link: '',
+    twitter_link: '',
+    telegram_link: '',
+    discord_link: '',
+    freelanced_before: '',
+    freelancing_goal: '',
+    work_type: '',
+    title: '',
     skills: [],
     languages: [],
     services: [],
     clients: [],
     client_images: [],
-    display_name: "default_name",
-    username: "default",
+    display_name: 'default_name',
+    username: 'default',
     user_id: 0,
     rating: 3,
     num_ratings: 0,
-    profile_image: "",
+    profile_image: '',
     verified: false,
   };
 }
@@ -262,6 +262,6 @@ export type ApplicationData = {
 };
 export type ApplicationContainerProps = {
   application: ApplicationData;
-  handleMessageBoxClick: (userId: number, freelander: Freelancer) => void;
-  redirectToApplication: (applicationId: string) => void;
+  handleMessageBoxClick: (_userId: number, _freelander: Freelancer) => void;
+  redirectToApplication: (_applicationId: string) => void;
 };

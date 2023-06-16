@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface CustomModalProps {
   open: boolean;
@@ -14,7 +14,7 @@ const CustomModal = ({
   className,
 }: CustomModalProps) => {
   return open ? (
-    <div data-testid="filter-modal" onClick={onClose} className={className}>
+    <div data-testid='filter-modal' onClick={onClose} className={className}>
       {children}
     </div>
   ) : null;

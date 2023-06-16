@@ -187,15 +187,15 @@ input::placeholder {
   }
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
 }
 
 /* Create a custom checkbox */
-input[type="checkbox"]::before {
-  content: "";
+input[type='checkbox']::before {
+  content: '';
   display: inline-block;
   width: 16px;
   height: 16px;
@@ -205,16 +205,16 @@ input[type="checkbox"]::before {
 }
 
 /* Add the custom checkmark when checked */
-input[type="checkbox"]:checked::before {
-  background-image: url("../assets/svgs/check.svg");
+input[type='checkbox']:checked::before {
+  background-image: url('../assets/svgs/check.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-color: #1b1b1b;
 }
 
 /* Add the custom unchecked style */
-input[type="checkbox"]:not(:checked)::before {
-  background-image: url("../assets/svgs/uncheck.svg");
+input[type='checkbox']:not(:checked)::before {
+  background-image: url('../assets/svgs/uncheck.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-color: #1b1b1b;

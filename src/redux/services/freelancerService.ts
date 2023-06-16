@@ -1,11 +1,12 @@
+import { checkEnvironment } from '@/utils';
+
+import * as config from '@/config';
 import {
   Freelancer,
   FreelancerResponse,
   FreelancerSqlFilter,
   Project,
-} from "@/model";
-import * as config from "@/config";
-import { checkEnvironment } from "@/utils";
+} from '@/model';
 
 export async function createFreelancingProfile(freelancer: any) {
   // Check that this user doesnt already have a freelancer profile.
@@ -14,7 +15,7 @@ export async function createFreelancingProfile(freelancer: any) {
       `${config.apiBase}freelancers/`,
       {
         headers: config.postAPIHeaders,
-        method: "put",
+        method: 'put',
         body: JSON.stringify({ freelancer }),
       }
     );
@@ -32,7 +33,7 @@ export const getAllFreelancers = async (
   const resp = await fetch(`${config.apiBase}freelancers?items_per_page=${itemsPerPage}&page=${currentPage}`,
     {
       headers: config.postAPIHeaders,
-      method: "get",
+      method: 'get',
     }
   );
   if (resp.ok) {
@@ -51,7 +52,7 @@ export async function getFreelancerProfile(
     checkEnvironment().concat(`${config.apiBase}freelancers/${username}`),
     {
       headers: config.getAPIHeaders,
-      method: "get",
+      method: 'get',
     }
   );
 
@@ -68,7 +69,7 @@ export async function freelancerExists(username: string): Promise<boolean> {
     `${config.apiBase}freelancers/${username}`,
     {
       headers: config.getAPIHeaders,
-      method: "get",
+      method: 'get',
     }
   );
 
@@ -84,7 +85,7 @@ export async function updateFreelancer(freelancer: Freelancer) {
     `${config.apiBase}freelancers/${freelancer.username}`,
     {
       headers: config.postAPIHeaders,
-      method: "put",
+      method: 'put',
       body: JSON.stringify({ freelancer }),
     }
   );
@@ -92,7 +93,7 @@ export async function updateFreelancer(freelancer: Freelancer) {
   if (resp.ok) {
     return (await resp.json()) as Freelancer;
   } else {
-    // TODO: 
+    // TODO:
     // console.log("Failed to update freelancer profile. status:" + resp.status);
   }
 }
@@ -104,7 +105,7 @@ export const callSearchFreelancers = async (
     `${config.apiBase}freelancers/search`,
     {
       headers: config.postAPIHeaders,
-      method: "post",
+      method: 'post',
       body: JSON.stringify(filter),
     }
   );
@@ -112,7 +113,7 @@ export const callSearchFreelancers = async (
     const data: FreelancerResponse = await resp.json();
     return data;
   } else {
-    throw new Error("Failed to search freelancers. status:" + resp.status);
+    throw new Error('Failed to search freelancers. status:' + resp.status);
   }
 };
 
@@ -121,7 +122,7 @@ export const getFreelancerApplications = async (userId: number) => {
     checkEnvironment().concat(`${config.apiBase}freelancers/${userId}/applications`),
     {
       headers: config.postAPIHeaders,
-      method: "get",
+      method: 'get',
     }
   );
 
@@ -129,7 +130,7 @@ export const getFreelancerApplications = async (userId: number) => {
     return (await resp.json()) as Array<Project>;
   } else {
     throw new Error(
-      "Failed to get all freelancer applications. status:" + resp.status
+      'Failed to get all freelancer applications. status:' + resp.status
     );
   }
 };

@@ -1,23 +1,27 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from "react";
-import { Brief, Freelancer, User } from "@/model";
+import ArrowIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
+import StarIcon from '@mui/icons-material/Star';
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+
+import { getServerSideProps } from '@/utils/serverSideProps';
+
+import BioInsights from '@/components/Briefs/BioInsights';
+import BioPanel from '@/components/Briefs/BioPanel';
+import ErrorScreen from '@/components/ErrorScreen';
+import SuccessScreen from '@/components/SuccessScreen';
+
+import { Brief, Freelancer, User } from '@/model';
 import {
   checkIfBriefSaved,
   getBrief,
   saveBriefData,
-} from "@/redux/services/briefService";
-import TimeAgo from "javascript-time-ago";
-import en from "javascript-time-ago/locale/en";
-import { fetchUser, getCurrentUser } from "../../utils";
-import StarIcon from "@mui/icons-material/Star";
-import ArrowIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
-import { useRouter } from "next/router";
-import BioPanel from "@/components/Briefs/BioPanel";
-import BioInsights from "@/components/Briefs/BioInsights";
-import { getServerSideProps } from "@/utils/serverSideProps";
-import ErrorScreen from "@/components/ErrorScreen";
-import { getFreelancerProfile } from "@/redux/services/freelancerService";
-import SuccessScreen from "@/components/SuccessScreen";
+} from '@/redux/services/briefService';
+import { getFreelancerProfile } from '@/redux/services/freelancerService';
+
+import { fetchUser, getCurrentUser } from '../../utils';
 
 TimeAgo.addLocale(en);
 
@@ -28,21 +32,21 @@ export type BriefProps = {
 const BriefDetails = (): JSX.Element => {
   const router = useRouter();
   const [success, setSuccess] = useState<boolean>(false);
-  const [successTitle, setSuccessTitle] = useState<string>("");
+  const [successTitle, setSuccessTitle] = useState<string>('');
   const [brief, setBrief] = useState<Brief>({
-    id: "",
-    headline: "",
+    id: '',
+    headline: '',
     industries: [],
-    description: "",
+    description: '',
     skills: [],
     scope_id: 0,
-    scope_level: "",
-    duration: "",
+    scope_level: '',
+    duration: '',
     duration_id: 0,
     budget: 0,
     created: new Date(),
-    created_by: "",
-    experience_level: "",
+    created_by: '',
+    experience_level: '',
     experience_id: 0,
     number_of_briefs_submitted: 0,
     user_id: 0,
@@ -79,7 +83,7 @@ const BriefDetails = (): JSX.Element => {
         setTargetUser(targetUser);
         setFreelancer(_freelancer);
       } else {
-        setError({ message: "No Brief Found" });
+        setError({ message: 'No Brief Found' });
       }
     }
   };
@@ -106,48 +110,49 @@ const BriefDetails = (): JSX.Element => {
       currentUserId: browsingUser?.id,
     });
     if (resp?.brief_id) {
-      setSuccessTitle("Brief Saved Successfully");
+      setSuccessTitle('Brief Saved Successfully');
       setIsSavedBrief(true);
       setSuccess(true);
     } else {
-      setError({ message: "Brief already Saved" });
+      setError({ message: 'Brief already Saved' });
     }
   };
 
   const ClientHistory = (
-    <div className="transparent-conatainer relative max-width-750px:!px-3">
-      <div className="flex justify-between w-full">
+    <div className='transparent-conatainer relative max-width-750px:!px-3'>
+      <div className='flex justify-between w-full'>
         <h3>Client Contact History (4)</h3>
         <div
-          className={`transition transform ease-in-out duration-600 ${showClientHistory && "rotate-180"
-            } cursor-pointer`}
+          className={`transition transform ease-in-out duration-600 ${
+            showClientHistory && 'rotate-180'
+          } cursor-pointer`}
         >
           <ArrowIcon
             onClick={() => setShowClientHistory(!showClientHistory)}
-            className="scale-150"
+            className='scale-150'
           />
         </div>
       </div>
-      <div className={`${!showClientHistory && "hidden"} my-6`}>
-        <hr className="separator" />
+      <div className={`${!showClientHistory && 'hidden'} my-6`}>
+        <hr className='separator' />
         {/* FIXME: replace dummy array with client history data*/}
         {[3, 3, 3].map((history, index) => (
-          <div key={`${index}-similar-brief`} className="similar-brief">
-            <div className="flex flex-col gap-5">
+          <div key={`${index}-similar-brief`} className='similar-brief'>
+            <div className='flex flex-col gap-5'>
               <h3>Imbue Project</h3>
-              <div className="flex items-center">
+              <div className='flex items-center'>
                 {[4, 4, 4, 4].map((star, index) => (
                   <StarIcon
                     key={`${index}-star-icon`}
-                    className={`${index <= 4 && "primary-icon"}`}
+                    className={`${index <= 4 && 'primary-icon'}`}
                   />
                 ))}
-                <span className="ml-3">
+                <span className='ml-3'>
                   Thanks for choosing me. All the best for your future works...
                 </span>
               </div>
             </div>
-            <div className="flex flex-col gap-5">
+            <div className='flex flex-col gap-5'>
               <p>January 24 , 2033</p>
               <p>Budget $5000</p>
             </div>
@@ -155,7 +160,7 @@ const BriefDetails = (): JSX.Element => {
         ))}
       </div>
       {showClientHistory && (
-        <span className="primary-text font-bold absolute bottom-2 right-4 cursor-pointer">
+        <span className='primary-text font-bold absolute bottom-2 right-4 cursor-pointer'>
           View more (1)
         </span>
       )}
@@ -163,41 +168,42 @@ const BriefDetails = (): JSX.Element => {
   );
 
   const SimilarProjects = (
-    <div className="transparent-conatainer relative max-width-750px:!px-3">
-      <div className="flex justify-between w-full">
+    <div className='transparent-conatainer relative max-width-750px:!px-3'>
+      <div className='flex justify-between w-full'>
         <h3>Similar projects on Imbue</h3>
         <div
-          className={`transition transform ease-in-out duration-600 ${showSimilarBrief && "rotate-180"
-            } cursor-pointer`}
+          className={`transition transform ease-in-out duration-600 ${
+            showSimilarBrief && 'rotate-180'
+          } cursor-pointer`}
         >
           <ArrowIcon
             onClick={() => setShowSimilarBrief(!showSimilarBrief)}
-            className="scale-150"
+            className='scale-150'
           />
         </div>
       </div>
 
-      <div className={`${!showSimilarBrief && "hidden"} my-6`}>
-        <hr className="separator" />
+      <div className={`${!showSimilarBrief && 'hidden'} my-6`}>
+        <hr className='separator' />
         {/* TODO: Need an object for the list of similar projects */}
         {/* FIXME: replace dummy array with similar projects data*/}
         {[3, 3, 3].map((history, index) => (
-          <div key={`${index}-sim-brief`} className="similar-brief">
-            <div className="similar-brief-details">
-              <h3 className="max-width-750px:!text-base">NFT Mining</h3>
-              <span className="max-width-750px:!text-base max-width-750px:overflow-hidden max-width-750px:text-ellipsis max-width-750px:ml-3 max-width-750px:line-clamp-2">
+          <div key={`${index}-sim-brief`} className='similar-brief'>
+            <div className='similar-brief-details'>
+              <h3 className='max-width-750px:!text-base'>NFT Mining</h3>
+              <span className='max-width-750px:!text-base max-width-750px:overflow-hidden max-width-750px:text-ellipsis max-width-750px:ml-3 max-width-750px:line-clamp-2'>
                 Hi guys, I have an NFT I would like to design. The NFT has to
                 have a picture of......
               </span>
             </div>
-            <button className="primary-btn in-dark w-button max-width-750px:!px-[9px] max-width-750px:mr-0">
+            <button className='primary-btn in-dark w-button max-width-750px:!px-[9px] max-width-750px:mr-0'>
               View Brief
             </button>
           </div>
         ))}
       </div>
       {showSimilarBrief && (
-        <span className="primary-text font-bold absolute bottom-2 right-4 cursor-pointer">
+        <span className='primary-text font-bold absolute bottom-2 right-4 cursor-pointer'>
           View more (1)
         </span>
       )}
@@ -205,8 +211,8 @@ const BriefDetails = (): JSX.Element => {
   );
 
   return (
-    <div className="brief-details-container hq-layout px-[15px] lg:px-[40px]">
-      <div className="brief-info max-width-750px:!flex-col">
+    <div className='brief-details-container hq-layout px-[15px] lg:px-[40px]'>
+      <div className='brief-info max-width-750px:!flex-col'>
         {/* TODO: Implement */}
         <BioPanel
           brief={brief}
@@ -230,16 +236,16 @@ const BriefDetails = (): JSX.Element => {
       {ClientHistory}
       {SimilarProjects}
       <ErrorScreen {...{ error, setError }}>
-        <div className="flex flex-col gap-4 w-1/2">
+        <div className='flex flex-col gap-4 w-1/2'>
           <button
-            onClick={() => router.push("/briefs")}
-            className="primary-btn in-dark w-button w-full !m-0"
+            onClick={() => router.push('/briefs')}
+            className='primary-btn in-dark w-button w-full !m-0'
           >
             Seach Brief
           </button>
           <button
             onClick={() => router.push(`/dashboard`)}
-            className="underline text-xs lg:text-base font-bold"
+            className='underline text-xs lg:text-base font-bold'
           >
             Go to Dashboard
           </button>
@@ -247,12 +253,12 @@ const BriefDetails = (): JSX.Element => {
       </ErrorScreen>
 
       <SuccessScreen title={successTitle} open={success} setOpen={setSuccess}>
-        <div className="flex flex-col gap-4 w-1/2">
+        <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => {
               setSuccess(false);
             }}
-            className="primary-btn in-dark w-button w-full !m-0"
+            className='primary-btn in-dark w-button w-full !m-0'
           >
             Done
           </button>

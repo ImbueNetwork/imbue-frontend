@@ -1,47 +1,48 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from "react";
+import { useRouter } from 'next/router';
+import React, { useState } from 'react';
+
+import * as utils from '@/utils';
+
+import ErrorScreen from '@/components/ErrorScreen';
+
 import {
-  stepData,
   freelancedBefore,
   freelancingGoal,
-  importInformation,
+  // importInformation,
+  stepData,
   suggestedFreelancingSkills,
-  suggestedServices,
   suggestedLanguages,
-} from "@/config/freelancer-data";
-import { getDefaultFreelancer, User } from "@/model";
-import { TagsInput } from "../../components/TagsInput";
-import * as utils from "@/utils";
-import {
-  createFreelancingProfile,
-  freelancerExists,
-} from "@/redux/services/freelancerService";
-import { useRouter } from "next/router";
-import { FreelancerProps } from "@/types/freelancerTypes";
-import styles from "../../styles/modules/Freelancers/new-Freelancer.module.css";
-import ErrorScreen from "@/components/ErrorScreen";
+  suggestedServices,
+} from '@/config/freelancer-data';
+import { createFreelancingProfile } from '@/redux/services/freelancerService';
+
+import { TagsInput } from '../../components/TagsInput';
+import styles from '../../styles/modules/Freelancers/new-Freelancer.module.css';
+
+import { FreelancerProps } from '@/types/freelancerTypes';
 
 const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const displayName = user?.display_name;
-  const [freelancingBefore, setFreelancingBefore] = useState("");
-  const [goal, setGoal] = useState("");
-  const [resume, setResume] = useState("");
-  const [title, setTitle] = useState("");
+  const [freelancingBefore, setFreelancingBefore] = useState('');
+  const [goal, setGoal] = useState('');
+  // const [resume, setResume] = useState('');
+  const [title, setTitle] = useState('');
   const [languages, setLanguages] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
-  const [bio, setBio] = useState("");
+  const [bio, setBio] = useState('');
   const [services, setServices] = useState<string[]>([]);
-
-  const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<any>()
+  // TODO: add loading animation
+  // const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<any>();
 
   const HelloPanel = (
     <div className={styles.helloPanel}>
       <div className={styles.contentTextSmall}>
         {stepData[step].content
-          .split("\n")
+          .split('\n')
           .map((line: string, index: number) => (
             <p key={index}>{line}</p>
           ))}
@@ -53,7 +54,7 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     <div className={styles.freelanceXpContainer}>
       <div className={styles.contentTextSmallFlex}>
         {stepData[step].content
-          .split("\n")
+          .split('\n')
           .map((line: string, index: number) => (
             <p key={index}>{line}</p>
           ))}
@@ -63,8 +64,9 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-xp-${index}`}
-            className={`${styles.freelanceXpItem} ${freelancingBefore === value ? styles.active : ""
-              }`}
+            className={`${styles.freelanceXpItem} ${
+              freelancingBefore === value ? styles.active : ''
+            }`}
             onClick={() => setFreelancingBefore(value)}
           >
             {label}
@@ -77,7 +79,7 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
   const FreelancingGoal = (
     <div className={styles.freelanceXpContainer}>
       <div className={styles.contentTextSmallFlex}>
-        {stepData[step].content.split("\n").map((line, index) => (
+        {stepData[step].content.split('\n').map((line, index) => (
           <p key={index}>{line}</p>
         ))}
       </div>
@@ -86,8 +88,9 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-goal-${index}`}
-            className={`${styles.freelanceXpItem} ${goal === value ? styles.active : ""
-              }`}
+            className={`${styles.freelanceXpItem} ${
+              goal === value ? styles.active : ''
+            }`}
             onClick={() => setGoal(value)}
           >
             {label}
@@ -97,42 +100,43 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     </div>
   );
 
-  const ImportResume = (
-    // TODO:
-    <div className={styles.freelanceXpContainer}>
-      <div className={styles.contentTextSmallFlex}>
-        {stepData[step].content.split("\n").map((line, index) => (
-          <p key={index}>{line}</p>
-        ))}
-      </div>
-      <div className={styles.freelanceXpOptions}>
-        {importInformation.map(({ label, value }, index) => (
-          <div
-            key={index}
-            className={`${styles.freelanceXpItem} ${resume === value ? styles.active : ""
-              }`}
-            onClick={() => setResume(value)}
-          >
-            {label}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  // const ImportResume = (
+  //   // TODO:
+  //   <div className={styles.freelanceXpContainer}>
+  //     <div className={styles.contentTextSmallFlex}>
+  //       {stepData[step].content.split('\n').map((line, index) => (
+  //         <p key={index}>{line}</p>
+  //       ))}
+  //     </div>
+  //     <div className={styles.freelanceXpOptions}>
+  //       {importInformation.map(({ label, value }, index) => (
+  //         <div
+  //           key={index}
+  //           className={`${styles.freelanceXpItem} ${
+  //             resume === value ? styles.active : ''
+  //           }`}
+  //           onClick={() => setResume(value)}
+  //         >
+  //           {label}
+  //         </div>
+  //       ))}
+  //     </div>
+  //   </div>
+  // );
 
   const TitlePanel = (
     <div className={styles.freelanceXpContainer}>
       <div className={styles.contentTextSmallFlex}>
-        {stepData[step].content.split("\n").map((line, index) => (
+        {stepData[step].content.split('\n').map((line, index) => (
           <p key={index}>{line}</p>
         ))}
       </div>
       <div className={styles.namePanelInputWrapper}>
         <input
           className={styles.fieldInput}
-          placeholder="Enter your title"
-          data-testid="title"
-          name="title"
+          placeholder='Enter your title'
+          data-testid='title'
+          name='title'
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
@@ -140,37 +144,37 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     </div>
   );
 
-  const ExperiencePanel = (
-    <div className={styles.freelanceXpContainer}>
-      <div className={styles.contentTextSmallFlex}>
-        {stepData[step].content.split("\n").map((line, index) => (
-          <p key={index}>{line}</p>
-        ))}
-      </div>
-    </div>
-  );
+  // const ExperiencePanel = (
+  //   <div className={styles.freelanceXpContainer}>
+  //     <div className={styles.contentTextSmallFlex}>
+  //       {stepData[step].content.split('\n').map((line, index) => (
+  //         <p key={index}>{line}</p>
+  //       ))}
+  //     </div>
+  //   </div>
+  // );
 
-  const EducationPanel = (
-    <div className={styles.freelanceXpContainer}>
-      <div className={styles.contentTextSmallFlex}>
-        {stepData[step].content.split("\n").map((line, index) => (
-          <p key={index}>{line}</p>
-        ))}
-      </div>
-    </div>
-  );
+  // const EducationPanel = (
+  //   <div className={styles.freelanceXpContainer}>
+  //     <div className={styles.contentTextSmallFlex}>
+  //       {stepData[step].content.split('\n').map((line, index) => (
+  //         <p key={index}>{line}</p>
+  //       ))}
+  //     </div>
+  //   </div>
+  // );
 
   const LanguagePanel = (
     <div className={styles.freelanceXpContainer}>
       <div className={styles.contentTextSmallFlex}>
-        {stepData[step].content.split("\n").map((line, index) => (
+        {stepData[step].content.split('\n').map((line, index) => (
           <p key={index}>{line}</p>
         ))}
       </div>
-      <div className="mt-6 pb-20">
+      <div className='mt-6 pb-20'>
         <TagsInput
           suggestData={suggestedLanguages}
-          data-testid="languages"
+          data-testid='languages'
           tags={languages}
           onChange={(tags: string[]) => setLanguages(tags)}
         />
@@ -181,12 +185,12 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
   const SkillsPanel = (
     <div className={styles.freelanceXpContainer}>
       <div className={styles.contentTextSmallFlex}>
-        {stepData[step].content.split("\n").map((line, index) => (
+        {stepData[step].content.split('\n').map((line, index) => (
           <p key={index}>{line}</p>
         ))}
       </div>
-      <h3 className="text-lg text-black mt-5">Your Skills</h3>
-      <div className="mt-5 mb-20">
+      <h3 className='text-lg text-black mt-5'>Your Skills</h3>
+      <div className='mt-5 mb-20'>
         <TagsInput
           suggestData={suggestedFreelancingSkills}
           tags={skills}
@@ -199,7 +203,7 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
   const BioPanel = (
     <div className={styles.freelanceXpContainer}>
       <div className={styles.contentTextSmallFlex}>
-        {stepData[step].content.split("\n").map((line, index) => (
+        {stepData[step].content.split('\n').map((line, index) => (
           <p key={index}>{line}</p>
         ))}
       </div>
@@ -207,9 +211,9 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
       <div className={styles.namePanelInputWrapper}>
         <textarea
           className={`${styles.fieldInput} ${styles.large}`}
-          placeholder="Enter your bio"
-          data-testid="bio"
-          name="bio"
+          placeholder='Enter your bio'
+          data-testid='bio'
+          name='bio'
           maxLength={5000}
           rows={6}
           value={bio}
@@ -222,11 +226,11 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
   const ServicesPanel = (
     <div className={styles.freelanceXpContainer}>
       <div className={styles.contentTextSmallFlex}>
-        {stepData[step].content.split("\n").map((line, index) => (
+        {stepData[step].content.split('\n').map((line, index) => (
           <p key={index}>{line}</p>
         ))}
       </div>
-      <div className="mt-5 mb-20">
+      <div className='mt-5 mb-20'>
         <TagsInput
           suggestData={suggestedServices}
           tags={services}
@@ -285,15 +289,16 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
 
   async function createProfile() {
     try {
-      setLoading(true)
+      // TODO: add loading animation
+      // setLoading(true);
       const response: any = await createFreelancingProfile({
         id: 0,
         bio,
-        education: "",
+        education: '',
         experience: freelancingBefore,
         freelanced_before: freelancingBefore,
         freelancing_goal: goal,
-        work_type: "",
+        work_type: '',
         skills,
         title,
         languages,
@@ -301,28 +306,28 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
         user_id: user?.id,
         username: user?.display_name,
         display_name: user?.display_name,
-        discord_link: "",
-        facebook_link: "",
-        telegram_link: "",
-        twitter_link: "",
+        discord_link: '',
+        facebook_link: '',
+        telegram_link: '',
+        twitter_link: '',
         clients: [],
         client_images: [],
         num_ratings: 0,
-        profileImageUrl: require("@/assets/images/profile-image.png"),
+        profileImageUrl: require('@/assets/images/profile-image.png'),
       });
 
       if (response.status === 201) {
         setStep(step + 1);
-      }
-      else {
-        setError({ message: `Could not update freelancer Profile ${response.status} (${response.statusText})` })
+      } else {
+        setError({
+          message: `Could not update freelancer Profile ${response.status} (${response.statusText})`,
+        });
       }
     } catch (error) {
-      setError(error)
-      console.log(error);
-    }
-    finally {
-      setLoading(false)
+      setError(error);
+    } finally {
+      // TODO: add loading animation
+      // setLoading(false);
     }
   }
 
@@ -330,15 +335,15 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     <div className={styles.freelancerDetailsContainer}>
       <div className={styles.mainPanel}>
         <div className={styles.freelancerContents}>
-          <h2 data-testid="heading" className="text-theme-secondary">
-            {stepData[step].heading.replace("{name}", displayName)}
+          <h2 data-testid='heading' className='text-theme-secondary'>
+            {stepData[step].heading.replace('{name}', displayName)}
           </h2>
           {panels[step] ?? <></>}
         </div>
         <div className={step === 0 ? styles.buttonLeft : styles.buttonRight}>
           {step >= 1 && (
             <button
-              className="secondary-btn !mt-0"
+              className='secondary-btn !mt-0'
               onClick={() => setStep(step - 1)}
             >
               Back
@@ -347,23 +352,23 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
 
           {step === 0 ? (
             <button
-              className="primary-btn in-dark w-button mr-auto mt-6"
+              className='primary-btn in-dark w-button mr-auto mt-6'
               onClick={() => setStep(1)}
-              data-testid="get-started-button"
+              data-testid='get-started-button'
             >
               Get Started!
             </button>
           ) : step === stepData.length - 1 ? (
             <button
-              className="primary-btn in-dark w-button"
-              onClick={() => utils.redirect("briefs")}
+              className='primary-btn in-dark w-button'
+              onClick={() => utils.redirect('briefs')}
             >
               Discover Briefs
             </button>
           ) : step === stepData.length - 2 ? (
             <button
-              className="primary-btn in-dark w-button"
-              data-testid="submit-button"
+              className='primary-btn in-dark w-button'
+              data-testid='submit-button'
               disabled={!validate()}
               onClick={() => createProfile()}
             >
@@ -371,8 +376,8 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
             </button>
           ) : (
             <button
-              className="primary-btn in-dark w-button !mt-0"
-              data-testid="next-button"
+              className='primary-btn in-dark w-button !mt-0'
+              data-testid='next-button'
               disabled={!validate()}
               onClick={() => setStep(step + 1)}
             >
@@ -385,12 +390,14 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
         <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => setError(null)}
-            className='primary-btn in-dark w-button w-full !m-0'>
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
             Try Again
           </button>
           <button
             onClick={() => router.push(`/dashboard`)}
-            className='underline text-xs lg:text-base font-bold'>
+            className='underline text-xs lg:text-base font-bold'
+          >
             Go to Dashboard
           </button>
         </div>

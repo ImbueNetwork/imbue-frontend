@@ -1,63 +1,62 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from "react";
-import ReactCountryFlag from "react-country-flag";
-import {
-  FaFacebook,
-  FaRegShareSquare,
-  FaTwitter,
-  FaTelegram,
-  FaDiscord,
-  FaStar,
-  FaRegThumbsUp,
-  FaRegThumbsDown,
-} from "react-icons/fa";
-import { FiEdit } from "react-icons/fi";
-import { IoPeople } from "react-icons/io5";
-import VerifiedIcon from "@mui/icons-material/Verified";
-import { Freelancer, User } from "@/model";
-import {
-  getFreelancerProfile,
-  updateFreelancer,
-} from "@/redux/services/freelancerService";
-import { checkEnvironment, fetchUser } from "../../utils";
-import ChatPopup from "@/components/ChatPopup";
-import Image from "next/image";
-import { TextArea } from "@/components/Briefs/TextArea";
-import { useRouter } from "next/router";
-import { GrCertificate } from "react-icons/gr";
-import { AiOutlineUser } from "react-icons/ai";
-import { MdOutlineWatchLater } from "react-icons/md";
-import { ImStack } from "react-icons/im";
-import styles from "@/styles/modules/freelancers.module.css";
-import { authenticate } from "@/pages/api/info/user";
+import SearchIcon from '@mui/icons-material/Search';
+import VerifiedIcon from '@mui/icons-material/Verified';
 import {
   Alert,
-  Badge,
-  Box,
   FormControl,
   InputAdornment,
   InputLabel,
   MenuItem,
-  Modal,
   Select,
   TextField,
-  ToggleButton,
-} from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import { StyledEngineProvider } from "@mui/system";
-import CountrySelector from "@/components/Profile/CountrySelector";
-import Clients from "@/components/Profile/Clients";
-import Skills from "@/components/Profile/Skills";
-import UploadImage from "@/components/Profile/UploadImage";
-import AccountChoice from "@/components/AccountChoice";
-import { WalletAccount } from "@talismn/connect-wallets";
-import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
-import { SignerResult } from "@polkadot/api/types";
-import SuccessScreen from "@/components/SuccessScreen";
-import ErrorScreen from "@/components/ErrorScreen";
-import FullScreenLoader from "@/components/FullScreenLoader";
-import fiverrIcon from "@/assets/images/fiverr.png"
-import ImbueIcon from "@/assets/svgs/loader.svg"
+} from '@mui/material';
+import { StyledEngineProvider } from '@mui/system';
+import { SignerResult } from '@polkadot/api/types';
+import { WalletAccount } from '@talismn/connect-wallets';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import ReactCountryFlag from 'react-country-flag';
+import { AiOutlineUser } from 'react-icons/ai';
+import {
+  FaDiscord,
+  FaFacebook,
+  FaRegShareSquare,
+  FaRegThumbsDown,
+  FaRegThumbsUp,
+  FaStar,
+  FaTelegram,
+  FaTwitter,
+} from 'react-icons/fa';
+import { FiEdit } from 'react-icons/fi';
+import { GrCertificate } from 'react-icons/gr';
+import { ImStack } from 'react-icons/im';
+import { IoPeople } from 'react-icons/io5';
+import { MdOutlineWatchLater } from 'react-icons/md';
+
+import AccountChoice from '@/components/AccountChoice';
+import { TextArea } from '@/components/Briefs/TextArea';
+import ChatPopup from '@/components/ChatPopup';
+import ErrorScreen from '@/components/ErrorScreen';
+import FullScreenLoader from '@/components/FullScreenLoader';
+import Clients from '@/components/Profile/Clients';
+import CountrySelector from '@/components/Profile/CountrySelector';
+import Skills from '@/components/Profile/Skills';
+import UploadImage from '@/components/Profile/UploadImage';
+import SuccessScreen from '@/components/SuccessScreen';
+
+import FiverrIcon from '@/assets/images/fiverr.png';
+import ImbueIcon from '@/assets/svgs/loader.svg';
+import { Freelancer, User } from '@/model';
+import { authenticate } from '@/pages/api/info/user';
+import {
+  getFreelancerProfile,
+  updateFreelancer,
+} from '@/redux/services/freelancerService';
+import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
+import styles from '@/styles/modules/freelancers.module.css';
+
+import { checkEnvironment, fetchUser } from '../../utils';
 
 export type ProfileProps = {
   initFreelancer: Freelancer;
@@ -66,13 +65,13 @@ export type ProfileProps = {
 
 const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const router = useRouter();
-  const slug = router.query.slug as string;
   const [freelancer, setFreelancer] = useState<any>(initFreelancer);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
-  const [browsingUser, setBrowsingUser] = useState<User>(user);
+  const browsingUser = user;
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
-  const isCurrentFreelancer = browsingUser && browsingUser.id == freelancer?.user_id;
+  const isCurrentFreelancer =
+    browsingUser && browsingUser.id == freelancer?.user_id;
 
   const [skills, setSkills] = useState<string[]>(
     freelancer?.skills?.map(
@@ -82,13 +81,13 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   );
 
   const [openAccountChoice, setOpenAccountChoice] = useState<boolean>(false);
-  const [error, setError] = useState<any>()
-  const [success, setSuccess] = useState<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(false)
-  const [copied, setCopied] = useState<boolean>(false)
+  const [error, setError] = useState<any>();
+  const [success, setSuccess] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
 
   function urlify(text: string) {
-    var urlRegex = /(https?:\/\/[^\s]+)/g;
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
     if (!urlRegex.test(text)) {
       const finalUrl = new URL(`https://${text}`);
       return finalUrl.href;
@@ -109,7 +108,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   const onSave = async () => {
     try {
       if (freelancer) {
-        setLoading(true)
+        setLoading(true);
         let data = freelancer;
         data = {
           ...data,
@@ -118,13 +117,12 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         };
 
         await updateFreelancer(data);
-        setSuccess(true)
+        setSuccess(true);
       }
     } catch (error) {
-      setError(error)
-    }
-    finally {
-      setLoading(false)
+      setError(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -147,17 +145,17 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   };
 
   const cancelEdit = async () => {
-    setFreelancer(initFreelancer)
-    setIsEditMode(false)
-    setClients(clinetsData)
-  }
+    setFreelancer(initFreelancer);
+    setIsEditMode(false);
+    setClients(clinetsData);
+  };
 
   const accountSelected = async (account: WalletAccount): Promise<any> => {
     try {
       const result = await getAccountAndSign(account);
       const resp = await authorise(
         result?.signature as SignerResult,
-        result?.challenge!,
+        result?.challenge as string,
         account
       );
       if (resp.ok) {
@@ -168,64 +166,63 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         });
       }
     } catch (error) {
-      setError(error)
-      console.log(error);
+      setError(error);
     }
   };
 
   const socials = [
     {
-      label: "Facebook",
-      key: "facebook_link",
+      label: 'Facebook',
+      key: 'facebook_link',
       // value: freelancer?.facebook_link,
-      value: "facebook.com",
+      value: 'facebook.com',
       icon: (
         <FaFacebook
-          color="#4267B2"
+          color='#4267B2'
           onClick={() =>
             freelancer?.facebook_link &&
-            window.open(urlify(freelancer?.facebook_link), "_blank")
+            window.open(urlify(freelancer?.facebook_link), '_blank')
           }
         />
       ),
     },
     {
-      label: "Twitter",
-      key: "twitter_link",
+      label: 'Twitter',
+      key: 'twitter_link',
       // value: freelancer?.twitter_link,
-      value: "twitter.com",
+      value: 'twitter.com',
       icon: (
         <FaTwitter
-          color="#1DA1F2"
+          color='#1DA1F2'
           onClick={() =>
             freelancer?.twitter_link &&
-            window.open(urlify(freelancer?.twitter_link), "_blank")
+            window.open(urlify(freelancer?.twitter_link), '_blank')
           }
         />
       ),
     },
     {
-      label: "Telegram",
-      key: "telegram_link",
+      label: 'Telegram',
+      key: 'telegram_link',
       value: freelancer?.telegram_link,
       icon: (
         <FaTelegram
           onClick={() =>
             freelancer?.telegram_link &&
-            window.open(urlify(freelancer?.telegram_link), "_blank")
+            window.open(urlify(freelancer?.telegram_link), '_blank')
           }
         />
       ),
     },
     {
-      label: "Discord",
-      key: "discord_link",
+      label: 'Discord',
+      key: 'discord_link',
       value: freelancer?.discord_link,
       icon: (
         <FaDiscord
           onClick={() =>
             freelancer?.discord_link &&
-            window.open(urlify(freelancer?.discord_link), "_blank")
+            window.open(urlify(freelancer?.discord_link), '_blank')
           }
         />
       ),
@@ -233,137 +230,135 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
   ];
 
   const work = {
-    title: "Product Development Engineer",
+    title: 'Product Development Engineer',
     ratings: 3,
-    time: "Jan 19, 2023 - Jan 20, 2023",
+    time: 'Jan 19, 2023 - Jan 20, 2023',
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed rhoncus elit nec imperdiet mollis. Donec et pharetra magna. Fusce sed urna vestibulum, pretium turpis eu, ultricies urna. Donec faucibus, justo sed pretium commodo, felis sapien malesuada mauris, a finibus orci dolor non ante. Morbi aliquam tortor in massa efficitur pulvinar. Ut interdum tempor aliquet. Duis eget dignissim nunc. Ut non ligula nec lectus cursus tincidunt eget nec mauris",
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed rhoncus elit nec imperdiet mollis. Donec et pharetra magna. Fusce sed urna vestibulum, pretium turpis eu, ultricies urna. Donec faucibus, justo sed pretium commodo, felis sapien malesuada mauris, a finibus orci dolor non ante. Morbi aliquam tortor in massa efficitur pulvinar. Ut interdum tempor aliquet. Duis eget dignissim nunc. Ut non ligula nec lectus cursus tincidunt eget nec mauris',
     budget: 23000,
-    budgetType: "Fixed Price",
+    budgetType: 'Fixed Price',
   };
 
-  const [sortReviews, setSortReviews] = useState<any>("relevant");
+  const [sortReviews, setSortReviews] = useState<any>('relevant');
   const reviews = [
     {
-      name: "Sam",
+      name: 'Sam',
       ratings: 3,
-      time: "1 month",
+      time: '1 month',
       description:
-        "I have created a web NFT marketplace landing page for imbue , you can check on my profile to see more",
-      countryCode: "US",
-      country: "United States",
+        'I have created a web NFT marketplace landing page for imbue , you can check on my profile to see more',
+      countryCode: 'US',
+      country: 'United States',
       image:
-        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
+        'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
     },
     {
-      name: "Sausan",
+      name: 'Sausan',
       ratings: 3,
-      time: "1 month",
+      time: '1 month',
       description:
-        "I have created a web NFT marketplace landing page for imbue , you can check on my profile to see more",
-      countryCode: "NO",
-      country: "Norway",
+        'I have created a web NFT marketplace landing page for imbue , you can check on my profile to see more',
+      countryCode: 'NO',
+      country: 'Norway',
       image:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
+        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
     },
     {
-      name: "Aala S.",
+      name: 'Aala S.',
       ratings: 3,
-      time: "1 month",
+      time: '1 month',
       description:
-        "I have contacted idris muhammad for building web3 for new eBook product that i am developing for my coaching business",
-      countryCode: "CA",
-      country: "Canada",
+        'I have contacted idris muhammad for building web3 for new eBook product that i am developing for my coaching business',
+      countryCode: 'CA',
+      country: 'Canada',
       image:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
+        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
     },
   ];
 
   const clinetsData = [
-    { id: 1, name: "Fiverr", logo: fiverrIcon, website: "fiverr.com" },
-    { id: 2, name: "Imbue", logo: ImbueIcon, website: "fiverr.com" },
-  ]
+    { id: 1, name: 'Fiverr', logo: FiverrIcon, website: 'fiverr.com' },
+    { id: 2, name: 'Imbue', logo: ImbueIcon, website: 'fiverr.com' },
+  ];
 
-  const [clients, setClients] = useState<any>(clinetsData)
+  const [clients, setClients] = useState<any>(clinetsData);
 
   const copyProfile = () => {
-    const webSiteURL = checkEnvironment().concat(`${router.asPath}`)
-    navigator.clipboard.writeText(webSiteURL)
-    setCopied(true)
+    const webSiteURL = checkEnvironment().concat(`${router.asPath}`);
+    navigator.clipboard.writeText(webSiteURL);
+    setCopied(true);
 
     setTimeout(() => {
-      setCopied(false)
+      setCopied(false);
     }, 3000);
-  }
+  };
 
   return (
-    <div className="profile-container lg:-mt-8 overflow-x-hidden relative">
-      <div className="banner">
+    <div className='profile-container lg:-mt-8 overflow-x-hidden relative'>
+      <div className='banner'>
         <Image
-          src={require("@/assets/images/profile-banner.png")}
+          src={require('@/assets/images/profile-banner.png')}
           priority
-          alt="profile banner"
-          className="banner-image w-full object-cover h-[242px]"
+          alt='profile banner'
+          className='banner-image w-full object-cover h-[242px]'
         />
       </div>
 
-      <div className="flex flex-col lg:flex-row justify-evenly lg:mx-[40px] px-[30px] lg:px-[40px]">
-        <div className="flex flex-col lg:items-center gap-[20px] lg:gap-[70px] lg:w-[40%]">
-          <div className="w-full flex flex-col items-center gap-[16px] pb-[30px] bg-theme-grey-dark rounded-xl border border-light-white">
+      <div className='flex flex-col lg:flex-row justify-evenly lg:mx-[40px] px-[30px] lg:px-[40px]'>
+        <div className='flex flex-col lg:items-center gap-[20px] lg:gap-[70px] lg:w-[40%]'>
+          <div className='w-full flex flex-col items-center gap-[16px] pb-[30px] bg-theme-grey-dark rounded-xl border border-light-white'>
             <UploadImage {...{ isEditMode, setFreelancer, freelancer }} />
-            <div className="w-full flex flex-col gap-[16px] -mt-11 px-[30px] lg:px-[40px]">
+            <div className='w-full flex flex-col gap-[16px] -mt-11 px-[30px] lg:px-[40px]'>
               {isEditMode ? (
                 <TextField
                   onChange={(e) => handleUpdateState(e)}
-                  id="outlined-basic"
-                  name="display_name"
-                  label="Name"
-                  variant="outlined"
+                  id='outlined-basic'
+                  name='display_name'
+                  label='Name'
+                  variant='outlined'
                   defaultValue={freelancer?.display_name}
                 />
               ) : (
                 <div className='flex gap-2 items-center justify-center mt-8'>
-                  <h3 className="!text-2xl font-bold text-center z-[1]">
+                  <h3 className='!text-2xl font-bold text-center z-[1]'>
                     {freelancer?.display_name}
                   </h3>
-                  {
-                    initFreelancer?.verified && <VerifiedIcon color='primary' />
-                  }
+                  {initFreelancer?.verified && <VerifiedIcon color='primary' />}
                 </div>
               )}
 
-              <div className="flex gap-[15px] items-center justify-center flex-wrap">
+              <div className='flex gap-[15px] items-center justify-center flex-wrap'>
                 {isEditMode ? (
                   <TextField
                     onChange={(e) => handleUpdateState(e)}
-                    className="w-full"
-                    id="outlined-basic"
-                    name="username"
-                    label="Username"
-                    variant="outlined"
+                    className='w-full'
+                    id='outlined-basic'
+                    name='username'
+                    label='Username'
+                    variant='outlined'
                     defaultValue={freelancer?.username}
                   />
                 ) : (
-                  <p className="text-[16px] leading-[1.2] text-primary max-w-full break-words text-center">
+                  <p className='text-[16px] leading-[1.2] text-primary max-w-full break-words text-center'>
                     @{freelancer?.username}
                   </p>
                 )}
 
-                <div className="flex items-center gap-2 w-full justify-center">
+                <div className='flex items-center gap-2 w-full justify-center'>
                   {isEditMode ? (
                     <TextField
                       onChange={(e) => handleUpdateState(e)}
-                      className="w-full"
-                      id="outlined-basic"
-                      name="title"
-                      label="Tittle"
-                      variant="outlined"
+                      className='w-full'
+                      id='outlined-basic'
+                      name='title'
+                      label='Tittle'
+                      variant='outlined'
                       defaultValue={freelancer?.title}
                     />
                   ) : (
                     <>
-                      <IoPeople color="var(--theme-secondary)" size="24px" />
-                      <p className="text-[16px] leading-[1.2] text-[#ebeae2]">
+                      <IoPeople color='var(--theme-secondary)' size='24px' />
+                      <p className='text-[16px] leading-[1.2] text-[#ebeae2]'>
                         {freelancer?.title}
                       </p>
                     </>
@@ -374,25 +369,25 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
 
               {/* TODO: Implement reviews */}
 
-              <div className="rating flex justify-center gap-3">
-                <p className="mb-3">
-                  <FaStar color="var(--theme-primary)" />
-                  <FaStar color="var(--theme-primary)" />
-                  <FaStar color="var(--theme-primary)" />
-                  <FaStar color="white" />
+              <div className='rating flex justify-center gap-3'>
+                <p className='mb-3'>
+                  <FaStar color='var(--theme-primary)' />
+                  <FaStar color='var(--theme-primary)' />
+                  <FaStar color='var(--theme-primary)' />
+                  <FaStar color='white' />
                 </p>
                 <p>
                   <span>Top Rated</span>
-                  <span className="review-count ml-1">(1434 reviews)</span>
+                  <span className='review-count ml-1'>(1434 reviews)</span>
                 </p>
               </div>
 
-              <div className="connect-buttons flex justify-center gap-[24px] mb-[20px]">
+              <div className='connect-buttons flex justify-center gap-[24px] mb-[20px]'>
                 {/* {!isCurrentFreelancer && (
                   <>
                     <button
                       onClick={() => handleMessageBoxClick()}
-                      className=" message"
+                      className=' message'
                     >
                       Message
                     </button>
@@ -400,60 +395,48 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                 )}
                 */}
 
-                {isCurrentFreelancer
-                  ? (
-                    <>
-                      {
-                        isEditMode
-                          ? (
-                            <button onClick={() => onSave()} className="message">
-                              Save Changes <FiEdit />
-                            </button>
-                          )
-                          : (
-                            <button onClick={() => flipEdit()} className="message">
-                              Edit Profile <FiEdit />
-                            </button>
-                          )
-                      }
-                    </>
-                  )
-                  : (
-                    <>
-                      <button
-                        onClick={() => handleMessageBoxClick()}
-                        className=" message"
-                      >
-                        Message
-                      </button>
-                    </>
-                  )
-                    ? (
-                      <button onClick={() => flipEdit()} className="message">
-                        Edit Profile <FiEdit />
-                      </button>
-                    )
-                    : (
-                      <button onClick={() => onSave()} className="message">
+                {isCurrentFreelancer ? (
+                  <>
+                    {isEditMode ? (
+                      <button onClick={() => onSave()} className='message'>
                         Save Changes <FiEdit />
                       </button>
-                    )
-                }
-
-                {(!isEditMode && isCurrentFreelancer)
-                  ? (
-                    <button onClick={copyProfile} className="share">
-                      <FaRegShareSquare color="white" />
-                      Share Profile
+                    ) : (
+                      <button onClick={() => flipEdit()} className='message'>
+                        Edit Profile <FiEdit />
+                      </button>
+                    )}
+                  </>
+                ) : <>
+                    <button
+                      onClick={() => handleMessageBoxClick()}
+                      className=' message'
+                    >
+                      Message
                     </button>
-                  )
-                  : (
-                    <button onClick={() => cancelEdit()} className="message !bg-red-600">
-                      Cancel
-                    </button>
-                  )
-                }
+                  </> ? (
+                  <button onClick={() => flipEdit()} className='message'>
+                    Edit Profile <FiEdit />
+                  </button>
+                ) : (
+                  <button onClick={() => onSave()} className='message'>
+                    Save Changes <FiEdit />
+                  </button>
+                )}
 
+                {!isEditMode && isCurrentFreelancer ? (
+                  <button onClick={copyProfile} className='share'>
+                    <FaRegShareSquare color='white' />
+                    Share Profile
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => cancelEdit()}
+                    className='message !bg-red-600'
+                  >
+                    Cancel
+                  </button>
+                )}
               </div>
               {/* TODO: Implement */}
               {/* <div className="divider"></div>
@@ -462,22 +445,29 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                             <MdKeyboardArrowDown size="20" />
                         </div> */}
             </div>
-            <hr className="separator" />
+            <hr className='separator' />
 
-            <div className="flex items-center gap-3">
-              <p className="text-xl">Among my clients</p>
-              <span className="h-4 w-4 flex justify-center items-center rounded-full bg-gray-500 text-black">
+            <div className='flex items-center gap-3'>
+              <p className='text-xl'>Among my clients</p>
+              <span className='h-4 w-4 flex justify-center items-center rounded-full bg-gray-500 text-black'>
                 ?
               </span>
             </div>
 
-            <Clients {...{ setFreelancer, isEditMode, setIsEditMode, clients, setClients }} />
+            <Clients
+              {...{
+                setFreelancer,
+                isEditMode,
+                setIsEditMode,
+                clients,
+                setClients,
+              }}
+            />
 
-            <hr className="separator" />
-
-            <div className="w-full px-[30px] lg:px-[40px]">
-              <p className="text-xl">Wallet Address</p>
-              <div className="mt-3 border break-words p-3 rounded-md bg-black">
+            <hr className='separator' />
+            <div className='w-full px-[30px] lg:px-[40px]'>
+              <p className='text-xl'>Wallet Address</p>
+              <div className='mt-3 border break-words p-3 rounded-md bg-black'>
                 {freelancer?.web3_address}
               </div>
             </div>
@@ -485,7 +475,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
             {isEditMode && (
               <button
                 onClick={() => setOpenAccountChoice(true)}
-                className="primary-btn in-dark w-2/3"
+                className='primary-btn in-dark w-2/3'
               >
                 Connect wallet
               </button>
@@ -499,48 +489,48 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
               setVisible={setOpenAccountChoice}
             />
 
-            <hr className="separator" />
+            <hr className='separator' />
 
-            <div className="w-full px-[30px] lg:px-[40px]">
-              <div className="flex justify-between mb-3">
-                <div className="flex items-center gap-4">
+            <div className='w-full px-[30px] lg:px-[40px]'>
+              <div className='flex justify-between mb-3'>
+                <div className='flex items-center gap-4'>
                   <AiOutlineUser size={24} />
-                  <p className="text-light-grey">Member Since</p>
+                  <p className='text-light-grey'>Member Since</p>
                 </div>
                 <div>Jan 2023</div>
               </div>
-              <div className="flex justify-between mb-3">
-                <div className="flex items-center gap-4">
+              <div className='flex justify-between mb-3'>
+                <div className='flex items-center gap-4'>
                   <MdOutlineWatchLater size={24} />
-                  <p className="text-light-grey">Last project Delivery</p>
+                  <p className='text-light-grey'>Last project Delivery</p>
                 </div>
                 <div>2 hour</div>
               </div>
-              <div className="flex justify-between mb-3">
-                <div className="flex items-center gap-4">
+              <div className='flex justify-between mb-3'>
+                <div className='flex items-center gap-4'>
                   <ImStack size={24} />
-                  <p className="text-light-grey">Number of projects</p>
+                  <p className='text-light-grey'>Number of projects</p>
                 </div>
                 <div>58</div>
               </div>
             </div>
           </div>
 
-          <div className="flex w-full">
-            <div className="flex flex-col gap-[36px] grow shrink-0 basis-[40%]">
+          <div className='flex w-full'>
+            <div className='flex flex-col gap-[36px] grow shrink-0 basis-[40%]'>
               <div className={`${styles.freelancerProfileSection} py-[30px]`}>
-                <div className="mx-[30px] lg:mx-[40px]">
+                <div className='mx-[30px] lg:mx-[40px]'>
                   <h5>Linked Account</h5>
-                  <div className="flex flex-col gap-[16px] mt-[24px]">
+                  <div className='flex flex-col gap-[16px] mt-[24px]'>
                     {socials?.map(({ label, key, value, icon }, index) => (
                       <div
-                        className="h-auto flex flex-wrap justify-between items-center"
+                        className='h-auto flex flex-wrap justify-between items-center'
                         key={index}
                       >
-                        <p className="text-base">{label} </p>
+                        <p className='text-base'>{label} </p>
                         {isEditMode ? (
                           <div
-                            className="h-auto w-full lg:w-2/3 flex justify-between items-center"
+                            className='h-auto w-full lg:w-2/3 flex justify-between items-center'
                             key={index}
                           >
                             <TextArea
@@ -554,13 +544,13 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                                 }
                               }}
                               //   className="bio-input"
-                              className="bio-inpu bg-[#1a1a19] text-white border border-light-white"
-                              id="bio-input-id"
+                              className='bio-inpu bg-[#1a1a19] text-white border border-light-white'
+                              id='bio-input-id'
                             />
                           </div>
                         ) : (
-                          <button className="bg-[#262626] w-[32px] h-[32px] rounded-[10px] text-[#ebeae2] border-none text-[20px] font-semibold items-center justify-center">
-                            {socials && value ? icon : "+"}
+                          <button className='bg-[#262626] w-[32px] h-[32px] rounded-[10px] text-[#ebeae2] border-none text-[20px] font-semibold items-center justify-center'>
+                            {socials && value ? icon : '+'}
                           </button>
                         )}
                       </div>
@@ -568,7 +558,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                   </div>
                 </div>
 
-                <hr className="separator" />
+                <hr className='separator' />
 
                 <Skills
                   {...{
@@ -580,20 +570,20 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                   }}
                 />
 
-                <hr className="separator" />
+                <hr className='separator' />
                 {/* TODO: Implement */}
-                <div className="ml-[30px] lg:mx-[40px]">
-                  <div className="header-editable">
+                <div className='ml-[30px] lg:mx-[40px]'>
+                  <div className='header-editable'>
                     <h5>Certification</h5>
-                    <div className="flex gap-3 mt-4">
-                      <div className="bg-theme-secondary h-11 w-11 rounded-full flex justify-center items-center">
+                    <div className='flex gap-3 mt-4'>
+                      <div className='bg-theme-secondary h-11 w-11 rounded-full flex justify-center items-center'>
                         <GrCertificate className={styles.whiteIcon} size={24} />
                       </div>
                       <div>
-                        <p className="text-light-grey">
+                        <p className='text-light-grey'>
                           Web3 Certification of participation
                         </p>
-                        <p className="text-light-grey">Jan 14</p>
+                        <p className='text-light-grey'>Jan 14</p>
                       </div>
                     </div>
                   </div>
@@ -692,7 +682,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
           <div
             className={`${styles.freelancerProfileSection} w-full py-[30px] px-[30px] lg:px-[40px]`}
           >
-            <div className="header-editable">
+            <div className='header-editable'>
               <h5>About</h5>
             </div>
             {isEditMode ? (
@@ -709,26 +699,26 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                     }
                   }}
                   rows={8}
-                  className="bio-inpu px-4 py-2 bg-[#1a1a19] text-white border border-light-white"
-                  id="bio-input-id"
+                  className='bio-inpu px-4 py-2 bg-[#1a1a19] text-white border border-light-white'
+                  id='bio-input-id'
                 />
               </>
             ) : (
               <>
-                <div className="bio">
+                <div className='bio'>
                   {freelancer?.bio
-                    ?.split?.("\n")
+                    ?.split?.('\n')
                     ?.map?.((line: any, index: number) => (
-                      <p className="leading-[1.2] text-base" key={index}>
+                      <p className='leading-[1.2] text-base' key={index}>
                         {line}
                       </p>
                     ))}
                 </div>
               </>
             )}
-            <hr className="separator" />
+            <hr className='separator' />
 
-            <div className="header-editable">
+            <div className='header-editable'>
               <h5>Education</h5>
             </div>
             {isEditMode ? (
@@ -745,13 +735,13 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                     }
                   }}
                   rows={8}
-                  className="bio-inpu px-4 py-2 bg-[#1a1a19] text-white border border-light-white"
-                  id="bio-input-id"
+                  className='bio-inpu px-4 py-2 bg-[#1a1a19] text-white border border-light-white'
+                  id='bio-input-id'
                 />
               </>
             ) : (
               <>
-                <div className="bio">
+                <div className='bio'>
                   {/* TODO: Implementation */}
                   {/* {freelancer?.education
                   ?.split?.("\n")
@@ -760,141 +750,141 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                       {line}
                     </p>
                   ))} */}
-                  {freelancer?.education || "No Education Data Found"}
+                  {freelancer?.education || 'No Education Data Found'}
                 </div>
               </>
             )}
           </div>
         </div>
 
-        <div className="lg:w-[50%] mt-[20px] lg:mt-0">
-          <div className="bg-theme-grey-dark rounded-xl border border-light-white">
-            <div className="px-[30px] lg:px-[40px] py-[30px] border-b border-b-light-white">
-              <h3 className="mb-3">Work History</h3>
-              <p className="text-primary">Completed Projects (3)</p>
+        <div className='lg:w-[50%] mt-[20px] lg:mt-0'>
+          <div className='bg-theme-grey-dark rounded-xl border border-light-white'>
+            <div className='px-[30px] lg:px-[40px] py-[30px] border-b border-b-light-white'>
+              <h3 className='mb-3'>Work History</h3>
+              <p className='text-primary'>Completed Projects (3)</p>
             </div>
             <div>
               {[...Array(3)].map((v, i) => (
                 <div
                   key={i}
-                  className="px-[30px] lg:px-[40px] py-[30px] flex flex-col gap-3 border-b last:border-b-0 border-b-light-white"
+                  className='px-[30px] lg:px-[40px] py-[30px] flex flex-col gap-3 border-b last:border-b-0 border-b-light-white'
                 >
-                  <p className="text-xl">{work.title}</p>
-                  <div className="flex gap-3 lg:gap-8 flex-wrap items-center justify-between">
-                    <div className="flex">
+                  <p className='text-xl'>{work.title}</p>
+                  <div className='flex gap-3 lg:gap-8 flex-wrap items-center justify-between'>
+                    <div className='flex'>
                       {[...Array(4)].map((r, ri) => (
                         <FaStar
-                          className="lg:h-[24px] lg:w-[24px]"
+                          className='lg:h-[24px] lg:w-[24px]'
                           key={ri}
                           color={
                             ri + 1 > work.ratings
-                              ? "white"
-                              : "var(--theme-primary)"
+                              ? 'white'
+                              : 'var(--theme-primary)'
                           }
                         />
                       ))}
                     </div>
-                    <p className="text-light-grey">{work.time}</p>
+                    <p className='text-light-grey'>{work.time}</p>
                   </div>
-                  <p className="text-light-grey">{work.description}</p>
-                  <div className="flex justify-between">
-                    <p className="">${work.budget}</p>
-                    <p className="">{work.budgetType}</p>
+                  <p className='text-light-grey'>{work.description}</p>
+                  <div className='flex justify-between'>
+                    <p className=''>${work.budget}</p>
+                    <p className=''>{work.budgetType}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <p className="text-primary text-right m-2 cursor-pointer">
+          <p className='text-primary text-right m-2 cursor-pointer'>
             View More
           </p>
 
           <StyledEngineProvider injectFirst>
-            <div className="flex flex-col">
+            <div className='flex flex-col'>
               <TextField
-                id="outlined-controlled"
-                label="Search"
-                sx={{ maxWidth: "350px" }}
+                id='outlined-controlled'
+                label='Search'
+                sx={{ maxWidth: '350px' }}
                 InputProps={{
                   endAdornment: (
-                    <InputAdornment position="end">
+                    <InputAdornment position='end'>
                       <SearchIcon />
                     </InputAdornment>
                   ),
                 }}
               />
               <FormControl
-                variant="standard"
-                sx={{ m: 1, minWidth: 180, maxWidth: "100px" }}
+                variant='standard'
+                sx={{ m: 1, minWidth: 180, maxWidth: '100px' }}
               >
-                <InputLabel id="demo-simple-select-standard-label">
+                <InputLabel id='demo-simple-select-standard-label'>
                   Sort by
                 </InputLabel>
                 <Select
-                  labelId="demo-simple-select-standard-label"
-                  id="demo-simple-select-standard"
+                  labelId='demo-simple-select-standard-label'
+                  id='demo-simple-select-standard'
                   value={sortReviews}
                   onChange={(e) => setSortReviews(e.target.value)}
-                  label="Sort by"
+                  label='Sort by'
                 >
-                  <MenuItem value="relevant">Most Relevant</MenuItem>
-                  <MenuItem value="ratings">Ratings</MenuItem>
-                  <MenuItem value="budget">Budget</MenuItem>
-                  <MenuItem value="date">Date</MenuItem>
+                  <MenuItem value='relevant'>Most Relevant</MenuItem>
+                  <MenuItem value='ratings'>Ratings</MenuItem>
+                  <MenuItem value='budget'>Budget</MenuItem>
+                  <MenuItem value='date'>Date</MenuItem>
                 </Select>
               </FormControl>
             </div>
           </StyledEngineProvider>
-          <hr className="separator" />
+          <hr className='separator' />
 
-          <div className="flex flex-col gap-5">
+          <div className='flex flex-col gap-5'>
             {reviews.map((review, index) => (
               <div
                 key={index}
-                className="flex flex-col gap-3 pt-2 pb-5 border-b last:border-b-0 border-b-light-white"
+                className='flex flex-col gap-3 pt-2 pb-5 border-b last:border-b-0 border-b-light-white'
               >
-                <div className="flex gap-3">
-                  <div className="h-[46px] w-[46px] rounded-full overflow-hidden relative">
+                <div className='flex gap-3'>
+                  <div className='h-[46px] w-[46px] rounded-full overflow-hidden relative'>
                     <Image
-                      sizes="24"
-                      className="object-cover"
+                      sizes='24'
+                      className='object-cover'
                       src={review.image}
                       fill
-                      alt="user"
+                      alt='user'
                     />
                   </div>
                   <div>
                     <p>{review.name}</p>
-                    <div className="flex gap-2 items-center">
+                    <div className='flex gap-2 items-center'>
                       <ReactCountryFlag countryCode={review.countryCode} />
                       <span>{review.country}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center">
+                <div className='flex items-center'>
                   {[...Array(4)].map((r, ri) => (
                     <FaStar
-                      className="lg:h-[24px] lg:w-[24px]"
+                      className='lg:h-[24px] lg:w-[24px]'
                       key={ri}
                       color={
                         ri + 1 > review.ratings
-                          ? "white"
-                          : "var(--theme-primary)"
+                          ? 'white'
+                          : 'var(--theme-primary)'
                       }
                     />
                   ))}
-                  <span className="text-light-grey ml-2">| {review.time}</span>
+                  <span className='text-light-grey ml-2'>| {review.time}</span>
                 </div>
-                <p className="mt-2">{review.description}</p>
-                <div className="flex gap-4">
+                <p className='mt-2'>{review.description}</p>
+                <div className='flex gap-4'>
                   <p>Helpful?</p>
-                  <div className="flex gap-3">
-                    <div className="cta-vote">
+                  <div className='flex gap-3'>
+                    <div className='cta-vote'>
                       <FaRegThumbsUp />
                       Yes
                     </div>
-                    <div className="cta-vote">
+                    <div className='cta-vote'>
                       <FaRegThumbsDown />
                       No
                     </div>
@@ -914,18 +904,23 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
       {loading && <FullScreenLoader />}
 
       <SuccessScreen
-        title={"You have successfully updated your profile"}
+        title={'You have successfully updated your profile'}
         open={success}
-        setOpen={setSuccess}>
+        setOpen={setSuccess}
+      >
         <div className='flex flex-col gap-4 w-1/2'>
           <button
-            onClick={() => { flipEdit(), setSuccess(false) }}
-            className='primary-btn in-dark w-button w-full !m-0'>
+            onClick={() => {
+              flipEdit(), setSuccess(false);
+            }}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
             See Profile
           </button>
           <button
             onClick={() => router.push(`/dashboard`)}
-            className='underline text-xs lg:text-base font-bold'>
+            className='underline text-xs lg:text-base font-bold'
+          >
             Go to Dashboard
           </button>
         </div>
@@ -935,17 +930,26 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => setError(null)}
-            className='primary-btn in-dark w-button w-full !m-0'>
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
             Try Again
           </button>
           <button
             onClick={() => router.push(`/dashboard`)}
-            className='underline text-xs lg:text-base font-bold'>
+            className='underline text-xs lg:text-base font-bold'
+          >
             Go to Dashboard
           </button>
         </div>
       </ErrorScreen>
-      <Alert className={`absolute top-2 z-10 transform duration-300 transition-all ${copied ? "right-5" :"-right-full"}`} severity="success">Profile Link Copied to clipboard</Alert>
+      <Alert
+        className={`absolute top-2 z-10 transform duration-300 transition-all ${
+          copied ? 'right-5' : '-right-full'
+        }`}
+        severity='success'
+      >
+        Profile Link Copied to clipboard
+      </Alert>
     </div>
   );
 };
@@ -959,17 +963,17 @@ export const getServerSideProps = async (context: any) => {
   }
 
   try {
-    const user = await authenticate("jwt", req, res);
+    const user = await authenticate('jwt', req, res);
     if (user) {
       return { props: { isAuthenticated: true, user, initFreelancer } };
     }
   } catch (error: any) {
-    console.error(error);
+    console.error(error); // TODO:
   }
 
   return {
     redirect: {
-      destination: "/",
+      destination: '/',
       permanent: false,
     },
   };
