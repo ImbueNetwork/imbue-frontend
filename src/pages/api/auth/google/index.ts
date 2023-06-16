@@ -2,12 +2,13 @@ import jwt from 'jsonwebtoken';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
+import { setTokenCookie } from '@/lib/auth-cookies';
+import * as models from '@/lib/models';
+import { fetchUserOrEmail, updateFederatedLoginUser } from '@/lib/models';
+
 import db from '@/db';
-import { setTokenCookie } from '@/pages/api/auth-cookies';
 
 import { jwtOptions } from '../common';
-import * as models from '../../models';
-import { fetchUserOrEmail, updateFederatedLoginUser } from '../../models';
 export default nextConnect().post(
   async (req: NextApiRequest, res: NextApiResponse) => {
     const creds = req.body;

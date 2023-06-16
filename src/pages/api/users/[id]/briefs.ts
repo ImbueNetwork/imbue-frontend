@@ -3,14 +3,14 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import passport from 'passport';
 
-import db from '@/db';
-
 import {
   fetchBriefApplications,
   fetchProject,
   fetchProjectMilestones,
   fetchUserBriefs,
-} from '../../models';
+} from '@/lib/models';
+
+import db from '@/db';
 
 export default nextConnect()
   .use(passport.initialize())
