@@ -1,4 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import Pagination from 'rc-pagination';
@@ -17,33 +19,13 @@ import {
   callSearchBriefs,
   getAllBriefs,
   getAllSavedBriefs,
-<<<<<<< HEAD
-} from "@/redux/services/briefService";
-import { BriefFilterOption } from "@/types/briefTypes";
-import { useRouter } from "next/router";
-import { FiFilter } from "react-icons/fi";
-import { useWindowSize } from "@/hooks";
-import Pagination from "rc-pagination";
-import FullScreenLoader from "@/components/FullScreenLoader";
-import ErrorScreen from "@/components/ErrorScreen";
-import { filterIcon, savedIcon } from "@/assets/svgs";
-import Image from "next/image";
-import CustomDropDown from "@/components/CustomDropDown";
-import CustomModal from "@/components/CustomModal";
-import search from "../api/freelancers/search";
-import user from "../api/info/user";
-import { getCurrentUser } from "@/utils";
-import TimeAgo from "javascript-time-ago";
-import en from "javascript-time-ago/locale/en";
-
-TimeAgo.addLocale(en);
-
-const timeAgo = new TimeAgo("en-US");
-=======
 } from '@/redux/services/briefService';
 
 import { BriefFilterOption } from '@/types/briefTypes';
->>>>>>> origin/main
+
+TimeAgo.addLocale(en);
+
+const timeAgo = new TimeAgo('en-US');
 
 interface FilterModalProps {
   open: boolean;
@@ -618,17 +600,17 @@ const Briefs = (): JSX.Element => {
                     ))}
                   </div>
 
-                  <div className="flex justify-between w-[400px] items-center">
-                    <div className="brief-proposals">
-                      <span className="proposals-heading">
-                        Proposals Submitted:{" "}
+                  <div className='flex justify-between w-[400px] items-center'>
+                    <div className='brief-proposals'>
+                      <span className='proposals-heading'>
+                        Proposals Submitted:{' '}
                       </span>
-                      <span className="proposals-count">
+                      <span className='proposals-count'>
                         {item.number_of_briefs_submitted}
                       </span>
                     </div>
 
-                    <div className="leading-none">
+                    <div className='leading-none'>
                       {timeAgo.format(new Date(item?.created))}
                     </div>
                   </div>
