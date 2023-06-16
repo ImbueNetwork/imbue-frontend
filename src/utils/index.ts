@@ -1,7 +1,7 @@
 import { StreamChat } from 'stream-chat';
 
 import * as config from '@/config';
-import { Project } from '@/model';
+import { Project, User } from '@/model';
 
 export type BadRoute =
   | 'not-found'

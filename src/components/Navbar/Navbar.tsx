@@ -1,6 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Avatar, Box, IconButton, Menu, Tooltip } from '@mui/material';
+import { Avatar, Box, IconButton, Menu, Skeleton, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -82,9 +82,8 @@ function Navbar() {
   return (
     <>
       <header
-        className={`navBar ${
-          solidNav ? 'bg-theme-black-text' : 'bg-transparent'
-        }`}
+        className={`navBar ${solidNav ? 'bg-theme-black-text' : 'bg-transparent'
+          }`}
         id='header-wrapper'
       >
         <div className='text-center w-full bg-primary text-black py-1 text-xs lg:text-sm'>
@@ -143,40 +142,47 @@ function Navbar() {
               Discover Freelancers
             </Link>
             <Tooltip title='Account settings'>
-              <IconButton
-                onClick={(e) => handleClick(e)}
-                size="small"
-                sx={{ ml: 2 }}
-                aria-controls={open ? 'account-menu' : undefined}
-                aria-haspopup='true'
-                aria-expanded={open ? 'true' : undefined}
-              >
-                {user?.username ? (
-                  <Avatar className="w-8 h-8 lg:w-10 lg:h-10">
-                    <Image
-                      src={freelancerProfile?.profile_image || defaultProfile}
-                      width={40}
-                      height={40}
-                      alt='profile'
-                    />
-                  </Avatar>
-                ) : (
-                  <div>
-                    {openMenu ? (
-                      <CloseIcon htmlColor='white' />
-                    ) : (
-                      <div onClick={() => setOpenMenu(!openMenu)}>
-                        {openMenu ? (
-                          <CloseIcon htmlColor="white" />
-                        ) : (
-                          <MenuIcon htmlColor="white" />
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )
-                }
-              </IconButton>
+              {
+                loading
+                  ? <Skeleton variant="circular" width={40} height={40} />
+                  : (
+                    <IconButton
+                      onClick={(e) => handleClick(e)}
+                      size="small"
+                      sx={{ ml: 2 }}
+                      aria-controls={open ? 'account-menu' : undefined}
+                      aria-haspopup='true'
+                      aria-expanded={open ? 'true' : undefined}
+                    >
+                      {user?.username ? (
+                        <Avatar className="w-8 h-8 lg:w-10 lg:h-10">
+                          <Image
+                            src={freelancerProfile?.profile_image || defaultProfile}
+                            width={40}
+                            height={40}
+                            alt='profile'
+                          />
+                        </Avatar>
+                      ) : (
+                        <div>
+                          {openMenu ? (
+                            <CloseIcon htmlColor='white' />
+                          ) : (
+                            <div onClick={() => setOpenMenu(!openMenu)}>
+                              {openMenu ? (
+                                <CloseIcon htmlColor="white" />
+                              ) : (
+                                <MenuIcon htmlColor="white" />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )
+                      }
+                    </IconButton>
+                  )
+              }
+
             </Tooltip>
 
           </Box>
@@ -200,7 +206,7 @@ function Navbar() {
       </header>
       <Login
         visible={loginModal}
-        setVisible={(val:any) => {
+        setVisible={(val: any) => {
           setLoginModal(val);
         }}
         redirectUrl={'/dashboard'}

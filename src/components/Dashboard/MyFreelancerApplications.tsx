@@ -1,8 +1,9 @@
-import { useRouter } from "next/router";
-import React, { useState } from "react";
-import { Project, OffchainProjectState, displayState } from "@/model";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
+
+import { displayState,OffchainProjectState, Project } from "@/model";
 TimeAgo.addLocale(en);
 
 type FreelancerApplicationsType = {
@@ -17,8 +18,8 @@ const MyFreelancerApplications = ({
   const router = useRouter();
   const ongoingBriefs = myApplications?.filter((application: any) => !application?.chain_project_id)
   const cuttentBriefs = myApplications?.filter((application: any) => application?.chain_project_id)
-  const [appliedBriefs, setAppliedBriefs] = useState<any>(ongoingBriefs)
-  const [currentProject, setCurrentProject] = useState<any>(cuttentBriefs)
+  const [appliedBriefs] = useState<any>(ongoingBriefs)
+  const [currentProject] = useState<any>(cuttentBriefs)
 
   const redirectToApplication = (application: Project) => {
     router.push(

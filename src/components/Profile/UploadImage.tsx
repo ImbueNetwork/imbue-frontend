@@ -6,7 +6,7 @@ import { uploadPhoto } from '@/utils/imageUpload';
 
 type UploadImageProps = {
     isEditMode: boolean;
-    setUser: Function;
+    setUser: (value: any) => void;
     user: any;
 }
 

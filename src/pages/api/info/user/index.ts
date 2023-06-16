@@ -2,19 +2,19 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
 import passport from "passport";
-// @ts-ignore
 import * as passportJwt from "passport-jwt";
 
 import db from "@/db";
 
 import { jwtOptions } from "../../auth/common";
-// @ts-ignore
 import { fetchUser } from "../../../../lib/models";
 import * as models from "../../../../lib/models";
 const JwtStrategy = passportJwt.Strategy;
 
+//@ts-ignore
 export const imbueStrategy = new JwtStrategy(jwtOptions, async function (
   jwt_payload: any,
+  // eslint-disable-next-line @typescript-eslint/ban-types
   next: Function
 ) {
   const id = jwt_payload.id;

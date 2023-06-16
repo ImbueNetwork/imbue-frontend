@@ -337,7 +337,7 @@ export const updateUserGetStreamToken =
     )[0];
 
 export const insertToTable =
-  <T>(item: string, table_name: string) =>
+  (item: string, table_name: string) =>
   async (tx: Knex.Transaction) =>
     (
       await tx(table_name)

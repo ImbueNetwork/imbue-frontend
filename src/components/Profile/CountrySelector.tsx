@@ -6,14 +6,14 @@ import { CountryDropdown, RegionDropdown } from 'react-country-region-selector';
 
 type CountrySelectorProps = {
   user: any;
-  setUser: Function;
+  setUser: (value: any) => void;
   isEditMode: boolean;
 };
 
 const CountrySelector = ({ setUser, user, isEditMode }: CountrySelectorProps) => {
   const [country, setCountry] = useState<string>(user?.country || "");
   const [region, setRegion] = useState(user?.region || '');
-  
+
   const handleCountry = (countryName: string) => {
     setCountry(countryName)
     setUser({ ...user, country: countryName })
