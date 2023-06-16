@@ -1,4 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import Pagination from 'rc-pagination';
@@ -20,6 +22,10 @@ import {
 } from '@/redux/services/briefService';
 
 import { BriefFilterOption } from '@/types/briefTypes';
+
+TimeAgo.addLocale(en);
+
+const timeAgo = new TimeAgo('en-US');
 
 interface FilterModalProps {
   open: boolean;
@@ -594,13 +600,19 @@ const Briefs = (): JSX.Element => {
                     ))}
                   </div>
 
-                  <div className='brief-proposals'>
-                    <span className='proposals-heading'>
-                      Proposals Submitted:{' '}
-                    </span>
-                    <span className='proposals-count'>
-                      {item.number_of_briefs_submitted}
-                    </span>
+                  <div className='flex justify-between w-[400px] items-center'>
+                    <div className='brief-proposals'>
+                      <span className='proposals-heading'>
+                        Proposals Submitted:{' '}
+                      </span>
+                      <span className='proposals-count'>
+                        {item.number_of_briefs_submitted}
+                      </span>
+                    </div>
+
+                    <div className='leading-none'>
+                      {timeAgo.format(new Date(item?.created))}
+                    </div>
                   </div>
                 </div>
               )
