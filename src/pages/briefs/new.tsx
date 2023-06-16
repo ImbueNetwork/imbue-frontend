@@ -1,54 +1,43 @@
-import React, { useState } from "react";
-import { Option } from "@/components/Option";
-import { ProgressBar } from "@/components/ProgressBar";
-import { TagsInput } from "@/components/TagsInput";
-import { TextArea } from "@/components/Briefs/TextArea";
-import * as utils from "@/utils";
+import { useRouter } from 'next/router';
+import React, { useState } from 'react';
+
+import * as utils from '@/utils';
+import { getServerSideProps } from '@/utils/serverSideProps';
+
+import { TextArea } from '@/components/Briefs/TextArea';
+import ErrorScreen from '@/components/ErrorScreen';
+import FullScreenLoader from '@/components/FullScreenLoader';
+import { Option } from '@/components/Option';
+import { ProgressBar } from '@/components/ProgressBar';
+import { TagsInput } from '@/components/TagsInput';
+
+import * as config from '@/config';
 import {
-  stepData,
-  scopeData,
-  timeData,
   experiencedLevel,
   nameExamples,
+  scopeData,
+  stepData,
   suggestedIndustries,
   suggestedSkills,
-} from "@/config/briefs-data";
-import * as config from "@/config";
-import { BriefInfo, BriefProps } from "@/types/briefTypes";
-import { getServerSideProps } from "@/utils/serverSideProps";
-import styles from "../../styles/modules/newBrief.module.css";
-import ErrorScreen from "@/components/ErrorScreen";
-import FullScreenLoader from "@/components/FullScreenLoader";
-import { useRouter } from "next/router";
+  timeData,
+} from '@/config/briefs-data';
+
+import styles from '../../styles/modules/newBrief.module.css';
 
 const getAPIHeaders = {
-  accept: "application/json",
+  accept: 'application/json',
 };
 
 const postAPIHeaders = {
   ...getAPIHeaders,
-  "content-type": "application/json",
+  'content-type': 'application/json',
 };
 
-async function invokeBriefAPI(brief: BriefInfo) {
-  const resp = await fetch(`${config.apiBase}/briefs/`, {
-    headers: postAPIHeaders,
-    method: "post",
-    body: JSON.stringify({ brief }),
-  });
-
-  if (resp.ok) {
-    // could be 200 or 201
-    // Brief API successfully invoked
-    console.log("Brief created successfully via Brief REST API");
-  }
-}
-
-const NewBrief = (props: BriefProps): JSX.Element => {
+const NewBrief = (): JSX.Element => {
   const [step, setStep] = useState(0);
-  const [headline, setHeadline] = useState("");
+  const [headline, setHeadline] = useState('');
   const [industries, setIndustries] = useState<string[]>([]);
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState('');
   const [skills, setSkills] = useState<string[]>([]);
   const [expId, setExpId] = useState<number>();
   const [scopeId, setScopeId] = useState<number>();
@@ -65,9 +54,9 @@ const NewBrief = (props: BriefProps): JSX.Element => {
       <div className={styles.namePanelInputWrapper}>
         <textarea
           className={styles.briefDetailFieldInput}
-          data-testid="headline-input"
-          placeholder="Enter the name of your project"
-          name="headline"
+          data-testid='headline-input'
+          placeholder='Enter the name of your project'
+          name='headline'
           value={headline}
           onChange={(e) => setHeadline(e.target.value)}
         />
@@ -89,7 +78,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
       <div className={styles.industryContainer}>
         <TagsInput
           suggestData={suggestedIndustries}
-          data-testid="industries-input"
+          data-testid='industries-input'
           tags={industries}
           onChange={(tags: string[]) => setIndustries(tags)}
         />
@@ -104,11 +93,11 @@ const NewBrief = (props: BriefProps): JSX.Element => {
       </p>
       <div className={styles.descriptionContainer}>
         <TextArea
-          data-testid="description-input"
+          data-testid='description-input'
           value={description}
-          name="description"
+          name='description'
           maxLength={5000}
-          className="text-black"
+          className='text-black'
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
             setDescription(e.target.value)
           }
@@ -124,7 +113,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
         <TagsInput
           suggestData={suggestedSkills}
           tags={skills}
-          data-testid="skills-input"
+          data-testid='skills-input'
           onChange={(tags: string[]) => setSkills(tags)}
         />
       </div>
@@ -185,10 +174,10 @@ const NewBrief = (props: BriefProps): JSX.Element => {
       <div className={styles.budgetInputContainer}>
         <input
           className={styles.briefDetailFieldInput}
-          style={{ paddingLeft: "24px", height: "auto" }}
-          type="number"
-          data-testid="budget-input"
-          value={budget || ""}
+          style={{ paddingLeft: '24px', height: 'auto' }}
+          type='number'
+          data-testid='budget-input'
+          value={budget || ''}
           onChange={(e) => setBudget(Number(e.target.value))}
         />
         <div className={styles.budgetCurrencyContainer}>$</div>
@@ -254,7 +243,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
       const user_id = (await utils.getCurrentUser())?.id;
       const resp = await fetch(`${config.apiBase}/briefs/`, {
         headers: postAPIHeaders,
-        method: "post",
+        method: 'post',
         body: JSON.stringify({
           headline,
           industries,
@@ -270,7 +259,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
       if (resp.status === 200 || resp.status === 201) {
         setStep(step + 1);
       } else {
-        setError({ message: "Failed to submit the brief" });
+        setError({ message: 'Failed to submit the brief' });
       }
     } catch (error) {
       setError(error);
@@ -279,15 +268,15 @@ const NewBrief = (props: BriefProps): JSX.Element => {
     }
   };
   return (
-    <div className="h-[90%] flex">
+    <div className='h-[90%] flex'>
       <div className={`${styles.newBriefContainer} hq-layout`}>
         <div className={styles.leftPanel}>
           <ProgressBar
-            titleArray={["Description", "Skills", "Scope", "Budget"]}
+            titleArray={['Description', 'Skills', 'Scope', 'Budget']}
             currentValue={stepData[step].progress}
           />
           <h1 className={styles.heading}>{stepData[step].heading}</h1>
-          {stepData[step].content.split("\n").map((content, index) => (
+          {stepData[step].content.split('\n').map((content, index) => (
             <p className={styles.help} key={index}>
               {content}
             </p>
@@ -298,7 +287,7 @@ const NewBrief = (props: BriefProps): JSX.Element => {
           <div className={styles.buttons}>
             {step >= 1 && (
               <button
-                className="secondary-btn !mt-0"
+                className='secondary-btn !mt-0'
                 onClick={() => setStep(step - 1)}
               >
                 Back
@@ -307,28 +296,28 @@ const NewBrief = (props: BriefProps): JSX.Element => {
 
             {step === stepData.length - 1 ? (
               <button
-                className="primary-btn in-dark w-button"
-                onClick={() => utils.redirect("briefs")}
+                className='primary-btn in-dark w-button'
+                onClick={() => utils.redirect('briefs')}
               >
                 Discover Briefs
               </button>
             ) : step === stepData.length - 2 ? (
               <button
-                className="primary-btn in-dark w-button !mt-0"
+                className='primary-btn in-dark w-button !mt-0'
                 disabled={!validate()}
-                data-testid="submit-button"
+                data-testid='submit-button'
                 onClick={() => onReviewPost()}
               >
                 Submit
               </button>
             ) : (
               <button
-                className="primary-btn in-dark w-button !mt-0"
-                data-testid="next-button"
+                className='primary-btn in-dark w-button !mt-0'
+                data-testid='next-button'
                 onClick={() => setStep(step + 1)}
                 disabled={!validate()}
               >
-                {stepData[step].next ? `Next: ${stepData[step].next}` : "Next"}
+                {stepData[step].next ? `Next: ${stepData[step].next}` : 'Next'}
               </button>
             )}
           </div>
@@ -336,16 +325,16 @@ const NewBrief = (props: BriefProps): JSX.Element => {
       </div>
       {loading && <FullScreenLoader />}
       <ErrorScreen {...{ error, setError }}>
-        <div className="flex flex-col gap-4 w-1/2">
+        <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => router.push(`/briefs`)}
-            className="primary-btn in-dark w-button w-full !m-0"
+            className='primary-btn in-dark w-button w-full !m-0'
           >
             Discover Briefs
           </button>
           <button
             onClick={() => setError(null)}
-            className="underline text-xs lg:text-base font-bold"
+            className='underline text-xs lg:text-base font-bold'
           >
             Try Again
           </button>

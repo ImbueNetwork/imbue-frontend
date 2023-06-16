@@ -143,7 +143,7 @@
 
 .value-input .input-budget {
   background-color: #1a1a19;
-  border:1px solid var(--theme-light-white);
+  border: 1px solid var(--theme-light-white);
   border-radius: 5px;
   padding: 10px 20px;
   position: relative;
@@ -152,14 +152,14 @@
 
 .input-budget {
   background-color: #1a1a19;
-  border:1px solid var(--theme-light-white);
+  border: 1px solid var(--theme-light-white);
   border-radius: 5px;
   padding: 10px 20px;
   width: 100%;
 }
 
 .value-input .input-budget:before {
-  content: "$";
+  content: '$';
 }
 
 .progress-container {
@@ -262,7 +262,6 @@
   margin-bottom: 0.5rem;
 }
 
-
 .modal-container ::-webkit-scrollbar {
   width: 3px;
 }
@@ -294,9 +293,7 @@
   }
 } */
 
-
 @media screen and (max-width: 500px) {
-
   .payment-details {
     flex-direction: column;
   }

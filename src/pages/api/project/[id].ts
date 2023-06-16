@@ -1,18 +1,18 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import db from "@/db";
-import * as models from "../models";
-import nextConnect from 'next-connect'
+import { NextApiRequest, NextApiResponse } from 'next';
+import nextConnect from 'next-connect';
+
+import db from '@/db';
+
+import * as models from '../models';
 
 type ProjectPkg = models.Project & {
   milestones: models.Milestone[];
 };
 
-
 export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
-    const { method, query, body } = req;
+    const { query } = req;
     const id: any = query.id as string[];
-
 
     db.transaction(async (tx) => {
       try {
@@ -36,7 +36,7 @@ export default nextConnect()
     });
   })
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
-    const { method, query, body } = req;
+    const { query, body } = req;
     const id: any = query.id as string[];
     const {
       name,
@@ -81,7 +81,7 @@ export default nextConnect()
         })(tx);
 
         if (!project.id) {
-          return new Error("Cannot update milestones: `project_id` missing.");
+          return new Error('Cannot update milestones: `project_id` missing.');
         }
 
         // drop then recreate

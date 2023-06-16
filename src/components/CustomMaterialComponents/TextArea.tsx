@@ -1,11 +1,11 @@
+import styled from '@emotion/styled';
 import {
-  FormControl,
-  InputLabel,
   FilledInput,
+  FormControl,
   FormHelperText,
-} from "@mui/material";
-import React, { useState } from "react";
-import styled from "@emotion/styled";
+  InputLabel,
+} from '@mui/material';
+import React, { useState } from 'react';
 
 type TextAreaProps = {
   name: string;
@@ -20,11 +20,11 @@ type InputProps = {
 };
 
 const Input = styled(FilledInput)(({ error }: InputProps) => ({
-  "&:after": {
-    borderBottom: error ? "1px solid #ff5a58" : "1px solid #b2ff0b",
+  '&:after': {
+    borderBottom: error ? '1px solid #ff5a58' : '1px solid #b2ff0b',
   },
-  "& .Mui-focused": {
-    borderBottom: error ? "1px solid #ff5a58" : "1px solid #000",
+  '& .Mui-focused': {
+    borderBottom: error ? '1px solid #ff5a58' : '1px solid #000',
   },
 }));
 
@@ -43,7 +43,7 @@ const TextArea = ({
   mt,
 }: TextAreaProps): JSX.Element => {
   const [focused, setFocused] = useState(false);
-  const [text, setText] = useState("");
+  const [text, setText] = useState('');
 
   const countText = (str: string): number => {
     return str.length;
@@ -51,21 +51,21 @@ const TextArea = ({
 
   return (
     <div style={{ marginTop: mt || 0 }}>
-      <FormControl variant="filled" className="text-input-container">
+      <FormControl variant='filled' className='text-input-container'>
         <InputLabel
-          htmlFor="component-filled"
+          htmlFor='component-filled'
           className={
             error
-              ? "text-input-label-error"
+              ? 'text-input-label-error'
               : focused
-              ? "text-input-label-focused"
-              : "text-input-label"
+              ? 'text-input-label-focused'
+              : 'text-input-label'
           }
         >
           {placeholder}
         </InputLabel>
         <Input
-          id="component-filled"
+          id='component-filled'
           name={name}
           multiline
           rows={12}
@@ -74,16 +74,16 @@ const TextArea = ({
           onChange={(e) => setText(e?.target?.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          className="text-area-input-field"
+          className='text-area-input-field'
         />
       </FormControl>
       <SpacedRow>
         <FormHelperText
-          className={error ? "text-input-field-error" : "text-input-field"}
+          className={error ? 'text-input-field-error' : 'text-input-field'}
         >
-          {focused ? `${message || " "}` : " "}
+          {focused ? `${message || ' '}` : ' '}
         </FormHelperText>
-        <FormHelperText className="text-input-field">
+        <FormHelperText className='text-input-field'>
           {countText(text)}/5000
         </FormHelperText>
       </SpacedRow>

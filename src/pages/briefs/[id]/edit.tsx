@@ -1,26 +1,27 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from "react";
-import { timeData } from "@/config/briefs-data";
-import { Brief, User } from "@/model";
-import { getBrief, updateBriefById } from "@/redux/services/briefService";
-import { getCurrentUser } from "@/utils";
-import { getFreelancerProfile } from "@/redux/services/freelancerService";
-import { useRouter } from "next/router";
-import FullScreenLoader from "@/components/FullScreenLoader";
-import styles from "@/styles/modules/newBrief.module.css";
-import { TagsInput } from "@/components/TagsInput";
+import styled from '@emotion/styled';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+
+import { getCurrentUser } from '@/utils';
+
+import { TextArea } from '@/components/Briefs/TextArea';
+import ErrorScreen from '@/components/ErrorScreen';
+import FullScreenLoader from '@/components/FullScreenLoader';
+import { Option } from '@/components/Option';
+import SuccessScreen from '@/components/SuccessScreen';
+import { TagsInput } from '@/components/TagsInput';
+
+import { timeData } from '@/config/briefs-data';
 import {
-  scopeData,
   experiencedLevel,
+  scopeData,
   suggestedIndustries,
   suggestedSkills,
-} from "@/config/briefs-data";
-import { TextArea } from "@/components/Briefs/TextArea";
-import { Option } from "@/components/Option";
-import styled from "@emotion/styled";
-import { postAPIHeaders } from "@/config";
-import SuccessScreen from "@/components/SuccessScreen";
-import ErrorScreen from "@/components/ErrorScreen";
+} from '@/config/briefs-data';
+import { Brief, User } from '@/model';
+import { getBrief, updateBriefById } from '@/redux/services/briefService';
+import styles from '@/styles/modules/newBrief.module.css';
 
 const SpacedRow = styled.div`
   display: flex;
@@ -35,26 +36,22 @@ const SpacedRow = styled.div`
   }
 `;
 
-interface MilestoneItem {
-  name: string;
-  amount: number | undefined;
-}
-
 export const EditProposal = (): JSX.Element => {
-  const [brief, setBrief] = useState<Brief | any>();
-  const [user, setUser] = useState<User | null>();
+  // FIXME: brief
+  const [_brief, setBrief] = useState<Brief | any>();
+  // FIXME: user
+  const [_user, setUser] = useState<User | null>();
   const [industries, setIndustries] = useState<string[]>([]);
-  const [description, setDescription] = useState("");
-  const [headline, setHeadline] = useState("");
+  const [description, setDescription] = useState('');
+  const [headline, setHeadline] = useState('');
   const [expId, setExpId] = useState<number>();
   const [scopeId, setScopeId] = useState<number>();
   const [durationId, setDurationId] = useState<number>();
   const [budget, setBudget] = useState<number | bigint | any>();
 
-
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<any>()
-  const [success, setSuccess] = useState<boolean>(false)
+  const [error, setError] = useState<any>();
+  const [success, setSuccess] = useState<boolean>(false);
 
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
@@ -94,12 +91,11 @@ export const EditProposal = (): JSX.Element => {
         router.push(`/briefs/${briefId}`);
       }
     } catch (error) {
+      // FIXME: error handling
       console.log(error);
+    } finally {
+      setLoading(false);
     }
-    finally {
-      setLoading(false)
-    }
-
   };
 
   async function handleSubmit() {
@@ -122,17 +118,14 @@ export const EditProposal = (): JSX.Element => {
       });
       if (updateBriefResponse) {
         setSuccess(true);
-      }
-      else {
-        setError({ message: "Could not update brief. Please try again" })
+      } else {
+        setError({ message: 'Could not update brief. Please try again' });
       }
     } catch (error) {
-      setError({ message: "Could not update brief. Please try again" })
-    }
-    finally {
+      setError({ message: 'Could not update brief. Please try again' });
+    } finally {
       setLoading(false);
     }
-
   }
 
   function filterStrings(arr1: string[], arr2: string[]): string[] {
@@ -140,22 +133,22 @@ export const EditProposal = (): JSX.Element => {
   }
 
   return (
-    <div className="flex flex-row max-width-868px:block hq-layout max-md:px-7">
+    <div className='flex flex-row max-width-868px:block hq-layout max-md:px-7'>
       <header
-        className="
+        className='
       max-w-[400px] 
       p-0 pb-[40px] 
       max-width-868px:w-[auto] 
       max-width-868px:max-w-[unset]
       md:w-[70%]
       md:mr-20 
-      "
+      '
       >
-        <h1 className=" text-4xl leading-[50px] !text-white m-0 font-normal mx-0">
+        <h1 className=' text-4xl leading-[50px] !text-white m-0 font-normal mx-0'>
           Edit Brief Details
         </h1>
       </header>
-      <div className="imbu-proposals-draft-submission-form">
+      <div className='imbu-proposals-draft-submission-form'>
         <fieldset>
           <p className={`${styles.fieldName} !text-white !text-3xl`}>
             Headline
@@ -163,13 +156,13 @@ export const EditProposal = (): JSX.Element => {
           <div className={styles.budgetInputContainer}>
             <input
               className={styles.briefDetailFieldInput}
-              style={{ paddingLeft: "24px", height: "auto" }}
-              type="text"
-              value={headline || ""}
+              style={{ paddingLeft: '24px', height: 'auto' }}
+              type='text'
+              value={headline || ''}
               onChange={(e) => setHeadline(e.target.value)}
             />
           </div>
-          <h1 className="!text-3xl m-0 font-normal my-0 mx-0">Skills</h1>
+          <h1 className='!text-3xl m-0 font-normal my-0 mx-0'>Skills</h1>
           <div className={styles.skillsContainer}>
             <TagsInput
               suggestData={filterStrings(suggestedSkills, skills)}
@@ -178,11 +171,11 @@ export const EditProposal = (): JSX.Element => {
             />
           </div>
 
-          <h1 className="!text-3xl m-0 font-normal my-0 mx-0">Industries</h1>
+          <h1 className='!text-3xl m-0 font-normal my-0 mx-0'>Industries</h1>
           <div className={styles.industryContainer}>
             <TagsInput
               suggestData={filterStrings(suggestedIndustries, industries)}
-              data-testid="industries-input"
+              data-testid='industries-input'
               tags={industries}
               onChange={(tags: string[]) => {
                 setIndustries([...tags]);
@@ -197,9 +190,9 @@ export const EditProposal = (): JSX.Element => {
             <div className={styles.budgetInputContainer}>
               <input
                 className={styles.briefDetailFieldInput}
-                style={{ paddingLeft: "24px", height: "auto" }}
-                type="number"
-                value={budget || ""}
+                style={{ paddingLeft: '24px', height: 'auto' }}
+                type='number'
+                value={budget || ''}
                 onChange={(e) => setBudget(Number(e.target.value))}
               />
               <div className={styles.budgetCurrencyContainer}>$</div>
@@ -214,13 +207,13 @@ export const EditProposal = (): JSX.Element => {
         </fieldset>
 
         <fieldset>
-          <h1 className="!text-3xl m-0 font-normal my-0 mx-0">Description</h1>
+          <h1 className='!text-3xl m-0 font-normal my-0 mx-0'>Description</h1>
           <div className={styles.descriptionContainer}>
             <TextArea
               value={description}
-              name="description"
+              name='description'
               maxLength={5000}
-              className="text-black"
+              className='text-black'
               rows={10}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 setDescription(e.target.value)
@@ -230,21 +223,21 @@ export const EditProposal = (): JSX.Element => {
 
           <SpacedRow>
             <div className={styles.scopeContainer}>
-              <h1 className="!text-3xl m-0 font-normal my-0 mx-0">Scope</h1>
-              {scopeData.map(({ label, value, description }, index) => (
+              <h1 className='!text-3xl m-0 font-normal my-0 mx-0'>Scope</h1>
+              {scopeData.map(({ label, value }, index) => (
                 <Option
                   label={label}
                   value={value}
                   key={index}
                   checked={scopeId === value}
                   onSelect={() => setScopeId(value)}
-                  textclass="!text-white"
+                  textclass='!text-white'
                 />
               ))}
             </div>
 
             <div className={styles.scopeContainer}>
-              <h1 className="!text-3xl m-0 font-normal my-0 mx-0">
+              <h1 className='!text-3xl m-0 font-normal my-0 mx-0'>
                 Experience
               </h1>
 
@@ -255,13 +248,13 @@ export const EditProposal = (): JSX.Element => {
                   key={index}
                   checked={expId === value}
                   onSelect={() => setExpId(value)}
-                  textclass="!text-white"
+                  textclass='!text-white'
                 />
               ))}
             </div>
 
             <div className={styles.scopeContainer}>
-              <h1 className="!text-3xl m-0 font-normal my-0 mx-0">Duration</h1>
+              <h1 className='!text-3xl m-0 font-normal my-0 mx-0'>Duration</h1>
               {timeData.map(({ label, value }, index) => (
                 <Option
                   label={label}
@@ -269,7 +262,7 @@ export const EditProposal = (): JSX.Element => {
                   key={index}
                   checked={durationId === value}
                   onSelect={() => setDurationId(value)}
-                  textclass="!text-white"
+                  textclass='!text-white'
                 />
               ))}
             </div>
@@ -277,10 +270,10 @@ export const EditProposal = (): JSX.Element => {
         </fieldset>
 
         <fieldset>
-          <div className="buttons-container">
+          <div className='buttons-container'>
             <button
               disabled={false}
-              className="primary-btn in-dark w-button w-full"
+              className='primary-btn in-dark w-button w-full'
               onClick={() => handleSubmit()}
             >
               Submit
@@ -292,18 +285,21 @@ export const EditProposal = (): JSX.Element => {
       {loading && <FullScreenLoader />}
 
       <SuccessScreen
-        title={"Your have successfully updated this brief"}
+        title={'Your have successfully updated this brief'}
         open={success}
-        setOpen={setSuccess}>
+        setOpen={setSuccess}
+      >
         <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => router.push(`/briefs/${briefId}/`)}
-            className='primary-btn in-dark w-button w-full !m-0'>
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
             See Updated Brief
           </button>
           <button
             onClick={() => router.push(`/dashboard`)}
-            className='underline text-xs lg:text-base font-bold'>
+            className='underline text-xs lg:text-base font-bold'
+          >
             Go to Dashboard
           </button>
         </div>
@@ -313,12 +309,14 @@ export const EditProposal = (): JSX.Element => {
         <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => setError(null)}
-            className='primary-btn in-dark w-button w-full !m-0'>
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
             Try Again
           </button>
           <button
             onClick={() => router.push(`/dashboard`)}
-            className='underline text-xs lg:text-base font-bold'>
+            className='underline text-xs lg:text-base font-bold'
+          >
             Go to Dashboard
           </button>
         </div>

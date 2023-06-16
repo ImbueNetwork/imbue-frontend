@@ -183,7 +183,6 @@
 }
 
 @media screen and (max-width: 500px) {
-
   .newBriefContainer {
     max-width: 95%;
     margin: auto auto;
@@ -255,32 +254,32 @@
     margin-top: 20px;
   }
 
-  .budgetDescription{
+  .budgetDescription {
     padding: 0;
     font-size: 14px;
     margin-bottom: 20px;
   }
 
-  .namePanelNameExamples{
+  .namePanelNameExamples {
     padding-bottom: 20px;
   }
 
-  .namePanelNameExample{
+  .namePanelNameExample {
     font-size: 14px;
   }
 
-  .namePanelInputWrapper .briefDetailFieldInput{
+  .namePanelInputWrapper .briefDetailFieldInput {
     height: 100%;
     min-height: 110px;
     font-size: 14px;
     padding: 8px;
   }
 
-  .industryContainer{
+  .industryContainer {
     padding-bottom: 0;
   }
 
-  .descriptionContainer textarea{
+  .descriptionContainer textarea {
     min-height: 200px;
     font-size: 14px;
   }

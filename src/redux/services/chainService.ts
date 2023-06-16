@@ -1,36 +1,37 @@
-import { ImbueApiInfo } from "@/utils/polkadot";
-import * as polkadot from "@/utils/polkadot";
+import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
+import type { DispatchError } from '@polkadot/types/interfaces';
+import type { EventRecord } from '@polkadot/types/interfaces';
+import type { ITuple } from '@polkadot/types/types';
+import { WalletAccount } from '@talismn/connect-wallets';
+
+import * as utils from '@/utils';
+import { ImbueApiInfo } from '@/utils/polkadot';
+import * as polkadot from '@/utils/polkadot';
+
 import {
   BasicTxResponse,
-  Currency,
   Contribution,
+  Currency,
   Milestone,
+  OnchainProjectState,
   Project,
   ProjectOnChain,
-  OnchainProjectState,
   RoundType,
   User,
-} from "@/model";
-import type { DispatchError } from "@polkadot/types/interfaces";
-import type { ITuple } from "@polkadot/types/types";
-import { SubmittableExtrinsic } from "@polkadot/api/types";
-import type { EventRecord } from "@polkadot/types/interfaces";
-import * as utils from "@/utils";
-import MilestoneItem from "@/components/MilestoneItem";
-import { Wallet, WalletAccount } from "@talismn/connect-wallets";
+} from '@/model';
 
 type EventDetails = {
   eventName: string;
 };
 
 const eventMapping: Record<string, EventDetails> = {
-  contribute: { eventName: "ContributeSucceeded" },
-  submitMilestone: { eventName: "MilestoneSubmitted" },
-  voteOnMilestone: { eventName: "VoteComplete" },
-  approveMilestone: { eventName: "MilestoneApproved" },
-  withraw: { eventName: "ProjectFundsWithdrawn" },
-  createBrief: { eventName: "BriefSubmitted" },
-  commenceWork: { eventName: "ProjectCreated" },
+  contribute: { eventName: 'ContributeSucceeded' },
+  submitMilestone: { eventName: 'MilestoneSubmitted' },
+  voteOnMilestone: { eventName: 'VoteComplete' },
+  approveMilestone: { eventName: 'MilestoneApproved' },
+  withraw: { eventName: 'ProjectFundsWithdrawn' },
+  createBrief: { eventName: 'BriefSubmitted' },
+  commenceWork: { eventName: 'ProjectCreated' },
 };
 
 class ChainService {
@@ -51,7 +52,7 @@ class ChainService {
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
-      eventMapping["commenceWork"].eventName
+      eventMapping['commenceWork'].eventName
     );
   }
 
@@ -77,7 +78,7 @@ class ChainService {
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
-      eventMapping["createBrief"].eventName
+      eventMapping['createBrief'].eventName
     );
   }
 
@@ -96,7 +97,7 @@ class ChainService {
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
-      eventMapping["contribute"].eventName
+      eventMapping['contribute'].eventName
     );
   }
 
@@ -114,7 +115,7 @@ class ChainService {
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
-      eventMapping["submitMilestone"].eventName
+      eventMapping['submitMilestone'].eventName
     );
   }
 
@@ -135,7 +136,7 @@ class ChainService {
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
-      eventMapping["voteOnMilestone"].eventName
+      eventMapping['voteOnMilestone'].eventName
     );
   }
 
@@ -154,7 +155,7 @@ class ChainService {
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
-      eventMapping["approveMilestone"].eventName
+      eventMapping['approveMilestone'].eventName
     );
   }
 
@@ -169,20 +170,20 @@ class ChainService {
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
-      eventMapping["withraw"].eventName
+      eventMapping['withraw'].eventName
     );
   }
 
   async submitImbueExtrinsic(
     account: WalletAccount,
-    extrinsic: SubmittableExtrinsic<"promise">,
-    eventName: String
+    extrinsic: SubmittableExtrinsic<'promise'>,
+    eventName: string
   ): Promise<BasicTxResponse> {
     const transactionState: BasicTxResponse = {} as BasicTxResponse;
     try {
       const unsubscribe = await extrinsic.signAndSend(
         account.address,
-        { signer: account.signer! },
+        { signer: account.signer as Signer },
         (result) => {
           this.imbueApi.imbue.api.query.system.events(
             (events: EventRecord[]) => {
@@ -192,15 +193,14 @@ class ChainService {
 
               events
                 .filter(
-                  ({ event: { data, method, section }, phase }: EventRecord) =>
-                    section === "imbueProposals" ||
-                    section === "imbueBriefs" ||
-                    section === "system"
+                  ({ event: { section } }: EventRecord) =>
+                    section === 'imbueProposals' ||
+                    section === 'imbueBriefs' ||
+                    section === 'system'
                 )
                 .forEach(
                   ({
-                    event: { data, method, section },
-                    phase,
+                    event: { data, method },
                   }: EventRecord): BasicTxResponse => {
                     transactionState.transactionHash = extrinsic.hash.toHex();
 
@@ -219,7 +219,7 @@ class ChainService {
                       transactionState.status = true;
                       transactionState.eventData = data.toHuman();
                       return transactionState;
-                    } else if (method === "ExtrinsicFailed") {
+                    } else if (method === 'ExtrinsicFailed') {
                       transactionState.status = false;
                       transactionState.txError = true;
                       return transactionState;
@@ -246,16 +246,15 @@ class ChainService {
         transactionState.errorMessage = error.message;
       }
       transactionState.txError = true;
-    } finally {
-      return transactionState;
     }
+    return transactionState;
   }
 
   async submitExtrinsic(
     account: WalletAccount,
-    extrinsic: SubmittableExtrinsic<"promise">
+    extrinsic: SubmittableExtrinsic<'promise'>
   ): Promise<BasicTxResponse> {
-    const { web3FromSource } = await import("@polkadot/extension-dapp");
+    const { web3FromSource } = await import('@polkadot/extension-dapp');
     const injector = await web3FromSource(account.source);
     const transactionState: BasicTxResponse = {} as BasicTxResponse;
     try {
@@ -269,20 +268,17 @@ class ChainService {
             }
             result.events
               .filter(
-                ({ event: { data, method, section }, phase }: EventRecord) =>
-                  section === "system" || section === "imbueProposals"
+                ({ event: { section } }: EventRecord) =>
+                  section === 'system' || section === 'imbueProposals'
               )
               .forEach(
-                ({
-                  event: { data, method, section },
-                  phase,
-                }: EventRecord): BasicTxResponse => {
+                ({ event: { method } }: EventRecord): BasicTxResponse => {
                   transactionState.transactionHash = extrinsic.hash.toHex();
 
-                  if (method === "ExtrinsicSuccess") {
+                  if (method === 'ExtrinsicSuccess') {
                     transactionState.status = true;
                     return transactionState;
-                  } else if (method === "ExtrinsicFailed") {
+                  } else if (method === 'ExtrinsicFailed') {
                     transactionState.status = false;
                     return transactionState;
                   }
@@ -318,7 +314,7 @@ class ChainService {
     dispatchError: DispatchError
   ): BasicTxResponse {
     try {
-      let errorMessage = polkadot.getDispatchError(dispatchError);
+      const errorMessage = polkadot.getDispatchError(dispatchError);
       transactionState.errorMessage = errorMessage;
       transactionState.txError = true;
     } catch (error) {
@@ -326,9 +322,8 @@ class ChainService {
         transactionState.errorMessage = error.message;
       }
       transactionState.txError = true;
-    } finally {
-      return transactionState;
     }
+    return transactionState;
   }
 
   public async getProject(projectId: string | number) {
@@ -337,18 +332,22 @@ class ChainService {
   }
 
   async convertToOnChainProject(project: Project) {
-    if (!project.chain_project_id)
-      return;
+    if (!project.chain_project_id) return;
 
-    const projectOnChain: any = await this.getProjectOnChain(project.chain_project_id!);
+    const projectOnChain: any = await this.getProjectOnChain(
+      project.chain_project_id
+    );
     const raisedFunds = BigInt(
-      projectOnChain?.raisedFunds?.replaceAll(",", "") || 0
+      projectOnChain?.raisedFunds?.replaceAll(',', '') || 0
     );
     const milestones = await this.getProjectMilestones(projectOnChain, project);
 
     // get project state
     let projectState = OnchainProjectState.PendingProjectApproval;
-    let userIsInitiator = await this.isUserInitiator(this.user, projectOnChain);
+    const userIsInitiator = await this.isUserInitiator(
+      this.user,
+      projectOnChain
+    );
     let projectInContributionRound = false;
     let projectInVotingRound = false;
     const lastApprovedMilestoneKey = await this.findLastApprovedMilestone(
@@ -360,11 +359,11 @@ class ChainService {
       await await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries();
 
     let roundKey: number | undefined = undefined;
-    for (var i = Object.keys(rounds).length - 1; i >= 0; i--) {
+    for (let i = Object.keys(rounds).length - 1; i >= 0; i--) {
       const [id, round] = rounds[i];
       const readableRound = round.toHuman();
-      const roundStart = BigInt(readableRound.start.replaceAll(",", ""));
-      const roundEnd = BigInt(readableRound.end.replaceAll(",", ""));
+      const roundStart = BigInt(readableRound.start.replaceAll(',', ''));
+      const roundEnd = BigInt(readableRound.end.replaceAll(',', ''));
       const projectExistsInRound = readableRound.projectKeys.includes(
         projectOnChain.milestones[0].projectKey
       );
@@ -427,35 +426,35 @@ class ChainService {
     }
     const convertedProject: ProjectOnChain = {
       id: projectOnChain.milestones[0].projectKey,
-      requiredFunds: BigInt(projectOnChain.requiredFunds.replaceAll(",", "")),
+      requiredFunds: BigInt(projectOnChain.requiredFunds.replaceAll(',', '')),
       requiredFundsFormatted:
-        projectOnChain.requiredFunds.replaceAll(",", "") / 1e12,
+        projectOnChain.requiredFunds.replaceAll(',', '') / 1e12,
       raisedFunds: raisedFunds,
       raisedFundsFormatted: Number(raisedFunds / BigInt(1e12)),
-      withdrawnFunds: BigInt(projectOnChain.withdrawnFunds.replaceAll(",", "")),
+      withdrawnFunds: BigInt(projectOnChain.withdrawnFunds.replaceAll(',', '')),
       currencyId:
-        projectOnChain.currencyId == "Native"
+        projectOnChain.currencyId == 'Native'
           ? Currency.IMBU
           : (projectOnChain.currencyId as Currency),
       milestones: milestones,
       contributions: Object.keys(projectOnChain.contributions).map(
         (accountId: string) =>
-        ({
-          value: BigInt(
-            projectOnChain.contributions[accountId].value.replaceAll(",", "")
-          ),
-          accountId: accountId,
-          timestamp: BigInt(
-            projectOnChain.contributions[accountId].timestamp.replaceAll(
-              ",",
-              ""
-            )
-          ),
-        } as Contribution)
+          ({
+            value: BigInt(
+              projectOnChain.contributions[accountId].value.replaceAll(',', '')
+            ),
+            accountId: accountId,
+            timestamp: BigInt(
+              projectOnChain.contributions[accountId].timestamp.replaceAll(
+                ',',
+                ''
+              )
+            ),
+          } as Contribution)
       ),
       initiator: projectOnChain.initiator,
       createBlockNumber: BigInt(
-        projectOnChain?.createBlockNumber?.replaceAll(",", "") || 0
+        projectOnChain?.createBlockNumber?.replaceAll(',', '') || 0
       ),
       approvedForFunding: projectOnChain.approvedForFunding,
       fundingThresholdMet: projectOnChain.fundingThresholdMet,
@@ -471,20 +470,23 @@ class ChainService {
     projectOnChain: ProjectOnChain,
     projectOffChain: any
   ): Promise<Milestone[]> {
-    let milestones: Milestone[] = Object.keys(projectOnChain.milestones)
+    const milestones: Milestone[] = Object.keys(projectOnChain.milestones)
       .map((milestoneItem: any) => projectOnChain.milestones[milestoneItem])
       .map(
         (milestone: any) =>
-        ({
-          project_id: projectOffChain.id,
-          project_chain_id: Number(milestone.projectKey),
-          milestone_key: Number(milestone.milestoneKey),
-          name: projectOffChain.milestones[milestone.milestoneKey].name,
-          modified: projectOffChain.milestones[milestone.milestoneKey].modified,
-          percentage_to_unlock: Number(milestone.percentageToUnlock),
-          amount: Number(projectOffChain.milestones[milestone.milestoneKey].amount),
-          is_approved: milestone.isApproved,
-        } as Milestone)
+          ({
+            project_id: projectOffChain.id,
+            project_chain_id: Number(milestone.projectKey),
+            milestone_key: Number(milestone.milestoneKey),
+            name: projectOffChain.milestones[milestone.milestoneKey].name,
+            modified:
+              projectOffChain.milestones[milestone.milestoneKey].modified,
+            percentage_to_unlock: Number(milestone.percentageToUnlock),
+            amount: Number(
+              projectOffChain.milestones[milestone.milestoneKey].amount
+            ),
+            is_approved: milestone.isApproved,
+          } as Milestone)
       );
 
     return milestones;
@@ -533,7 +535,7 @@ class ChainService {
 
   public async getProjectOnChain(chain_project_id: string | number) {
     const projectOnChain: any = (
-      await this.imbueApi.imbue?.api.query.imbueProposals.projects(
+      await this.imbueApi.imbue.api.query.imbueProposals.projects(
         chain_project_id
       )
     ).toHuman();
@@ -541,16 +543,23 @@ class ChainService {
   }
 
   public async getBalance(accountAddress: string, currencyId: number) {
-
     switch (currencyId) {
-      case 0:
-        const balance: any = await this.imbueApi.imbue.api.query.system.account(accountAddress)
-        const imbueBalance = balance?.data?.free / 1e12
-        return `${imbueBalance.toFixed(2)} IMBU`
-      case 1:
-        const ksmResponse: any = await this.imbueApi.imbue.api.query.ormlTokens.accounts(accountAddress, currencyId)
+      case 0: {
+        const balance: any = await this.imbueApi.imbue.api.query.system.account(
+          accountAddress
+        );
+        const imbueBalance = balance?.data?.free / 1e12;
+        return `${imbueBalance.toFixed(2)} IMBU`;
+      }
+      case 1: {
+        const ksmResponse: any =
+          await this.imbueApi.imbue.api.query.ormlTokens.accounts(
+            accountAddress,
+            currencyId
+          );
         const ksmBalance = ksmResponse.free / 1e12;
-        return `${ksmBalance.toFixed(2)} KSM`
+        return `${ksmBalance.toFixed(2)} KSM`;
+      }
     }
   }
 }
