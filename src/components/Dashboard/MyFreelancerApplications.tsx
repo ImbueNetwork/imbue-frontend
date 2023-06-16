@@ -21,15 +21,9 @@ const MyFreelancerApplications = ({
   const [currentProject, setCurrentProject] = useState<any>(cuttentBriefs)
 
   const redirectToApplication = (application: Project) => {
-    let test = OffchainProjectState[application.status_id];
-    //TODO: redirect to projects page if accepted
-    // if (application.status_id === ProjectStatus?.Accepted) {
-    //   router.push(`/project/${application?.id}`);
-    // } else {
     router.push(
       `/briefs/${application.brief_id}/applications/${application.id}/`
     );
-    // }
   };
 
   const redirectToDiscoverBriefs = () => {
