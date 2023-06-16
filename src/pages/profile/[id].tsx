@@ -464,19 +464,11 @@ export const getServerSideProps = async (context: any) => {
   }
 
   return {
-    props: {
-      isAuthenticated: true,
-      browsingUser : {},
-      initUser: {},
+    redirect: {
+      destination: "/",
+      permanent: false,
     },
   };
-
-  // return {
-  //   redirect: {
-  //     destination: "/",
-  //     permanent: false,
-  //   },
-  // };
 };
 
 export default Profile;
