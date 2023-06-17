@@ -10,47 +10,49 @@ import {
   Select,
   TextField,
 } from "@mui/material";
-import {
-  FaFacebook,
-  FaRegShareSquare,
-  FaTwitter,
-  FaTelegram,
-  FaDiscord,
-  FaStar,
-  FaRegThumbsUp,
-  FaRegThumbsDown,
-} from "react-icons/fa";
 import { StyledEngineProvider } from "@mui/system";
-import CountrySelector from "@/components/Profile/CountrySelector";
-import Clients from "@/components/Profile/Clients";
-import Skills from "@/components/Profile/Skills";
-import UploadImage from "@/components/Profile/UploadImage";
-import AccountChoice from "@/components/AccountChoice";
-import { WalletAccount } from "@talismn/connect-wallets";
-import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
 import { SignerResult } from "@polkadot/api/types";
-import SuccessScreen from "@/components/SuccessScreen";
-import ErrorScreen from "@/components/ErrorScreen";
-import FullScreenLoader from "@/components/FullScreenLoader";
-import fiverrIcon from "@/assets/images/fiverr.png";
-import ImbueIcon from "@/assets/svgs/loader.svg";
-import { getFreelancerProfile, updateFreelancer } from '@/redux/services/freelancerService';
-import { authenticate } from '../api/info/user';
-import { Freelancer, User } from '@/model';
+import { WalletAccount } from "@talismn/connect-wallets";
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { checkEnvironment, fetchUser } from '@/utils';
-import Image from 'next/image';
-import { IoPeople } from "react-icons/io5";
-import { FiEdit } from "react-icons/fi";
-import { AiOutlineUser } from "react-icons/ai";
-import { MdOutlineWatchLater } from "react-icons/md";
-import { ImStack } from "react-icons/im";
-import { TextArea } from '@/components/Briefs/TextArea';
-import { GrCertificate } from "react-icons/gr";
 import ReactCountryFlag from 'react-country-flag';
+import { AiOutlineUser } from "react-icons/ai";
+import {
+  FaDiscord,
+  FaFacebook,
+  FaRegShareSquare,
+  FaRegThumbsDown,
+  FaRegThumbsUp,
+  FaStar,
+  FaTelegram,
+  FaTwitter,
+} from "react-icons/fa";
+import { FiEdit } from "react-icons/fi";
+import { GrCertificate } from "react-icons/gr";
+import { ImStack } from "react-icons/im";
+import { IoPeople } from "react-icons/io5";
+import { MdOutlineWatchLater } from "react-icons/md";
+
+import { checkEnvironment, fetchUser } from '@/utils';
+
+import AccountChoice from "@/components/AccountChoice";
+import { TextArea } from '@/components/Briefs/TextArea';
 import ChatPopup from '@/components/ChatPopup';
+import ErrorScreen from "@/components/ErrorScreen";
+import FullScreenLoader from "@/components/FullScreenLoader";
+import Clients from "@/components/Profile/Clients";
+import CountrySelector from "@/components/Profile/CountrySelector";
+import Skills from "@/components/Profile/Skills";
+import UploadImage from "@/components/Profile/UploadImage";
+import SuccessScreen from "@/components/SuccessScreen";
+
+import { Freelancer, User } from '@/model';
+import { getFreelancerProfile, updateFreelancer } from '@/redux/services/freelancerService';
+import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
 import styles from "@/styles/modules/freelancers.module.css";
+
+import { authenticate } from '../api/info/user';
 
 export type ProfileProps = {
   initFreelancer: Freelancer;
@@ -82,7 +84,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
 
 
   const [clients, setClients] = useState<any>(
-    freelancer?.clients[0] ? freelancer.clients : []
+    initFreelancer?.clients[0] ? initFreelancer.clients : []
   );
 
   function urlify(text: string) {
@@ -101,9 +103,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
       }
     };
     setup();
-  }, [freelancer]);
-
-  console.log({freelancer, clients})
+  }, []);
 
   //The fields must be pre populated correctly.
   const onSave = async () => {
@@ -278,18 +278,18 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
     },
   ];
 
-  const clinetsData = [
-    {
-      name: "Fiverr",
-      logo: "https://res.cloudinary.com/ssani7/image/upload/v1686857275/imbue/loader_mrgfrj.svg",
-      website: "fiverr.com",
-    },
-    {
-      name: "Imbue",
-      logo: "https://res.cloudinary.com/ssani7/image/upload/v1686857275/imbue/loader_mrgfrj.svg",
-      website: "imbue.com",
-    },
-  ];
+  // const clinetsData = [
+  //   {
+  //     name: "Fiverr",
+  //     logo: "https://res.cloudinary.com/ssani7/image/upload/v1686857275/imbue/loader_mrgfrj.svg",
+  //     website: "fiverr.com",
+  //   },
+  //   {
+  //     name: "Imbue",
+  //     logo: "https://res.cloudinary.com/ssani7/image/upload/v1686857275/imbue/loader_mrgfrj.svg",
+  //     website: "imbue.com",
+  //   },
+  // ];
 
 
   const copyProfile = () => {

@@ -2,10 +2,9 @@ import { Badge, Box, CircularProgress, Modal, TextField, ToggleButton, Tooltip }
 import Image from 'next/image';
 import React, { ChangeEvent, useState } from 'react';
 
-import fiverrIcon from '@/assets/images/fiverr.png';
-import ImbueIcon from '@/assets/svgs/loader.svg';
-import { Freelancer } from '@/model';
 import { uploadPhoto } from '@/utils/imageUpload';
+
+import { Freelancer } from '@/model';
 
 type ClientsProps = {
   setFreelancer: (_freelancer: any) => void; // FIXME:
@@ -16,7 +15,7 @@ type ClientsProps = {
 };
 
 const style = {
-  position: 'absolute' as 'absolute',
+  position: 'absolute' as const,
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
@@ -36,7 +35,7 @@ const Clients = ({ setFreelancer, isEditMode, clients, setClients }: ClientsProp
   const [loading, setLoading] = useState<boolean>(false)
   const handleClose = () => setOpen(false);
 
-  const [openAddClient, setOpenAddClient] = useState<boolean>(false)
+  const [openAddClient] = useState<boolean>(false)
 
   const removeClient = (e: any, logo: string) => {
     if ((e.target as HTMLElement).nodeName == "SPAN") {

@@ -1,4 +1,5 @@
 import type { Knex } from "knex";
+
 import { ON_UPDATE_TIMESTAMP_FUNCTION } from "../utils";
 
 export async function up(knex: Knex): Promise<void> {
