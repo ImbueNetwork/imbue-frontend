@@ -15,9 +15,9 @@ import {
 } from 'stream-chat-react';
 import 'stream-chat-react/dist/css/v2/index.css';
 
-import { User } from '@/model';
+import { getStreamChat } from '@/utils';
 
-import { getStreamChat } from '../utils';
+import { User } from '@/model';
 
 export type ChatProps = {
   user: User;
