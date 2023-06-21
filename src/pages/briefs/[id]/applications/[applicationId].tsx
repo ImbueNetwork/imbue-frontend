@@ -80,8 +80,6 @@ const ApplicationPreview = (): JSX.Element => {
         );
         const userResponse = await getCurrentUser();
 
-        console.log(applicationResponse);
-
         setBrief(brief);
         setApplication(applicationResponse);
         setFreelancer(freelancerResponse);
@@ -574,7 +572,7 @@ const ApplicationPreview = (): JSX.Element => {
             onClick={() => setSuccess(false)}
             className='primary-btn in-dark w-button w-full !m-0'
           >
-            Continue to Project
+            Continue
           </button>
           <button
             onClick={() => router.push(`/dashboard`)}
