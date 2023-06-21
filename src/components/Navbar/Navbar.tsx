@@ -1,3 +1,5 @@
+'use client'
+
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Avatar, Box, IconButton, Menu, Skeleton, Tooltip } from '@mui/material';
@@ -5,12 +7,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import { getCurrentUser } from '@/utils';
 
 import { appLogo } from '@/assets/svgs';
 import { User } from '@/model';
+import { login, logout } from '@/redux/reducers/userReducers';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
+import { AppDispatch } from '@/redux/store/store';
 
 import MenuItems from './MenuItems';
 import Login from '../Login';
@@ -31,6 +36,9 @@ function Navbar() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [openMenu, setOpenMenu] = useState(false);
+
+  const dispatch = useDispatch<AppDispatch>()
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
     setOpenMenu(Boolean(event.currentTarget));
@@ -44,6 +52,7 @@ function Navbar() {
     const setup = async () => {
       try {
         const user = await getCurrentUser();
+        dispatch(login())
         if (user) {
           const res = await getFreelancerProfile(user.username);
           setFreelancerProfile(res);
@@ -123,6 +132,12 @@ function Navbar() {
           <Box
             sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}
           >
+            <span
+              className='mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline'
+              onClick={logout}
+            >
+              Logout
+            </span>
             <span
               className='mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline'
               onClick={navigateToPage}
