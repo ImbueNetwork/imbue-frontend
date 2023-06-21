@@ -126,6 +126,9 @@
   --talisman-connect-modal-max-height: 90%;
 }
 
+.error {
+  color: var(--theme-error);
+}
 .primary-btn:disabled {
   background-color: #676767;
   color: #b5b5b5;
