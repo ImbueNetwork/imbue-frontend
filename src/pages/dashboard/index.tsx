@@ -34,6 +34,7 @@ const Dashboard = (): JSX.Element => {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [client, setClient] = useState<StreamChat>();
   const user = useSelector((state: RootState) => state.user.value)
+  console.log(user);
   const filters = { members: { $in: [user?.username] } };
   const [selectedOption, setSelectedOption] = useState<number>(1);
   const [unreadMessages, setUnreadMsg] = useState<number>(0);
@@ -74,7 +75,7 @@ const Dashboard = (): JSX.Element => {
       setLoadingStreamChat(false);
     };
     setupStreamChat();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (client && user.username && !loadingStreamChat) {

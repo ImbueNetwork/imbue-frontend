@@ -4,7 +4,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { User } from '@/model';
 
-import { login, logout } from '../reducers/userReducers';
+import { logout } from '../reducers/userReducers';
 
 const initialState: { value: User } = {
   value: {
@@ -18,17 +18,23 @@ const initialState: { value: User } = {
 export const user = createSlice({
   name: 'user',
   initialState,
-  reducers: {},
+  reducers: {
+    addUserState : (state, action)=>{
+        state.value = action.payload
+    }
+  },
   extraReducers: (builder) => {
     builder.addCase(logout.fulfilled, (state) => {
       state = initialState;
       return state;
     });
 
-    builder.addCase(login.fulfilled, (state, action) => {
-      state.value = { ...action.payload };
-    });
+    // builder.addCase(login.fulfilled, (state, action) => {
+    //   state.value = { ...action.payload };
+    // });
   },
 });
+
+export const {addUserState} = user.actions
 
 export default user.reducer;

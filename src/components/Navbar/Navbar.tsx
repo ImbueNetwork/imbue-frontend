@@ -13,8 +13,9 @@ import { getCurrentUser } from '@/utils';
 
 import { appLogo } from '@/assets/svgs';
 import { User } from '@/model';
-import { login, logout } from '@/redux/reducers/userReducers';
+import { logout } from '@/redux/reducers/userReducers';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
+import { addUserState } from '@/redux/slices/userSlice';
 import { AppDispatch } from '@/redux/store/store';
 
 import MenuItems from './MenuItems';
@@ -52,7 +53,7 @@ function Navbar() {
     const setup = async () => {
       try {
         const user = await getCurrentUser();
-        dispatch(login())
+        dispatch(addUserState(user))
         if (user) {
           const res = await getFreelancerProfile(user.username);
           setFreelancerProfile(res);
@@ -134,7 +135,7 @@ function Navbar() {
           >
             <span
               className='mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline'
-              onClick={logout}
+              onClick={() => dispatch(logout())}
             >
               Logout
             </span>
