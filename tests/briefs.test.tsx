@@ -1,15 +1,13 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import Briefs from '@/pages/briefs';
+
+import { briefsData, expertExpData } from './__mocks__/briefsData';
 import {
-  getAllBriefs,
   callSearchBriefs,
+  getAllBriefs,
 } from '../src/redux/services/briefService';
-import {
-  briefsData,
-  expertExpData,
-  intermediateExpData,
-} from './__mocks__/briefsData';
 
 jest.mock('../src/redux/services/briefService', () => ({
   getAllBriefs: jest.fn(),
@@ -53,7 +51,7 @@ describe('Briefs Page', () => {
   });
 
   test('applies filters and updates briefs', async () => {
-    const comp = render(<Briefs />);
+    render(<Briefs />);
     // Mock the API calls used in the useEffect hook
 
     // Mock the briefsService.getAllBriefs method to return a fixed array of briefs
