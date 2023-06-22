@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 
 import Freelancers from '@/pages/freelancers/new';
+import { Providers } from '@/redux/providers/userProviders';
 
 function setUp() {
   const user = {
@@ -13,23 +14,15 @@ function setUp() {
     web3_address: 'test',
     getstream_token: 'test',
   };
-  render(<Freelancers user={user} />);
+  render(<Providers><Freelancers/></Providers>);
 }
 
 test('test Freelancer rendering', () => {
   expect(
     render(
-      <Freelancers
-        user={{
-          id: 1,
-          username: 'test',
-          display_name: 'test',
-          password: 'test',
-          web3Accounts: [],
-          web3_address: 'test',
-          getstream_token: 'test',
-        }}
-      />
+      <Providers>
+        <Freelancers/>
+      </Providers>
     )
   ).toBeTruthy();
 });
