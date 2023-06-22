@@ -13,8 +13,10 @@ import { initImbueAPIInfo } from '@/utils/polkadot';
 import AccountChoice from '@/components/AccountChoice';
 import ChatPopup from '@/components/ChatPopup';
 import { Dialogue } from '@/components/Dialogue';
+import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 import Login from '@/components/Login';
+import SuccessScreen from '@/components/SuccessScreen';
 
 import {
   Freelancer,
@@ -87,6 +89,10 @@ function Project() {
   const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
   const [isApplicant, setIsApplicant] = useState<boolean>();
 
+  const [success, setSuccess] = useState<boolean>(false)
+  const [successTitle, setSuccessTitle] = useState<string>("")
+  const [error, setError] = useState<any>()
+
   // fetching the project data from api and from chain
   useEffect(() => {
     if (projectId) {
@@ -138,16 +144,24 @@ function Project() {
   // voting on a mile stone
   const voteOnMilestone = async (account: WalletAccount, vote: boolean) => {
     setLoading(true);
-    const imbueApi = await initImbueAPIInfo();
-    const userRes: User | any = await utils.getCurrentUser();
-    const chainService = new ChainService(imbueApi, userRes);
-    await chainService.voteOnMilestone(
-      account,
-      onChainProject,
-      milestoneKeyInView,
-      vote
-    );
-    setLoading(false);
+    try {
+      const imbueApi = await initImbueAPIInfo();
+      const userRes: User | any = await utils.getCurrentUser();
+      const chainService = new ChainService(imbueApi, userRes);
+      await chainService.voteOnMilestone(
+        account,
+        onChainProject,
+        milestoneKeyInView,
+        vote
+      );
+      setSuccess(true)
+      setSuccessTitle("Your vote was successfull")
+    } catch (error) {
+      setError({ message: "Could not vote. Please try again later" })
+    }
+    finally {
+      setLoading(false);
+    }
   };
 
   // submitting a milestone
@@ -164,9 +178,11 @@ function Project() {
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
-          // TODO: show Success screen
+          setSuccess(true)
+          setSuccessTitle("Milestone Submitted Successfully")
         } else if (result.txError) {
           // TODO: show error screen
+          setError({ message: result.errorMessage })
           console.log(result.errorMessage);
         }
         break;
@@ -186,9 +202,11 @@ function Project() {
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
-          // TODO: show success screen
+          setSuccess(true)
+          setSuccessTitle("Withdraw successfull")
         } else if (result.txError) {
           // TODO: show error screen
+          setError({ message: result.errorMessage })
           console.log(result.errorMessage);
         }
         break;
@@ -318,8 +336,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, 'Completed')
               : milestone?.milestone_key == milestoneBeingVotedOn
-              ? openForVotingTag()
-              : projectStateTag(modified, 'Not Started')}
+                ? openForVotingTag()
+                : projectStateTag(modified, 'Not Started')}
 
             <Image
               src={require(expanded
@@ -372,7 +390,7 @@ function Project() {
 
           {isApplicant &&
             onChainProject?.projectState !==
-              OnchainProjectState.OpenForVoting && (
+            OnchainProjectState.OpenForVoting && (
               <button
                 className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
                 data-testid='next-button'
@@ -506,13 +524,12 @@ function Project() {
             <div className='w-48 bg-[#1C2608] mt-5 h-1 relative my-auto'>
               <div
                 style={{
-                  width: `${
-                    (onChainProject?.milestones?.filter?.(
-                      (m: any) => m?.is_approved
-                    )?.length /
-                      onChainProject?.milestones?.length) *
+                  width: `${(onChainProject?.milestones?.filter?.(
+                    (m: any) => m?.is_approved
+                  )?.length /
+                    onChainProject?.milestones?.length) *
                     100
-                  }%`,
+                    }%`,
                 }}
                 className='h-full rounded-xl Accepted-button absolute'
               ></div>
@@ -520,9 +537,8 @@ function Project() {
                 {onChainProject?.milestones?.map((m: any, i: number) => (
                   <div
                     key={i}
-                    className={`h-4 w-4 ${
-                      m.is_approved ? 'Accepted-button' : 'bg-[#1C2608]'
-                    } rounded-full -mt-1.5`}
+                    className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#1C2608]'
+                      } rounded-full -mt-1.5`}
                   ></div>
                 ))}
               </div>
@@ -611,6 +627,44 @@ function Project() {
         }}
         redirectUrl={`/project/${projectId}/`}
       />
+
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
+
+      <SuccessScreen
+        title={successTitle}
+        open={success}
+        setOpen={setSuccess}
+      >
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setSuccess(false)}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Continue to Project
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to dashboard
+          </button>
+        </div>
+      </SuccessScreen>
     </div>
   );
 }
