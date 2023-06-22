@@ -16,8 +16,6 @@ import '@/styles/animation.css';
 
 import Layout from '@/components/Layout';
 
-import { Providers } from '@/redux/providers/userProviders';
-
 export default function App({ Component, pageProps }: AppProps) {
   const theme = createTheme({
     palette: {
@@ -36,11 +34,9 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <ThemeProvider theme={theme}>
         <StyledEngineProvider injectFirst>
-          <Providers>
             <Layout>
               <Component {...pageProps} />
             </Layout>
-          </Providers>
         </StyledEngineProvider>
       </ThemeProvider>
     </>
