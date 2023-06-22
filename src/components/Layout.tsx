@@ -26,6 +26,7 @@ function Layout({ children }: LayoutProps) {
       router.events.off('routeChangeError', () => setProgress(100));
     };
   }, [router]);
+  
   return (
     <React.Fragment>
       {progress > 0 && (
