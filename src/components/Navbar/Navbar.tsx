@@ -7,16 +7,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-
-import { getCurrentUser } from '@/utils';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { appLogo } from '@/assets/svgs';
-import { User } from '@/model';
-import { logout } from '@/redux/reducers/userReducers';
+import { fetchUser } from '@/redux/reducers/userReducers';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
-import { addUserState } from '@/redux/slices/userSlice';
-import { AppDispatch } from '@/redux/store/store';
+import { AppDispatch, RootState } from '@/redux/store/store';
 
 import MenuItems from './MenuItems';
 import Login from '../Login';
@@ -25,7 +21,6 @@ import defaultProfile from '../../assets/images/profile-image.png';
 function Navbar() {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [freelancerProfile, setFreelancerProfile] = useState<any>();
-  const [user, setUser] = useState<User>();
   const [loading, setLoading] = useState<boolean>(true)
 
   const [solidNav, setSolidNav] = useState<boolean>(false);
@@ -38,6 +33,7 @@ function Navbar() {
   const open = Boolean(anchorEl);
   const [openMenu, setOpenMenu] = useState(false);
 
+  const user = useSelector((state: RootState) => state.userState.user)
   const dispatch = useDispatch<AppDispatch>()
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -51,23 +47,21 @@ function Navbar() {
 
   useEffect(() => {
     const setup = async () => {
+      dispatch(fetchUser())
       try {
-        const user = await getCurrentUser();
-        dispatch(addUserState(user))
-        if (user) {
+        if (user?.username) {
           const res = await getFreelancerProfile(user.username);
           setFreelancerProfile(res);
-          setUser(user);
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
       finally {
         setLoading(false)
       }
     };
     setup();
-  }, []);
+  }, [dispatch, user.username]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -81,9 +75,9 @@ function Navbar() {
     };
   }, []);
 
-  const navigateToPage = () => {
+  const navigateToPage = (url: string) => {
     if (user?.username) {
-      router.push('/briefs/new');
+      router.push(url);
     } else {
       setLoginModal(true);
     }
@@ -135,13 +129,7 @@ function Navbar() {
           >
             <span
               className='mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline'
-              onClick={() => dispatch(logout())}
-            >
-              Logout
-            </span>
-            <span
-              className='mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline'
-              onClick={navigateToPage}
+              onClick={() => navigateToPage('/briefs/new')}
             >
               Submit a Brief
             </span>
@@ -161,42 +149,55 @@ function Navbar() {
               {
                 loading
                   ? <Skeleton variant="circular" width={40} height={40} />
-                  : (
-                    <IconButton
-                      onClick={(e) => handleClick(e)}
-                      size="small"
-                      sx={{ ml: 2 }}
-                      aria-controls={open ? 'account-menu' : undefined}
-                      aria-haspopup='true'
-                      aria-expanded={open ? 'true' : undefined}
-                    >
-                      {user?.username ? (
-                        <Avatar className="w-8 h-8 lg:w-10 lg:h-10">
-                          <Image
-                            src={freelancerProfile?.profile_image || defaultProfile}
-                            width={40}
-                            height={40}
-                            alt='profile'
-                          />
-                        </Avatar>
-                      ) : (
-                        <div>
-                          {openMenu ? (
-                            <CloseIcon htmlColor='white' />
-                          ) : (
-                            <div onClick={() => setOpenMenu(!openMenu)}>
-                              {openMenu ? (
-                                <CloseIcon htmlColor="white" />
-                              ) : (
-                                <MenuIcon htmlColor="white" />
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      )
-                      }
-                    </IconButton>
-                  )
+                  : <>
+                    {
+                      user?.username
+                        ? (
+                          <IconButton
+                            onClick={(e) => handleClick(e)}
+                            size="small"
+                            sx={{ ml: 2 }}
+                            aria-controls={open ? 'account-menu' : undefined}
+                            aria-haspopup='true'
+                            aria-expanded={open ? 'true' : undefined}
+                          >
+                            {user?.username ? (
+                              <Avatar className="w-8 h-8 lg:w-10 lg:h-10">
+                                <Image
+                                  src={freelancerProfile?.profile_image || defaultProfile}
+                                  width={40}
+                                  height={40}
+                                  alt='profile'
+                                />
+                              </Avatar>
+                            ) : (
+                              <div>
+                                {openMenu ? (
+                                  <CloseIcon htmlColor='white' />
+                                ) : (
+                                  <div onClick={() => setOpenMenu(!openMenu)}>
+                                    {openMenu ? (
+                                      <CloseIcon htmlColor="white" />
+                                    ) : (
+                                      <MenuIcon htmlColor="white" />
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            )
+                            }
+                          </IconButton>
+                        )
+                        : (
+                          <span
+                            className='mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline'
+                            onClick={() => setLoginModal(true)}
+                          >
+                            Sign In
+                          </span>
+                        )
+                    }
+                  </>
               }
 
             </Tooltip>

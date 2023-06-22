@@ -4,37 +4,41 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { User } from '@/model';
 
-import { logout } from '../reducers/userReducers';
+import { fetchUser, logout } from '../reducers/userReducers';
 
-const initialState: { value: User } = {
-  value: {
+const initialState: { user: User, loading : boolean, error : any } = {
+  user: {
     id: 0,
     display_name: '',
     username: '',
     getstream_token: '',
   },
+  loading: false,
+  error: {}
 };
 
-export const user = createSlice({
-  name: 'user',
+export const userState = createSlice({
+  name: 'userState',
   initialState,
-  reducers: {
-    addUserState : (state, action)=>{
-        state.value = action.payload
-    }
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(logout.fulfilled, (state) => {
       state = initialState;
       return state;
     });
 
-    // builder.addCase(login.fulfilled, (state, action) => {
-    //   state.value = { ...action.payload };
-    // });
+    builder.addCase(fetchUser.fulfilled, (state, action) => {
+      if(action.payload.status === "failed"){
+        state.error = action?.payload?.error
+      }
+      state.user = { ...action.payload };
+      state.loading = false;
+    });
+    
+    builder.addCase(fetchUser.pending, (state) => {
+      state.loading = true;
+    });
   },
 });
 
-export const {addUserState} = user.actions
-
-export default user.reducer;
+export default userState.reducer;

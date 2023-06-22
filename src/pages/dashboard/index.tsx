@@ -14,6 +14,7 @@ import ChatPopup from '@/components/ChatPopup';
 import DashboardChatBox from '@/components/Dashboard/MyChatBox';
 import MyClientBriefsView from '@/components/Dashboard/MyClientBriefsView';
 import MyFreelancerApplications from '@/components/Dashboard/MyFreelancerApplications';
+import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 import Login from '@/components/Login';
 
@@ -33,8 +34,7 @@ export type DashboardProps = {
 const Dashboard = (): JSX.Element => {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [client, setClient] = useState<StreamChat>();
-  const user = useSelector((state: RootState) => state.user.value)
-  console.log(user);
+  const { user, loading: loadingUser, error: userError } = useSelector((state: RootState) => state.userState)
   const filters = { members: { $in: [user?.username] } };
   const [selectedOption, setSelectedOption] = useState<number>(1);
   const [unreadMessages, setUnreadMsg] = useState<number>(0);
@@ -49,6 +49,8 @@ const Dashboard = (): JSX.Element => {
 
   const router = useRouter();
   const { briefId } = router.query;
+
+  const [error, setError] = useState<any>(userError)
 
   const handleMessageBoxClick = async (
     user_id: number,
@@ -69,11 +71,19 @@ const Dashboard = (): JSX.Element => {
 
   useEffect(() => {
     const setupStreamChat = async () => {
-      setClient(await getStreamChat());
-      _setBriefs(await getUserBriefs(user?.id))
-      _setMyApplications(await getFreelancerApplications(user?.id))
-      setLoadingStreamChat(false);
+      try {
+        if (user?.username && loadingUser) return
+
+        setClient(await getStreamChat());
+        _setBriefs(await getUserBriefs(user?.id))
+        _setMyApplications(await getFreelancerApplications(user?.id))
+      } catch (error) {
+        setError(error)
+      } finally {
+        setLoadingStreamChat(false);
+      }      
     };
+
     setupStreamChat();
   }, [user]);
 
@@ -95,7 +105,7 @@ const Dashboard = (): JSX.Element => {
     }
   }, [client, user?.getstream_token, user?.username]);
 
-  if (loadingStreamChat) return <FullScreenLoader />;
+  if (loadingStreamChat || loadingUser) return <FullScreenLoader />;
 
   return client ? (
     <div className='hq-layout px-[15px]'>
@@ -148,6 +158,17 @@ const Dashboard = (): JSX.Element => {
         setVisible={setLoginModal}
         redirectUrl='/dashboard'
       />
+
+      <ErrorScreen error={error} setError={setError}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => router.push(`/`)}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Log In
+          </button>
+        </div>
+      </ErrorScreen>
     </div>
   ) : (
     <p>GETSTREAM_API_KEY not found</p>

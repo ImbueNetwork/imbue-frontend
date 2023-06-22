@@ -1,23 +1,34 @@
-'use client'
+'use client';
 
 import { googleLogout } from '@react-oauth/google';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-import { redirect } from '@/utils';
+import { getCurrentUser, redirect } from '@/utils';
 
 import { postAPIHeaders } from '@/config';
 
-
-// export const login = createAsyncThunk('user/login',async () => {
-//     const resp = await getCurrentUser()
-//     return resp
-// })
+export const fetchUser = createAsyncThunk('user/fetchUser', async () => {
+  try {
+    const resp = await getCurrentUser();
+    return resp;
+  } catch (error) {
+    return {
+      status : "failed",
+      error
+    }
+  }
+});
 
 export const logout = createAsyncThunk('users/logout', async () => {
-  await fetch(`/api/auth/logout`, {
-    headers: postAPIHeaders,
-    method: 'get',
-  });
-  googleLogout();
-  redirect('');
+  try {
+    await fetch(`/api/auth/logout`, {
+      headers: postAPIHeaders,
+      method: 'get',
+    });
+    googleLogout();
+    redirect('');
+  } catch (error) {
+    console.log(error);
+  }
+  
 });
