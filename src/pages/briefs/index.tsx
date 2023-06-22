@@ -56,7 +56,7 @@ const Briefs = (): JSX.Element => {
   const { pathname } = router;
   const { expRange, submitRange, lengthRange, heading } = router.query;
 
-  const { user:currentUser } = useSelector((state: RootState) => state.userState)
+  const { user: currentUser } = useSelector((state: RootState) => state.userState)
 
   // The thing with this implentation is that the interior order must stay totally ordered.
   // The interior index is used to specify which entry will be used in the search brief.

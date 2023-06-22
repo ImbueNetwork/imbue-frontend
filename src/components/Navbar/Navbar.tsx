@@ -145,65 +145,60 @@ function Navbar() {
             >
               Discover Freelancers
             </Link>
-            <Tooltip title='Account settings'>
+            <Tooltip title='Account settings'
+              className={`${!user?.username && !loading && "lg:hidden"}`}>
               {
                 loading
                   ? <Skeleton variant="circular" width={40} height={40} />
-                  : <>
-                    {
-                      user?.username
-                        ? (
-                          <IconButton
-                            onClick={(e) => handleClick(e)}
-                            size="small"
-                            sx={{ ml: 2 }}
-                            aria-controls={open ? 'account-menu' : undefined}
-                            aria-haspopup='true'
-                            aria-expanded={open ? 'true' : undefined}
-                          >
-                            {user?.username ? (
-                              <Avatar className="w-8 h-8 lg:w-10 lg:h-10">
-                                <Image
-                                  src={freelancerProfile?.profile_image || defaultProfile}
-                                  width={40}
-                                  height={40}
-                                  alt='profile'
-                                />
-                              </Avatar>
-                            ) : (
-                              <div>
-                                {openMenu ? (
-                                  <CloseIcon htmlColor='white' />
-                                ) : (
-                                  <div onClick={() => setOpenMenu(!openMenu)}>
-                                    {openMenu ? (
-                                      <CloseIcon htmlColor="white" />
-                                    ) : (
-                                      <MenuIcon htmlColor="white" />
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            )
-                            }
-                          </IconButton>
-                        )
-                        : (
-                          <button
-                            className='mx-1 text-xs lg:text-sm bg-theme-grey-dark hover:bg-primary hover:text-black transition-all px-6 py-2 rounded-full'
-                            onClick={() => setLoginModal(true)}
-                          >
-                            Sign In
-                          </button>
-                        )
+                  : <IconButton
+                    onClick={(e) => handleClick(e)}
+                    size="small"
+                    sx={{ ml: 2 }}
+                    aria-controls={open ? 'account-menu' : undefined}
+                    aria-haspopup='true'
+                    aria-expanded={open ? 'true' : undefined}
+                  >
+                    {user?.username
+                      ? (
+                        <Avatar className="w-8 h-8 lg:w-10 lg:h-10">
+                          <Image
+                            src={freelancerProfile?.profile_image || defaultProfile}
+                            width={40}
+                            height={40}
+                            alt='profile'
+                          />
+                        </Avatar>)
+                      : (
+                        <div>
+                          {openMenu ? (
+                            <CloseIcon htmlColor='white' />
+                          ) : (
+                            <div onClick={() => setOpenMenu(!openMenu)}>
+                              {openMenu ? (
+                                <CloseIcon htmlColor="white" />
+                              ) : (
+                                <MenuIcon htmlColor="white" />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )
                     }
-                  </>
+                  </IconButton>
               }
 
             </Tooltip>
 
+            <button
+              className='mx-1 text-xs lg:text-sm bg-theme-grey-dark hover:bg-primary hover:text-black transition-all px-6 py-2 rounded-full hidden lg:inline-block'
+              onClick={() => setLoginModal(true)}
+            >
+              Sign In
+            </button>
+
           </Box>
         </div>
+
         <Menu
           disableScrollLock={true}
           id='basic-menu'
