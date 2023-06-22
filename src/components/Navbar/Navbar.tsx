@@ -189,12 +189,12 @@ function Navbar() {
                           </IconButton>
                         )
                         : (
-                          <span
-                            className='mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline'
+                          <button
+                            className='mx-1 text-xs lg:text-sm bg-theme-grey-dark hover:bg-primary hover:text-black transition-all px-6 py-2 rounded-full'
                             onClick={() => setLoginModal(true)}
                           >
                             Sign In
-                          </span>
+                          </button>
                         )
                     }
                   </>
@@ -226,7 +226,7 @@ function Navbar() {
         setVisible={(val: any) => {
           setLoginModal(val);
         }}
-        redirectUrl={'/dashboard'}
+        redirectUrl={router?.asPath}
       />
     </>
   );
