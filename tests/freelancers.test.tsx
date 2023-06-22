@@ -5,23 +5,23 @@ import Freelancers from '@/pages/freelancers/new';
 import { Providers } from '@/redux/providers/userProviders';
 
 function setUp() {
-  const user = {
-    id: 1,
-    username: 'test',
-    display_name: 'test',
-    password: 'test',
-    web3Accounts: [],
-    web3_address: 'test',
-    getstream_token: 'test',
-  };
-  render(<Providers><Freelancers/></Providers>);
+  // const user = {
+  //   id: 1,
+  //   username: 'test',
+  //   display_name: 'test',
+  //   password: 'test',
+  //   web3Accounts: [],
+  //   web3_address: 'test',
+  //   getstream_token: 'test',
+  // };
+  render(<Providers><Freelancers /></Providers>);
 }
 
 test('test Freelancer rendering', () => {
   expect(
     render(
       <Providers>
-        <Freelancers/>
+        <Freelancers />
       </Providers>
     )
   ).toBeTruthy();

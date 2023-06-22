@@ -28,7 +28,7 @@ export const userState = createSlice({
     });
 
     builder.addCase(fetchUser.fulfilled, (state, action) => {
-      if(action.payload.status === "failed"){
+      if(action?.payload?.status === "failed"){
         state.error = action?.payload?.error
       }
       state.user = { ...action.payload };

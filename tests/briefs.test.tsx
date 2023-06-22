@@ -7,7 +7,7 @@ import { Providers } from '@/redux/providers/userProviders';
 import {
   briefsData,
   expertExpData,
-  intermediateExpData,
+  // intermediateExpData,
 } from './__mocks__/briefsData';
 import {
   callSearchBriefs,
@@ -56,7 +56,7 @@ describe('Briefs Page', () => {
   });
 
   test('applies filters and updates briefs', async () => {
-    const comp = render(<Providers><Briefs /></Providers>);
+    render(<Providers><Briefs /></Providers>);
     // Mock the API calls used in the useEffect hook
 
     // Mock the briefsService.getAllBriefs method to return a fixed array of briefs

@@ -72,7 +72,7 @@ const Dashboard = (): JSX.Element => {
   useEffect(() => {
     const setupStreamChat = async () => {
       try {
-        if (user?.username && loadingUser) return
+        if (!user?.username && !loadingUser) return router.push("/")
 
         setClient(await getStreamChat());
         _setBriefs(await getUserBriefs(user?.id))
