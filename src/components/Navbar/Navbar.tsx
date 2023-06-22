@@ -189,12 +189,16 @@ function Navbar() {
 
             </Tooltip>
 
-            <button
-              className='mx-1 text-xs lg:text-sm bg-theme-grey-dark hover:bg-primary hover:text-black transition-all px-6 py-2 rounded-full hidden lg:inline-block'
-              onClick={() => setLoginModal(true)}
-            >
-              Sign In
-            </button>
+            {
+              !user.username && (
+                <button
+                  className='mx-1 text-xs lg:text-sm bg-theme-grey-dark hover:bg-primary hover:text-black transition-all px-6 py-2 rounded-full hidden lg:inline-block'
+                  onClick={() => setLoginModal(true)}
+                >
+                  Sign In
+                </button>
+              )
+            }
 
           </Box>
         </div>
