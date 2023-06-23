@@ -13,7 +13,7 @@ clean_build: clean
 migrate: migrate_latest
 
 migrate_latest: node_modules
-	yarn run knex --cwd ${DBDIR} migrate:latest
+	yarn run knex --cwd "./src/db" migrate:latest
 
 migrate_up: node_modules
 	yarn run knex --cwd ${DBDIR} migrate:up
@@ -29,7 +29,7 @@ migrate_reset: node_modules
 	    done;\
 	'
 seed:
-	yarn run knex --cwd ${DBDIR} seed:run
+	yarn run knex --cwd "./src/db" seed:run
 
 db_seed: migrate seed
 

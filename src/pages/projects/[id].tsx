@@ -109,15 +109,14 @@ function Project() {
     // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
     const onChainProjectRes = await chainService.getProject(projectId);
-    console.log(onChainProjectRes);
 
     if (onChainProjectRes) {
       const isApplicant = onChainProjectRes.initiator == user.web3_address;
 
-      // if (isApplicant) {
-      // }
-      
-      await getFreelancerData(user.username);
+      if (isApplicant) {
+        await getFreelancerData(user?.username);
+      }
+
       setIsApplicant(isApplicant);
       if (onChainProjectRes.projectState == OnchainProjectState.OpenForVoting) {
         const firstPendingMilestone =
@@ -134,7 +133,6 @@ function Project() {
 
   const getProject = async () => {
     const projectRes = await getProjectById(projectId);
-    console.log(projectRes);
     setProject(projectRes);
     // api  project response
     // const userResponse = await utils.getCurrentUser();
