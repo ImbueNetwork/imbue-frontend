@@ -11,14 +11,11 @@ import {
 export async function createFreelancingProfile(freelancer: any) {
   // Check that this user doesnt already have a freelancer profile.
   try {
-    const resp = await fetch(
-      `${config.apiBase}freelancers/`,
-      {
-        headers: config.postAPIHeaders,
-        method: 'put',
-        body: JSON.stringify({ freelancer }),
-      }
-    );
+    const resp = await fetch(`${config.apiBase}freelancers/`, {
+      headers: config.postAPIHeaders,
+      method: 'put',
+      body: JSON.stringify({ freelancer }),
+    });
 
     return resp;
   } catch (error) {
@@ -30,7 +27,8 @@ export const getAllFreelancers = async (
   itemsPerPage: number,
   currentPage: number
 ): Promise<FreelancerResponse> => {
-  const resp = await fetch(`${config.apiBase}freelancers?items_per_page=${itemsPerPage}&page=${currentPage}`,
+  const resp = await fetch(
+    `${config.apiBase}freelancers?items_per_page=${itemsPerPage}&page=${currentPage}`,
     {
       headers: config.postAPIHeaders,
       method: 'get',
@@ -65,13 +63,10 @@ export async function getFreelancerProfile(
 }
 
 export async function freelancerExists(username: string): Promise<boolean> {
-  const resp = await fetch(
-    `${config.apiBase}freelancers/${username}`,
-    {
-      headers: config.getAPIHeaders,
-      method: 'get',
-    }
-  );
+  const resp = await fetch(`${config.apiBase}freelancers/${username}`, {
+    headers: config.getAPIHeaders,
+    method: 'get',
+  });
 
   if (resp.ok) {
     return true;
@@ -101,14 +96,11 @@ export async function updateFreelancer(freelancer: Freelancer) {
 export const callSearchFreelancers = async (
   filter: FreelancerSqlFilter
 ): Promise<FreelancerResponse> => {
-  const resp = await fetch(
-    `${config.apiBase}freelancers/search`,
-    {
-      headers: config.postAPIHeaders,
-      method: 'post',
-      body: JSON.stringify(filter),
-    }
-  );
+  const resp = await fetch(`${config.apiBase}freelancers/search`, {
+    headers: config.postAPIHeaders,
+    method: 'post',
+    body: JSON.stringify(filter),
+  });
   if (resp.ok) {
     const data: FreelancerResponse = await resp.json();
     return data;
@@ -119,7 +111,9 @@ export const callSearchFreelancers = async (
 
 export const getFreelancerApplications = async (userId: number) => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}freelancers/${userId}/applications`),
+    checkEnvironment().concat(
+      `${config.apiBase}freelancers/${userId}/applications`
+    ),
     {
       headers: config.postAPIHeaders,
       method: 'get',
