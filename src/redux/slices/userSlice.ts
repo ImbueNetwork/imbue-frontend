@@ -6,7 +6,7 @@ import { User } from '@/model';
 
 import { fetchUser, logout } from '../reducers/userReducers';
 
-const initialState: { user: User, loading : boolean, error : any } = {
+export const initialState: { user: User, loading : boolean, error : any } = {
   user: {
     id: 0,
     display_name: '',

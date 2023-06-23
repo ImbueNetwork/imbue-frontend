@@ -247,6 +247,7 @@ export const SubmitProposal = (): JSX.Element => {
                         Description
                       </h3>
                       <textarea
+                        data-testid="milestone-description-0"
                         className='input-description text-base'
                         value={name}
                         onChange={(e) =>
@@ -266,6 +267,7 @@ export const SubmitProposal = (): JSX.Element => {
                         Amount
                       </h3>
                       <input
+                        data-testid="milestone-amount-0"
                         type='number'
                         className='input-budget bg-[#1a1a19] border border-white text-base leading-5 rounded-[5px] py-3 px-5'
                         value={amount || ''}
