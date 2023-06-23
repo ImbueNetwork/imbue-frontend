@@ -37,6 +37,11 @@ export enum ProjectStatus {
   Accepted = 4,
 }
 
+export enum ProjectType {
+  Brief = 0,
+  Grant = 1
+}
+
 export type Web3Account = {
   address: string;
   user_id: number;
