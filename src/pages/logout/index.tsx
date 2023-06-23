@@ -1,23 +1,16 @@
-import { googleLogout } from '@react-oauth/google';
 import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
-import { redirect } from '@/utils';
-
-import { postAPIHeaders } from '@/config';
+import { logout } from '@/redux/reducers/userReducers';
+import { AppDispatch } from '@/redux/store/store';
 
 const Logout = () => {
-  const logout = async () => {
-    await fetch(`/api/auth/logout`, {
-      headers: postAPIHeaders,
-      method: 'get',
-    });
-    googleLogout();
-    await redirect('');
-  };
+  const dispatch : AppDispatch = useDispatch()
+  
 
   useEffect(() => {
-    void logout();
-  }, []);
+    dispatch(logout())
+  }, [dispatch]);
 };
 
 export default Logout;

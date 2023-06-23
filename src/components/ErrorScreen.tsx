@@ -3,14 +3,14 @@ import React, { ReactNode } from 'react';
 
 type ErrorScreenProps = {
   error: any;
-  setError: (_e: any) => void;
+  setError?: (_e: any) => void;
   children: ReactNode;
 };
 
 const ErrorScreen = (props: ErrorScreenProps) => {
   const { error, setError } = props;
   const handleClose = () => {
-    setError(null);
+    setError && setError(null);
   };
 
   return (

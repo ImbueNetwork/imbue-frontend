@@ -2,8 +2,13 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import Briefs from '@/pages/briefs';
+import { Providers } from '@/redux/providers/userProviders';
 
-import { briefsData, expertExpData } from './__mocks__/briefsData';
+import {
+  briefsData,
+  expertExpData,
+  // intermediateExpData,
+} from './__mocks__/briefsData';
 import {
   callSearchBriefs,
   getAllBriefs,
@@ -29,12 +34,12 @@ const mockBriefs = {
 
 describe('Briefs Page', () => {
   test('renders without errors', () => {
-    render(<Briefs />);
+    render(<Providers><Briefs /></Providers>);
     // Assert that no errors occurred during rendering
   });
 
   test('displays briefs after data fetching', async () => {
-    render(<Briefs />);
+    render(<Providers><Briefs /></Providers>);
     // Mock the API call to getAllBriefs
     const mockGetAllBriefs = getAllBriefs as jest.MockedFunction<
       typeof getAllBriefs
@@ -51,7 +56,7 @@ describe('Briefs Page', () => {
   });
 
   test('applies filters and updates briefs', async () => {
-    render(<Briefs />);
+    render(<Providers><Briefs /></Providers>);
     // Mock the API calls used in the useEffect hook
 
     // Mock the briefsService.getAllBriefs method to return a fixed array of briefs

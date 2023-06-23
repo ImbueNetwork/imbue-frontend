@@ -1,10 +1,11 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 import * as utils from '@/utils';
 import { getServerSideProps } from '@/utils/serverSideProps';
 
 import NewBrief from '@/pages/briefs/new';
+import { Providers } from '@/redux/providers/userProviders';
 
 import { dummyUser, getServerSideData } from './__mocks__/userData';
 
@@ -30,7 +31,11 @@ describe('NewBrief', () => {
   });
 
   beforeEach(() => {
-    render(<NewBrief />);
+    render(
+      <Providers>
+        <NewBrief />
+      </Providers>
+    );
   });
 
   test('renders the headline input field', () => {
@@ -396,7 +401,11 @@ describe('Test case for API call', () => {
   });
 
   beforeEach(() => {
-    render(<NewBrief />);
+    render(
+      <Providers>
+        <NewBrief />
+      </Providers>
+    );
   });
   test('Test case for validating the API call', () => {
     const headlineInput = screen.getByTestId(
@@ -449,6 +458,9 @@ describe('Test case for API call', () => {
     const submitBtn = screen.getByTestId('submit-button');
     fireEvent.click(submitBtn);
 
-    expect(utils.getCurrentUser).toHaveBeenCalled();
+    waitFor(() => {
+      const completedText = screen.getByText("That's It. All done!");
+      expect(completedText).toBeInTheDocument();
+    });
   });
 });

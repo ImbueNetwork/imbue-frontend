@@ -5,8 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import Pagination from 'rc-pagination';
 import React, { useEffect, useState } from 'react';
-
-import { getCurrentUser } from '@/utils';
+import { useSelector } from 'react-redux';
 
 import CustomDropDown from '@/components/CustomDropDown';
 import CustomModal from '@/components/CustomModal';
@@ -20,6 +19,7 @@ import {
   getAllBriefs,
   getAllSavedBriefs,
 } from '@/redux/services/briefService';
+import { RootState } from '@/redux/store/store';
 
 import { BriefFilterOption } from '@/types/briefTypes';
 
@@ -55,6 +55,8 @@ const Briefs = (): JSX.Element => {
   const [error, setError] = useState<any>();
   const { pathname } = router;
   const { expRange, submitRange, lengthRange, heading } = router.query;
+
+  const { user: currentUser } = useSelector((state: RootState) => state.userState)
 
   // The thing with this implentation is that the interior order must stay totally ordered.
   // The interior index is used to specify which entry will be used in the search brief.
@@ -359,7 +361,7 @@ const Briefs = (): JSX.Element => {
             default:
               console.log(
                 'Invalid filter option selected or unimplemented. type:' +
-                  filterType
+                filterType
               );
           }
         }
@@ -408,7 +410,6 @@ const Briefs = (): JSX.Element => {
   };
 
   const onSavedBriefs = async () => {
-    const currentUser = await getCurrentUser();
     const briefs_all: any = await getAllSavedBriefs(
       itemsPerPage,
       currentPage,
@@ -425,14 +426,12 @@ const Briefs = (): JSX.Element => {
   const PageItem = (props: any) => {
     return (
       <div
-        className={`h-[32px] rounded-[4px] hover:bg-[--theme-primary] hover:text-black border border-primary w-[32px] cursor-pointer pt-1 items-center text-center text-sm !font-bold mr-6 ${
-          currentPage === parseInt(props.page) ? 'text-black' : 'text-white'
-        }
-        ${
-          currentPage === parseInt(props.page)
+        className={`h-[32px] rounded-[4px] hover:bg-[--theme-primary] hover:text-black border border-primary w-[32px] cursor-pointer pt-1 items-center text-center text-sm !font-bold mr-6 ${currentPage === parseInt(props.page) ? 'text-black' : 'text-white'
+          }
+        ${currentPage === parseInt(props.page)
             ? 'bg-[--theme-primary]'
             : 'bg-transparent'
-        }
+          }
         `}
       >
         {props.page}

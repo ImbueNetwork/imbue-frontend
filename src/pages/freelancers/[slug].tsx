@@ -33,6 +33,7 @@ import { GrCertificate } from 'react-icons/gr';
 import { ImStack } from 'react-icons/im';
 import { IoPeople } from 'react-icons/io5';
 import { MdOutlineWatchLater } from 'react-icons/md';
+import { useSelector } from 'react-redux';
 
 import AccountChoice from '@/components/AccountChoice';
 import { TextArea } from '@/components/Briefs/TextArea';
@@ -48,30 +49,26 @@ import SuccessScreen from '@/components/SuccessScreen';
 import FiverrIcon from '@/assets/images/fiverr.png';
 import ImbueIcon from '@/assets/svgs/loader.svg';
 import { Freelancer, User } from '@/model';
-import { authenticate } from '@/pages/api/info/user';
 import {
   getFreelancerProfile,
   updateFreelancer,
 } from '@/redux/services/freelancerService';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
+import { RootState } from '@/redux/store/store';
 import styles from '@/styles/modules/freelancers.module.css';
 
 import { checkEnvironment, fetchUser } from '../../utils';
 
 export type ProfileProps = {
   initFreelancer: Freelancer;
-  user: User;
 };
 
-const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
+const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const router = useRouter();
   const [freelancer, setFreelancer] = useState<any>(initFreelancer);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
-  const browsingUser = user;
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
-  const isCurrentFreelancer =
-    browsingUser && browsingUser.id == freelancer?.user_id;
 
   const [skills, setSkills] = useState<string[]>(
     freelancer?.skills?.map(
@@ -79,6 +76,11 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         skill?.name?.charAt(0).toUpperCase() + skill?.name?.slice(1)
     )
   );
+
+  const { user: browsingUser } = useSelector((state: RootState) => state.userState)
+
+  const isCurrentFreelancer =
+    browsingUser && (browsingUser?.id === freelancer?.user_id);
 
   const [openAccountChoice, setOpenAccountChoice] = useState<boolean>(false);
   const [error, setError] = useState<any>();
@@ -382,7 +384,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                 </p>
               </div>
 
-              <div className='connect-buttons flex justify-center gap-[24px] mb-[20px]'>
+              <div className='connect-buttons'>
                 {/* {!isCurrentFreelancer && (
                   <>
                     <button
@@ -395,35 +397,71 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                 )}
                 */}
 
-                {isCurrentFreelancer ? (
-                  <>
-                    {isEditMode ? (
-                      <button onClick={() => onSave()} className='message'>
-                        Save Changes <FiEdit />
+                {
+                  isCurrentFreelancer
+                    ? (
+                      <>
+                        {
+                          isEditMode ? (
+                            <div className='flex items-center justify-center gap-6 mb-5'>
+                              <button onClick={() => onSave()} className='message'>
+                                Save Changes <FiEdit />
+                              </button>
+                              <button
+                                onClick={() => cancelEdit()}
+                                className='message !bg-red-600'
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <div className='flex items-center justify-center gap-6 mb-5'>
+                              <button onClick={() => flipEdit()} className='message'>
+                                Edit Profile <FiEdit />
+                              </button>
+                              <button onClick={copyProfile} className='share'>
+                                <FaRegShareSquare color='white' />
+                                Share Profile
+                              </button>
+                            </div>
+                          )
+                        }
+                      </>)
+                    : (
+                      <div className='flex items-center justify-center gap-6 mb-5'>
+                        <button
+                          onClick={() => handleMessageBoxClick()}
+                          className=' message'
+                        >
+                          Message
+                        </button>
+                        <button onClick={copyProfile} className='share'>
+                          <FaRegShareSquare color='white' />
+                          Share Profile
+                        </button>
+                      </div>
+                    )
+                }
+
+                {/***
+                  (<div>
+                      <button
+                        onClick={() => handleMessageBoxClick()}
+                        className=' message'
+                      >
+                        Message
                       </button>
-                    ) : (
+                    </div>) ? (
                       <button onClick={() => flipEdit()} className='message'>
                         Edit Profile <FiEdit />
                       </button>
-                    )}
-                  </>
-                ) : <>
-                    <button
-                      onClick={() => handleMessageBoxClick()}
-                      className=' message'
-                    >
-                      Message
-                    </button>
-                  </> ? (
-                  <button onClick={() => flipEdit()} className='message'>
-                    Edit Profile <FiEdit />
-                  </button>
-                ) : (
-                  <button onClick={() => onSave()} className='message'>
-                    Save Changes <FiEdit />
-                  </button>
-                )}
-
+                    ) : (
+                      <button onClick={() => onSave()} className='message'>
+                        Save Changes <FiEdit />
+                      </button>
+                    )
+                 */}
+{/* 
                 {!isEditMode && isCurrentFreelancer ? (
                   <button onClick={copyProfile} className='share'>
                     <FaRegShareSquare color='white' />
@@ -436,7 +474,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                   >
                     Cancel
                   </button>
-                )}
+                )} */}
               </div>
               {/* TODO: Implement */}
               {/* <div className="divider"></div>
@@ -943,9 +981,8 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         </div>
       </ErrorScreen>
       <Alert
-        className={`absolute top-2 z-10 transform duration-300 transition-all ${
-          copied ? 'right-5' : '-right-full'
-        }`}
+        className={`absolute top-2 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
+          }`}
         severity='success'
       >
         Profile Link Copied to clipboard
@@ -955,20 +992,20 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
 };
 
 export const getServerSideProps = async (context: any) => {
-  const { req, res, query } = context;
+  const { query } = context;
 
-  let initFreelancer: any;
   if (query.slug) {
-    initFreelancer = await getFreelancerProfile(query.slug);
-  }
+    try {
+      const initFreelancer = await getFreelancerProfile(query.slug);
 
-  try {
-    const user = await authenticate('jwt', req, res);
-    if (user) {
-      return { props: { isAuthenticated: true, user, initFreelancer } };
+      if (initFreelancer) {
+        return { props: { isAuthenticated: true, initFreelancer } };
+      }
+
+    } catch (error) {
+      console.error(error); // TODO:
     }
-  } catch (error: any) {
-    console.error(error); // TODO:
+
   }
 
   return {

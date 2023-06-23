@@ -77,7 +77,7 @@ export const getAllSavedBriefs = async (
 
 export const checkIfBriefSaved = async (
   briefId: string | number,
-  userId: string
+  userId: string | number
 ) => {
   const resp = await fetch(
     `${config.apiBase}briefs/save/${briefId}?user_id=${userId}`,

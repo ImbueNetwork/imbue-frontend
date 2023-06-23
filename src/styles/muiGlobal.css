@@ -135,4 +135,9 @@
     margin: 0 auto;
     width: 300px;
   }
+
+  .navBar
+    .MuiPaper-root.MuiMenu-paper.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation8.MuiPopover-paper {
+    right: 10px;
+  }
 }
