@@ -20,14 +20,13 @@ export default nextConnect().post(
         if (!user) {
           return res.status(404).end();
         }
-
-        if (!user.getstream_token) {
-          const token = await generateGetStreamToken(user);
-          await updateUserGetStreamToken(user?.id, token)(tx);
-        }
         const loginSuccessful = await bcrypt.compare(password, user.password);
         if (!loginSuccessful) {
           return res.status(404).end();
+        }
+        if (!user.getstream_token) {
+          const token = await generateGetStreamToken(user);
+          await updateUserGetStreamToken(user?.id, token)(tx);
         }
         const payload = { id: user.id };
         const token = await jwt.sign(payload, jwtOptions.secretOrKey);
