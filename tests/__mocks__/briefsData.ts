@@ -311,3 +311,35 @@ export const expfilter = {
     },
   ],
 };
+
+export const dummyFreelancerBrief = {
+  id: 4,
+  headline: 'jhdkb\n',
+  description: 'dkvxjncv',
+  scope_level: 'Medium',
+  scope_id: 2,
+  duration: '3-6 months',
+  duration_id: 2,
+  budget: 10,
+  created_by: 'TegaBrave',
+  experience_level: 'Expert',
+  experience_id: 3,
+  created: new Date('2023-06-14T19:33:02.790Z'),
+  user_id: 6,
+  project_id: undefined,
+  number_of_briefs_submitted: 2,
+  skills: [
+    {
+      id: 7,
+      name: 'polkadot',
+    },
+  ],
+  skill_ids: ['7'],
+  industries: [
+    {
+      id: 10,
+      name: 'arts and culture',
+    },
+  ],
+  industry_ids: ['10'],
+};
