@@ -1,6 +1,18 @@
+import { Dialog, IconButton } from '@mui/material';
+import WalletIcon from '@svgs/wallet.svg';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+import CopyToClipboard from 'react-copy-to-clipboard';
+import { FaRegCopy } from 'react-icons/fa';
 import { FiPlusCircle } from 'react-icons/fi';
 
+import { getCurrentUser } from '@/utils';
+
+import ErrorScreen from '@/components/ErrorScreen';
+import FullScreenLoader from '@/components/FullScreenLoader';
+
+import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
 import { Currency } from '@/model';
 
@@ -10,6 +22,10 @@ interface MilestoneItem {
 }
 
 const GrantApplication = (): JSX.Element => {
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<any>();
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [approvers, setApprovers] = useState<string[]>([]);
@@ -18,6 +34,13 @@ const GrantApplication = (): JSX.Element => {
   const [milestones, setMilestones] = useState<MilestoneItem[]>([
     { name: '', amount: undefined },
   ]);
+  const [durationId, setDurationId] = useState(0);
+  const [success, setSuccess] = useState(false);
+  const [projectId, setProjectId] = useState<number>();
+  // FIXME:
+  const [onChainAddress, _setOnChainAddress] = useState(
+    '0x524c3d9e935649A448FA33666048C'
+  );
 
   const durationOptions = timeData.sort((a, b) =>
     a.value > b.value ? 1 : a.value < b.value ? -1 : 0
@@ -83,8 +106,45 @@ const GrantApplication = (): JSX.Element => {
 
   const formDataValid = validateFormData();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // TODO: Submit a grant
+    setLoading(true);
+    try {
+      const user_id = (await getCurrentUser())?.id;
+      const resp = await fetch(`${config.apiBase}grants`, {
+        headers: config.postAPIHeaders,
+        method: 'post',
+        body: JSON.stringify({
+          title,
+          description,
+          duration_id: durationId, // TODO:
+          required_funds: totalCost,
+          currency_id: currencyId,
+          user_id,
+          total_cost_without_fee: totalCostWithoutFee,
+          imbue_fee: imbueFee,
+          chain_project_id: 0, // TODO:
+          milestones: milestones.map((milestone) => ({
+            ...milestone,
+            percentage_to_unlock: Math.floor(
+              100 * ((milestone.amount ?? 0) / totalCostWithoutFee)
+            ),
+          })),
+          approvers,
+        }),
+      });
+      if (resp.status === 200 || resp.status === 201) {
+        const { grant_id } = (await resp.json()) as any;
+        setProjectId(grant_id);
+        setSuccess(true);
+      } else {
+        setError({ message: 'Failed to submit a grant' });
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -166,6 +226,8 @@ const GrantApplication = (): JSX.Element => {
               </h3>
               <select
                 name='duration'
+                value={durationId}
+                onChange={(e) => setDurationId(Number(e.target.value))}
                 className='bg-[#1a1a19] round border border-white rounded-[5px] text-base px-5 py-3 mt-4 w-full'
                 placeholder='Select a duration'
                 required
@@ -297,7 +359,7 @@ const GrantApplication = (): JSX.Element => {
             <div className='flex flex-row items-center mb-5'>
               <div className='flex flex-col flex-grow'>
                 <h3 className='text-lg lg:text-xl font-bold m-0 p-0'>
-                  Total price of the project
+                  Requested budget
                 </h3>
               </div>
               <div className='budget-value'>
@@ -306,6 +368,7 @@ const GrantApplication = (): JSX.Element => {
                 }`}
               </div>
             </div>
+
             <hr className='my-6 text-white' />
 
             <div className='flex flex-row items-center mb-5'>
@@ -320,6 +383,17 @@ const GrantApplication = (): JSX.Element => {
                 }`}
               </div>
             </div>
+
+            <hr className='my-6 text-white' />
+
+            <div className='flex flex-row items-center mb-5'>
+              <div className='flex flex-col flex-grow'>
+                <h3 className='text-lg lg:text-xl font-bold m-0 p-0'>Total</h3>
+              </div>
+              <div className='budget-value'>
+                ${Number(totalCost.toFixed(2)).toLocaleString()}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -332,9 +406,57 @@ const GrantApplication = (): JSX.Element => {
         >
           Submit
         </button>
-        {/* TODO: Add Drafts Functionality */}
-        {/* <button className="secondary-btn">Save draft</button> */}
       </div>
+      {loading && <FullScreenLoader />}
+      <Dialog
+        open={success}
+        onClose={() => router.push(`/projects/${projectId}`)}
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
+        className='p-14 errorDialogue'
+      >
+        <div className='my-auto flex flex-col gap-3 items-center p-8'>
+          <div className='f-modal-alert'>
+            <div className='p-10 border-[5px] border-solid border-primary rounded-full  relative'>
+              <Image src={WalletIcon} alt='wallet icon' className='w-24 h-24' />
+            </div>
+          </div>
+          <div className='my-2 lg:my-10'>
+            <p className='text-center text-lg lg:text-3xl font-bold'>
+              Grant Created Successfully
+            </p>
+          </div>
+
+          <CopyToClipboard text={onChainAddress}>
+            <div className='flex flex-row gap-4 items-center rounded-[10px] border border-solid border-light-grey py-8 px-6 text-xl text-white'>
+              <IconButton>
+                <FaRegCopy className='text-white' />
+              </IconButton>
+              <span>{onChainAddress}</span>
+            </div>
+          </CopyToClipboard>
+          <div className='mt-6 mb-12 text-white text-lg text-center'>
+            Please use this given address to create a proposal in your Kusama
+            treasury. After the voting is passed your project will be created
+          </div>
+          <button
+            onClick={() => router.push(`/projects/${projectId}`)}
+            className='primary-btn in-dark w-button'
+          >
+            Continue
+          </button>
+        </div>
+      </Dialog>
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Try Again
+          </button>
+        </div>
+      </ErrorScreen>
     </div>
   );
 };

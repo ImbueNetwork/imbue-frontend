@@ -16,7 +16,8 @@
     "incremental": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@db/*": ["./src/db/*"]
+      "@db/*": ["./src/db/*"],
+      "@svgs/*": ["./src/assets/svgs/*"]
     },
     "plugins": [
       {

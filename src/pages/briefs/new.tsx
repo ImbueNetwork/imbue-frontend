@@ -24,15 +24,6 @@ import {
 
 import styles from '../../styles/modules/newBrief.module.css';
 
-const getAPIHeaders = {
-  accept: 'application/json',
-};
-
-const postAPIHeaders = {
-  ...getAPIHeaders,
-  'content-type': 'application/json',
-};
-
 const NewBrief = (): JSX.Element => {
   const [step, setStep] = useState(0);
   const [headline, setHeadline] = useState('');
@@ -242,7 +233,7 @@ const NewBrief = (): JSX.Element => {
     try {
       const user_id = (await utils.getCurrentUser())?.id;
       const resp = await fetch(`${config.apiBase}/briefs/`, {
-        headers: postAPIHeaders,
+        headers: config.postAPIHeaders,
         method: 'post',
         body: JSON.stringify({
           headline,

@@ -195,7 +195,7 @@ export const getProjectById = async (projectId: string | number) => {
   const resp = await fetch(
     `${config.apiBase}project/${projectId}`,
     {
-      headers: postAPIHeaders,
+      headers: getAPIHeaders,
       method: 'get',
     }
   );

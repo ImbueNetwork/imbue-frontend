@@ -24,6 +24,7 @@ import {
   OnchainProjectState,
   Project,
   ProjectOnChain,
+  ProjectType,
   User,
 } from '@/model';
 import { getProjectById } from '@/redux/services/briefService';
@@ -89,9 +90,9 @@ function Project() {
   const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
   const [isApplicant, setIsApplicant] = useState<boolean>();
 
-  const [success, setSuccess] = useState<boolean>(false)
-  const [successTitle, setSuccessTitle] = useState<string>("")
-  const [error, setError] = useState<any>()
+  const [success, setSuccess] = useState<boolean>(false);
+  const [successTitle, setSuccessTitle] = useState<string>('');
+  const [error, setError] = useState<any>();
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -132,7 +133,7 @@ function Project() {
     setProject(projectRes);
     // api  project response
     const userResponse = await utils.getCurrentUser();
-    await setUser(userResponse);
+    setUser(userResponse);
     await getChainProject();
   };
 
@@ -154,12 +155,11 @@ function Project() {
         milestoneKeyInView,
         vote
       );
-      setSuccess(true)
-      setSuccessTitle("Your vote was successfull")
+      setSuccess(true);
+      setSuccessTitle('Your vote was successfull');
     } catch (error) {
-      setError({ message: "Could not vote. Please try again later" })
-    }
-    finally {
+      setError({ message: 'Could not vote. Please try again later' });
+    } finally {
       setLoading(false);
     }
   };
@@ -178,11 +178,11 @@ function Project() {
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
-          setSuccess(true)
-          setSuccessTitle("Milestone Submitted Successfully")
+          setSuccess(true);
+          setSuccessTitle('Milestone Submitted Successfully');
         } else if (result.txError) {
           // TODO: show error screen
-          setError({ message: result.errorMessage })
+          setError({ message: result.errorMessage });
           console.log(result.errorMessage);
         }
         break;
@@ -202,11 +202,11 @@ function Project() {
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
-          setSuccess(true)
-          setSuccessTitle("Withdraw successfull")
+          setSuccess(true);
+          setSuccessTitle('Withdraw successfull');
         } else if (result.txError) {
           // TODO: show error screen
-          setError({ message: result.errorMessage })
+          setError({ message: result.errorMessage });
           console.log(result.errorMessage);
         }
         break;
@@ -336,8 +336,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, 'Completed')
               : milestone?.milestone_key == milestoneBeingVotedOn
-                ? openForVotingTag()
-                : projectStateTag(modified, 'Not Started')}
+              ? openForVotingTag()
+              : projectStateTag(modified, 'Not Started')}
 
             <Image
               src={require(expanded
@@ -390,7 +390,7 @@ function Project() {
 
           {isApplicant &&
             onChainProject?.projectState !==
-            OnchainProjectState.OpenForVoting && (
+              OnchainProjectState.OpenForVoting && (
               <button
                 className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
                 data-testid='next-button'
@@ -447,11 +447,13 @@ function Project() {
             </h3>
             <span
               onClick={() => {
-                // project?.brief_id
+                // TODO:
               }}
               className='text-[#b2ff0b] cursor-pointer text-[20px]  max-lg: text-base  font-normal !m-0 !p-0 relative top-4'
             >
-              View full brief
+              {`View full ${
+                project.project_type === ProjectType.Brief ? 'brief' : 'grant'
+              }`}
             </span>
           </div>
           <div className='text-inactive w-[80%]'>
@@ -502,6 +504,19 @@ function Project() {
               Message
             </button>
           </div>
+
+          {project?.approvers && (
+            <>
+              <p className='text-white text-xl font-normal leading-[1.5] mt-[16px] p-0'>
+                Approvers
+              </p>
+              <div className='flex flex-row gap-4'>
+                {project.approvers.map((approver: string, index: number) => (
+                  <span key={index}>{approver}</span>
+                ))}
+              </div>
+            </>
+          )}
         </div>
         <div className='flex flex-col gap-[50px] flex-grow flex-shrink-0 basis-[20%]  max-lg:mt-10'>
           <div className='flex flex-col'>
@@ -524,12 +539,13 @@ function Project() {
             <div className='w-48 bg-[#1C2608] mt-5 h-1 relative my-auto'>
               <div
                 style={{
-                  width: `${(onChainProject?.milestones?.filter?.(
-                    (m: any) => m?.is_approved
-                  )?.length /
-                    onChainProject?.milestones?.length) *
+                  width: `${
+                    (onChainProject?.milestones?.filter?.(
+                      (m: any) => m?.is_approved
+                    )?.length /
+                      onChainProject?.milestones?.length) *
                     100
-                    }%`,
+                  }%`,
                 }}
                 className='h-full rounded-xl Accepted-button absolute'
               ></div>
@@ -537,8 +553,9 @@ function Project() {
                 {onChainProject?.milestones?.map((m: any, i: number) => (
                   <div
                     key={i}
-                    className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#1C2608]'
-                      } rounded-full -mt-1.5`}
+                    className={`h-4 w-4 ${
+                      m.is_approved ? 'Accepted-button' : 'bg-[#1C2608]'
+                    } rounded-full -mt-1.5`}
                   ></div>
                 ))}
               </div>
@@ -645,11 +662,7 @@ function Project() {
         </div>
       </ErrorScreen>
 
-      <SuccessScreen
-        title={successTitle}
-        open={success}
-        setOpen={setSuccess}
-      >
+      <SuccessScreen title={successTitle} open={success} setOpen={setSuccess}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => setSuccess(false)}
