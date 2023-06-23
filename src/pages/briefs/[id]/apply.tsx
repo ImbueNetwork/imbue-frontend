@@ -8,7 +8,6 @@ import { getCurrentUser } from '@/utils';
 
 import AccountChoice from '@/components/AccountChoice';
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
-import MilestoneItem from '@/components/Briefs/MilestoneItem';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 import SuccessScreen from '@/components/SuccessScreen';
