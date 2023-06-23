@@ -1,5 +1,6 @@
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import { useRouter } from 'next/router';
+import * as reactRedux from 'react-redux'
 
 import { getCurrentUser } from '@/utils';
 
@@ -11,6 +12,11 @@ import { getFreelancerProfile } from '@/redux/services/freelancerService';
 
 import { briefsData, dummyFreelancerBrief } from './__mocks__/briefsData';
 import { dummyUser } from './__mocks__/userData';
+
+jest.mock("react-redux", () => ({
+  ...jest.requireActual("react-redux"),
+  useSelector: jest.fn()
+}));
 
 jest.mock('next/router', () => ({
   useRouter: jest.fn(),
@@ -29,12 +35,17 @@ jest.mock('@/redux/services/freelancerService', () => ({
   getFreelancerProfile: jest.fn(),
 }));
 
+
 describe('SubmitProposal', () => {
+  const useSelectorMock = jest.spyOn(reactRedux, 'useSelector')
+
   beforeEach(() => {
     const mockGetCurrentUser = getCurrentUser as jest.MockedFunction<
       typeof getCurrentUser
     >;
     mockGetCurrentUser.mockResolvedValue(dummyUser);
+
+    useSelectorMock.mockReturnValue({user : dummyUser})
 
     const mockGetFreelancerProfile =
       getFreelancerProfile as jest.MockedFunction<typeof getFreelancerProfile>;
@@ -130,7 +141,7 @@ describe('SubmitProposal', () => {
 
     await waitFor(() => {
       expect(getFreelancerBrief).toHaveBeenCalledTimes(1);
-      // expect(getFreelancerBrief).toHaveBeenCalledWith(5, '1');
+      expect(getFreelancerBrief).toHaveBeenCalledWith(5, '1');
     });
   });
 
