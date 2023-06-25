@@ -14,7 +14,10 @@ export default nextConnect()
 
     db.transaction(async (tx) => {
       try {
-        const freelancer = await fetchFreelancerDetailsByUsername(username)(tx);
+        let freelancer;
+        freelancer = await fetchFreelancerDetailsByUsername(username)(tx);
+
+        if(!freelancer) freelancer = await models.fetchFreelancerDetailsByUserID(Number(username))(tx);
 
         if (!freelancer) {
           return res.status(404).end();

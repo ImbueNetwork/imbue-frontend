@@ -88,7 +88,7 @@ const Dashboard = (): JSX.Element => {
   }, [user]);
 
   useEffect(() => {
-    if (client && user.username && !loadingStreamChat) {
+    if (client && user?.username && !loadingStreamChat) {
       client?.connectUser(
         {
           id: user.username,
@@ -103,7 +103,7 @@ const Dashboard = (): JSX.Element => {
         }
       });
     }
-  }, [client, user?.getstream_token, user?.username]);
+  }, [client, user?.getstream_token, user?.username, loadingStreamChat]);
 
   if (loadingStreamChat || loadingUser) return <FullScreenLoader />;
 

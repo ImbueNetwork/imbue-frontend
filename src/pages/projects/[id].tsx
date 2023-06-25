@@ -113,10 +113,6 @@ function Project() {
     if (onChainProjectRes) {
       const isApplicant = onChainProjectRes.initiator == user.web3_address;
 
-      if (isApplicant) {
-        await getFreelancerData(user?.username);
-      }
-
       setIsApplicant(isApplicant);
       if (onChainProjectRes.projectState == OnchainProjectState.OpenForVoting) {
         const firstPendingMilestone =
@@ -133,6 +129,9 @@ function Project() {
 
   const getProject = async () => {
     const projectRes = await getProjectById(projectId);
+    const freelancer = await getFreelancerData(projectRes?.user_id)
+    console.log(freelancer);
+
     setProject(projectRes);
     // api  project response
     // const userResponse = await utils.getCurrentUser();
@@ -485,9 +484,11 @@ function Project() {
               {freelancer?.display_name}
             </p>
 
-            <button
-              onClick={() => handleMessageBoxClick(project?.user_id)}
-              className='primary-btn 
+            {
+              isApplicant || (
+                <button
+                  onClick={() => handleMessageBoxClick(project?.user_id)}
+                  className='primary-btn 
               in-dark w-button 
               !mt-0 
               font-normal 
@@ -502,10 +503,13 @@ function Project() {
               px-8
               max-lg:!mr-0
               '
-              data-testid='next-button'
-            >
-              Message
-            </button>
+                  data-testid='next-button'
+                >
+                  Message
+                </button>
+              )
+            }
+
           </div>
         </div>
         <div className='flex flex-col gap-[50px] flex-grow flex-shrink-0 basis-[20%]  max-lg:mt-10'>
