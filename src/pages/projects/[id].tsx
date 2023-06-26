@@ -8,7 +8,6 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import * as utils from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import AccountChoice from '@/components/AccountChoice';
@@ -20,12 +19,10 @@ import Login from '@/components/Login';
 import SuccessScreen from '@/components/SuccessScreen';
 
 import {
-  Freelancer,
   Milestone,
   OnchainProjectState,
   Project,
   ProjectOnChain,
-  User,
 } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
