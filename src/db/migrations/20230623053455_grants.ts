@@ -5,7 +5,7 @@ import { auditFields } from "../utils";
 
 export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable('project_approvers', (table) => {
-        table.increments('id');
+        table.increments('id', { primaryKey: true });
         table.integer('project_id');
         table.foreign('project_id').references('projects.id');
         table.string('approver');
