@@ -27,7 +27,7 @@ import {
   ProjectOnChain,
   User,
 } from '@/model';
-import { getProjectById } from '@/redux/services/briefService';
+import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { RootState } from '@/redux/store/store';
@@ -70,7 +70,7 @@ const projectStateTag = (dateCreated: Date, text: string): JSX.Element => {
 function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
-  const [freelancer, setFreelancer] = useState<Freelancer | any>({});
+  const [targetUser, setTargetUser] = useState<any>({});
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
   // const [user, setUser] = useState<User | any>();
   const { user } = useSelector((state: RootState) => state.userState)
@@ -129,8 +129,13 @@ function Project() {
 
   const getProject = async () => {
     const projectRes = await getProjectById(projectId);
-    const freelancer = await getFreelancerData(projectRes?.user_id)
-    console.log(freelancer);
+    if (projectRes?.user_id !== user?.id) {
+      await getTargetUser(projectRes?.user_id)
+    }
+    else {
+      const brief = await getBrief(projectRes.brief_id)
+      brief?.user_id && await getTargetUser(brief?.user_id.toString())
+    }
 
     setProject(projectRes);
     // api  project response
@@ -139,9 +144,9 @@ function Project() {
     await getChainProject();
   };
 
-  const getFreelancerData = async (freelancerName: string) => {
+  const getTargetUser = async (freelancerName: string) => {
     const freelanceRes = await getFreelancerProfile(freelancerName);
-    setFreelancer(freelanceRes);
+    setTargetUser(freelanceRes);
   };
 
   // voting on a mile stone
@@ -427,7 +432,7 @@ function Project() {
             showMessageBox,
             setShowMessageBox,
             browsingUser: user,
-            targetUser: chatTargetUser,
+            targetUser
           }}
         />
       )}
@@ -468,7 +473,9 @@ function Project() {
           </p>
 
           <p className='text-white text-xl font-normal leading-[1.5] mt-[16px] p-0'>
-            Freelancer hired
+            {
+              isApplicant ? "Project Owner" : "Freelancer hired"
+            }
           </p>
 
           <div className='flex flex-row items-center max-lg:flex-wrap mt-5'>
@@ -481,14 +488,12 @@ function Project() {
             />
 
             <p className='text-white text-[20px] font-normal leading-[1.5] p-0 mx-7'>
-              {freelancer?.display_name}
+              {targetUser?.display_name}
             </p>
 
-            {
-              isApplicant || (
-                <button
-                  onClick={() => handleMessageBoxClick(project?.user_id)}
-                  className='primary-btn 
+            <button
+              onClick={() => handleMessageBoxClick(project?.user_id)}
+              className='primary-btn 
               in-dark w-button 
               !mt-0 
               font-normal 
@@ -503,12 +508,10 @@ function Project() {
               px-8
               max-lg:!mr-0
               '
-                  data-testid='next-button'
-                >
-                  Message
-                </button>
-              )
-            }
+              data-testid='next-button'
+            >
+              Message
+            </button>
 
           </div>
         </div>
