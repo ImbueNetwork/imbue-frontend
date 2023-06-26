@@ -8,7 +8,6 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import * as utils from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import AccountChoice from '@/components/AccountChoice';
@@ -20,14 +19,12 @@ import Login from '@/components/Login';
 import SuccessScreen from '@/components/SuccessScreen';
 
 import {
-  Freelancer,
   Milestone,
   OnchainProjectState,
   Project,
   ProjectOnChain,
-  User,
 } from '@/model';
-import { getProjectById } from '@/redux/services/briefService';
+import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { RootState } from '@/redux/store/store';
@@ -70,11 +67,10 @@ const projectStateTag = (dateCreated: Date, text: string): JSX.Element => {
 function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
-  const [freelancer, setFreelancer] = useState<Freelancer | any>({});
+  const [targetUser, setTargetUser] = useState<any>({});
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
   // const [user, setUser] = useState<User | any>();
   const { user } = useSelector((state: RootState) => state.userState)
-  const [chatTargetUser, setChatTargetUser] = useState<User | null>(null);
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
   const [submittingMilestone, setSubmittingMilestone] =
@@ -113,10 +109,6 @@ function Project() {
     if (onChainProjectRes) {
       const isApplicant = onChainProjectRes.initiator == user.web3_address;
 
-      if (isApplicant) {
-        await getFreelancerData(user?.username);
-      }
-
       setIsApplicant(isApplicant);
       if (onChainProjectRes.projectState == OnchainProjectState.OpenForVoting) {
         const firstPendingMilestone =
@@ -133,6 +125,14 @@ function Project() {
 
   const getProject = async () => {
     const projectRes = await getProjectById(projectId);
+    if (projectRes?.user_id !== user?.id) {
+      await getTargetUser(projectRes?.user_id)
+    }
+    else {
+      const brief = await getBrief(projectRes.brief_id)
+      brief?.user_id && await getTargetUser(brief?.user_id.toString())
+    }
+
     setProject(projectRes);
     // api  project response
     // const userResponse = await utils.getCurrentUser();
@@ -140,9 +140,9 @@ function Project() {
     await getChainProject();
   };
 
-  const getFreelancerData = async (freelancerName: string) => {
+  const getTargetUser = async (freelancerName: string) => {
     const freelanceRes = await getFreelancerProfile(freelancerName);
-    setFreelancer(freelanceRes);
+    setTargetUser(freelanceRes);
   };
 
   // voting on a mile stone
@@ -286,7 +286,6 @@ function Project() {
   const handleMessageBoxClick = async (user_id: number) => {
     if (user_id) {
       setShowMessageBox(true);
-      setChatTargetUser(await utils.fetchUser(user_id));
     } else {
       setLoginModal(true);
     }
@@ -428,7 +427,7 @@ function Project() {
             showMessageBox,
             setShowMessageBox,
             browsingUser: user,
-            targetUser: chatTargetUser,
+            targetUser
           }}
         />
       )}
@@ -469,7 +468,9 @@ function Project() {
           </p>
 
           <p className='text-white text-xl font-normal leading-[1.5] mt-[16px] p-0'>
-            Freelancer hired
+            {
+              isApplicant ? "Project Owner" : "Freelancer hired"
+            }
           </p>
 
           <div className='flex flex-row items-center max-lg:flex-wrap mt-5'>
@@ -482,7 +483,7 @@ function Project() {
             />
 
             <p className='text-white text-[20px] font-normal leading-[1.5] p-0 mx-7'>
-              {freelancer?.display_name}
+              {targetUser?.display_name}
             </p>
 
             <button
@@ -506,6 +507,7 @@ function Project() {
             >
               Message
             </button>
+
           </div>
         </div>
         <div className='flex flex-col gap-[50px] flex-grow flex-shrink-0 basis-[20%]  max-lg:mt-10'>
