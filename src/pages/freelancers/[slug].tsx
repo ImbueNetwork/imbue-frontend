@@ -13,6 +13,7 @@ import {
 import { StyledEngineProvider } from '@mui/system';
 import { SignerResult } from '@polkadot/api/types';
 import { WalletAccount } from '@talismn/connect-wallets';
+import moment from 'moment';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -48,8 +49,10 @@ import SuccessScreen from '@/components/SuccessScreen';
 
 import FiverrIcon from '@/assets/images/fiverr.png';
 import ImbueIcon from '@/assets/svgs/loader.svg';
-import { Freelancer, User } from '@/model';
+import { Freelancer, Project, User } from '@/model';
+import { Currency } from '@/model';
 import {
+  getFreelancerApplications,
   getFreelancerProfile,
   updateFreelancer,
 } from '@/redux/services/freelancerService';
@@ -69,6 +72,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
+  const [projects, setProjects] = useState<Project[]>()
+
+ const memberSince = moment(freelancer?.created).format('MMMM YYYY')
 
   const [skills, setSkills] = useState<string[]>(
     freelancer?.skills?.map(
@@ -101,6 +107,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     const setup = async () => {
       if (freelancer) {
         setTargetUser(await fetchUser(freelancer?.user_id));
+        setProjects(await getFreelancerApplications(freelancer?.user_id))
       }
     };
     setup();
@@ -535,7 +542,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   <AiOutlineUser size={24} />
                   <p className='text-light-grey'>Member Since</p>
                 </div>
-                <div>Jan 2023</div>
+                <div>{memberSince}</div>
               </div>
               <div className='flex justify-between mb-3'>
                 <div className='flex items-center gap-4'>
@@ -549,7 +556,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   <ImStack size={24} />
                   <p className='text-light-grey'>Number of projects</p>
                 </div>
-                <div>58</div>
+                <div>{projects?.length || 0}</div>
               </div>
             </div>
           </div>
@@ -799,15 +806,15 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           <div className='bg-theme-grey-dark rounded-xl border border-light-white'>
             <div className='px-[30px] lg:px-[40px] py-[30px] border-b border-b-light-white'>
               <h3 className='mb-3'>Work History</h3>
-              <p className='text-primary'>Completed Projects (3)</p>
+              <p className='text-primary'>Completed Projects ({projects?.length || 0})</p>
             </div>
             <div>
-              {[...Array(3)].map((v, i) => (
+              {projects?.map((v, i) => (
                 <div
                   key={i}
                   className='px-[30px] lg:px-[40px] py-[30px] flex flex-col gap-3 border-b last:border-b-0 border-b-light-white'
                 >
-                  <p className='text-xl'>{work.title}</p>
+                  <p className='text-xl'>{v?.name}</p>
                   <div className='flex gap-3 lg:gap-8 flex-wrap items-center justify-between'>
                     <div className='flex'>
                       {[...Array(4)].map((r, ri) => (
@@ -822,12 +829,12 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                         />
                       ))}
                     </div>
-                    <p className='text-light-grey'>{work.time}</p>
+                    <p className='text-light-grey'>{moment(v?.created).format("Do MMM YYYY")}</p>
                   </div>
-                  <p className='text-light-grey'>{work.description}</p>
-                  <div className='flex justify-between'>
-                    <p className=''>${work.budget}</p>
-                    <p className=''>{work.budgetType}</p>
+                  <p className='text-light-grey'>{v?.description}</p>
+                  <div className='flex gap-1'>
+                    <p className=''>{v?.required_funds}</p>
+                    <p className=''>{Currency[v?.currency_id]}</p>
                   </div>
                 </div>
               ))}
