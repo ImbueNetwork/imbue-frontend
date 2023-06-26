@@ -74,7 +74,6 @@ function Project() {
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
   // const [user, setUser] = useState<User | any>();
   const { user } = useSelector((state: RootState) => state.userState)
-  const [chatTargetUser, setChatTargetUser] = useState<User | null>(null);
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
   const [submittingMilestone, setSubmittingMilestone] =
@@ -290,7 +289,6 @@ function Project() {
   const handleMessageBoxClick = async (user_id: number) => {
     if (user_id) {
       setShowMessageBox(true);
-      setChatTargetUser(await utils.fetchUser(user_id));
     } else {
       setLoginModal(true);
     }
