@@ -41,7 +41,7 @@ export const HirePopup = ({
   const [projectId, setProjectId] = useState<string>();
   const router = useRouter();
 
-  const { user } = useSelector((state: RootState) => state.userState)
+  const { user } = useSelector((state: RootState) => state.userState);
 
   const modalStyle = {
     position: 'absolute' as const,
@@ -62,7 +62,9 @@ export const HirePopup = ({
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
-    const briefOwners: string[] = user?.web3_address ? [user?.web3_address] : [""];
+    const briefOwners: string[] = user?.web3_address
+      ? [user?.web3_address]
+      : [''];
     const freelancerAddress: string = freelancer.web3_address;
     const budget = BigInt(totalCost * 1e12);
     const initialContribution = BigInt(totalCost * 1e12);

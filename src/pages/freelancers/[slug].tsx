@@ -77,10 +77,12 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     )
   );
 
-  const { user: browsingUser } = useSelector((state: RootState) => state.userState)
+  const { user: browsingUser } = useSelector(
+    (state: RootState) => state.userState
+  );
 
   const isCurrentFreelancer =
-    browsingUser && (browsingUser?.id === freelancer?.user_id);
+    browsingUser && browsingUser?.id === freelancer?.user_id;
 
   const [openAccountChoice, setOpenAccountChoice] = useState<boolean>(false);
   const [error, setError] = useState<any>();
@@ -306,11 +308,15 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         />
       </div>
 
-      <div className="flex flex-col lg:flex-row justify-evenly lg:mx-[40px] px-[30px] lg:px-[40px]">
-        <div className="flex flex-col lg:items-center gap-[20px] lg:gap-[70px] lg:w-[40%]">
-          <div className="w-full flex flex-col items-center gap-[16px] pb-[30px] bg-theme-grey-dark rounded-xl border border-light-white">
-            <UploadImage isEditMode={isEditMode} user={freelancer} setUser={setFreelancer} />
-            <div className="w-full flex flex-col gap-[16px] -mt-11 px-[30px] lg:px-[40px]">
+      <div className='flex flex-col lg:flex-row justify-evenly lg:mx-[40px] px-[30px] lg:px-[40px]'>
+        <div className='flex flex-col lg:items-center gap-[20px] lg:gap-[70px] lg:w-[40%]'>
+          <div className='w-full flex flex-col items-center gap-[16px] pb-[30px] bg-theme-grey-dark rounded-xl border border-light-white'>
+            <UploadImage
+              isEditMode={isEditMode}
+              user={freelancer}
+              setUser={setFreelancer}
+            />
+            <div className='w-full flex flex-col gap-[16px] -mt-11 px-[30px] lg:px-[40px]'>
               {isEditMode ? (
                 <TextField
                   onChange={(e) => handleUpdateState(e)}
@@ -322,7 +328,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                 />
               ) : (
                 <div className='flex gap-2 items-center justify-center mt-10'>
-                  <h3 className="!text-2xl font-bold text-center z-[1]">
+                  <h3 className='!text-2xl font-bold text-center z-[1]'>
                     {freelancer?.display_name}
                   </h3>
                   {initFreelancer?.verified && <VerifiedIcon color='primary' />}
@@ -367,7 +373,11 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   )}
                 </div>
               </div>
-              <CountrySelector isEditMode={isEditMode} user={freelancer} setUser={setFreelancer} />
+              <CountrySelector
+                isEditMode={isEditMode}
+                user={freelancer}
+                setUser={setFreelancer}
+              />
 
               {/* TODO: Implement reviews */}
 
@@ -397,51 +407,46 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                 )}
                 */}
 
-                {
-                  isCurrentFreelancer
-                    ? (
-                      <>
-                        {
-                          isEditMode ? (
-                            <div className='flex items-center justify-center gap-6 mb-5'>
-                              <button onClick={() => onSave()} className='message'>
-                                Save Changes <FiEdit />
-                              </button>
-                              <button
-                                onClick={() => cancelEdit()}
-                                className='message !bg-red-600'
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          ) : (
-                            <div className='flex items-center justify-center gap-6 mb-5'>
-                              <button onClick={() => flipEdit()} className='message'>
-                                Edit Profile <FiEdit />
-                              </button>
-                              <button onClick={copyProfile} className='share'>
-                                <FaRegShareSquare color='white' />
-                                Share Profile
-                              </button>
-                            </div>
-                          )
-                        }
-                      </>)
-                    : (
+                {isCurrentFreelancer ? (
+                  <>
+                    {isEditMode ? (
                       <div className='flex items-center justify-center gap-6 mb-5'>
+                        <button onClick={() => onSave()} className='message'>
+                          Save Changes <FiEdit />
+                        </button>
                         <button
-                          onClick={() => handleMessageBoxClick()}
-                          className=' message'
+                          onClick={() => cancelEdit()}
+                          className='message !bg-red-600'
                         >
-                          Message
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <div className='flex items-center justify-center gap-6 mb-5'>
+                        <button onClick={() => flipEdit()} className='message'>
+                          Edit Profile <FiEdit />
                         </button>
                         <button onClick={copyProfile} className='share'>
                           <FaRegShareSquare color='white' />
                           Share Profile
                         </button>
                       </div>
-                    )
-                }
+                    )}
+                  </>
+                ) : (
+                  <div className='flex items-center justify-center gap-6 mb-5'>
+                    <button
+                      onClick={() => handleMessageBoxClick()}
+                      className=' message'
+                    >
+                      Message
+                    </button>
+                    <button onClick={copyProfile} className='share'>
+                      <FaRegShareSquare color='white' />
+                      Share Profile
+                    </button>
+                  </div>
+                )}
 
                 {/***
                   (<div>
@@ -461,7 +466,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                       </button>
                     )
                  */}
-{/* 
+                {/* 
                 {!isEditMode && isCurrentFreelancer ? (
                   <button onClick={copyProfile} className='share'>
                     <FaRegShareSquare color='white' />
@@ -981,8 +986,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         </div>
       </ErrorScreen>
       <Alert
-        className={`absolute top-2 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
-          }`}
+        className={`absolute top-2 z-10 transform duration-300 transition-all ${
+          copied ? 'right-5' : '-right-full'
+        }`}
         severity='success'
       >
         Profile Link Copied to clipboard
@@ -1001,11 +1007,9 @@ export const getServerSideProps = async (context: any) => {
       if (initFreelancer) {
         return { props: { isAuthenticated: true, initFreelancer } };
       }
-
     } catch (error) {
       console.error(error); // TODO:
     }
-
   }
 
   return {

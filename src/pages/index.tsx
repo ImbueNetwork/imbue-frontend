@@ -12,7 +12,7 @@ export default function Home() {
   const router = useRouter();
   const [loginModal, setLoginModal] = useState<boolean>(false);
 
-  const {user, loading}= useSelector((state : RootState)=>state.userState)
+  const { user, loading } = useSelector((state: RootState) => state.userState);
 
   useEffect(() => {
     !loading && getLogedInUser();

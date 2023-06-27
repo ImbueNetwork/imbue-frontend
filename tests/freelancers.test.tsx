@@ -14,7 +14,11 @@ function setUp() {
   //   web3_address: 'test',
   //   getstream_token: 'test',
   // };
-  render(<Providers><Freelancers /></Providers>);
+  render(
+    <Providers>
+      <Freelancers />
+    </Providers>
+  );
 }
 
 test('test Freelancer rendering', () => {

@@ -6,7 +6,7 @@ import { User } from '@/model';
 
 import { fetchUser, logout } from '../reducers/userReducers';
 
-export const initialState: { user: User, loading : boolean, error : any } = {
+export const initialState: { user: User; loading: boolean; error: any } = {
   user: {
     id: 0,
     display_name: '',
@@ -14,7 +14,7 @@ export const initialState: { user: User, loading : boolean, error : any } = {
     getstream_token: '',
   },
   loading: false,
-  error: {}
+  error: {},
 };
 
 export const userState = createSlice({
@@ -28,13 +28,13 @@ export const userState = createSlice({
     });
 
     builder.addCase(fetchUser.fulfilled, (state, action) => {
-      if(action?.payload?.status === "failed"){
-        state.error = action?.payload?.error
+      if (action?.payload?.status === 'failed') {
+        state.error = action?.payload?.error;
       }
       state.user = { ...action.payload };
       state.loading = false;
     });
-    
+
     builder.addCase(fetchUser.pending, (state) => {
       state.loading = true;
     });

@@ -1,11 +1,11 @@
-import { useRouter } from "next/router";
-import React from "react";
-import { useEffect, useState } from "react";
-import LoadingBar from "react-top-loading-bar";
+import { useRouter } from 'next/router';
+import React from 'react';
+import { useEffect, useState } from 'react';
+import LoadingBar from 'react-top-loading-bar';
 
-import { Providers } from "@/redux/providers/userProviders";
+import { Providers } from '@/redux/providers/userProviders';
 
-import Navbar from "./Navbar/Navbar";
+import Navbar from './Navbar/Navbar';
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -26,7 +26,7 @@ function Layout({ children }: LayoutProps) {
       router.events.off('routeChangeError', () => setProgress(100));
     };
   }, [router]);
-  
+
   return (
     <React.Fragment>
       {progress > 0 && (

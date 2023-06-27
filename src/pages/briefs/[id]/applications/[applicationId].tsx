@@ -46,7 +46,7 @@ export type ApplicationPreviewProps = {
 
 const ApplicationPreview = (): JSX.Element => {
   const [brief, setBrief] = useState<Brief | any>();
-  const { user } = useSelector((state: RootState) => state.userState)
+  const { user } = useSelector((state: RootState) => state.userState);
   const [application, setApplication] = useState<Project | any>();
   const [freelancer, setFreelancer] = useState<Freelancer | any>();
   const [loginModal, setLoginModal] = useState<boolean>(false);

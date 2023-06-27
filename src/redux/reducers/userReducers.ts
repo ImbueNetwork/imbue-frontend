@@ -13,9 +13,9 @@ export const fetchUser = createAsyncThunk('user/fetchUser', async () => {
     return resp;
   } catch (error) {
     return {
-      status : "failed",
-      error
-    }
+      status: 'failed',
+      error,
+    };
   }
 });
 
@@ -30,5 +30,4 @@ export const logout = createAsyncThunk('users/logout', async () => {
   } catch (error) {
     console.log(error);
   }
-  
 });
