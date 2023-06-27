@@ -12,7 +12,7 @@ export const postAPIHeaders = {
 export const grantProposalsURL = '/proposals';
 export const dashboardUrl = '/dashboard';
 
-export const googleClientId = process.env.GOOGLE_CLIENT_ID || "";
+export const googleClientId = process.env.GOOGLE_CLIENT_ID || '';
 
 export const proposalsDraftLocalDraftKey = 'imbu-proposals-draft:local-draft';
 

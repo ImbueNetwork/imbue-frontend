@@ -5,6 +5,7 @@ import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import { getServerSideProps } from '@/utils/serverSideProps';
 
@@ -20,8 +21,9 @@ import {
   saveBriefData,
 } from '@/redux/services/briefService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
+import { RootState } from '@/redux/store/store';
 
-import { fetchUser, getCurrentUser } from '../../utils';
+import { fetchUser } from '../../utils';
 
 TimeAgo.addLocale(en);
 
@@ -52,7 +54,10 @@ const BriefDetails = (): JSX.Element => {
     user_id: 0,
   });
 
-  const [browsingUser, setBrowsingUser] = useState<User | null>(null);
+  // const [browsingUser, setBrowsingUser] = useState<User | null>(null);
+  const { user: browsingUser } = useSelector(
+    (state: RootState) => state.userState
+  );
   const [isSavedBrief, setIsSavedBrief] = useState<boolean>(false);
   const [freelancer, setFreelancer] = useState<Freelancer>();
   const [targetUser, setTargetUser] = useState<User | null>(null);
@@ -67,23 +72,27 @@ const BriefDetails = (): JSX.Element => {
   const id: any = router?.query?.id || 0;
 
   const fetchData = async () => {
-    if (id) {
-      const briefData: Brief | Error | undefined = await getBrief(id);
-      if (briefData?.id) {
-        const targetUser = await fetchUser(briefData.user_id);
-        setBrief(briefData);
-        const currentUser = await getCurrentUser();
-        const _freelancer = await getFreelancerProfile(currentUser.username);
-        const briefIsSaved = await checkIfBriefSaved(
-          briefData?.id,
-          currentUser?.id
-        );
-        setIsSavedBrief(briefIsSaved.isSaved);
-        setBrowsingUser(currentUser);
-        setTargetUser(targetUser);
-        setFreelancer(_freelancer);
-      } else {
-        setError({ message: 'No Brief Found' });
+    if (id && browsingUser?.username) {
+      try {
+        const briefData: Brief | Error | undefined = await getBrief(id);
+        if (briefData?.id) {
+          const targetUser = await fetchUser(briefData.user_id);
+          setBrief(briefData);
+          const _freelancer = await getFreelancerProfile(
+            browsingUser?.username
+          );
+          const briefIsSaved = await checkIfBriefSaved(
+            briefData?.id,
+            browsingUser?.id
+          );
+          setIsSavedBrief(briefIsSaved.isSaved);
+          setTargetUser(targetUser);
+          setFreelancer(_freelancer);
+        } else {
+          setError({ message: 'No Brief Found' });
+        }
+      } catch (error) {
+        setError(error);
       }
     }
   };

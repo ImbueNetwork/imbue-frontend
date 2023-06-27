@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import * as utils from '@/utils';
 import { getServerSideProps } from '@/utils/serverSideProps';
@@ -21,6 +22,7 @@ import {
   suggestedSkills,
   timeData,
 } from '@/config/briefs-data';
+import { RootState } from '@/redux/store/store';
 
 import styles from '../../styles/modules/newBrief.module.css';
 
@@ -38,6 +40,8 @@ const NewBrief = (): JSX.Element => {
   const [error, setError] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
+
+  const { user } = useSelector((state: RootState) => state.userState);
 
   const NamePanel = (
     <>
@@ -231,7 +235,7 @@ const NewBrief = (): JSX.Element => {
     //TODO: implement api call
     setLoading(true);
     try {
-      const user_id = (await utils.getCurrentUser())?.id;
+      const user_id = user?.id;
       const resp = await fetch(`${config.apiBase}/briefs/`, {
         headers: config.postAPIHeaders,
         method: 'post',

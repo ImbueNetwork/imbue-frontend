@@ -4,6 +4,7 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import { StyledEngineProvider } from '@mui/material/styles';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { StreamChat } from 'stream-chat';
 import 'stream-chat-react/dist/css/v2/index.css';
 
@@ -13,14 +14,15 @@ import ChatPopup from '@/components/ChatPopup';
 import DashboardChatBox from '@/components/Dashboard/MyChatBox';
 import MyClientBriefsView from '@/components/Dashboard/MyClientBriefsView';
 import MyFreelancerApplications from '@/components/Dashboard/MyFreelancerApplications';
+import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 import Login from '@/components/Login';
 
 import { Freelancer, Project, User } from '@/model';
 import { Brief } from '@/model';
-import { authenticate } from '@/pages/api/info/user';
 import { getUserBriefs } from '@/redux/services/briefService';
 import { getFreelancerApplications } from '@/redux/services/freelancerService';
+import { RootState } from '@/redux/store/store';
 
 export type DashboardProps = {
   user: User;
@@ -29,30 +31,30 @@ export type DashboardProps = {
   myApplicationsResponse: Project[];
 };
 
-const Dashboard = ({
-  user,
-  isAuthenticated,
-  myBriefs,
-  myApplicationsResponse,
-}: DashboardProps): JSX.Element => {
-  const [loginModal, setLoginModal] = useState<boolean>(!isAuthenticated);
+const Dashboard = (): JSX.Element => {
+  const [loginModal, setLoginModal] = useState<boolean>(false);
   const [client, setClient] = useState<StreamChat>();
+  const {
+    user,
+    loading: loadingUser,
+    error: userError,
+  } = useSelector((state: RootState) => state.userState);
   const filters = { members: { $in: [user?.username] } };
   const [selectedOption, setSelectedOption] = useState<number>(1);
   const [unreadMessages, setUnreadMsg] = useState<number>(0);
   // FIXME: setBriefs
-  const [briefs, _setBriefs] = useState<any>(myBriefs);
+  const [briefs, _setBriefs] = useState<any>();
   // const [briefId, setBriefId] = useState<number | undefined>();
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
   // FIXME: setMyApplications
-  const [myApplications, _setMyApplications] = useState<Project[]>(
-    myApplicationsResponse
-  );
+  const [myApplications, _setMyApplications] = useState<Project[]>();
   const [loadingStreamChat, setLoadingStreamChat] = useState<boolean>(true);
 
   const router = useRouter();
   const { briefId } = router.query;
+
+  const [error, setError] = useState<any>(userError);
 
   const handleMessageBoxClick = async (
     user_id: number,
@@ -73,15 +75,25 @@ const Dashboard = ({
 
   useEffect(() => {
     const setupStreamChat = async () => {
-      setClient(await getStreamChat());
-      setLoadingStreamChat(false);
+      try {
+        if (!user?.username && !loadingUser) return router.push('/');
+
+        setClient(await getStreamChat());
+        _setBriefs(await getUserBriefs(user?.id));
+        _setMyApplications(await getFreelancerApplications(user?.id));
+      } catch (error) {
+        setError(error);
+      } finally {
+        setLoadingStreamChat(false);
+      }
     };
+
     setupStreamChat();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    if (client && user) {
-      client.connectUser(
+    if (client && user.username && !loadingStreamChat) {
+      client?.connectUser(
         {
           id: user.username,
           name: user.username,
@@ -97,7 +109,7 @@ const Dashboard = ({
     }
   }, [client, user?.getstream_token, user?.username]);
 
-  if (loadingStreamChat) return <FullScreenLoader />;
+  if (loadingStreamChat || loadingUser) return <FullScreenLoader />;
 
   return client ? (
     <div className='hq-layout px-[15px]'>
@@ -151,37 +163,48 @@ const Dashboard = ({
         setVisible={setLoginModal}
         redirectUrl='/dashboard'
       />
+
+      <ErrorScreen error={error} setError={setError}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => router.push(`/`)}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Log In
+          </button>
+        </div>
+      </ErrorScreen>
     </div>
   ) : (
     <p>GETSTREAM_API_KEY not found</p>
   );
 };
 
-export const getServerSideProps = async (context: any) => {
-  const { req, res } = context;
-  try {
-    const user: any = await authenticate('jwt', req, res);
-    if (user) {
-      const myBriefs = await getUserBriefs(user?.id);
-      const myApplicationsResponse = await getFreelancerApplications(user?.id);
-      return {
-        props: {
-          isAuthenticated: true,
-          user,
-          myBriefs,
-          myApplicationsResponse,
-        },
-      };
-    }
-  } catch (error: any) {
-    console.error(error);
-  }
-  return {
-    redirect: {
-      destination: '/',
-      permanent: false,
-    },
-  };
-};
+// export const getServerSideProps = async (context: any) => {
+//   const { req, res } = context;
+//   try {
+//     // const user: any = await authenticate('jwt', req, res);
+//     if (user) {
+//       const myBriefs = await getUserBriefs(user?.id);
+//       const myApplicationsResponse = await getFreelancerApplications(user?.id);
+//       return {
+//         props: {
+//           isAuthenticated: true,
+//           user,
+//           myBriefs,
+//           myApplicationsResponse,
+//         },
+//       };
+//     }
+//   } catch (error: any) {
+//     console.error(error);
+//   }
+//   return {
+//     redirect: {
+//       destination: '/',
+//       permanent: false,
+//     },
+//   };
+// };
 
 export default Dashboard;

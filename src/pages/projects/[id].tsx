@@ -6,6 +6,7 @@ import moment from 'moment';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import * as utils from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
@@ -30,6 +31,7 @@ import {
 import { getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
+import { RootState } from '@/redux/store/store';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -71,7 +73,8 @@ function Project() {
   const [project, setProject] = useState<Project | any>({});
   const [freelancer, setFreelancer] = useState<Freelancer | any>({});
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
-  const [user, setUser] = useState<User | any>();
+  // const [user, setUser] = useState<User | any>();
+  const { user } = useSelector((state: RootState) => state.userState);
   const [chatTargetUser, setChatTargetUser] = useState<User | null>(null);
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
@@ -104,14 +107,15 @@ function Project() {
   const getChainProject = async () => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
-    const user: User | any = await utils.getCurrentUser();
+    // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
     const onChainProjectRes = await chainService.getProject(projectId);
+
     if (onChainProjectRes) {
       const isApplicant = onChainProjectRes.initiator == user.web3_address;
 
       if (isApplicant) {
-        await getFreelancerData(user.username);
+        await getFreelancerData(user?.username);
       }
 
       setIsApplicant(isApplicant);
@@ -132,8 +136,6 @@ function Project() {
     const projectRes = await getProjectById(projectId);
     setProject(projectRes);
     // api  project response
-    const userResponse = await utils.getCurrentUser();
-    setUser(userResponse);
     await getChainProject();
   };
 
@@ -147,8 +149,8 @@ function Project() {
     setLoading(true);
     try {
       const imbueApi = await initImbueAPIInfo();
-      const userRes: User | any = await utils.getCurrentUser();
-      const chainService = new ChainService(imbueApi, userRes);
+      // const userRes: User | any = await utils.getCurrentUser();
+      const chainService = new ChainService(imbueApi, user);
       await chainService.voteOnMilestone(
         account,
         onChainProject,
@@ -168,7 +170,7 @@ function Project() {
   const submitMilestone = async (account: WalletAccount) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
-    const user: User | any = await utils.getCurrentUser();
+    // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
     const result = await chainService.submitMilestone(
       account,
@@ -196,7 +198,7 @@ function Project() {
   const withdraw = async (account: WalletAccount) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
-    const user: User | any = await utils.getCurrentUser();
+    // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
     const result = await chainService.withdraw(account, onChainProject);
     while (true) {

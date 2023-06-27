@@ -1,10 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import * as utils from '@/utils';
 
 import ErrorScreen from '@/components/ErrorScreen';
+import FullScreenLoader from '@/components/FullScreenLoader';
 
 import {
   freelancedBefore,
@@ -16,15 +18,17 @@ import {
   suggestedServices,
 } from '@/config/freelancer-data';
 import { createFreelancingProfile } from '@/redux/services/freelancerService';
+import { RootState } from '@/redux/store/store';
 
 import { TagsInput } from '../../components/TagsInput';
 import styles from '../../styles/modules/Freelancers/new-Freelancer.module.css';
 
-import { FreelancerProps } from '@/types/freelancerTypes';
-
-const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
+const Freelancer = (): JSX.Element => {
   const router = useRouter();
   const [step, setStep] = useState(0);
+  const { user, loading: userLoading } = useSelector(
+    (state: RootState) => state.userState
+  );
   const displayName = user?.display_name;
   const [freelancingBefore, setFreelancingBefore] = useState('');
   const [goal, setGoal] = useState('');
@@ -34,8 +38,7 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
   const [skills, setSkills] = useState<string[]>([]);
   const [bio, setBio] = useState('');
   const [services, setServices] = useState<string[]>([]);
-  // TODO: add loading animation
-  // const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<any>();
 
   const HelloPanel = (
@@ -289,8 +292,7 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
 
   async function createProfile() {
     try {
-      // TODO: add loading animation
-      // setLoading(true);
+      setLoading(true);
       const response: any = await createFreelancingProfile({
         id: 0,
         bio,
@@ -326,10 +328,11 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
     } catch (error) {
       setError(error);
     } finally {
-      // TODO: add loading animation
-      // setLoading(false);
+      setLoading(false);
     }
   }
+
+  if (loading || userLoading) return <FullScreenLoader />;
 
   return (
     <div className={styles.freelancerDetailsContainer}>
@@ -404,18 +407,6 @@ const Freelancer = ({ user }: FreelancerProps): JSX.Element => {
       </ErrorScreen>
     </div>
   );
-};
-
-Freelancer.getInitialProps = async () => {
-  const userResponse = await utils.getCurrentUser();
-
-  if (!userResponse) {
-    return {
-      user: undefined,
-    };
-  }
-
-  return { user: userResponse };
 };
 
 export default Freelancer;

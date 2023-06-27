@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import EditSkills from '../CustomMaterialComponents/EditSkills';
 
@@ -12,17 +12,17 @@ type SkillsCompProps = {
 
 const Skills = ({
   isEditMode,
-  setFreelancer,
   freelancer,
   skills,
   setSkills,
 }: SkillsCompProps) => {
+  const [user, setUser] = useState(freelancer);
   useEffect(() => {
-    setFreelancer({
+    setUser({
       ...freelancer,
-      skills: skills.map((skill) => ({ name: skill })),
+      skills: skills?.map((skill) => ({ name: skill })),
     });
-  }, [freelancer, skills, setFreelancer]);
+  }, [skills, freelancer]);
 
   return (
     <div className='mx-[30px] lg:mx-[40px]'>
@@ -33,7 +33,7 @@ const Skills = ({
         <EditSkills {...{ skills, setSkills }} />
       ) : (
         <div className='flex flex-wrap gap-5 mt-6'>
-          {freelancer?.skills?.map?.((skill: any, skillIndex: string) => (
+          {user?.skills?.map?.((skill: any, skillIndex: string) => (
             <p className={`pill-button capitalize`} key={skillIndex}>
               {skill?.name}
             </p>

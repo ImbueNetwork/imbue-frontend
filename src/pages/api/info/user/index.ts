@@ -1,14 +1,14 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiRequest, NextApiResponse } from "next";
-import nextConnect from "next-connect";
-import passport from "passport";
-import * as passportJwt from "passport-jwt";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nextConnect from 'next-connect';
+import passport from 'passport';
+import * as passportJwt from 'passport-jwt';
 
-import db from "@/db";
+import db from '@/db';
 
-import { jwtOptions } from "../../auth/common";
-import { fetchUser } from "../../../../lib/models";
-import * as models from "../../../../lib/models";
+import { jwtOptions } from '../../auth/common';
+import { fetchUser } from '../../../../lib/models';
+import * as models from '../../../../lib/models';
 const JwtStrategy = passportJwt.Strategy;
 
 //@ts-ignore
@@ -70,7 +70,7 @@ export default nextConnect()
   .use(passport.initialize())
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
     try {
-      const user = await authenticate("jwt", req, res);
+      const user = await authenticate('jwt', req, res);
       res.status(200).send(user);
     } catch (error: any) {
       console.error(error);
