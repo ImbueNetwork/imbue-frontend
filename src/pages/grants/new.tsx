@@ -1,27 +1,26 @@
 import { Dialog, IconButton } from '@mui/material';
 import WalletIcon from '@svgs/wallet.svg';
+import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { FaRegCopy } from 'react-icons/fa';
 import { FiPlusCircle } from 'react-icons/fi';
+import { useSelector } from 'react-redux';
 
 import { getCurrentUser } from '@/utils';
+import { initImbueAPIInfo } from '@/utils/polkadot';
 
+import AccountChoice from '@/components/AccountChoice';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 
 import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
-import { Currency, Web3Account } from '@/model';
+import { Currency } from '@/model';
 import ChainService from '@/redux/services/chainService';
-import { initImbueAPIInfo } from '@/utils/polkadot';
-import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store/store';
-import AccountChoice from '@/components/AccountChoice';
-import { WalletAccount } from '@talismn/connect-wallets';
-import { selectAccount } from '@/redux/services/polkadotService';
 
 interface MilestoneItem {
   name: string;
