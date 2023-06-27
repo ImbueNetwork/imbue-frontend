@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export default function RootLayout({
   children,
@@ -7,7 +7,7 @@ export default function RootLayout({
 }) {
   return (
     <html>
-      <head lang="en">
+      <head lang='en'>
         <title>Imbue API Documentation</title>
       </head>
       <body>{children}</body>

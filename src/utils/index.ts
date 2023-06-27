@@ -10,11 +10,11 @@ export type BadRoute =
   | 'bad-route';
 
 export function redirect(path: string, returnUrl?: string) {
-	if (returnUrl) {
-		window.location.href = `${window.location.origin}/${path}?redirect=${returnUrl}`;
-	} else {
-		window.location.href = `${window.location.origin}/${path}`;
-	}
+  if (returnUrl) {
+    window.location.href = `${window.location.origin}/${path}?redirect=${returnUrl}`;
+  } else {
+    window.location.href = `${window.location.origin}/${path}`;
+  }
 }
 
 export async function redirectBack() {
@@ -32,14 +32,12 @@ export async function redirectBack() {
 }
 
 export const validProjectId = (candidate: any) => {
-	return !!Number(String(candidate));
+  return !!Number(String(candidate));
 };
 
 export const getCurrentUser = async () => {
   try {
-    const resp = await fetch(
-      `${config.apiBase}info/user`
-    );
+    const resp = await fetch(`${config.apiBase}info/user`);
     if (resp.ok) {
       return resp.json();
     }
@@ -52,22 +50,19 @@ export const getCurrentUser = async () => {
 export const getProjectId = async () => {
   const candidate = window.location.pathname.split('/').pop();
 
-	if (validProjectId(candidate)) {
-		return candidate as string;
-	}
+  if (validProjectId(candidate)) {
+    return candidate as string;
+  }
 
-	return null;
+  return null;
 };
 
 export const fetchProject = async (projectId: string | number | null) => {
   try {
-    const resp = await fetch(
-      `${config.apiBase}project/${projectId}`,
-      {
-        headers: config.getAPIHeaders,
-        method: 'get',
-      }
-    );
+    const resp = await fetch(`${config.apiBase}project/${projectId}`, {
+      headers: config.getAPIHeaders,
+      method: 'get',
+    });
     if (resp.ok) {
       return (await resp.json()) as Project;
     }
@@ -77,12 +72,9 @@ export const fetchProject = async (projectId: string | number | null) => {
 };
 
 export const fetchUser = async (id: number) => {
-  const resp = await fetch(
-    `${config.apiBase}users/byid/${id}`,
-    {
-      headers: config.getAPIHeaders,
-    }
-  );
+  const resp = await fetch(`${config.apiBase}users/byid/${id}`, {
+    headers: config.getAPIHeaders,
+  });
   if (resp.ok) {
     const user = await resp.json();
     return user;
@@ -90,11 +82,11 @@ export const fetchUser = async (id: number) => {
 };
 
 export const badRouteEvent = (type: BadRoute) =>
-	new CustomEvent(config.event.badRoute, {
-		bubbles: true,
-		composed: true,
-		detail: type,
-	});
+  new CustomEvent(config.event.badRoute, {
+    bubbles: true,
+    composed: true,
+    detail: type,
+  });
 
 export function validateForm(form: HTMLFormElement): boolean {
   const fields: HTMLInputElement[] = Array.from(
@@ -102,15 +94,14 @@ export function validateForm(form: HTMLFormElement): boolean {
   );
   fields.forEach((input) => reportValidity(input, true));
 
-	const valid = fields.every(($input) => $input.checkValidity());
-	return valid;
+  const valid = fields.every(($input) => $input.checkValidity());
+  return valid;
 }
 
 export const getStreamChat = async () => {
-  const { getstreamApiKey } =
-    await fetch(`${config.apiBase}info`).then(
-      (resp) => resp.json()
-    );
+  const { getstreamApiKey } = await fetch(`${config.apiBase}info`).then(
+    (resp) => resp.json()
+  );
   return new StreamChat(getstreamApiKey);
 };
 
@@ -126,22 +117,21 @@ export const checkEnvironment = () => {
   return base_url;
 };
 
-
 export const updateUser = async (user: User) => {
-	const resp = { status: 401, message: 'could not fetch' };
-	try {
-		const update = await fetch(`${config.apiBase}/info/user/update`, {
-			headers: config.postAPIHeaders,
-			method: 'put',
-			body: JSON.stringify(user),
-		});
+  const resp = { status: 401, message: 'could not fetch' };
+  try {
+    const update = await fetch(`${config.apiBase}/info/user/update`, {
+      headers: config.postAPIHeaders,
+      method: 'put',
+      body: JSON.stringify(user),
+    });
 
-		if (update.status === 200) {
-			return update.json();
-		} else {
-			return resp;
-		}
-	} catch (error) {
-		return resp;
-	}
+    if (update.status === 200) {
+      return update.json();
+    } else {
+      return resp;
+    }
+  } catch (error) {
+    return resp;
+  }
 };

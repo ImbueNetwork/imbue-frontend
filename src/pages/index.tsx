@@ -1,25 +1,26 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-
-import { getCurrentUser } from '@/utils';
+import { useSelector } from 'react-redux';
 
 import FullScreenLoader from '@/components/FullScreenLoader';
 import Login from '@/components/Login';
 
+import { RootState } from '@/redux/store/store';
+
 export default function Home() {
   const router = useRouter();
   const [loginModal, setLoginModal] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
+
+  const { user, loading } = useSelector((state: RootState) => state.userState);
 
   useEffect(() => {
-    getLogedInUser();
-  }, []);
+    !loading && getLogedInUser();
+  }, [user]);
 
   const getLogedInUser = async () => {
     try {
-      const userResponse = await getCurrentUser();
-      if (userResponse) {
+      if (user?.username) {
         // FIXME:
         // const userAuth = {
         //   isAuthenticated: true,
@@ -33,8 +34,6 @@ export default function Home() {
     } catch (error) {
       // TODO: show error
       console.log(error);
-    } finally {
-      setLoading(false);
     }
   };
 

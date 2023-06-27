@@ -1,15 +1,17 @@
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import { User } from '@/lib/models';
-import { fetchUser, getCurrentUser } from '@/utils';
+import { fetchUser } from '@/utils';
 
 import { ApplicationContainer } from '@/components/Briefs/ApplicationContainer';
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
 import ChatPopup from '@/components/ChatPopup';
 
 import { Brief } from '@/model';
+import { RootState } from '@/redux/store/store';
 import styles from '@/styles/modules/brief-applications.module.css';
 
 import {
@@ -23,7 +25,9 @@ const BriefApplications = () => {
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [sortValue, setSortValue] = useState<string>('match');
   const [brief, setBrief] = useState<Brief>();
-  const [browsingUser, setBrowsingUser] = useState<User>();
+  const { user: browsingUser } = useSelector(
+    (state: RootState) => state.userState
+  );
 
   const router = useRouter();
   const { id: briefID } = router.query;
@@ -42,7 +46,6 @@ const BriefApplications = () => {
   useEffect(() => {
     async function setup(id: string | string[]) {
       try {
-        setBrowsingUser(await getCurrentUser());
         const briefData = await getBrief(id);
         setBrief(briefData);
 

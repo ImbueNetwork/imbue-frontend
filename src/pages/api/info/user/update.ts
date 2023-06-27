@@ -1,17 +1,17 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import nextConnect from "next-connect";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nextConnect from 'next-connect';
 
-import db from "@/db";
+import db from '@/db';
 
-import * as models from "../../../../lib/models";
+import * as models from '../../../../lib/models';
 
 export default nextConnect().put(
   async (req: NextApiRequest, res: NextApiResponse) => {
     const user: Partial<models.User> | any = req.body as Partial<models.User>;
     if (!user.id) {
       res.status(400).json({
-        status: "Failed",
-        message: "No user data provided.",
+        status: 'Failed',
+        message: 'No user data provided.',
       });
       return;
     } else {
@@ -21,7 +21,7 @@ export default nextConnect().put(
           const userData = await models.updateUserData(user.id, user)(tx);
 
           if (!userData) {
-            return new Error("User not found!.");
+            return new Error('User not found!.');
           }
 
           response = userData;
@@ -33,7 +33,7 @@ export default nextConnect().put(
         }
       });
       res.status(200).json({
-        status: "Successful",
+        status: 'Successful',
         user: response,
       });
     }

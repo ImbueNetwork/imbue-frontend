@@ -17,14 +17,11 @@ const postAPIHeaders = {
 export const callSearchBriefs = async (filter: BriefSqlFilter) => {
   // return [] as Array<Brief>;
   //:TODO implement api for callSearchBriefs
-  const resp = await fetch(
-    `${config.apiBase}briefs/search`,
-    {
-      headers: postAPIHeaders,
-      method: 'post',
-      body: JSON.stringify(filter),
-    }
-  );
+  const resp = await fetch(`${config.apiBase}briefs/search`, {
+    headers: postAPIHeaders,
+    method: 'post',
+    body: JSON.stringify(filter),
+  });
   if (resp.ok) {
     return (await resp.json()) as PaginatedResponse;
   } else {
@@ -77,7 +74,7 @@ export const getAllSavedBriefs = async (
 
 export const checkIfBriefSaved = async (
   briefId: string | number,
-  userId: string
+  userId: string | number
 ) => {
   const resp = await fetch(
     `${config.apiBase}briefs/save/${briefId}?user_id=${userId}`,
@@ -95,13 +92,10 @@ export const checkIfBriefSaved = async (
 
 export const getBrief = async (briefId: number | string | string[]) => {
   try {
-    const resp = await fetch(
-      `${config.apiBase}briefs/${briefId}`,
-      {
-        headers: postAPIHeaders,
-        method: 'get',
-      }
-    );
+    const resp = await fetch(`${config.apiBase}briefs/${briefId}`, {
+      headers: postAPIHeaders,
+      method: 'get',
+    });
 
     if (resp.ok) {
       return (await resp.json()) as Brief;
@@ -157,17 +151,14 @@ export const changeBriefApplicationStatus = async (
   projectId: number,
   status_id: OffchainProjectState
 ) => {
-  const resp = await fetch(
-    `${config.apiBase}briefs/${briefId}/status`,
-    {
-      headers: postAPIHeaders,
-      method: 'put',
-      body: JSON.stringify({
-        project_id: projectId,
-        status_id,
-      }),
-    }
-  );
+  const resp = await fetch(`${config.apiBase}briefs/${briefId}/status`, {
+    headers: postAPIHeaders,
+    method: 'put',
+    body: JSON.stringify({
+      project_id: projectId,
+      status_id,
+    }),
+  });
 
   if (resp.ok) {
     return await resp.json();
@@ -192,13 +183,10 @@ export const getFreelancerBrief = async (userId: number, briefId: number) => {
 };
 
 export const getProjectById = async (projectId: string | number) => {
-  const resp = await fetch(
-    `${config.apiBase}project/${projectId}`,
-    {
-      headers: postAPIHeaders,
-      method: 'get',
-    }
-  );
+  const resp = await fetch(`${config.apiBase}project/${projectId}`, {
+    headers: postAPIHeaders,
+    method: 'get',
+  });
 
   if (resp.ok) {
     return await resp.json();
@@ -239,14 +227,11 @@ export const updateBriefById = async (params: BriefInfo) => {
 };
 
 export const saveBriefData = async (brief: Brief) => {
-  const resp = await fetch(
-    `${config.apiBase}briefs/save`,
-    {
-      headers: postAPIHeaders,
-      method: 'post',
-      body: JSON.stringify(brief),
-    }
-  );
+  const resp = await fetch(`${config.apiBase}briefs/save`, {
+    headers: postAPIHeaders,
+    method: 'post',
+    body: JSON.stringify(brief),
+  });
   if (resp.ok) {
     return (await resp.json()) as {
       status: string;

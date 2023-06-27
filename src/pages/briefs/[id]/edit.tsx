@@ -2,8 +2,7 @@
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-
-import { getCurrentUser } from '@/utils';
+import { useSelector } from 'react-redux';
 
 import { TextArea } from '@/components/Briefs/TextArea';
 import ErrorScreen from '@/components/ErrorScreen';
@@ -19,8 +18,9 @@ import {
   suggestedIndustries,
   suggestedSkills,
 } from '@/config/briefs-data';
-import { Brief, User } from '@/model';
+import { Brief } from '@/model';
 import { getBrief, updateBriefById } from '@/redux/services/briefService';
+import { RootState } from '@/redux/store/store';
 import styles from '@/styles/modules/newBrief.module.css';
 
 const SpacedRow = styled.div`
@@ -40,7 +40,7 @@ export const EditProposal = (): JSX.Element => {
   // FIXME: brief
   const [_brief, setBrief] = useState<Brief | any>();
   // FIXME: user
-  const [_user, setUser] = useState<User | null>();
+  const { user } = useSelector((state: RootState) => state.userState);
   const [industries, setIndustries] = useState<string[]>([]);
   const [description, setDescription] = useState('');
   const [headline, setHeadline] = useState('');
@@ -62,11 +62,9 @@ export const EditProposal = (): JSX.Element => {
 
   const getCurrentUserBrief = async () => {
     try {
-      const userResponse = await getCurrentUser();
-      setUser(userResponse);
       const briefResponse: Brief | undefined = await getBrief(briefId);
-      const userOwnsBriefs = briefResponse?.user_id == userResponse?.id;
-      if (briefResponse && userResponse && userOwnsBriefs) {
+      const userOwnsBriefs = briefResponse?.user_id == user?.id;
+      if (briefResponse && user?.username && userOwnsBriefs) {
         const skillNames = briefResponse?.skills?.map?.((item) => item?.name);
         const industryNames = briefResponse?.industries?.map?.(
           (item) => item?.name

@@ -214,7 +214,7 @@ export const fetchUser = (id: number) => (tx: Knex.Transaction) =>
 
 export const updateUserData =
   (id: number, data: Partial<User>) => async (tx: Knex.Transaction) =>
-    (await tx<User>("users").update(data).where({ id }).returning("*"))[0];
+    (await tx<User>('users').update(data).where({ id }).returning('*'))[0];
 
 export const fetchUserOrEmail =
   (userOrEmail: string) => (tx: Knex.Transaction) =>
@@ -337,8 +337,7 @@ export const updateUserGetStreamToken =
     )[0];
 
 export const insertToTable =
-  (item: string, table_name: string) =>
-  async (tx: Knex.Transaction) =>
+  (item: string, table_name: string) => async (tx: Knex.Transaction) =>
     (
       await tx(table_name)
         .insert({

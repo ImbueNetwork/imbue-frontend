@@ -33,6 +33,7 @@ import { GrCertificate } from 'react-icons/gr';
 import { ImStack } from 'react-icons/im';
 import { IoPeople } from 'react-icons/io5';
 import { MdOutlineWatchLater } from 'react-icons/md';
+import { useSelector } from 'react-redux';
 
 import AccountChoice from '@/components/AccountChoice';
 import { TextArea } from '@/components/Briefs/TextArea';
@@ -48,30 +49,26 @@ import SuccessScreen from '@/components/SuccessScreen';
 import FiverrIcon from '@/assets/images/fiverr.png';
 import ImbueIcon from '@/assets/svgs/loader.svg';
 import { Freelancer, User } from '@/model';
-import { authenticate } from '@/pages/api/info/user';
 import {
   getFreelancerProfile,
   updateFreelancer,
 } from '@/redux/services/freelancerService';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
+import { RootState } from '@/redux/store/store';
 import styles from '@/styles/modules/freelancers.module.css';
 
 import { checkEnvironment, fetchUser } from '../../utils';
 
 export type ProfileProps = {
   initFreelancer: Freelancer;
-  user: User;
 };
 
-const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
+const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const router = useRouter();
   const [freelancer, setFreelancer] = useState<any>(initFreelancer);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
-  const browsingUser = user;
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
-  const isCurrentFreelancer =
-    browsingUser && browsingUser.id == freelancer?.user_id;
 
   const [skills, setSkills] = useState<string[]>(
     freelancer?.skills?.map(
@@ -79,6 +76,13 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         skill?.name?.charAt(0).toUpperCase() + skill?.name?.slice(1)
     )
   );
+
+  const { user: browsingUser } = useSelector(
+    (state: RootState) => state.userState
+  );
+
+  const isCurrentFreelancer =
+    browsingUser && browsingUser?.id === freelancer?.user_id;
 
   const [openAccountChoice, setOpenAccountChoice] = useState<boolean>(false);
   const [error, setError] = useState<any>();
@@ -304,11 +308,15 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
         />
       </div>
 
-      <div className="flex flex-col lg:flex-row justify-evenly lg:mx-[40px] px-[30px] lg:px-[40px]">
-        <div className="flex flex-col lg:items-center gap-[20px] lg:gap-[70px] lg:w-[40%]">
-          <div className="w-full flex flex-col items-center gap-[16px] pb-[30px] bg-theme-grey-dark rounded-xl border border-light-white">
-            <UploadImage isEditMode={isEditMode} user={freelancer} setUser={setFreelancer} />
-            <div className="w-full flex flex-col gap-[16px] -mt-11 px-[30px] lg:px-[40px]">
+      <div className='flex flex-col lg:flex-row justify-evenly lg:mx-[40px] px-[30px] lg:px-[40px]'>
+        <div className='flex flex-col lg:items-center gap-[20px] lg:gap-[70px] lg:w-[40%]'>
+          <div className='w-full flex flex-col items-center gap-[16px] pb-[30px] bg-theme-grey-dark rounded-xl border border-light-white'>
+            <UploadImage
+              isEditMode={isEditMode}
+              user={freelancer}
+              setUser={setFreelancer}
+            />
+            <div className='w-full flex flex-col gap-[16px] -mt-11 px-[30px] lg:px-[40px]'>
               {isEditMode ? (
                 <TextField
                   onChange={(e) => handleUpdateState(e)}
@@ -320,7 +328,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                 />
               ) : (
                 <div className='flex gap-2 items-center justify-center mt-10'>
-                  <h3 className="!text-2xl font-bold text-center z-[1]">
+                  <h3 className='!text-2xl font-bold text-center z-[1]'>
                     {freelancer?.display_name}
                   </h3>
                   {initFreelancer?.verified && <VerifiedIcon color='primary' />}
@@ -365,7 +373,11 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                   )}
                 </div>
               </div>
-              <CountrySelector isEditMode={isEditMode} user={freelancer} setUser={setFreelancer} />
+              <CountrySelector
+                isEditMode={isEditMode}
+                user={freelancer}
+                setUser={setFreelancer}
+              />
 
               {/* TODO: Implement reviews */}
 
@@ -382,7 +394,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                 </p>
               </div>
 
-              <div className='connect-buttons flex justify-center gap-[24px] mb-[20px]'>
+              <div className='connect-buttons'>
                 {/* {!isCurrentFreelancer && (
                   <>
                     <button
@@ -398,32 +410,63 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                 {isCurrentFreelancer ? (
                   <>
                     {isEditMode ? (
-                      <button onClick={() => onSave()} className='message'>
-                        Save Changes <FiEdit />
-                      </button>
+                      <div className='flex items-center justify-center gap-6 mb-5'>
+                        <button onClick={() => onSave()} className='message'>
+                          Save Changes <FiEdit />
+                        </button>
+                        <button
+                          onClick={() => cancelEdit()}
+                          className='message !bg-red-600'
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     ) : (
-                      <button onClick={() => flipEdit()} className='message'>
-                        Edit Profile <FiEdit />
-                      </button>
+                      <div className='flex items-center justify-center gap-6 mb-5'>
+                        <button onClick={() => flipEdit()} className='message'>
+                          Edit Profile <FiEdit />
+                        </button>
+                        <button onClick={copyProfile} className='share'>
+                          <FaRegShareSquare color='white' />
+                          Share Profile
+                        </button>
+                      </div>
                     )}
                   </>
-                ) : <>
+                ) : (
+                  <div className='flex items-center justify-center gap-6 mb-5'>
                     <button
                       onClick={() => handleMessageBoxClick()}
                       className=' message'
                     >
                       Message
                     </button>
-                  </> ? (
-                  <button onClick={() => flipEdit()} className='message'>
-                    Edit Profile <FiEdit />
-                  </button>
-                ) : (
-                  <button onClick={() => onSave()} className='message'>
-                    Save Changes <FiEdit />
-                  </button>
+                    <button onClick={copyProfile} className='share'>
+                      <FaRegShareSquare color='white' />
+                      Share Profile
+                    </button>
+                  </div>
                 )}
 
+                {/***
+                  (<div>
+                      <button
+                        onClick={() => handleMessageBoxClick()}
+                        className=' message'
+                      >
+                        Message
+                      </button>
+                    </div>) ? (
+                      <button onClick={() => flipEdit()} className='message'>
+                        Edit Profile <FiEdit />
+                      </button>
+                    ) : (
+                      <button onClick={() => onSave()} className='message'>
+                        Save Changes <FiEdit />
+                      </button>
+                    )
+                 */}
+                {/* 
                 {!isEditMode && isCurrentFreelancer ? (
                   <button onClick={copyProfile} className='share'>
                     <FaRegShareSquare color='white' />
@@ -436,7 +479,7 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
                   >
                     Cancel
                   </button>
-                )}
+                )} */}
               </div>
               {/* TODO: Implement */}
               {/* <div className="divider"></div>
@@ -955,20 +998,18 @@ const Profile = ({ initFreelancer, user }: ProfileProps): JSX.Element => {
 };
 
 export const getServerSideProps = async (context: any) => {
-  const { req, res, query } = context;
+  const { query } = context;
 
-  let initFreelancer: any;
   if (query.slug) {
-    initFreelancer = await getFreelancerProfile(query.slug);
-  }
+    try {
+      const initFreelancer = await getFreelancerProfile(query.slug);
 
-  try {
-    const user = await authenticate('jwt', req, res);
-    if (user) {
-      return { props: { isAuthenticated: true, user, initFreelancer } };
+      if (initFreelancer) {
+        return { props: { isAuthenticated: true, initFreelancer } };
+      }
+    } catch (error) {
+      console.error(error); // TODO:
     }
-  } catch (error: any) {
-    console.error(error); // TODO:
   }
 
   return {
