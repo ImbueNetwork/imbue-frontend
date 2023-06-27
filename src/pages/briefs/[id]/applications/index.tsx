@@ -25,7 +25,9 @@ const BriefApplications = () => {
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [sortValue, setSortValue] = useState<string>('match');
   const [brief, setBrief] = useState<Brief>();
-  const { user: browsingUser } = useSelector((state: RootState) => state.userState)
+  const { user: browsingUser } = useSelector(
+    (state: RootState) => state.userState
+  );
 
   const router = useRouter();
   const { id: briefID } = router.query;

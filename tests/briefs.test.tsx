@@ -34,12 +34,20 @@ const mockBriefs = {
 
 describe('Briefs Page', () => {
   test('renders without errors', () => {
-    render(<Providers><Briefs /></Providers>);
+    render(
+      <Providers>
+        <Briefs />
+      </Providers>
+    );
     // Assert that no errors occurred during rendering
   });
 
   test('displays briefs after data fetching', async () => {
-    render(<Providers><Briefs /></Providers>);
+    render(
+      <Providers>
+        <Briefs />
+      </Providers>
+    );
     // Mock the API call to getAllBriefs
     const mockGetAllBriefs = getAllBriefs as jest.MockedFunction<
       typeof getAllBriefs
@@ -56,7 +64,11 @@ describe('Briefs Page', () => {
   });
 
   test('applies filters and updates briefs', async () => {
-    render(<Providers><Briefs /></Providers>);
+    render(
+      <Providers>
+        <Briefs />
+      </Providers>
+    );
     // Mock the API calls used in the useEffect hook
 
     // Mock the briefsService.getAllBriefs method to return a fixed array of briefs

@@ -26,7 +26,9 @@ import styles from '../../styles/modules/Freelancers/new-Freelancer.module.css';
 const Freelancer = (): JSX.Element => {
   const router = useRouter();
   const [step, setStep] = useState(0);
-  const { user, loading: userLoading } = useSelector((state: RootState) => state.userState)
+  const { user, loading: userLoading } = useSelector(
+    (state: RootState) => state.userState
+  );
   const displayName = user?.display_name;
   const [freelancingBefore, setFreelancingBefore] = useState('');
   const [goal, setGoal] = useState('');
@@ -65,8 +67,9 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-xp-${index}`}
-            className={`${styles.freelanceXpItem} ${freelancingBefore === value ? styles.active : ''
-              }`}
+            className={`${styles.freelanceXpItem} ${
+              freelancingBefore === value ? styles.active : ''
+            }`}
             onClick={() => setFreelancingBefore(value)}
           >
             {label}
@@ -88,8 +91,9 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-goal-${index}`}
-            className={`${styles.freelanceXpItem} ${goal === value ? styles.active : ''
-              }`}
+            className={`${styles.freelanceXpItem} ${
+              goal === value ? styles.active : ''
+            }`}
             onClick={() => setGoal(value)}
           >
             {label}
@@ -328,7 +332,7 @@ const Freelancer = (): JSX.Element => {
     }
   }
 
-  if (loading || userLoading) return <FullScreenLoader />
+  if (loading || userLoading) return <FullScreenLoader />;
 
   return (
     <div className={styles.freelancerDetailsContainer}>

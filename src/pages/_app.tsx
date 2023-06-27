@@ -34,9 +34,9 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <ThemeProvider theme={theme}>
         <StyledEngineProvider injectFirst>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
         </StyledEngineProvider>
       </ThemeProvider>
     </>
