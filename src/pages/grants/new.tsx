@@ -37,7 +37,6 @@ const GrantApplication = (): JSX.Element => {
   const [approvers, setApprovers] = useState<string[]>([]);
   const [newApprover, setNewApprover] = useState<string>();
   const [currencyId, setCurrencyId] = useState<number>(0);
-  console.log(currencyId);
   const [milestones, setMilestones] = useState<MilestoneItem[]>([
     { name: '', amount: undefined },
   ]);
