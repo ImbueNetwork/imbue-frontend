@@ -36,7 +36,8 @@ const GrantApplication = (): JSX.Element => {
   const [description, setDescription] = useState<string>('');
   const [approvers, setApprovers] = useState<string[]>([]);
   const [newApprover, setNewApprover] = useState<string>();
-  const [currencyId, setCurrencyId] = useState(0);
+  const [currencyId, setCurrencyId] = useState<number>(0);
+  console.log(currencyId);
   const [milestones, setMilestones] = useState<MilestoneItem[]>([
     { name: '', amount: undefined },
   ]);
@@ -51,8 +52,6 @@ const GrantApplication = (): JSX.Element => {
   const { user } = useSelector((state: RootState) => state.userState);
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
-  const [userAccount, setUserAccount] = useState<WalletAccount>()
-
 
   const durationOptions = timeData.sort((a, b) =>
     a.value > b.value ? 1 : a.value < b.value ? -1 : 0
@@ -121,8 +120,7 @@ const GrantApplication = (): JSX.Element => {
   const handleSelectAccount = async (account: WalletAccount) => {
     try {
       setLoading(true);
-      setUserAccount(account);
-      await submitGrant();
+      await submitGrant(account);
     } catch (error) {
       setError(error);
     } finally {
@@ -131,13 +129,11 @@ const GrantApplication = (): JSX.Element => {
     }
   };
 
-  console.log(showPolkadotAccounts);
-
   async function handleSubmit() {
     setShowPolkadotAccounts(true);
   }
 
-  const submitGrant = async () => {
+  const submitGrant = async (account : WalletAccount) => {
     // TODO: Submit a grant
     setLoading(true);
 
@@ -145,8 +141,8 @@ const GrantApplication = (): JSX.Element => {
       const user_id = (await getCurrentUser())?.id;
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user)
-      if (!userAccount) return
-      const res = await chainService.submitInitialGrant(userAccount, milestones, approvers, currencyId, totalCostWithoutFee, "KUSAMA", 2)
+      if (!account) return
+      const res = await chainService.submitInitialGrant(account, milestones, approvers, currencyId, totalCost, "KUSAMA", 2)
       console.log(res);
       const resp = await fetch(`${config.apiBase}grants`, {
         headers: config.postAPIHeaders,
@@ -179,6 +175,7 @@ const GrantApplication = (): JSX.Element => {
       }
     } catch (error) {
       setError(error);
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -481,7 +478,7 @@ const GrantApplication = (): JSX.Element => {
           </button>
         </div>
       </Dialog>
-      
+
       <AccountChoice
         accountSelected={(account: WalletAccount) =>
           handleSelectAccount(account)
