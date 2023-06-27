@@ -454,7 +454,7 @@ function Project() {
               className='text-[#b2ff0b] cursor-pointer text-[20px]  max-lg: text-base  font-normal !m-0 !p-0 relative top-4'
             >
               {`View full ${
-                project.project_type === ProjectType.Brief ? 'brief' : 'grant'
+                project?.project_type === ProjectType?.Brief ? 'brief' : 'grant'
               }`}
             </span>
           </div>

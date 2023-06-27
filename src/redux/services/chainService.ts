@@ -55,6 +55,30 @@ class ChainService {
       eventMapping['commenceWork'].eventName
     );
   }
+  
+  public async submitInitialGrant(
+    account: WalletAccount,
+    milestones: any,
+    approvers:string[],
+    currencyId: number,
+    amount:number,
+    teasury:string,
+    grantID:number
+  ): Promise<BasicTxResponse> {
+    const extrinsic = this.imbueApi.imbue.api.tx.imbueGrants.submitInitialGrant(
+      milestones,
+      approvers,
+      amount,
+      currencyId,
+      teasury,
+      grantID
+    );
+    return await this.submitImbueExtrinsic(
+      account,
+      extrinsic,
+      eventMapping['submitInitialGrant'].eventName
+    );
+  }
 
   public async hireFreelancer(
     account: WalletAccount,

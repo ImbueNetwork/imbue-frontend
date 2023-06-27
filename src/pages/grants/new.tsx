@@ -14,7 +14,14 @@ import FullScreenLoader from '@/components/FullScreenLoader';
 
 import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
-import { Currency } from '@/model';
+import { Currency, Web3Account } from '@/model';
+import ChainService from '@/redux/services/chainService';
+import { initImbueAPIInfo } from '@/utils/polkadot';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store/store';
+import AccountChoice from '@/components/AccountChoice';
+import { WalletAccount } from '@talismn/connect-wallets';
+import { selectAccount } from '@/redux/services/polkadotService';
 
 interface MilestoneItem {
   name: string;
@@ -41,6 +48,12 @@ const GrantApplication = (): JSX.Element => {
   const [onChainAddress, _setOnChainAddress] = useState(
     '0x524c3d9e935649A448FA33666048C'
   );
+
+  const { user } = useSelector((state: RootState) => state.userState);
+  const [showPolkadotAccounts, setShowPolkadotAccounts] =
+    useState<boolean>(false);
+  const [userAccount, setUserAccount] = useState<WalletAccount>()
+
 
   const durationOptions = timeData.sort((a, b) =>
     a.value > b.value ? 1 : a.value < b.value ? -1 : 0
@@ -106,11 +119,36 @@ const GrantApplication = (): JSX.Element => {
 
   const formDataValid = validateFormData();
 
-  const handleSubmit = async () => {
+  const handleSelectAccount = async (account: WalletAccount) => {
+    try {
+      setLoading(true);
+      setUserAccount(account);
+      await submitGrant();
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+      setShowPolkadotAccounts(false);
+    }
+  };
+
+  console.log(showPolkadotAccounts);
+
+  async function handleSubmit() {
+    setShowPolkadotAccounts(true);
+  }
+
+  const submitGrant = async () => {
     // TODO: Submit a grant
     setLoading(true);
+
     try {
       const user_id = (await getCurrentUser())?.id;
+      const imbueApi = await initImbueAPIInfo();
+      const chainService = new ChainService(imbueApi, user)
+      if (!userAccount) return
+      const res = await chainService.submitInitialGrant(userAccount, milestones, approvers, currencyId, totalCostWithoutFee, "KUSAMA", 2)
+      console.log(res);
       const resp = await fetch(`${config.apiBase}grants`, {
         headers: config.postAPIHeaders,
         method: 'post',
@@ -174,9 +212,8 @@ const GrantApplication = (): JSX.Element => {
                   onChange={(e) => setDescription(e.target.value)}
                   className='border border-solid border-white bg-[#1a1a19] min-h-[160px] p-3'
                 />
-                <div className='text-[rgba(235, 234, 226, 0.70)]'>{`${
-                  description?.length || 0
-                }/300`}</div>
+                <div className='text-[rgba(235, 234, 226, 0.70)]'>{`${description?.length || 0
+                  }/300`}</div>
               </div>
             </div>
           </div>
@@ -363,9 +400,8 @@ const GrantApplication = (): JSX.Element => {
                 </h3>
               </div>
               <div className='budget-value'>
-                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${
-                  currencies[currencyId]
-                }`}
+                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
+                  }`}
               </div>
             </div>
 
@@ -378,9 +414,8 @@ const GrantApplication = (): JSX.Element => {
                 </h3>
               </div>
               <div className='budget-value'>
-                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${
-                  currencies[currencyId]
-                }`}
+                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
+                  }`}
               </div>
             </div>
 
@@ -447,6 +482,14 @@ const GrantApplication = (): JSX.Element => {
           </button>
         </div>
       </Dialog>
+      
+      <AccountChoice
+        accountSelected={(account: WalletAccount) =>
+          handleSelectAccount(account)
+        }
+        visible={showPolkadotAccounts}
+        setVisible={setShowPolkadotAccounts}
+      />
       <ErrorScreen {...{ error, setError }}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button
