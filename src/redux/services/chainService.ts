@@ -32,6 +32,7 @@ const eventMapping: Record<string, EventDetails> = {
   withraw: { eventName: 'ProjectFundsWithdrawn' },
   createBrief: { eventName: 'BriefSubmitted' },
   commenceWork: { eventName: 'ProjectCreated' },
+  submitInitialGrant: { eventName: 'GrantSubmitted' },
 };
 
 class ChainService {
@@ -65,11 +66,12 @@ class ChainService {
     teasury:string,
     grantID:string
   ): Promise<BasicTxResponse> {
+
     const extrinsic = this.imbueApi.imbue.api.tx.imbueGrants.submitInitialGrant(
       milestones,
       approvers,
-      amount,
       currencyId,
+      amount,
       teasury,
       grantID
     );
