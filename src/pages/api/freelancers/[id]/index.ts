@@ -94,7 +94,7 @@ export default nextConnect()
         let client_ids: number[] = [];
 
         if (freelancer.clients) {
-          client_ids = await models.upsertItems(
+          client_ids = await models.upsertFreelancerClientsItems(
             freelancer.clients,
             'clients'
           )(tx);
@@ -119,7 +119,8 @@ export default nextConnect()
           region,
           web3_address,
           web3_type,
-          web3_challenge
+          web3_challenge,
+          freelancer.clients
         )(tx);
 
         if (!freelancer_id) {
