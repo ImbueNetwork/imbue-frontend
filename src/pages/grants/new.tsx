@@ -134,7 +134,7 @@ const GrantApplication = (): JSX.Element => {
     setShowPolkadotAccounts(true);
   }
 
-  const submitGrant = async (account : WalletAccount) => {
+  const submitGrant = async (account: WalletAccount) => {
     // TODO: Submit a grant
     setLoading(true);
 
@@ -151,7 +151,7 @@ const GrantApplication = (): JSX.Element => {
         user_id,
         total_cost_without_fee: totalCostWithoutFee,
         imbue_fee: imbueFee,
-        chain_project_id: 0, // TODO:
+        chain_project_id: projectId,
         milestones: milestones.map((milestone) => ({
           ...milestone,
           percentage_to_unlock: Math.floor(
@@ -164,7 +164,7 @@ const GrantApplication = (): JSX.Element => {
       const grantMilestones = grant.milestones.map((m) => ({
         percentageToUnlock: m.percentage_to_unlock,
       }));
-      
+
       const grant_id = blake2AsHex(JSON.stringify(grant));
 
       if (!account) return
@@ -175,6 +175,8 @@ const GrantApplication = (): JSX.Element => {
           if (result.status) {
             console.log("**** result data is ");
             console.log(result.eventData);
+            setProjectId(result?.eventData[2])
+            _setOnChainAddress(result?.eventData[5])
             setSuccess(true);
           } else if (result.txError) {
             setError({ message: result.errorMessage });
@@ -183,21 +185,24 @@ const GrantApplication = (): JSX.Element => {
         }
         await new Promise((f) => setTimeout(f, 1000));
       }
-      // const resp = await fetch(`${config.apiBase}grants`, {
-      //   headers: config.postAPIHeaders,
-      //   method: 'post',
-      //   body: JSON.stringify(grant),
-      // });
-      // if (resp.status === 200 || resp.status === 201) {
-      //   const { grant_id } = (await resp.json()) as any;
-      //   setProjectId(grant_id);
-      //   setSuccess(true);
-      // } else {
-      //   setError({ message: 'Failed to submit a grant' });
-      // }
+      const resp = await fetch(`${config.apiBase}grants`, {
+        headers: config.postAPIHeaders,
+        method: 'post',
+        body: JSON.stringify({...grant,
+          chain_project_id : result?.eventData[2],
+          grant_address : result?.eventData[5]
+         }),
+      });
+
+      if (resp.status === 200 || resp.status === 201) {
+        const { grant_id } = (await resp.json()) as any;
+        setProjectId(grant_id);
+        setSuccess(true);
+      } else {
+        setError({ message: 'Failed to submit a grant' });
+      }
     } catch (error) {
       setError(error);
-      console.log(error);
     } finally {
       setLoading(false);
     }

@@ -358,7 +358,7 @@ class ChainService {
   }
 
   async convertToOnChainProject(project: Project) {
-    if (!project.chain_project_id) return;
+    if (!project?.chain_project_id) return;
 
     const projectOnChain: any = await this.getProjectOnChain(
       project.chain_project_id

@@ -85,6 +85,7 @@ export type Grant = {
   onchain_address: string;
   approvers: GrantApprover[];
   chain_project_id: number;
+  grant_address : string;
 };
 
 export type Milestone = ProposedMilestone & {
@@ -116,6 +117,7 @@ export type Project = {
   imbue_fee?: number;
   status_id?: number;
   project_type: number;
+  grant_address : string
 };
 
 export type ProjectProperties = {
@@ -1226,7 +1228,9 @@ export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
     approvers,
     chain_project_id,
     user_id,
+    grant_address
   } = grant;
+  
   const project = await insertProject({
     name: title,
     logo: '',
@@ -1239,6 +1243,7 @@ export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
     imbue_fee,
     project_type: ProjectType.Grant,
     chain_project_id,
+    grant_address
   })(tx);
 
   if (project.id === undefined) {
