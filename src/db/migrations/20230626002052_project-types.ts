@@ -1,10 +1,13 @@
 import { Knex } from "knex";
 
+import { auditFields } from "../utils";
+
 
 export async function up(knex: Knex): Promise<void> {
-    knex.schema.createTable('project_types', table => {
+    await knex.schema.createTable('project_types', table => {
         table.increments('type', { primaryKey: true });
         table.string('description');
+        auditFields(knex, table);
     });
 }
 
