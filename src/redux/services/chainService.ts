@@ -32,7 +32,7 @@ const eventMapping: Record<string, EventDetails> = {
   withraw: { eventName: 'ProjectFundsWithdrawn' },
   createBrief: { eventName: 'BriefSubmitted' },
   commenceWork: { eventName: 'ProjectCreated' },
-  submitInitialGrant: { eventName: 'GrantSubmitted' },
+  submitInitialGrant: { eventName: 'ProjectCreated' },
 };
 
 class ChainService {
