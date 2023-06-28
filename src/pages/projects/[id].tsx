@@ -25,6 +25,7 @@ import {
   OnchainProjectState,
   Project,
   ProjectOnChain,
+  ProjectType,
   User,
 } from '@/model';
 import { getProjectById } from '@/redux/services/briefService';
@@ -135,8 +136,6 @@ function Project() {
     const projectRes = await getProjectById(projectId);
     setProject(projectRes);
     // api  project response
-    // const userResponse = await utils.getCurrentUser();
-    // await setUser(userResponse);
     await getChainProject();
   };
 
@@ -450,11 +449,13 @@ function Project() {
             </h3>
             <span
               onClick={() => {
-                // project?.brief_id
+                // TODO:
               }}
               className='text-[#b2ff0b] cursor-pointer text-[20px]  max-lg: text-base  font-normal !m-0 !p-0 relative top-4'
             >
-              View full brief
+              {`View full ${
+                project.project_type === ProjectType.Brief ? 'brief' : 'grant'
+              }`}
             </span>
           </div>
           <div className='text-inactive w-[80%]'>
@@ -505,6 +506,19 @@ function Project() {
               Message
             </button>
           </div>
+
+          {project?.approvers && (
+            <>
+              <p className='text-white text-xl font-normal leading-[1.5] mt-[16px] p-0'>
+                Approvers
+              </p>
+              <div className='flex flex-row gap-4'>
+                {project.approvers.map((approver: string, index: number) => (
+                  <span key={index}>{approver}</span>
+                ))}
+              </div>
+            </>
+          )}
         </div>
         <div className='flex flex-col gap-[50px] flex-grow flex-shrink-0 basis-[20%]  max-lg:mt-10'>
           <div className='flex flex-col'>

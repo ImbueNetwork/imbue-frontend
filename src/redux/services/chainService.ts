@@ -46,7 +46,7 @@ class ChainService {
     account: WalletAccount,
     briefId: string
   ): Promise<BasicTxResponse> {
-    const extrinsic = await this.imbueApi.imbue.api.tx.imbueBriefs.commenceWork(
+    const extrinsic = this.imbueApi.imbue.api.tx.imbueBriefs.commenceWork(
       briefId
     );
     return await this.submitImbueExtrinsic(
@@ -66,7 +66,7 @@ class ChainService {
     currencyId: number,
     milestones: any[]
   ): Promise<BasicTxResponse> {
-    const extrinsic = await this.imbueApi.imbue.api.tx.imbueBriefs.createBrief(
+    const extrinsic = this.imbueApi.imbue.api.tx.imbueBriefs.createBrief(
       briefOwners,
       freelancerAddress,
       budget,
@@ -89,7 +89,7 @@ class ChainService {
   ): Promise<BasicTxResponse> {
     const projectId = projectOnChain.milestones[0].projectKey;
     const extrinsic =
-      await this.imbueApi.imbue.api.tx.imbueProposals.contribute(
+      this.imbueApi.imbue.api.tx.imbueProposals.contribute(
         projectOnChain.roundKey,
         projectId,
         contribution
@@ -108,7 +108,7 @@ class ChainService {
   ): Promise<BasicTxResponse> {
     const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic =
-      await this.imbueApi.imbue.api.tx.imbueProposals.submitMilestone(
+      this.imbueApi.imbue.api.tx.imbueProposals.submitMilestone(
         projectId,
         milestoneKey
       );
@@ -127,7 +127,7 @@ class ChainService {
   ): Promise<BasicTxResponse> {
     const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic =
-      await this.imbueApi.imbue.api.tx.imbueProposals.voteOnMilestone(
+      this.imbueApi.imbue.api.tx.imbueProposals.voteOnMilestone(
         projectId,
         milestoneKey,
         projectOnChain.roundKey,
@@ -147,7 +147,7 @@ class ChainService {
   ): Promise<BasicTxResponse> {
     const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic =
-      await this.imbueApi.imbue.api.tx.imbueProposals.finaliseMilestoneVoting(
+      this.imbueApi.imbue.api.tx.imbueProposals.finaliseMilestoneVoting(
         projectOnChain.roundKey,
         projectId,
         [milestoneKey]
@@ -164,7 +164,7 @@ class ChainService {
     projectOnChain: any
   ): Promise<BasicTxResponse> {
     const projectId = projectOnChain.milestones[0].project_chain_id;
-    const extrinsic = await this.imbueApi.imbue.api.tx.imbueProposals.withdraw(
+    const extrinsic = this.imbueApi.imbue.api.tx.imbueProposals.withdraw(
       projectId
     );
     return await this.submitImbueExtrinsic(
@@ -439,18 +439,18 @@ class ChainService {
       milestones: milestones,
       contributions: Object.keys(projectOnChain.contributions).map(
         (accountId: string) =>
-          ({
-            value: BigInt(
-              projectOnChain.contributions[accountId].value.replaceAll(',', '')
-            ),
-            accountId: accountId,
-            timestamp: BigInt(
-              projectOnChain.contributions[accountId].timestamp.replaceAll(
-                ',',
-                ''
-              )
-            ),
-          } as Contribution)
+        ({
+          value: BigInt(
+            projectOnChain.contributions[accountId].value.replaceAll(',', '')
+          ),
+          accountId: accountId,
+          timestamp: BigInt(
+            projectOnChain.contributions[accountId].timestamp.replaceAll(
+              ',',
+              ''
+            )
+          ),
+        } as Contribution)
       ),
       initiator: projectOnChain.initiator,
       createBlockNumber: BigInt(
@@ -474,19 +474,19 @@ class ChainService {
       .map((milestoneItem: any) => projectOnChain.milestones[milestoneItem])
       .map(
         (milestone: any) =>
-          ({
-            project_id: projectOffChain.id,
-            project_chain_id: Number(milestone.projectKey),
-            milestone_key: Number(milestone.milestoneKey),
-            name: projectOffChain.milestones[milestone.milestoneKey].name,
-            modified:
-              projectOffChain.milestones[milestone.milestoneKey].modified,
-            percentage_to_unlock: Number(milestone.percentageToUnlock),
-            amount: Number(
-              projectOffChain.milestones[milestone.milestoneKey].amount
-            ),
-            is_approved: milestone.isApproved,
-          } as Milestone)
+        ({
+          project_id: projectOffChain.id,
+          project_chain_id: Number(milestone.projectKey),
+          milestone_key: Number(milestone.milestoneKey),
+          name: projectOffChain.milestones[milestone.milestoneKey].name,
+          modified:
+            projectOffChain.milestones[milestone.milestoneKey].modified,
+          percentage_to_unlock: Number(milestone.percentageToUnlock),
+          amount: Number(
+            projectOffChain.milestones[milestone.milestoneKey].amount
+          ),
+          is_approved: milestone.isApproved,
+        } as Milestone)
       );
 
     return milestones;

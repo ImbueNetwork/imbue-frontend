@@ -324,9 +324,6 @@ const ApplicationPreview = (): JSX.Element => {
                   </div>
                 )}
               </h3>
-              <h3 className='flex text-lg lg:text-xl leading-[1.5] font-bold m-0 p-0'>
-                Client&apos;s budget: ${Number(brief?.budget).toLocaleString()}
-              </h3>
             </div>
 
             {isEditingBio && (
