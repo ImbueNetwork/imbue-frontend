@@ -158,7 +158,7 @@ Before we can go through the proposal flow, we need to go through the freelancer
 Before you can submit a proposal for a brief you need to have a freelancer profile created
 
 - Step 1: From the dashboard view go the menu and click the `Join 
-       the freelancer` button, as shown below
+     the freelancer` button, as shown below
   <br/><br/>
   <img src="./public/readme/images/freelancerJoinMenu.png" alt="Alt text" width="700" height="400">
   <br/><br/>

@@ -1,6 +1,6 @@
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import { useRouter } from 'next/router';
-import * as reactRedux from 'react-redux'
+import * as reactRedux from 'react-redux';
 
 import { getCurrentUser } from '@/utils';
 
@@ -13,9 +13,9 @@ import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { briefsData, dummyFreelancerBrief } from './__mocks__/briefsData';
 import { dummyUser } from './__mocks__/userData';
 
-jest.mock("react-redux", () => ({
-  ...jest.requireActual("react-redux"),
-  useSelector: jest.fn()
+jest.mock('react-redux', () => ({
+  ...jest.requireActual('react-redux'),
+  useSelector: jest.fn(),
 }));
 
 jest.mock('next/router', () => ({
@@ -35,9 +35,8 @@ jest.mock('@/redux/services/freelancerService', () => ({
   getFreelancerProfile: jest.fn(),
 }));
 
-
 describe('SubmitProposal', () => {
-  const useSelectorMock = jest.spyOn(reactRedux, 'useSelector')
+  const useSelectorMock = jest.spyOn(reactRedux, 'useSelector');
 
   beforeEach(() => {
     const mockGetCurrentUser = getCurrentUser as jest.MockedFunction<
@@ -45,7 +44,7 @@ describe('SubmitProposal', () => {
     >;
     mockGetCurrentUser.mockResolvedValue(dummyUser);
 
-    useSelectorMock.mockReturnValue({user : dummyUser})
+    useSelectorMock.mockReturnValue({ user: dummyUser });
 
     const mockGetFreelancerProfile =
       getFreelancerProfile as jest.MockedFunction<typeof getFreelancerProfile>;
@@ -71,7 +70,11 @@ describe('SubmitProposal', () => {
       push: pushMock,
     });
 
-    const { getByText } = render(<Providers><SubmitProposal /></Providers>);
+    const { getByText } = render(
+      <Providers>
+        <SubmitProposal />
+      </Providers>
+    );
 
     expect(getByText('Job description')).toBeInTheDocument();
     expect(getByText('Milestones')).toBeInTheDocument();
@@ -80,7 +83,11 @@ describe('SubmitProposal', () => {
   });
 
   test('displays brief insights if brief exists', async () => {
-    const { getByText } = render(<Providers><SubmitProposal /></Providers>);
+    const { getByText } = render(
+      <Providers>
+        <SubmitProposal />
+      </Providers>
+    );
 
     await waitFor(() => expect(getByText('jhdkb')).toBeInTheDocument());
   });
@@ -90,7 +97,11 @@ describe('SubmitProposal', () => {
       getFreelancerProfile as jest.MockedFunction<typeof getFreelancerProfile>;
     mockGetFreelancerProfile.mockResolvedValue(undefined);
 
-    render(<Providers><SubmitProposal /></Providers>);
+    render(
+      <Providers>
+        <SubmitProposal />
+      </Providers>
+    );
 
     await waitFor(() =>
       expect(useRouter().push).toHaveBeenCalledWith('/freelancers/new')
@@ -103,7 +114,11 @@ describe('SubmitProposal', () => {
     >;
     mockGetFreelancerBrief.mockResolvedValue(briefsData[0]);
 
-    render(<Providers><SubmitProposal /></Providers>);
+    render(
+      <Providers>
+        <SubmitProposal />
+      </Providers>
+    );
 
     await waitFor(() =>
       expect(useRouter().push).toHaveBeenCalledWith('/briefs/1/applications/1/')
@@ -111,7 +126,11 @@ describe('SubmitProposal', () => {
   });
 
   test('calls getCurrentUser and getFreelancerProfile on component mount', async () => {
-    render(<Providers><SubmitProposal /></Providers>);
+    render(
+      <Providers>
+        <SubmitProposal />
+      </Providers>
+    );
 
     await waitFor(() => {
       // expect(getCurrentUser).toHaveBeenCalledTimes(1);
@@ -125,7 +144,11 @@ describe('SubmitProposal', () => {
     const mockgetBrief = getBrief as jest.MockedFunction<typeof getBrief>;
     mockgetBrief.mockResolvedValue(undefined);
 
-    render(<Providers><SubmitProposal /></Providers>);
+    render(
+      <Providers>
+        <SubmitProposal />
+      </Providers>
+    );
 
     await waitFor(() => {
       expect(getBrief).toHaveBeenCalledTimes(1);
@@ -137,7 +160,11 @@ describe('SubmitProposal', () => {
     const mockgetBrief = getBrief as jest.MockedFunction<typeof getBrief>;
     mockgetBrief.mockResolvedValue(briefsData[1]);
 
-    render(<Providers><SubmitProposal /></Providers>);
+    render(
+      <Providers>
+        <SubmitProposal />
+      </Providers>
+    );
 
     await waitFor(() => {
       expect(getFreelancerBrief).toHaveBeenCalledTimes(1);
@@ -146,7 +173,11 @@ describe('SubmitProposal', () => {
   });
 
   test('adds milestone field on click of add milestone button', async () => {
-    const { getByText, getAllByText } = render(<Providers><SubmitProposal /></Providers>);
+    const { getByText, getAllByText } = render(
+      <Providers>
+        <SubmitProposal />
+      </Providers>
+    );
 
     fireEvent.click(getByText('Add milestone'));
 
@@ -154,7 +185,11 @@ describe('SubmitProposal', () => {
   });
 
   test('fills input fields and clicks submit button', async () => {
-    const { getByText, getByTestId } = render(<Providers><SubmitProposal /></Providers>);
+    const { getByText, getByTestId } = render(
+      <Providers>
+        <SubmitProposal />
+      </Providers>
+    );
 
     const descriptionInput = getByTestId(
       'milestone-description-0'

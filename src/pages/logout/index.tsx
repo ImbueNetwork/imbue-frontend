@@ -5,11 +5,10 @@ import { logout } from '@/redux/reducers/userReducers';
 import { AppDispatch } from '@/redux/store/store';
 
 const Logout = () => {
-  const dispatch : AppDispatch = useDispatch()
-  
+  const dispatch: AppDispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(logout())
+    dispatch(logout());
   }, [dispatch]);
 };
 

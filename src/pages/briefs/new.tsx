@@ -50,7 +50,7 @@ const NewBrief = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
-  const {user} = useSelector((state:RootState)=>state.userState)
+  const { user } = useSelector((state: RootState) => state.userState);
 
   const NamePanel = (
     <>

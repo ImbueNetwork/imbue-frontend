@@ -55,7 +55,9 @@ const BriefDetails = (): JSX.Element => {
   });
 
   // const [browsingUser, setBrowsingUser] = useState<User | null>(null);
-  const { user: browsingUser } = useSelector((state: RootState) => state.userState)
+  const { user: browsingUser } = useSelector(
+    (state: RootState) => state.userState
+  );
   const [isSavedBrief, setIsSavedBrief] = useState<boolean>(false);
   const [freelancer, setFreelancer] = useState<Freelancer>();
   const [targetUser, setTargetUser] = useState<User | null>(null);
@@ -76,7 +78,9 @@ const BriefDetails = (): JSX.Element => {
         if (briefData?.id) {
           const targetUser = await fetchUser(briefData.user_id);
           setBrief(briefData);
-          const _freelancer = await getFreelancerProfile(browsingUser?.username);
+          const _freelancer = await getFreelancerProfile(
+            browsingUser?.username
+          );
           const briefIsSaved = await checkIfBriefSaved(
             briefData?.id,
             browsingUser?.id
@@ -90,7 +94,6 @@ const BriefDetails = (): JSX.Element => {
       } catch (error) {
         setError(error);
       }
-
     }
   };
 
@@ -129,8 +132,9 @@ const BriefDetails = (): JSX.Element => {
       <div className='flex justify-between w-full'>
         <h3>Client Contact History (4)</h3>
         <div
-          className={`transition transform ease-in-out duration-600 ${showClientHistory && 'rotate-180'
-            } cursor-pointer`}
+          className={`transition transform ease-in-out duration-600 ${
+            showClientHistory && 'rotate-180'
+          } cursor-pointer`}
         >
           <ArrowIcon
             onClick={() => setShowClientHistory(!showClientHistory)}
@@ -177,8 +181,9 @@ const BriefDetails = (): JSX.Element => {
       <div className='flex justify-between w-full'>
         <h3>Similar projects on Imbue</h3>
         <div
-          className={`transition transform ease-in-out duration-600 ${showSimilarBrief && 'rotate-180'
-            } cursor-pointer`}
+          className={`transition transform ease-in-out duration-600 ${
+            showSimilarBrief && 'rotate-180'
+          } cursor-pointer`}
         >
           <ArrowIcon
             onClick={() => setShowSimilarBrief(!showSimilarBrief)}

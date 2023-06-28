@@ -16,7 +16,7 @@ const Skills = ({
   skills,
   setSkills,
 }: SkillsCompProps) => {
-  const [user, setUser] = useState(freelancer)
+  const [user, setUser] = useState(freelancer);
   useEffect(() => {
     setUser({
       ...freelancer,
