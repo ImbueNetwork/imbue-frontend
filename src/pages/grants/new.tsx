@@ -159,26 +159,42 @@ const GrantApplication = (): JSX.Element => {
           ),
         })),
         approvers,
-      }
+      };
+
+      const grantMilestones = grant.milestones.map((m) => ({
+        percentageToUnlock: m.percentage_to_unlock,
+      }));
       
       const grant_id = blake2AsHex(JSON.stringify(grant));
 
       if (!account) return
-      const res = await chainService.submitInitialGrant(account, milestones, approvers, currencyId, totalCost, "Kusama", grant_id)
-      console.log(res);
-      
-      const resp = await fetch(`${config.apiBase}grants`, {
-        headers: config.postAPIHeaders,
-        method: 'post',
-        body: JSON.stringify(grant),
-      });
-      if (resp.status === 200 || resp.status === 201) {
-        const { grant_id } = (await resp.json()) as any;
-        setProjectId(grant_id);
-        setSuccess(true);
-      } else {
-        setError({ message: 'Failed to submit a grant' });
+      const result = await chainService.submitInitialGrant(account, grantMilestones, approvers, currencyId, totalCost, "kusama", grant_id);
+
+      while (true) {
+        if (result.status || result.txError) {
+          if (result.status) {
+            console.log("**** result data is ");
+            console.log(result.eventData);
+            setSuccess(true);
+          } else if (result.txError) {
+            setError({ message: result.errorMessage });
+          }
+          break;
+        }
+        await new Promise((f) => setTimeout(f, 1000));
       }
+      // const resp = await fetch(`${config.apiBase}grants`, {
+      //   headers: config.postAPIHeaders,
+      //   method: 'post',
+      //   body: JSON.stringify(grant),
+      // });
+      // if (resp.status === 200 || resp.status === 201) {
+      //   const { grant_id } = (await resp.json()) as any;
+      //   setProjectId(grant_id);
+      //   setSuccess(true);
+      // } else {
+      //   setError({ message: 'Failed to submit a grant' });
+      // }
     } catch (error) {
       setError(error);
       console.log(error);
