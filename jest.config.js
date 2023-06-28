@@ -15,7 +15,11 @@ const customJestConfig = {
     '^@pages/(.*)$': '<rootDir>/src/pages/$1',
     '^@redux/(.*)$': '<rootDir>/src/redux/$1',
     '^@/(.*)$': '<rootDir>/src/$1',
+    uuid: require.resolve('uuid'),
   },
+  transformIgnorePatterns: [
+    '/node_modules/(?!uuid)', // Exclude all node_modules except for uuid
+  ],
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

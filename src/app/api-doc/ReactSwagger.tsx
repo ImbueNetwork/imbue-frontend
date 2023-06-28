@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React from "react";
-import SwaggerUI from "swagger-ui-react";
-import "swagger-ui-react/swagger-ui.css";
+import React from 'react';
+import SwaggerUI from 'swagger-ui-react';
+import 'swagger-ui-react/swagger-ui.css';
 
 type Props = {
   spec: Record<string, any>;

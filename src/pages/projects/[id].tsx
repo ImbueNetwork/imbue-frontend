@@ -6,6 +6,7 @@ import moment from 'moment';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import * as utils from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
@@ -13,8 +14,10 @@ import { initImbueAPIInfo } from '@/utils/polkadot';
 import AccountChoice from '@/components/AccountChoice';
 import ChatPopup from '@/components/ChatPopup';
 import { Dialogue } from '@/components/Dialogue';
+import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 import Login from '@/components/Login';
+import SuccessScreen from '@/components/SuccessScreen';
 
 import {
   Freelancer,
@@ -27,6 +30,7 @@ import {
 import { getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
+import { RootState } from '@/redux/store/store';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -68,7 +72,8 @@ function Project() {
   const [project, setProject] = useState<Project | any>({});
   const [freelancer, setFreelancer] = useState<Freelancer | any>({});
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
-  const [user, setUser] = useState<User | any>();
+  // const [user, setUser] = useState<User | any>();
+  const { user } = useSelector((state: RootState) => state.userState);
   const [chatTargetUser, setChatTargetUser] = useState<User | null>(null);
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
@@ -87,6 +92,10 @@ function Project() {
   const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
   const [isApplicant, setIsApplicant] = useState<boolean>();
 
+  const [success, setSuccess] = useState<boolean>(false);
+  const [successTitle, setSuccessTitle] = useState<string>('');
+  const [error, setError] = useState<any>();
+
   // fetching the project data from api and from chain
   useEffect(() => {
     if (projectId) {
@@ -97,14 +106,15 @@ function Project() {
   const getChainProject = async () => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
-    const user: User | any = await utils.getCurrentUser();
+    // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
     const onChainProjectRes = await chainService.getProject(projectId);
+
     if (onChainProjectRes) {
       const isApplicant = onChainProjectRes.initiator == user.web3_address;
 
       if (isApplicant) {
-        await getFreelancerData(user.username);
+        await getFreelancerData(user?.username);
       }
 
       setIsApplicant(isApplicant);
@@ -125,8 +135,8 @@ function Project() {
     const projectRes = await getProjectById(projectId);
     setProject(projectRes);
     // api  project response
-    const userResponse = await utils.getCurrentUser();
-    await setUser(userResponse);
+    // const userResponse = await utils.getCurrentUser();
+    // await setUser(userResponse);
     await getChainProject();
   };
 
@@ -138,23 +148,30 @@ function Project() {
   // voting on a mile stone
   const voteOnMilestone = async (account: WalletAccount, vote: boolean) => {
     setLoading(true);
-    const imbueApi = await initImbueAPIInfo();
-    const userRes: User | any = await utils.getCurrentUser();
-    const chainService = new ChainService(imbueApi, userRes);
-    await chainService.voteOnMilestone(
-      account,
-      onChainProject,
-      milestoneKeyInView,
-      vote
-    );
-    setLoading(false);
+    try {
+      const imbueApi = await initImbueAPIInfo();
+      // const userRes: User | any = await utils.getCurrentUser();
+      const chainService = new ChainService(imbueApi, user);
+      await chainService.voteOnMilestone(
+        account,
+        onChainProject,
+        milestoneKeyInView,
+        vote
+      );
+      setSuccess(true);
+      setSuccessTitle('Your vote was successfull');
+    } catch (error) {
+      setError({ message: 'Could not vote. Please try again later' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   // submitting a milestone
   const submitMilestone = async (account: WalletAccount) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
-    const user: User | any = await utils.getCurrentUser();
+    // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
     const result = await chainService.submitMilestone(
       account,
@@ -164,9 +181,11 @@ function Project() {
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
-          // TODO: show Success screen
+          setSuccess(true);
+          setSuccessTitle('Milestone Submitted Successfully');
         } else if (result.txError) {
           // TODO: show error screen
+          setError({ message: result.errorMessage });
           console.log(result.errorMessage);
         }
         break;
@@ -180,15 +199,17 @@ function Project() {
   const withdraw = async (account: WalletAccount) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
-    const user: User | any = await utils.getCurrentUser();
+    // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
     const result = await chainService.withdraw(account, onChainProject);
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
-          // TODO: show success screen
+          setSuccess(true);
+          setSuccessTitle('Withdraw successfull');
         } else if (result.txError) {
           // TODO: show error screen
+          setError({ message: result.errorMessage });
           console.log(result.errorMessage);
         }
         break;
@@ -611,6 +632,40 @@ function Project() {
         }}
         redirectUrl={`/project/${projectId}/`}
       />
+
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
+
+      <SuccessScreen title={successTitle} open={success} setOpen={setSuccess}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setSuccess(false)}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Continue to Project
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to dashboard
+          </button>
+        </div>
+      </SuccessScreen>
     </div>
   );
 }

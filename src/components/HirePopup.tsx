@@ -8,12 +8,12 @@ import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 
-import { getCurrentUser } from '@/utils';
-
-import { Currency, OffchainProjectState, User } from '@/model';
+import { Currency, OffchainProjectState } from '@/model';
 import { changeBriefApplicationStatus } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
+import { RootState } from '@/redux/store/store';
 
 import AccountChoice from './AccountChoice';
 import ErrorScreen from './ErrorScreen';
@@ -41,6 +41,8 @@ export const HirePopup = ({
   const [projectId, setProjectId] = useState<string>();
   const router = useRouter();
 
+  const { user } = useSelector((state: RootState) => state.userState);
+
   const modalStyle = {
     position: 'absolute' as const,
     top: '50%',
@@ -59,9 +61,10 @@ export const HirePopup = ({
   const selectedAccount = async (account: WalletAccount) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
-    const user: User | any = await getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
-    const briefOwners: string[] = [user?.web3_address];
+    const briefOwners: string[] = user?.web3_address
+      ? [user?.web3_address]
+      : [''];
     const freelancerAddress: string = freelancer.web3_address;
     const budget = BigInt(totalCost * 1e12);
     const initialContribution = BigInt(totalCost * 1e12);
@@ -96,7 +99,6 @@ export const HirePopup = ({
           );
           setProjectId(resp.project_id);
         } else if (result.txError) {
-          // TODO, SHOW ERROR POPUP
           setError({ message: result.errorMessage });
           application.status_id = OffchainProjectState.PendingReview;
         }

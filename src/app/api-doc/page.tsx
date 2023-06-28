@@ -1,6 +1,6 @@
-import { getApiDocs } from "@/lib/swagger";
+import { getApiDocs } from '@/lib/swagger';
 
-import ReactSwagger from "./ReactSwagger";
+import ReactSwagger from './ReactSwagger';
 
 async function ApiDocPage() {
   const spec = await getApiDocs();

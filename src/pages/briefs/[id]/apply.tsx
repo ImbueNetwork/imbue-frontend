@@ -3,8 +3,7 @@ import { WalletAccount } from '@talismn/connect-wallets';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
-
-import { getCurrentUser } from '@/utils';
+import { useSelector } from 'react-redux';
 
 import AccountChoice from '@/components/AccountChoice';
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
@@ -15,10 +14,11 @@ import SuccessScreen from '@/components/SuccessScreen';
 
 import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
-import { Brief, Currency, Freelancer, User } from '@/model';
+import { Brief, Currency, Freelancer } from '@/model';
 import { getBrief, getFreelancerBrief } from '@/redux/services/briefService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { selectAccount } from '@/redux/services/polkadotService';
+import { RootState } from '@/redux/store/store';
 
 interface MilestoneItem {
   name: string;
@@ -28,7 +28,8 @@ interface MilestoneItem {
 export const SubmitProposal = (): JSX.Element => {
   const [currencyId, setCurrencyId] = useState(0);
   const [brief, setBrief] = useState<Brief | any>();
-  const [user, setUser] = useState<User>();
+  // const [user, setUser] = useState<User>();
+  const { user } = useSelector((state: RootState) => state.userState);
   // FIXME: freelancer
   const [_freelancer, setFreelancer] = useState<Freelancer>();
   // const userHasWeb3Addresss = !!user?.web3_address;
@@ -56,9 +57,7 @@ export const SubmitProposal = (): JSX.Element => {
   }, [user]);
 
   const getUserAndFreelancer = async () => {
-    const userResponse = await getCurrentUser();
-    setUser(userResponse);
-    const freelancer = await getFreelancerProfile(userResponse?.username);
+    const freelancer = await getFreelancerProfile(user?.username);
     if (!freelancer?.id) {
       router.push(`/freelancers/new`);
     }
@@ -248,6 +247,7 @@ export const SubmitProposal = (): JSX.Element => {
                         Description
                       </h3>
                       <textarea
+                        data-testid='milestone-description-0'
                         className='input-description text-base'
                         value={name}
                         onChange={(e) =>
@@ -267,6 +267,7 @@ export const SubmitProposal = (): JSX.Element => {
                         Amount
                       </h3>
                       <input
+                        data-testid='milestone-amount-0'
                         type='number'
                         className='input-budget bg-[#1a1a19] border border-white text-base leading-5 rounded-[5px] py-3 px-5'
                         value={amount || ''}

@@ -3,8 +3,9 @@ import { Backdrop, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { FiEdit, FiPlusCircle } from 'react-icons/fi';
+import { useSelector } from 'react-redux';
 
-import { fetchProject, fetchUser, getCurrentUser } from '@/utils';
+import { fetchProject, fetchUser } from '@/utils';
 
 import ApplicationOwnerHeader from '@/components/Application/ApplicationOwnerHeader';
 import BriefOwnerHeader from '@/components/Application/BriefOwnerHeader';
@@ -29,6 +30,7 @@ import {
   getBrief,
 } from '@/redux/services/briefService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
+import { RootState } from '@/redux/store/store';
 
 interface MilestoneItem {
   name: string;
@@ -44,7 +46,7 @@ export type ApplicationPreviewProps = {
 
 const ApplicationPreview = (): JSX.Element => {
   const [brief, setBrief] = useState<Brief | any>();
-  const [user, setUser] = useState<User | any>();
+  const { user } = useSelector((state: RootState) => state.userState);
   const [application, setApplication] = useState<Project | any>();
   const [freelancer, setFreelancer] = useState<Freelancer | any>();
   const [loginModal, setLoginModal] = useState<boolean>(false);
@@ -78,12 +80,10 @@ const ApplicationPreview = (): JSX.Element => {
         const freelancerResponse = await getFreelancerProfile(
           freelancerUser?.username
         );
-        const userResponse = await getCurrentUser();
 
         setBrief(brief);
         setApplication(applicationResponse);
         setFreelancer(freelancerResponse);
-        setUser(userResponse);
       } catch (error) {
         setError(error);
       } finally {
