@@ -63,7 +63,7 @@ class ChainService {
     currencyId: number,
     amount:number,
     teasury:string,
-    grantID:number
+    grantID:string
   ): Promise<BasicTxResponse> {
     const extrinsic = this.imbueApi.imbue.api.tx.imbueGrants.submitInitialGrant(
       milestones,

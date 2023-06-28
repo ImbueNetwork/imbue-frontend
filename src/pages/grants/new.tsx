@@ -1,4 +1,5 @@
 import { Dialog, IconButton } from '@mui/material';
+import { blake2AsHex } from '@polkadot/util-crypto';
 import WalletIcon from '@svgs/wallet.svg';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
@@ -21,6 +22,7 @@ import { timeData } from '@/config/briefs-data';
 import { Currency } from '@/model';
 import ChainService from '@/redux/services/chainService';
 import { RootState } from '@/redux/store/store';
+
 
 interface MilestoneItem {
   name: string;
@@ -140,30 +142,35 @@ const GrantApplication = (): JSX.Element => {
       const user_id = (await getCurrentUser())?.id;
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user)
+      const grant = {
+        title,
+        description,
+        duration_id: durationId, // TODO:
+        required_funds: totalCost,
+        currency_id: currencyId,
+        user_id,
+        total_cost_without_fee: totalCostWithoutFee,
+        imbue_fee: imbueFee,
+        chain_project_id: 0, // TODO:
+        milestones: milestones.map((milestone) => ({
+          ...milestone,
+          percentage_to_unlock: Math.floor(
+            100 * ((milestone.amount ?? 0) / totalCostWithoutFee)
+          ),
+        })),
+        approvers,
+      }
+      
+      const grant_id = blake2AsHex(JSON.stringify(grant));
+
       if (!account) return
-      const res = await chainService.submitInitialGrant(account, milestones, approvers, currencyId, totalCost, "KUSAMA", 2)
+      const res = await chainService.submitInitialGrant(account, milestones, approvers, currencyId, totalCost, "Kusama", grant_id)
       console.log(res);
+      
       const resp = await fetch(`${config.apiBase}grants`, {
         headers: config.postAPIHeaders,
         method: 'post',
-        body: JSON.stringify({
-          title,
-          description,
-          duration_id: durationId, // TODO:
-          required_funds: totalCost,
-          currency_id: currencyId,
-          user_id,
-          total_cost_without_fee: totalCostWithoutFee,
-          imbue_fee: imbueFee,
-          chain_project_id: 0, // TODO:
-          milestones: milestones.map((milestone) => ({
-            ...milestone,
-            percentage_to_unlock: Math.floor(
-              100 * ((milestone.amount ?? 0) / totalCostWithoutFee)
-            ),
-          })),
-          approvers,
-        }),
+        body: JSON.stringify(grant),
       });
       if (resp.status === 200 || resp.status === 201) {
         const { grant_id } = (await resp.json()) as any;
