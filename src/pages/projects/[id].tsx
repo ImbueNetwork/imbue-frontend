@@ -129,14 +129,21 @@ function Project() {
 
       setOnChainProject(onChainProjectRes);
     }
-    setLoading(false);
   };
 
   const getProject = async () => {
-    const projectRes = await getProjectById(projectId);
+    try {
+      const projectRes = await getProjectById(projectId);
     setProject(projectRes);
     // api  project response
     await getChainProject();
+    } catch (error) {
+      setError(error)
+    }
+    finally{
+      setLoading(false)
+    }
+    
   };
 
   const getFreelancerData = async (freelancerName: string) => {

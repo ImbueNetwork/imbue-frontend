@@ -83,7 +83,7 @@ export default nextConnect()
           owner,
           total_cost_without_fee,
           imbue_fee,
-          project_type: exists.project_type
+          // project_type: exists.project_type,
         })(tx);
 
         if (!project.id) {

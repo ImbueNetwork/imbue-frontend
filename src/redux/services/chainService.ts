@@ -47,26 +47,24 @@ class ChainService {
     account: WalletAccount,
     briefId: string
   ): Promise<BasicTxResponse> {
-    const extrinsic = this.imbueApi.imbue.api.tx.imbueBriefs.commenceWork(
-      briefId
-    );
+    const extrinsic =
+      this.imbueApi.imbue.api.tx.imbueBriefs.commenceWork(briefId);
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
       eventMapping['commenceWork'].eventName
     );
   }
-  
+
   public async submitInitialGrant(
     account: WalletAccount,
     milestones: any,
-    approvers:string[],
+    approvers: string[],
     currencyId: number,
-    amount:number,
-    teasury:string,
-    grantID:string
+    amount: number,
+    teasury: string,
+    grantID: string
   ): Promise<BasicTxResponse> {
-
     const extrinsic = this.imbueApi.imbue.api.tx.imbueGrants.createAndConvert(
       milestones,
       approvers,
@@ -114,12 +112,11 @@ class ChainService {
     contribution: bigint
   ): Promise<BasicTxResponse> {
     const projectId = projectOnChain.milestones[0].projectKey;
-    const extrinsic =
-      this.imbueApi.imbue.api.tx.imbueProposals.contribute(
-        projectOnChain.roundKey,
-        projectId,
-        contribution
-      );
+    const extrinsic = this.imbueApi.imbue.api.tx.imbueProposals.contribute(
+      projectOnChain.roundKey,
+      projectId,
+      contribution
+    );
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
@@ -133,11 +130,10 @@ class ChainService {
     milestoneKey: number
   ): Promise<BasicTxResponse> {
     const projectId = projectOnChain.milestones[0].project_chain_id;
-    const extrinsic =
-      this.imbueApi.imbue.api.tx.imbueProposals.submitMilestone(
-        projectId,
-        milestoneKey
-      );
+    const extrinsic = this.imbueApi.imbue.api.tx.imbueProposals.submitMilestone(
+      projectId,
+      milestoneKey
+    );
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
@@ -152,13 +148,12 @@ class ChainService {
     userVote: boolean
   ): Promise<BasicTxResponse> {
     const projectId = projectOnChain.milestones[0].project_chain_id;
-    const extrinsic =
-      this.imbueApi.imbue.api.tx.imbueProposals.voteOnMilestone(
-        projectId,
-        milestoneKey,
-        projectOnChain.roundKey,
-        userVote
-      );
+    const extrinsic = this.imbueApi.imbue.api.tx.imbueProposals.voteOnMilestone(
+      projectId,
+      milestoneKey,
+      projectOnChain.roundKey,
+      userVote
+    );
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
@@ -190,9 +185,8 @@ class ChainService {
     projectOnChain: any
   ): Promise<BasicTxResponse> {
     const projectId = projectOnChain.milestones[0].project_chain_id;
-    const extrinsic = this.imbueApi.imbue.api.tx.imbueProposals.withdraw(
-      projectId
-    );
+    const extrinsic =
+      this.imbueApi.imbue.api.tx.imbueProposals.withdraw(projectId);
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
@@ -382,7 +376,7 @@ class ChainService {
     const lastHeader = await this.imbueApi.imbue.api.rpc.chain.getHeader();
     const currentBlockNumber = lastHeader.number.toBigInt();
     const rounds: any =
-      await await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries();
+      await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries();
 
     let roundKey: number | undefined = undefined;
     for (let i = Object.keys(rounds).length - 1; i >= 0; i--) {
@@ -465,18 +459,18 @@ class ChainService {
       milestones: milestones,
       contributions: Object.keys(projectOnChain.contributions).map(
         (accountId: string) =>
-        ({
-          value: BigInt(
-            projectOnChain.contributions[accountId].value.replaceAll(',', '')
-          ),
-          accountId: accountId,
-          timestamp: BigInt(
-            projectOnChain.contributions[accountId].timestamp.replaceAll(
-              ',',
-              ''
-            )
-          ),
-        } as Contribution)
+          ({
+            value: BigInt(
+              projectOnChain.contributions[accountId].value.replaceAll(',', '')
+            ),
+            accountId: accountId,
+            timestamp: BigInt(
+              projectOnChain.contributions[accountId].timestamp.replaceAll(
+                ',',
+                ''
+              )
+            ),
+          } as Contribution)
       ),
       initiator: projectOnChain.initiator,
       createBlockNumber: BigInt(
@@ -500,19 +494,19 @@ class ChainService {
       .map((milestoneItem: any) => projectOnChain.milestones[milestoneItem])
       .map(
         (milestone: any) =>
-        ({
-          project_id: projectOffChain.id,
-          project_chain_id: Number(milestone.projectKey),
-          milestone_key: Number(milestone.milestoneKey),
-          name: projectOffChain.milestones[milestone.milestoneKey].name,
-          modified:
-            projectOffChain.milestones[milestone.milestoneKey].modified,
-          percentage_to_unlock: Number(milestone.percentageToUnlock),
-          amount: Number(
-            projectOffChain.milestones[milestone.milestoneKey].amount
-          ),
-          is_approved: milestone.isApproved,
-        } as Milestone)
+          ({
+            project_id: projectOffChain.id,
+            project_chain_id: Number(milestone.projectKey),
+            milestone_key: Number(milestone.milestoneKey),
+            name: projectOffChain.milestones[milestone.milestoneKey].name,
+            modified:
+              projectOffChain.milestones[milestone.milestoneKey].modified,
+            percentage_to_unlock: Number(milestone.percentageToUnlock),
+            amount: Number(
+              projectOffChain.milestones[milestone.milestoneKey].amount
+            ),
+            is_approved: milestone.isApproved,
+          } as Milestone)
       );
 
     return milestones;

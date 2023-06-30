@@ -1,4 +1,4 @@
-import { Dialog, IconButton } from '@mui/material';
+import { Alert, Dialog, IconButton } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import WalletIcon from '@svgs/wallet.svg';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -45,10 +45,19 @@ const GrantApplication = (): JSX.Element => {
   const [durationId, setDurationId] = useState(0);
   const [success, setSuccess] = useState(false);
   const [projectId, setProjectId] = useState<number>();
-  // FIXME:
-  const [onChainAddress, _setOnChainAddress] = useState(
-    '0x524c3d9e935649A448FA33666048C'
-  );
+  const [chainProjectId, setChainProjectId] = useState<number>();
+
+  const [copied, setCopied] = useState<boolean>(false);
+
+  const copyAddress = () => {
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 3000);
+  }
+
+  const [onChainAddress, _setOnChainAddress] = useState('');
 
   const { user } = useSelector((state: RootState) => state.userState);
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
@@ -135,7 +144,6 @@ const GrantApplication = (): JSX.Element => {
   }
 
   const submitGrant = async (account: WalletAccount) => {
-    // TODO: Submit a grant
     setLoading(true);
 
     try {
@@ -151,7 +159,7 @@ const GrantApplication = (): JSX.Element => {
         user_id,
         total_cost_without_fee: totalCostWithoutFee,
         imbue_fee: imbueFee,
-        chain_project_id: projectId,
+        chain_project_id: chainProjectId,
         milestones: milestones.map((milestone) => ({
           ...milestone,
           percentage_to_unlock: Math.floor(
@@ -175,7 +183,7 @@ const GrantApplication = (): JSX.Element => {
           if (result.status) {
             console.log("**** result data is ");
             console.log(result.eventData);
-            setProjectId(result?.eventData[2])
+            setChainProjectId(result?.eventData[2])
             _setOnChainAddress(result?.eventData[5])
             setSuccess(true);
           } else if (result.txError) {
@@ -188,15 +196,17 @@ const GrantApplication = (): JSX.Element => {
       const resp = await fetch(`${config.apiBase}grants`, {
         headers: config.postAPIHeaders,
         method: 'post',
-        body: JSON.stringify({...grant,
-          chain_project_id : result?.eventData[2],
-          grant_address : result?.eventData[5]
-         }),
+        body: JSON.stringify({
+          ...grant,
+          chain_project_id: result?.eventData[2],
+          grant_address: result?.eventData[5]
+        }),
       });
 
       if (resp.status === 200 || resp.status === 201) {
-        const { grant_id } = (await resp.json()) as any;
-        setProjectId(grant_id);
+        const { grant_id, id } = (await resp.json()) as any;
+        setChainProjectId(grant_id);
+        setProjectId(id)
         setSuccess(true);
       } else {
         setError({ message: 'Failed to submit a grant' });
@@ -248,9 +258,9 @@ const GrantApplication = (): JSX.Element => {
           <div>Approvers</div>
           <div>{`Total grant: ${totalCost} ${currencies[currencyId]}`}</div>
         </div>
-        <div className='flex justify-between px-12 py-8 text-base leading-[1.2]  border border-solid border-b-white items-start'>
-          <div className='flex flex-col gap-8'>
-            <div className='flex flex-row gap-4 w-[480px] items-center'>
+        <div className='flex flex-col lg:flex-row justify-between px-12 py-8 text-base leading-[1.2]  border border-solid border-b-white items-start'>
+          <div className='flex flex-col gap-8 w-full'>
+            <div className='flex flex-col lg:flex-row gap-4 w-full lg:w-[480px] lg:items-center'>
               <input
                 value={newApprover || ''}
                 placeholder='Input address of an approver'
@@ -468,7 +478,7 @@ const GrantApplication = (): JSX.Element => {
       {loading && <FullScreenLoader />}
       <Dialog
         open={success}
-        onClose={() => router.push(`/projects/${projectId}`)}
+        onClose={() => router.push(`/projects/${chainProjectId}`)}
         aria-labelledby='alert-dialog-title'
         aria-describedby='alert-dialog-description'
         className='p-14 errorDialogue'
@@ -487,7 +497,7 @@ const GrantApplication = (): JSX.Element => {
 
           <CopyToClipboard text={onChainAddress}>
             <div className='flex flex-row gap-4 items-center rounded-[10px] border border-solid border-light-grey py-8 px-6 text-xl text-white'>
-              <IconButton>
+              <IconButton onClick={() => copyAddress()}>
                 <FaRegCopy className='text-white' />
               </IconButton>
               <span>{onChainAddress}</span>
@@ -504,6 +514,13 @@ const GrantApplication = (): JSX.Element => {
             Continue
           </button>
         </div>
+        <Alert
+          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${copied ? 'flex' : 'hidden'
+            }`}
+          severity='success'
+        >
+          Grant Wallet Address Copied to clipboard
+        </Alert>
       </Dialog>
 
       <AccountChoice
@@ -523,6 +540,7 @@ const GrantApplication = (): JSX.Element => {
           </button>
         </div>
       </ErrorScreen>
+
     </div>
   );
 };

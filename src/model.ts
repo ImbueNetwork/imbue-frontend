@@ -69,7 +69,7 @@ export type Project = {
   total_cost_without_fee?: number;
   imbue_fee?: number;
   status_id?: number;
-  project_type: ProjectType;
+  // project_type: ProjectType;
   approvers: string[];
 };
 
