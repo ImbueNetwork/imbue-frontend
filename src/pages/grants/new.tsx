@@ -1,4 +1,4 @@
-import { Alert, Dialog, IconButton } from '@mui/material';
+import { Alert, Autocomplete, CircularProgress, Dialog, FormControl, IconButton, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent, TextField, Theme, useTheme } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import WalletIcon from '@svgs/wallet.svg';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -218,6 +218,26 @@ const GrantApplication = (): JSX.Element => {
     }
   };
 
+  const [personName, setPersonName] = useState<string[]>([])
+  const [names, setName] = useState<any>(users)
+
+  const theme = useTheme();
+
+  function getStyles(name: string, personName: string[], theme: Theme) {
+    return {
+      fontWeight:
+        personName?.indexOf(name) === -1
+          ? theme.typography.fontWeightRegular
+          : theme.typography.fontWeightMedium,
+    };
+  }
+
+  function handleChange(e: SelectChangeEvent<any>) {
+    setPersonName(e.target.value)
+  }
+
+  console.log(personName);
+
   return (
     <div className='flex flex-col gap-10 leading-[1.5] hq-layout !mx-3 lg:!mx-auto'>
       <div className='rounded-[20px] border border-solid border-white bg-theme-grey-dark'>
@@ -260,13 +280,46 @@ const GrantApplication = (): JSX.Element => {
         </div>
         <div className='flex flex-col lg:flex-row justify-between px-12 py-8 text-base leading-[1.2]  border border-solid border-b-white items-start'>
           <div className='flex flex-col gap-8 w-full'>
-            <div className='flex flex-col lg:flex-row gap-4 w-full lg:w-[480px] lg:items-center'>
-              <input
+            <div className='flex flex-col lg:flex-row gap-4 w-full lg:w-4/5 lg:items-center'>
+              {/* <input
                 value={newApprover || ''}
                 placeholder='Input address of an approver'
                 onChange={(e) => setNewApprover(e.target.value)}
                 className='bg-[#1a1a18] border border-solid border-white rounded-[5px] p-3 flex-grow h-fit'
-              />
+              /> */}
+              <FormControl sx={{ m: 1, width: "100%" }}>
+                <InputLabel id="demo-multiple-name-label">Approver Wallet Address</InputLabel>
+                <Select
+                  multiple
+                  labelId="demo-multiple-name-label"
+                  id="demo-multiple-name"
+                  value={personName}
+                  onChange={handleChange}
+                  input={<OutlinedInput label="Approver Wallet Address" />}
+                // MenuProps={MenuProps}
+                >
+                  {names?.map((name: any) => (
+                    <MenuItem
+                      key={name.web3_address}
+                      value={name.web3_address}
+                      // style={getStyles(name, personName, theme)}
+                      className='hover:bg-light-white py-2'
+                    >
+                      <div className='flex justify-evenly w-full items-center'>
+                        <div className='flex w-full'>
+                          <Image width={40} height={40} src={name?.profile_photo} alt='' />
+                          <div className='flex flex-col ml-4 gap-1 justify-center'>
+                            <span>{name?.display_name}</span>
+                            <span className='text-xs'>{name?.web3_address}</span>
+                          </div>
+                        </div>
+                        <span className='text-sm'>Request</span>
+                      </div>
+
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               <div
                 className='flex flex-row items-center gap-2 clickable-text cursor-pointer active:scale-105 origin-top-left'
                 onClick={onAddApprover}
@@ -546,3 +599,12 @@ const GrantApplication = (): JSX.Element => {
 };
 
 export default GrantApplication;
+
+const users = [
+  { display_name: 'Sam', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK1" },
+  { display_name: 'Aala', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK2" },
+  { display_name: 'Felix', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK3" },
+  { display_name: '', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK4" },
+  { display_name: 'Oliver', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK5" },
+  { display_name: 'Michael', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK6" },
+];

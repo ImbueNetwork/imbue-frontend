@@ -52,6 +52,14 @@
   margin-bottom: 24px;
 }
 
+.approvers .MuiFormControl-root{
+  margin-bottom: 0;
+}
+
+.MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation1.MuiAutocomplete-paper{
+  background-color: var(--theme-background);
+}
+
 #demo-simple-select-helper-label,
 #demo-simple-select-helper,
 .MuiSvgIcon-root.MuiSvgIcon-fontSizeMedium.MuiSelect-icon.MuiSelect-iconOutlined {
@@ -78,7 +86,7 @@
 }
 
 .MuiPaper-root.MuiMenu-paper.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation8.MuiPopover-paper {
-  background: var(--theme-grey-dark);
+  background: var(--theme-background);
   color: white;
 }
 
