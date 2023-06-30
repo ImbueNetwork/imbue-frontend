@@ -144,6 +144,7 @@ const GrantApplication = (): JSX.Element => {
   }
 
   const submitGrant = async (account: WalletAccount) => {
+    if (!account) return
     setLoading(true);
 
     try {
@@ -157,6 +158,7 @@ const GrantApplication = (): JSX.Element => {
         required_funds: totalCost,
         currency_id: currencyId,
         user_id,
+        owner: account.address,
         total_cost_without_fee: totalCostWithoutFee,
         imbue_fee: imbueFee,
         chain_project_id: chainProjectId,
@@ -178,11 +180,10 @@ const GrantApplication = (): JSX.Element => {
       if (!account) return
       const result = await chainService.submitInitialGrant(account, grantMilestones, approvers, currencyId, totalCost, "kusama", grant_id);
 
+      // eslint-disable-next-line no-constant-condition
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
-            console.log("**** result data is ");
-            console.log(result.eventData);
             setChainProjectId(result?.eventData[2])
             _setOnChainAddress(result?.eventData[5])
             setSuccess(true);
@@ -199,7 +200,7 @@ const GrantApplication = (): JSX.Element => {
         body: JSON.stringify({
           ...grant,
           chain_project_id: result?.eventData[2],
-          grant_address: result?.eventData[5]
+          escrow_address: result?.eventData[5]
         }),
       });
 
