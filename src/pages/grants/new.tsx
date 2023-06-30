@@ -22,6 +22,7 @@ import { timeData } from '@/config/briefs-data';
 import { Currency } from '@/model';
 import ChainService from '@/redux/services/chainService';
 import { RootState } from '@/redux/store/store';
+import Approvers from '@/components/Grant/Approvers';
 
 
 interface MilestoneItem {
@@ -329,7 +330,7 @@ const GrantApplication = (): JSX.Element => {
                 ))}
               </div>
               <div className='flex flex-col'>
-                <FormControl sx={{ m: 1, width: "100%" }}>
+                {/* <FormControl sx={{ m: 1, width: "100%" }}>
                   <InputLabel id="demo-multiple-name-label">Approver Wallet Address</InputLabel>
                   <Select
                     multiple
@@ -368,15 +369,16 @@ const GrantApplication = (): JSX.Element => {
                       </MenuItem>
                     ))}
                   </Select>
-                </FormControl>
-                <div
-                  className='flex flex-row items-center gap-2 clickable-text cursor-pointer active:scale-105 origin-top-left ml-2 mb-10'
+                </FormControl> */}
+                <Approvers approvers={approvers} setApprovers={setApprovers} />
+                {/* <div
+                  className='flex flex-row items-center gap-2 clickable-text cursor-pointer active:scale-105 origin-top-left ml-2 my-10'
                   onClick={onAddApprover}
                 >
                   <FiPlusCircle color='var(--theme-primary)' />
                   <p className='w-full'>Add approver</p>
 
-                </div>
+                </div> */}
               </div>
             </div>
 
