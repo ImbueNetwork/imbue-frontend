@@ -71,6 +71,7 @@ export type Project = {
   status_id?: number;
   // project_type: ProjectType;
   approvers: string[];
+  created? : string;
 };
 
 
