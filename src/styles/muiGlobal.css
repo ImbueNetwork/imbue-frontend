@@ -50,6 +50,7 @@
 
 .MuiFormControl-root {
   margin-bottom: 24px;
+  margin-left: 0;
 }
 
 .approvers .MuiFormControl-root{

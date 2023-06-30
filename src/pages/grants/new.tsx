@@ -45,8 +45,6 @@ const GrantApplication = (): JSX.Element => {
   const [durationId, setDurationId] = useState(0);
   const [success, setSuccess] = useState(false);
   const [projectId, setProjectId] = useState<number>();
-  const [chainProjectId, setChainProjectId] = useState<number>();
-
   const [copied, setCopied] = useState<boolean>(false);
 
   const copyAddress = () => {
@@ -71,11 +69,13 @@ const GrantApplication = (): JSX.Element => {
     (key: any) => !isNaN(Number(Currency[key]))
   );
 
-  const onAddApprover = () => {
-    if (!newApprover) return;
-    setApprovers([...approvers, newApprover]);
-    setNewApprover('');
-  };
+  // const onAddApprover = () => {
+  //   if (!newApprover) return;
+  //   setApprovers([...approvers, newApprover]);
+  //   setNewApprover('');
+  // };
+
+
 
   const imbueFeePercentage = 5;
   const totalCostWithoutFee = milestones.reduce(
@@ -97,12 +97,12 @@ const GrantApplication = (): JSX.Element => {
     setMilestones(newMilestones);
   };
 
-  const removeApprover = (index: number) => {
-    if (approvers.length === 0) return;
-    const newApprovers = [...approvers];
-    newApprovers.splice(index, 1);
-    setApprovers(newApprovers);
-  };
+  // const removeApprover = (index: number) => {
+  //   if (approvers.length === 0) return;
+  //   const newApprovers = [...approvers];
+  //   newApprovers.splice(index, 1);
+  //   setApprovers(newApprovers);
+  // };
 
   const validateFormData = () => {
     for (let i = 0; i < milestones.length; i++) {
@@ -161,7 +161,7 @@ const GrantApplication = (): JSX.Element => {
         owner: account.address,
         total_cost_without_fee: totalCostWithoutFee,
         imbue_fee: imbueFee,
-        chain_project_id: chainProjectId,
+        chain_project_id: projectId,
         milestones: milestones.map((milestone) => ({
           ...milestone,
           percentage_to_unlock: Math.floor(
@@ -184,7 +184,6 @@ const GrantApplication = (): JSX.Element => {
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
-            setChainProjectId(result?.eventData[2])
             _setOnChainAddress(result?.eventData[5])
             setSuccess(true);
           } else if (result.txError) {
@@ -205,9 +204,8 @@ const GrantApplication = (): JSX.Element => {
       });
 
       if (resp.status === 200 || resp.status === 201) {
-        const { grant_id, id } = (await resp.json()) as any;
-        setChainProjectId(grant_id);
-        setProjectId(id)
+        const { grant_id } = (await resp.json()) as any;
+        setProjectId(grant_id)
         setSuccess(true);
       } else {
         setError({ message: 'Failed to submit a grant' });
@@ -220,6 +218,7 @@ const GrantApplication = (): JSX.Element => {
   };
 
   const [personName, setPersonName] = useState<string[]>([])
+  const [approversPreview, setApproverPreview] = useState<any[]>([])
   const [names, setName] = useState<any>(users)
 
   const theme = useTheme();
@@ -235,19 +234,40 @@ const GrantApplication = (): JSX.Element => {
 
   function handleChange(e: SelectChangeEvent<any>) {
     setPersonName(e.target.value)
+    console.log(e.target.value);
+    // setApprovers([...approvers, e.target.value])
   }
 
-  console.log(personName);
+  const onAddApprover = () => {
+    if (!personName.length) return
+
+    const approversList = [...approversPreview, ...personName]
+    const approversAddress = approversList.map((v: any) => v?.web3_address)
+
+    setApproverPreview(approversList)
+    setApprovers(approversAddress)
+    setPersonName([])
+  }
+
+  const removeApprover = (index: number) => {
+    if (approvers.length === 0) return;
+    const newApprovers = [...approversPreview];
+    newApprovers.splice(index, 1);
+    setApprovers(newApprovers.map((v: any) => v?.web3_address));
+    setApproverPreview(newApprovers)
+  };
+
+  console.log(approvers);
 
   return (
     <div className='flex flex-col gap-10 leading-[1.5] hq-layout !mx-3 lg:!mx-auto'>
       <div className='rounded-[20px] border border-solid border-white bg-theme-grey-dark'>
-        <div className='px-12 py-5 text-[20px] text-white border-b border-white'>
+        <div className='px-6 lg:px-12 py-5 text-[20px] text-white border-b border-white'>
           Grant description
         </div>
-        <div className='px-12 py-8 text-base leading-[1.2]'>
+        <div className='px-6 lg:px-12 py-8 text-base leading-[1.2]'>
           <div className='flex justify-between'>
-            <div className='flex flex-col gap-8 w-3/5'>
+            <div className='flex flex-col gap-8 w-full lg:w-3/5'>
               <div className='flex flex-col gap-4'>
                 <div>Title</div>
                 <input
@@ -275,73 +295,92 @@ const GrantApplication = (): JSX.Element => {
       </div>
 
       <div className='rounded-[20px] border border-solid border-white bg-theme-grey-dark'>
-        <div className='flex justify-between text-[20px] text-white px-12 py-5 border-b border-white'>
+        <div className='flex justify-between text-[20px] text-white px-6 lg:px-12 py-5 border-b border-white'>
           <div>Approvers</div>
           <div>{`Total grant: ${totalCost} ${currencies[currencyId]}`}</div>
         </div>
-        <div className='flex flex-col lg:flex-row justify-between px-12 py-8 text-base leading-[1.2]  border border-solid border-b-white items-start'>
+        <div className='flex flex-col lg:flex-row justify-between px-6 lg:px-12 py-8 text-base leading-[1.2]  border border-solid border-b-white items-start'>
           <div className='flex flex-col gap-8 w-full'>
-            <div className='flex flex-col lg:flex-row gap-4 w-full lg:w-4/5 lg:items-center'>
+            <div className='flex flex-col gap-4 w-full lg:w-4/5'>
               {/* <input
                 value={newApprover || ''}
                 placeholder='Input address of an approver'
                 onChange={(e) => setNewApprover(e.target.value)}
                 className='bg-[#1a1a18] border border-solid border-white rounded-[5px] p-3 flex-grow h-fit'
               /> */}
-              <FormControl sx={{ m: 1, width: "100%" }}>
-                <InputLabel id="demo-multiple-name-label">Approver Wallet Address</InputLabel>
-                <Select
-                  multiple
-                  labelId="demo-multiple-name-label"
-                  id="demo-multiple-name"
-                  value={personName}
-                  onChange={handleChange}
-                  input={<OutlinedInput label="Approver Wallet Address" />}
-                // MenuProps={MenuProps}
-                >
-                  {names?.map((name: any) => (
-                    <MenuItem
-                      key={name.web3_address}
-                      value={name.web3_address}
-                      // style={getStyles(name, personName, theme)}
-                      className='hover:bg-light-white py-2'
-                    >
-                      <div className='flex justify-evenly w-full items-center'>
-                        <div className='flex w-full'>
-                          <Image width={40} height={40} src={name?.profile_photo} alt='' />
-                          <div className='flex flex-col ml-4 gap-1 justify-center'>
-                            <span>{name?.display_name}</span>
-                            <span className='text-xs'>{name?.web3_address}</span>
-                          </div>
-                        </div>
-                        <span className='text-sm'>Request</span>
+              <div className='flex flex-col gap-4 ml-2'>
+                {approversPreview.map((approver, index) => (
+                  <div key={index} className='flex flex-row justify-between items-center w-full lg:w-2/3 gap-10'>
+                    {/* <span>{approver}</span> */}
+                    <div className='flex w-full'>
+                      <Image className='w-10 h-10' width={40} height={40} src={approver?.profile_photo} alt='' />
+                      <div className='flex flex-col ml-4 gap-1 justify-center'>
+                        <span>{approver?.display_name}</span>
+                        <span className='text-xs break-all'>{approver?.web3_address}</span>
                       </div>
+                    </div>
+                    <span
+                      className='text-light-grey font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
+                      onClick={() => removeApprover(index)}
+                    >
+                      x
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className='flex flex-col'>
+                <FormControl sx={{ m: 1, width: "100%" }}>
+                  <InputLabel id="demo-multiple-name-label">Approver Wallet Address</InputLabel>
+                  <Select
+                    multiple
+                    labelId="demo-multiple-name-label"
+                    id="demo-multiple-name"
+                    value={personName}
+                    onChange={handleChange}
+                    input={<OutlinedInput label="Approver Wallet Address" />}
+                  // MenuProps={MenuProps}
+                  >
+                    {names?.map((name: any) => (
+                      <MenuItem
+                        key={name.web3_address}
+                        value={name}
+                        disabled={approvers.includes(name.web3_address)}
+                        style={getStyles(name, personName, theme)}
+                        className='hover:bg-light-white py-2'
+                      >
+                        <div className='flex justify-evenly w-full items-center'>
+                          <div className='flex w-full'>
+                            <Image width={40} height={40} src={name?.profile_photo} alt='' />
+                            <div className='flex flex-col ml-4 gap-1 justify-center'>
+                              <span>{name?.display_name}</span>
+                              <span className='text-xs'>{name?.web3_address}</span>
+                            </div>
+                          </div>
+                          <span className='text-sm'>
+                            {
+                              approvers.includes(name?.web3_address)
+                                ? <span className='text-primary'>Requested</span>
+                                : <span className='text-theme-secondary'>Request</span>
+                            }
+                          </span>
+                        </div>
 
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <div
-                className='flex flex-row items-center gap-2 clickable-text cursor-pointer active:scale-105 origin-top-left'
-                onClick={onAddApprover}
-              >
-                <FiPlusCircle color='var(--theme-primary)' />
-                Add approver
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <div
+                  className='flex flex-row items-center gap-2 clickable-text cursor-pointer active:scale-105 origin-top-left ml-2 mb-10'
+                  onClick={onAddApprover}
+                >
+                  <FiPlusCircle color='var(--theme-primary)' />
+                  <p className='w-full'>Add approver</p>
+
+                </div>
               </div>
             </div>
-            <div className='flex flex-col gap-4'>
-              {approvers.map((approver, index) => (
-                <div key={index} className='flex flex-row justify-between'>
-                  <span>{approver}</span>
-                  <span
-                    className='text-light-grey font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
-                    onClick={() => removeApprover(index)}
-                  >
-                    x
-                  </span>
-                </div>
-              ))}
-            </div>
+
+
           </div>
           <div className='flex flex-col gap-4'>
             <div>
@@ -388,8 +427,8 @@ const GrantApplication = (): JSX.Element => {
             </div>
           </div>
         </div>
-        <div className='flex flex-col px-7 py-5'>
-          <div className='text-[20px] text-white ml-5 mb-8'>Milestones</div>
+        <div className='flex flex-col px-6 lg:px-7 py-5'>
+          <div className='text-[20px] text-white lg:ml-5 mb-8'>Milestones</div>
           <div className='flex flex-col gap-4'>
             {milestones.map(({ name, amount }, index) => {
               const percent = Number(
@@ -477,7 +516,7 @@ const GrantApplication = (): JSX.Element => {
             Add milestone
           </div>
 
-          <div className='mx-4'>
+          <div className='lg:mx-4'>
             <hr className='my-6 text-white' />
 
             <div className='flex flex-row items-center mb-5'>
@@ -532,7 +571,7 @@ const GrantApplication = (): JSX.Element => {
       {loading && <FullScreenLoader />}
       <Dialog
         open={success}
-        onClose={() => router.push(`/projects/${chainProjectId}`)}
+        onClose={() => router.push(`/projects/${projectId}`)}
         aria-labelledby='alert-dialog-title'
         aria-describedby='alert-dialog-description'
         className='p-14 errorDialogue'
@@ -602,10 +641,10 @@ const GrantApplication = (): JSX.Element => {
 export default GrantApplication;
 
 const users = [
-  { display_name: 'Sam', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK1" },
-  { display_name: 'Aala', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK2" },
-  { display_name: 'Felix', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK3" },
-  { display_name: '', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK4" },
-  { display_name: 'Oliver', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK5" },
-  { display_name: 'Michael', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK6" },
+  { display_name: 'Sam', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK" },
+  { display_name: 'Aala', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH2" },
+  { display_name: 'Felix', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH3" },
+  { display_name: '', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH4" },
+  { display_name: 'Oliver', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH5" },
+  { display_name: 'Michael', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH6" },
 ];

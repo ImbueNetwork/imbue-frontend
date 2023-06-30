@@ -89,7 +89,7 @@ export type ProjectOnChain = {
   createBlockNumber: bigint;
   approvedForFunding: boolean;
   fundingThresholdMet: boolean;
-  roundKey: number | undefined;
+  roundKey?: number | undefined;
   cancelled: boolean;
   projectState: OnchainProjectState;
 };
