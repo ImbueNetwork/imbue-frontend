@@ -110,8 +110,10 @@ function Project() {
 
   useEffect(() => {
     const setupProject = async () => {
-
-      if (project?.approvers?.length) {
+      
+      console.log(project?.approvers);
+      
+      if (project?.approvers?.length > approversPreview.length) {
         project?.approvers.map(async (v: any) => {
           const user = await utils.fetchUserByUsernameOrAddress(v)
           if (user?.length) setApproverPreview((prev: any) => [...prev, ...user])
@@ -551,7 +553,7 @@ function Project() {
               <p className='text-white text-xl font-normal leading-[1.5] mt-[16px] p-0'>
                 Approvers
               </p>
-              <div className='flex flex-row gap-4'>
+              <div className='flex flex-row flex-wrap gap-4'>
                 {/* {project.approvers.map((approver: string, index: number) => (
                   // <span key={index}>{approver}</span>
                 ))} */}

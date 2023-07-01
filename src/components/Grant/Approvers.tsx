@@ -55,6 +55,8 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
         const newList = [...approversPreview, newApprover]
         setApproversPreview(newList)
         setApprovers(newList.map((v: any) => v.web3_address))
+        setInput("")
+        setOpen(false)
     }
 
     const removeApprover = (index: number) => {
@@ -96,9 +98,10 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
                     <TextField
                         onClick={(e) => getAllUsers(e)}
                         id="outlined-basic"
-                        label="Outlined"
+                        label="Add Approvers"
                         variant="outlined"
                         className='w-full'
+                        value={input}
                         onChange={(e) => handleInputChange(e)}
                     />
 

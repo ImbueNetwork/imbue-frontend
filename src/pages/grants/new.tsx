@@ -213,23 +213,13 @@ const GrantApplication = (): JSX.Element => {
       }
     } catch (error) {
       setError(error);
+      console.log(error);
     } finally {
       setLoading(false);
     }
   };
 
   const [approversPreview, setApproverPreview] = useState<any[]>([])
-
-  // const onAddApprover = () => {
-  //   if (!personName.length) return
-
-  //   const approversList = [...approversPreview, ...personName]
-  //   const approversAddress = approversList.map((v: any) => v?.web3_address)
-
-  //   setApproverPreview(approversList)
-  //   setApprovers(approversAddress)
-  //   setPersonName([])
-  // }
 
   const removeApprover = (index: number) => {
     if (approvers.length === 0) return;
