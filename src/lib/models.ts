@@ -246,6 +246,9 @@ export const upsertWeb3Challenge =
   async (
     tx: Knex.Transaction
   ): Promise<[web3Account: Web3Account, isInsert: boolean]> => {
+    const updatedUser = await tx<User>('users')
+    .update({ web3_address: address })
+    .where({ id: user.id }).returning("*");
     const web3Account = await tx<Web3Account>('web3_accounts')
       .select()
       .where({
