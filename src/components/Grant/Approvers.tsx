@@ -2,6 +2,7 @@ import { CircularProgress, ClickAwayListener, TextField } from '@mui/material';
 import Image from 'next/image';
 import React, { useState } from 'react';
 
+import { fetchUserByUsernameOrAddress } from '@/utils';
 import { isValidAddressPolkadotAddress } from '@/utils/helper';
 
 
@@ -21,25 +22,17 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
 
     const notUser = (regUsers[0]?.web3_address !== input) && input && validAddress
     const notUserApprover = {
+        // id: 6,
         display_name: "",
-        id: 6,
+        profile_photo: null,
         username: "",
         web3_address: ""
-    }
-
-    const getUserByUsernameOrAddress = async (usernameOrAddress: string) => {
-        try {
-            const resp = await fetch(`/api/users/search/${usernameOrAddress}`)
-            return await resp.json()
-        } catch (error) {
-            return []
-        }
     }
 
     const getAllUsers = async (e: any) => {
         setOpen(true)
         if (e.target.value === "") {
-            setRegUsers(await getUserByUsernameOrAddress(""))
+            setRegUsers(await fetchUserByUsernameOrAddress(""))
             setLoading(false)
         }
     }
@@ -51,7 +44,7 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
     const handleInputChange = async (e: any) => {
         const input = e.target.value
         setInput(input)
-        const allUsers = await getUserByUsernameOrAddress(input)
+        const allUsers = await fetchUserByUsernameOrAddress(input)
 
         const isValid = isValidAddressPolkadotAddress(input)
         setValidAddress(isValid)
@@ -75,12 +68,18 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
         <div>
             <div className='mb-5 flex flex-wrap gap-3'>
                 {
-                    approversPreview?.map((preview: any, index: number) => (
+                    approversPreview?.map((approver: any, index: number) => (
                         <div key={index} className='flex text-white gap-3 items-center cursor-pointer border border-light-white px-2 py-1 rounded-full'>
-                            <Image height={40} width={40} src={"http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png"} alt='' />
+                            <Image
+                                height={40}
+                                width={40}
+                                src={approver?.profile_photo ?? "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png"}
+                                alt=''
+                                className='rounded-full'
+                            />
                             <div className='flex flex-col'>
-                                <span>{preview?.display_name}</span>
-                                <p className='text-xs'>{preview?.web3_address}</p>
+                                <span>{approver?.display_name}</span>
+                                <p className='text-xs'>{approver?.web3_address}</p>
 
                             </div>
                             <div
@@ -152,7 +151,13 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
 
                                                                 <div className='flex justify-between items-center w-full hover:bg-secondary-dark-hover px-4 py-2'>
                                                                     <div className='flex text-white gap-3 items-center cursor-pointer'>
-                                                                        <Image height={40} width={40} src={"http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png"} alt='' />
+                                                                        <Image
+                                                                            height={40}
+                                                                            width={40}
+                                                                            src={user?.profile_photo ?? "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png"}
+                                                                            alt=''
+                                                                            className='rounded-full'
+                                                                        />
                                                                         <div className='flex flex-col'>
                                                                             <span>{user?.display_name}</span>
                                                                             <p className='text-xs mt-2 text-white text-opacity-60'>{user?.web3_address ?? "No Web3 address found"}</p>

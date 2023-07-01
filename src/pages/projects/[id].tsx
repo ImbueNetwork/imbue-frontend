@@ -109,13 +109,25 @@ function Project() {
   }, [projectId]);
 
   useEffect(() => {
-    if (project?.approvers?.length) {
-      users.map((u) => {
-        if (project?.approvers?.includes(u?.web3_address)) {
-          setApproverPreview([...approversPreview, u])
-        }
-      })
+    const setupProject = async () => {
+
+      if (project?.approvers?.length) {
+        project?.approvers.map(async (v: any) => {
+          const user = await utils.fetchUserByUsernameOrAddress(v)
+          if (user?.length) setApproverPreview((prev: any) => [...prev, ...user])
+          else {
+            setApproverPreview((prev: any) => [...prev, {
+              // id: 6,
+              display_name: "",
+              profile_photo: null,
+              username: "",
+              web3_address: v
+            }])
+          }
+        })
+      }
     }
+    setupProject()
   }, [project?.approvers])
 
   const getChainProject = async () => {
@@ -544,12 +556,18 @@ function Project() {
                   // <span key={index}>{approver}</span>
                 ))} */}
                 {
-                  approversPreview?.map((preview: any, index: number) => (
+                  approversPreview?.map((approver: any, index: number) => (
                     <div key={index} className='flex text-white gap-3 items-center cursor-pointer border border-light-white px-2 py-1 rounded-full'>
-                      <Image height={40} width={40} src={"http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png"} alt='' />
+                      <Image
+                        height={40}
+                        width={40}
+                        src={approver?.profile_photo ?? "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png"}
+                        alt=''
+                        className='rounded-full'
+                      />
                       <div className='flex flex-col'>
-                        <span>{preview?.display_name}</span>
-                        <p className='text-xs'>{preview?.web3_address}</p>
+                        <span>{approver?.display_name}</span>
+                        <p className='text-xs'>{approver?.web3_address}</p>
                       </div>
                     </div>
                   ))
@@ -746,11 +764,11 @@ function Project() {
 
 export default Project;
 
-const users = [
-  { display_name: 'Sam', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK" },
-  { display_name: 'Aala', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5HQXiQVj8C3Tfp6k4WEvZNNQqWe5k51nWoBrKZWuYTEkuzUk" },
-  { display_name: 'Felix', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH3" },
-  { display_name: '', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH4" },
-  { display_name: 'Oliver', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH5" },
-  { display_name: 'Michael', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH6" },
-];
+// const users = [
+//   { display_name: 'Sam', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK" },
+//   { display_name: 'Aala', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5HQXiQVj8C3Tfp6k4WEvZNNQqWe5k51nWoBrKZWuYTEkuzUk" },
+//   { display_name: 'Felix', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH3" },
+//   { display_name: '', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH4" },
+//   { display_name: 'Oliver', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH5" },
+//   { display_name: 'Michael', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH6" },
+// ];

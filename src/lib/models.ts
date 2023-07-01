@@ -218,14 +218,26 @@ export const fetchWeb3AccountsByUserId =
     fetchAllWeb3Account()(tx).where({ user_id }).select();
 
 export const fetchAllUser = () => (tx: Knex.Transaction) =>
-  tx<User>('users').select('id', 'display_name', 'username', 'web3_address');
+  tx<User>('users').select(
+    'id',
+    'display_name',
+    'profile_photo',
+    'username',
+    'web3_address'
+  );
 
 export const fetchUserWithUsernameOrAddress =
   (usernameOrAddress: string) => (tx: Knex.Transaction) =>
     tx<User>('users')
       .where('username', 'ilike', `%${usernameOrAddress}%`)
       .orWhere('web3_address', 'ilike', `%${usernameOrAddress}%`)
-      .select('id', 'display_name', 'username', 'web3_address');
+      .select(
+        'id',
+        'display_name',
+        'profile_photo',
+        'username',
+        'web3_address'
+      );
 
 export const fetchUser = (id: number) => (tx: Knex.Transaction) =>
   tx<User>('users').where({ id }).first();
@@ -247,8 +259,9 @@ export const upsertWeb3Challenge =
     tx: Knex.Transaction
   ): Promise<[web3Account: Web3Account, isInsert: boolean]> => {
     const updatedUser = await tx<User>('users')
-    .update({ web3_address: address })
-    .where({ id: user.id }).returning("*");
+      .update({ web3_address: address })
+      .where({ id: user.id })
+      .returning('*');
     const web3Account = await tx<Web3Account>('web3_accounts')
       .select()
       .where({
