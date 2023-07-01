@@ -217,6 +217,15 @@ export const fetchWeb3AccountsByUserId =
   (user_id: number) => (tx: Knex.Transaction) =>
     fetchAllWeb3Account()(tx).where({ user_id }).select();
 
+export const fetchAllUser = () => (tx: Knex.Transaction) =>
+  tx<User>('users').select('id', 'display_name', 'username', 'web3_address');
+
+export const fetchUserWithUsernameOrAddress =
+  (usernameOrAddress: string) => (tx: Knex.Transaction) =>
+    tx<User>('users')
+      .where('username', 'like', `%${usernameOrAddress}%`)
+      .select('id', 'display_name', 'username', 'web3_address');
+
 export const fetchUser = (id: number) => (tx: Knex.Transaction) =>
   tx<User>('users').where({ id }).first();
 
@@ -1246,7 +1255,7 @@ export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
     logo: '',
     description,
     website: '',
-    category:  0,
+    category: 0,
     required_funds,
     currency_id,
     chain_project_id,

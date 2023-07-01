@@ -1,4 +1,4 @@
-import { Alert, Autocomplete, CircularProgress, Dialog, FormControl, IconButton, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent, TextField, Theme, useTheme } from '@mui/material';
+import { Alert, Dialog, IconButton } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import WalletIcon from '@svgs/wallet.svg';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -16,13 +16,13 @@ import { initImbueAPIInfo } from '@/utils/polkadot';
 import AccountChoice from '@/components/AccountChoice';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
+import Approvers from '@/components/Grant/Approvers';
 
 import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
 import { Currency } from '@/model';
 import ChainService from '@/redux/services/chainService';
 import { RootState } from '@/redux/store/store';
-import Approvers from '@/components/Grant/Approvers';
 
 
 interface MilestoneItem {
@@ -38,7 +38,7 @@ const GrantApplication = (): JSX.Element => {
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [approvers, setApprovers] = useState<string[]>([]);
-  const [newApprover, setNewApprover] = useState<string>();
+  // const [newApprover, setNewApprover] = useState<string>();
   const [currencyId, setCurrencyId] = useState<number>(0);
   const [milestones, setMilestones] = useState<MilestoneItem[]>([
     { name: '', amount: undefined },
@@ -218,37 +218,18 @@ const GrantApplication = (): JSX.Element => {
     }
   };
 
-  const [personName, setPersonName] = useState<string[]>([])
   const [approversPreview, setApproverPreview] = useState<any[]>([])
-  const [names, setName] = useState<any>(users)
 
-  const theme = useTheme();
+  // const onAddApprover = () => {
+  //   if (!personName.length) return
 
-  function getStyles(name: string, personName: string[], theme: Theme) {
-    return {
-      fontWeight:
-        personName?.indexOf(name) === -1
-          ? theme.typography.fontWeightRegular
-          : theme.typography.fontWeightMedium,
-    };
-  }
+  //   const approversList = [...approversPreview, ...personName]
+  //   const approversAddress = approversList.map((v: any) => v?.web3_address)
 
-  function handleChange(e: SelectChangeEvent<any>) {
-    setPersonName(e.target.value)
-    console.log(e.target.value);
-    // setApprovers([...approvers, e.target.value])
-  }
-
-  const onAddApprover = () => {
-    if (!personName.length) return
-
-    const approversList = [...approversPreview, ...personName]
-    const approversAddress = approversList.map((v: any) => v?.web3_address)
-
-    setApproverPreview(approversList)
-    setApprovers(approversAddress)
-    setPersonName([])
-  }
+  //   setApproverPreview(approversList)
+  //   setApprovers(approversAddress)
+  //   setPersonName([])
+  // }
 
   const removeApprover = (index: number) => {
     if (approvers.length === 0) return;
@@ -257,8 +238,6 @@ const GrantApplication = (): JSX.Element => {
     setApprovers(newApprovers.map((v: any) => v?.web3_address));
     setApproverPreview(newApprovers)
   };
-
-  console.log(approvers);
 
   return (
     <div className='flex flex-col gap-10 leading-[1.5] hq-layout !mx-3 lg:!mx-auto'>
@@ -642,11 +621,3 @@ const GrantApplication = (): JSX.Element => {
 
 export default GrantApplication;
 
-const users = [
-  { display_name: 'Sam', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK" },
-  { display_name: 'Aala', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH2" },
-  { display_name: 'Felix', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH3" },
-  { display_name: '', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH4" },
-  { display_name: 'Oliver', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH5" },
-  { display_name: 'Michael', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH6" },
-];

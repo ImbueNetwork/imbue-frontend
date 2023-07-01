@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -9,6 +10,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import * as utils from '@/utils';
+import { getBalance } from '@/utils/helper';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import AccountChoice from '@/components/AccountChoice';
@@ -32,8 +34,6 @@ import { getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { RootState } from '@/redux/store/store';
-import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
-import { getBalance } from '@/utils/helper';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -545,12 +545,11 @@ function Project() {
                 ))} */}
                 {
                   approversPreview?.map((preview: any, index: number) => (
-                    <div className='flex text-white gap-3 items-center cursor-pointer border border-light-white px-2 py-1 rounded-full'>
+                    <div key={index} className='flex text-white gap-3 items-center cursor-pointer border border-light-white px-2 py-1 rounded-full'>
                       <Image height={40} width={40} src={"http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png"} alt='' />
                       <div className='flex flex-col'>
                         <span>{preview?.display_name}</span>
                         <p className='text-xs'>{preview?.web3_address}</p>
-
                       </div>
                     </div>
                   ))
