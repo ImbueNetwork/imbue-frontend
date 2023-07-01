@@ -22,7 +22,6 @@ import Login from '@/components/Login';
 import SuccessScreen from '@/components/SuccessScreen';
 
 import {
-  Freelancer,
   Milestone,
   OnchainProjectState,
   Project,
@@ -30,7 +29,7 @@ import {
   ProjectType,
   User,
 } from '@/model';
-import { getProjectById } from '@/redux/services/briefService';
+import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { RootState } from '@/redux/store/store';
@@ -73,7 +72,7 @@ const projectStateTag = (dateCreated: Date, text: string): JSX.Element => {
 function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
-  const [freelancer, setFreelancer] = useState<Freelancer | any>({});
+  const [targetUser, setTargetUser] = useState<any>({});
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
   // const [user, setUser] = useState<User | any>();
   const { user } = useSelector((state: RootState) => state.userState);
@@ -89,7 +88,7 @@ function Project() {
   >({});
   const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const projectId: any = router?.query?.id || 0;
   const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
@@ -108,34 +107,8 @@ function Project() {
     }
   }, [projectId]);
 
-  useEffect(() => {
-    const setupProject = async () => {
-      
-      console.log(project?.approvers);
-      
-      if (project?.approvers?.length > approversPreview.length) {
-        project?.approvers.map(async (v: any) => {
-          const user = await utils.fetchUserByUsernameOrAddress(v)
-          if (user?.length) setApproverPreview((prev: any) => [...prev, ...user])
-          else {
-            setApproverPreview((prev: any) => [...prev, {
-              // id: 6,
-              display_name: "",
-              profile_photo: null,
-              username: "",
-              web3_address: v
-            }])
-          }
-        })
-      }
-    }
-    setupProject()
-  }, [project?.approvers])
-
   const getChainProject = async () => {
-    setLoading(true);
     const imbueApi = await initImbueAPIInfo();
-    // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
     const onChainProjectRes = await chainService.getProject(projectId);
 
@@ -159,12 +132,53 @@ function Project() {
     }
   };
 
+  const getTargetUser = async (freelancerName: string) => {
+    const freelanceRes = await getFreelancerProfile(freelancerName);
+    setTargetUser(freelanceRes);
+  };
+
   const getProject = async () => {
     try {
       const projectRes = await getProjectById(projectId);
+
+      // setting project owner name if it is a grant, else showing owner/freelancer name
+      if (projectRes?.approvers) {
+        setTargetUser(await utils.fetchUser(projectRes?.user_id))
+      }
+      else if (projectRes?.user_id !== user?.id) {
+        await getTargetUser(projectRes?.user_id)
+      }
+      else {
+        const brief = await getBrief(projectRes.brief_id)
+        brief?.user_id && await getTargetUser(brief?.user_id.toString())
+      }
       setProject(projectRes);
+
+      // setting approver list
+      const approversPreviewList = [...approversPreview]
+
+      if (projectRes?.approvers?.length) {
+        projectRes?.approvers.map(async (v: any) => {
+          const user = await utils.fetchUserByUsernameOrAddress(v)
+          if (user?.length) {
+            setApproverPreview((prev: any) => [...prev, ...user])
+          }
+          else {
+            setApproverPreview((prev: any) => [...prev, {
+              // id: 6,
+              display_name: "",
+              profile_photo: null,
+              username: "",
+              web3_address: v
+            }])
+          }
+        })
+      }
+      setApproverPreview(approversPreviewList)
+
       // api  project response
       await getChainProject();
+
       const balance = await getBalance(
         project?.escrow_address,
         project?.currency_id,
@@ -173,17 +187,15 @@ function Project() {
       setBalance(balance || 0)
     } catch (error) {
       setError(error)
-      console.log(error);
     }
     finally {
       setLoading(false)
     }
-
   };
 
   const getFreelancerData = async (freelancerName: string) => {
     const freelanceRes = await getFreelancerProfile(freelancerName);
-    setFreelancer(freelanceRes);
+    setTargetUser(freelanceRes);
   };
 
   // voting on a mile stone
@@ -509,7 +521,9 @@ function Project() {
           </p>
 
           <p className='text-white text-xl font-normal leading-[1.5] mt-[16px] p-0'>
-            Freelancer hired
+            {
+              (isApplicant || project?.approvers) ? "Project Owner" : "Freelancer hired"
+            }
           </p>
 
           <div className='flex flex-row items-center max-lg:flex-wrap mt-5'>
@@ -522,7 +536,7 @@ function Project() {
             />
 
             <p className='text-white text-[20px] font-normal leading-[1.5] p-0 mx-7'>
-              {freelancer?.display_name}
+              {targetUser?.display_name}
             </p>
 
             <button

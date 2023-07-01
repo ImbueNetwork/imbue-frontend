@@ -1,5 +1,5 @@
 import { Alert, Dialog, IconButton } from '@mui/material';
-import { blake2AsHex } from '@polkadot/util-crypto';
+// import { blake2AsHex } from '@polkadot/util-crypto';
 import WalletIcon from '@svgs/wallet.svg';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
@@ -11,8 +11,8 @@ import { FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 
 import { getCurrentUser } from '@/utils';
-import { initImbueAPIInfo } from '@/utils/polkadot';
 
+// import { initImbueAPIInfo } from '@/utils/polkadot';
 import AccountChoice from '@/components/AccountChoice';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
@@ -21,7 +21,7 @@ import Approvers from '@/components/Grant/Approvers';
 import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
 import { Currency } from '@/model';
-import ChainService from '@/redux/services/chainService';
+// import ChainService from '@/redux/services/chainService';
 import { RootState } from '@/redux/store/store';
 
 
@@ -56,7 +56,9 @@ const GrantApplication = (): JSX.Element => {
     }, 3000);
   }
 
-  const [onChainAddress, _setOnChainAddress] = useState('');
+  const [escrow_address, setEscrowAddress] = useState(
+    '5EYCAe5hKq6D9ACdEwwQxSSkWY9rqX4PqJyRBV3wA4NC8VSu'
+  );
 
   const { user } = useSelector((state: RootState) => state.userState);
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
@@ -150,8 +152,6 @@ const GrantApplication = (): JSX.Element => {
 
     try {
       const user_id = (await getCurrentUser())?.id;
-      const imbueApi = await initImbueAPIInfo();
-      const chainService = new ChainService(imbueApi, user)
       const grant = {
         title,
         description,
@@ -172,35 +172,41 @@ const GrantApplication = (): JSX.Element => {
         approvers,
       };
 
-      const grantMilestones = grant.milestones.map((m) => ({
-        percentageToUnlock: m.percentage_to_unlock,
-      }));
+      // const imbueApi = await initImbueAPIInfo();
+      // const chainService = new ChainService(imbueApi, user)
 
-      const grant_id = blake2AsHex(JSON.stringify(grant));
+      // const grantMilestones = grant.milestones.map((m) => ({
+      //   percentageToUnlock: m.percentage_to_unlock,
+      // }));
 
-      if (!account) return
-      const result = await chainService.submitInitialGrant(account, grantMilestones, approvers, currencyId, totalCost, "kusama", grant_id);
+      // const grant_id = blake2AsHex(JSON.stringify(grant));
 
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        if (result.status || result.txError) {
-          if (result.status) {
-            _setOnChainAddress(result?.eventData[5])
-            setSuccess(true);
-          } else if (result.txError) {
-            setError({ message: result.errorMessage });
-          }
-          break;
-        }
-        await new Promise((f) => setTimeout(f, 1000));
-      }
+      // if (!account) return
+      // const result = await chainService.submitInitialGrant(account, grantMilestones, approvers, currencyId, totalCost, "kusama", grant_id);
+
+      // // eslint-disable-next-line no-constant-condition
+      // while (true) {
+      //   if (result.status || result.txError) {
+      //     if (result.status) {
+      //       _setOnChainAddress(result?.eventData[5])
+      //       setSuccess(true);
+      //     } else if (result.txError) {
+      //       setError({ message: result.errorMessage });
+      //     }
+      //     break;
+      //   }
+      //   await new Promise((f) => setTimeout(f, 1000));
+      // }
+
       const resp = await fetch(`${config.apiBase}grants`, {
         headers: config.postAPIHeaders,
         method: 'post',
         body: JSON.stringify({
           ...grant,
-          chain_project_id: result?.eventData[2],
-          escrow_address: result?.eventData[5]
+          // chain_project_id: result?.eventData[2],
+          // escrow_address: result?.eventData[5]
+          chain_project_id: 217,
+          escrow_address: escrow_address
         }),
       });
 
@@ -213,7 +219,6 @@ const GrantApplication = (): JSX.Element => {
       }
     } catch (error) {
       setError(error);
-      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -299,46 +304,6 @@ const GrantApplication = (): JSX.Element => {
                 ))}
               </div>
               <div className='flex flex-col'>
-                {/* <FormControl sx={{ m: 1, width: "100%" }}>
-                  <InputLabel id="demo-multiple-name-label">Approver Wallet Address</InputLabel>
-                  <Select
-                    multiple
-                    labelId="demo-multiple-name-label"
-                    id="demo-multiple-name"
-                    value={personName}
-                    onChange={handleChange}
-                    input={<OutlinedInput label="Approver Wallet Address" />}
-                  // MenuProps={MenuProps}
-                  >
-                    {names?.map((name: any) => (
-                      <MenuItem
-                        key={name.web3_address}
-                        value={name}
-                        disabled={approvers.includes(name.web3_address)}
-                        style={getStyles(name, personName, theme)}
-                        className='hover:bg-light-white py-2'
-                      >
-                        <div className='flex justify-evenly w-full items-center'>
-                          <div className='flex w-full'>
-                            <Image width={40} height={40} src={name?.profile_photo} alt='' />
-                            <div className='flex flex-col ml-4 gap-1 justify-center'>
-                              <span>{name?.display_name}</span>
-                              <span className='text-xs'>{name?.web3_address}</span>
-                            </div>
-                          </div>
-                          <span className='text-sm'>
-                            {
-                              approvers.includes(name?.web3_address)
-                                ? <span className='text-primary'>Requested</span>
-                                : <span className='text-theme-secondary'>Request</span>
-                            }
-                          </span>
-                        </div>
-
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl> */}
                 <Approvers approvers={approvers} setApprovers={setApprovers} />
                 {/* <div
                   className='flex flex-row items-center gap-2 clickable-text cursor-pointer active:scale-105 origin-top-left ml-2 my-10'
@@ -559,12 +524,12 @@ const GrantApplication = (): JSX.Element => {
             </p>
           </div>
 
-          <CopyToClipboard text={onChainAddress}>
+          <CopyToClipboard text={escrow_address}>
             <div className='flex flex-row gap-4 items-center rounded-[10px] border border-solid border-light-grey py-8 px-6 text-xl text-white'>
               <IconButton onClick={() => copyAddress()}>
                 <FaRegCopy className='text-white' />
               </IconButton>
-              <span>{onChainAddress}</span>
+              <span>{escrow_address}</span>
             </div>
           </CopyToClipboard>
           <div className='mt-6 mb-12 text-white text-lg text-center'>
