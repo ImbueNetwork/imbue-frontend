@@ -1,0 +1,56 @@
+.navbar {
+  display: flex;
+  align-items: center;
+}
+
+.toggleButton {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.options {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.5s, transform 0.5s;
+}
+
+.options li {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #eee;
+  border-bottom: 1px solid #ccc;
+  transition-delay: 0.5s;
+}
+
+.options li:last-child {
+  border-bottom: none;
+}
+
+.options.reveal {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.options.reveal li {
+  transition-delay: 0s;
+}
+
+.options.reveal li:nth-child(3) {
+  transition-delay: 0.1s;
+}
+
+.options.reveal li:nth-child(2) {
+  transition-delay: 0.2s;
+}
+
+.options.reveal li:nth-child(1) {
+  transition-delay: 0.3s;
+}

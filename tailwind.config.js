@@ -27,6 +27,7 @@ module.exports = {
         'light-grey': 'rgba(235, 234, 226, 0.5)',
         'dark-black': '#1E1E1E',
         'imbue-purple': '#3B27C1',
+        'grey-background': '#EBEAE2',
         primary: '#b2ff0b',
       },
       screens: {

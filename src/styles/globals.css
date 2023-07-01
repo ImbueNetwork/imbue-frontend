@@ -5,8 +5,9 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #000;
-  background-image: url('background.png');
+  background-color: #ebeae2;
+  /* background-color: #000;
+  background-image: url('background.png'); */
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: scroll;

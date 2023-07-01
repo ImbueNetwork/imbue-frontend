@@ -1,5 +1,3 @@
-'use client';
-
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
@@ -16,10 +14,11 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { appLogo } from '@/assets/svgs';
+import { appLogo, cancelIcon } from '@/assets/svgs';
 import { fetchUser } from '@/redux/reducers/userReducers';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { AppDispatch, RootState } from '@/redux/store/store';
+import styles from '@/styles/modules/navbar.module.css';
 
 import MenuItems from './MenuItems';
 import Login from '../Login';
@@ -42,6 +41,8 @@ function Navbar() {
 
   const user = useSelector((state: RootState) => state.userState.user);
   const dispatch = useDispatch<AppDispatch>();
+
+  const [expanded, setExpanded] = useState(false);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -89,6 +90,11 @@ function Navbar() {
     }
   };
 
+  const navPillclasses =
+    'text-imbue-purple h-[2.9375rem] !bg-white rounded-[5.07319rem] !flex justify-center items-center px-[3rem] hover:no-underline !text-[1.10975rem] ';
+  const cancelClass =
+    'text-imbue-purple h-[2.9375rem] !bg-white rounded-[5.07319rem] !flex justify-center items-center px-[0.9rem] hover:no-underline !text-[1.10975rem] ';
+
   return (
     <>
       <header
@@ -110,10 +116,15 @@ function Navbar() {
         </div>
         <div
           id='main-header'
-          className='flex justify-between items-center px-4 lg:px-8 py-2'
+          className='flex justify-between items-center px-4 lg:px-8 py-2 my-[0.9rem]'
         >
-          <h1 className='main-title'>
-            <Link href='/'>
+          <div className={`flex items-center ${styles.navbar}`}>
+            <h1
+              onClick={() => {
+                setExpanded(!expanded);
+              }}
+              className={`main-title h-[2.9375rem] !bg-white rounded-[5.07319rem] w-full flex justify-center items-center cursor-pointer ${styles.toggleButton}`}
+            >
               <div id='logo'>
                 <Image
                   src={appLogo}
@@ -121,8 +132,49 @@ function Navbar() {
                   className='w-2/3 lg:w-full'
                 />
               </div>
-            </Link>
-          </h1>
+            </h1>
+
+            {expanded && (
+              <div
+                className={`flex items-center ml-[2rem] ${styles.options} ${styles.reveal}`}
+              >
+                <span
+                  className={`mx-1 lg:text-sm lg:inline-block cursor-pointer ${navPillclasses} ${styles.option}`}
+                  onClick={() => navigateToPage('/briefs/new')}
+                >
+                  Submit a Brief
+                </span>
+
+                <Link
+                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer ${navPillclasses} ${styles.option} nav-item nav-item-2`}
+                  href='/briefs/'
+                >
+                  Discover Briefs
+                </Link>
+
+                <Link
+                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${navPillclasses} ${styles.option}`}
+                  href='/freelancers'
+                >
+                  Discover Freelancers
+                </Link>
+
+                <div
+                  onClick={() => {
+                    setExpanded(!expanded);
+                  }}
+                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${cancelClass} ${styles.option}`}
+                >
+                  <Image
+                    src={cancelIcon}
+                    alt={'cancel'}
+                    className='w-2/3 lg:w-full'
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* <div className="context-menu" id="context-menu">
             <div className="context-menu-item" onClick={toggleSideBar}>
               <a id="main-menu" className="material-icons">
@@ -134,24 +186,6 @@ function Navbar() {
           <Box
             sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}
           >
-            <span
-              className='mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline'
-              onClick={() => navigateToPage('/briefs/new')}
-            >
-              Submit a Brief
-            </span>
-            <Link
-              className='mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline'
-              href='/briefs/'
-            >
-              Discover Briefs
-            </Link>
-            <Link
-              className='mx-1 lg:mx-5 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline'
-              href='/freelancers'
-            >
-              Discover Freelancers
-            </Link>
             <Tooltip
               title='Account settings'
               className={`${!user?.username && !loading && 'lg:hidden'}`}
