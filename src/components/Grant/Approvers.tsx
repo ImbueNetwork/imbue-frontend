@@ -2,6 +2,9 @@ import { CircularProgress, ClickAwayListener, TextField } from '@mui/material';
 import Image from 'next/image';
 import React, { useState } from 'react';
 
+import { isValidAddressPolkadotAddress } from '@/utils/helper';
+
+
 type ApproverProps = {
     approvers: string[]
     setApprovers: (value: string[]) => void;
@@ -9,10 +12,20 @@ type ApproverProps = {
 
 const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
     const [open, setOpen] = useState<boolean>(false)
-    const [regUsers, setRegUsers] = useState([])
+    const [regUsers, setRegUsers] = useState<any>([])
     // const [approvers, setApprovers] = useState<string[]>([])
     const [approversPreview, setApproversPreview] = useState<any>([])
     const [loading, setLoading] = useState<boolean>(true)
+    const [input, setInput] = useState<string>("")
+    const [validAddress, setValidAddress] = useState<boolean>(false)
+
+    const notUser = (regUsers[0]?.web3_address !== input) && input && validAddress
+    const notUserApprover = {
+        display_name: "",
+        id: 6,
+        username: "",
+        web3_address: ""
+    }
 
     const getUserByUsernameOrAddress = async (usernameOrAddress: string) => {
         try {
@@ -36,8 +49,12 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
     }
 
     const handleInputChange = async (e: any) => {
-        const allUsers = await getUserByUsernameOrAddress(e.target.value)
+        const input = e.target.value
+        setInput(input)
+        const allUsers = await getUserByUsernameOrAddress(input)
 
+        const isValid = isValidAddressPolkadotAddress(input)
+        setValidAddress(isValid)
         setRegUsers(allUsers)
     }
 
@@ -93,38 +110,73 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
                                     loading
                                         ? <p className='flex items-center gap-10 p-4'>Loading users <CircularProgress /></p>
                                         : <>
-                                            {
-                                                regUsers?.length
-                                                    ? (
-                                                        <>
-                                                            {
-                                                                regUsers?.map((user: any, index: number) => (
-                                                                    <div
-                                                                        key={index}
-                                                                        onClick={() => approvers.includes(user?.web3_address) || addApprover(user)}
-                                                                        className='flex justify-between items-center w-full hover:bg-secondary-dark-hover px-4 py-2'
-                                                                    >
-                                                                        <div className='flex text-white gap-3 items-center cursor-pointer'>
-                                                                            <Image height={40} width={40} src={"http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png"} alt='' />
-                                                                            <div className='flex flex-col'>
-                                                                                <span>{user?.display_name}</span>
-                                                                                <p className='text-xs mt-2 text-white text-opacity-60'>{user?.web3_address ?? "No Web3 address found"}</p>
+                                            {(
+                                                <>
+                                                    {
+                                                        (regUsers[0]?.web3_address !== input) && input && (
+                                                            <div
+                                                                onClick={() => notUser && !approvers.includes(input) && addApprover({ ...notUserApprover, web3_address: input })}
+                                                                className={`px-4 py-2 flex justify-between items-center ${notUser && "cursor-pointer hover:bg-secondary-dark-hover"}`}>
+                                                                <div className='flex gap-3 items-center'>
+                                                                    {
+                                                                        notUser && <Image height={40} width={40} src={"http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png"} alt='' />
+                                                                    }
+                                                                    <span>
+                                                                        {input}
+                                                                    </span>
+                                                                </div>
+                                                                <span>
+                                                                    {
+                                                                        validAddress
+                                                                            ? <>
+                                                                                {
+                                                                                    approvers.includes(input)
+                                                                                        ? <span className='text-primary text-sm'>Requested</span>
+                                                                                        : <span className='text-theme-secondary text-sm'>Request</span>
+                                                                                }
+                                                                            </>
+                                                                            : <span className='text-red-600 text-sm'>Invalid Web 3 Address</span>
+                                                                    }
+                                                                </span>
 
-                                                                            </div>
+                                                            </div>
+                                                        )
+                                                    }
+                                                    {
+                                                        regUsers?.map((user: any, index: number) => (
+                                                            <div
+                                                                key={index}
+                                                                onClick={() => (!approvers.includes(user?.web3_address) && user?.web3_address) && addApprover(user)}
+                                                                className='flex flex-col gap-4'
+                                                            >
+
+                                                                <div className='flex justify-between items-center w-full hover:bg-secondary-dark-hover px-4 py-2'>
+                                                                    <div className='flex text-white gap-3 items-center cursor-pointer'>
+                                                                        <Image height={40} width={40} src={"http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png"} alt='' />
+                                                                        <div className='flex flex-col'>
+                                                                            <span>{user?.display_name}</span>
+                                                                            <p className='text-xs mt-2 text-white text-opacity-60'>{user?.web3_address ?? "No Web3 address found"}</p>
+
                                                                         </div>
-                                                                        <span className='text-sm'>
-                                                                            {
-                                                                                approvers.includes(user?.web3_address)
-                                                                                    ? <span className='text-primary'>Requested</span>
-                                                                                    : <span className='text-theme-secondary'>Request</span>
-                                                                            }
-                                                                        </span>
                                                                     </div>
-                                                                ))
-                                                            }
-                                                        </>
-                                                    )
-                                                    : <div className='px-4 py-2'>No Approver Found</div>
+                                                                    {
+                                                                        user?.web3_address && (
+                                                                            <span className='text-sm'>
+                                                                                {
+                                                                                    approvers.includes(user?.web3_address)
+                                                                                        ? <span className='text-primary'>Requested</span>
+                                                                                        : <span className='text-theme-secondary'>Request</span>
+                                                                                }
+                                                                            </span>
+                                                                        )
+                                                                    }
+                                                                </div>
+
+                                                            </div>
+                                                        ))
+                                                    }
+                                                </>
+                                            )
                                             }
                                         </>
                                 }

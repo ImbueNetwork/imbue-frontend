@@ -1,5 +1,8 @@
 import ChainService from '@/redux/services/chainService';
+
 import { initImbueAPIInfo } from './polkadot';
+const { decodeAddress, encodeAddress } = require('@polkadot/keyring');
+const { hexToU8a, isHex } = require('@polkadot/util');
 
 const buttonType = {
   outline: {
@@ -67,6 +70,19 @@ export const getBalance = async (
     );
     return balance;
   } catch (error) {
-    return ({ status: "failed", message: `An error occured while fetching balance.` });
+    return {
+      status: 'failed',
+      message: `An error occured while fetching balance.`,
+    };
+  }
+};
+
+export const isValidAddressPolkadotAddress = (address: string) => {
+  try {
+    encodeAddress(isHex(address) ? hexToU8a(address) : decodeAddress(address));
+
+    return true;
+  } catch (error) {
+    return false;
   }
 };
