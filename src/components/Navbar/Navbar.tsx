@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
@@ -29,6 +30,7 @@ function Navbar() {
   const [freelancerProfile, setFreelancerProfile] = useState<any>();
   const [loading, setLoading] = useState<boolean>(true);
 
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   const [solidNav, setSolidNav] = useState<boolean>(false);
 
   const router = useRouter();
@@ -99,12 +101,7 @@ function Navbar() {
 
   return (
     <>
-      <header
-        className={`navBar ${
-          solidNav ? 'bg-theme-black-text' : 'bg-transparent'
-        }`}
-        id='header-wrapper'
-      >
+      <header className={`navBar bg-transparent`} id='header-wrapper'>
         <div className='text-center w-full bg-primary text-black py-1 text-xs lg:text-sm'>
           Thanks for trying the beta version of Imbue. Please let us know what
           we should work on to make it better! Submit your feedback

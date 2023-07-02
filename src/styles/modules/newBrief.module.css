@@ -1,15 +1,15 @@
 .newBriefContainer h1 {
-  font-size: 52px;
-  line-height: 1.1;
-  color: var(--theme-title-color);
+  font-size: 3rem;
+  line-height: 1.3;
+  color: var(--theme-imbue-purple);
   margin: 0px;
 }
 
 .fieldName {
-  font-size: 20px;
+  font-size: 1.25rem;
   line-height: 1.15;
-  color: var(--theme-black-text);
-  font-weight: bold;
+  color: var(--theme-purple);
+  font-weight: 400;
 }
 
 .fieldInput {
@@ -28,16 +28,16 @@
   display: flex;
   flex-direction: row;
   width: 100%;
-  min-height: 650px;
-  max-height: 650px;
+  min-height: 100%;
+  max-height: 100%;
   align-self: center;
   margin-right: auto;
   border-radius: 20px;
 }
 
 .leftPanel {
-  background-color: #2c2c2c;
-  padding: 64px 32px 64px 48px;
+  background-color: #f6f5ff;
+  padding: 8rem 32px 8rem 48px;
   width: 50%;
   border-radius: 20px 0px 0px 20px;
 }
@@ -45,10 +45,10 @@
 .rightPanel {
   display: flex;
   flex-direction: column;
-  background-color: var(--theme-ink-color);
-  padding: 32px 64px;
+  background-color: #fff;
+  padding: 10rem 64px;
   width: 50%;
-  border-radius: 0px 20px 20px 0px;
+  border-radius: 0px 1.25rem 1.25rem 0px;
 }
 
 .heading {
@@ -56,9 +56,10 @@
 }
 
 .leftPanel .help {
-  color: var(--theme-ink-color);
+  color: var(--theme-purple-dark);
   padding-right: 48px;
   padding-bottom: 8px;
+  font-size: 1.25rem;
 }
 
 .contents {
@@ -89,8 +90,8 @@
 }
 
 .namePanelNameExample {
-  font-size: 20px;
-  color: black;
+  font-size: 1.25rem;
+  color: #9880f2;
   line-height: 1.5;
   margin: 0px;
 }
@@ -99,6 +100,7 @@
   display: flex;
   flex-direction: column;
   height: 90%;
+  margin-bottom: 5rem;
 }
 
 .descriptionContainer {
@@ -116,15 +118,15 @@
 }
 
 .scopeItemDescription {
-  color: var(--theme-black-text);
-  font-size: 14px;
+  color: var(--theme-purple-dark);
+  font-size: 1rem;
   line-height: 1.25;
 }
 
 .timeContainer {
   display: flex;
   flex-direction: column;
-  gap: 64px;
+  gap: 34px;
   margin-bottom: 120px;
 }
 
@@ -142,16 +144,17 @@
 }
 
 .briefDetailFieldInput {
-  background-color: var(--theme-ink-color);
+  background-color: #fff;
   border: solid 1px black;
   border-radius: 8px;
   backdrop-filter: blur(8px);
   padding: 8px 8px 8px 16px;
   width: 100%;
-  height: 180px;
+  height: 3.5rem;
   font-size: 16px;
   line-height: 1.5;
   color: black;
+  outline: none;
 }
 
 .budgetCurrencyContainer {
@@ -169,12 +172,13 @@
 .budgetDescription {
   margin-bottom: 160px;
   padding-right: 112px;
-  color: black;
+  color: var(--theme-purple-dark);
 }
 
 .industryContainer {
   padding-top: 24px;
   padding-bottom: 80px;
+  border-radius: 20px;
 }
 
 .skillsContainer {
@@ -256,7 +260,7 @@
 
   .budgetDescription {
     padding: 0;
-    font-size: 14px;
+    font-size: 1rem;
     margin-bottom: 20px;
   }
 

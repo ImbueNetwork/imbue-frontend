@@ -149,7 +149,7 @@ ul li {
 
 .primary-btn {
   margin-right: 16px;
-  padding: 12px 24px;
+  padding: 8px 24px;
   -webkit-align-self: center;
   -ms-flex-item-align: center;
   -ms-grid-row-align: center;
@@ -592,16 +592,16 @@ input[type='radio'] {
 }
 
 .progress-step-circle.active {
-  background-color: var(--theme-primary);
+  background-color: var(--theme-purple);
 }
 
 .progress-step-circle.disabled {
-  background-color: var(--theme-grey-text);
+  background-color: #d2d2d2;
 }
 
 .progress-step-text {
-  color: var(--theme-grey-text);
-  font-size: 12px;
+  color: var(--theme-purple-dark);
+  font-size: 0.62rem;
   line-height: 1;
   position: absolute;
   padding-top: 12px;
@@ -618,7 +618,7 @@ input[type='radio'] {
 .progress-bar-back {
   position: absolute;
   height: 6px;
-  background: var(--theme-grey-text);
+  background: #d2d2d2;
   left: 4px;
   right: 4px;
   top: 6px;
@@ -628,7 +628,7 @@ input[type='radio'] {
 .progress-bar-progress {
   position: absolute;
   height: 6px;
-  background: var(--theme-primary);
+  background: var(--theme-purple);
   left: 4px;
   right: 4px;
   top: 6px;
@@ -643,7 +643,7 @@ input[type='radio'] {
   gap: 4px;
   /* background: var(--theme-ink-color); */
   border: 1px solid var(--theme-black-text);
-  border-radius: 20px;
+  border-radius: 0.25rem;
   backdrop-filter: blur(8px);
   padding: 8px 8px 8px 16px;
 }
@@ -686,13 +686,15 @@ input[type='radio'] {
   color: var(--theme-secondary);
   padding: 8px 12px;
   cursor: pointer;
+  background-color: #e1ddff;
 }
 
 .new-tag-input {
   border: 1px solid var(--theme-grey-text);
   padding: 10px;
-  border-radius: 20px;
+  border-radius: 0.25rem;
   background: white;
+  outline: none;
 }
 
 .tag-suggestion-text {
@@ -716,7 +718,7 @@ input[type='radio'] {
 }
 
 .secondary-btn {
-  padding: 12px 24px;
+  padding: 8px 24px;
   -webkit-align-self: center;
   -ms-flex-item-align: center;
   -ms-grid-row-align: center;
@@ -726,7 +728,7 @@ input[type='radio'] {
   -webkit-transition: color 0.3s, background-color 0.3s;
   transition: color 0.3s, background-color 0.3s;
   font-family: 'Space Grotesk', sans-serif;
-  color: var(--theme-secondary);
+  color: var(--theme-purple-dark);
   font-size: 16px;
   line-height: 22px;
   font-weight: 400;
