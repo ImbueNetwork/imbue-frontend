@@ -7,6 +7,7 @@ import {
   Menu,
   Skeleton,
   Tooltip,
+  useMediaQuery,
 } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -14,11 +15,10 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { appLogo, cancelIcon } from '@/assets/svgs';
+import { appLogo, cancelIcon, hamburgerIcon } from '@/assets/svgs';
 import { fetchUser } from '@/redux/reducers/userReducers';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { AppDispatch, RootState } from '@/redux/store/store';
-import styles from '@/styles/modules/navbar.module.css';
 
 import MenuItems from './MenuItems';
 import Login from '../Login';
@@ -32,6 +32,8 @@ function Navbar() {
   const [solidNav, setSolidNav] = useState<boolean>(false);
 
   const router = useRouter();
+
+  const mobile = useMediaQuery('(max-width:600px)');
 
   const feedbackLink = 'https://pfljr3ser45.typeform.com/to/bv00pviH';
 
@@ -118,60 +120,55 @@ function Navbar() {
           id='main-header'
           className='flex justify-between items-center px-4 lg:px-8 py-2 my-[0.9rem]'
         >
-          <div className={`flex items-center ${styles.navbar}`}>
+          <div className={`flex items-center`}>
             <h1
-              onClick={() => {
-                setExpanded(!expanded);
-              }}
-              className={`main-title h-[2.9375rem] !bg-white rounded-[5.07319rem] w-full flex justify-center items-center cursor-pointer ${styles.toggleButton}`}
+              onClick={() => router.push('/')}
+              className={`main-title h-[2.9375rem] !bg-white rounded-[5.07319rem] w-full flex justify-center items-center cursor-pointer`}
             >
               <div id='logo'>
-                <Image
-                  src={appLogo}
-                  alt={'app logo'}
-                  className='w-2/3 lg:w-full'
-                />
+                <Image src={appLogo} alt={'app logo'} className='w-full' />
               </div>
             </h1>
 
-            {expanded && (
-              <div
-                className={`flex items-center ml-[2rem] ${styles.options} ${styles.reveal}`}
-              >
-                <span
-                  className={`mx-1 lg:text-sm lg:inline-block cursor-pointer ${navPillclasses} ${styles.option}`}
-                  onClick={() => navigateToPage('/briefs/new')}
-                >
-                  Submit a Brief
-                </span>
+            {!mobile && (
+              <>
+                {expanded && (
+                  <div className={`flex items-center ml-[2rem]`}>
+                    <span
+                      className={`mx-1 lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
+                      onClick={() => navigateToPage('/briefs/new')}
+                    >
+                      Submit a Brief
+                    </span>
 
-                <Link
-                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer ${navPillclasses} ${styles.option} nav-item nav-item-2`}
-                  href='/briefs/'
-                >
-                  Discover Briefs
-                </Link>
+                    <Link
+                      className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer ${navPillclasses} nav-item nav-item-2`}
+                      href='/briefs/'
+                    >
+                      Discover Briefs
+                    </Link>
 
-                <Link
-                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${navPillclasses} ${styles.option}`}
-                  href='/freelancers'
-                >
-                  Discover Freelancers
-                </Link>
-
+                    <Link
+                      className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${navPillclasses}`}
+                      href='/freelancers'
+                    >
+                      Discover Freelancers
+                    </Link>
+                  </div>
+                )}
                 <div
                   onClick={() => {
                     setExpanded(!expanded);
                   }}
-                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${cancelClass} ${styles.option}`}
+                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${cancelClass}`}
                 >
                   <Image
-                    src={cancelIcon}
+                    src={expanded ? cancelIcon : hamburgerIcon}
                     alt={'cancel'}
                     className='w-2/3 lg:w-full'
                   />
                 </div>
-              </div>
+              </>
             )}
           </div>
 
@@ -211,15 +208,17 @@ function Navbar() {
                       />
                     </Avatar>
                   ) : (
-                    <div>
+                    <div
+                      className={`mx-1 text-xs lg:text-sm lg:inline-block cursor-pointer text-imbue-purple h-[2.9375rem] !bg-white rounded-[5.07319rem] !flex justify-center items-center px-[0.8rem] hover:no-underline !text-[1.10975rem] `}
+                    >
                       {openMenu ? (
-                        <CloseIcon htmlColor='white' />
+                        <CloseIcon htmlColor='#3B27C1' />
                       ) : (
                         <div onClick={() => setOpenMenu(!openMenu)}>
                           {openMenu ? (
-                            <CloseIcon htmlColor='white' />
+                            <CloseIcon htmlColor='#3B27C1' />
                           ) : (
-                            <MenuIcon htmlColor='white' />
+                            <MenuIcon htmlColor='#3B27C1' />
                           )}
                         </div>
                       )}

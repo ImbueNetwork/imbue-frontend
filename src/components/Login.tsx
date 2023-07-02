@@ -1,66 +1,46 @@
-import styled from '@emotion/styled';
-import { Dialog, DialogContent, DialogTitle, TextField } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { SignerResult } from '@polkadot/api/types';
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import { WalletAccount } from '@talismn/connect-wallets';
+import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState } from 'react';
+import customStyled from 'styled-components';
 
 import * as utils from '@/utils';
 
 import AccountChoice from '@/components/AccountChoice';
 
+import { googleIcon, walletIcon } from '@/assets/svgs';
 import { postAPIHeaders } from '@/config';
 import * as config from '@/config';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
+
 type LoginProps = {
   visible: boolean;
   redirectUrl: string;
   setVisible: (_visible: boolean) => void;
 };
 
-const CssTextField = styled(TextField)({
-  '& label.Mui-focused': {
-    color: '#aaa',
-  },
-
-  '& label.Mui-error': {
-    color: '#aaa',
-  },
-  '& .MuiInputLabel-root': {
-    color: '#aaa',
-  },
-  '& div.Mui-error': {
-    borderRadius: 10,
-    border: 2,
-  },
-  '& div.MuiOutlinedInput-root': {
-    backgroundColor: '#ebeae21c',
-  },
-  '& p.MuiFormHelperText-root': {
-    backgroundColor: '#282725',
-    color: 'white',
-  },
-  '& .MuiInputBase-formControl': {
-    '& input': {
-      color: 'white',
-    },
-  },
-  '& .MuiOutlinedInput-root': {
-    borderRadius: 10,
-    ':hover': {
-      borderColor: '#b2ff0b',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: '#b2ff0b',
-      borderRadius: 10,
-    },
-    '& fieldset:hover': {
-      borderRadius: 10,
-    },
-  },
-});
+const CustomInput = customStyled.input`
+  height: 2.6rem;
+  width: 100%;
+  border-width: 1px;
+  border-color: #03116a;
+  border-radius: 0.25rem !important;
+  padding: 0.62rem 1.25rem !important;
+  outline: none;
+  background-color: #fff;
+  color: #03116A !important;
+  
+  ::placeholder,
+  ::-webkit-input-placeholder {
+    color: rgba(3, 17, 106, 0.30);
+  }
+  :-ms-input-placeholder {
+     color: rgba(3, 17, 106, 0.30);
+  }
+`;
 
 const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   const [userOrEmail, setUserOrEmail] = useState<string>();
@@ -107,6 +87,10 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     }
   };
 
+  // const loginGoogleFunction = useGoogleLogin({
+  //   onSuccess: (tokenResponse: any) => googleLogin(tokenResponse),
+  // });
+
   const accountSelected = async (account: WalletAccount): Promise<any> => {
     try {
       const result = await getAccountAndSign(account);
@@ -130,14 +114,34 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
         open={visible}
         onClose={() => setVisible(false)}
         aria-labelledby='responsive-dialog-title'
+        sx={(theme) => ({
+          '& .MuiPaper-root': {
+            backgroundColor: theme.palette.common.white,
+            boxShadow: 'none',
+            maxWidth: '100%',
+            borderRadius: '1.25rem',
+            padding: '6.25rem 11.78rem',
+
+            '@media (max-width: 766px)': {
+              padding: '1rem 0.5rem',
+              width: '85%',
+            },
+            '@media (max-width: 1024px)': {
+              padding: '2rem 1rem',
+            },
+          },
+        })}
       >
         {
           <div className='lg:min-w-[450px] py-2'>
-            <DialogTitle className='text-center' id='responsive-dialog-title'>
+            <DialogTitle
+              className='text-center text-imbue-purple-dark text-[1.5rem] lg:text-[2rem] font-normal font-Aeonik'
+              id='responsive-dialog-title'
+            >
               {'You must be signed in to continue'}
             </DialogTitle>
             <DialogContent>
-              <p className='text-base text-[#ebeae2] mb-7 relative text-center'>
+              <p className='text-[1rem] lg:text-[1.25rem] text-imbue-purple-dark mb-7 relative text-center'>
                 Please use the link below to sign in.
               </p>
               <div>
@@ -148,17 +152,23 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                   onSubmit={imbueLogin}
                 >
                   <div className='login justify-center items-center w-full flex flex-col'>
-                    <div className='flex justify-center pb-[10px] w-[80%]'>
-                      <CssTextField
-                        label='Email/Username'
+                    <div className='flex flex-col justify-center pb-[10px] w-[100%] lg:w-[80%]'>
+                      <label className='font-Aeonik text-[1rem] lg:text-[1.25rem] text-imbue-purple-dark font-normal'>
+                        Username/Email
+                      </label>
+                      <CustomInput
+                        placeholder='Enter your Username/Email'
                         onChange={(e: any) => setUserOrEmail(e.target.value)}
                         className='mdc-text-field'
                         required
                       />
                     </div>
-                    <div className='flex justify-center pb-[10px] w-[80%]'>
-                      <CssTextField
-                        label='Password'
+                    <div className='flex flex-col justify-center pb-[10px] w-[100%] lg:w-[80%] mt-[1.2rem]'>
+                      <label className='font-Aeonik text-[1rem] lg:text-[1.25rem] text-imbue-purple-dark font-normal'>
+                        Password
+                      </label>
+                      <CustomInput
+                        placeholder='Enter your password'
                         onChange={(e: any) => setPassword(e.target.value)}
                         type='password'
                         className='mdc-text-field'
@@ -171,7 +181,14 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                         {errorMessage}
                       </span>
                     </div>
-                    <div className='w-[70%] mt-1 mb-5'>
+
+                    <div className='flex flex-col justify-end pb-[10px] w-[100%] lg:w-[80%]'>
+                      <span className='text-[#03116A] text-[1rem] text-right'>
+                        Forgot password?
+                      </span>
+                    </div>
+
+                    <div className='w-[100%] lg:w-[80%] mt-[2rem] mb-5'>
                       <button
                         type='submit'
                         // disabled={!this.state.creds.username && !this.state.creds.password}
@@ -183,24 +200,45 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                     </div>
 
                     <div>
-                      <span>Don&apos;t have an account?</span>
+                      <span className='text-[#03116A] text-[1rem]'>
+                        Don&apos;t have an account?
+                      </span>
                       <Link
                         href='/join'
                         onClick={() => {
                           setVisible(false);
                         }}
-                        className='signup text-primary ml-1'
+                        className='signup text-[#FC6760] ml-1'
                       >
                         Sign up
                       </Link>
+                    </div>
+
+                    <div className='w-[100%] lg:w-[80%] mt-[2rem] mb-5 flex justify-between items-center'>
+                      <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
+                      <p className='text-[1rem] text-imbue-purple-dark'>or</p>
+                      <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
                     </div>
                   </div>
                 </form>
 
                 <div className='login justify-center items-center w-full flex flex-col'>
-                  <li className='lg:max-w-[65%] mt-1 mb-2'>
+                  <li className='mt-1 mb-2 w-[100%] lg:w-[80%]'>
                     <GoogleOAuthProvider clientId={config.googleClientId}>
-                      <GoogleLogin
+                      <button
+                        // onClick={() => loginGoogleFunction()}
+                        className='h-[2.6rem] rounded-[1.56rem] border border-imbue-purple-dark w-full justify-center'
+                      >
+                        <div className='flex text-imbue-purple-dark text-[1rem] justify-center items-center'>
+                          <Image
+                            src={googleIcon}
+                            alt='Google-icon'
+                            className='relative right-2'
+                          />
+                          Login with Google
+                        </div>
+                      </button>
+                      {/* <GoogleLogin
                         theme='filled_black'
                         shape='rectangular'
                         useOneTap={true}
@@ -209,20 +247,28 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                           // FIXME: error handling
                           console.log('Login Failed');
                         }}
-                      />
+                      
+                      /> */}
                     </GoogleOAuthProvider>
                   </li>
                 </div>
 
                 <div className='login justify-center items-center w-full flex flex-col'>
                   <li
-                    className='mt-4 flex flex-row items-center cursor-pointer'
+                    className='mt-4 flex flex-row items-center cursor-pointer w-[100%] lg:w-[80%]'
                     tabIndex={0}
                     data-mdc-dialog-action='web3'
                     onClick={() => closeModal()}
                   >
-                    <button className='pill-button primary'>
-                      {'Sign in with a wallet'}
+                    <button className='h-[2.6rem] rounded-[1.56rem] border border-imbue-purple-dark w-full justify-center bg-[#E1DDFF]'>
+                      <div className='flex text-imbue-purple-dark text-[1rem] justify-center items-center'>
+                        <Image
+                          src={walletIcon}
+                          alt='Wallet-icon'
+                          className='relative right-2'
+                        />
+                        Sign in with a wallet
+                      </div>
                     </button>
                   </li>
                 </div>

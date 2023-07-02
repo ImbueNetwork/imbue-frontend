@@ -29,6 +29,7 @@ module.exports = {
         'imbue-purple': '#3B27C1',
         'grey-background': '#EBEAE2',
         primary: '#b2ff0b',
+        'imbue-purple-dark': 'var(--imbue-purple-dark, #03116A)',
       },
       screens: {
         'max-width-1800px': { raw: '(max-width: 1800px)' },
@@ -43,6 +44,10 @@ module.exports = {
         'max-md': { raw: '(max-width: 768px)' },
         'max-lg': { raw: '(max-width: 1024px)' },
         'max-xl': { raw: '(max-width: 1280px)' },
+      },
+      fontFamily: {
+        Aeonik: 'Aeonik',
+        src: 'url(../fonts/Aeonik-Regular.otf) format("opentype")',
       },
     },
   },
