@@ -26,7 +26,6 @@ import {
   OnchainProjectState,
   Project,
   ProjectOnChain,
-  ProjectType,
   User,
 } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
@@ -500,15 +499,19 @@ function Project() {
             <h3 className='text-[32px] max-lg:text-[24px] leading-[1.5] font-normal m-0 p-0'>
               {project?.name}
             </h3>
-            <span
-              onClick={() => {
-                // TODO:
-              }}
-              className='text-[#b2ff0b] cursor-pointer text-[20px]  max-lg: text-base  font-normal !m-0 !p-0 relative top-4'
-            >
-              {`View full ${project?.project_type === ProjectType?.Brief ? 'brief' : 'grant'
-                }`}
-            </span>
+            {
+              project?.brief_id && (
+                <span
+                  onClick={() => {
+                    // TODO:
+                  }}
+                  className='text-[#b2ff0b] cursor-pointer text-[20px]  max-lg: text-base  font-normal !m-0 !p-0 relative top-4'
+                >
+                  {`View full brief`}
+                </span>
+              )
+            }
+
           </div>
           <div className='text-inactive w-[80%]'>
             <p className=' text-base font-normal leading-[178.15%]'>
@@ -585,8 +588,8 @@ function Project() {
                         className='rounded-full'
                       />
                       <div className='flex flex-col'>
-                        <span>{approver?.display_name}</span>
-                        <p className='text-xs'>{approver?.web3_address}</p>
+                        <span className='text-base'>{approver?.display_name}</span>
+                        <p className='text-xs break-all text-white text-opacity-40'>{approver?.web3_address}</p>
                       </div>
                     </div>
                   ))
@@ -595,7 +598,7 @@ function Project() {
             </>
           )}
         </div>
-        <div className='flex flex-col gap-[50px] flex-grow flex-shrink-0 basis-[20%]  max-lg:mt-10'>
+        <div className='flex flex-col gap-[50px] max-lg:mt-10 lg:w-56'>
           <div className='flex flex-col'>
             <div className='flex flex-row'>
               <Image
