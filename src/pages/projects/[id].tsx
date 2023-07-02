@@ -58,10 +58,10 @@ const openForVotingTag = (): JSX.Element => {
 const projectStateTag = (dateCreated: Date, text: string): JSX.Element => {
   return (
     <div className='flex flex-row items-center'>
-      <p className='text-[14px] font-normal leading-[16px] text-white'>
+      <p className='text-sm font-normal leading-[16px] text-white'>
         {moment(dateCreated)?.format('DD MMM YYYY')}
       </p>
-      <p className='text-xl font-normal leading-[23px] text-[#411DC9] mr-[27px] ml-[14px]'>
+      <p className='text-sm lg:text-xl font-normal leading-[23px] text-[#411DC9] mr-[27px] ml-[14px]'>
         {text}
       </p>
     </div>
@@ -513,7 +513,7 @@ function Project() {
             }
 
           </div>
-          <div className='text-inactive w-[80%]'>
+          <div className='text-inactive lg:w-[80%]'>
             <p className=' text-base font-normal leading-[178.15%]'>
               {project?.description}
             </p>
@@ -600,44 +600,49 @@ function Project() {
         </div>
         <div className='flex flex-col gap-[50px] max-lg:mt-10 lg:w-56'>
           <div className='flex flex-col'>
-            <div className='flex flex-row'>
+            <div className='flex flex-row items-start'>
               <Image
                 src={require('@/assets/svgs/shield.svg')}
                 height={24}
                 width={24}
                 alt={'shieldIcon'}
+                className="mt-1"
               />
 
-              <h3 className='text-xl leading-[1.5] ml-6  font-normal m-0 p-0'>
-                Milestone{' '}
-                <span className='text-[#BAFF36]'>
-                  {approvedMilestones?.length}/{project?.milestones?.length}
-                </span>
-              </h3>
-            </div>
-            {/* mile stone step indicator */}
-            <div className='w-48 bg-[#1C2608] mt-5 h-1 relative my-auto'>
-              <div
-                style={{
-                  width: `${(onChainProject?.milestones?.filter?.(
-                    (m: any) => m?.is_approved
-                  )?.length /
-                    onChainProject?.milestones?.length) *
-                    100
-                    }%`,
-                }}
-                className='h-full rounded-xl Accepted-button absolute'
-              ></div>
-              <div className='flex justify-evenly'>
-                {onChainProject?.milestones?.map((m: any, i: number) => (
+              <div className='ml-6 w-full'>
+                <h3 className='text-xl leading-[1.5] font-normal m-0 p-0'>
+                  Milestone{' '}
+                  <span className='text-[#BAFF36]'>
+                    {approvedMilestones?.length}/{project?.milestones?.length}
+                  </span>
+                </h3>
+                {/* mile stone step indicator */}
+                <div className='w-full bg-[#1C2608] mt-5 h-1 relative my-auto'>
                   <div
-                    key={i}
-                    className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#1C2608]'
-                      } rounded-full -mt-1.5`}
+                    style={{
+                      width: `${(onChainProject?.milestones?.filter?.(
+                        (m: any) => m?.is_approved
+                      )?.length /
+                        onChainProject?.milestones?.length) *
+                        100
+                        }%`,
+                    }}
+                    className='h-full rounded-xl Accepted-button absolute'
                   ></div>
-                ))}
+                  <div className='flex justify-evenly'>
+                    {onChainProject?.milestones?.map((m: any, i: number) => (
+                      <div
+                        key={i}
+                        className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#1C2608]'
+                          } rounded-full -mt-1.5`}
+                      ></div>
+                    ))}
+                  </div>
+                </div>
               </div>
+
             </div>
+
           </div>
 
           <div className='flex flex-col'>
@@ -647,6 +652,7 @@ function Project() {
                 height={24}
                 width={24}
                 alt={'dollarSign'}
+                className="mt-1"
               />
               <div className='flex flex-col'>
                 <h3 className='text-xl leading-[1.5] font-normal m-0 p-0'>
@@ -662,7 +668,7 @@ function Project() {
             project?.escrow_address && (
               <div className='flex flex-col'>
                 <div className='flex flex-row items-start gap-6'>
-                  <AccountBalanceWalletOutlinedIcon />
+                  <AccountBalanceWalletOutlinedIcon className='mt-1'/>
                   <div className='flex flex-col'>
                     <h3 className='text-xl leading-[1.5] font-normal m-0 p-0'>
                       Wallet Address
@@ -685,6 +691,7 @@ function Project() {
                 height={24}
                 width={24}
                 alt={'calenderIcon'}
+                className="mt-1"
               />
               <div className='flex flex-col'>
                 <h3 className='text-xl font-normal'>
