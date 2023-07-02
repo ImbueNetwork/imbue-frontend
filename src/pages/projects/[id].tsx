@@ -157,31 +157,31 @@ function Project() {
       // setting approver list
       const approversPreviewList = [...approversPreview]
 
-      if (projectRes?.approvers?.length) {
+      if (projectRes?.approvers?.length && approversPreviewList.length === 0) {
         projectRes?.approvers.map(async (v: any) => {
           const user = await utils.fetchUserByUsernameOrAddress(v)
           if (user?.length) {
-            setApproverPreview((prev: any) => [...prev, ...user])
+            approversPreviewList.push(...user)
           }
           else {
-            setApproverPreview((prev: any) => [...prev, {
+            approversPreviewList.push({
               // id: 6,
               display_name: "",
               profile_photo: null,
               username: "",
               web3_address: v
-            }])
+            })
           }
         })
+        setApproverPreview(approversPreviewList)
       }
-      setApproverPreview(approversPreviewList)
 
       // api  project response
       await getChainProject();
 
       const balance = await getBalance(
-        project?.escrow_address,
-        project?.currency_id,
+        projectRes?.escrow_address,
+        projectRes?.currency_id || 0,
         user)
 
       setBalance(balance || 0)
@@ -261,7 +261,6 @@ function Project() {
           setSuccess(true);
           setSuccessTitle('Withdraw successfull');
         } else if (result.txError) {
-          // TODO: show error screen
           setError({ message: result.errorMessage });
           console.log(result.errorMessage);
         }
@@ -528,11 +527,15 @@ function Project() {
 
           <div className='flex flex-row items-center max-lg:flex-wrap mt-5'>
             <Image
-              src={require('@/assets/images/profile-image.png')}
+              src={
+                targetUser?.profile_image ||
+                targetUser?.profile_photo ||
+                require('@/assets/images/profile-image.png')
+              }
               alt='freelaner-icon'
               height={50}
               width={50}
-              className='border border-solid border-white rounded-[25px]'
+              className='rounded-full'
             />
 
             <p className='text-white text-[20px] font-normal leading-[1.5] p-0 mx-7'>
@@ -573,7 +576,7 @@ function Project() {
                 ))} */}
                 {
                   approversPreview?.map((approver: any, index: number) => (
-                    <div key={index} className='flex text-white gap-3 items-center cursor-pointer border border-light-white px-2 py-1 rounded-full'>
+                    <div key={index} className='flex text-white gap-3 items-center border border-light-white p-2 rounded-full'>
                       <Image
                         height={40}
                         width={40}

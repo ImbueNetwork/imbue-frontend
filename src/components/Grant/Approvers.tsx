@@ -71,7 +71,7 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
             <div className='mb-5 flex flex-wrap gap-3'>
                 {
                     approversPreview?.map((approver: any, index: number) => (
-                        <div key={index} className='flex text-white gap-3 items-center cursor-pointer border border-light-white px-2 py-1 rounded-full'>
+                        <div key={index} className='flex text-white gap-3 items-center cursor-pointer border border-light-white p-2 rounded-full'>
                             <Image
                                 height={40}
                                 width={40}
