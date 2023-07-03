@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -9,6 +10,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import * as utils from '@/utils';
+import { getBalance } from '@/utils/helper';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import AccountChoice from '@/components/AccountChoice';
@@ -20,14 +22,13 @@ import Login from '@/components/Login';
 import SuccessScreen from '@/components/SuccessScreen';
 
 import {
-  Freelancer,
   Milestone,
   OnchainProjectState,
   Project,
   ProjectOnChain,
   User,
 } from '@/model';
-import { getProjectById } from '@/redux/services/briefService';
+import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { RootState } from '@/redux/store/store';
@@ -57,10 +58,10 @@ const openForVotingTag = (): JSX.Element => {
 const projectStateTag = (dateCreated: Date, text: string): JSX.Element => {
   return (
     <div className='flex flex-row items-center'>
-      <p className='text-[14px] font-normal leading-[16px] text-white'>
+      <p className='text-sm font-normal leading-[16px] text-white'>
         {moment(dateCreated)?.format('DD MMM YYYY')}
       </p>
-      <p className='text-xl font-normal leading-[23px] text-[#411DC9] mr-[27px] ml-[14px]'>
+      <p className='text-sm lg:text-xl font-normal leading-[23px] text-[#411DC9] mr-[27px] ml-[14px]'>
         {text}
       </p>
     </div>
@@ -70,7 +71,7 @@ const projectStateTag = (dateCreated: Date, text: string): JSX.Element => {
 function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
-  const [freelancer, setFreelancer] = useState<Freelancer | any>({});
+  const [targetUser, setTargetUser] = useState<any>({});
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
   // const [user, setUser] = useState<User | any>();
   const { user } = useSelector((state: RootState) => state.userState);
@@ -86,7 +87,7 @@ function Project() {
   >({});
   const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const projectId: any = router?.query?.id || 0;
   const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
@@ -95,6 +96,8 @@ function Project() {
   const [success, setSuccess] = useState<boolean>(false);
   const [successTitle, setSuccessTitle] = useState<string>('');
   const [error, setError] = useState<any>();
+  const [balance, setBalance] = useState<any>(0)
+  const [approversPreview, setApproverPreview] = useState<any>([])
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -104,9 +107,7 @@ function Project() {
   }, [projectId]);
 
   const getChainProject = async () => {
-    setLoading(true);
     const imbueApi = await initImbueAPIInfo();
-    // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
     const onChainProjectRes = await chainService.getProject(projectId);
 
@@ -128,21 +129,72 @@ function Project() {
 
       setOnChainProject(onChainProjectRes);
     }
-    setLoading(false);
+  };
+
+  const getTargetUser = async (freelancerName: string) => {
+    const freelanceRes = await getFreelancerProfile(freelancerName);
+    setTargetUser(freelanceRes);
   };
 
   const getProject = async () => {
-    const projectRes = await getProjectById(projectId);
-    setProject(projectRes);
-    // api  project response
-    // const userResponse = await utils.getCurrentUser();
-    // await setUser(userResponse);
-    await getChainProject();
+    try {
+      const projectRes = await getProjectById(projectId);
+
+      // setting project owner name if it is a grant, else showing owner/freelancer name
+      if (projectRes?.approvers) {
+        setTargetUser(await utils.fetchUser(projectRes?.user_id))
+      }
+      else if (projectRes?.user_id !== user?.id) {
+        await getTargetUser(projectRes?.user_id)
+      }
+      else {
+        const brief = await getBrief(projectRes.brief_id)
+        brief?.user_id && await getTargetUser(brief?.user_id.toString())
+      }
+      setProject(projectRes);
+
+      // setting approver list
+      const approversPreviewList = [...approversPreview]
+
+      if (projectRes?.approvers?.length && approversPreviewList.length === 0) {
+        projectRes?.approvers.map(async (v: any) => {
+          const user = await utils.fetchUserByUsernameOrAddress(v)
+          if (user?.length) {
+            approversPreviewList.push(...user)
+          }
+          else {
+            approversPreviewList.push({
+              // id: 6,
+              display_name: "",
+              profile_photo: null,
+              username: "",
+              web3_address: v
+            })
+          }
+        })
+        setApproverPreview(approversPreviewList)
+      }
+
+      // api  project response
+      await getChainProject();
+
+      const balance = await getBalance(
+        projectRes?.escrow_address,
+        projectRes?.currency_id || 0,
+        user)
+
+      setBalance(balance || 0)
+    } catch (error) {
+      setError(error)
+    }
+    finally {
+      setLoading(false)
+    }
   };
 
   const getFreelancerData = async (freelancerName: string) => {
     const freelanceRes = await getFreelancerProfile(freelancerName);
-    setFreelancer(freelanceRes);
+    setTargetUser(freelanceRes);
   };
 
   // voting on a mile stone
@@ -208,7 +260,6 @@ function Project() {
           setSuccess(true);
           setSuccessTitle('Withdraw successfull');
         } else if (result.txError) {
-          // TODO: show error screen
           setError({ message: result.errorMessage });
           console.log(result.errorMessage);
         }
@@ -218,6 +269,10 @@ function Project() {
     }
     setLoading(false);
   };
+
+  const handleRefund = async () => {
+    // TODO: create vote of no confidence for refund
+  }
 
   const renderPolkadotJSModal = (
     <div>
@@ -339,8 +394,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, 'Completed')
               : milestone?.milestone_key == milestoneBeingVotedOn
-              ? openForVotingTag()
-              : projectStateTag(modified, 'Not Started')}
+                ? openForVotingTag()
+                : projectStateTag(modified, 'Not Started')}
 
             <Image
               src={require(expanded
@@ -393,7 +448,7 @@ function Project() {
 
           {isApplicant &&
             onChainProject?.projectState !==
-              OnchainProjectState.OpenForVoting && (
+            OnchainProjectState.OpenForVoting && (
               <button
                 className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
                 data-testid='next-button'
@@ -448,16 +503,21 @@ function Project() {
             <h3 className='text-[32px] max-lg:text-[24px] leading-[1.5] font-normal m-0 p-0'>
               {project?.name}
             </h3>
-            <span
-              onClick={() => {
-                // project?.brief_id
-              }}
-              className='text-[#b2ff0b] cursor-pointer text-[20px]  max-lg: text-base  font-normal !m-0 !p-0 relative top-4'
-            >
-              View full brief
-            </span>
+            {
+              project?.brief_id && (
+                <span
+                  onClick={() => {
+                    // TODO:
+                  }}
+                  className='text-[#b2ff0b] cursor-pointer text-[20px]  max-lg: text-base  font-normal !m-0 !p-0 relative top-4'
+                >
+                  {`View full brief`}
+                </span>
+              )
+            }
+
           </div>
-          <div className='text-inactive w-[80%]'>
+          <div className='text-inactive lg:w-[80%]'>
             <p className=' text-base font-normal leading-[178.15%]'>
               {project?.description}
             </p>
@@ -467,20 +527,26 @@ function Project() {
           </p>
 
           <p className='text-white text-xl font-normal leading-[1.5] mt-[16px] p-0'>
-            Freelancer hired
+            {
+              (isApplicant || project?.approvers) ? "Project Owner" : "Freelancer hired"
+            }
           </p>
 
           <div className='flex flex-row items-center max-lg:flex-wrap mt-5'>
             <Image
-              src={require('@/assets/images/profile-image.png')}
+              src={
+                targetUser?.profile_image ||
+                targetUser?.profile_photo ||
+                require('@/assets/images/profile-image.png')
+              }
               alt='freelaner-icon'
               height={50}
               width={50}
-              className='border border-solid border-white rounded-[25px]'
+              className='rounded-full'
             />
 
             <p className='text-white text-[20px] font-normal leading-[1.5] p-0 mx-7'>
-              {freelancer?.display_name}
+              {targetUser?.display_name}
             </p>
 
             <button
@@ -504,84 +570,148 @@ function Project() {
             >
               Message
             </button>
+
+            <button
+              className='border px-6 py-[9px] rounded-full hover:bg-white hover:text-black transition-colors'
+              onClick={() => handleRefund()}
+            >Refund</button>
           </div>
+
+          {project?.approvers && (
+            <>
+              <p className='text-white text-xl font-normal leading-[1.5] mt-[16px] p-0'>
+                Approvers
+              </p>
+              <div className='flex flex-row flex-wrap gap-4'>
+                {/* {project.approvers.map((approver: string, index: number) => (
+                  // <span key={index}>{approver}</span>
+                ))} */}
+                {
+                  approversPreview?.map((approver: any, index: number) => (
+                    <div key={index} className='flex text-white gap-3 items-center border border-light-white p-2 rounded-full'>
+                      <Image
+                        height={40}
+                        width={40}
+                        src={approver?.profile_photo ?? "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png"}
+                        alt=''
+                        className='rounded-full'
+                      />
+                      <div className='flex flex-col'>
+                        <span className='text-base'>{approver?.display_name}</span>
+                        <p className='text-xs break-all text-white text-opacity-40'>{approver?.web3_address}</p>
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
+            </>
+          )}
         </div>
-        <div className='flex flex-col gap-[50px] flex-grow flex-shrink-0 basis-[20%]  max-lg:mt-10'>
+        <div className='flex flex-col gap-[50px] max-lg:mt-10 lg:w-56'>
           <div className='flex flex-col'>
-            <div className='flex flex-row'>
+            <div className='flex flex-row items-start'>
               <Image
                 src={require('@/assets/svgs/shield.svg')}
                 height={24}
                 width={24}
                 alt={'shieldIcon'}
+                className="mt-1"
               />
 
-              <h3 className='text-xl leading-[1.5] ml-6  font-normal m-0 p-0'>
-                Milestone{' '}
-                <span className='text-[#BAFF36]'>
-                  {approvedMilestones?.length}/{project?.milestones?.length}
-                </span>
-              </h3>
-            </div>
-            {/* mile stone step indicator */}
-            <div className='w-48 bg-[#1C2608] mt-5 h-1 relative my-auto'>
-              <div
-                style={{
-                  width: `${
-                    (onChainProject?.milestones?.filter?.(
-                      (m: any) => m?.is_approved
-                    )?.length /
-                      onChainProject?.milestones?.length) *
-                    100
-                  }%`,
-                }}
-                className='h-full rounded-xl Accepted-button absolute'
-              ></div>
-              <div className='flex justify-evenly'>
-                {onChainProject?.milestones?.map((m: any, i: number) => (
+              <div className='ml-6 w-full'>
+                <h3 className='text-xl leading-[1.5] font-normal m-0 p-0'>
+                  Milestone{' '}
+                  <span className='text-[#BAFF36]'>
+                    {approvedMilestones?.length}/{project?.milestones?.length}
+                  </span>
+                </h3>
+                {/* mile stone step indicator */}
+                <div className='w-full bg-[#1C2608] mt-5 h-1 relative my-auto'>
                   <div
-                    key={i}
-                    className={`h-4 w-4 ${
-                      m.is_approved ? 'Accepted-button' : 'bg-[#1C2608]'
-                    } rounded-full -mt-1.5`}
+                    style={{
+                      width: `${(onChainProject?.milestones?.filter?.(
+                        (m: any) => m?.is_approved
+                      )?.length /
+                        onChainProject?.milestones?.length) *
+                        100
+                        }%`,
+                    }}
+                    className='h-full rounded-xl Accepted-button absolute'
                   ></div>
-                ))}
+                  <div className='flex justify-evenly'>
+                    {onChainProject?.milestones?.map((m: any, i: number) => (
+                      <div
+                        key={i}
+                        className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#1C2608]'
+                          } rounded-full -mt-1.5`}
+                      ></div>
+                    ))}
+                  </div>
+                </div>
               </div>
+
             </div>
+
           </div>
 
           <div className='flex flex-col'>
-            <div className='flex flex-row'>
+            <div className='flex flex-row items-start gap-6'>
               <Image
                 src={require('@/assets/svgs/dollar_sign.svg')}
                 height={24}
                 width={24}
                 alt={'dollarSign'}
+                className="mt-1"
               />
-              <h3 className='text-xl leading-[1.5] ml-6 font-normal m-0 p-0'>
-                {Number(project?.total_cost_without_fee)?.toLocaleString()}{' '}
-                $IMBU
-              </h3>
+              <div className='flex flex-col'>
+                <h3 className='text-xl leading-[1.5] font-normal m-0 p-0'>
+                  {Number(project?.total_cost_without_fee)?.toLocaleString()}{' '}
+                  $IMBU
+                </h3>
+                <div className='text-inactive mt-2'>Budget - Fixed</div>
+              </div>
             </div>
-
-            <div className='text-inactive ml-[20%] mt-2'>Budget - Fixed</div>
           </div>
 
+          {
+            project?.escrow_address && (
+              <div className='flex flex-col'>
+                <div className='flex flex-row items-start gap-6'>
+                  <AccountBalanceWalletOutlinedIcon className='mt-1' />
+                  <div className='flex flex-col'>
+                    <h3 className='text-xl leading-[1.5] font-normal m-0 p-0'>
+                      Wallet Address
+                    </h3>
+                    <div className='text-inactive mt-2 text-xs break-all'>{project?.escrow_address}</div>
+                    <div className='text-inactive mt-2'>
+                      balance : {balance}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          }
+
+
           <div className='flex flex-col'>
-            <div className='flex flex-row '>
+            <div className='flex flex-row items-start gap-6'>
               <Image
                 src={require('@/assets/svgs/calendar_icon.svg')}
                 height={24}
                 width={24}
                 alt={'calenderIcon'}
+                className="mt-1"
               />
+              <div className='flex flex-col'>
+                <h3 className='text-xl font-normal'>
+                  1 to 3 months
+                </h3>
+                <div className='text-inactive'>Timeline</div>
+              </div>
 
-              <h3 className='text-xl leading-[1.5] ml-6 font-normal m-0 p-0'>
-                1 to 3 months
-              </h3>
+
             </div>
 
-            <div className='text-inactive  ml-[20%] mt-2'>Timeline</div>
           </div>
         </div>
       </div>
@@ -671,3 +801,12 @@ function Project() {
 }
 
 export default Project;
+
+// const users = [
+//   { display_name: 'Sam', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK" },
+//   { display_name: 'Aala', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5HQXiQVj8C3Tfp6k4WEvZNNQqWe5k51nWoBrKZWuYTEkuzUk" },
+//   { display_name: 'Felix', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH3" },
+//   { display_name: '', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH4" },
+//   { display_name: 'Oliver', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH5" },
+//   { display_name: 'Michael', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH6" },
+// ];

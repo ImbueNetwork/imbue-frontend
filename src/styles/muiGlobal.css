@@ -50,6 +50,15 @@
 
 .MuiFormControl-root {
   margin-bottom: 24px;
+  margin-left: 0;
+}
+
+.approvers .MuiFormControl-root{
+  margin-bottom: 0;
+}
+
+.MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation1.MuiAutocomplete-paper{
+  background-color: var(--theme-background);
 }
 
 #demo-simple-select-helper-label,
@@ -78,7 +87,7 @@
 }
 
 .MuiPaper-root.MuiMenu-paper.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation8.MuiPopover-paper {
-  background: var(--theme-grey-dark);
+  background: var(--theme-background);
   color: white;
 }
 
@@ -118,6 +127,12 @@
   background-color: #1e1e1e;
 }
 
+/* grants popup */
+
+.errorDialogue .MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation24.MuiDialog-paper.MuiDialog-paperScrollPaper.MuiDialog-paperWidthSm{
+  max-width: 60%;
+}
+
 @media screen and (max-width: 470px) {
   .MuiBottomNavigation-root {
     height: 46px;
@@ -139,5 +154,9 @@
   .navBar
     .MuiPaper-root.MuiMenu-paper.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation8.MuiPopover-paper {
     right: 10px;
+  }
+
+  .errorDialogue .MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation24.MuiDialog-paper.MuiDialog-paperScrollPaper.MuiDialog-paperWidthSm{
+    max-width: 100%;
   }
 }
