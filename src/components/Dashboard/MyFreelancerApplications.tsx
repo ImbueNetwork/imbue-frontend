@@ -70,14 +70,14 @@ const MyFreelancerApplications = ({
                   </div>
                   <div className='flex flex-col gap-2 justify-evenly items-center ml-auto'>
                     <span className='text-xs lg:text-base'>
-                      {timeAgo?.format(new Date(application?.created))}
+                      {timeAgo?.format(new Date(application?.created || 0))}
                     </span>
                     <div
                       className={`px-4 py-2 w-fit rounded-full text-xs lg:text-base ${
-                        OffchainProjectState[application.status_id]
+                        OffchainProjectState[application?.status_id || 0]
                       }-button `}
                     >
-                      {displayState(application.status_id)}
+                      {displayState(application?.status_id || 0)}
                     </div>
                   </div>
                 </div>
@@ -117,14 +117,14 @@ const MyFreelancerApplications = ({
                     </div>
                     <div className='flex flex-col gap-2 justify-evenly items-center ml-auto'>
                       <span className='text-xs lg:text-base'>
-                        {timeAgo?.format(new Date(application?.created))}
+                        {timeAgo?.format(new Date(application?.created || 0))}
                       </span>
                       <div
                         className={`px-4 py-2 w-fit rounded-full text-xs lg:text-base ${
-                          OffchainProjectState[application.status_id]
+                          OffchainProjectState[application?.status_id || 0]
                         }-button `}
                       >
-                        {displayState(application.status_id)}
+                        {displayState(application?.status_id || 0)}
                       </div>
                     </div>
                   </div>

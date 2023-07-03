@@ -19,7 +19,7 @@ export default nextConnect()
     await db.transaction(async (tx: any) => {
       try {
         await fetchAllBriefs()(tx).then(async (briefs: any) => {
-          const { currentData, totalItems } = await models.paginatedData(
+          const { currentData, totalItems } = models.paginatedData(
             Number(data?.page || 1),
             Number(data?.items_per_page || 5),
             briefs

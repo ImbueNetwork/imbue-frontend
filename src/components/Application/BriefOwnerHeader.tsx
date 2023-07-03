@@ -15,6 +15,7 @@ import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 import AccountChoice from '../AccountChoice';
 import ErrorScreen from '../ErrorScreen';
 import { HirePopup } from '../HirePopup';
+import { getBalance } from '@/utils/helper';
 
 interface MilestoneItem {
   name: string;
@@ -73,22 +74,6 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
     setAnchorEl(null);
   };
 
-  const getBalance = async (walletAddress: string, currency_id: number) => {
-    try {
-      const imbueApi = await initImbueAPIInfo();
-      const chainService = new ChainService(imbueApi, user);
-
-      if (!walletAddress) return;
-      const balance: any = await chainService.getBalance(
-        walletAddress,
-        currency_id
-      );
-      return balance;
-    } catch (error) {
-      setError({ message: `An error occured while fetching balance.` });
-    }
-  };
-
   const accountSelected = async (account: WalletAccount): Promise<any> => {
     try {
       setLoadingWallet((prev: any) => ({ ...prev, connecting: true }));
@@ -99,7 +84,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         account
       );
       if (resp.status === 200 || resp.status === 201) {
-        const bl = await getBalance(account.address, application.currency_id);
+        const bl = await getBalance(account.address, application.currency_id, user);
         setBalance(bl);
       } else {
         setError({ message: 'Could not connect wallet. Please Try again' });
@@ -117,7 +102,8 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         setLoadingWallet((prev: any) => ({ ...prev, balance: true }));
         const balance = await getBalance(
           user?.web3_address,
-          application?.currency_id ?? 0
+          application?.currency_id ?? 0,
+          user
         );
         setBalance(balance);
       } catch (error) {

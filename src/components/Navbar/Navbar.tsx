@@ -198,7 +198,7 @@ function Navbar() {
                   {user?.username ? (
                     <Avatar className='w-8 h-8 lg:w-10 lg:h-10'>
                       <Image
-                        src={freelancerProfile?.profile_image || defaultProfile}
+                        src={user?.profile_photo ?? defaultProfile}
                         width={40}
                         height={40}
                         alt='profile'
