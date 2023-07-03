@@ -270,6 +270,10 @@ function Project() {
     setLoading(false);
   };
 
+  const handleRefund = async () => {
+    // TODO: create vote of no confidence for refund
+  }
+
   const renderPolkadotJSModal = (
     <div>
       <AccountChoice
@@ -567,7 +571,10 @@ function Project() {
               Message
             </button>
 
-            <button className='border px-6 py-[9px] rounded-full hover:bg-white hover:text-black transition-colors'>Refund</button>
+            <button
+              className='border px-6 py-[9px] rounded-full hover:bg-white hover:text-black transition-colors'
+              onClick={() => handleRefund()}
+            >Refund</button>
           </div>
 
           {project?.approvers && (
@@ -670,7 +677,7 @@ function Project() {
             project?.escrow_address && (
               <div className='flex flex-col'>
                 <div className='flex flex-row items-start gap-6'>
-                  <AccountBalanceWalletOutlinedIcon className='mt-1'/>
+                  <AccountBalanceWalletOutlinedIcon className='mt-1' />
                   <div className='flex flex-col'>
                     <h3 className='text-xl leading-[1.5] font-normal m-0 p-0'>
                       Wallet Address
