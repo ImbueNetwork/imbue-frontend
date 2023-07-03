@@ -6,8 +6,8 @@
   --theme-secondary-dark-hover: #121c7f;
   --theme-error: #ff5a58;
   --theme-error-hover: #ff7a78;
-  --theme-background: #1a1a19;
-  --theme-title-color: #fff;
+  --theme-background: #FFFFFF;
+  --theme-title-color: #03116A;
   --theme-ink-color: #ebeae2;
   --theme-font-family: 'Aeonik', sans-serif;
   --theme-grey-text: #a6a6a6;
@@ -113,12 +113,12 @@
   --hq-base-transition: var(--base-transition);
 
   /* talisman */
-  --talisman-connect-control-background: #383838;
+  --talisman-connect-control-background: #E1DDFF;
   --talisman-connect-control-foreground: inherit;
-  --talisman-connect-active-background: #5a5a5a;
+  --talisman-connect-active-background: #d1cbff;
   --talisman-connect-active-foreground: inherit;
-  --talisman-connect-modal-background: var(--theme-grey-dark);
-  --talisman-connect-modal-foreground: var(--theme-white);
+  --talisman-connect-modal-background: var(--theme-background);
+  --talisman-connect-modal-foreground: var(--theme-title-color);
   --talisman-connect-button-background: var(
     --talisman-connect-control-background
   );
