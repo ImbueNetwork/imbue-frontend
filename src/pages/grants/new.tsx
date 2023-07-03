@@ -8,7 +8,6 @@ import React, { useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { FaRegCopy } from 'react-icons/fa';
 import { FiPlusCircle } from 'react-icons/fi';
-import { useSelector } from 'react-redux';
 
 import { getCurrentUser } from '@/utils';
 
@@ -22,8 +21,6 @@ import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
 import { Currency } from '@/model';
 // import ChainService from '@/redux/services/chainService';
-import { RootState } from '@/redux/store/store';
-
 
 interface MilestoneItem {
   name: string;
@@ -56,11 +53,11 @@ const GrantApplication = (): JSX.Element => {
     }, 3000);
   }
 
-  const [escrow_address, setEscrowAddress] = useState(
+  const [escrow_address] = useState(
     '5EYCAe5hKq6D9ACdEwwQxSSkWY9rqX4PqJyRBV3wA4NC8VSu'
   );
 
-  const { user } = useSelector((state: RootState) => state.userState);
+  // const { user } = useSelector((state: RootState) => state.userState);
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
 
@@ -263,6 +260,47 @@ const GrantApplication = (): JSX.Element => {
                 />
                 <div className='text-[rgba(235, 234, 226, 0.70)]'>{`${description?.length || 0
                   }/300`}</div>
+              </div>
+            </div>
+            <div className='flex flex-col gap-[50px] max-lg:mt-10 lg:w-60'>
+
+              <div className='flex flex-col'>
+                <div className='flex flex-row items-start gap-6'>
+                  <Image
+                    src={require('@/assets/svgs/dollar_sign.svg')}
+                    height={24}
+                    width={24}
+                    alt={'dollarSign'}
+                    className="mt-1"
+                  />
+                  <div className='flex flex-col'>
+                    <h3 className='text-xl leading-[1.5] font-normal m-0 p-0'>
+                      Ecosystem
+                    </h3>
+                    <div className='text-inactive mt-2'>Kusama Treasury (KSM)</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className='flex flex-col'>
+                <div className='flex flex-row items-start gap-6'>
+                  <Image
+                    src={require('@/assets/svgs/calendar_icon.svg')}
+                    height={24}
+                    width={24}
+                    alt={'calenderIcon'}
+                    className="mt-1"
+                  />
+                  <div className='flex flex-col'>
+                    <h3 className='text-xl font-normal'>
+                      {durationOptions[durationId - 1]?.label}
+                    </h3>
+                    <div className='text-inactive'>Timeline</div>
+                  </div>
+
+
+                </div>
+
               </div>
             </div>
           </div>
