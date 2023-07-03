@@ -12,7 +12,7 @@ import CustomModal from '@/components/CustomModal';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 
-import { filterIcon, savedIcon } from '@/assets/svgs';
+import { filterIcon, filterSvg, savedIcon, searchSvg } from '@/assets/svgs';
 import { Brief, BriefSqlFilter } from '@/model';
 import {
   callSearchBriefs,
@@ -297,7 +297,7 @@ const Briefs = (): JSX.Element => {
   // Here we have to get all the checked boxes and try and construct a query out of it...
   const onSearch = async () => {
     // The filter initially should return all values
-    setFilterVisible(!filterVisble);
+
     let is_search = false;
 
     let exp_range: number[] = [];
@@ -396,6 +396,10 @@ const Briefs = (): JSX.Element => {
           page: currentPage,
         };
 
+        if (search_value.length === 0) {
+          setFilterVisible(!filterVisble);
+        }
+
         const briefs_filtered: any = await callSearchBriefs(filter);
 
         setBriefs(briefs_filtered?.currentData);
@@ -466,9 +470,9 @@ const Briefs = (): JSX.Element => {
           onClick={(e: any) => {
             e?.stopPropagation();
           }}
-          className='bg-[#1B1B1B] rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative'
+          className='bg-white rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] lg:w-[60%] w-[95vw] self-center relative'
         >
-          <p className='font-normal text-base text-white mb-9'>Filter by:</p>
+          <p className='font-normal text-base text-black mb-9'>Filter</p>
 
           <div className='grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5'>
             {customDropdownConfigs
@@ -506,80 +510,59 @@ const Briefs = (): JSX.Element => {
   if (loading) return <FullScreenLoader />;
 
   return (
-    <div className='search-briefs-container px-[15px] lg:px-[80px]'>
+    <div className='search-briefs-container px-[15px] '>
       <FilterModal open={filterVisble} handleClose={() => toggleFilter()} />
 
       <div className='briefs-section  max-width-750px:overflow-hidden'>
         <div className='briefs-heading'>
-          <div className='tab-section'>
-            <button
-              onClick={toggleFilter}
-              test-id='filter-button'
-              className='h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105'
-            >
-              Filter
-              <Image
-                src={filterIcon}
-                alt={'filter-icon'}
-                className='h-[14px] w-[14px] ml-2'
-              />
-            </button>
-            {selectedFilterIds?.length > 0 && (
+          <div className='flex justify-between lg:flex-row flex-col items-start lg:py-[3rem]'>
+            <div>
+              <div className='flex items-center'>
+                <input
+                  id='search-input'
+                  className='search-input px-[12px] !w-full  lg:!w-[20rem] !h-[2.875rem] !rounded-tr-[0px] !rounded-br-[0px]'
+                  placeholder='Search'
+                />
+                <div
+                  role='button'
+                  onClick={onSearch}
+                  className='h-[2.975rem] w-[3.0625rem] rounded-tr-[8px] rounded-br-[8px] bg-imbue-purple flex justify-center items-center cursor-pointer'
+                >
+                  <Image src={searchSvg} alt='Search' role='button' />
+                </div>
+              </div>
+
+              <p className='text-[1rem] text-imbue-purple-dark mt-[0.75rem]'>
+                {Number(briefs_total) === 0 ? 'No' : briefs_total} brief
+                {Number(briefs_total) === 1 ? '' : 's'} found
+              </p>
+            </div>
+
+            <div className='flex items-center mt-[2rem] lg:mt-0'>
               <button
-                onClick={async () => {
-                  await router.push({
-                    pathname,
-                    query: {},
-                  });
-                  await setSlectedFilterIds([]);
+                onClick={() => {
+                  onSavedBriefs();
                 }}
-                className='h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]'
+                className='h-[43px] px-[20px] mr-12 rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 lg:ml-[44px]'
               >
-                Reset Filter X
+                Saved Briefs
+                <Image
+                  src={savedIcon}
+                  alt={'filter-icon'}
+                  className='h-[20px] w-[20px] ml-2'
+                />
               </button>
-            )}
-
-            <button
-              onClick={() => {
-                onSavedBriefs();
-              }}
-              className='h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]'
-            >
-              Saved Briefs
-              <Image
-                src={savedIcon}
-                alt={'filter-icon'}
-                className='h-[20px] w-[20px] ml-2'
-              />
-            </button>
-          </div>
-          <input
-            id='search-input'
-            className='search-input px-[12px] !w-full'
-            placeholder='Search'
-          />
-          <div className='search-result'>
-            <span className='result-count'>
-              {Number(briefs_total) === 0 ? 'No' : briefs_total}
-            </span>
-            <span> brief{Number(briefs_total) === 1 ? '' : 's'} found</span>
-
-            <span className='ml-8'>
-              Briefs per page
-              <select
-                className='ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none focus:outline-none focus:outline-white'
-                onChange={(e) => {
-                  setNumItemsPerPage(parseInt(e.target.value));
-                }}
-                value={itemsPerPage}
+              <div
+                className='flex items-center cursor-pointer'
+                onClick={toggleFilter}
+                role='button'
               >
-                {dropDownValues?.map((item, itemIndex) => (
-                  <option key={itemIndex} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </span>
+                <p className='mr-[0.25rem] text-imbue-purple-dark text-[1rem]'>
+                  Filter
+                </p>
+                <Image src={filterSvg} alt='Filter Icon' />
+              </div>
+            </div>
           </div>
         </div>
         <div className='briefs-list'>
@@ -605,17 +588,17 @@ const Briefs = (): JSX.Element => {
                     ))}
                   </div>
 
-                  <div className='flex justify-between w-[400px] items-center'>
+                  <div className='flex justify-between lg:flex-row flex-col lg:w-[400px] lg:items-center'>
                     <div className='brief-proposals'>
                       <span className='proposals-heading'>
                         Proposals Submitted:{' '}
                       </span>
                       <span className='proposals-count'>
-                        {item.number_of_briefs_submitted}
+                        Less than {item.number_of_briefs_submitted}
                       </span>
                     </div>
 
-                    <div className='leading-none'>
+                    <div className='leading-none text-black mt-3 lg:mt-0'>
                       {timeAgo.format(new Date(item?.created))}
                     </div>
                   </div>
@@ -623,7 +606,7 @@ const Briefs = (): JSX.Element => {
               )
           )}
         </div>
-        <Pagination
+        {/* <Pagination
           pageSize={itemsPerPage}
           total={briefs_total}
           onChange={(page: number) => setCurrentPage(page)}
@@ -638,7 +621,7 @@ const Briefs = (): JSX.Element => {
           nextIcon={<div className={pageinationIconClassName}>{'>'}</div>}
           jumpNextIcon={<div className={pageinationIconClassName}>{'>>'}</div>}
           jumpPrevIcon={<div className={pageinationIconClassName}>{'<<'}</div>}
-        />
+        /> */}
       </div>
 
       <ErrorScreen {...{ error, setError }}>
@@ -660,5 +643,24 @@ const Briefs = (): JSX.Element => {
     </div>
   );
 };
+
+{
+  /* <span className='ml-8'>
+  Briefs per page
+  <select
+    className='ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none focus:outline-none focus:outline-white'
+    onChange={(e) => {
+      setNumItemsPerPage(parseInt(e.target.value));
+    }}
+    value={itemsPerPage}
+  >
+    {dropDownValues?.map((item, itemIndex) => (
+      <option key={itemIndex} value={item}>
+        {item}
+      </option>
+    ))}
+  </select>
+</span>; */
+}
 
 export default Briefs;

@@ -30,6 +30,8 @@ module.exports = {
         'grey-background': '#EBEAE2',
         primary: '#b2ff0b',
         'imbue-purple-dark': 'var(--imbue-purple-dark, #03116A)',
+        'imbue-light-purple': '#E1DDFF',
+        'imbue-light-purple-two': '#9880F2',
       },
       screens: {
         'max-width-1800px': { raw: '(max-width: 1800px)' },
