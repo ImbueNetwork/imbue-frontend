@@ -566,6 +566,8 @@ function Project() {
             >
               Message
             </button>
+
+            <button className='border px-6 py-[9px] rounded-full hover:bg-white hover:text-black transition-colors'>Refund</button>
           </div>
 
           {project?.approvers && (
