@@ -78,7 +78,7 @@
 }
 
 .search-input::placeholder {
-  color: rgba(3, 17, 106, 0.5);
+  color: rgba(3, 17, 106, 0.5) !important;
 }
 
 /* input {

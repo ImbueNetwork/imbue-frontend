@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -12,7 +13,13 @@ import CustomModal from '@/components/CustomModal';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 
-import { filterIcon, filterSvg, savedIcon, searchSvg } from '@/assets/svgs';
+import {
+  chevLeftIcon,
+  chevRightIcon,
+  filterSvg,
+  savedIcon,
+  searchSvg,
+} from '@/assets/svgs';
 import { Brief, BriefSqlFilter } from '@/model';
 import {
   callSearchBriefs,
@@ -43,17 +50,16 @@ const Briefs = (): JSX.Element => {
   const [briefs_total, setBriefsTotal] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   // FIXME: setLoading
-  const [loading, _setLoading] = useState<boolean>(false);
+  const [loading] = useState<boolean>(false);
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const router = useRouter();
-  const [itemsPerPage, setNumItemsPerPage] = useState<number>(5);
+  const itemsPerPage = 6;
 
   const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
   // FIXME: openDropdown
   const [_openDropDown, setOpenDropDown] = useState<string>('');
 
   const [error, setError] = useState<any>();
-  const { pathname } = router;
   const { expRange, submitRange, lengthRange, heading } = router.query;
 
   const { user: currentUser } = useSelector(
@@ -361,6 +367,7 @@ const Briefs = (): JSX.Element => {
               break;
 
             default:
+              // eslint-disable-next-line no-console
               console.log(
                 'Invalid filter option selected or unimplemented. type:' +
                   filterType
@@ -429,24 +436,6 @@ const Briefs = (): JSX.Element => {
     setFilterVisible(!filterVisble);
   };
 
-  const PageItem = (props: any) => {
-    return (
-      <div
-        className={`h-[32px] rounded-[4px] hover:bg-[--theme-primary] hover:text-black border border-primary w-[32px] cursor-pointer pt-1 items-center text-center text-sm !font-bold mr-6 ${
-          currentPage === parseInt(props.page) ? 'text-black' : 'text-white'
-        }
-        ${
-          currentPage === parseInt(props.page)
-            ? 'bg-[--theme-primary]'
-            : 'bg-transparent'
-        }
-        `}
-      >
-        {props.page}
-      </div>
-    );
-  };
-
   // const closeFilterDropDowns = () => { // looking for a better solution
   //   const itemsToClear = customDropdownConfigs
   //     ?.filter((item) => item?.filterOptions && item?.filterOptions?.length > 0)
@@ -456,8 +445,6 @@ const Briefs = (): JSX.Element => {
   //     localStorage.removeItem(item);
   //   }, []);
   // };
-
-  const dropDownValues = [5, 10, 20, 50];
 
   const FilterModal = ({ open, handleClose }: FilterModalProps) => {
     return (
@@ -472,7 +459,7 @@ const Briefs = (): JSX.Element => {
           }}
           className='bg-white rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] lg:w-[60%] w-[95vw] self-center relative'
         >
-          <p className='font-normal text-base text-black mb-9'>Filter</p>
+          <p className='font-normal text-base text-black mb-9'>Filter by:</p>
 
           <div className='grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5'>
             {customDropdownConfigs
@@ -504,163 +491,158 @@ const Briefs = (): JSX.Element => {
     );
   };
 
-  const pageinationIconClassName =
-    'h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary';
-
   if (loading) return <FullScreenLoader />;
 
   return (
-    <div className='search-briefs-container px-[15px] '>
-      <FilterModal open={filterVisble} handleClose={() => toggleFilter()} />
+    <div className='flex flex-col'>
+      <div className='search-briefs-container !overflow-hidden max-width-868px:px-5'>
+        <FilterModal open={filterVisble} handleClose={() => toggleFilter()} />
 
-      <div className='briefs-section  max-width-750px:overflow-hidden'>
-        <div className='briefs-heading'>
-          <div className='flex justify-between lg:flex-row flex-col items-start lg:py-[3rem]'>
-            <div>
-              <div className='flex items-center'>
-                <input
-                  id='search-input'
-                  className='search-input px-[12px] !w-full  lg:!w-[20rem] !h-[2.875rem] !rounded-tr-[0px] !rounded-br-[0px]'
-                  placeholder='Search'
-                />
-                <div
-                  role='button'
-                  onClick={onSearch}
-                  className='h-[2.975rem] w-[3.0625rem] rounded-tr-[8px] rounded-br-[8px] bg-imbue-purple flex justify-center items-center cursor-pointer'
-                >
-                  <Image src={searchSvg} alt='Search' role='button' />
+        <div className='briefs-section !overflow-hidden'>
+          <div className='briefs-heading'>
+            <div className='flex justify-between lg:flex-row flex-col items-start lg:py-[3rem]'>
+              <div>
+                <div className='flex items-center'>
+                  <input
+                    id='search-input'
+                    className='search-input px-[12px] !w-full  lg:!w-[20rem] !h-[2.875rem] !rounded-tr-[0px] !rounded-br-[0px]'
+                    placeholder='Search'
+                  />
+                  <div
+                    role='button'
+                    onClick={onSearch}
+                    className='h-[2.975rem] w-[3.0625rem] rounded-tr-[8px] rounded-br-[8px] bg-imbue-purple flex justify-center items-center cursor-pointer'
+                  >
+                    <Image src={searchSvg} alt='Search' role='button' />
+                  </div>
                 </div>
+
+                <p className='text-[1rem] text-imbue-purple-dark mt-[0.75rem]'>
+                  {Number(briefs_total) === 0 ? 'No' : briefs_total} brief
+                  {Number(briefs_total) === 1 ? '' : 's'} found
+                </p>
               </div>
 
-              <p className='text-[1rem] text-imbue-purple-dark mt-[0.75rem]'>
-                {Number(briefs_total) === 0 ? 'No' : briefs_total} brief
-                {Number(briefs_total) === 1 ? '' : 's'} found
-              </p>
-            </div>
-
-            <div className='flex items-center mt-[2rem] lg:mt-0'>
-              <button
-                onClick={() => {
-                  onSavedBriefs();
-                }}
-                className='h-[43px] px-[20px] mr-12 rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 lg:ml-[44px]'
-              >
-                Saved Briefs
-                <Image
-                  src={savedIcon}
-                  alt={'filter-icon'}
-                  className='h-[20px] w-[20px] ml-2'
-                />
-              </button>
-              <div
-                className='flex items-center cursor-pointer'
-                onClick={toggleFilter}
-                role='button'
-              >
-                <p className='mr-[0.25rem] text-imbue-purple-dark text-[1rem]'>
-                  Filter
-                </p>
-                <Image src={filterSvg} alt='Filter Icon' />
+              <div className='flex items-center mt-[2rem] lg:mt-0'>
+                <button
+                  onClick={() => {
+                    onSavedBriefs();
+                  }}
+                  className='h-[43px] px-[20px] mr-12 rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 lg:ml-[44px]'
+                >
+                  Saved Briefs
+                  <Image
+                    src={savedIcon}
+                    alt={'filter-icon'}
+                    className='h-[20px] w-[20px] ml-2'
+                  />
+                </button>
+                <div
+                  className='flex items-center cursor-pointer'
+                  onClick={toggleFilter}
+                  role='button'
+                >
+                  <p className='mr-[0.25rem] text-imbue-purple-dark text-[1rem]'>
+                    Filter
+                  </p>
+                  <Image src={filterSvg} alt='Filter Icon' />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className='briefs-list'>
-          {briefs?.map(
-            (item, itemIndex) =>
-              !item?.project_id && (
-                <div
-                  className='brief-item'
-                  key={itemIndex}
-                  onClick={() => router.push(`/briefs/${item?.id}/`)}
-                >
-                  <div className='brief-title'>{item.headline}</div>
-                  <div className='brief-time-info'>
-                    {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
-                  </div>
-                  <div className='brief-description'>{item.description}</div>
 
-                  <div className='brief-tags'>
-                    {item.skills.map((skill: any, skillIndex: any) => (
-                      <div className='tag-item' key={skillIndex}>
-                        {skill.name}
+          <div className='briefs-list !overflow-hidden'>
+            {briefs?.map(
+              (item, itemIndex) =>
+                !item?.project_id && (
+                  <div
+                    className='brief-item'
+                    key={itemIndex}
+                    onClick={() => router.push(`/briefs/${item?.id}/`)}
+                  >
+                    <div className='brief-title'>{item.headline}</div>
+                    <div className='brief-time-info'>
+                      {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
+                    </div>
+                    <div className='brief-description'>{item.description}</div>
+
+                    <div className='brief-tags'>
+                      {item.skills.map((skill: any, skillIndex: any) => (
+                        <div className='tag-item' key={skillIndex}>
+                          {skill.name}
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className='flex justify-between lg:flex-row flex-col lg:w-[400px] lg:items-center'>
+                      <div className='brief-proposals'>
+                        <span className='proposals-heading'>
+                          Proposals Submitted:{' '}
+                        </span>
+                        <span className='proposals-count'>
+                          Less than {item.number_of_briefs_submitted}
+                        </span>
                       </div>
-                    ))}
-                  </div>
 
-                  <div className='flex justify-between lg:flex-row flex-col lg:w-[400px] lg:items-center'>
-                    <div className='brief-proposals'>
-                      <span className='proposals-heading'>
-                        Proposals Submitted:{' '}
-                      </span>
-                      <span className='proposals-count'>
-                        Less than {item.number_of_briefs_submitted}
-                      </span>
-                    </div>
-
-                    <div className='leading-none text-black mt-3 lg:mt-0'>
-                      {timeAgo.format(new Date(item?.created))}
+                      <div className='leading-none text-black mt-3 lg:mt-0'>
+                        {timeAgo.format(new Date(item?.created))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )
-          )}
+                )
+            )}
+          </div>
         </div>
-        {/* <Pagination
+
+        <ErrorScreen {...{ error, setError }}>
+          <div className='flex flex-col gap-4 w-1/2'>
+            <button
+              onClick={() => setError(null)}
+              className='primary-btn in-dark w-button w-full !m-0'
+            >
+              Try Again
+            </button>
+            <button
+              onClick={() => router.push(`/dashboard`)}
+              className='underline text-xs lg:text-base font-bold'
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        </ErrorScreen>
+      </div>
+      <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center justify-between  max-width-868px:w-[90%] self-center'>
+        <Pagination
           pageSize={itemsPerPage}
           total={briefs_total}
           onChange={(page: number) => setCurrentPage(page)}
-          className='flex flex-row items-center my-10 px-10'
+          className='flex flex-row items-center lg:px-10'
           itemRender={(page, type, originalElement) => {
             if (type === 'page') {
-              return <PageItem page={page} />;
+              return (
+                <div className='mx-[1.62rem] text-[#5E5E5E] text-[0.7rem] lg:text-[1rem] font-normal'>
+                  {page} of {(briefs_total / itemsPerPage).toFixed(0)}
+                </div>
+              );
             }
             return originalElement;
           }}
-          prevIcon={<div className={pageinationIconClassName}>{'<'}</div>}
-          nextIcon={<div className={pageinationIconClassName}>{'>'}</div>}
-          jumpNextIcon={<div className={pageinationIconClassName}>{'>>'}</div>}
-          jumpPrevIcon={<div className={pageinationIconClassName}>{'<<'}</div>}
-        /> */}
+          prevIcon={
+            <button className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'>
+              <Image src={chevLeftIcon} alt='chev left' />
+              Previous
+            </button>
+          }
+          nextIcon={
+            <button className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'>
+              Next
+              <Image src={chevRightIcon} alt='chev right' />
+            </button>
+          }
+        />
       </div>
-
-      <ErrorScreen {...{ error, setError }}>
-        <div className='flex flex-col gap-4 w-1/2'>
-          <button
-            onClick={() => setError(null)}
-            className='primary-btn in-dark w-button w-full !m-0'
-          >
-            Try Again
-          </button>
-          <button
-            onClick={() => router.push(`/dashboard`)}
-            className='underline text-xs lg:text-base font-bold'
-          >
-            Go to Dashboard
-          </button>
-        </div>
-      </ErrorScreen>
     </div>
   );
 };
-
-{
-  /* <span className='ml-8'>
-  Briefs per page
-  <select
-    className='ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none focus:outline-none focus:outline-white'
-    onChange={(e) => {
-      setNumItemsPerPage(parseInt(e.target.value));
-    }}
-    value={itemsPerPage}
-  >
-    {dropDownValues?.map((item, itemIndex) => (
-      <option key={itemIndex} value={item}>
-        {item}
-      </option>
-    ))}
-  </select>
-</span>; */
-}
 
 export default Briefs;

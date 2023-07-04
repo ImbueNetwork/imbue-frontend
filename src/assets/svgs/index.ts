@@ -10,6 +10,8 @@ const walletIcon = require('./wallet-icon.svg');
 const filterSvg = require('./filter-icon.svg');
 const searchSvg = require('./search-icon.svg');
 const chevDownIcon = require('./chevron-down.svg');
+const chevLeftIcon = require('./chevron-left.svg');
+const chevRightIcon = require('./chevron-right.svg');
 
 export {
   appLoader,
@@ -17,6 +19,8 @@ export {
   arrowDownIcon,
   cancelIcon,
   chevDownIcon,
+  chevLeftIcon,
+  chevRightIcon,
   filterIcon,
   filterSvg,
   googleIcon,

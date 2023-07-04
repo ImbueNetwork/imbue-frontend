@@ -96,7 +96,7 @@ describe('Briefs Page', () => {
     });
 
     // Perform additional assertions on the filter modal content
-    expect(screen.getByText('Filter')).toBeInTheDocument();
+    expect(screen.getByText('Filter by:')).toBeInTheDocument();
 
     // Simulate clicking on the experience level dropdown from filter modal
 

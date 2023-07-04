@@ -32,6 +32,7 @@ module.exports = {
         'imbue-purple-dark': 'var(--imbue-purple-dark, #03116A)',
         'imbue-light-purple': '#E1DDFF',
         'imbue-light-purple-two': '#9880F2',
+        'imbue-foundation-blue': '#00234C',
       },
       screens: {
         'max-width-1800px': { raw: '(max-width: 1800px)' },
