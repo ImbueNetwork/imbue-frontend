@@ -405,7 +405,9 @@ const Freelancers = (): JSX.Element => {
     <div>
       <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
         <FilterModal open={filterVisble} handleClose={() => toggleFilter()} />
-        <div className={`${styles.freelancersView} max-width-750px:!w-full`}>
+        <div
+          className={`${styles.freelancersView} max-width-750px:!w-full max-width-750px:px-5`}
+        >
           <div className='bg-white py-[1.5rem] px-[3.88rem] rounded-[1.25rem]'>
             <div className='flex justify-between lg:flex-row flex-col items-start'>
               <div>
@@ -462,7 +464,7 @@ const Freelancers = (): JSX.Element => {
                     }: Freelancer,
                     index: number
                   ) => (
-                    <Grid item xs={6} md={3} key={index}>
+                    <Grid item xs={12} sm={12} md={3} key={index}>
                       <div className={`${styles.freelancer} py-[0.94rem]`}>
                         <div className='flex items-center justify-center'>
                           <Image
@@ -518,7 +520,7 @@ const Freelancers = (): JSX.Element => {
                 )}
           </Grid>
 
-          <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center justify-between  max-width-868px:w-[90%] self-center'>
+          <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center justify-between   self-center'>
             <Pagination
               pageSize={itemsPerPage}
               total={freelancers_total}
