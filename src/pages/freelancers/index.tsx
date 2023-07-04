@@ -353,9 +353,11 @@ const Freelancers = (): JSX.Element => {
           onClick={(e: any) => {
             e?.stopPropagation();
           }}
-          className='bg-[#1B1B1B] rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative'
+          className='bg-white rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative'
         >
-          <p className='font-normal text-base text-white !mb-9'>Filter</p>
+          <p className='font-normal text-base !text-imbue-purple-dark !mb-9'>
+            Filter
+          </p>
 
           <div className='grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5'>
             {customDropdownConfigs
