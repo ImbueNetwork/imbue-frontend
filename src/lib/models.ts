@@ -68,18 +68,24 @@ export type ProposedMilestone = {
   amount: number;
 };
 
-export type GrantProposal = {
-  name: string;
-  logo: string;
+export type GrantApprover = string;
+
+export type Grant = {
+  id?: string | number;
+  title: string;
   description: string;
-  website: string;
   milestones: ProposedMilestone[];
+  duration_id: number;
   required_funds: number;
-  owner?: string;
-  user_id?: number;
-  category?: string | number;
+  total_cost_without_fee: number;
+  imbue_fee: number;
+  user_id: number;
+  owner: string;
   currency_id: number;
-  chain_project_id?: number;
+  onchain_address: string;
+  approvers: GrantApprover[];
+  chain_project_id: number;
+  escrow_address: string;
 };
 
 export type Milestone = ProposedMilestone & {
@@ -110,6 +116,8 @@ export type Project = {
   total_cost_without_fee?: number;
   imbue_fee?: number;
   status_id?: number;
+  // project_type: number;
+  escrow_address?: string;
 };
 
 export type ProjectProperties = {
@@ -209,6 +217,28 @@ export const fetchWeb3AccountsByUserId =
   (user_id: number) => (tx: Knex.Transaction) =>
     fetchAllWeb3Account()(tx).where({ user_id }).select();
 
+export const fetchAllUser = () => (tx: Knex.Transaction) =>
+  tx<User>('users').select(
+    'id',
+    'display_name',
+    'profile_photo',
+    'username',
+    'web3_address'
+  );
+
+export const fetchUserWithUsernameOrAddress =
+  (usernameOrAddress: string) => (tx: Knex.Transaction) =>
+    tx<User>('users')
+      .where('username', 'ilike', `%${usernameOrAddress}%`)
+      .orWhere('web3_address', 'ilike', `%${usernameOrAddress}%`)
+      .select(
+        'id',
+        'display_name',
+        'profile_photo',
+        'username',
+        'web3_address'
+      );
+
 export const fetchUser = (id: number) => (tx: Knex.Transaction) =>
   tx<User>('users').where({ id }).first();
 
@@ -228,6 +258,10 @@ export const upsertWeb3Challenge =
   async (
     tx: Knex.Transaction
   ): Promise<[web3Account: Web3Account, isInsert: boolean]> => {
+    const updatedUser = await tx<User>('users')
+      .update({ web3_address: address })
+      .where({ id: user.id })
+      .returning('*');
     const web3Account = await tx<Web3Account>('web3_accounts')
       .select()
       .where({
@@ -390,6 +424,13 @@ export const fetchUserBriefApplications =
 export const fetchProject = (id: string | number) => (tx: Knex.Transaction) =>
   tx<Project>('projects').select().where({ id: id }).first();
 
+export const fetchGrantProject =
+  (project_id: number) => (tx: Knex.Transaction) =>
+    tx<Project>('projects')
+      .select()
+      .where({ chain_project_id: project_id })
+      .first();
+
 export const acceptBriefApplication =
   (id: string | number, project_id: number) => async (tx: Knex.Transaction) =>
     (
@@ -448,6 +489,12 @@ export const deleteMilestones =
 export const fetchProjectMilestones =
   (id: string | number) => (tx: Knex.Transaction) =>
     tx<Milestone>('milestones').select().where({ project_id: id });
+
+export const fetchProjectApprovers =
+  (id: string | number) => (tx: Knex.Transaction) =>
+    tx<Milestone>('project_approvers')
+      .select('approver')
+      .where({ project_id: id });
 
 export const updateMilestoneDetails =
   (id: string | number, milestoneId: string | number, details: string) =>
@@ -536,6 +583,26 @@ export const fetchAllBriefs = () => (tx: Knex.Transaction) =>
     .groupBy('briefs.experience_id')
     .groupBy('experience.experience_level')
     .groupBy('users.id');
+
+export const fetchAllGrants = () => (tx: Knex.Transaction) =>
+  tx
+    .select(
+      'grants.id',
+      'grants.title',
+      'grants.description',
+      'grants.duration_id',
+      'duration.duration',
+      'grants.budget',
+      'grants.currency_id',
+      'users.display_name as created_by',
+      'grants.created',
+      'grants.user_id',
+      'grants.project_id'
+    )
+    .from('grants')
+    .leftJoin('duration', { 'grants.duration_id': 'duration.id' })
+    .innerJoin('users', { 'grants.user_id': 'users.id' })
+    .orderBy('grants.created', 'desc');
 
 export const fetchItems =
   (ids: number[], tableName: string) => async (tx: Knex.Transaction) =>
@@ -1184,3 +1251,50 @@ export const searchFreelancers = async (
     .where('username', 'ilike', '%' + filter.search_input + '%')
     .where('title', 'ilike', '%' + filter.search_input + '%')
     .where('bio', 'ilike', '%' + filter.search_input + '%');
+
+export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
+  const {
+    title,
+    description,
+    required_funds,
+    total_cost_without_fee,
+    imbue_fee,
+    owner,
+    currency_id,
+    milestones,
+    approvers,
+    chain_project_id,
+    user_id,
+    escrow_address,
+  } = grant;
+  const project = await insertProject({
+    name: title,
+    logo: '',
+    description,
+    website: '',
+    category: 0,
+    required_funds,
+    currency_id,
+    chain_project_id,
+    escrow_address,
+    owner,
+    user_id,
+    total_cost_without_fee,
+    imbue_fee,
+    // project_type: project_type ?? models.ProjectType.Brief
+  })(tx);
+
+  if (project.id === undefined) {
+    return new Error('Failed to insert project');
+  }
+
+  await insertMilestones(milestones, project.id)(tx);
+
+  for await (const approver of approvers) {
+    await tx('project_approvers').insert({
+      project_id: project.id,
+      approver,
+    });
+  }
+  return project.id;
+};

@@ -105,6 +105,11 @@ ul li {
   color: var(--hq-dialog-content-color);
 }
 
+.aeonikFont {
+  font-family: Aeonik, sans-serif;
+  font-weight: 400;
+}
+
 .button-container {
   display: flex;
 }
@@ -177,7 +182,7 @@ ul li {
   align-self: center;
   border-radius: 46px;
   background-color: #411dc9;
-  font-family: Aeoniktrial, sans-serif;
+  font-family: Aeonik, sans-serif;
   font-weight: 400;
   text-align: center;
 }
