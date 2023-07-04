@@ -3,13 +3,13 @@ import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { WalletAccount } from '@talismn/connect-wallets';
 import bcrypt from 'bcryptjs';
 import Image from 'next/image';
-import Link from 'next/link';
-import React, { useRef } from 'react';
+import React from 'react';
 import { useState } from 'react';
 
 import * as utils from '@/utils';
 
 import AccountChoice from '@/components/AccountChoice';
+import Login from '@/components/Login';
 
 import { walletIcon } from '@/assets/svgs';
 import { postAPIHeaders } from '@/config';
@@ -24,6 +24,7 @@ const Join = (): JSX.Element => {
   const [matchPassword, setMatchPassword] = useState('');
   const [error, setError] = useState('');
 
+  const [visible, setVisible] = useState<boolean>(false);
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
 
 
@@ -76,8 +77,6 @@ const Join = (): JSX.Element => {
     }
   };
 
-  const googleParentRef = useRef<any>()
-
   const googleLogin = async (response: any) => {
     const resp = await fetch(`${config.apiBase}auth/google/`, {
       headers: postAPIHeaders,
@@ -96,10 +95,58 @@ const Join = (): JSX.Element => {
     <div>
       <div id='registration-form' className='registration-container bg-white w-[70%] py-5 -mt-3 rounded-2xl mx-auto'>
         <div className='flex flex-col w-[75%] justify-center items-center mx-auto'>
-          <div className='flex flex-col gap-8'>
+          <div className='flex flex-col gap-4'>
             <h1>Create account with imbue</h1>
             <p className='text-imbue-purple-dark text-center text-xl'>Please use the link below to sign in</p>
           </div>
+
+
+          {/* <div className='flex flex-wrap flex-row justify-center'>
+            <CssTextField
+              value={user}
+              onChange={(e: any) => setUser(e.target.value)}
+              id='username'
+              type='text'
+              label='Username'
+              className='mdc-text-field !rounded-[10px] !w-[70%]'
+              required
+            />
+          </div>
+
+          <div className='flex flex-wrap flex-row justify-center'>
+            <CssTextField
+              type='email'
+              label='Email'
+              onChange={(e: any) => setEmail(e.target.value)}
+              className='mdc-text-field  !rounded-[10px] !w-[70%]'
+              required
+            />
+          </div>
+          <div className='flex flex-wrap flex-row justify-center'>
+            <CssTextField
+              label='Password'
+              helperText='Min 8 chars, at least one uppercase, lowercase, number and one special character'
+              onChange={(e: any) => setPassword(e.target.value)}
+              type='password'
+              className='mdc-text-field !rounded-[10px] !w-[70%]'
+              required
+            />
+          </div>
+
+          <div className='flex flex-wrap flex-row justify-center'>
+            <CssTextField
+              label='Confirm Password'
+              error={matchPassword.length > 0 && password != matchPassword}
+              onChange={(e: any) => setMatchPassword(e.target.value)}
+              helperText={
+                password != matchPassword ? 'Please match password' : ''
+              }
+              type='password'
+              className='mdc-text-field  !rounded-[10px] !w-[70%]'
+              required
+            />
+          </div> */}
+
 
           <div className='w-full max-w-[50%] mx-auto mt-3'>
             <form
@@ -109,7 +156,7 @@ const Join = (): JSX.Element => {
               onSubmit={handleSubmit}
               className='w-full'
             >
-              <div className='flex flex-col justify-center pb-[10px] w-full mt-5'>
+              <div className='flex flex-col justify-center pb-[10px] w-full mt-2'>
                 <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
                   Username
                 </label>
@@ -122,7 +169,7 @@ const Join = (): JSX.Element => {
                 />
               </div>
 
-              <div className='flex flex-col justify-center pb-[10px] w-full mt-5'>
+              <div className='flex flex-col justify-center pb-[10px] w-full mt-2'>
                 <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
                   Email
                 </label>
@@ -137,7 +184,7 @@ const Join = (): JSX.Element => {
                 />
               </div>
 
-              <div className='flex flex-col justify-center pb-[10px] w-full mt-5'>
+              <div className='flex flex-col justify-center pb-[10px] w-full mt-2'>
                 <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
                   Password
                 </label>
@@ -151,7 +198,7 @@ const Join = (): JSX.Element => {
                 />
               </div>
 
-              <div className='flex flex-col justify-center pb-[10px] w-full mt-5'>
+              <div className='flex flex-col justify-center pb-[10px] w-full mt-2'>
                 <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
                   Confirm Password
                 </label>
@@ -168,7 +215,7 @@ const Join = (): JSX.Element => {
               <div className='flex flex-wrap flex-row justify-center'>
                 <span className={!error ? 'hide' : 'error'}>{error}</span>
               </div>
-              <div className='flex justify-center mt-5 w-full'>
+              <div className='flex justify-center mt-2 w-full'>
                 <input
                   type='submit'
                   disabled={password != matchPassword}
@@ -182,27 +229,26 @@ const Join = (): JSX.Element => {
                 <span className='text-imbue-purple-dark text-base'>
                   Already have an account?
                 </span>
-                <Link
-                  href='/join'
+                <span
                   onClick={() => {
-                    // setVisible(false);
+                    setVisible(true);
                   }}
-                  className='signup text-imbue-coral ml-1 hover:underline'
+                  className='signup text-imbue-coral ml-1 hover:underline cursor-pointer'
                 >
                   Sign In
-                </Link>
+                </span>
               </div>
 
-              <div className='w-full mt-8 mb-5 flex justify-between items-center'>
+              <div className='w-full my-4 flex justify-between items-center'>
                 <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
                 <p className='text-base text-imbue-purple-dark'>or</p>
                 <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
               </div>
 
-              <div ref={googleParentRef} className='login flex flex-col justify-center items-center w-full'>
+              <div className='login flex flex-col justify-center items-center w-full'>
                 <GoogleOAuthProvider clientId={config.googleClientId}>
                   <GoogleLogin
-                    width={`${googleParentRef?.current?.clientWidth}`}
+                    width={'400'}
                     logo_alignment="center"
                     shape='circle'
                     size="large"
@@ -244,6 +290,13 @@ const Join = (): JSX.Element => {
         visible={polkadotAccountsVisible}
         setVisible={showPolkadotAccounts}
       />
+
+      <Login
+        visible={visible}
+        setVisible={setVisible}
+        redirectUrl='/dashboard'
+      />
+
     </div >
   );
 };
