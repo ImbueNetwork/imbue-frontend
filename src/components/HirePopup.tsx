@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useMediaQuery } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
@@ -87,6 +88,7 @@ export const HirePopup = ({
       milestones
     );
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {

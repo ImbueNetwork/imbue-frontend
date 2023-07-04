@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Badge, Menu, MenuItem, useMediaQuery } from '@mui/material';
 import { SignerResult } from '@polkadot/api/types';
