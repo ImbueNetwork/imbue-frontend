@@ -18,6 +18,7 @@ module.exports = {
       },
 
       colors: {
+        primary: '#b2ff0b',
         'theme-grey-dark': '#2c2c2c',
         'theme-secondary': '#411dc9',
         'theme-black-text': '#0f0f0f',
@@ -27,10 +28,11 @@ module.exports = {
         'dark-black': '#1E1E1E',
         'grey-background': '#EBEAE2',
         'imbue-purple': '#3B27C1',
-        'imbue-purple-light': '#E1DDFF',
-        'imbue-purple-dark': '#03116A',
+        'imbue-purple-dark': 'var(--imbue-purple-dark, #03116A)',
+        'imbue-light-purple': '#E1DDFF',
+        'imbue-light-purple-two': '#9880F2',
         'imbue-coral': '#FC6760',
-        primary: '#b2ff0b',
+        'imbue-foundation-blue': '#00234C',
       },
       screens: {
         'max-width-1800px': { raw: '(max-width: 1800px)' },

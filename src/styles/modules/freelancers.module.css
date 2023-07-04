@@ -1,5 +1,5 @@
 .freelancersContainer {
-  margin: 0 72px;
+  margin: 0px;
   /* display: flex; */
   flex-direction: row;
 }
@@ -14,17 +14,13 @@
 }
 
 .freelancer {
-  background: #0f0f0f;
-  border: 1px solid #2c2c2c;
-  border-radius: 0px 0px 12px 12px;
+  background: #fff;
+  border-radius: 0.5rem;
   display: flex;
   flex-direction: column;
-  width: 100%;
 }
 
 .freelancerProfilePic {
-  width: 50%;
-  height: 80%;
   border-radius: 50%;
   overflow: hidden;
   object-fit: cover;
@@ -33,17 +29,6 @@
 .freelancerInfo {
   border-top: none;
   border-bottom: none;
-  padding: 16px 20px;
-}
-
-.freelancerImageContainer {
-  width: 100%;
-  aspect-ratio: 3/2;
-  background: rgba(0, 0, 0, 0.67);
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .verifiedIcon {
@@ -85,15 +70,16 @@
 
 .skills {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: no-wrap;
   gap: 10px;
   margin-top: 24px;
 }
 
 .skill {
   padding: 7px 14px;
-  border: 1px solid white;
-  border-radius: 8px;
+  background-color: #e1ddff;
+  color: #3b27c1;
+  border-radius: 6rem;
 }
 
 .freelancersContainer p {
@@ -108,6 +94,7 @@
   flex-direction: column;
   gap: 28px;
   margin: 32px 20px;
+  background-color: #fff;
 }
 
 .filterHeading {

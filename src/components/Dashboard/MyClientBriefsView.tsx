@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Skeleton } from '@mui/material';
 import { useRouter } from 'next/router';

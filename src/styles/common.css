@@ -13,14 +13,17 @@
   --theme-grey-text: #a6a6a6;
   --theme-black-text: #0f0f0f;
   --theme-imbue-purple: #3b27c1;
-  --theme-imbue-purple-light: #E1DDFF;
+  --theme-imbue-light-purple: #E1DDFF;
   --theme-imbue-purple-dark: #03116A;
   --theme-imbue-white: #ffffff;
   --theme-grey-dark: #2c2c2c;
   --theme-light-grey: #ebeae2;
   --theme-grey-text: #a6a6a6;
   --theme-white: #fff;
+  --theme-coral: #fc6760;
   --theme-purple-dark: #03116a;
+  --theme-purple-light: #e1ddff;
+  --theme-purple-light-two: #9880f2;
   --theme-purple: #3b27c1;
   --theme-light-white: rgba(255, 255, 255, 0.25);
   --theme-h1-size: 75px;

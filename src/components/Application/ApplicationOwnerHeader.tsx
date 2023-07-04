@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-condition */
 import { useMediaQuery } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { WalletAccount } from '@talismn/connect-wallets';
