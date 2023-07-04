@@ -1,17 +1,17 @@
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { SignerResult } from '@polkadot/api/types';
-import { GoogleLogin, GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { ReactNode, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import customStyled from 'styled-components';
 
 import * as utils from '@/utils';
 
 import AccountChoice from '@/components/AccountChoice';
 
-import { googleIcon, walletIcon } from '@/assets/svgs';
+import { walletIcon } from '@/assets/svgs';
 import { postAPIHeaders } from '@/config';
 import * as config from '@/config';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
@@ -154,7 +154,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                 >
                   <div className='login justify-center items-center w-full flex flex-col'>
                     <div className='flex flex-col justify-center pb-2 w-full'>
-                      <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal'>
+                      <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
                         Username/Email
                       </label>
                       <CustomInput
@@ -165,7 +165,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                       />
                     </div>
                     <div className='flex flex-col justify-center pb-[10px] w-full mt-[1.2rem]'>
-                      <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal'>
+                      <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
                         Password
                       </label>
                       <CustomInput

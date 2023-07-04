@@ -27,10 +27,10 @@ module.exports = {
         'dark-black': '#1E1E1E',
         'grey-background': '#EBEAE2',
         'imbue-purple': '#3B27C1',
+        'imbue-purple-light': '#E1DDFF',
         'imbue-purple-dark': '#03116A',
         'imbue-coral': '#FC6760',
         primary: '#b2ff0b',
-        'imbue-purple-dark': 'var(--imbue-purple-dark, #03116A)',
       },
       screens: {
         'max-width-1800px': { raw: '(max-width: 1800px)' },

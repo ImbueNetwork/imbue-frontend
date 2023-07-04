@@ -13,6 +13,8 @@
   --theme-grey-text: #a6a6a6;
   --theme-black-text: #0f0f0f;
   --theme-imbue-purple: #3b27c1;
+  --theme-imbue-purple-light: #E1DDFF;
+  --theme-imbue-purple-dark: #03116A;
   --theme-imbue-white: #ffffff;
   --theme-grey-dark: #2c2c2c;
   --theme-light-grey: #ebeae2;
@@ -273,6 +275,22 @@ select.round {
 
 .country-picker option {
   background: var(--theme-black-text);
+}
+
+.outlinedInput{
+  height: 2.6rem;
+  padding: 0.62rem 1.25rem !important;
+  border-width: 1px;
+  border-color: var(--theme-purple-dark);
+  background-color: transparent;
+  color: var(--theme-purple-dark) !important;
+  border-radius: 4px;
+  outline-width: 1px;
+  outline-color: var(--theme-imbue-purple);
+}
+
+.outlinedInput::placeholder{
+  color: rgba(3, 17, 106, 0.30);
 }
 
 /* Chrome, Safari, Edge, Opera */
