@@ -94,7 +94,7 @@
 .MuiInputBase-input,
 .MuiSvgIcon-root.MuiSvgIcon-fontSizeMedium.MuiSelect-icon.MuiSelect-iconStandard,
 .MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiInput-input {
-  color: white;
+  color: var(--theme-purple);
 }
 
 .profile-container

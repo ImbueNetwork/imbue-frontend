@@ -37,15 +37,15 @@ const CountrySelector = ({
     <>
       {isEditMode ? (
         <div className='w-full relative'>
-          <h3 className='text-lg mb-2'>Your Location</h3>
+          <h3 className='text-lg mb-2 text-imbue-purple-dark'>Your Location</h3>
           <div className='country-picker flex flex-wrap gap-2'>
             <CountryDropdown
-              classes='bg-transparent border border-light-white px-3 py-4 rounded max-w-full'
+              classes='bg-transparent border border-imbue-purple px-3 py-4 rounded max-w-full text-imbue-purple'
               value={country}
               onChange={(val) => handleCountry(val)}
             />
             <RegionDropdown
-              classes='bg-transparent border border-light-white px-3 py-4 rounded max-w-full'
+              classes='bg-transparent border border-imbue-purple px-3 py-4 rounded max-w-full text-imbue-purple'
               country={country}
               value={region}
               onChange={(val) => handleRegion(val)}
@@ -57,7 +57,7 @@ const CountrySelector = ({
           {country && (
             <>
               <ReactCountryFlag countryCode={findFlag() || ''} />
-              <p className='text-base leading-[1.2]'>
+              <p className='text-base leading-[1.2] text-imbue-purple-dark'>
                 {region}, {country}
               </p>
             </>

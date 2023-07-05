@@ -278,7 +278,7 @@ select.round {
 }
 
 .country-picker option {
-  background: var(--theme-black-text);
+  background: var(--theme-background);
 }
 
 .outlinedInput{

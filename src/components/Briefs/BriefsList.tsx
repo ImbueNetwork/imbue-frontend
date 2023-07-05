@@ -46,7 +46,7 @@ export const BriefLists = ({
     );
 
   if (briefs?.length === 0 && !showNewBriefButton)
-    return <h2 className='text-[16px]'>Nothing to show</h2>;
+    return <h2 className='text-[16px] text-imbue-purple'>Nothing to show</h2>;
 
   return (
     <div className='bg-white mb-8 overflow-hidden rounded-xl'>
