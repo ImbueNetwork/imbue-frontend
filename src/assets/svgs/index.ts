@@ -12,6 +12,7 @@ const searchSvg = require('./search-icon.svg');
 const chevDownIcon = require('./chevron-down.svg');
 const chevLeftIcon = require('./chevron-left.svg');
 const chevRightIcon = require('./chevron-right.svg');
+const copyIcon = require('./copy-icon.svg');
 
 export {
   appLoader,
@@ -21,6 +22,7 @@ export {
   chevDownIcon,
   chevLeftIcon,
   chevRightIcon,
+  copyIcon,
   filterIcon,
   filterSvg,
   googleIcon,
