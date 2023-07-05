@@ -1,12 +1,12 @@
 /* navbar */
 .menuItems
   .MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.MuiMenuItem-root.MuiMenuItem-gutters:hover {
-  background: rgba(128, 128, 128, 0.3);
+  background: var(--theme-purple-light);
 }
 
 .navBar
   .MuiPaper-root.MuiMenu-paper.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation8.MuiPopover-paper {
-  background: var(--theme-black-text);
+  background: var(--theme-background);
   left: auto !important;
   right: 20px;
   border-radius: 15px;
@@ -24,21 +24,20 @@
 
 /* common.css */
 .MuiBottomNavigation-root {
-  background: var(--theme-grey-dark);
+  background: var(--theme-background);
   border-radius: 10px;
-  border: 1px solid var(--theme-light-white);
-  margin-bottom: 36px;
+  border: 1px solid var(--theme-purple-light);
+  margin-bottom: 32px;
   overflow: hidden;
 }
 
 .MuiButtonBase-root.MuiBottomNavigationAction-root.Mui-selected {
   background-color: var(--theme-primary);
-  color: black;
 }
 
 .MuiButtonBase-root.MuiBottomNavigationAction-root {
   max-width: 33.34%;
-  color: white;
+  color: var(--theme-purple-dark);
 }
 
 .MuiBottomNavigationAction-label,

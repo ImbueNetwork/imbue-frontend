@@ -21,6 +21,7 @@
   --theme-grey-text: #a6a6a6;
   --theme-white: #fff;
   --theme-coral: #fc6760;
+  --theme-purple: #3b27c1;
   --theme-purple-dark: #03116a;
   --theme-purple-light: #e1ddff;
   --theme-purple-light-two: #9880f2;
@@ -197,7 +198,7 @@
 }
 
 .PendingReview-button {
-  background-color: var(--theme-background);
+  background-color: var(--theme-purple);
   color: white;
 }
 
