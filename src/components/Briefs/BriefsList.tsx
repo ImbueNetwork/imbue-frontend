@@ -54,7 +54,7 @@ export const BriefLists = ({
         <div
           key={index}
           onClick={() => handleItemClick(brief)}
-          className={`flex cursor-pointer hover:bg-imbue-light-purple-hover px-5 py-3 lg:px-10 lg:py-8 justify-between border-b border-b-light-white last:border-b-0`}
+          className={`flex cursor-pointer hover:bg-imbue-light-purple-hover px-5 py-3 lg:px-10 lg:py-8 justify-between border-b border-b-imbue-light-purple last:border-b-0`}
         >
           <div className='flex flex-col gap-1 lg:gap-3'>
             <span className='text-sm text-imbue-purple-dark lg:text-xl'>{brief.headline}</span>

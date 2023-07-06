@@ -1,13 +1,13 @@
 .fieldInput {
-  background-color: var(--theme-ink-color);
-  border: solid 1px black;
+  background-color: transparent;
+  border: solid 1px var(--theme-imbue-purple);
   border-radius: 8px;
   backdrop-filter: blur(8px);
   padding: 8px 8px 8px 16px;
   width: 100%;
   font-size: 16px;
   line-height: 1.5;
-  color: black;
+  color: var(--theme-imbue-purple-dark);
 }
 
 .large {
@@ -18,7 +18,7 @@
   display: flex;
   flex-direction: row;
   min-height: 650px;
-  max-width: 800px;
+  width: 50%;
   margin-left: auto;
   margin-right: auto;
   border-radius: 20px;
@@ -26,9 +26,8 @@
 
 .mainPanel {
   display: flex;
-  flex-direction: column;
-  background-color: var(--theme-ink-color);
-  padding: 20px 54px;
+  background-color: var(--theme-background);
+  padding: 40px 54px;
   width: 100%;
   margin-left: auto;
   margin-right: auto;
@@ -42,9 +41,6 @@
 }
 
 .freelancerContents {
-  padding-top: 2%;
-  padding-bottom: 2%;
-  height: 100%;
   flex-grow: 1;
 }
 
@@ -73,7 +69,7 @@
 
 .contentTextSmall {
   width: 90%;
-  color: #2c2c2c;
+  color: var(--theme-imbue-purple);
   font-size: 23px;
   text-align: left;
   padding-top: 5%;
@@ -98,13 +94,18 @@
 .freelanceXpItem {
   display: flex;
   flex-direction: column;
-  background: var(--theme-imbue-white);
+  background: var(--theme-imbue-light-purple);
   color: var(--theme-imbue-purple);
   font-size: 15px;
   line-height: 1;
   padding: 17px;
   border-radius: 8px;
   cursor: pointer;
+}
+
+.freelanceXpItem:hover {
+  background: var(--theme-imbue-light-purple-hover);
+  color: var(--theme-imbue-purple);
 }
 
 .active {
