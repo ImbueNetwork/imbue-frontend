@@ -245,14 +245,14 @@ select.round {
 
 .pill-button {
   padding: 12px 24px;
-  border: 1px solid white;
-  border-radius: 8px;
+  background-color: var(--theme-imbue-light-purple);
+  border-radius: 20px;
   cursor: pointer;
   width: fit-content;
 }
 
 .pill-button:hover {
-  background: white;
+  background: var(--theme-imbue-light-purple-hover);
   color: black;
 }
 

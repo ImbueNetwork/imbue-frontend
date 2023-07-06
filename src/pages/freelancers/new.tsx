@@ -369,7 +369,7 @@ const Freelancer = (): JSX.Element => {
           <div className={step === 0 ? styles.buttonLeft : styles.buttonRight}>
             {step >= 1 && (
               <button
-                className='secondary-btn !mt-0'
+                className='secondary-btn !mt-0 !border !border-imbue-purple hover:!border-primary'
                 onClick={() => setStep(step - 1)}
               >
                 Back

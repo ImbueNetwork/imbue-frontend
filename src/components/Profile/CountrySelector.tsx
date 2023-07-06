@@ -53,7 +53,7 @@ const CountrySelector = ({
           </div>
         </div>
       ) : (
-        <div className='flex gap-3 mx-auto'>
+        <div className='flex gap-3'>
           {country && (
             <>
               <ReactCountryFlag countryCode={findFlag() || ''} />

@@ -52,11 +52,11 @@
   margin-left: 0;
 }
 
-.approvers .MuiFormControl-root{
+.approvers .MuiFormControl-root {
   margin-bottom: 0;
 }
 
-.MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation1.MuiAutocomplete-paper{
+.MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation1.MuiAutocomplete-paper {
   background-color: var(--theme-background);
 }
 
@@ -77,7 +77,7 @@
 }
 
 .MuiOutlinedInput-notchedOutline {
-  border-color: var(--theme-light-white);
+  border-color: var(--theme-purple);
 }
 
 .applicationList .MuiFormControl-root {
@@ -87,7 +87,7 @@
 
 .MuiPaper-root.MuiMenu-paper.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation8.MuiPopover-paper {
   background: var(--theme-background);
-  color: white;
+  color: var(--theme-purple);
 }
 
 .MuiFormLabel-root,
@@ -99,8 +99,12 @@
 
 .profile-container
   .MuiInputAdornment-root.MuiInputAdornment-positionEnd.MuiInputAdornment-outlined.MuiInputAdornment-sizeMedium {
-  color: white;
+  color: var(--theme-purple);
   cursor: pointer;
+}
+
+.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected{
+  background: var(--theme-purple-light);
 }
 
 .MuiDialog-paper {
@@ -125,8 +129,6 @@
   cursor: pointer;
 }
 
-/* error screen */
-
 .errorDialogue .MuiDialog-paper {
   min-height: 300px;
   width: 100%;
@@ -136,7 +138,8 @@
 
 /* grants popup */
 
-.errorDialogue .MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation24.MuiDialog-paper.MuiDialog-paperScrollPaper.MuiDialog-paperWidthSm{
+.errorDialogue
+  .MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation24.MuiDialog-paper.MuiDialog-paperScrollPaper.MuiDialog-paperWidthSm {
   max-width: 60%;
 }
 
@@ -163,7 +166,8 @@
     right: 10px;
   }
 
-  .errorDialogue .MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation24.MuiDialog-paper.MuiDialog-paperScrollPaper.MuiDialog-paperWidthSm{
+  .errorDialogue
+    .MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation24.MuiDialog-paper.MuiDialog-paperScrollPaper.MuiDialog-paperWidthSm {
     max-width: 100%;
   }
 }
