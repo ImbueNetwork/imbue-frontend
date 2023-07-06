@@ -13,6 +13,7 @@ import {
 import { StyledEngineProvider } from '@mui/system';
 import { SignerResult } from '@polkadot/api/types';
 import { WalletAccount } from '@talismn/connect-wallets';
+import moment from 'moment';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -48,8 +49,10 @@ import SuccessScreen from '@/components/SuccessScreen';
 
 import FiverrIcon from '@/assets/images/fiverr.png';
 import ImbueIcon from '@/assets/svgs/loader.svg';
-import { Freelancer, User } from '@/model';
+import { Freelancer, Project, User } from '@/model';
+import { Currency } from '@/model';
 import {
+  getFreelancerApplications,
   getFreelancerProfile,
   updateFreelancer,
 } from '@/redux/services/freelancerService';
@@ -69,6 +72,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
+  const [projects, setProjects] = useState<Project[]>()
+
+ const memberSince = moment(freelancer?.created).format('MMMM YYYY')
 
   const [skills, setSkills] = useState<string[]>(
     freelancer?.skills?.map(
@@ -77,12 +83,10 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     )
   );
 
-  const { user: browsingUser } = useSelector(
-    (state: RootState) => state.userState
-  );
+  const { user: browsingUser } = useSelector((state: RootState) => state.userState)
 
   const isCurrentFreelancer =
-    browsingUser && browsingUser?.id === freelancer?.user_id;
+    browsingUser && (browsingUser?.id === freelancer?.user_id);
 
   const [openAccountChoice, setOpenAccountChoice] = useState<boolean>(false);
   const [error, setError] = useState<any>();
@@ -103,6 +107,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     const setup = async () => {
       if (freelancer) {
         setTargetUser(await fetchUser(freelancer?.user_id));
+        setProjects(await getFreelancerApplications(freelancer?.user_id))
       }
     };
     setup();
@@ -308,15 +313,11 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         />
       </div>
 
-      <div className='flex flex-col lg:flex-row justify-evenly lg:mx-[40px] px-[30px] lg:px-[40px]'>
-        <div className='flex flex-col lg:items-center gap-[20px] lg:gap-[70px] lg:w-[40%]'>
-          <div className='w-full flex flex-col items-center gap-[16px] pb-[30px] bg-theme-grey-dark rounded-xl border border-light-white'>
-            <UploadImage
-              isEditMode={isEditMode}
-              user={freelancer}
-              setUser={setFreelancer}
-            />
-            <div className='w-full flex flex-col gap-[16px] -mt-11 px-[30px] lg:px-[40px]'>
+      <div className="flex flex-col lg:flex-row justify-evenly lg:mx-[40px] px-[30px] lg:px-[40px]">
+        <div className="flex flex-col lg:items-center gap-[20px] lg:gap-[70px] lg:w-[40%]">
+          <div className="w-full flex flex-col items-center gap-[16px] pb-[30px] bg-theme-grey-dark rounded-xl border border-light-white">
+            <UploadImage isEditMode={isEditMode} user={freelancer} setUser={setFreelancer} />
+            <div className="w-full flex flex-col gap-[16px] -mt-11 px-[30px] lg:px-[40px]">
               {isEditMode ? (
                 <TextField
                   onChange={(e) => handleUpdateState(e)}
@@ -328,7 +329,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                 />
               ) : (
                 <div className='flex gap-2 items-center justify-center mt-10'>
-                  <h3 className='!text-2xl font-bold text-center z-[1]'>
+                  <h3 className="!text-2xl font-bold text-center z-[1]">
                     {freelancer?.display_name}
                   </h3>
                   {initFreelancer?.verified && <VerifiedIcon color='primary' />}
@@ -373,11 +374,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   )}
                 </div>
               </div>
-              <CountrySelector
-                isEditMode={isEditMode}
-                user={freelancer}
-                setUser={setFreelancer}
-              />
+              <CountrySelector isEditMode={isEditMode} user={freelancer} setUser={setFreelancer} />
 
               {/* TODO: Implement reviews */}
 
@@ -407,46 +404,51 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                 )}
                 */}
 
-                {isCurrentFreelancer ? (
-                  <>
-                    {isEditMode ? (
+                {
+                  isCurrentFreelancer
+                    ? (
+                      <>
+                        {
+                          isEditMode ? (
+                            <div className='flex items-center justify-center gap-6 mb-5'>
+                              <button onClick={() => onSave()} className='message'>
+                                Save Changes <FiEdit />
+                              </button>
+                              <button
+                                onClick={() => cancelEdit()}
+                                className='message !bg-red-600'
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <div className='flex items-center justify-center gap-6 mb-5'>
+                              <button onClick={() => flipEdit()} className='message'>
+                                Edit Profile <FiEdit />
+                              </button>
+                              <button onClick={copyProfile} className='share'>
+                                <FaRegShareSquare color='white' />
+                                Share Profile
+                              </button>
+                            </div>
+                          )
+                        }
+                      </>)
+                    : (
                       <div className='flex items-center justify-center gap-6 mb-5'>
-                        <button onClick={() => onSave()} className='message'>
-                          Save Changes <FiEdit />
-                        </button>
                         <button
-                          onClick={() => cancelEdit()}
-                          className='message !bg-red-600'
+                          onClick={() => handleMessageBoxClick()}
+                          className=' message'
                         >
-                          Cancel
-                        </button>
-                      </div>
-                    ) : (
-                      <div className='flex items-center justify-center gap-6 mb-5'>
-                        <button onClick={() => flipEdit()} className='message'>
-                          Edit Profile <FiEdit />
+                          Message
                         </button>
                         <button onClick={copyProfile} className='share'>
                           <FaRegShareSquare color='white' />
                           Share Profile
                         </button>
                       </div>
-                    )}
-                  </>
-                ) : (
-                  <div className='flex items-center justify-center gap-6 mb-5'>
-                    <button
-                      onClick={() => handleMessageBoxClick()}
-                      className=' message'
-                    >
-                      Message
-                    </button>
-                    <button onClick={copyProfile} className='share'>
-                      <FaRegShareSquare color='white' />
-                      Share Profile
-                    </button>
-                  </div>
-                )}
+                    )
+                }
 
                 {/***
                   (<div>
@@ -466,7 +468,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                       </button>
                     )
                  */}
-                {/* 
+{/* 
                 {!isEditMode && isCurrentFreelancer ? (
                   <button onClick={copyProfile} className='share'>
                     <FaRegShareSquare color='white' />
@@ -540,7 +542,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   <AiOutlineUser size={24} />
                   <p className='text-light-grey'>Member Since</p>
                 </div>
-                <div>Jan 2023</div>
+                <div>{memberSince}</div>
               </div>
               <div className='flex justify-between mb-3'>
                 <div className='flex items-center gap-4'>
@@ -554,7 +556,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   <ImStack size={24} />
                   <p className='text-light-grey'>Number of projects</p>
                 </div>
-                <div>58</div>
+                <div>{projects?.length || 0}</div>
               </div>
             </div>
           </div>
@@ -804,15 +806,15 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           <div className='bg-theme-grey-dark rounded-xl border border-light-white'>
             <div className='px-[30px] lg:px-[40px] py-[30px] border-b border-b-light-white'>
               <h3 className='mb-3'>Work History</h3>
-              <p className='text-primary'>Completed Projects (3)</p>
+              <p className='text-primary'>Completed Projects ({projects?.length || 0})</p>
             </div>
             <div>
-              {[...Array(3)].map((v, i) => (
+              {projects?.map((v, i) => (
                 <div
                   key={i}
                   className='px-[30px] lg:px-[40px] py-[30px] flex flex-col gap-3 border-b last:border-b-0 border-b-light-white'
                 >
-                  <p className='text-xl'>{work.title}</p>
+                  <p className='text-xl'>{v?.name}</p>
                   <div className='flex gap-3 lg:gap-8 flex-wrap items-center justify-between'>
                     <div className='flex'>
                       {[...Array(4)].map((r, ri) => (
@@ -827,12 +829,12 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                         />
                       ))}
                     </div>
-                    <p className='text-light-grey'>{work.time}</p>
+                    <p className='text-light-grey'>{moment(v?.created).format("Do MMM YYYY")}</p>
                   </div>
-                  <p className='text-light-grey'>{work.description}</p>
-                  <div className='flex justify-between'>
-                    <p className=''>${work.budget}</p>
-                    <p className=''>{work.budgetType}</p>
+                  <p className='text-light-grey'>{v?.description}</p>
+                  <div className='flex gap-1'>
+                    <p className=''>{v?.required_funds}</p>
+                    <p className=''>{Currency[v?.currency_id]}</p>
                   </div>
                 </div>
               ))}
@@ -986,9 +988,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         </div>
       </ErrorScreen>
       <Alert
-        className={`absolute top-2 z-10 transform duration-300 transition-all ${
-          copied ? 'right-5' : '-right-full'
-        }`}
+        className={`absolute top-2 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
+          }`}
         severity='success'
       >
         Profile Link Copied to clipboard
@@ -1007,9 +1008,11 @@ export const getServerSideProps = async (context: any) => {
       if (initFreelancer) {
         return { props: { isAuthenticated: true, initFreelancer } };
       }
+
     } catch (error) {
       console.error(error); // TODO:
     }
+
   }
 
   return {
