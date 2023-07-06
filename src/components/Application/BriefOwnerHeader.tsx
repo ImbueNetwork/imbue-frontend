@@ -6,17 +6,16 @@ import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { FaStar } from 'react-icons/fa';
 
-import { initImbueAPIInfo } from '@/utils/polkadot';
+import { getBalance } from '@/utils/helper';
 
 import { Brief, Freelancer, OffchainProjectState, Project } from '@/model';
-import ChainService from '@/redux/services/chainService';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 
 import AccountChoice from '../AccountChoice';
 import ErrorScreen from '../ErrorScreen';
 import { HirePopup } from '../HirePopup';
-import { getBalance } from '@/utils/helper';
 
 interface MilestoneItem {
   name: string;
@@ -85,7 +84,11 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         account
       );
       if (resp.status === 200 || resp.status === 201) {
-        const bl = await getBalance(account.address, application.currency_id, user);
+        const bl = await getBalance(
+          account.address,
+          application.currency_id,
+          user
+        );
         setBalance(bl);
       } else {
         setError({ message: 'Could not connect wallet. Please Try again' });
@@ -120,9 +123,9 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
 
   return (
     <div className='flex items-center w-full md:justify-between lg:px-10 flex-wrap gap-4'>
-      <div className='flex gap-5 items-center'>
+      <div className='flex gap-[3rem] items-start'>
         <Image
-          className='w-16 h-16 rounded-full object-cover cursor-pointer'
+          className='w-[3rem] h-[3rem] rounded-full object-cover cursor-pointer'
           src={require('@/assets/images/profile-image.png')}
           priority
           alt='profileImage'
@@ -135,11 +138,25 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
               !(application?.status_id === OffchainProjectState.Accepted)
             }
           >
-            <p className='text-2xl font-bold capitalize'>
+            <p className='text-[1.25rem] font-normal capitalize text-imbue-purple'>
               {freelancer?.display_name}
             </p>
           </Badge>
-          <p className='text-sm mt-2'>
+
+          <div className='flex items-center mt-[1rem]'>
+            <Image
+              className='h-4 w-6 object-cover'
+              height={16}
+              width={24}
+              src='https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg'
+              alt='Flag'
+            />
+            <h3 className='ml-2 text-imbue-purple text-[1rem] !font-normal'>
+              Los Angeles, United State
+            </h3>
+          </div>
+
+          <p className='text-sm mt-[1.25rem] text-imbue-purple'>
             {loadingWallet?.balance && 'Loading Wallet...'}
             {loadingWallet?.connecting && 'Connecting Wallet...'}
             {!loadingWallet?.balance &&
@@ -150,18 +167,36 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
           </p>
         </div>
       </div>
-      {
-        <p className='text-base text-primary max-w-[50%] break-words'>
-          @
-          {mobileView && freelancer?.username?.length > 16
-            ? `${freelancer?.username?.substr(0, 16)}...`
-            : freelancer?.username}
-        </p>
-      }
+
+      <div className='flex flex-col justify-center items-center'>
+        {
+          <p className='text-[1rem] text-imbue-purple max-w-[55%] text-center break-words'>
+            @
+            {mobileView && freelancer?.username?.length > 16
+              ? `${freelancer?.username?.substr(0, 16)}...`
+              : freelancer?.username}
+          </p>
+        }
+
+        <div className='rating flex justify-center gap-[1.25rem] mt-[1.5rem]'>
+          <p className=''>
+            <FaStar color='#BAFF36' />
+            <FaStar color='#BAFF36' />
+            <FaStar color='#BAFF36' />
+            <FaStar color='#E1DDFF' />
+          </p>
+          <p className='text-imbue-purple font-normal'>
+            <span>Top Rated</span>
+            <span className='review-count ml-1 text-imbue-purple font-normal'>
+              (1434 reviews)
+            </span>
+          </p>
+        </div>
+      </div>
 
       <div className='relative flex gap-3'>
         <button
-          className='Pending Review-btn in-dark text-xs lg:text-base rounded-full py-3 px-6 lg:px-6 lg:py-[14px]'
+          className='Pending Review-btn !bg-[#BAFF36] !text-imbue-purple in-dark h-[2.68rem] text-xs lg:text-base rounded-full px-6 lg:px-6'
           onClick={() =>
             application.user_id &&
             handleMessageBoxClick(application?.user_id, freelancer?.username)
@@ -177,7 +212,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
             aria-haspopup='true'
             aria-expanded={open ? 'true' : undefined}
             onClick={handleOptionsClick}
-            className='primary-btn in-dark w-button !text-xs lg:!text-base'
+            className='primary-btn hover:!bg-imbue-purple hover:!text-white in-dark w-button !text-xs lg:!text-base'
             disabled={loadingWallet?.balance || loadingWallet?.connecting}
           >
             {loadingWallet?.balance || loadingWallet?.connecting ? (
@@ -211,6 +246,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
               handleOptionsClose();
               router.push(`/freelancers/${freelancer?.username}/`);
             }}
+            className='!text-imbue-purple'
           >
             Freelancer Profile
           </MenuItem>
@@ -221,6 +257,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                   handleOptionsClose();
                   setOpenPopup(true);
                 }}
+                className='!text-imbue-purple'
               >
                 Hire
               </MenuItem>
@@ -232,6 +269,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                     OffchainProjectState.ChangesRequested
                   );
                 }}
+                className='!text-imbue-purple'
               >
                 Request Changes
               </MenuItem>
@@ -243,6 +281,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                     OffchainProjectState.Rejected
                   );
                 }}
+                className='!text-imbue-purple'
               >
                 Reject
               </MenuItem>
