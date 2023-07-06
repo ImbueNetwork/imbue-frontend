@@ -135,10 +135,11 @@
 }
 
 .input-description {
-  background-color: #1a1a19;
-  height: 8rem;
-  border: 1px solid var(--theme-light-white);
+  background-color: transparent;
+  height: 11rem;
   padding: 10px 20px;
+  outline: none;
+  color: #3b27c1;
 }
 
 .value-input .input-budget {
@@ -151,11 +152,12 @@
 }
 
 .input-budget {
-  background-color: #1a1a19;
-  border: 1px solid var(--theme-light-white);
+  background-color: transparent;
+  border: 1px solid var(--theme-purple-dark);
   border-radius: 5px;
   padding: 10px 20px;
   width: 100%;
+  outline: none;
 }
 
 .value-input .input-budget:before {
