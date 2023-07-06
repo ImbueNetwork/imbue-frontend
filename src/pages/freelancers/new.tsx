@@ -34,6 +34,7 @@ const Freelancer = (): JSX.Element => {
   const [goal, setGoal] = useState('');
   // const [resume, setResume] = useState('');
   const [title, setTitle] = useState('');
+  const [education, setEducation] = useState<string>('');
   const [languages, setLanguages] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
   const [bio, setBio] = useState('');
@@ -53,7 +54,19 @@ const Freelancer = (): JSX.Element => {
     </div>
   );
 
-  const FreelanceExperience = (
+  const FreelanceExperience1 = (
+    <div className={styles.freelanceXpContainer}>
+      <div className={styles.contentTextSmallFlex}>
+        {stepData[step].content
+          .split('\n')
+          .map((line: string, index: number) => (
+            <p key={index}>{line}</p>
+          ))}
+      </div>
+    </div>
+  );
+  
+  const FreelanceExperience2 = (
     <div className={styles.freelanceXpContainer}>
       <div className={styles.contentTextSmallFlex}>
         {stepData[step].content
@@ -67,9 +80,8 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-xp-${index}`}
-            className={`${styles.freelanceXpItem} ${
-              freelancingBefore === value ? styles.active : ''
-            }`}
+            className={`${styles.freelanceXpItem} ${freelancingBefore === value ? styles.active : ''
+              }`}
             onClick={() => setFreelancingBefore(value)}
           >
             {label}
@@ -91,9 +103,8 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-goal-${index}`}
-            className={`${styles.freelanceXpItem} ${
-              goal === value ? styles.active : ''
-            }`}
+            className={`${styles.freelanceXpItem} ${goal === value ? styles.active : ''
+              }`}
             onClick={() => setGoal(value)}
           >
             {label}
@@ -136,7 +147,7 @@ const Freelancer = (): JSX.Element => {
       </div>
       <div className={styles.namePanelInputWrapper}>
         <input
-          className={styles.fieldInput}
+          className={`${styles.fieldInput} placeholder:text-imbue-light-purple`}
           placeholder='Enter your title'
           data-testid='title'
           name='title'
@@ -157,15 +168,24 @@ const Freelancer = (): JSX.Element => {
   //   </div>
   // );
 
-  // const EducationPanel = (
-  //   <div className={styles.freelanceXpContainer}>
-  //     <div className={styles.contentTextSmallFlex}>
-  //       {stepData[step].content.split('\n').map((line, index) => (
-  //         <p key={index}>{line}</p>
-  //       ))}
-  //     </div>
-  //   </div>
-  // );
+  const EducationPanel = (
+    <div className={styles.freelanceXpContainer}>
+      <div className={styles.contentTextSmallFlex}>
+        {stepData[step].content.split('\n').map((line, index) => (
+          <p key={index}>{line}</p>
+        ))}
+      </div>
+      <div className={styles.namePanelInputWrapper}>
+        <input
+          className={`${styles.fieldInput} placeholder:text-imbue-light-purple`}
+          placeholder='Enter your education'
+          name='education'
+          value={education}
+          onChange={(e) => setEducation(e.target.value)}
+        />
+      </div>
+    </div>
+  );
 
   const LanguagePanel = (
     <div className={styles.freelanceXpContainer}>
@@ -245,16 +265,18 @@ const Freelancer = (): JSX.Element => {
 
   const ConfirmPanel = (
     <div className={styles.descriptionPanel}>
-      <p>Thank you for your submission!</p>
+      <p className='mt-8 text-imbue-purple-dark'>Thank you for your submission!</p>
     </div>
   );
 
   const panels = [
     HelloPanel,
-    FreelanceExperience,
+    FreelanceExperience1,
+    FreelanceExperience2,
     FreelancingGoal,
     // ImportResume,
     TitlePanel,
+    EducationPanel,
     // ExperiencePanel,EducationPanel,
     LanguagePanel,
     SkillsPanel,
@@ -265,26 +287,26 @@ const Freelancer = (): JSX.Element => {
 
   const validate = (): boolean => {
     // TODO: show notification
-    if (step === 1 && !freelancingBefore) {
+    if (step === 2 && !freelancingBefore) {
       return false;
     }
-    if (step === 2 && !goal) {
+    if (step === 3 && !goal) {
       return false;
     }
-    if (step === 3 && !title) {
+    if (step === 4 && !title) {
       // TODO: minimum required length for description
       return false;
     }
-    // if (step === 4 && !languages.length) {
+    // if (step === 5 && !languages.length) {
     //   return false;
     // }
-    if (step === 5 && !skills.length) {
+    if (step === 7 && !skills.length) {
       return false;
     }
-    if (step === 6 && !bio) {
+    if (step === 8 && !bio) {
       return false;
     }
-    if (step === 7 && !services.length) {
+    if (step === 9 && !services.length) {
       return false;
     }
     return true;
@@ -296,7 +318,7 @@ const Freelancer = (): JSX.Element => {
       const response: any = await createFreelancingProfile({
         id: 0,
         bio,
-        education: '',
+        education: education,
         experience: freelancingBefore,
         freelanced_before: freelancingBefore,
         freelancing_goal: goal,
@@ -337,57 +359,76 @@ const Freelancer = (): JSX.Element => {
   return (
     <div className={styles.freelancerDetailsContainer}>
       <div className={styles.mainPanel}>
-        <div className={styles.freelancerContents}>
-          <h2 data-testid='heading' className='text-theme-secondary'>
-            {stepData[step].heading.replace('{name}', displayName)}
-          </h2>
-          {panels[step] ?? <></>}
-        </div>
-        <div className={step === 0 ? styles.buttonLeft : styles.buttonRight}>
-          {step >= 1 && (
-            <button
-              className='secondary-btn !mt-0'
-              onClick={() => setStep(step - 1)}
-            >
-              Back
-            </button>
-          )}
+        <div className='h-full w-full flex flex-col justify-between'>
+          <div className={styles.freelancerContents}>
+            <h2 data-testid='heading' className='text-theme-secondary'>
+              {stepData[step].heading.replace('{name}', displayName)}
+            </h2>
+            {panels[step] ?? <></>}
+          </div>
+          <div className={step === 0 ? styles.buttonLeft : styles.buttonRight}>
+            {step >= 1 && (
+              <button
+                className='secondary-btn !mt-0'
+                onClick={() => setStep(step - 1)}
+              >
+                Back
+              </button>
+            )}
 
-          {step === 0 ? (
-            <button
-              className='primary-btn in-dark w-button mr-auto mt-6'
-              onClick={() => setStep(1)}
-              data-testid='get-started-button'
-            >
-              Get Started!
-            </button>
-          ) : step === stepData.length - 1 ? (
-            <button
-              className='primary-btn in-dark w-button'
-              onClick={() => utils.redirect('briefs')}
-            >
-              Discover Briefs
-            </button>
-          ) : step === stepData.length - 2 ? (
-            <button
-              className='primary-btn in-dark w-button'
-              data-testid='submit-button'
-              disabled={!validate()}
-              onClick={() => createProfile()}
-            >
-              Submit
-            </button>
-          ) : (
-            <button
-              className='primary-btn in-dark w-button !mt-0'
-              data-testid='next-button'
-              disabled={!validate()}
-              onClick={() => setStep(step + 1)}
-            >
-              Next
-            </button>
-          )}
+            {step === 0 ? (
+              <button
+                className='primary-btn in-dark w-button mr-auto mt-6'
+                onClick={() => setStep(1)}
+                data-testid='get-started-button'
+              >
+                Get Started!
+              </button>
+            ) : step === stepData.length - 1 ? (
+              <button
+                className='primary-btn in-dark w-button'
+                onClick={() => utils.redirect('briefs')}
+              >
+                Discover Briefs
+              </button>
+            ) : step === stepData.length - 2 ? (
+              <button
+                className='primary-btn in-dark w-button'
+                data-testid='submit-button'
+                disabled={!validate()}
+                onClick={() => createProfile()}
+              >
+                Submit
+              </button>
+            ) : (
+              <button
+                className='primary-btn in-dark w-button !mt-0'
+                data-testid='next-button'
+                disabled={!validate()}
+                onClick={() => setStep(step + 1)}
+              >
+                Next
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* {
+          step===0 && (
+            <div className='h-full bg-imbue-light-purple px-8 py-14 w-2/5 rounded-xl ml-10'>
+              <Image 
+              height={180} 
+              width={180} 
+              src={require('@/assets/images/Freelancer.png')} 
+              alt=''
+              className='m-auto w-full object-cover'
+              />
+              <p className='text-imbue-purple mt-8'>Expert Backend Developer, Greece. Over 20 projects successfully completed on Imbue Enterprise to date.</p>
+              <p className='text-imbue-purple mt-8 text-2xl'>Suzie John</p>
+            </div>
+          )
+        } */}
+
       </div>
       <ErrorScreen {...{ error, setError }}>
         <div className='flex flex-col gap-4 w-1/2'>

@@ -52,7 +52,6 @@ const Join = (): JSX.Element => {
       const error = await resp.json();
       setError(error);
     }
-    console.log("object");
   };
 
 
