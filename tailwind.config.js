@@ -32,8 +32,10 @@ module.exports = {
         'imbue-light-purple': '#E1DDFF',
         'imbue-light-purple-hover': 'rgba(59, 39, 193, 0.1)',
         'imbue-light-purple-two': '#9880F2',
+        'imbue-light-purple-three': '#F6F5FF',
         'imbue-coral': '#FC6760',
         'imbue-foundation-blue': '#00234C',
+        'imbue-lemon': '#7AA822',
       },
       screens: {
         'max-width-1800px': { raw: '(max-width: 1800px)' },
