@@ -88,13 +88,13 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
           >
             <ListItemIcon>
               <i
-                className='material-icons relative top-[4px] text-white'
+                className='material-icons relative top-[4px] text-imbue-purple-dark'
                 aria-hidden='true'
               >
                 {item?.icon}
               </i>
             </ListItemIcon>
-            <p>{item?.text}</p>
+            <p className='text-imbue-purple-dark'>{item?.text}</p>
           </MenuItem>
         ))}
       </div>

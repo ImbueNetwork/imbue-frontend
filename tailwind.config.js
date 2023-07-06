@@ -30,6 +30,7 @@ module.exports = {
         'imbue-purple': '#3B27C1',
         'imbue-purple-dark': 'var(--imbue-purple-dark, #03116A)',
         'imbue-light-purple': '#E1DDFF',
+        'imbue-light-purple-hover': 'rgba(59, 39, 193, 0.1)',
         'imbue-light-purple-two': '#9880F2',
         'imbue-light-purple-three': '#F6F5FF',
         'imbue-coral': '#FC6760',

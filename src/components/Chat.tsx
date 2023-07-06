@@ -40,7 +40,7 @@ export function CustomChannelHeader(props: any) {
   });
 
   return (
-    <div className='py-2 lg:py-3 border-b border-b-white border-opacity-25'>
+    <div className='py-2 lg:py-3 border-b border-b-imbue-light-purple'>
       <div className='w-full flex gap-2 lg:gap-3 items-center ml-3'>
         {!chatPopUp && (
           <span className='md:hidden' onClick={closeChat}>
@@ -58,7 +58,7 @@ export function CustomChannelHeader(props: any) {
           )}
         </div>
         <div className='flex flex-col items-start'>
-          <span className='header-pound font-bold text-sm lg:text-lg break-words max-w-[130px] md:max-w-full'>
+          <span className='header-pound font-bold text-sm lg:text-lg break-words max-w-[130px] md:max-w-full text-imbue-purple'>
             {chatTitle.length > 22
               ? `${chatTitle?.substring(0, 22)}...`
               : chatTitle}

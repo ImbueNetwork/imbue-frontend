@@ -28,7 +28,7 @@ const UploadImage = ({ isEditMode, setUser, user }: UploadImageProps) => {
   };
 
   return (
-    <div className='h-40 w-40 bg-theme-grey-dark rounded-full p-12 relative -mt-32 unset mx-auto border border-light-white'>
+    <div className='h-32 w-32 bg-white rounded-full relative -mt-12 unset mx-auto border border-light-purple'>
       <Image
         src={image || require('@/assets/images/profile-image.png')}
         alt='profile image'

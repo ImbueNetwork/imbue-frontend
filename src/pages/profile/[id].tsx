@@ -1,4 +1,4 @@
-import { OutlinedInput, TextField } from '@mui/material';
+import { Divider, OutlinedInput, TextField } from '@mui/material';
 import { SignerResult } from '@polkadot/api/types';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
@@ -66,7 +66,6 @@ const Profile = ({ initUser, browsingUser }: any) => {
         };
         setLoading(true);
         const userResponse: any = await updateUser(userData);
-        console.log(userResponse);
 
         if (userResponse.status === 'Successful') {
           setSuccess(true);
@@ -130,7 +129,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
 
       <div className='pt-60'>
         <div className='flex flex-col lg:items-center gap-5 lg:gap-16 w-full'>
-          <div className='w-full flex flex-col gap-4 pb-8 px-24 bg-theme-grey-dark rounded-xl border border-light-white relative'>
+          <div className='w-full flex flex-col gap-4 pb-8 px-24 bg-white rounded-xl border border-light-white relative'>
             <div className='w-fit'>
               <UploadImage
                 setUser={setUser}
@@ -149,9 +148,9 @@ const Profile = ({ initUser, browsingUser }: any) => {
                   defaultValue={user?.display_name}
                 />
               ) : (
-                <h3 className='!text-2xl font-bold capitalize'>
+                <p className='!text-2xl capitalize text-imbue-purple-dark'>
                   {user?.display_name}
-                </h3>
+                </p>
               )}
 
               {isEditMode ? (
@@ -170,13 +169,17 @@ const Profile = ({ initUser, browsingUser }: any) => {
                 </p>
               )}
 
+              <div>
+                <CountrySelector
+                  user={user}
+                  setUser={setUser}
+                  {...{ isEditMode }}
+                />
+              </div>
+
+
               <div className='flex justify-between'>
                 <div className='w-1/3'>
-                  <CountrySelector
-                    user={user}
-                    setUser={setUser}
-                    {...{ isEditMode }}
-                  />
                   {!isEditMode && (
                     <div className='mt-5'>
                       <button className='primary-btn in-dark w-button'>
@@ -190,23 +193,23 @@ const Profile = ({ initUser, browsingUser }: any) => {
                 </div>
                 {/* TODO: Implement reviews */}
 
-                <div className='rating flex flex-col gap-3'>
+                <div className='rating flex flex-col gap-3 text-imbue-purple-dark'>
                   <p>
                     <span>Top Rated</span>
-                    <span className='review-count ml-1'>(1434 reviews)</span>
+                    <span className='review-count ml-1 text-imbue-purple'>(1,434 reviews)</span>
                   </p>
                   <p className='mb-3'>
                     <FaStar size={30} color='var(--theme-primary)' />
                     <FaStar size={30} color='var(--theme-primary)' />
                     <FaStar size={30} color='var(--theme-primary)' />
-                    <FaStar size={30} color='white' />
+                    <FaStar size={30} color='var(--theme-light-grey)' />
                   </p>
                 </div>
 
                 <div className='w-3/12'>
                   <div className='w-full'>
-                    <p className='text-xl'>Wallet Address</p>
-                    <div className='mt-3 border break-words p-3 mb-4 rounded-md bg-black'>
+                    <p className='text-xl text-imbue-purple-dark'>Wallet Address</p>
+                    <div className='mt-3 border border-imbue-purple break-words p-3 mb-4 rounded-md'>
                       {user?.web3_address}
                     </div>
                   </div>
@@ -223,12 +226,15 @@ const Profile = ({ initUser, browsingUser }: any) => {
               </div>
             </div>
 
-            <BiEdit
-              onClick={() => setIsEditMode(!isEditMode)}
-              className='absolute top-5 right-5 cursor-pointer'
-              size={30}
-              color='#b2ff0b'
-            />
+            <div className='absolute top-5 right-5 cursor-pointer'>
+              <span className='text-imbue-purple mr-2'>Edit</span>
+              <BiEdit
+                onClick={() => setIsEditMode(!isEditMode)}
+                size={30}
+                color='#3B27C1'
+              />
+            </div>
+
 
             <AccountChoice
               accountSelected={(account: WalletAccount) =>
@@ -243,8 +249,9 @@ const Profile = ({ initUser, browsingUser }: any) => {
             className={`${styles.freelancerProfileSection} w-full py-8 lg:px-24`}
           >
             <div className='header-editable'>
-              <h5 className='font-bold text-xl'>About</h5>
+              <h5 className='text-xl text-imbue-purple-dark'>About</h5>
             </div>
+
             {isEditMode ? (
               <>
                 <TextArea
@@ -259,23 +266,25 @@ const Profile = ({ initUser, browsingUser }: any) => {
                     }
                   }}
                   rows={8}
-                  className='bio-inpu px-4 py-2 bg-theme-grey-dark text-white border border-light-white'
+                  className='bio-input px-4 py-2 bg-transparent text-imbue-purple-dark border border-imbue-purple'
                   id='bio-input-id'
                   defaultValue={user?.about}
                 />
               </>
             ) : (
               <>
-                <div className='bio'>
-                  {user?.about}
-                  {/* {user?.bio
+                {
+                  user?.about && (
+                    <div className='bio text-imbue-purple'>
+                      {user?.about}
+                      {/* {user?.bio
                                         ?.split?.("\n")
                                         ?.map?.((line: any, index: number) => (
                                             <p className="leading-[1.2] text-base" key={index}>
                                                 {line}
                                             </p>
                                         ))} */}
-                  {/* Welcome to a vibrant and multiple award-winning
+                      {/* Welcome to a vibrant and multiple award-winning
                   telecommunications service provider. Our aim is to bring
                   people and businesses together in what we do best, by offering
                   mobile and fixed services, broadband connectivity and IPTV
@@ -286,50 +295,54 @@ const Profile = ({ initUser, browsingUser }: any) => {
                   Smart Contract | DApps | DeFi | Solidity | Hyperledger |
                   Polkadot Rust | C | C ++ | C# | Python | Golang | Java |
                   Javascript | Scala | Simplicity | Haskell | */}
-                </div>
+                    </div>
+                  )
+                }
               </>
             )}
 
+            <Divider />
+
             <div className='flex gap-14 items-center'>
-              <p className='w-24 font-bold text-xl'>Website :</p>
+              <p className='w-24 text-xl text-imbue-purple-dark'>Website :</p>
               {isEditMode ? (
                 <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>
                   <OutlinedInput
                     name='website'
                     onChange={(e) => handleChange(e)}
-                    className='w-full'
+                    className='w-full border border-imbue-purple'
                   />
                 </div>
               ) : (
-                <span className='text-primary'>{user?.website}</span>
+                <span className='text-imbue-purple'>{user?.website}</span>
               )}
             </div>
             <div className='flex gap-14 items-center'>
-              <p className='w-24 font-bold text-xl'>Industry :</p>
+              <p className='w-24 text-imbue-purple-dark text-xl'>Industry :</p>
               {isEditMode ? (
                 <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>
                   <OutlinedInput
                     name='industry'
                     onChange={(e) => handleChange(e)}
-                    className='w-full'
+                    className='w-full border border-imbue-purple'
                   />
                 </div>
               ) : (
-                <span className='text-primary'>{user?.industry}</span>
+                <span className='text-imbue-purple'>{user?.industry}</span>
               )}
             </div>
             <div className='flex gap-14 items-center'>
-              <p className='w-24 font-bold text-xl'>Member :</p>
-              <span className='text-primary'>Mar-12-2023</span>
+              <p className='w-24 text-imbue-purple-dark text-xl'>Member :</p>
+              <span className='text-imbue-purple'>Mar-12-2023</span>
             </div>
             <div className='flex gap-14 items-center'>
-              <p className='w-24 font-bold text-xl'>Hired :</p>
-              <span className='text-primary'>58</span>
+              <p className='w-24 text-imbue-purple-dark text-xl'>Hired :</p>
+              <span className='text-imbue-purple'>58</span>
             </div>
           </div>
 
-          <div className='w-full bg-theme-grey-dark rounded-xl border border-light-white'>
-            <h3 className='px-24 py-6'>Open Briefs</h3>
+          <div className='w-full bg-white rounded-xl'>
+            <p className='px-24 py-6 text-xl text-imbue-purple-dark'>Open Briefs</p>
             <div className='briefs-list w-full'>
               {openBriefs?.map(
                 (item, itemIndex) =>
