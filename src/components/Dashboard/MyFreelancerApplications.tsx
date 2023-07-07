@@ -73,7 +73,7 @@ const MyFreelancerApplications = ({
                       {timeAgo?.format(new Date(application?.created || 0))}
                     </span>
                     <div
-                      className={`px-4 py-2 w-fit rounded-full text-xs lg:text-base ${
+                      className={`px-4 py-1 lg:py-2 w-fit rounded-full text-xs lg:text-base text-center ${
                         OffchainProjectState[application?.status_id || 0]
                       }-button `}
                     >

@@ -56,12 +56,12 @@ export const BriefLists = ({
           onClick={() => handleItemClick(brief)}
           className={`flex cursor-pointer hover:bg-imbue-light-purple-hover px-5 py-3 lg:px-10 lg:py-8 justify-between border-b border-b-imbue-light-purple last:border-b-0`}
         >
-          <div className='flex flex-col gap-1 lg:gap-3'>
+          <div className='flex flex-col gap-2 lg:gap-3'>
             <span className='text-sm text-imbue-purple-dark lg:text-xl'>{brief.headline}</span>
             <p className='text-xs lg:text-[16px] text-imbue-purple'>
               Budget ${Number(brief.budget).toLocaleString()} - Public
             </p>
-            <p className='text-xs mt-3 text-imbue-purple'>
+            <p className='text-xs mt-2 lg:mt-3 text-imbue-purple'>
               Created {timeAgo.format(new Date(brief.created))}
             </p>
           </div>
