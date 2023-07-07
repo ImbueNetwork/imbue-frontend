@@ -321,7 +321,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     <div className='profile-container overflow-x-hidden relative'>
       <div className='banner'>
         <Image
-          src={require('@/assets/images/profile-banner.png')}
+          src={require('@/assets/images/profile_banner.png')}
           priority
           alt='profile banner'
           className='banner-image w-full object-cover h-[242px]'
@@ -330,7 +330,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
 
       <div className='flex flex-col lg:flex-row justify-evenly lg:mx-[40px] px-[30px] lg:px-[40px]'>
         <div className='flex flex-col lg:items-center gap-[20px] lg:gap-[70px] lg:w-[40%]'>
-          <div className='w-full flex flex-col gap-4 pb-8 px-10 bg-white rounded-xl'>
+          <div className='w-full flex flex-col gap-4 pb-8 lg:px-10 bg-white rounded-xl'>
             <div className='w-full flex flex-col items-start gap-4 px-10 relative'>
               {isCurrentFreelancer && !isEditMode && (
                 <div
@@ -430,7 +430,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   </p>
                   <p className='text-imbue-purple'>
                     <span>Top Rated</span>
-                    <span className='review-count ml-1'>(1434 reviews)</span>
+                    <span className='review-count ml-1'>(1,434 reviews)</span>
                   </p>
                 </div>
 
@@ -485,7 +485,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                     <div className='flex gap-6 mb-5'>
                       <button
                         onClick={() => handleMessageBoxClick()}
-                        className=' message'
+                        className='bg-imbue-light-purple border-0 !text-content-primary'
                       >
                         Message
                       </button>
@@ -635,7 +635,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           <div className='flex w-full'>
             <div className='flex flex-col gap-[36px] grow shrink-0 basis-[40%]'>
               <div className={`${styles.freelancerProfileSection}`}>
-                <div className='mx-[30px] lg:mx-[40px] text-imbue-purple-dark'>
+                <div className='lg:mx-[40px] text-imbue-purple-dark'>
                   <h5>Linked Account</h5>
                   <div className='flex flex-col gap-[16px] mt-[24px]'>
                     {socials?.map(({ label, key, value, icon }, index) => (
@@ -688,7 +688,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
 
                 <hr className='separator' />
                 {/* TODO: Implement */}
-                <div className='ml-[30px] lg:mx-[40px]'>
+                <div className='lg:mx-[40px]'>
                   <div className='header-editable text-imbue-purple-dark'>
                     <h5>Certification</h5>
                     <div className='flex gap-3 mt-4'>
@@ -796,7 +796,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           </div>
 
           <div
-            className={`${styles.freelancerProfileSection} w-full py-[30px] px-[30px] lg:px-[40px]`}
+            className={`${styles.freelancerProfileSection} w-full py-[30px] 30px] lg:px-[40px]`}
           >
             <div className='header-editable'>
               <h5 className='text-imbue-purple-dark'>About</h5>
@@ -874,7 +874,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         </div>
 
         <div className='lg:w-[50%] mt-[20px] lg:mt-0'>
-          <div className='bg-white rounded-xl px-10'>
+          <div className='bg-white rounded-xl lg:px-10'>
             <div className='px-8 lg:px-10 py-8'>
               <h3 className='mb-3 text-imbue-purple-dark'>Work History</h3>
               <p className='text-imbue-purple'>
@@ -923,6 +923,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           <StyledEngineProvider injectFirst>
             <div className='flex flex-col'>
               <TextField
+                color='secondary'
                 id='outlined-controlled'
                 label='Search'
                 sx={{ maxWidth: '350px' }}
@@ -962,7 +963,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
             {reviews.map((review, index) => (
               <div
                 key={index}
-                className='flex flex-col gap-3 pt-2 pb-5 border-b last:border-b-0 border-b-light-white text-imbue-purple-dark'
+                className='flex flex-col gap-3 pt-2 pb-5 border-b last:border-b-0 border-b-imbue-light-purple text-imbue-purple-dark'
               >
                 <div className='flex gap-3'>
                   <div className='h-[46px] w-[46px] rounded-full overflow-hidden relative'>

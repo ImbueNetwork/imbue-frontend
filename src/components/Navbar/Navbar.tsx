@@ -97,11 +97,11 @@ function Navbar() {
   const navPillclasses =
     'text-imbue-purple h-[2.9375rem] !bg-white rounded-[5.07319rem] !flex justify-center items-center px-[3rem] hover:no-underline !text-[1.10975rem] ';
   const cancelClass =
-    'text-imbue-purple h-[2.9375rem] !bg-white rounded-[5.07319rem] !flex justify-center items-center px-[0.9rem] hover:no-underline !text-[1.10975rem] ';
+    'text-imbue-purple h-[2.9375rem] w-[2.9375rem] !bg-white rounded-[5.07319rem] !flex justify-center items-center px-[0.9rem] hover:no-underline !text-[1.10975rem] ';
 
   return (
     <>
-      <header className={`navBar bg-transparent`} id='header-wrapper'>
+      <header className={`navBar bg-[#ebeae2]`} id='header-wrapper'>
         <div className='text-center w-full bg-primary text-black py-1 text-xs lg:text-sm'>
           Thanks for trying the beta version of Imbue. Please let us know what
           we should work on to make it better! Submit your feedback
@@ -115,57 +115,71 @@ function Navbar() {
         </div>
         <div
           id='main-header'
-          className='flex justify-between items-center px-4 lg:px-8 py-2 my-[0.9rem]'
+          className='flex justify-between items-center px-4 lg:px-8 py-2'
         >
-          <div className={`flex items-center`}>
+          <div className={`flex items-center transition-all`}>
             <h1
               onClick={() => router.push('/')}
-              className={`main-title h-[2.9375rem] !bg-white rounded-[5.07319rem] w-full flex justify-center items-center cursor-pointer`}
+              className={`main-title lg:h-[2.9375rem] !bg-white rounded-[5.07319rem] w-full flex justify-center items-center cursor-pointer z-10 relative px-5 py-2 lg:!p-0`}
             >
               <div id='logo'>
-                <Image src={appLogo} alt={'app logo'} className='w-full' />
+                <Image src={appLogo} alt={'app logo'} className='w-28 lg:w-full' />
               </div>
             </h1>
 
             {!mobile && (
-              <>
-                {expanded && (
-                  <div className={`flex items-center ml-[2rem]`}>
-                    <span
-                      className={`mx-1 lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
-                      onClick={() => navigateToPage('/briefs/new')}
-                    >
-                      Submit a Brief
-                    </span>
+              <div className='relative flex items-center z-0'>
+                <div className={`${expanded ? "translate-x-0 opacity-100 duration-700" : "-translate-x-full opacity-0 duration-1000"} flex items-center ml-1 transition-all`}>
+                  <Link
+                    onClick={() => setExpanded(false)}
+                    className={`mx-1 lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
+                    href='/briefs/new'
+                  >
+                    Submit a Brief
+                  </Link>
 
-                    <Link
-                      className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer ${navPillclasses} nav-item nav-item-2`}
-                      href='/briefs/'
-                    >
-                      Discover Briefs
-                    </Link>
+                  <Link
+                    onClick={() => setExpanded(false)}
+                    className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer ${navPillclasses} nav-item nav-item-2`}
+                    href='/briefs/'
+                  >
+                    Discover Briefs
+                  </Link>
 
-                    <Link
-                      className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${navPillclasses}`}
-                      href='/freelancers'
-                    >
-                      Discover Freelancers
-                    </Link>
+                  <Link
+                    onClick={() => setExpanded(false)}
+                    className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${navPillclasses}`}
+                    href='/freelancers'
+                  >
+                    Discover Freelancers
+                  </Link>
+
+                  <div
+                    onClick={() => {
+                      setExpanded(!expanded);
+                    }}
+                    className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${cancelClass}`}
+                  >
+                    <Image
+                      src={expanded ? cancelIcon : hamburgerIcon}
+                      alt={'cancel'}
+                      className='w-10 h-10'
+                    />
                   </div>
-                )}
+                </div>
                 <div
                   onClick={() => {
                     setExpanded(!expanded);
                   }}
-                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${cancelClass}`}
+                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${!expanded && cancelClass} ${expanded ? "lg:invisible" : "visible delay-700"} absolute`}
                 >
                   <Image
                     src={expanded ? cancelIcon : hamburgerIcon}
                     alt={'cancel'}
-                    className='w-2/3 lg:w-full'
+                    className='w-10 h-10'
                   />
                 </div>
-              </>
+              </div>
             )}
           </div>
 

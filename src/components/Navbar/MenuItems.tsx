@@ -78,7 +78,7 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
   };
   return (
     <>
-      <div className='menuItems flex flex-col gap-2'>
+      <div className='menuItems flex flex-col lg:gap-2'>
         {linkItems.map((item, index) => (
           <MenuItem
             className={`${item.duplicate && 'lg:hidden'} ${item.needAuthentication && !user?.username && 'hidden'

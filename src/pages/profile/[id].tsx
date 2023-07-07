@@ -128,8 +128,8 @@ const Profile = ({ initUser, browsingUser }: any) => {
       </div>
 
       <div className='pt-60'>
-        <div className='flex flex-col lg:items-center gap-5 lg:gap-16 w-full'>
-          <div className='w-full flex flex-col gap-4 pb-8 px-24 bg-white rounded-xl border border-light-white relative'>
+        <div className='flex flex-col lg:items-center gap-5 lg:gap-16 w-full px-4 lg:px-0'>
+          <div className='w-full flex flex-col gap-4 pb-8 px-10 lg:px-16 bg-white rounded-xl border border-light-white relative'>
             <div className='w-fit'>
               <UploadImage
                 setUser={setUser}
@@ -177,10 +177,10 @@ const Profile = ({ initUser, browsingUser }: any) => {
                 />
               </div>
 
-              <div className='flex justify-between'>
-                <div className='w-1/3'>
+              <div className='flex flex-col gap-6 lg:flex-row lg:justify-between'>
+                <div className='w-full lg:w-1/3'>
                   {!isEditMode && (
-                    <div className='mt-5'>
+                    <div className='mt-5 flex items-center gap-4'>
                       <button className='primary-btn in-dark w-button'>
                         View Website
                       </button>
@@ -207,12 +207,12 @@ const Profile = ({ initUser, browsingUser }: any) => {
                   </p>
                 </div>
 
-                <div className='w-3/12'>
+                <div className='w-full lg:w-3/12'>
                   <div className='w-full'>
                     <p className='text-xl text-imbue-purple-dark'>
                       Wallet Address
                     </p>
-                    <div className='mt-3 border border-imbue-purple break-words p-3 mb-4 rounded-md'>
+                    <div className='mt-3 border border-imbue-purple break-words p-3 mb-4 rounded-md text-content-primary'>
                       {user?.web3_address}
                     </div>
                   </div>
@@ -248,7 +248,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
           </div>
 
           <div
-            className={`${styles.freelancerProfileSection} w-full py-8 lg:px-24`}
+            className={`${styles.freelancerProfileSection} w-full py-8 lg:!px-16`}
           >
             <div className='header-editable'>
               <h5 className='text-xl text-imbue-purple-dark'>About</h5>
@@ -304,7 +304,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
             <Divider />
 
             <div className='flex gap-14 items-center'>
-              <p className='w-24 text-xl text-imbue-purple-dark'>Website :</p>
+              <p className='w-24 lg:text-xl text-imbue-purple-dark'>Website :</p>
               {isEditMode ? (
                 <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>
                   <OutlinedInput
@@ -318,7 +318,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
               )}
             </div>
             <div className='flex gap-14 items-center'>
-              <p className='w-24 text-imbue-purple-dark text-xl'>Industry :</p>
+              <p className='w-24 text-imbue-purple-dark lg:text-xl'>Industry :</p>
               {isEditMode ? (
                 <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>
                   <OutlinedInput
@@ -332,17 +332,17 @@ const Profile = ({ initUser, browsingUser }: any) => {
               )}
             </div>
             <div className='flex gap-14 items-center'>
-              <p className='w-24 text-imbue-purple-dark text-xl'>Member :</p>
+              <p className='w-24 text-imbue-purple-dark lg:text-xl'>Member :</p>
               <span className='text-imbue-purple'>Mar-12-2023</span>
             </div>
             <div className='flex gap-14 items-center'>
-              <p className='w-24 text-imbue-purple-dark text-xl'>Hired :</p>
+              <p className='w-24 text-imbue-purple-dark lg:text-xl'>Hired :</p>
               <span className='text-imbue-purple'>58</span>
             </div>
           </div>
 
           <div className='w-full bg-white rounded-xl'>
-            <p className='px-24 py-6 text-xl text-imbue-purple-dark'>
+            <p className='px-10 lg:px-16 py-6 text-xl text-imbue-purple-dark'>
               Open Briefs
             </p>
             <div className='briefs-list w-full'>
@@ -350,15 +350,15 @@ const Profile = ({ initUser, browsingUser }: any) => {
                 (item, itemIndex) =>
                   !item?.project_id && (
                     <div
-                      className='brief-item !px-24 rounded-b-xl'
+                      className='brief-item !px-10 lg:!px-16 rounded-b-xl'
                       key={itemIndex}
                       onClick={() => router.push(`/briefs/${item?.id}/`)}
                     >
-                      <div className='brief-title'>{item.headline}</div>
-                      <div className='brief-time-info'>
+                      <div className='brief-title !text-xl lg:!text-2xl'>{item.headline}</div>
+                      <div className='brief-time-info !text-sm lg:!text-base'>
                         {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
                       </div>
-                      <div className='brief-description'>
+                      <div className='brief-description !text-sm lg:!text-base'>
                         {item.description}
                       </div>
 
@@ -370,7 +370,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                         ))}
                       </div>
 
-                      <div className='brief-proposals'>
+                      <div className='brief-proposals !text-xs lg:!text-sm'>
                         <span className='proposals-heading'>
                           Proposals Submitted:{' '}
                         </span>
