@@ -64,7 +64,6 @@ import styles from '@/styles/modules/freelancers.module.css';
 
 import { checkEnvironment, fetchUser } from '../../utils';
 
-
 export type ProfileProps = {
   initFreelancer: Freelancer;
 };
@@ -75,9 +74,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
-  const [projects, setProjects] = useState<Project[]>()
+  const [projects, setProjects] = useState<Project[]>();
 
-  const memberSince = moment(freelancer?.created).format('MMMM YYYY')
+  const memberSince = moment(freelancer?.created).format('MMMM YYYY');
 
   const [skills, setSkills] = useState<string[]>(
     freelancer?.skills?.map(
@@ -86,16 +85,18 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     )
   );
 
-  const { user: browsingUser } = useSelector((state: RootState) => state.userState)
+  const { user: browsingUser } = useSelector(
+    (state: RootState) => state.userState
+  );
 
   const isCurrentFreelancer =
-    browsingUser && (browsingUser?.id === freelancer?.user_id);
+    browsingUser && browsingUser?.id === freelancer?.user_id;
 
   const [openAccountChoice, setOpenAccountChoice] = useState<boolean>(false);
   const [error, setError] = useState<any>();
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [copied, setCopied] = useState<string>("");
+  const [copied, setCopied] = useState<string>('');
 
   function urlify(text: string) {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -110,7 +111,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     const setup = async () => {
       if (freelancer) {
         setTargetUser(await fetchUser(freelancer?.user_id));
-        setProjects(await getFreelancerApplications(freelancer?.user_id))
+        setProjects(await getFreelancerApplications(freelancer?.user_id));
       }
     };
     setup();
@@ -295,10 +296,16 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
 
   const [clients, setClients] = useState<any>(clinetsData);
 
-  const copyToClipboard = ({ text, title }: { text?: string, title: string }) => {
-    let textToCopy = text || "";
+  const copyToClipboard = ({
+    text,
+    title,
+  }: {
+    text?: string;
+    title: string;
+  }) => {
+    let textToCopy = text || '';
 
-    if (title === "Profile Link") {
+    if (title === 'Profile Link') {
       textToCopy = checkEnvironment().concat(`${router.asPath}`);
     }
 
@@ -306,12 +313,12 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     setCopied(title);
 
     setTimeout(() => {
-      setCopied("");
+      setCopied('');
     }, 3000);
   };
 
   return (
-    <div className='profile-container lg:-mt-8 overflow-x-hidden relative'>
+    <div className='profile-container overflow-x-hidden relative'>
       <div className='banner'>
         <Image
           src={require('@/assets/images/profile-banner.png')}
@@ -321,26 +328,28 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         />
       </div>
 
-      <div className="flex flex-col lg:flex-row justify-evenly lg:mx-[40px] px-[30px] lg:px-[40px]">
-        <div className="flex flex-col lg:items-center gap-[20px] lg:gap-[70px] lg:w-[40%]">
-          <div className="w-full flex flex-col gap-4 pb-8 px-10 bg-white rounded-xl">
+      <div className='flex flex-col lg:flex-row justify-evenly lg:mx-[40px] px-[30px] lg:px-[40px]'>
+        <div className='flex flex-col lg:items-center gap-[20px] lg:gap-[70px] lg:w-[40%]'>
+          <div className='w-full flex flex-col gap-4 pb-8 px-10 bg-white rounded-xl'>
             <div className='w-full flex flex-col items-start gap-4 px-10 relative'>
-              {
-                isCurrentFreelancer && !isEditMode && (
-                  <div
-                    onClick={() => setIsEditMode(true)}
-                    className='flex items-center absolute top-5 right-5 gap-2 cursor-pointer'
-                  >
-                    <span className='text-imbue-purple'>Edit</span>
-                    <div className='border border-imbue-purple rounded-full p-1 flex items-center justify-center'>
-                      <BsPencilSquare color='var(--theme-purple)' />
-                    </div>
+              {isCurrentFreelancer && !isEditMode && (
+                <div
+                  onClick={() => setIsEditMode(true)}
+                  className='flex items-center absolute top-5 right-5 gap-2 cursor-pointer'
+                >
+                  <span className='text-imbue-purple'>Edit</span>
+                  <div className='border border-imbue-purple rounded-full p-1 flex items-center justify-center'>
+                    <BsPencilSquare color='var(--theme-purple)' />
                   </div>
-                )
-              }
+                </div>
+              )}
 
-              <UploadImage isEditMode={isEditMode} user={freelancer} setUser={setFreelancer} />
-              <div className="w-full flex flex-col gap-[16px] -mt-11">
+              <UploadImage
+                isEditMode={isEditMode}
+                user={freelancer}
+                setUser={setFreelancer}
+              />
+              <div className='w-full flex flex-col gap-[16px] -mt-11'>
                 {isEditMode ? (
                   <TextField
                     onChange={(e) => handleUpdateState(e)}
@@ -352,13 +361,15 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   />
                 ) : (
                   <div className='flex gap-2 mt-10'>
-                    <h3 className="!text-2xl z-[1] text-imbue-purple">
+                    <h3 className='!text-2xl z-[1] text-imbue-purple'>
                       {freelancer?.display_name}
                     </h3>
                     {initFreelancer?.verified && (
                       <div className='bg-[#EAFFC2] flex items-center px-2 rounded-full'>
                         <VerifiedIcon htmlColor='#38e894' />
-                        <span className='text-sm ml-1 text-imbue-purple'>verified</span>
+                        <span className='text-sm ml-1 text-imbue-purple'>
+                          verified
+                        </span>
                       </div>
                     )}
                   </div>
@@ -402,7 +413,11 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                     )}
                   </div>
                 </div>
-                <CountrySelector isEditMode={isEditMode} user={freelancer} setUser={setFreelancer} />
+                <CountrySelector
+                  isEditMode={isEditMode}
+                  user={freelancer}
+                  setUser={setFreelancer}
+                />
 
                 {/* TODO: Implement reviews */}
 
@@ -432,51 +447,59 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                 )}
                 */}
 
-                  {
-                    isCurrentFreelancer
-                      ? (
-                        <>
-                          {
-                            isEditMode ? (
-                              <div className='flex gap-6 mb-5'>
-                                <button onClick={() => onSave()} className='message'>
-                                  Save Changes <FiEdit />
-                                </button>
-                                <button
-                                  onClick={() => cancelEdit()}
-                                  className='message !bg-red-600'
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            ) : (
-                              <div className='flex gap-6 mb-5'>
-                                <button onClick={() => flipEdit()} className='message'>
-                                  Edit Profile <FiEdit />
-                                </button>
-                                <button onClick={() => copyToClipboard({ title: "Profile Link" })} className='share'>
-                                  <FaRegShareSquare color='white' />
-                                  Share Profile
-                                </button>
-                              </div>
-                            )
-                          }
-                        </>)
-                      : (
+                  {isCurrentFreelancer ? (
+                    <>
+                      {isEditMode ? (
+                        <div className='flex gap-6 mb-5'>
+                          <button onClick={() => onSave()} className='message'>
+                            Save Changes <FiEdit />
+                          </button>
+                          <button
+                            onClick={() => cancelEdit()}
+                            className='message !bg-red-600'
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
                         <div className='flex gap-6 mb-5'>
                           <button
-                            onClick={() => handleMessageBoxClick()}
-                            className=' message'
+                            onClick={() => flipEdit()}
+                            className='message'
                           >
-                            Message
+                            Edit Profile <FiEdit />
                           </button>
-                          <button onClick={() => copyToClipboard({ title: "Profile Link" })} className='share'>
+                          <button
+                            onClick={() =>
+                              copyToClipboard({ title: 'Profile Link' })
+                            }
+                            className='share'
+                          >
                             <FaRegShareSquare color='white' />
                             Share Profile
                           </button>
                         </div>
-                      )
-                  }
+                      )}
+                    </>
+                  ) : (
+                    <div className='flex gap-6 mb-5'>
+                      <button
+                        onClick={() => handleMessageBoxClick()}
+                        className=' message'
+                      >
+                        Message
+                      </button>
+                      <button
+                        onClick={() =>
+                          copyToClipboard({ title: 'Profile Link' })
+                        }
+                        className='share'
+                      >
+                        <FaRegShareSquare color='white' />
+                        Share Profile
+                      </button>
+                    </div>
+                  )}
 
                   {/***
                   (<div>
@@ -510,9 +533,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                     Cancel
                   </button>
                 )} */}
-
                 </div>
-
 
                 {/* TODO: Implement */}
                 {/* <div className="divider"></div>
@@ -527,7 +548,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
 
             <div className='px-10 flex flex-col gap-4'>
               <div className='flex items-center gap-3'>
-                <p className='text-xl text-imbue-purple-dark'>Among my clients</p>
+                <p className='text-xl text-imbue-purple-dark'>
+                  Among my clients
+                </p>
                 <span className='h-4 w-4 flex justify-center items-center rounded-full bg-imbue-light-purple text-imbue-purple'>
                   ?
                 </span>
@@ -552,11 +575,14 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   {freelancer?.web3_address}
                 </div>
                 <div
-                  onClick={() => copyToClipboard({
-                    text: freelancer?.web3_address || "",
-                    title: "Web 3 address"
-                  })}
-                  className='p-1 border border-imbue-purple rounded-full cursor-pointer'>
+                  onClick={() =>
+                    copyToClipboard({
+                      text: freelancer?.web3_address || '',
+                      title: 'Web 3 address',
+                    })
+                  }
+                  className='p-1 border border-imbue-purple rounded-full cursor-pointer'
+                >
                   <ContentCopyIcon htmlColor='#3b27c1' />
                 </div>
               </div>
@@ -851,7 +877,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           <div className='bg-white rounded-xl px-10'>
             <div className='px-8 lg:px-10 py-8'>
               <h3 className='mb-3 text-imbue-purple-dark'>Work History</h3>
-              <p className='text-imbue-purple'>Completed Projects ({projects?.length || 0})</p>
+              <p className='text-imbue-purple'>
+                Completed Projects ({projects?.length || 0})
+              </p>
             </div>
             <hr className='separator' />
             <div>
@@ -875,7 +903,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                         />
                       ))}
                     </div>
-                    <p className='text-imbue-purple text-sm'>{moment(v?.created).format("Do MMM YYYY")}</p>
+                    <p className='text-imbue-purple text-sm'>
+                      {moment(v?.created).format('Do MMM YYYY')}
+                    </p>
                   </div>
                   <p className='text-imbue-purple-dark'>{v?.description}</p>
                   <div className='flex gap-1  text-imbue-purple'>
@@ -965,7 +995,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                       }
                     />
                   ))}
-                  <span className='text-imbue-purple ml-3'>| {review.time}</span>
+                  <span className='text-imbue-purple ml-3'>
+                    | {review.time}
+                  </span>
                 </div>
                 <p className='mt-2'>{review.description}</p>
                 <div className='flex gap-4'>
@@ -1033,13 +1065,12 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           </button>
         </div>
       </ErrorScreen>
-      <div className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
-            }`}>
-        <Alert
-          severity='success'
-        >
-          {`${copied} Copied to clipboard`}
-        </Alert>
+      <div
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${
+          copied ? 'right-5' : '-right-full'
+        }`}
+      >
+        <Alert severity='success'>{`${copied} Copied to clipboard`}</Alert>
       </div>
     </div>
   );
@@ -1055,11 +1086,9 @@ export const getServerSideProps = async (context: any) => {
       if (initFreelancer) {
         return { props: { isAuthenticated: true, initFreelancer } };
       }
-
     } catch (error) {
       console.error(error); // TODO:
     }
-
   }
 
   return {

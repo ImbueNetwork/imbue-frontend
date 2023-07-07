@@ -117,7 +117,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
   };
 
   return (
-    <div className='profile-container lg:-mt-8'>
+    <div className='profile-container'>
       <div className='banner absolute left-0 right-0'>
         <Image
           src={require('@/assets/images/profile-banner.png')}
@@ -177,7 +177,6 @@ const Profile = ({ initUser, browsingUser }: any) => {
                 />
               </div>
 
-
               <div className='flex justify-between'>
                 <div className='w-1/3'>
                   {!isEditMode && (
@@ -196,7 +195,9 @@ const Profile = ({ initUser, browsingUser }: any) => {
                 <div className='rating flex flex-col gap-3 text-imbue-purple-dark'>
                   <p>
                     <span>Top Rated</span>
-                    <span className='review-count ml-1 text-imbue-purple'>(1,434 reviews)</span>
+                    <span className='review-count ml-1 text-imbue-purple'>
+                      (1,434 reviews)
+                    </span>
                   </p>
                   <p className='mb-3'>
                     <FaStar size={30} color='var(--theme-primary)' />
@@ -208,7 +209,9 @@ const Profile = ({ initUser, browsingUser }: any) => {
 
                 <div className='w-3/12'>
                   <div className='w-full'>
-                    <p className='text-xl text-imbue-purple-dark'>Wallet Address</p>
+                    <p className='text-xl text-imbue-purple-dark'>
+                      Wallet Address
+                    </p>
                     <div className='mt-3 border border-imbue-purple break-words p-3 mb-4 rounded-md'>
                       {user?.web3_address}
                     </div>
@@ -234,7 +237,6 @@ const Profile = ({ initUser, browsingUser }: any) => {
                 color='#3B27C1'
               />
             </div>
-
 
             <AccountChoice
               accountSelected={(account: WalletAccount) =>
@@ -273,18 +275,17 @@ const Profile = ({ initUser, browsingUser }: any) => {
               </>
             ) : (
               <>
-                {
-                  user?.about && (
-                    <div className='bio text-imbue-purple'>
-                      {user?.about}
-                      {/* {user?.bio
+                {user?.about && (
+                  <div className='bio text-imbue-purple'>
+                    {user?.about}
+                    {/* {user?.bio
                                         ?.split?.("\n")
                                         ?.map?.((line: any, index: number) => (
                                             <p className="leading-[1.2] text-base" key={index}>
                                                 {line}
                                             </p>
                                         ))} */}
-                      {/* Welcome to a vibrant and multiple award-winning
+                    {/* Welcome to a vibrant and multiple award-winning
                   telecommunications service provider. Our aim is to bring
                   people and businesses together in what we do best, by offering
                   mobile and fixed services, broadband connectivity and IPTV
@@ -295,9 +296,8 @@ const Profile = ({ initUser, browsingUser }: any) => {
                   Smart Contract | DApps | DeFi | Solidity | Hyperledger |
                   Polkadot Rust | C | C ++ | C# | Python | Golang | Java |
                   Javascript | Scala | Simplicity | Haskell | */}
-                    </div>
-                  )
-                }
+                  </div>
+                )}
               </>
             )}
 
@@ -342,7 +342,9 @@ const Profile = ({ initUser, browsingUser }: any) => {
           </div>
 
           <div className='w-full bg-white rounded-xl'>
-            <p className='px-24 py-6 text-xl text-imbue-purple-dark'>Open Briefs</p>
+            <p className='px-24 py-6 text-xl text-imbue-purple-dark'>
+              Open Briefs
+            </p>
             <div className='briefs-list w-full'>
               {openBriefs?.map(
                 (item, itemIndex) =>
