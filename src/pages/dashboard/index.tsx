@@ -34,7 +34,11 @@ export type DashboardProps = {
 const Dashboard = (): JSX.Element => {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [client, setClient] = useState<StreamChat>();
-  const { user, loading: loadingUser, error: userError } = useSelector((state: RootState) => state.userState)
+  const {
+    user,
+    loading: loadingUser,
+    error: userError,
+  } = useSelector((state: RootState) => state.userState);
   const filters = { members: { $in: [user?.username] } };
   const [selectedOption, setSelectedOption] = useState<number>(1);
   const [unreadMessages, setUnreadMsg] = useState<number>(0);
@@ -50,7 +54,7 @@ const Dashboard = (): JSX.Element => {
   const router = useRouter();
   const { briefId } = router.query;
 
-  const [error, setError] = useState<any>(userError)
+  const [error, setError] = useState<any>(userError);
 
   const handleMessageBoxClick = async (
     user_id: number,
@@ -72,16 +76,16 @@ const Dashboard = (): JSX.Element => {
   useEffect(() => {
     const setupStreamChat = async () => {
       try {
-        if (!user?.username && !loadingUser) return router.push("/")
+        if (!user?.username && !loadingUser) return router.push('/');
 
         setClient(await getStreamChat());
-        _setBriefs(await getUserBriefs(user?.id))
-        _setMyApplications(await getFreelancerApplications(user?.id))
+        _setBriefs(await getUserBriefs(user?.id));
+        _setMyApplications(await getFreelancerApplications(user?.id));
       } catch (error) {
-        setError(error)
+        setError(error);
       } finally {
         setLoadingStreamChat(false);
-      }      
+      }
     };
 
     setupStreamChat();
@@ -108,7 +112,7 @@ const Dashboard = (): JSX.Element => {
   if (loadingStreamChat || loadingUser) return <FullScreenLoader />;
 
   return client ? (
-    <div className='hq-layout px-[15px]'>
+    <div className='px-[15px]'>
       <StyledEngineProvider injectFirst>
         <BottomNavigation
           showLabels
@@ -119,8 +123,9 @@ const Dashboard = (): JSX.Element => {
         >
           <BottomNavigationAction label='Client View' value={1} />
           <BottomNavigationAction
-            label={`Messages ${unreadMessages > 0 ? `(${unreadMessages})` : ''
-              }`}
+            label={`Messages ${
+              unreadMessages > 0 ? `(${unreadMessages})` : ''
+            }`}
             value={2}
           />
           <BottomNavigationAction label='Freelancer View' value={3} />
