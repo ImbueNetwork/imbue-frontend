@@ -143,6 +143,10 @@
   max-width: 60%;
 }
 
+.amountInput .MuiInputBase-input{
+  text-align: right;
+}
+
 @media screen and (max-width: 470px) {
   .MuiBottomNavigation-root {
     height: 46px;
