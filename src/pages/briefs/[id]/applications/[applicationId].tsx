@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 
 import { fetchProject, fetchUser } from '@/utils';
 
-// import ApplicationOwnerHeader from '@/components/Application/ApplicationOwnerHeader';
+import ApplicationOwnerHeader from '@/components/Application/ApplicationOwnerHeader';
 import BriefOwnerHeader from '@/components/Application/BriefOwnerHeader';
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
 import ChatPopup from '@/components/ChatPopup';
@@ -54,7 +54,7 @@ const ApplicationPreview = (): JSX.Element => {
   const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
-  // const [briefOwner, setBriefOwner] = useState<any>();
+  const [briefOwner, setBriefOwner] = useState<any>();
   const [loading, setLoading] = useState<boolean>(true);
 
   const isApplicationOwner =
@@ -100,9 +100,9 @@ const ApplicationPreview = (): JSX.Element => {
     async function setup() {
       if (brief) {
         setLoading(true);
-        // const briefOwner: User = await fetchUser(brief?.user_id);
+        const briefOwner: User = await fetchUser(brief?.user_id);
         setLoading(false);
-        // setBriefOwner(briefOwner);
+        setBriefOwner(briefOwner);
       }
     }
     setup();
@@ -284,24 +284,25 @@ const ApplicationPreview = (): JSX.Element => {
           )}
         </div>
 
-        {/* no need to show application owner */}
-        {/* {isApplicationOwner && (
-          <ApplicationOwnerHeader
-            {...{
-              briefOwner,
-              brief,
-              handleMessageBoxClick,
-              freelancer,
-              application,
-              setLoading,
-              updateProject,
-              user,
-            }}
-          />
-        )} */}
+        <div className='bg-white py-[1.25rem] px-[2.3rem] rounded-[1.25rem]'>
+          {isApplicationOwner && (
+            <ApplicationOwnerHeader
+              {...{
+                briefOwner,
+                brief,
+                handleMessageBoxClick,
+                freelancer,
+                application,
+                setLoading,
+                updateProject,
+                user,
+              }}
+            />
+          )}
+        </div>
 
         {/* loading screen while connecting to wallet*/}
-        <Backdrop sx={{ color: '#fff', zIndex: 5 }} open={loading}>
+        <Backdrop sx={{ color: '#fff', zIndex: 1000 }} open={loading}>
           <CircularProgress color='inherit' />
         </Backdrop>
 

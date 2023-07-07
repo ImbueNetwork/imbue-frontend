@@ -99,10 +99,12 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           priority
           alt='profileImage'
         />
-        <p className='text-2xl font-bold'>{briefOwner?.display_name}</p>
+        <p className='text-[1.25rem] font-normal capitalize text-imbue-purple'>
+          {briefOwner?.display_name}
+        </p>
       </div>
       {
-        <p className='text-base text-primary break-words text-center ml-3'>
+        <p className='text-[1rem] text-imbue-purple max-w-[55%] text-center break-words'>
           @
           {mobileView && briefOwner?.username?.length > 16
             ? `${briefOwner?.username.substr(0, 16)}...`
@@ -121,7 +123,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         </button>
         {application?.status_id === 4 ? (
           <button
-            className='Accepted-btn text-black in-dark text-xs lg:text-base rounded-full py-[7px] px-3 ml-3 lg:ml-0 lg:px-6 md:py-[14px]'
+            className='Accepted-btn h-[2.7rem] text-black in-dark text-xs lg:text-base rounded-full px-3 ml-3 lg:ml-0 lg:px-6'
             onClick={() => brief?.project_id && setOpenPopup(true)}
           >
             Start Work
