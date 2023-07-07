@@ -36,6 +36,11 @@ module.exports = {
         'imbue-coral': '#FC6760',
         'imbue-foundation-blue': '#00234C',
         'imbue-lemon': '#7AA822',
+        'background': "#FFFFFF",
+        'background-dark': "#",
+        'content': "#03116A",
+        'content-primary': "#3B27C1",
+        'overlay': "#F6F5FF",
       },
       screens: {
         'max-width-1800px': { raw: '(max-width: 1800px)' },

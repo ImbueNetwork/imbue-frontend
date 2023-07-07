@@ -68,10 +68,10 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
 
     return (
         <div>
-            <div className='mb-5 flex flex-wrap gap-3'>
+            <div className='lg:mb-5 flex flex-wrap gap-3'>
                 {
                     approversPreview?.map((approver: any, index: number) => (
-                        <div key={index} className='flex text-white gap-3 items-center cursor-pointer border border-light-white p-2 rounded-full'>
+                        <div key={index} className='flex gap-3 items-start lg:items-center cursor-pointer border border-light-white p-2 rounded-full'>
                             <Image
                                 height={40}
                                 width={40}
@@ -80,13 +80,13 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
                                 className='rounded-full'
                             />
                             <div className='flex flex-col'>
-                                <span>{approver?.display_name}</span>
-                                <p className='text-xs'>{approver?.web3_address}</p>
+                                <span className='text-content'>{approver?.display_name}</span>
+                                <p className='text-xs text-content-primary break-all mt-2 lg:mt-0'>{approver?.web3_address}</p>
 
                             </div>
                             <div
                                 onClick={() => removeApprover(index)}
-                                className='px-2 py-0.5 rounded-full bg-purple-300 cursor-pointer'>
+                                className='py-1 px-2 flex items-center justify-center rounded-full bg-purple-300 cursor-pointer text-[10px]'>
                                 X
                             </div>
                         </div>
@@ -94,20 +94,21 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
                 }
             </div>
             <ClickAwayListener onClickAway={handleClose}>
-                <div className='relative h-14'>
+                <div className='relative h-14 mt-6 lg:mt-0'>
                     <TextField
+                        color='secondary'
                         onClick={(e) => getAllUsers(e)}
                         id="outlined-basic"
                         label="Add Approvers"
                         variant="outlined"
-                        className='w-full'
+                        className='w-full approverInput'
                         value={input}
                         onChange={(e) => handleInputChange(e)}
                     />
 
                     {
                         open && (
-                            <div className='flex flex-col bg-black absolute top-full w-full z-[5] py-2'>
+                            <div className='flex flex-col bg-overlay border border-imbue-purple rounded-lg absolute top-full w-full z-[5] overflow-hidden'>
                                 {
                                     loading
                                         ? <p className='flex items-center gap-10 p-4'>Loading users <CircularProgress /></p>
@@ -118,12 +119,12 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
                                                         (regUsers[0]?.web3_address !== input) && input && (
                                                             <div
                                                                 onClick={() => notUser && !approvers.includes(input) && addApprover({ ...notUserApprover, web3_address: input })}
-                                                                className={`px-4 py-2 flex justify-between items-center ${notUser && "cursor-pointer hover:bg-secondary-dark-hover"}`}>
+                                                                className={`px-4 py-2 flex justify-between items-center ${notUser && "cursor-pointer hover:bg-imbue-light-purple"}`}>
                                                                 <div className='flex gap-3 items-center'>
                                                                     {
                                                                         notUser && <Image height={40} width={40} src={"http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png"} alt='' />
                                                                     }
-                                                                    <span>
+                                                                    <span className='text-content-primary'>
                                                                         {input}
                                                                     </span>
                                                                 </div>
@@ -152,7 +153,7 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
                                                                 className='flex flex-col gap-4'
                                                             >
 
-                                                                <div className='flex justify-between items-center w-full hover:bg-secondary-dark-hover px-4 py-2'>
+                                                                <div className='flex justify-between items-center w-full hover:bg-imbue-light-purple px-4 py-2'>
                                                                     <div className='flex text-white gap-3 items-center cursor-pointer'>
                                                                         <Image
                                                                             height={40}
@@ -162,8 +163,8 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
                                                                             className='rounded-full'
                                                                         />
                                                                         <div className='flex flex-col'>
-                                                                            <span>{user?.display_name}</span>
-                                                                            <p className='text-xs mt-2 text-white text-opacity-60'>{user?.web3_address ?? "No Web3 address found"}</p>
+                                                                            <span className='text-content'>{user?.display_name}</span>
+                                                                            <p className='text-xs mt-2 text-opacity-60 text-content-primary'>{user?.web3_address ?? "No Web3 address found"}</p>
 
                                                                         </div>
                                                                     </div>

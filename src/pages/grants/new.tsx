@@ -1,4 +1,4 @@
-import { Alert, Dialog, IconButton } from '@mui/material';
+import { Alert, Dialog, IconButton, InputAdornment, TextField } from '@mui/material';
 // import { blake2AsHex } from '@polkadot/util-crypto';
 import WalletIcon from '@svgs/wallet.svg';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -233,41 +233,41 @@ const GrantApplication = (): JSX.Element => {
 
   return (
     <div className='flex flex-col gap-10 leading-[1.5] hq-layout !mx-3 lg:!mx-auto'>
-      <div className='rounded-[20px] border border-solid border-white bg-theme-grey-dark'>
-        <div className='px-6 lg:px-12 py-5 text-[20px] text-white border-b border-white'>
+      <div className='rounded-[20px] border border-solid border-white bg-background'>
+        <p className='px-6 lg:px-12 py-5 text-[20px] text-imbue-purple-dark border-b border-imbue-light-purple'>
           Grant description
-        </div>
-        <div className='px-6 lg:px-12 py-8 text-base leading-[1.2]'>
-          <div className='flex justify-between'>
+        </p>
+        <div className='px-6 lg:px-12 py-5 lg:py-8 text-base leading-[1.2]'>
+          <div className='flex flex-col-reverse lg:flex-row justify-between gap-10 lg:gap-0'>
             <div className='flex flex-col gap-8 w-full lg:w-3/5'>
-              <div className='flex flex-col gap-4'>
+              <div className='flex flex-col gap-4 text-imbue-purple-dark'>
                 <div>Title</div>
                 <input
                   value={title}
                   placeholder='Input title'
                   onChange={(e) => setTitle(e.target.value)}
-                  className='bg-[#1a1a18] border border-solid border-white rounded-[5px] p-3'
+                  className='bg-transparent border border-imbue-purple rounded-md p-3 placeholder:text-imbue-light-purple text-imbue-purple outline-primary'
                 />
               </div>
-              <div className='flex flex-col gap-4'>
+              <div className='flex flex-col gap-4 text-imbue-purple-dark'>
                 <div>Description</div>
                 <textarea
                   maxLength={500}
                   value={description}
                   placeholder='Input description'
                   onChange={(e) => setDescription(e.target.value)}
-                  className='border border-solid border-white bg-[#1a1a19] min-h-[160px] p-3'
+                  className='bg-transparent border border-imbue-purple rounded-md p-3 placeholder:text-imbue-light-purple text-imbue-purple outline-primary min-h-[160px] p-3'
                 />
-                <div className='text-[rgba(235, 234, 226, 0.70)]'>{`${description?.length || 0
+                <div className='text-imbue-purple text-sm'>{`${description?.length || 0
                   }/300`}</div>
               </div>
             </div>
-            <div className='flex flex-col gap-[50px] max-lg:mt-10 lg:w-60'>
+            <div className='flex flex-col gap-[50px] lg:mt-10 lg:w-60'>
 
-              <div className='flex flex-col'>
+              <div className='flex flex-col text-content'>
                 <div className='flex flex-row items-start gap-6'>
                   <Image
-                    src={require('@/assets/svgs/dollar_sign.svg')}
+                    src={require('@/assets/svgs/tag.svg')}
                     height={24}
                     width={24}
                     alt={'dollarSign'}
@@ -277,7 +277,7 @@ const GrantApplication = (): JSX.Element => {
                     <h3 className='text-xl leading-[1.5] font-normal m-0 p-0'>
                       Ecosystem
                     </h3>
-                    <div className='text-inactive mt-2'>Kusama Treasury (KSM)</div>
+                    <div className='mt-2 text-content-primary'>Kusama Treasury (KSM)</div>
                   </div>
                 </div>
               </div>
@@ -285,20 +285,18 @@ const GrantApplication = (): JSX.Element => {
               <div className='flex flex-col'>
                 <div className='flex flex-row items-start gap-6'>
                   <Image
-                    src={require('@/assets/svgs/calendar_icon.svg')}
+                    src={require('@/assets/svgs/calendar-icon.svg')}
                     height={24}
                     width={24}
                     alt={'calenderIcon'}
                     className="mt-1"
                   />
                   <div className='flex flex-col'>
-                    <h3 className='text-xl font-normal'>
-                      {durationOptions[durationId - 1]?.label}
+                    <h3 className='text-xl font-normal text-content'>
+                      {durationOptions[durationId]?.label}
                     </h3>
-                    <div className='text-inactive'>Timeline</div>
+                    <div className='text-content-primary mt-2'>Timeline</div>
                   </div>
-
-
                 </div>
 
               </div>
@@ -307,14 +305,14 @@ const GrantApplication = (): JSX.Element => {
         </div>
       </div>
 
-      <div className='rounded-[20px] border border-solid border-white bg-theme-grey-dark'>
-        <div className='flex justify-between text-[20px] text-white px-6 lg:px-12 py-5 border-b border-white'>
-          <div>Approvers</div>
+      <div className='rounded-[20px] bg-background'>
+        <div className='flex justify-between text-[20px] text-content px-6 lg:px-12 py-5 border-b border-imbue-light-purple'>
+          <p>Approvers</p>
           <div>{`Total grant: ${totalCost} ${currencies[currencyId]}`}</div>
         </div>
-        <div className='flex flex-col lg:flex-row justify-between px-6 lg:px-12 py-8 text-base leading-[1.2]  border border-solid border-b-white items-start'>
-          <div className='flex flex-col gap-8 w-full'>
-            <div className='flex flex-col gap-4 w-full lg:w-4/5'>
+        <div className='flex flex-col lg:flex-row justify-between px-6 lg:px-12 py-8 text-base leading-[1.2] border-b border-b-imbue-light-purple items-start'>
+          <div className='flex flex-col gap-8 w-full lg:w-1/2'>
+            <div className='flex flex-col gap-4 w-full'>
               {/* <input
                 value={newApprover || ''}
                 placeholder='Input address of an approver'
@@ -324,16 +322,15 @@ const GrantApplication = (): JSX.Element => {
               <div className='flex flex-col gap-4 ml-2'>
                 {approversPreview.map((approver, index) => (
                   <div key={index} className='flex flex-row justify-between items-center w-full lg:w-2/3 gap-10'>
-                    {/* <span>{approver}</span> */}
                     <div className='flex w-full'>
                       <Image className='w-10 h-10' width={40} height={40} src={approver?.profile_photo} alt='' />
-                      <div className='flex flex-col ml-4 gap-1 justify-center'>
+                      <div className='flex flex-col ml-4 gap-1 justify-center  text-content-primary'>
                         <span>{approver?.display_name}</span>
-                        <span className='text-xs break-all'>{approver?.web3_address}</span>
+                        <span className='text-xs break-all text-content-primary'>{approver?.web3_address}</span>
                       </div>
                     </div>
                     <span
-                      className='text-light-grey font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
+                      className='text-content-primary font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
                       onClick={() => removeApprover(index)}
                     >
                       x
@@ -356,42 +353,42 @@ const GrantApplication = (): JSX.Element => {
 
 
           </div>
-          <div className='flex flex-col gap-4'>
+          <div className='flex flex-col gap-4 mt-8 lg:mt-0'>
             <div>
-              <h3 className='text-lg lg:text-xl font-bold m-0 p-0'>
+              <p className='text-lg text-content m-0 p-0'>
                 How long will this project take?
-              </h3>
+              </p>
               <select
                 name='duration'
                 value={durationId}
                 onChange={(e) => setDurationId(Number(e.target.value))}
-                className='bg-[#1a1a19] round border border-white rounded-[5px] text-base px-5 py-3 mt-4 w-full'
+                className='bg-transparent round border border-imbue-purple rounded-[5px] text-base px-5 py-3 mt-4 w-full text-content-primary outline-content-primary'
                 placeholder='Select a duration'
                 required
               >
                 {durationOptions.map(({ label, value }, index) => (
-                  <option value={value} key={index} className='duration-option'>
+                  <option value={value} key={index} className='duration-option bg-overlay py-2'>
                     {label}
                   </option>
                 ))}
               </select>
             </div>
             <div>
-              <h3 className='text-lg lg:text-xl font-bold m-0 p-0'>Currency</h3>
+              <p className='text-lg text-content m-0 p-0'>Currency</p>
               <div>
                 <select
                   name='currencyId'
                   value={currencyId}
                   onChange={(e) => setCurrencyId(Number(e.target.value))}
                   placeholder='Select a currency'
-                  className='bg-[#1a1a19] round border border-white rounded-[5px] text-base px-5 py-3 mt-4 w-full'
+                  className='bg-transparent round border border-imbue-purple rounded-[5px] text-base px-5 py-3 mt-4 w-full text-content-primary outline-content-primary'
                   required
                 >
                   {currencies.map((currency: any) => (
                     <option
                       value={Currency[currency]}
                       key={Currency[currency]}
-                      className='duration-option'
+                      className='hover:!bg-overlay'
                     >
                       {currency}
                     </option>
@@ -402,7 +399,7 @@ const GrantApplication = (): JSX.Element => {
           </div>
         </div>
         <div className='flex flex-col px-6 lg:px-7 py-5'>
-          <div className='text-[20px] text-white lg:ml-5 mb-8'>Milestones</div>
+          <div className='text-[20px] text-content lg:ml-5 mb-8'>Milestones</div>
           <div className='flex flex-col gap-4'>
             {milestones.map(({ name, amount }, index) => {
               const percent = Number(
@@ -413,16 +410,16 @@ const GrantApplication = (): JSX.Element => {
                   <div className='flex flex-row relative'>
                     <span
                       onClick={() => onRemoveMilestone(index)}
-                      className='absolute top-0 right-2 text-sm lg:text-xl text-light-grey font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
+                      className='absolute top-0 right-2 text-sm lg:text-xl text-imbue-purple font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
                     >
                       x
                     </span>
-                    <div className='text-base mr-4 lg:mr-9'>{index + 1}.</div>
-                    <div className='flex flex-row justify-between w-full'>
+                    <div className='text-base mr-4 lg:mr-9 text-content mt-0.5'>{index + 1}.</div>
+                    <div className='flex flex-row justify-between w-full text-content'>
                       <div className='w-3/5'>
-                        <h3 className='mb-2 lg:mb-5 text-base lg:text-xl font-bold m-0 p-0'>
+                        <p className='mb-2 lg:mb-5 text-base lg:text-lg'>
                           Description
-                        </h3>
+                        </p>
                         <textarea
                           className='input-description text-base'
                           value={name}
@@ -439,12 +436,17 @@ const GrantApplication = (): JSX.Element => {
                         />
                       </div>
                       <div className='flex flex-col w-4/12'>
-                        <h3 className='mb-2 lg:mb-5 text-base lg:text-xl font-bold m-0 p-0'>
+                        <p className='mb-2 lg:mb-5 text-base lg:text-lg m-0 p-0'>
                           Amount
-                        </h3>
-                        <input
+                        </p>
+                        <TextField
+                          color='secondary'
+                          id="outlined-start-adornment"
+                          InputProps={{
+                            startAdornment: <InputAdornment sx={{ color: "var(--theme-purple)" }} position="start">{currencies[currencyId]}</InputAdornment>,
+                          }}
+                          className='amountInput'
                           type='number'
-                          className='input-budget bg-[#1a1a19] border border-white text-base leading-5 rounded-[5px] py-3 px-5'
                           value={amount || ''}
                           onChange={(e) =>
                             setMilestones([
@@ -459,7 +461,7 @@ const GrantApplication = (): JSX.Element => {
                         />
                         {totalCostWithoutFee !== 0 && (
                           <div className='flex flex-col items-end mt-3 gap-2 w-full'>
-                            <div className='progress-value text-base'>
+                            <div className='mt-2 text-base text-content-primary'>
                               {percent}%
                             </div>
                             <div className='progress-bar'>
@@ -476,7 +478,7 @@ const GrantApplication = (): JSX.Element => {
                     </div>
                   </div>
                   {index !== milestones.length - 1 && (
-                    <hr className='mx-4 my-4 text-white' />
+                    <hr className='mx-4 my-4 text-content' />
                   )}
                 </div>
               );
@@ -490,42 +492,40 @@ const GrantApplication = (): JSX.Element => {
             Add milestone
           </div>
 
-          <div className='lg:mx-4'>
-            <hr className='my-6 text-white' />
-
+          <div className='lg:mx-4 px-10 mt-10 bg-overlay py-8 rounded-xl mb-4'>
             <div className='flex flex-row items-center mb-5'>
               <div className='flex flex-col flex-grow'>
-                <h3 className='text-lg lg:text-xl font-bold m-0 p-0'>
+                <p className='text-lg lg:text-xl text-content m-0 p-0'>
                   Requested budget
-                </h3>
+                </p>
               </div>
-              <div className='budget-value'>
+              <div className='text-content-primary'>
                 {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
                   }`}
               </div>
             </div>
 
-            <hr className='my-6 text-white' />
+            <hr className='my-6 text-content' />
 
             <div className='flex flex-row items-center mb-5'>
               <div className='flex flex-col flex-grow'>
-                <h3 className='text-lg lg:text-xl font-bold m-0 p-0'>
+                <p className='text-lg lg:text-xl text-content m-0 p-0'>
                   Imbue Service Fee 5% - Learn more about Imbue’s fees
-                </h3>
+                </p>
               </div>
-              <div className='budget-value'>
+              <div className='text-content-primary'>
                 {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
                   }`}
               </div>
             </div>
 
-            <hr className='my-6 text-white' />
+            <hr className='my-6 text-content' />
 
             <div className='flex flex-row items-center mb-5'>
               <div className='flex flex-col flex-grow'>
-                <h3 className='text-lg lg:text-xl font-bold m-0 p-0'>Total</h3>
+                <p className='text-lg lg:text-xl text-content m-0 p-0'>Total</p>
               </div>
-              <div className='budget-value'>
+              <div className='text-content-primary'>
                 ${Number(totalCost.toFixed(2)).toLocaleString()}
               </div>
             </div>
@@ -563,14 +563,14 @@ const GrantApplication = (): JSX.Element => {
           </div>
 
           <CopyToClipboard text={escrow_address}>
-            <div className='flex flex-row gap-4 items-center rounded-[10px] border border-solid border-light-grey py-8 px-6 text-xl text-white'>
+            <div className='flex flex-row gap-4 items-center rounded-[10px] border border-solid border-light-grey py-8 px-6 text-xl text-content'>
               <IconButton onClick={() => copyAddress()}>
-                <FaRegCopy className='text-white' />
+                <FaRegCopy className='text-content' />
               </IconButton>
               <span>{escrow_address}</span>
             </div>
           </CopyToClipboard>
-          <div className='mt-6 mb-12 text-white text-lg text-center'>
+          <div className='mt-6 mb-12 text-content text-lg text-center'>
             Please use this given address to create a proposal in your Kusama
             treasury. After the voting is passed your project will be created
           </div>
