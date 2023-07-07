@@ -25,7 +25,7 @@ const Skills = ({
   }, [skills, freelancer]);
 
   return (
-    <div className='mx-[30px] lg:mx-[40px] text-imbue-purple-dark'>
+    <div className='lg:mx-[40px] text-imbue-purple-dark'>
       <div className='header-editable'>
         <h5>Skills</h5>
       </div>
