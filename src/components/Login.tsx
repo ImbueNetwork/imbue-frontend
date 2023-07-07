@@ -1,4 +1,10 @@
-import { CircularProgress, Dialog, DialogContent, DialogTitle } from '@mui/material';
+/* eslint-disable no-console */
+import {
+  CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@mui/material';
 import { SignerResult } from '@polkadot/api/types';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -52,11 +58,11 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
 
   const [formContent, setFormContent] = useState<string>('login');
 
-  const googleParentRef = useRef<any>()
+  const googleParentRef = useRef<any>();
 
   const imbueLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     setErrorMessage(undefined);
-    setLoading(true)
+    setLoading(true);
     event.preventDefault();
 
     try {
@@ -77,9 +83,8 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
     } catch (error) {
       console.log(error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-
   };
 
   const closeModal = (): void => {
@@ -134,100 +139,104 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
             >
               {'You must be signed in to continue'}
             </DialogTitle>
-            <DialogContent
-              className='mx-auto w-4/5'
-            >
+            <DialogContent className='mx-auto w-4/5'>
               <p className='text-base lg:text-xl text-imbue-purple-dark mb-7 relative text-center'>
                 Please use the link below to sign in.
               </p>
               <div>
-                {
-                  formContent === 'login'
-                    ? (
-                      <form
-                        id='contribution-submission-form'
-                        name='contribution-submission-form'
-                        method='get'
-                        onSubmit={imbueLogin}
-                      >
-                        <div className='login justify-center items-center w-full flex flex-col'>
-                          <div className='flex flex-col justify-center pb-2 w-full'>
-                            <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
-                              Username/Email
-                            </label>
-                            <CustomInput
-                              placeholder='Enter your Username/Email'
-                              onChange={(e: any) => setUserOrEmail(e.target.value)}
-                              className='mdc-text-field'
-                              required
-                            />
-                          </div>
-                          <div className='flex flex-col justify-center pb-[10px] w-full mt-[1.2rem]'>
-                            <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
-                              Password
-                            </label>
-                            <CustomInput
-                              placeholder='Enter your password'
-                              onChange={(e: any) => setPassword(e.target.value)}
-                              type='password'
-                              className='mdc-text-field'
-                              required
-                            />
-                          </div>
+                {formContent === 'login' ? (
+                  <form
+                    id='contribution-submission-form'
+                    name='contribution-submission-form'
+                    method='get'
+                    onSubmit={imbueLogin}
+                  >
+                    <div className='login justify-center items-center w-full flex flex-col'>
+                      <div className='flex flex-col justify-center pb-2 w-full'>
+                        <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
+                          Username/Email
+                        </label>
+                        <CustomInput
+                          placeholder='Enter your Username/Email'
+                          onChange={(e: any) => setUserOrEmail(e.target.value)}
+                          className='mdc-text-field'
+                          required
+                        />
+                      </div>
+                      <div className='flex flex-col justify-center pb-[10px] w-full mt-[1.2rem]'>
+                        <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
+                          Password
+                        </label>
+                        <CustomInput
+                          placeholder='Enter your password'
+                          onChange={(e: any) => setPassword(e.target.value)}
+                          type='password'
+                          className='mdc-text-field'
+                          required
+                        />
+                      </div>
 
-                          <div>
-                            <span className={!errorMessage ? 'hide' : 'error'}>
-                              {errorMessage}
-                            </span>
-                          </div>
+                      <div>
+                        <span className={!errorMessage ? 'hide' : 'error'}>
+                          {errorMessage}
+                        </span>
+                      </div>
 
-                          <span className='text-imbue-purple-dark text-base text-right hover:underline ml-auto cursor-pointer'>
-                            Forgot password?
+                      <span className='text-imbue-purple-dark text-base text-right hover:underline ml-auto cursor-pointer'>
+                        Forgot password?
+                      </span>
+
+                      <div className='flex justify-center my-2 w-full cursor-pointer'>
+                        <button
+                          type='submit'
+                          disabled={loading}
+                          className='primary-btn in-dark w-full !text-center group !mx-0 relative'
+                          id='sign-in'
+                        >
+                          {loading && (
+                            <CircularProgress
+                              className='absolute left-2'
+                              thickness={5}
+                              size={24}
+                              color='info'
+                            />
+                          )}
+                          <span className='font-normal text-white group-hover:text-black'>
+                            {loading ? 'Signing In' : 'Sign In'}
                           </span>
+                        </button>
+                      </div>
 
-                          <div className='flex justify-center my-2 w-full cursor-pointer'>
-                            <button
-                              type='submit'
-                              disabled={loading}
-                              className='primary-btn in-dark w-full !text-center group !mx-0 relative'
-                              id='sign-in'
-                            >
-                              {loading && <CircularProgress className='absolute left-2' thickness={5} size={24} color='info' />}
-                              <span className='font-normal text-white group-hover:text-black'>
-                                {
-                                  loading ? 'Signing In' : 'Sign In'
-                                }
-                              </span>
-                            </button>
-                          </div>
+                      <div>
+                        <span className='text-imbue-purple-dark text-base'>
+                          Don&apos;t have an account?
+                        </span>
+                        <span
+                          onClick={() => {
+                            setFormContent('join');
+                          }}
+                          className='signup text-imbue-coral ml-1 hover:underline cursor-pointer'
+                        >
+                          Sign up
+                        </span>
+                      </div>
 
-                          <div>
-                            <span className='text-imbue-purple-dark text-base'>
-                              Don&apos;t have an account?
-                            </span>
-                            <span
-                              onClick={() => {
-                                setFormContent("join");
-                              }}
-                              className='signup text-imbue-coral ml-1 hover:underline cursor-pointer'
-                            >
-                              Sign up
-                            </span>
-                          </div>
-
-                          <div className='w-full mt-8 mb-5 flex justify-between items-center'>
-                            <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
-                            <p className='text-base text-imbue-purple-dark'>or</p>
-                            <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
-                          </div>
-                        </div>
-                      </form>
-                    )
-                    : <SignUp {...{ setFormContent, redirectUrl }} />
-                }
+                      <div className='w-full mt-8 mb-5 flex justify-between items-center'>
+                        <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
+                        <p className='text-base text-imbue-purple-dark'>or</p>
+                        <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
+                      </div>
+                    </div>
+                  </form>
+                ) : (
+                  <SignUp {...{ setFormContent, redirectUrl }} />
+                )}
 
                 <div className='login justify-center items-center w-full flex flex-col'>
-                  <li ref={googleParentRef} className='mt-1 mb-2 w-full flex justify-center'>
+                  <li
+                    ref={googleParentRef}
+                    className='mt-1 mb-2 w-full flex justify-center'
+                  >
                     <GoogleOAuthProvider clientId={config.googleClientId}>
                       {/* <button
                         // onClick={() => loginGoogleFunction()}
@@ -244,16 +253,15 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                       </button> */}
                       <GoogleLogin
                         width={`${googleParentRef?.current?.clientWidth}`}
-                        logo_alignment="center"
+                        logo_alignment='center'
                         shape='circle'
-                        size="large"
+                        size='large'
                         useOneTap={true}
                         onSuccess={(creds: any) => googleLogin(creds)}
                         onError={() => {
                           // FIXME: error handling
                           console.log('Login Failed');
                         }}
-
                       />
                     </GoogleOAuthProvider>
                   </li>

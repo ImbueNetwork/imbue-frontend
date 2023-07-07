@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';

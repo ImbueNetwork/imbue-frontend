@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
 /* eslint-disable unused-imports/no-unused-vars */
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -123,13 +125,23 @@ function Navbar() {
               className={`main-title lg:h-[2.9375rem] !bg-white rounded-[5.07319rem] w-full flex justify-center items-center cursor-pointer z-10 relative px-5 py-2 lg:!p-0`}
             >
               <div id='logo'>
-                <Image src={appLogo} alt={'app logo'} className='w-28 lg:w-full' />
+                <Image
+                  src={appLogo}
+                  alt={'app logo'}
+                  className='w-28 lg:w-full'
+                />
               </div>
             </h1>
 
             {!mobile && (
               <div className='relative flex items-center z-0'>
-                <div className={`${expanded ? "translate-x-0 opacity-100 duration-700" : "-translate-x-full opacity-0 duration-1000"} flex items-center ml-1 transition-all`}>
+                <div
+                  className={`${
+                    expanded
+                      ? 'translate-x-0 opacity-100 duration-700'
+                      : '-translate-x-full opacity-0 duration-1000'
+                  } flex items-center ml-1 transition-all`}
+                >
                   <Link
                     onClick={() => setExpanded(false)}
                     className={`mx-1 lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
@@ -171,7 +183,11 @@ function Navbar() {
                   onClick={() => {
                     setExpanded(!expanded);
                   }}
-                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${!expanded && cancelClass} ${expanded ? "lg:invisible" : "visible delay-700"} absolute`}
+                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${
+                    !expanded && cancelClass
+                  } ${
+                    expanded ? 'lg:invisible' : 'visible delay-700'
+                  } absolute`}
                 >
                   <Image
                     src={expanded ? cancelIcon : hamburgerIcon}

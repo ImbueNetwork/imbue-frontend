@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { authenticate } from '@/pages/api/info/user';
 
 export const getServerSideProps = async (context: any) => {
