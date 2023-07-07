@@ -120,10 +120,10 @@ function Navbar() {
           <div className={`flex items-center transition-all`}>
             <h1
               onClick={() => router.push('/')}
-              className={`main-title h-[2.9375rem] !bg-white rounded-[5.07319rem] w-full flex justify-center items-center cursor-pointer z-10 relative`}
+              className={`main-title lg:h-[2.9375rem] !bg-white rounded-[5.07319rem] w-full flex justify-center items-center cursor-pointer z-10 relative px-5 py-2 lg:!p-0`}
             >
               <div id='logo'>
-                <Image src={appLogo} alt={'app logo'} className='w-full' />
+                <Image src={appLogo} alt={'app logo'} className='w-28 lg:w-full' />
               </div>
             </h1>
 
