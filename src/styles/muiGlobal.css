@@ -110,7 +110,11 @@
 .MuiDialog-paper {
   background-color: var(--theme-background);
   color: white;
-  /* margin: 7px auto; */
+  margin: 7px auto;
+}
+
+.errorDialogue .MuiDialog-paper {
+  margin: 7px auto;
 }
 
 .loginModal .MuiDialog-paper {

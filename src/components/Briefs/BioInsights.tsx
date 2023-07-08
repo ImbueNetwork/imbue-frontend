@@ -71,6 +71,7 @@ const BioInsights = ({
               max-width-750px:!px-4 
               flex 
               items-center 
+              justify-center
               gap-2
               !text-[1rem]
               !font-normal
