@@ -6,26 +6,27 @@
   --theme-secondary-dark-hover: #121c7f;
   --theme-error: #ff5a58;
   --theme-error-hover: #ff7a78;
-  --theme-background: #FFFFFF;
-  --theme-title-color: #03116A;
+  --theme-background: #ffffff;
+  --theme-title-color: #03116a;
   --theme-ink-color: #ebeae2;
   --theme-font-family: 'Aeonik', sans-serif;
   --theme-grey-text: #a6a6a6;
   --theme-black-text: #0f0f0f;
   --theme-imbue-purple: #3b27c1;
-  --theme-imbue-light-purple: #E1DDFF;
-  --theme-imbue-purple-dark: #03116A;
+  --theme-imbue-light-purple: #e1ddff;
+  --theme-imbue-light-purple-hover: #dbd6ff;
+  --theme-imbue-purple-dark: #03116a;
   --theme-imbue-white: #ffffff;
   --theme-grey-dark: #2c2c2c;
   --theme-light-grey: #ebeae2;
   --theme-grey-text: #a6a6a6;
   --theme-white: #fff;
   --theme-coral: #fc6760;
+  --theme-content: #3b27c1;
   --theme-purple: #3b27c1;
   --theme-purple-dark: #03116a;
   --theme-purple-light: #e1ddff;
   --theme-purple-light-two: #9880f2;
-  --theme-purple: #3b27c1;
   --theme-light-white: rgba(255, 255, 255, 0.25);
   --theme-h1-size: 75px;
   --theme-h1-weight: normal;
@@ -119,7 +120,7 @@
   --hq-base-transition: var(--base-transition);
 
   /* talisman */
-  --talisman-connect-control-background: #E1DDFF;
+  --talisman-connect-control-background: #e1ddff;
   --talisman-connect-control-foreground: inherit;
   --talisman-connect-active-background: #d1cbff;
   --talisman-connect-active-foreground: inherit;
@@ -244,14 +245,14 @@ select.round {
 
 .pill-button {
   padding: 12px 24px;
-  border: 1px solid white;
-  border-radius: 8px;
+  background-color: var(--theme-imbue-light-purple);
+  border-radius: 20px;
   cursor: pointer;
   width: fit-content;
 }
 
 .pill-button:hover {
-  background: white;
+  background: var(--theme-imbue-light-purple-hover);
   color: black;
 }
 
@@ -278,10 +279,10 @@ select.round {
 }
 
 .country-picker option {
-  background: var(--theme-black-text);
+  background: var(--theme-background);
 }
 
-.outlinedInput{
+.outlinedInput {
   height: 2.6rem;
   padding: 0.62rem 1.25rem !important;
   border-width: 1px;
@@ -293,8 +294,8 @@ select.round {
   outline-color: var(--theme-imbue-purple);
 }
 
-.outlinedInput::placeholder{
-  color: rgba(3, 17, 106, 0.30);
+.outlinedInput::placeholder {
+  color: rgba(3, 17, 106, 0.3);
 }
 
 /* Chrome, Safari, Edge, Opera */

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
@@ -17,7 +18,10 @@ export default nextConnect()
         let freelancer;
         freelancer = await fetchFreelancerDetailsByUsername(username)(tx);
 
-        if(!freelancer) freelancer = await models.fetchFreelancerDetailsByUserID(Number(username))(tx);
+        if (!freelancer)
+          freelancer = await models.fetchFreelancerDetailsByUserID(
+            Number(username)
+          )(tx);
 
         if (!freelancer) {
           return res.status(404).end();

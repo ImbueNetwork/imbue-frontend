@@ -174,9 +174,9 @@
   display: flex;
   flex-direction: column;
   gap: 26px;
-  background: var(--theme-grey-dark);
+  background: var(--theme-background);
   border-radius: 0.75rem;
-  border: 1px solid var(--theme-light-white);
+  padding: 2.5rem;
 }
 
 .whiteIcon path {
@@ -206,4 +206,15 @@
   .freelancer {
     width: 100%;
   }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.skills::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.skills {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

@@ -83,13 +83,20 @@ const MyClientBriefsView = (props: ClientViewProps) => {
             showNewBriefButton={true}
           />
 
-          <p className='text-imbue-purple-dark text-base lg:text-xl mb-3 mt-4 lg:mt-10'>
-            Projects
-          </p>
-          <BriefLists
-            briefs={briefs?.acceptedBriefs}
-            areAcceptedBriefs={true}
-          />
+          {
+            briefs?.acceptedBriefs?.length && (
+              <>
+                <p className='text-imbue-purple-dark text-base lg:text-xl mb-3 mt-4 lg:mt-10'>
+                  Projects
+                </p>
+                <BriefLists
+                  briefs={briefs?.acceptedBriefs}
+                  areAcceptedBriefs={true}
+                />
+              </>
+            )
+          }
+
         </div>
       )}
     </div>

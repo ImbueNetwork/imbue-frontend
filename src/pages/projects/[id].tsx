@@ -1,3 +1,5 @@
+/* eslint-disable no-constant-condition */
+/* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -21,6 +23,7 @@ import FullScreenLoader from '@/components/FullScreenLoader';
 import Login from '@/components/Login';
 import SuccessScreen from '@/components/SuccessScreen';
 
+import { calenderIcon, shieldIcon, tagIcon } from '@/assets/svgs';
 import {
   Milestone,
   OnchainProjectState,
@@ -96,8 +99,8 @@ function Project() {
   const [success, setSuccess] = useState<boolean>(false);
   const [successTitle, setSuccessTitle] = useState<string>('');
   const [error, setError] = useState<any>();
-  const [balance, setBalance] = useState<any>(0)
-  const [approversPreview, setApproverPreview] = useState<any>([])
+  const [balance, setBalance] = useState<any>(0);
+  const [approversPreview, setApproverPreview] = useState<any>([]);
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -142,37 +145,34 @@ function Project() {
 
       // setting project owner name if it is a grant, else showing owner/freelancer name
       if (projectRes?.approvers) {
-        setTargetUser(await utils.fetchUser(projectRes?.user_id))
-      }
-      else if (projectRes?.user_id !== user?.id) {
-        await getTargetUser(projectRes?.user_id)
-      }
-      else {
-        const brief = await getBrief(projectRes.brief_id)
-        brief?.user_id && await getTargetUser(brief?.user_id.toString())
+        setTargetUser(await utils.fetchUser(projectRes?.user_id));
+      } else if (projectRes?.user_id !== user?.id) {
+        await getTargetUser(projectRes?.user_id);
+      } else {
+        const brief = await getBrief(projectRes.brief_id);
+        brief?.user_id && (await getTargetUser(brief?.user_id.toString()));
       }
       setProject(projectRes);
 
       // setting approver list
-      const approversPreviewList = [...approversPreview]
+      const approversPreviewList = [...approversPreview];
 
       if (projectRes?.approvers?.length && approversPreviewList.length === 0) {
         projectRes?.approvers.map(async (v: any) => {
-          const user = await utils.fetchUserByUsernameOrAddress(v)
+          const user = await utils.fetchUserByUsernameOrAddress(v);
           if (user?.length) {
-            approversPreviewList.push(...user)
-          }
-          else {
+            approversPreviewList.push(...user);
+          } else {
             approversPreviewList.push({
               // id: 6,
-              display_name: "",
+              display_name: '',
               profile_photo: null,
-              username: "",
-              web3_address: v
-            })
+              username: '',
+              web3_address: v,
+            });
           }
-        })
-        setApproverPreview(approversPreviewList)
+        });
+        setApproverPreview(approversPreviewList);
       }
 
       // api  project response
@@ -181,14 +181,14 @@ function Project() {
       const balance = await getBalance(
         projectRes?.escrow_address,
         projectRes?.currency_id || 0,
-        user)
+        user
+      );
 
-      setBalance(balance || 0)
+      setBalance(balance || 0);
     } catch (error) {
-      setError(error)
-    }
-    finally {
-      setLoading(false)
+      setError(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -272,7 +272,7 @@ function Project() {
 
   const handleRefund = async () => {
     // TODO: create vote of no confidence for refund
-  }
+  };
 
   const renderPolkadotJSModal = (
     <div>
@@ -361,7 +361,7 @@ function Project() {
         className='
       transparent-conatainer 
       relative 
-      !bg-[#2c2c2c] 
+      !bg-white 
       !py-[20px] 
       !border 
       !border-white 
@@ -383,10 +383,10 @@ function Project() {
           max-width-750px:flex'
         >
           <div className='flex flex-row max-width-750px:w-full'>
-            <h3 className='text-[39px] max-width-750px:text-[24px] font-normal leading-[60px]'>
+            <h3 className='text-[2rem] text-imbue-purple max-width-750px:text-[24px] font-normal leading-[60px]'>
               Milestone {index + 1}
             </h3>
-            <h3 className='text-[24px] ml-[32px] font-normal leading-[60px]'>
+            <h3 className='text-[1.5rem] text-imbue-purple ml-[32px] font-normal leading-[60px]'>
               {milestone?.name}
             </h3>
           </div>
@@ -394,8 +394,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, 'Completed')
               : milestone?.milestone_key == milestoneBeingVotedOn
-                ? openForVotingTag()
-                : projectStateTag(modified, 'Not Started')}
+              ? openForVotingTag()
+              : projectStateTag(modified, 'Not Started')}
 
             <Image
               src={require(expanded
@@ -409,20 +409,20 @@ function Project() {
         </div>
 
         <div className={`${!expanded && 'hidden'} my-6`}>
-          <p className='text-[14px] font-normal text-white'>
+          <p className='text-[14px] font-normal text-imbue-purple'>
             Percentage of funds to be released{' '}
-            <span className='text-[#BAFF36]'>
+            <span className=' text-imbue-lemon'>
               {milestone?.percentage_to_unlock}%
             </span>
           </p>
-          <p className='text-[14px] font-normal text-white'>
+          <p className='text-[14px] font-normal text-imbue-purple'>
             Funding to be released{' '}
-            <span className='text-[#BAFF36]'>
+            <span className='text-imbue-lemon'>
               {Number(milestone?.amount)?.toLocaleString?.()} $IMBU
             </span>
           </p>
 
-          <p className=' text-base font-normal text-[#a6a6a6] leading-[178.15%] mt-[23px] w-[80%]'>
+          <p className=' text-base font-normal text-[#3B27C180] leading-[178.15%] mt-[23px] w-[80%]'>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
             purus sit amet luctus venenatis, lectus magna fringilla urna,
             porttitor rhoncus dolor purus non enim praesent elementum facilisis
@@ -438,7 +438,7 @@ function Project() {
 
           {!isApplicant && milestone.milestone_key == milestoneBeingVotedOn && (
             <button
-              className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
+              className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8'
               data-testid='next-button'
               onClick={() => vote()}
             >
@@ -448,7 +448,7 @@ function Project() {
 
           {isApplicant &&
             onChainProject?.projectState !==
-            OnchainProjectState.OpenForVoting && (
+              OnchainProjectState.OpenForVoting && (
               <button
                 className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
                 data-testid='next-button'
@@ -488,10 +488,7 @@ function Project() {
       <div
         className='flex 
       flex-row
-       bg-[#2c2c2c] 
-       border 
-       border-opacity-25 
-       -border--theme-light-white 
+       bg-white 
        rounded-[20px] 
        p-12
        max-lg:p-5
@@ -500,39 +497,36 @@ function Project() {
       >
         <div className='flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] max-lg:basis-[60%] mr-[5%]  max-lg:mr-0'>
           <div className='brief-title'>
-            <h3 className='text-[32px] max-lg:text-[24px] leading-[1.5] font-normal m-0 p-0'>
+            <h3 className='text-[2rem] max-lg:text-[24px] leading-[1.5] font-normal m-0 p-0 text-imbue-purple'>
               {project?.name}
             </h3>
-            {
-              project?.brief_id && (
-                <span
-                  onClick={() => {
-                    // TODO:
-                  }}
-                  className='text-[#b2ff0b] cursor-pointer text-[20px]  max-lg: text-base  font-normal !m-0 !p-0 relative top-4'
-                >
-                  {`View full brief`}
-                </span>
-              )
-            }
-
+            {project?.brief_id && (
+              <span
+                onClick={() => {
+                  // TODO:
+                }}
+                className=' text-imbue-lemon cursor-pointer text-[1.25rem]  max-lg:text-base  font-normal !m-0 !p-0 relative top-4'
+              >
+                {`View full brief`}
+              </span>
+            )}
           </div>
           <div className='text-inactive lg:w-[80%]'>
-            <p className=' text-base font-normal leading-[178.15%]'>
+            <p className='text-[1rem] text-[#3B27C180] font-normal leading-[178.15%]'>
               {project?.description}
             </p>
           </div>
-          <p className='text-inactive  text-base font-normal leading-[1.5] m-0 p-0'>
+          <p className='text-[1rem] text-[#3B27C180] font-normalleading-[1.5] m-0 p-0'>
             Posted {timePosted}
           </p>
 
-          <p className='text-white text-xl font-normal leading-[1.5] mt-[16px] p-0'>
-            {
-              (isApplicant || project?.approvers) ? "Project Owner" : "Freelancer hired"
-            }
+          <p className='text-imbue-purple text-[1.25rem] font-normal leading-[1.5] mt-[16px] p-0'>
+            {isApplicant || project?.approvers
+              ? 'Project Owner'
+              : 'Freelancer hired'}
           </p>
 
-          <div className='flex flex-row items-center max-lg:flex-wrap mt-5'>
+          <div className='flex flex-row items-center max-lg:flex-wrap'>
             <Image
               src={
                 targetUser?.profile_image ||
@@ -545,7 +539,7 @@ function Project() {
               className='rounded-full'
             />
 
-            <p className='text-white text-[20px] font-normal leading-[1.5] p-0 mx-7'>
+            <p className='text-imbue-purple text-[1.25rem] font-normal leading-[1.5] p-0 mx-7'>
               {targetUser?.display_name}
             </p>
 
@@ -555,7 +549,6 @@ function Project() {
               in-dark w-button 
               !mt-0 
               font-normal 
-              h-11
               max-lg:!w-full 
               max-lg:!text-center 
               max-lg:!ml-0 
@@ -565,6 +558,7 @@ function Project() {
               !py-0 ml-[40px] 
               px-8
               max-lg:!mr-0
+              h-[2.6rem]
               '
               data-testid='next-button'
             >
@@ -572,69 +566,79 @@ function Project() {
             </button>
 
             <button
-              className='border px-6 py-[9px] rounded-full hover:bg-white hover:text-black transition-colors'
+              className='border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors'
               onClick={() => handleRefund()}
-            >Refund</button>
+            >
+              Refund
+            </button>
           </div>
 
           {project?.approvers && (
             <>
-              <p className='text-white text-xl font-normal leading-[1.5] mt-[16px] p-0'>
+              <p className='text-imbue-purple-dark text-[1.25rem] font-normal leading-[1.5] mt-[16px] p-0'>
                 Approvers
               </p>
-              <div className='flex flex-row flex-wrap gap-4'>
-                {/* {project.approvers.map((approver: string, index: number) => (
-                  // <span key={index}>{approver}</span>
-                ))} */}
-                {
-                  approversPreview?.map((approver: any, index: number) => (
-                    <div key={index} className='flex text-white gap-3 items-center border border-light-white p-2 rounded-full'>
+              {approversPreview?.length > 0 && (
+                <div className='flex flex-row flex-wrap gap-4'>
+                  {approversPreview?.map((approver: any, index: number) => (
+                    <div
+                      key={index}
+                      className='flex text-imbue-purple-dark gap-3 items-center border border-light-white p-2 rounded-full'
+                    >
                       <Image
                         height={40}
                         width={40}
-                        src={approver?.profile_photo ?? "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png"}
+                        src={
+                          approver?.profile_photo ??
+                          'http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png'
+                        }
                         alt=''
                         className='rounded-full'
                       />
                       <div className='flex flex-col'>
-                        <span className='text-base'>{approver?.display_name}</span>
-                        <p className='text-xs break-all text-white text-opacity-40'>{approver?.web3_address}</p>
+                        <span className='text-base'>
+                          {approver?.display_name}
+                        </span>
+                        <p className='text-xs break-all text-imbue-purple-dark text-opacity-40'>
+                          {approver?.web3_address}
+                        </p>
                       </div>
                     </div>
-                  ))
-                }
-              </div>
+                  ))}
+                </div>
+              )}
             </>
           )}
         </div>
-        <div className='flex flex-col gap-[50px] max-lg:mt-10 lg:w-56'>
+        <div className='flex flex-col gap-[30px] max-lg:mt-10 lg:w-56'>
           <div className='flex flex-col'>
-            <div className='flex flex-row items-start'>
+            <div className='flex flex-row items-start gap-3'>
               <Image
-                src={require('@/assets/svgs/shield.svg')}
+                src={shieldIcon}
                 height={24}
                 width={24}
                 alt={'shieldIcon'}
-                className="mt-1"
+                className='mt-1'
               />
 
-              <div className='ml-6 w-full'>
-                <h3 className='text-xl leading-[1.5] font-normal m-0 p-0'>
+              <div className='w-full'>
+                <h3 className='text-lg lg:text-[1.25rem] leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0 flex'>
                   Milestone{' '}
-                  <span className='text-[#BAFF36]'>
+                  <span className='text-imbue-purple-dark  ml-2'>
                     {approvedMilestones?.length}/{project?.milestones?.length}
                   </span>
                 </h3>
                 {/* mile stone step indicator */}
-                <div className='w-full bg-[#1C2608] mt-5 h-1 relative my-auto'>
+                <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
                   <div
                     style={{
-                      width: `${(onChainProject?.milestones?.filter?.(
-                        (m: any) => m?.is_approved
-                      )?.length /
-                        onChainProject?.milestones?.length) *
+                      width: `${
+                        (onChainProject?.milestones?.filter?.(
+                          (m: any) => m?.is_approved
+                        )?.length /
+                          onChainProject?.milestones?.length) *
                         100
-                        }%`,
+                      }%`,
                     }}
                     className='h-full rounded-xl Accepted-button absolute'
                   ></div>
@@ -642,76 +646,75 @@ function Project() {
                     {onChainProject?.milestones?.map((m: any, i: number) => (
                       <div
                         key={i}
-                        className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#1C2608]'
-                          } rounded-full -mt-1.5`}
+                        className={`h-4 w-4 ${
+                          m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
+                        } rounded-full -mt-1.5`}
                       ></div>
                     ))}
                   </div>
                 </div>
               </div>
-
             </div>
-
           </div>
 
           <div className='flex flex-col'>
-            <div className='flex flex-row items-start gap-6'>
+            <div className='flex flex-row items-start gap-3'>
               <Image
-                src={require('@/assets/svgs/dollar_sign.svg')}
+                src={tagIcon}
                 height={24}
                 width={24}
                 alt={'dollarSign'}
-                className="mt-1"
+                className='mt-1'
               />
               <div className='flex flex-col'>
-                <h3 className='text-xl leading-[1.5] font-normal m-0 p-0'>
+                <h3 className='text-xl leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0'>
                   {Number(project?.total_cost_without_fee)?.toLocaleString()}{' '}
                   $IMBU
                 </h3>
-                <div className='text-inactive mt-2'>Budget - Fixed</div>
+                <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
+                  Budget - Fixed
+                </div>
               </div>
             </div>
           </div>
 
-          {
-            project?.escrow_address && (
-              <div className='flex flex-col'>
-                <div className='flex flex-row items-start gap-6'>
-                  <AccountBalanceWalletOutlinedIcon className='mt-1' />
-                  <div className='flex flex-col'>
-                    <h3 className='text-xl leading-[1.5] font-normal m-0 p-0'>
-                      Wallet Address
-                    </h3>
-                    <div className='text-inactive mt-2 text-xs break-all'>{project?.escrow_address}</div>
-                    <div className='text-inactive mt-2'>
-                      balance : {balance}
-                    </div>
+          {project?.escrow_address && (
+            <div className='flex flex-col'>
+              <div className='flex flex-row items-start gap-3'>
+                <AccountBalanceWalletOutlinedIcon className='mt-1 text-imbue-purple-dark' />
+                <div className='flex flex-col'>
+                  <h3 className='text-lg lg:text-[1.25rem] text-imbue-purple-dark leading-[1.5] font-normal m-0 p-0'>
+                    Wallet Address
+                  </h3>
+                  <div className='text-[1rem] text-imbue-light-purple-two mt-2 text-xs break-all'>
+                    {project?.escrow_address}
+                  </div>
+                  <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
+                    balance : {balance}
                   </div>
                 </div>
               </div>
-            )
-          }
-
+            </div>
+          )}
 
           <div className='flex flex-col'>
-            <div className='flex flex-row items-start gap-6'>
+            <div className='flex flex-row items-start gap-3'>
               <Image
-                src={require('@/assets/svgs/calendar_icon.svg')}
+                src={calenderIcon}
                 height={24}
                 width={24}
                 alt={'calenderIcon'}
-                className="mt-1"
+                className='mt-1'
               />
               <div className='flex flex-col'>
-                <h3 className='text-xl font-normal'>
+                <h3 className='text-lg lg:text-[1.25rem] text-imbue-purple-dark  font-normal'>
                   1 to 3 months
                 </h3>
-                <div className='text-inactive'>Timeline</div>
+                <div className='text-[1rem] text-imbue-light-purple-two'>
+                  Timeline
+                </div>
               </div>
-
-
             </div>
-
           </div>
         </div>
       </div>

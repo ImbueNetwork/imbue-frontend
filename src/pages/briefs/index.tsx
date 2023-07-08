@@ -62,6 +62,8 @@ const Briefs = (): JSX.Element => {
   const [error, setError] = useState<any>();
   const { expRange, submitRange, lengthRange, heading } = router.query;
 
+  const { pathname } = router;
+
   const { user: currentUser } = useSelector(
     (state: RootState) => state.userState
   );
@@ -446,6 +448,17 @@ const Briefs = (): JSX.Element => {
   //   }, []);
   // };
 
+  const reset = async () => {
+    await router.push({
+      pathname,
+      query: {},
+    });
+    const allBriefs: any = await getAllBriefs(itemsPerPage, currentPage);
+    await setSlectedFilterIds([]);
+    setBriefs(allBriefs?.currentData);
+    setBriefsTotal(allBriefs?.totalFreelancers);
+  };
+
   const FilterModal = ({ open, handleClose }: FilterModalProps) => {
     return (
       <CustomModal
@@ -524,6 +537,15 @@ const Briefs = (): JSX.Element => {
               </div>
 
               <div className='flex items-center mt-[2rem] lg:mt-0'>
+                {selectedFilterIds?.length > 0 && (
+                  <button
+                    onClick={reset}
+                    className='h-[43px] mr-4 px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]'
+                  >
+                    Reset
+                  </button>
+                )}
+
                 <button
                   onClick={() => {
                     onSavedBriefs();
@@ -537,6 +559,7 @@ const Briefs = (): JSX.Element => {
                     className='h-[20px] w-[20px] ml-2'
                   />
                 </button>
+
                 <div
                   className='flex items-center cursor-pointer'
                   onClick={toggleFilter}

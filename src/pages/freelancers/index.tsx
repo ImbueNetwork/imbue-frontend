@@ -62,6 +62,8 @@ const Freelancers = (): JSX.Element => {
     heading,
   } = router.query;
 
+  const { pathname } = router;
+
   const redirectToProfile = (username: any) => {
     router.push(`/freelancers/${username}/`);
   };
@@ -385,19 +387,19 @@ const Freelancers = (): JSX.Element => {
     );
   };
 
-  // const reset = async () => {
-  //   await router.push({
-  //     pathname,
-  //     query: {},
-  //   });
-  //   const allFreelancers: any = await getAllFreelancers(
-  //     itemsPerPage,
-  //     currentPage
-  //   );
-  //   await setSlectedFilterIds([]);
-  //   setFreelancers(allFreelancers?.currentData);
-  //   setFreelancersTotal(allFreelancers?.totalFreelancers);
-  // };
+  const reset = async () => {
+    await router.push({
+      pathname,
+      query: {},
+    });
+    const allFreelancers: any = await getAllFreelancers(
+      itemsPerPage,
+      currentPage
+    );
+    await setSlectedFilterIds([]);
+    setFreelancers(allFreelancers?.currentData);
+    setFreelancersTotal(allFreelancers?.totalFreelancers);
+  };
 
   if (loading) return <LoadingFreelancers />;
 
@@ -434,6 +436,15 @@ const Freelancers = (): JSX.Element => {
               </div>
 
               <div className='flex items-center mt-[2rem] lg:mt-0'>
+                {selectedFilterIds?.length > 0 && (
+                  <button
+                    onClick={reset}
+                    className='h-[43px] mr-4 px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]'
+                  >
+                    Reset
+                  </button>
+                )}
+
                 <div
                   className='flex items-center cursor-pointer'
                   onClick={toggleFilter}

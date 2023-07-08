@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable unused-imports/no-unused-vars */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-console */
 import { Knex } from 'knex';
 import { StreamChat } from 'stream-chat';
 
