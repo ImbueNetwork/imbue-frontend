@@ -284,8 +284,8 @@ const ApplicationPreview = (): JSX.Element => {
           </div>
         )}
 
-        <div className='bg-white py-[1.25rem] px-[2.3rem] rounded-[1.25rem]'>
-          {isApplicationOwner && (
+        {isApplicationOwner && (
+          <div className='bg-white py-[1.25rem] px-[2.3rem] rounded-[1.25rem]'>
             <ApplicationOwnerHeader
               {...{
                 briefOwner,
@@ -298,8 +298,8 @@ const ApplicationPreview = (): JSX.Element => {
                 user,
               }}
             />
-          )}
-        </div>
+          </div>
+        )}
 
         {/* loading screen while connecting to wallet*/}
         <Backdrop sx={{ color: '#fff', zIndex: 1000 }} open={loading}>

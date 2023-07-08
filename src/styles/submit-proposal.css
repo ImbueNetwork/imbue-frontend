@@ -210,7 +210,7 @@
 .separator {
   width: 100%;
   height: 1px;
-  border-color: var(--theme-light-purple);
+  border-color: var(--theme-imbue-light-purple);
   margin: 12px 0;
 }
 
