@@ -18,7 +18,7 @@ ol {
 }
 
 textarea {
-  background: var(--theme-ink-color);
+  background: transparent;
   border: 1px solid black;
   border-radius: 8px;
   backdrop-filter: blur(8px);
@@ -719,7 +719,7 @@ input[type='radio'] {
   text-align: right;
   font-size: 12px;
   line-height: 16px;
-  color: black;
+  color: var(--theme-content);
 }
 
 .secondary-btn {
@@ -761,9 +761,9 @@ input:-webkit-autofill {
   -webkit-text-fill-color: #03116a !important;
 }
 
-.profile-container .textarea-remaining {
+/* .profile-container .textarea-remaining {
   color: white;
-}
+} */
 
 @media screen and (max-width: 500px) {
   h2 {

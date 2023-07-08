@@ -63,9 +63,9 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
                 src={client.icon}
                 alt={client.name}
               />
-              <p className='text-imbue-purple-dark'>{client.name}</p>
             </div>
           </Badge>
+          <p className='text-imbue-purple-dark'>{client.name}</p>
         </div>
       ))}
       {isEditMode && (

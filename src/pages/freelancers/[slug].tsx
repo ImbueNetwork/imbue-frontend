@@ -75,6 +75,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [projects, setProjects] = useState<Project[]>();
+  console.log(projects);
 
   const memberSince = moment(freelancer?.created).format('MMMM YYYY');
 
@@ -331,7 +332,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
       <div className='flex flex-col lg:flex-row justify-evenly lg:mx-[40px] px-[30px] lg:px-[40px]'>
         <div className='flex flex-col lg:items-center gap-[20px] lg:gap-[70px] lg:w-[40%]'>
           <div className='w-full flex flex-col gap-4 pb-8 lg:px-10 bg-white rounded-xl'>
-            <div className='w-full flex flex-col items-start gap-4 px-10 relative'>
+            <div className='w-full flex flex-col items-start px-10 relative'>
               {isCurrentFreelancer && !isEditMode && (
                 <div
                   onClick={() => setIsEditMode(true)}
@@ -349,7 +350,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                 user={freelancer}
                 setUser={setFreelancer}
               />
-              <div className='w-full flex flex-col gap-[16px] -mt-11'>
+              <div className='w-full flex flex-col gap-[16px] mt-5'>
                 {isEditMode ? (
                   <TextField
                     onChange={(e) => handleUpdateState(e)}
@@ -360,7 +361,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                     defaultValue={freelancer?.display_name}
                   />
                 ) : (
-                  <div className='flex gap-2 mt-10'>
+                  <div className='flex gap-2'>
                     <h3 className='!text-2xl z-[1] text-imbue-purple'>
                       {freelancer?.display_name}
                     </h3>
@@ -456,7 +457,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                           </button>
                           <button
                             onClick={() => cancelEdit()}
-                            className='message !bg-red-600'
+                            className='message !bg-red-600 !border-0'
                           >
                             Cancel
                           </button>
@@ -640,7 +641,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   <div className='flex flex-col gap-[16px] mt-[24px]'>
                     {socials?.map(({ label, key, value, icon }, index) => (
                       <div
-                        className='h-auto flex flex-wrap justify-between items-center'
+                        className='h-auto flex justify-between items-center'
                         key={index}
                       >
                         <p className='text-base'>{label} </p>
@@ -649,7 +650,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                             className='h-auto w-full lg:w-2/3 flex justify-between items-center'
                             key={index}
                           >
-                            <TextArea
+                            <TextField
+                              color='secondary'
                               value={freelancer && freelancer[key]}
                               onChange={(e) => {
                                 if (freelancer) {
@@ -660,7 +662,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                                 }
                               }}
                               //   className="bio-input"
-                              className='bio-inpu bg-[#1a1a19] text-white border border-light-white'
+                              className='bg-transparent text-imbue-purple border border-imbue-purple !m-0 w-full'
                               id='bio-input-id'
                             />
                           </div>
@@ -815,7 +817,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                     }
                   }}
                   rows={8}
-                  className='bio-inpu px-4 py-2 bg-[#1a1a19] text-white border border-light-white'
+                  className='px-4 py-2 bg-tranparent text-content-primary border border-imbue-purple'
                   id='bio-input-id'
                 />
               </>
@@ -851,7 +853,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                     }
                   }}
                   rows={8}
-                  className='bio-inpu px-4 py-2 bg-[#1a1a19] text-white border border-light-white'
+                  className='px-4 py-2 bg-tranparent text-content-primary border border-imbue-purple'
                   id='bio-input-id'
                 />
               </>
