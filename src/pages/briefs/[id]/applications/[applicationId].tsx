@@ -15,7 +15,6 @@ import ErrorScreen from '@/components/ErrorScreen';
 import Login from '@/components/Login';
 import SuccessScreen from '@/components/SuccessScreen';
 
-import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
 import {
   Brief,
@@ -30,6 +29,7 @@ import {
   getBrief,
 } from '@/redux/services/briefService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
+import { createProject } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 interface MilestoneItem {
@@ -115,31 +115,53 @@ const ApplicationPreview = (): JSX.Element => {
   const updateProject = async (chainProjectId?: number) => {
     setLoading(true);
     try {
-      const resp = await fetch(`${config.apiBase}/project/${application.id}`, {
-        headers: config.postAPIHeaders,
-        method: 'put',
-        body: JSON.stringify({
-          user_id: user.id,
-          name: `${brief.headline}`,
-          total_cost_without_fee: totalCostWithoutFee,
-          imbue_fee: imbueFee,
-          currency_id: currencyId,
-          milestones: milestones
-            .filter((m) => m.amount !== undefined)
-            .map((m) => {
-              return {
-                name: m.name,
-                amount: m.amount,
-                percentage_to_unlock: (
-                  ((m.amount ?? 0) / totalCostWithoutFee) *
-                  100
-                ).toFixed(0),
-              };
-            }),
-          required_funds: totalCost,
-          chain_project_id: chainProjectId,
-        }),
-      });
+      // const resp = await fetch(`${config.apiBase}/project/${application.id}`, {
+      //   headers: config.postAPIHeaders,
+      //   method: 'put',
+      //   body: JSON.stringify({
+      //     user_id: user.id,
+      //     name: `${brief.headline}`,
+      //     total_cost_without_fee: totalCostWithoutFee,
+      //     imbue_fee: imbueFee,
+      //     currency_id: currencyId,
+      //     milestones: milestones
+      //       .filter((m) => m.amount !== undefined)
+      //       .map((m) => {
+      //         return {
+      //           name: m.name,
+      //           amount: m.amount,
+      //           percentage_to_unlock: (
+      //             ((m.amount ?? 0) / totalCostWithoutFee) *
+      //             100
+      //           ).toFixed(0),
+      //         };
+      //       }),
+      //     required_funds: totalCost,
+      //     chain_project_id: chainProjectId,
+      //   }),
+      // });
+      
+      const resp = await createProject(application?.id, {
+        user_id: user.id,
+        name: `${brief.headline}`,
+        total_cost_without_fee: totalCostWithoutFee,
+        imbue_fee: imbueFee,
+        currency_id: currencyId,
+        milestones: milestones
+          .filter((m) => m.amount !== undefined)
+          .map((m) => {
+            return {
+              name: m.name,
+              amount: m.amount,
+              percentage_to_unlock: (
+                ((m.amount ?? 0) / totalCostWithoutFee) *
+                100
+              ).toFixed(0),
+            };
+          }),
+        required_funds: totalCost,
+        chain_project_id: chainProjectId,
+      })
 
       if (resp.status === 201 || resp.status === 200) {
         setSuccess(true);
