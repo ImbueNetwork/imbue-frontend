@@ -262,8 +262,8 @@ const ApplicationPreview = (): JSX.Element => {
           />
         )}
 
-        <div className='bg-white py-[1.25rem] px-[2.3rem] rounded-[1.25rem]'>
-          {isBriefOwner && (
+        {isBriefOwner && (
+          <div className='bg-white py-[1.25rem] px-[2.3rem] rounded-[1.25rem]'>
             <BriefOwnerHeader
               {...{
                 brief,
@@ -281,8 +281,8 @@ const ApplicationPreview = (): JSX.Element => {
                 user,
               }}
             />
-          )}
-        </div>
+          </div>
+        )}
 
         <div className='bg-white py-[1.25rem] px-[2.3rem] rounded-[1.25rem]'>
           {isApplicationOwner && (

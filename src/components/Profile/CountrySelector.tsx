@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { getCode } from 'country-list';
 import React, { useState } from 'react';
 import ReactCountryFlag from 'react-country-flag';
