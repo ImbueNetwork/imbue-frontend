@@ -373,43 +373,43 @@ class ChainService {
     const lastApprovedMilestoneKey = await this.findLastApprovedMilestone(
       milestones
     );
-    // const lastHeader = await this.imbueApi.imbue.api.rpc.chain.getHeader();
-    // const currentBlockNumber = lastHeader.number?.toBigInt();
-    // const rounds: any =
-    //   await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries();
+    const lastHeader = await this.imbueApi.imbue.api.rpc.chain.getHeader();
+    const currentBlockNumber = lastHeader.number?.toBigInt();
+    const rounds: any =
+      await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries();
 
-    // let roundKey: number | undefined = undefined;
-    // for (let i = Object.keys(rounds).length - 1; i >= 0; i--) {
-    //   const [id, round] = rounds[i];
-    //   const readableRound = round.toHuman();
-    //   const roundStart = BigInt(readableRound.start.replaceAll(',', ''));
-    //   const roundEnd = BigInt(readableRound.end.replaceAll(',', ''));
-    //   const projectExistsInRound = readableRound.projectKeys.includes(
-    //     projectOnChain.milestones[0].projectKey
-    //   );
+    let roundKey: number | undefined = undefined;
+    for (let i = Object.keys(rounds).length - 1; i >= 0; i--) {
+      const [id, round] = rounds[i];
+      const readableRound = round.toHuman();
+      const roundStart = BigInt(readableRound.start.replaceAll(',', ''));
+      const roundEnd = BigInt(readableRound.end.replaceAll(',', ''));
+      const projectExistsInRound = readableRound.projectKeys.includes(
+        projectOnChain.milestones[0].projectKey
+      );
 
-    //   if (
-    //     roundStart < currentBlockNumber &&
-    //     roundEnd > currentBlockNumber &&
-    //     projectExistsInRound
-    //   ) {
-    //     if (
-    //       projectOnChain.approvedForFunding &&
-    //       readableRound.roundType == RoundType[RoundType.ContributionRound]
-    //     ) {
-    //       projectInContributionRound = true;
-    //       roundKey = Number(id.args.map((key: any) => key.toHuman()));
-    //       break;
-    //     } else if (
-    //       projectOnChain.fundingThresholdMet &&
-    //       readableRound.roundType == RoundType[RoundType.VotingRound]
-    //     ) {
-    //       projectInVotingRound = true;
-    //       roundKey = Number(id.args.map((key: any) => key.toHuman()));
-    //       break;
-    //     }
-    //   }
-    // }
+      if (
+        roundStart < currentBlockNumber &&
+        roundEnd > currentBlockNumber &&
+        projectExistsInRound
+      ) {
+        if (
+          projectOnChain.approvedForFunding &&
+          readableRound.roundType == RoundType[RoundType.ContributionRound]
+        ) {
+          projectInContributionRound = true;
+          roundKey = Number(id.args.map((key: any) => key.toHuman()));
+          break;
+        } else if (
+          projectOnChain.fundingThresholdMet &&
+          readableRound.roundType == RoundType[RoundType.VotingRound]
+        ) {
+          projectInVotingRound = true;
+          roundKey = Number(id.args.map((key: any) => key.toHuman()));
+          break;
+        }
+      }
+    }
 
     if (projectOnChain.fundingThresholdMet) {
       // Initators cannot contribute to their own project
@@ -480,7 +480,7 @@ class ChainService {
       fundingThresholdMet: projectOnChain.fundingThresholdMet,
       cancelled: projectOnChain.cancelled,
       projectState,
-      // roundKey,
+      roundKey,
     };
 
     return convertedProject;
