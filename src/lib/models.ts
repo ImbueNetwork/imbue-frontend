@@ -608,7 +608,6 @@ export const fetchAllGrants = () => (tx: Knex.Transaction) =>
     .innerJoin('users', { 'grants.user_id': 'users.id' })
     .orderBy('grants.created', 'desc');
 
-
 export const fetchProfileImages =
   (id: number, tableName: string) => async (tx: Knex.Transaction) =>
     tx(tableName).select('profile_image').where({ user_id: id }).first();
@@ -894,7 +893,7 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
       'display_name',
       'web3_accounts.address as web3_address',
       'freelancers.created',
-      'verified',
+      'verified'
       // tx.raw('ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills'),
       // tx.raw('ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids'),
 
@@ -909,17 +908,17 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
 
       // tx.raw('ARRAY_AGG(DISTINCT CAST(clients.img as text)) as client_images'),
       // tx.raw(
-        // 'ARRAY_AGG(DISTINCT CAST(clients.id as text)) as client_image_ids'
+      // 'ARRAY_AGG(DISTINCT CAST(clients.id as text)) as client_image_ids'
       // ),
       // tx.raw(
-        // '(SUM(freelancer_ratings.rating) / COUNT(freelancer_ratings.rating)) as rating'
+      // '(SUM(freelancer_ratings.rating) / COUNT(freelancer_ratings.rating)) as rating'
       // ),
       // tx.raw('COUNT(freelancer_ratings.rating) as num_ratings')
     )
     .from<Freelancer>('freelancers')
     // Join services and many to many
     // .leftJoin('freelancer_services', {
-      // 'freelancers.id': 'freelancer_services.freelancer_id',
+    // 'freelancers.id': 'freelancer_services.freelancer_id',
     // })
     // .leftJoin('services', { 'freelancer_services.service_id': 'services.id' })
     // Join clients and many to many
@@ -932,63 +931,68 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
     })
     // Join skills and many to many
     // .leftJoin('freelancer_skills', {
-      // 'freelancers.id': 'freelancer_skills.freelancer_id',
+    // 'freelancers.id': 'freelancer_skills.freelancer_id',
     // })
     // .leftJoin('skills', { 'freelancer_skills.skill_id': 'skills.id' })
     // Join languages and many to many
     // .leftJoin('freelancer_languages', {
-      // 'freelancers.id': 'freelancer_languages.freelancer_id',
+    // 'freelancers.id': 'freelancer_languages.freelancer_id',
     // })
     // .leftJoin('languages', {
-      // 'freelancer_languages.language_id': 'languages.id',
+    // 'freelancer_languages.language_id': 'languages.id',
     // })
     .innerJoin('users', { 'freelancers.user_id': 'users.id' })
     // .leftJoin('freelancer_ratings', {
-      // 'freelancers.id': 'freelancer_ratings.freelancer_id',
+    // 'freelancers.id': 'freelancer_ratings.freelancer_id',
     // })
     .leftJoin('web3_accounts', {
       'freelancers.user_id': 'web3_accounts.user_id',
-    })
-    // order and group by many-many selects
-    // .orderBy('profile_image', 'asc')
-    // .orderBy('freelancers.modified', 'desc')
-    // .groupBy('freelancers.id')
-    // .groupBy('users.username')
-    // .groupBy('users.display_name')
-    // .groupBy('address')
-    // .groupBy('profile_image')
-    // TODO Add limit until we have spinning loading icon in freelancers page
-    // .limit(100);
-
+    });
+// order and group by many-many selects
+// .orderBy('profile_image', 'asc')
+// .orderBy('freelancers.modified', 'desc')
+// .groupBy('freelancers.id')
+// .groupBy('users.username')
+// .groupBy('users.display_name')
+// .groupBy('address')
+// .groupBy('profile_image')
+// TODO Add limit until we have spinning loading icon in freelancers page
+// .limit(100);
 
 export const fetchFreelancerMetadata =
   (type: string, freelancer_id: number) => async (tx: Knex.Transaction) =>
-  tx.raw(`SELECT ARRAY_AGG(DISTINCT metadata.id) as ids FROM freelancer_${type}s freelancer_metadata
+    tx
+      .raw(
+        `SELECT ARRAY_AGG(DISTINCT metadata.id) as ids FROM freelancer_${type}s freelancer_metadata
    LEFT JOIN ${type}s metadata on freelancer_metadata.${type}_id = metadata.id
-   WHERE freelancer_metadata.freelancer_id = ${freelancer_id}`).then(async (results) => {
-    const ids = results.rows[0].ids;
-    if(ids) {
-      return await fetchItems(ids, `${type}s`)(tx);
-    }
-  });
+   WHERE freelancer_metadata.freelancer_id = ${freelancer_id}`
+      )
+      .then(async (results) => {
+        const ids = results.rows[0].ids;
+        if (ids) {
+          return await fetchItems(ids, `${type}s`)(tx);
+        }
+      });
 
-// We need this function because the clients tables does not follow the same consistency as languages and skills 
+// We need this function because the clients tables does not follow the same consistency as languages and skills
 export const fetchFreelancerClients =
   (freelancer_id: number) => async (tx: Knex.Transaction) =>
-  tx.raw(`SELECT ARRAY_AGG(DISTINCT metadata.id) as ids FROM freelancer_clients freelancer_metadata
+    tx
+      .raw(
+        `SELECT ARRAY_AGG(DISTINCT metadata.id) as ids FROM freelancer_clients freelancer_metadata
    LEFT JOIN clients metadata on freelancer_metadata.client_id = metadata.id
-   WHERE freelancer_metadata.client_id = ${freelancer_id}`).then(async (results) => {
-    const ids = results.rows[0].ids;
-    if(ids) {
-      return await fetchItems(ids, `clients`)(tx);
-    }
-  });
+   WHERE freelancer_metadata.client_id = ${freelancer_id}`
+      )
+      .then(async (results) => {
+        const ids = results.rows[0].ids;
+        if (ids) {
+          return await fetchItems(ids, `clients`)(tx);
+        }
+      });
 
 export const fetchItems =
   (ids: number[], tableName: string) => async (tx: Knex.Transaction) =>
     tx(tableName).select('id', 'name').whereIn(`id`, ids);
-
-
 
 export const insertFreelancerDetails =
   (
