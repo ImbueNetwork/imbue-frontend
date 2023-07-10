@@ -33,11 +33,7 @@ function Navbar() {
   const [loading, setLoading] = useState<boolean>(true);
 
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  const [solidNav, setSolidNav] = useState<boolean>(false);
-
   const router = useRouter();
-
-  const mobile = useMediaQuery('(max-width:600px)');
 
   const feedbackLink = 'https://pfljr3ser45.typeform.com/to/bv00pviH';
 
@@ -76,18 +72,6 @@ function Navbar() {
     setup();
   }, [dispatch, user.username]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const isScrolled: boolean = window.scrollY > 50;
-      setSolidNav(isScrolled);
-    };
-
-    document.addEventListener('scroll', handleScroll);
-    return () => {
-      document.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
   const navigateToPage = (url: string) => {
     if (user?.username) {
       router.push(url);
@@ -120,7 +104,7 @@ function Navbar() {
           className='flex justify-between items-center px-4 lg:px-8 py-2'
         >
           <div className={`flex items-center transition-all`}>
-            <h1
+            <div
               onClick={() => router.push('/')}
               className={`main-title lg:h-[2.9375rem] !bg-white rounded-[5.07319rem] w-full flex justify-center items-center cursor-pointer z-10 relative px-5 py-2 lg:!p-0`}
             >
@@ -131,10 +115,9 @@ function Navbar() {
                   className='w-28 lg:w-full'
                 />
               </div>
-            </h1>
+            </div>
 
-            {!mobile && (
-              <div className='relative flex items-center z-0'>
+            <div className='relative items-center z-0 hidden lg:flex'>
                 <div
                   className={`${
                     expanded
@@ -196,7 +179,6 @@ function Navbar() {
                   />
                 </div>
               </div>
-            )}
           </div>
 
           {/* <div className="context-menu" id="context-menu">

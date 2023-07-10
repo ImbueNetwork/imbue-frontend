@@ -5,20 +5,27 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #ebeae2;
+  background-color: #ebeae2 !important;
   /* background-color: #000;
   background-image: url('background.png'); */
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: scroll;
   font-family: var(--theme-font-family);
+  color: black !important;
 }
 
 h1,
 h2,
 h3 {
   font-weight: 700;
+  color: var(--theme-imbue-purple-dark);
 }
+
+.next-error-h1 {
+  border-right: 1px solid var(--theme-imbue-purple-dark) !important;
+}
+
 h3 {
   font-size: 20px;
 }

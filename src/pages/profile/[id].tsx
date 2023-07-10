@@ -193,18 +193,18 @@ const Profile = ({ initUser, browsingUser }: any) => {
                 {/* TODO: Implement reviews */}
 
                 <div className='rating flex flex-col gap-3 text-imbue-purple-dark'>
-                  <p>
+                  <div>
                     <span>Top Rated</span>
                     <span className='review-count ml-1 text-imbue-purple'>
                       (1,434 reviews)
                     </span>
-                  </p>
-                  <p className='mb-3'>
+                  </div>
+                  <div className='mb-3'>
                     <FaStar size={30} color='var(--theme-primary)' />
                     <FaStar size={30} color='var(--theme-primary)' />
                     <FaStar size={30} color='var(--theme-primary)' />
                     <FaStar size={30} color='var(--theme-light-grey)' />
-                  </p>
+                  </div>
                 </div>
 
                 <div className='w-full lg:w-3/12'>
