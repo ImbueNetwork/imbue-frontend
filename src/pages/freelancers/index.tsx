@@ -290,7 +290,7 @@ const Freelancers = (): JSX.Element => {
             default:
               console.log(
                 'Invalid filter option selected or unimplemented. type:' +
-                  filterType
+                filterType
               );
           }
         }
@@ -376,12 +376,25 @@ const Freelancers = (): JSX.Element => {
               ))}
           </div>
 
-          <button
-            onClick={onSearch}
-            className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 absolute md:bottom-10 bottom-5 right-10'
+          <div
+            className='h-[39px] text-center gap-5 flex items-center absolute md:bottom-10 bottom-5 right-10'
           >
-            Apply
-          </button>
+            <button
+              onClick={cancelFilters}
+              data-testid='Apply'
+              className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-coral flex items-center cursor-pointer hover:scale-105 hover:bg-primary hover:text-content'
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={onSearch}
+              data-testid='Apply'
+              className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 hover:bg-primary hover:text-content'
+            >
+              Apply
+            </button>
+          </div>
         </div>
       </CustomModal>
     );
@@ -400,6 +413,11 @@ const Freelancers = (): JSX.Element => {
     setFreelancers(allFreelancers?.currentData);
     setFreelancersTotal(allFreelancers?.totalFreelancers);
   };
+
+  const cancelFilters = async () => {
+    reset()
+    setFilterVisible(false)
+  }
 
   if (loading) return <LoadingFreelancers />;
 

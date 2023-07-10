@@ -21,6 +21,13 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
       duplicate: true,
     },
     {
+      icon: 'account_balance',
+      text: 'Submit A Grant',
+      link: '/briefs/new',
+      needAuthentication: true,
+      duplicate: true,
+    },
+    {
       icon: 'search',
       text: 'Discover Briefs',
       link: '/briefs',

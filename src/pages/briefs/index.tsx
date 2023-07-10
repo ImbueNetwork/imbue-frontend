@@ -372,7 +372,7 @@ const Briefs = (): JSX.Element => {
               // eslint-disable-next-line no-console
               console.log(
                 'Invalid filter option selected or unimplemented. type:' +
-                  filterType
+                filterType
               );
           }
         }
@@ -459,6 +459,11 @@ const Briefs = (): JSX.Element => {
     setBriefsTotal(allBriefs?.totalFreelancers);
   };
 
+  const cancelFilters = async () => {
+    reset()
+    setFilterVisible(false)
+  }
+
   const FilterModal = ({ open, handleClose }: FilterModalProps) => {
     return (
       <CustomModal
@@ -492,13 +497,26 @@ const Briefs = (): JSX.Element => {
               ))}
           </div>
 
-          <button
-            onClick={onSearch}
-            data-testid='Apply'
-            className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 absolute md:bottom-10 bottom-5 right-10'
+          <div
+            className='h-[39px] text-center gap-5 flex items-center absolute md:bottom-10 bottom-5 right-10'
           >
-            Apply
-          </button>
+            <button
+              onClick={cancelFilters}
+              data-testid='Apply'
+              className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-coral flex items-center cursor-pointer hover:scale-105 hover:bg-primary hover:text-content'
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={onSearch}
+              data-testid='Apply'
+              className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 hover:bg-primary hover:text-content'
+            >
+              Apply
+            </button>
+          </div>
+
         </div>
       </CustomModal>
     );
@@ -536,11 +554,11 @@ const Briefs = (): JSX.Element => {
                 </p>
               </div>
 
-              <div className='flex items-center mt-[2rem] lg:mt-0'>
+              <div className='flex items-center mt-[2rem] lg:mt-0 gap-4'>
                 {selectedFilterIds?.length > 0 && (
                   <button
                     onClick={reset}
-                    className='h-[43px] mr-4 px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]'
+                    className='h-[43px] lg:mr-4 px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 lg:ml-[44px]'
                   >
                     Reset
                   </button>
@@ -550,7 +568,7 @@ const Briefs = (): JSX.Element => {
                   onClick={() => {
                     onSavedBriefs();
                   }}
-                  className='h-[43px] px-[20px] mr-12 rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 lg:ml-[44px]'
+                  className='h-[43px] px-[20px] lg:mr-12 rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 lg:ml-[44px]'
                 >
                   Saved Briefs
                   <Image

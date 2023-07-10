@@ -10,7 +10,6 @@ import {
   Menu,
   Skeleton,
   Tooltip,
-  useMediaQuery,
 } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -131,6 +130,14 @@ function Navbar() {
                     href='/briefs/new'
                   >
                     Submit a Brief
+                  </Link>
+
+                  <Link
+                    onClick={() => setExpanded(false)}
+                    className={`mx-1 lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
+                    href='/grants/new'
+                  >
+                    Submit a Grant
                   </Link>
 
                   <Link
