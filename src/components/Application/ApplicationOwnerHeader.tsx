@@ -112,7 +112,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         </p>
       }
 
-      <div className='ml-auto lg:ml-0'>
+      <div className='ml-auto lg:ml-0 flex items-center gap-2 mt-3 lg:mt-0'>
         <button
           className='primary-btn in-dark w-button !text-xs lg:!text-base'
           onClick={() =>
@@ -132,7 +132,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           <button
             className={`${
               applicationStatusId[application?.status_id]
-            }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[14px]`}
+            }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[10px]`}
           >
             {applicationStatusId[application?.status_id]}
           </button>

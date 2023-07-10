@@ -42,7 +42,7 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
             {brief?.description}
           </p>
         </div>
-        <p className=' text-imbue-light-purple-two text-xs lg:text-base leading-[1.5] font-bold m-0 p-0 absolute bottom-0'>
+        <p className=' text-imbue-light-purple-two text-xs lg:text-base leading-[1.5] font-bold m-0 p-0'>
           Posted {timePosted}{' '}
         </p>
       </div>
