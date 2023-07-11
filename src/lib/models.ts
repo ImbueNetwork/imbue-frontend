@@ -70,6 +70,7 @@ export type ProposedMilestone = {
   name: string;
   percentage_to_unlock: number;
   amount: number;
+  description: string;
 };
 
 export type GrantApprover = string;

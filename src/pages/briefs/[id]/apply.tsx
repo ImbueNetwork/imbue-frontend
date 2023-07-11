@@ -25,6 +25,7 @@ import { RootState } from '@/redux/store/store';
 interface MilestoneItem {
   name: string;
   amount: number | undefined;
+  description: string;
 }
 
 export const SubmitProposal = (): JSX.Element => {
@@ -83,7 +84,7 @@ export const SubmitProposal = (): JSX.Element => {
   const imbueFeePercentage = 5;
 
   const [milestones, setMilestones] = useState<MilestoneItem[]>([
-    { name: '', amount: undefined },
+    { name: '', amount: undefined, description: '' },
   ]);
 
   const durationOptions = timeData.sort((a, b) =>
@@ -98,7 +99,10 @@ export const SubmitProposal = (): JSX.Element => {
   const totalCost = imbueFee + totalCostWithoutFee;
 
   const onAddMilestone = () => {
-    setMilestones([...milestones, { name: '', amount: undefined }]);
+    setMilestones([
+      ...milestones,
+      { name: '', amount: undefined, description: '' },
+    ]);
   };
 
   const onRemoveMilestone = (index: number) => {
@@ -152,6 +156,7 @@ export const SubmitProposal = (): JSX.Element => {
               return {
                 name: m.name,
                 amount: m.amount,
+                description: m.description,
                 percentage_to_unlock: (
                   ((m.amount ?? 0) / totalCostWithoutFee) *
                   100
@@ -184,7 +189,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   const allAmountAndNamesHaveValue = () => {
     for (let i = 0; i < milestones.length; i++) {
-      const { amount, name } = milestones[i];
+      const { amount, name, description } = milestones[i];
 
       if (
         amount === undefined ||
@@ -192,7 +197,10 @@ export const SubmitProposal = (): JSX.Element => {
         amount === 0 ||
         name === undefined ||
         name === null ||
-        name.length === 0
+        name.length === 0 ||
+        description === undefined ||
+        description === null ||
+        description.length === 0
       ) {
         return false;
       }
@@ -228,7 +236,7 @@ export const SubmitProposal = (): JSX.Element => {
         <hr className='h-[1px] bg-[rgba(3, 17, 106, 0.12)] w-full mt-4' />
 
         <div className='milestone-list !gap-0'>
-          {milestones.map(({ name, amount }, index) => {
+          {milestones.map(({ name, amount, description }, index) => {
             const percent = Number(
               ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
             );
@@ -248,19 +256,40 @@ export const SubmitProposal = (): JSX.Element => {
                 </div>
                 <div className='flex flex-row justify-between w-full'>
                   <div className='lg:w-2/5 w-3/5'>
-                    <h3 className='mb-2 lg:mb-5 text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
-                      Description
+                    <h3 className=' text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
+                      Title
                     </h3>
-                    <textarea
-                      className='input-description text-base'
-                      data-testid={`milestone-description-${index}`}
-                      value={name}
+
+                    <input
+                      type='text'
+                      data-testid={`milestone-title-${index}`}
+                      className='input-budget  text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-left  pl-5 mb-8'
+                      value={name || ''}
                       onChange={(e) =>
                         setMilestones([
                           ...milestones.slice(0, index),
                           {
                             ...milestones[index],
                             name: e.target.value,
+                          },
+                          ...milestones.slice(index + 1),
+                        ])
+                      }
+                    />
+
+                    <h3 className='mb-2 lg:mb-5 text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
+                      Description
+                    </h3>
+                    <textarea
+                      className='input-description text-base'
+                      data-testid={`milestone-description-${index}`}
+                      value={description}
+                      onChange={(e) =>
+                        setMilestones([
+                          ...milestones.slice(0, index),
+                          {
+                            ...milestones[index],
+                            description: e.target.value,
                           },
                           ...milestones.slice(index + 1),
                         ])

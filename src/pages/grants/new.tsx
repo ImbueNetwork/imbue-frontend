@@ -1,4 +1,10 @@
-import { Alert, Dialog, IconButton, InputAdornment, TextField } from '@mui/material';
+import {
+  Alert,
+  Dialog,
+  IconButton,
+  InputAdornment,
+  TextField,
+} from '@mui/material';
 // import { blake2AsHex } from '@polkadot/util-crypto';
 import WalletIcon from '@svgs/wallet.svg';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -25,6 +31,7 @@ import { Currency } from '@/model';
 interface MilestoneItem {
   name: string;
   amount: number | undefined;
+  description: string;
 }
 
 const GrantApplication = (): JSX.Element => {
@@ -38,7 +45,7 @@ const GrantApplication = (): JSX.Element => {
   // const [newApprover, setNewApprover] = useState<string>();
   const [currencyId, setCurrencyId] = useState<number>(0);
   const [milestones, setMilestones] = useState<MilestoneItem[]>([
-    { name: '', amount: undefined },
+    { name: '', amount: undefined, description: '' },
   ]);
   const [durationId, setDurationId] = useState(0);
   const [success, setSuccess] = useState(false);
@@ -51,7 +58,7 @@ const GrantApplication = (): JSX.Element => {
     setTimeout(() => {
       setCopied(false);
     }, 3000);
-  }
+  };
 
   const [escrow_address] = useState(
     '5EYCAe5hKq6D9ACdEwwQxSSkWY9rqX4PqJyRBV3wA4NC8VSu'
@@ -75,8 +82,6 @@ const GrantApplication = (): JSX.Element => {
   //   setNewApprover('');
   // };
 
-
-
   const imbueFeePercentage = 5;
   const totalCostWithoutFee = milestones.reduce(
     (acc, { amount }) => acc + (amount ?? 0),
@@ -86,7 +91,10 @@ const GrantApplication = (): JSX.Element => {
   const totalCost = imbueFee + totalCostWithoutFee;
 
   const onAddMilestone = () => {
-    setMilestones([...milestones, { name: '', amount: undefined }]);
+    setMilestones([
+      ...milestones,
+      { name: '', amount: undefined, description: '' },
+    ]);
   };
 
   const onRemoveMilestone = (index: number) => {
@@ -144,7 +152,7 @@ const GrantApplication = (): JSX.Element => {
   }
 
   const submitGrant = async (account: WalletAccount) => {
-    if (!account) return
+    if (!account) return;
     setLoading(true);
 
     try {
@@ -203,13 +211,13 @@ const GrantApplication = (): JSX.Element => {
           // chain_project_id: result?.eventData[2],
           // escrow_address: result?.eventData[5]
           chain_project_id: 217,
-          escrow_address: escrow_address
+          escrow_address: escrow_address,
         }),
       });
 
       if (resp.status === 200 || resp.status === 201) {
         const { grant_id } = (await resp.json()) as any;
-        setProjectId(grant_id)
+        setProjectId(grant_id);
         setSuccess(true);
       } else {
         setError({ message: 'Failed to submit a grant' });
@@ -221,14 +229,14 @@ const GrantApplication = (): JSX.Element => {
     }
   };
 
-  const [approversPreview, setApproverPreview] = useState<any[]>([])
+  const [approversPreview, setApproverPreview] = useState<any[]>([]);
 
   const removeApprover = (index: number) => {
     if (approvers.length === 0) return;
     const newApprovers = [...approversPreview];
     newApprovers.splice(index, 1);
     setApprovers(newApprovers.map((v: any) => v?.web3_address));
-    setApproverPreview(newApprovers)
+    setApproverPreview(newApprovers);
   };
 
   return (
@@ -256,14 +264,14 @@ const GrantApplication = (): JSX.Element => {
                   value={description}
                   placeholder='Input description'
                   onChange={(e) => setDescription(e.target.value)}
-                  className='bg-transparent border border-imbue-purple rounded-md p-3 placeholder:text-imbue-light-purple text-imbue-purple outline-primary min-h-[160px] p-3'
+                  className='bg-transparent border border-imbue-purple rounded-md placeholder:text-imbue-light-purple text-imbue-purple outline-primary min-h-[160px] p-3'
                 />
-                <div className='text-imbue-purple text-sm'>{`${description?.length || 0
-                  }/300`}</div>
+                <div className='text-imbue-purple text-sm'>{`${
+                  description?.length || 0
+                }/300`}</div>
               </div>
             </div>
             <div className='flex flex-col gap-[50px] lg:mt-10 lg:w-60'>
-
               <div className='flex flex-col text-content'>
                 <div className='flex flex-row items-start gap-6'>
                   <Image
@@ -271,13 +279,15 @@ const GrantApplication = (): JSX.Element => {
                     height={24}
                     width={24}
                     alt={'dollarSign'}
-                    className="mt-1"
+                    className='mt-1'
                   />
                   <div className='flex flex-col'>
                     <h3 className='text-xl leading-[1.5] font-normal m-0 p-0'>
                       Ecosystem
                     </h3>
-                    <div className='mt-2 text-content-primary'>Kusama Treasury (KSM)</div>
+                    <div className='mt-2 text-content-primary'>
+                      Kusama Treasury (KSM)
+                    </div>
                   </div>
                 </div>
               </div>
@@ -289,7 +299,7 @@ const GrantApplication = (): JSX.Element => {
                     height={24}
                     width={24}
                     alt={'calenderIcon'}
-                    className="mt-1"
+                    className='mt-1'
                   />
                   <div className='flex flex-col'>
                     <h3 className='text-xl font-normal text-content'>
@@ -298,7 +308,6 @@ const GrantApplication = (): JSX.Element => {
                     <div className='text-content-primary mt-2'>Timeline</div>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
@@ -321,12 +330,23 @@ const GrantApplication = (): JSX.Element => {
               /> */}
               <div className='flex flex-col gap-4 ml-2'>
                 {approversPreview.map((approver, index) => (
-                  <div key={index} className='flex flex-row justify-between items-center w-full lg:w-2/3 gap-10'>
+                  <div
+                    key={index}
+                    className='flex flex-row justify-between items-center w-full lg:w-2/3 gap-10'
+                  >
                     <div className='flex w-full'>
-                      <Image className='w-10 h-10' width={40} height={40} src={approver?.profile_photo} alt='' />
+                      <Image
+                        className='w-10 h-10'
+                        width={40}
+                        height={40}
+                        src={approver?.profile_photo}
+                        alt=''
+                      />
                       <div className='flex flex-col ml-4 gap-1 justify-center  text-content-primary'>
                         <span>{approver?.display_name}</span>
-                        <span className='text-xs break-all text-content-primary'>{approver?.web3_address}</span>
+                        <span className='text-xs break-all text-content-primary'>
+                          {approver?.web3_address}
+                        </span>
                       </div>
                     </div>
                     <span
@@ -350,8 +370,6 @@ const GrantApplication = (): JSX.Element => {
                 </div> */}
               </div>
             </div>
-
-
           </div>
           <div className='flex flex-col gap-4 mt-8 lg:mt-0'>
             <div>
@@ -367,7 +385,11 @@ const GrantApplication = (): JSX.Element => {
                 required
               >
                 {durationOptions.map(({ label, value }, index) => (
-                  <option value={value} key={index} className='duration-option bg-overlay py-2'>
+                  <option
+                    value={value}
+                    key={index}
+                    className='duration-option bg-overlay py-2'
+                  >
                     {label}
                   </option>
                 ))}
@@ -399,90 +421,124 @@ const GrantApplication = (): JSX.Element => {
           </div>
         </div>
         <div className='flex flex-col px-6 lg:px-7 py-5'>
-          <div className='text-[20px] text-content lg:ml-5 mb-8'>Milestones</div>
+          <div className='text-[20px] text-content lg:ml-5 mb-8'>
+            Milestones
+          </div>
           <div className='flex flex-col gap-4'>
-            {milestones.map(({ name, amount }, index) => {
-              const percent = Number(
-                ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
-              );
-              return (
-                <div key={index} className='flex flex-col gap-0'>
-                  <div className='flex flex-row relative'>
-                    <span
-                      onClick={() => onRemoveMilestone(index)}
-                      className='absolute top-0 right-2 text-sm lg:text-xl text-imbue-purple font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
-                    >
-                      x
-                    </span>
-                    <div className='text-base mr-4 lg:mr-9 text-content mt-0.5'>{index + 1}.</div>
-                    <div className='flex flex-row justify-between w-full text-content'>
-                      <div className='w-3/5'>
-                        <p className='mb-2 lg:mb-5 text-base lg:text-lg'>
-                          Description
-                        </p>
-                        <textarea
-                          className='input-description text-base'
-                          value={name}
-                          onChange={(e) =>
-                            setMilestones([
-                              ...milestones.slice(0, index),
-                              {
-                                ...milestones[index],
-                                name: e.target.value,
-                              },
-                              ...milestones.slice(index + 1),
-                            ])
-                          }
-                        />
+            {milestones.map(
+              ({ name, amount, description: milestoneDescription }, index) => {
+                const percent = Number(
+                  ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
+                );
+                return (
+                  <div key={index} className='flex flex-col gap-0'>
+                    <div className='flex flex-row relative'>
+                      <span
+                        onClick={() => onRemoveMilestone(index)}
+                        className='absolute top-0 right-2 text-sm lg:text-xl text-imbue-purple font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
+                      >
+                        x
+                      </span>
+                      <div className='text-base mr-4 lg:mr-9 text-content mt-0.5'>
+                        {index + 1}.
                       </div>
-                      <div className='flex flex-col w-4/12'>
-                        <p className='mb-2 lg:mb-5 text-base lg:text-lg m-0 p-0'>
-                          Amount
-                        </p>
-                        <TextField
-                          color='secondary'
-                          id="outlined-start-adornment"
-                          InputProps={{
-                            startAdornment: <InputAdornment sx={{ color: "var(--theme-purple)" }} position="start">{currencies[currencyId]}</InputAdornment>,
-                          }}
-                          className='amountInput'
-                          type='number'
-                          value={amount || ''}
-                          onChange={(e) =>
-                            setMilestones([
-                              ...milestones.slice(0, index),
-                              {
-                                ...milestones[index],
-                                amount: Number(e.target.value),
-                              },
-                              ...milestones.slice(index + 1),
-                            ])
-                          }
-                        />
-                        {totalCostWithoutFee !== 0 && (
-                          <div className='flex flex-col items-end mt-3 gap-2 w-full'>
-                            <div className='mt-2 text-base text-content-primary'>
-                              {percent}%
+                      <div className='flex flex-row justify-between w-full text-content'>
+                        <div className='w-3/5'>
+                          <h3 className=' text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
+                            Title
+                          </h3>
+
+                          <input
+                            type='text'
+                            data-testid={`milestone-title-${index}`}
+                            className='input-budget  text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-left  pl-5 mb-8'
+                            value={name || ''}
+                            onChange={(e) =>
+                              setMilestones([
+                                ...milestones.slice(0, index),
+                                {
+                                  ...milestones[index],
+                                  name: e.target.value,
+                                },
+                                ...milestones.slice(index + 1),
+                              ])
+                            }
+                          />
+
+                          <p className='mb-2 lg:mb-5 text-base lg:text-lg'>
+                            Description
+                          </p>
+                          <textarea
+                            className='input-description text-base'
+                            value={milestoneDescription}
+                            onChange={(e) =>
+                              setMilestones([
+                                ...milestones.slice(0, index),
+                                {
+                                  ...milestones[index],
+                                  description: e.target.value,
+                                },
+                                ...milestones.slice(index + 1),
+                              ])
+                            }
+                          />
+                        </div>
+                        <div className='flex flex-col w-4/12'>
+                          <p className='mb-2 lg:mb-5 text-base lg:text-lg m-0 p-0'>
+                            Amount
+                          </p>
+                          <TextField
+                            color='secondary'
+                            id='outlined-start-adornment'
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment
+                                  sx={{ color: 'var(--theme-purple)' }}
+                                  position='start'
+                                >
+                                  {currencies[currencyId]}
+                                </InputAdornment>
+                              ),
+                            }}
+                            className='amountInput'
+                            type='number'
+                            value={amount || ''}
+                            onChange={(e) =>
+                              setMilestones([
+                                ...milestones.slice(0, index),
+                                {
+                                  ...milestones[index],
+                                  amount: Number(e.target.value),
+                                },
+                                ...milestones.slice(index + 1),
+                              ])
+                            }
+                          />
+                          {totalCostWithoutFee !== 0 && (
+                            <div className='flex flex-col items-end mt-3 gap-2 w-full'>
+                              <div className='mt-2 text-base text-content-primary'>
+                                {percent}%
+                              </div>
+                              <div className='progress-bar'>
+                                <div
+                                  className='progress'
+                                  style={{
+                                    width: `${percent}%`,
+                                  }}
+                                ></div>
+                              </div>
                             </div>
-                            <div className='progress-bar'>
-                              <div
-                                className='progress'
-                                style={{
-                                  width: `${percent}%`,
-                                }}
-                              ></div>
-                            </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
                     </div>
+                    {index !== milestones.length - 1 && (
+                      <hr className='mx-4 my-4 text-content' />
+                    )}
                   </div>
-                  {index !== milestones.length - 1 && (
-                    <hr className='mx-4 my-4 text-content' />
-                  )}
-                </div>
-              );
-            })}
+                );
+              }
+            )}
           </div>
           <div
             className='clickable-text btn-add-milestone mx-5 mt-8 lg:mx-14 !mb-0 text-base lg:text-xl font-bold'
@@ -500,8 +556,9 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
-                  }`}
+                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${
+                  currencies[currencyId]
+                }`}
               </div>
             </div>
 
@@ -514,8 +571,9 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
-                  }`}
+                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${
+                  currencies[currencyId]
+                }`}
               </div>
             </div>
 
@@ -582,8 +640,9 @@ const GrantApplication = (): JSX.Element => {
           </button>
         </div>
         <Alert
-          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${copied ? 'flex' : 'hidden'
-            }`}
+          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${
+            copied ? 'flex' : 'hidden'
+          }`}
           severity='success'
         >
           Grant Wallet Address Copied to clipboard
@@ -607,10 +666,8 @@ const GrantApplication = (): JSX.Element => {
           </button>
         </div>
       </ErrorScreen>
-
     </div>
   );
 };
 
 export default GrantApplication;
-
