@@ -264,7 +264,7 @@ const GrantApplication = (): JSX.Element => {
                   value={description}
                   placeholder='Input description'
                   onChange={(e) => setDescription(e.target.value)}
-                  className='bg-transparent border border-imbue-purple rounded-md p-3 placeholder:text-imbue-light-purple text-imbue-purple outline-primary min-h-[160px] p-3'
+                  className='bg-transparent border border-imbue-purple rounded-md placeholder:text-imbue-light-purple text-imbue-purple outline-primary min-h-[160px] p-3'
                 />
                 <div className='text-imbue-purple text-sm'>{`${
                   description?.length || 0
