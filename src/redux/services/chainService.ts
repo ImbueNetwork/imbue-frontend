@@ -151,7 +151,6 @@ class ChainService {
     const extrinsic = this.imbueApi.imbue.api.tx.imbueProposals.voteOnMilestone(
       projectId,
       milestoneKey,
-      projectOnChain.roundKey,
       userVote
     );
     return await this.submitImbueExtrinsic(
