@@ -71,9 +71,8 @@ export type Project = {
   status_id?: number;
   // project_type: ProjectType;
   approvers: string[];
-  created? : string;
+  created?: string;
 };
-
 
 export type ProjectOnChain = {
   id?: string | number;
@@ -103,6 +102,7 @@ export type Milestone = {
   percentage_to_unlock: number;
   is_approved: boolean;
   amount: number;
+  description: string;
 };
 
 export type Contribution = {

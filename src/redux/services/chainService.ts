@@ -375,24 +375,25 @@ class ChainService {
     );
     const lastHeader = await this.imbueApi.imbue.api.rpc.chain.getHeader();
     const currentBlockNumber = lastHeader.number?.toBigInt();
-    const rounds: any[] = await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries(project.chain_project_id);
+    const rounds: any[] =
+      await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries(
+        project.chain_project_id
+      );
 
     for (let i = Object.keys(rounds).length - 1; i >= 0; i--) {
       const [roundType, expiringBlock] = rounds[i];
       const roundTypeHuman = roundType.toHuman()[1];
-      const expiringBlockHuman = BigInt(expiringBlock.toHuman().replaceAll(',', ''));
-      if (
-        expiringBlockHuman > currentBlockNumber
-      ) {
+      const expiringBlockHuman = BigInt(
+        expiringBlock.toHuman().replaceAll(',', '')
+      );
+      if (expiringBlockHuman > currentBlockNumber) {
         if (
           projectOnChain.approvedForFunding &&
           roundTypeHuman == RoundType[RoundType.ContributionRound]
         ) {
           projectInContributionRound = true;
           break;
-        } else if (
-          roundTypeHuman == RoundType[RoundType.VotingRound]
-        ) {
+        } else if (roundTypeHuman == RoundType[RoundType.VotingRound]) {
           projectInVotingRound = true;
           break;
         }
@@ -417,12 +418,16 @@ class ChainService {
 
     const convertedProject: ProjectOnChain = {
       id: projectOnChain.milestones[0].projectKey,
-      requiredFunds: BigInt(projectOnChain.requiredFunds?.replaceAll(',', '') || 0),
+      requiredFunds: BigInt(
+        projectOnChain.requiredFunds?.replaceAll(',', '') || 0
+      ),
       requiredFundsFormatted:
         projectOnChain.requiredFunds?.replaceAll(',', '') / 1e12,
       raisedFunds: raisedFunds,
       raisedFundsFormatted: Number(raisedFunds / BigInt(1e12)),
-      withdrawnFunds: BigInt(projectOnChain.withdrawnFunds?.replaceAll(',', '') || 0),
+      withdrawnFunds: BigInt(
+        projectOnChain.withdrawnFunds?.replaceAll(',', '') || 0
+      ),
       currencyId:
         projectOnChain.currencyId == 'Native'
           ? Currency.IMBU
@@ -430,18 +435,21 @@ class ChainService {
       milestones: milestones,
       contributions: Object.keys(projectOnChain.contributions).map(
         (accountId: string) =>
-        ({
-          value: BigInt(
-            projectOnChain.contributions[accountId].value?.replaceAll(',', '') || 0
-          ),
-          accountId: accountId,
-          timestamp: BigInt(
-            projectOnChain.contributions[accountId].timestamp?.replaceAll(
-              ',',
-              ''
-            ) || 0
-          ),
-        } as Contribution)
+          ({
+            value: BigInt(
+              projectOnChain.contributions[accountId].value?.replaceAll(
+                ',',
+                ''
+              ) || 0
+            ),
+            accountId: accountId,
+            timestamp: BigInt(
+              projectOnChain.contributions[accountId].timestamp?.replaceAll(
+                ',',
+                ''
+              ) || 0
+            ),
+          } as Contribution)
       ),
       initiator: projectOnChain.initiator,
       createBlockNumber: BigInt(
@@ -465,19 +473,21 @@ class ChainService {
       .map((milestoneItem: any) => projectOnChain.milestones[milestoneItem])
       .map(
         (milestone: any) =>
-        ({
-          project_id: projectOffChain.id,
-          project_chain_id: Number(milestone.projectKey),
-          milestone_key: Number(milestone.milestoneKey),
-          name: projectOffChain.milestones[milestone.milestoneKey].name,
-          modified:
-            projectOffChain.milestones[milestone.milestoneKey].modified,
-          percentage_to_unlock: Number(milestone.percentageToUnlock),
-          amount: Number(
-            projectOffChain.milestones[milestone.milestoneKey].amount
-          ),
-          is_approved: milestone.isApproved,
-        } as Milestone)
+          ({
+            project_id: projectOffChain.id,
+            project_chain_id: Number(milestone.projectKey),
+            milestone_key: Number(milestone.milestoneKey),
+            name: projectOffChain.milestones[milestone.milestoneKey].name,
+            description:
+              projectOffChain.milestones[milestone.milestoneKey].description,
+            modified:
+              projectOffChain.milestones[milestone.milestoneKey].modified,
+            percentage_to_unlock: Number(milestone.percentageToUnlock),
+            amount: Number(
+              projectOffChain.milestones[milestone.milestoneKey].amount
+            ),
+            is_approved: milestone.isApproved,
+          } as Milestone)
       );
 
     return milestones;
