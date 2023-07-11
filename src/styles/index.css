@@ -117,7 +117,7 @@ ul li {
 .button-container button {
   border-radius: var(--hq-button-border-radius, 3px);
   background-color: var(--hq-secondary-button-background-color, inherit);
-  color: var(--hq-secondary-button-color);
+  color: var(--theme-content);
   /* border: var(--hq-secondary-button-border); */
   transition: var(--hq-base-transition);
   width: 100%;
@@ -128,8 +128,7 @@ ul li {
 
 .button-container button.primary {
   background-color: var(--theme-black-text);
-  font-weight: bold;
-  border: 2px solid transparent;
+  border: 1px solid var(--theme-content);
 }
 
 .button-container button:hover {
@@ -137,7 +136,7 @@ ul li {
 }
 
 .button-container button.primary:hover {
-  border: 2px solid var(--theme-primary);
+  border: 1px solid var(--theme-primary);
 }
 
 .w-button {

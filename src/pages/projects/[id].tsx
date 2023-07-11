@@ -29,7 +29,6 @@ import {
   OnchainProjectState,
   Project,
   ProjectOnChain,
-  User,
 } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
@@ -77,8 +76,7 @@ function Project() {
   const [targetUser, setTargetUser] = useState<any>({});
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
   // const [user, setUser] = useState<User | any>();
-  const { user } = useSelector((state: RootState) => state.userState);
-  const [chatTargetUser, setChatTargetUser] = useState<User | null>(null);
+  const { user, loading: userLoading } = useSelector((state: RootState) => state.userState);
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
   const [submittingMilestone, setSubmittingMilestone] =
@@ -104,10 +102,10 @@ function Project() {
 
   // fetching the project data from api and from chain
   useEffect(() => {
-    if (projectId) {
+    if (projectId && !userLoading) {
       getProject();
     }
-  }, [projectId]);
+  }, [projectId, userLoading]);
 
   const getChainProject = async () => {
     const imbueApi = await initImbueAPIInfo();
@@ -117,9 +115,9 @@ function Project() {
     if (onChainProjectRes) {
       const isApplicant = onChainProjectRes.initiator == user.web3_address;
 
-      if (isApplicant) {
-        await getFreelancerData(user?.username);
-      }
+      // if (isApplicant) {
+      //   await getFreelancerData(user?.username);
+      // }
 
       setIsApplicant(isApplicant);
       if (onChainProjectRes.projectState == OnchainProjectState.OpenForVoting) {
@@ -134,23 +132,18 @@ function Project() {
     }
   };
 
-  const getTargetUser = async (freelancerName: string) => {
-    const freelanceRes = await getFreelancerProfile(freelancerName);
-    setTargetUser(freelanceRes);
-  };
-
   const getProject = async () => {
     try {
       const projectRes = await getProjectById(projectId);
 
-      // setting project owner name if it is a grant, else showing owner/freelancer name
-      if (projectRes?.approvers) {
-        setTargetUser(await utils.fetchUser(projectRes?.user_id));
-      } else if (projectRes?.user_id !== user?.id) {
-        await getTargetUser(projectRes?.user_id);
+      // showing owner profile if the current user if the applicant freelancer
+      const brief = await getBrief(projectRes.brief_id);
+      const owner = brief?.user_id ? await utils.fetchUser(brief?.user_id) : null
+      
+      if (projectRes?.user_id == user?.id) {
+        setTargetUser(owner);
       } else {
-        const brief = await getBrief(projectRes.brief_id);
-        brief?.user_id && (await getTargetUser(brief?.user_id.toString()));
+        await getFreelancerData(projectRes?.user_id)
       }
       setProject(projectRes);
 
@@ -172,8 +165,16 @@ function Project() {
             });
           }
         });
-        setApproverPreview(approversPreviewList);
+      } else {
+        approversPreviewList.push({
+          // id: 6,
+          display_name: owner?.display_name,
+          profile_photo: owner?.profile_photo,
+          username: owner?.username,
+          web3_address: owner?.web3_address,
+        });
       }
+      setApproverPreview(approversPreviewList);
 
       // api  project response
       await getChainProject();
@@ -337,15 +338,6 @@ function Project() {
     ? timeAgo.format(new Date(project?.created))
     : 0;
 
-  const handleMessageBoxClick = async (user_id: number) => {
-    if (user_id) {
-      setShowMessageBox(true);
-      setChatTargetUser(await utils.fetchUser(user_id));
-    } else {
-      setLoginModal(true);
-    }
-  };
-
   const ExpandableDropDowns = ({
     milestone,
     index,
@@ -358,23 +350,14 @@ function Project() {
 
     return (
       <div
-        className='
-      transparent-conatainer 
-      relative 
-      !bg-white 
-      !py-[20px] 
-      !border 
-      !border-white 
-      rounded-[20px]
-      max-lg:!px-[20px]
-      max-width-750px:!pb-[30px]
-      '
+        className='mt-8 relative bg-white px-5 border border-white rounded-2xl lg:px-12 max-width-750px:!pb-[30px]'
       >
         <div
           onClick={() => {
             setExpanded(!expanded);
           }}
           className='
+          py-6
           flex 
           justify-between 
           w-full 
@@ -394,8 +377,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, 'Completed')
               : milestone?.milestone_key == milestoneBeingVotedOn
-              ? openForVotingTag()
-              : projectStateTag(modified, 'Not Started')}
+                ? openForVotingTag()
+                : projectStateTag(modified, 'Not Started')}
 
             <Image
               src={require(expanded
@@ -408,7 +391,7 @@ function Project() {
           </div>
         </div>
 
-        <div className={`${!expanded && 'hidden'} my-6`}>
+        <div className={`${!expanded && 'hidden'} mb-6`}>
           <p className='text-[14px] font-normal text-imbue-purple'>
             Percentage of funds to be released{' '}
             <span className=' text-imbue-lemon'>
@@ -448,7 +431,7 @@ function Project() {
 
           {isApplicant &&
             onChainProject?.projectState !==
-              OnchainProjectState.OpenForVoting && (
+            OnchainProjectState.OpenForVoting && (
               <button
                 className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
                 data-testid='next-button'
@@ -481,7 +464,7 @@ function Project() {
             showMessageBox,
             setShowMessageBox,
             browsingUser: user,
-            targetUser: chatTargetUser,
+            targetUser,
           }}
         />
       )}
@@ -521,7 +504,7 @@ function Project() {
           </p>
 
           <p className='text-imbue-purple text-[1.25rem] font-normal leading-[1.5] mt-[16px] p-0'>
-            {isApplicant || project?.approvers
+            {isApplicant || project?.approvers?.length
               ? 'Project Owner'
               : 'Freelancer hired'}
           </p>
@@ -544,7 +527,7 @@ function Project() {
             </p>
 
             <button
-              onClick={() => handleMessageBoxClick(project?.user_id)}
+              onClick={() => setShowMessageBox(true)}
               className='primary-btn 
               in-dark w-button 
               !mt-0 
@@ -565,12 +548,16 @@ function Project() {
               Message
             </button>
 
-            <button
-              className='border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors'
-              onClick={() => handleRefund()}
-            >
-              Refund
-            </button>
+            {
+              isApplicant && (
+                <button
+                  className='border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors'
+                  onClick={() => handleRefund()}
+                >
+                  Refund
+                </button>
+              )
+            }
           </div>
 
           {project?.approvers && (
@@ -583,7 +570,7 @@ function Project() {
                   {approversPreview?.map((approver: any, index: number) => (
                     <div
                       key={index}
-                      className='flex text-imbue-purple-dark gap-3 items-center border border-light-white p-2 rounded-full'
+                      className='flex text-content gap-3 items-center border border-content-primary p-3 rounded-full'
                     >
                       <Image
                         height={40}
@@ -632,13 +619,12 @@ function Project() {
                 <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
                   <div
                     style={{
-                      width: `${
-                        (onChainProject?.milestones?.filter?.(
-                          (m: any) => m?.is_approved
-                        )?.length /
-                          onChainProject?.milestones?.length) *
+                      width: `${(onChainProject?.milestones?.filter?.(
+                        (m: any) => m?.is_approved
+                      )?.length /
+                        onChainProject?.milestones?.length) *
                         100
-                      }%`,
+                        }%`,
                     }}
                     className='h-full rounded-xl Accepted-button absolute'
                   ></div>
@@ -646,9 +632,8 @@ function Project() {
                     {onChainProject?.milestones?.map((m: any, i: number) => (
                       <div
                         key={i}
-                        className={`h-4 w-4 ${
-                          m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
-                        } rounded-full -mt-1.5`}
+                        className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
+                          } rounded-full -mt-1.5`}
                       ></div>
                     ))}
                   </div>

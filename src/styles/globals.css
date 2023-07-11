@@ -48,7 +48,7 @@ h3 {
 
 .mdc-dialog .mdc-dialog__title,
 .mdc-dialog__content {
-  color: var(--mdc-text-field-ink-color) !important;
+  color: var(--theme-content) !important;
 }
 
 .mdc-dialog--open .mdc-dialog__container {
