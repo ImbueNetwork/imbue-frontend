@@ -370,80 +370,52 @@ class ChainService {
     );
     let projectInContributionRound = false;
     let projectInVotingRound = false;
+
     const lastApprovedMilestoneKey = await this.findLastApprovedMilestone(
       milestones
     );
     const lastHeader = await this.imbueApi.imbue.api.rpc.chain.getHeader();
     const currentBlockNumber = lastHeader.number?.toBigInt();
-    const rounds: any =
-      await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries();
+    const rounds: any[] = await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries(project.chain_project_id);
 
-    let roundKey: number | undefined = undefined;
     for (let i = Object.keys(rounds).length - 1; i >= 0; i--) {
-      const [id, round] = rounds[i];
-      const readableRound = round.toHuman();
-      const roundStart = BigInt(readableRound.start.replaceAll(',', ''));
-      const roundEnd = BigInt(readableRound.end.replaceAll(',', ''));
-      const projectExistsInRound = readableRound.projectKeys.includes(
-        projectOnChain.milestones[0].projectKey
-      );
-
+      const [roundType, expiringBlock] = rounds[i];
+      const roundTypeHuman = roundType.toHuman()[1];
+      const expiringBlockHuman = BigInt(expiringBlock.toHuman().replaceAll(',', ''));
       if (
-        roundStart < currentBlockNumber &&
-        roundEnd > currentBlockNumber &&
-        projectExistsInRound
+        expiringBlockHuman > currentBlockNumber
       ) {
         if (
           projectOnChain.approvedForFunding &&
-          readableRound.roundType == RoundType[RoundType.ContributionRound]
+          roundTypeHuman == RoundType[RoundType.ContributionRound]
         ) {
           projectInContributionRound = true;
-          roundKey = Number(id.args.map((key: any) => key.toHuman()));
           break;
         } else if (
-          projectOnChain.fundingThresholdMet &&
-          readableRound.roundType == RoundType[RoundType.VotingRound]
+          roundTypeHuman == RoundType[RoundType.VotingRound]
         ) {
           projectInVotingRound = true;
-          roundKey = Number(id.args.map((key: any) => key.toHuman()));
           break;
         }
       }
     }
-
-    if (projectOnChain.fundingThresholdMet) {
-      // Initators cannot contribute to their own project
-      if (userIsInitiator) {
-        if (projectInVotingRound) {
-          projectState = OnchainProjectState.OpenForVoting;
-        } else if (projectInContributionRound) {
-          projectState = OnchainProjectState.OpenForContribution;
-        } else if (lastApprovedMilestoneKey >= 0) {
-          projectState = OnchainProjectState.OpenForWithdraw;
-        } else {
-          projectState = OnchainProjectState.PendingMilestoneSubmission;
-        }
-      } else if (projectInVotingRound) {
+    // Initators cannot contribute to their own project
+    if (userIsInitiator) {
+      if (projectInVotingRound) {
         projectState = OnchainProjectState.OpenForVoting;
+      } else if (projectInContributionRound) {
+        projectState = OnchainProjectState.OpenForContribution;
+      } else if (lastApprovedMilestoneKey >= 0) {
+        projectState = OnchainProjectState.OpenForWithdraw;
       } else {
         projectState = OnchainProjectState.PendingMilestoneSubmission;
       }
-    } else if (!userIsInitiator && projectInContributionRound) {
-      projectState = OnchainProjectState.OpenForContribution;
+    } else if (projectInVotingRound) {
+      projectState = OnchainProjectState.OpenForVoting;
     } else {
-      // Project not yet open for funding
-      if (projectOnChain.approvedForFunding && !projectInContributionRound) {
-        projectState = OnchainProjectState.PendingFundingApproval;
-      } else if (userIsInitiator) {
-        if (projectInContributionRound) {
-          projectState = OnchainProjectState.OpenForContribution;
-        } else {
-          projectState = OnchainProjectState.PendingProjectApproval;
-        }
-      } else {
-        projectState = OnchainProjectState.PendingProjectApproval;
-      }
+      projectState = OnchainProjectState.PendingMilestoneSubmission;
     }
+
     const convertedProject: ProjectOnChain = {
       id: projectOnChain.milestones[0].projectKey,
       requiredFunds: BigInt(projectOnChain.requiredFunds?.replaceAll(',', '') || 0),
@@ -459,18 +431,18 @@ class ChainService {
       milestones: milestones,
       contributions: Object.keys(projectOnChain.contributions).map(
         (accountId: string) =>
-          ({
-            value: BigInt(
-              projectOnChain.contributions[accountId].value?.replaceAll(',', '') || 0
-            ),
-            accountId: accountId,
-            timestamp: BigInt(
-              projectOnChain.contributions[accountId].timestamp?.replaceAll(
-                ',',
-                ''
-              ) || 0
-            ),
-          } as Contribution)
+        ({
+          value: BigInt(
+            projectOnChain.contributions[accountId].value?.replaceAll(',', '') || 0
+          ),
+          accountId: accountId,
+          timestamp: BigInt(
+            projectOnChain.contributions[accountId].timestamp?.replaceAll(
+              ',',
+              ''
+            ) || 0
+          ),
+        } as Contribution)
       ),
       initiator: projectOnChain.initiator,
       createBlockNumber: BigInt(
@@ -480,7 +452,7 @@ class ChainService {
       fundingThresholdMet: projectOnChain.fundingThresholdMet,
       cancelled: projectOnChain.cancelled,
       projectState,
-      roundKey,
+      // roundKey,
     };
 
     return convertedProject;
@@ -494,19 +466,19 @@ class ChainService {
       .map((milestoneItem: any) => projectOnChain.milestones[milestoneItem])
       .map(
         (milestone: any) =>
-          ({
-            project_id: projectOffChain.id,
-            project_chain_id: Number(milestone.projectKey),
-            milestone_key: Number(milestone.milestoneKey),
-            name: projectOffChain.milestones[milestone.milestoneKey].name,
-            modified:
-              projectOffChain.milestones[milestone.milestoneKey].modified,
-            percentage_to_unlock: Number(milestone.percentageToUnlock),
-            amount: Number(
-              projectOffChain.milestones[milestone.milestoneKey].amount
-            ),
-            is_approved: milestone.isApproved,
-          } as Milestone)
+        ({
+          project_id: projectOffChain.id,
+          project_chain_id: Number(milestone.projectKey),
+          milestone_key: Number(milestone.milestoneKey),
+          name: projectOffChain.milestones[milestone.milestoneKey].name,
+          modified:
+            projectOffChain.milestones[milestone.milestoneKey].modified,
+          percentage_to_unlock: Number(milestone.percentageToUnlock),
+          amount: Number(
+            projectOffChain.milestones[milestone.milestoneKey].amount
+          ),
+          is_approved: milestone.isApproved,
+        } as Milestone)
       );
 
     return milestones;
