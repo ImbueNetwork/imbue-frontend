@@ -41,12 +41,12 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
   };
 
   return (
-    <div className='grid grid-cols-2 px-[30px] lg:px-[40px] justify-center md:grid-cols-3 gap-5 w-full'>
+    <div className='grid grid-cols-2 justify-center md:grid-cols-3 gap-5 w-full'>
       {clients?.map((client) => (
         <div
           key={client.id}
           onClick={() => removeClient(client.id)}
-          className='flex items-center gap-3 w-fit mx-auto'
+          className='flex items-center gap-3 w-fit'
         >
           <Badge
             className='client-badge'
@@ -55,7 +55,7 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
             badgeContent='-'
             invisible={!isEditMode}
           >
-            <div>
+            <div className='flex items-center gap-3'>
               <Image
                 className='rounded-lg'
                 height={40}
@@ -63,9 +63,9 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
                 src={client.icon}
                 alt={client.name}
               />
-              <p>{client.name}</p>
             </div>
           </Badge>
+          <p className='text-imbue-purple-dark'>{client.name}</p>
         </div>
       ))}
       {isEditMode && (

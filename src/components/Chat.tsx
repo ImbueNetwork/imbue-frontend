@@ -15,9 +15,10 @@ import {
 } from 'stream-chat-react';
 import 'stream-chat-react/dist/css/v2/index.css';
 
+import { getStreamChat } from '@/utils';
+
 import { User } from '@/model';
 
-import { getStreamChat } from '../utils';
 
 export type ChatProps = {
   user: User;
@@ -40,7 +41,7 @@ export function CustomChannelHeader(props: any) {
   });
 
   return (
-    <div className='py-2 lg:py-3 border-b border-b-white border-opacity-25'>
+    <div className='py-2 lg:py-3 border-b border-b-imbue-light-purple'>
       <div className='w-full flex gap-2 lg:gap-3 items-center ml-3'>
         {!chatPopUp && (
           <span className='md:hidden' onClick={closeChat}>
@@ -58,7 +59,7 @@ export function CustomChannelHeader(props: any) {
           )}
         </div>
         <div className='flex flex-col items-start'>
-          <span className='header-pound font-bold text-sm lg:text-lg break-words max-w-[130px] md:max-w-full'>
+          <span className='header-pound font-bold text-sm lg:text-lg break-words max-w-[130px] md:max-w-full text-imbue-purple'>
             {chatTitle.length > 22
               ? `${chatTitle?.substring(0, 22)}...`
               : chatTitle}
@@ -71,13 +72,13 @@ export function CustomChannelHeader(props: any) {
 
 function CustomSkeletonLoading() {
   return (
-    <div className='h-full'>
-      <div className='w-full flex gap-3 items-center pl-2 pr-8 py-2 str-chat__channel-header'>
+    <div className='h-full bg-background'>
+      <div className='w-full flex !gap-3 items-center pl-2 pr-8 !py-2 str-chat__channel-header'>
         <Skeleton variant='circular' width={48} height={48} />
         <Skeleton variant='text' sx={{ fontSize: '1rem', width: '16rem' }} />
       </div>
 
-      <div className='flex flex-col justify-evenly px-3 h-full'>
+      <div className='flex flex-col gap-10 pt-5 px-3 h-full border-t border-t-imbue-light-purple'>
         {[4, 4, 4, 4].map((value, index) => (
           <div
             key={index}
@@ -102,7 +103,7 @@ function CustomSkeletonLoading() {
         ))}
       </div>
 
-      <div className='w-full flex justify-evenly items-center absolute bottom-0 str-chat__channel-header'>
+      <div className='w-full flex justify-evenly items-center absolute bottom-0 str-chat__channel-header !gap-2'>
         <Skeleton variant='text' sx={{ fontSize: '2rem', width: '20rem' }} />
         <Skeleton variant='circular' width={30} height={30} />
       </div>
@@ -149,7 +150,7 @@ export const ChatBox = ({
                 <Window>
                   <div>
                     <div
-                      className='w-5 cursor-pointer absolute top-2 right-1 z-10 font-semibold'
+                      className='w-5 cursor-pointer absolute top-2 right-1 z-10 font-semibold text-content-primary'
                       onClick={() => setShowMessageBox(false)}
                     >
                       x

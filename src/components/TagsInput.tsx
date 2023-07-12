@@ -45,7 +45,7 @@ export const TagsInput = ({
         {tags.map((tag, i) => (
           <div
             key={i}
-            className='selected-tag-item cursor-pointer'
+            className='selected-tag-item cursor-pointer !bg-white'
             onClick={() => handleDelete(i)}
           >
             {tag}
@@ -72,7 +72,9 @@ export const TagsInput = ({
               key={index}
               onClick={() => addItem(item)}
             >
-              <span className='tag-suggestion-text'>{item}</span>
+              <span className='tag-suggestion-text font-extralight text-[0.875rem] text-[#3B27C1]'>
+                {item}
+              </span>
               <span className='tag-suggest-button'>+</span>
             </div>
           ))}

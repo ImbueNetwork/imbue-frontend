@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
@@ -28,6 +30,7 @@ const SpacedRow = styled.div`
   flex-direction: row;
   align-items: flex-start;
   justify-content: space-between;
+  margin-top: 1.5rem;
 
   @media screen and (max-width: 500px) {
     display: flex;
@@ -131,27 +134,29 @@ export const EditProposal = (): JSX.Element => {
   }
 
   return (
-    <div className='flex flex-row max-width-868px:block hq-layout max-md:px-7'>
+    <div className='flex flex-row max-width-868px:block max-md:px-7'>
       <header
         className='
       max-w-[400px] 
-      p-0 pb-[40px] 
+      p-0 lg:pb-[40px] 
       max-width-868px:w-[auto] 
       max-width-868px:max-w-[unset]
       md:w-[70%]
       md:mr-20 
       '
       >
-        <h1 className=' text-4xl leading-[50px] !text-white m-0 font-normal mx-0'>
+        <h1 className='lg:text-4xl text-[1.5rem] leading-[50px] !text-imbue-purple m-0 font-normal mx-0'>
           Edit Brief Details
         </h1>
       </header>
       <div className='imbu-proposals-draft-submission-form'>
-        <fieldset>
-          <p className={`${styles.fieldName} !text-white !text-3xl`}>
+        <fieldset className='bg-white p-[1rem] lg:p-[2rem] rounded-[1.25rem]'>
+          <p
+            className={`${styles.fieldName} !text-imbue-purple-dark !text-[1.3rem] lg:!text-3xl`}
+          >
             Headline
           </p>
-          <div className={styles.budgetInputContainer}>
+          <div className={`${styles.budgetInputContainer} !mt-[0.5rem]`}>
             <input
               className={styles.briefDetailFieldInput}
               style={{ paddingLeft: '24px', height: 'auto' }}
@@ -160,8 +165,12 @@ export const EditProposal = (): JSX.Element => {
               onChange={(e) => setHeadline(e.target.value)}
             />
           </div>
-          <h1 className='!text-3xl m-0 font-normal my-0 mx-0'>Skills</h1>
-          <div className={styles.skillsContainer}>
+
+          <h1 className='!text-[1.3rem] lg:!text-3xl m-0 font-normal !my-0 mx-0 !mb-3'>
+            Skills
+          </h1>
+
+          <div className={`${styles.skillsContainer} !mt-0 !py-0 mb-6 `}>
             <TagsInput
               suggestData={filterStrings(suggestedSkills, skills)}
               tags={skills}
@@ -169,8 +178,10 @@ export const EditProposal = (): JSX.Element => {
             />
           </div>
 
-          <h1 className='!text-3xl m-0 font-normal my-0 mx-0'>Industries</h1>
-          <div className={styles.industryContainer}>
+          <h1 className='!text-[1.3rem] lg:!text-3xl m-0 font-normal my-0 mx-0'>
+            Industries
+          </h1>
+          <div className={`${styles.industryContainer} !mt-[0.5rem] !py-0 `}>
             <TagsInput
               suggestData={filterStrings(suggestedIndustries, industries)}
               data-testid='industries-input'
@@ -182,13 +193,20 @@ export const EditProposal = (): JSX.Element => {
           </div>
 
           <div>
-            <p className={`${styles.fieldName} !text-white !text-3xl`}>
+            <p
+              className={`${styles.fieldName} !text-imbue-purple-dark !text-[1.3rem] lg:!text-3xl mt-[1.5rem] mb-3`}
+            >
               Maximum project budget (USD)
             </p>
-            <div className={styles.budgetInputContainer}>
+            <div
+              className={`${styles.budgetInputContainer} !mt-[0.5rem] !py-0 !mb-3`}
+            >
               <input
-                className={styles.briefDetailFieldInput}
-                style={{ paddingLeft: '24px', height: 'auto' }}
+                className={`${styles.briefDetailFieldInput}`}
+                style={{
+                  paddingLeft: '24px',
+                  height: 'auto',
+                }}
                 type='number'
                 value={budget || ''}
                 onChange={(e) => setBudget(Number(e.target.value))}
@@ -196,7 +214,7 @@ export const EditProposal = (): JSX.Element => {
               <div className={styles.budgetCurrencyContainer}>$</div>
             </div>
             <div
-              className={`${styles.budgetDescription} !text-white !mb-0 !mt-0`}
+              className={`${styles.budgetDescription} !text-imbue-purple !mb-0 !mt-0`}
             >
               You will be able to set milestones which divide your project into
               manageable phases.
@@ -204,14 +222,16 @@ export const EditProposal = (): JSX.Element => {
           </div>
         </fieldset>
 
-        <fieldset>
-          <h1 className='!text-3xl m-0 font-normal my-0 mx-0'>Description</h1>
+        <fieldset className='bg-white p-[1rem] lg:p-[2rem] rounded-[1.25rem]'>
+          <h1 className='!text-[1.3rem] lg:!text-3xl m-0 font-normal my-0 mx-0'>
+            Description
+          </h1>
           <div className={styles.descriptionContainer}>
             <TextArea
               value={description}
               name='description'
               maxLength={5000}
-              className='text-black'
+              className='text-black bg-transparent'
               rows={10}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 setDescription(e.target.value)
@@ -221,7 +241,9 @@ export const EditProposal = (): JSX.Element => {
 
           <SpacedRow>
             <div className={styles.scopeContainer}>
-              <h1 className='!text-3xl m-0 font-normal my-0 mx-0'>Scope</h1>
+              <h1 className='!text-[1.3rem] lg:!text-3xl m-0 font-normal my-0 mx-0'>
+                Scope
+              </h1>
               {scopeData.map(({ label, value }, index) => (
                 <Option
                   label={label}
@@ -229,13 +251,13 @@ export const EditProposal = (): JSX.Element => {
                   key={index}
                   checked={scopeId === value}
                   onSelect={() => setScopeId(value)}
-                  textclass='!text-white'
+                  textclass='!text-imbue-purple-dark'
                 />
               ))}
             </div>
 
             <div className={styles.scopeContainer}>
-              <h1 className='!text-3xl m-0 font-normal my-0 mx-0'>
+              <h1 className='!text-[1.3rem] lg:!text-3xl m-0 font-normal mt-[1.5rem] lg:my-0 mx-0 '>
                 Experience
               </h1>
 
@@ -246,13 +268,15 @@ export const EditProposal = (): JSX.Element => {
                   key={index}
                   checked={expId === value}
                   onSelect={() => setExpId(value)}
-                  textclass='!text-white'
+                  textclass='!text-imbue-purple-dark'
                 />
               ))}
             </div>
 
             <div className={styles.scopeContainer}>
-              <h1 className='!text-3xl m-0 font-normal my-0 mx-0'>Duration</h1>
+              <h1 className='!text-[1.3rem] lg:!text-3xl m-0 font-normal mt-[1.5rem] lg:my-0 mx-0'>
+                Duration
+              </h1>
               {timeData.map(({ label, value }, index) => (
                 <Option
                   label={label}
@@ -260,7 +284,7 @@ export const EditProposal = (): JSX.Element => {
                   key={index}
                   checked={durationId === value}
                   onSelect={() => setDurationId(value)}
-                  textclass='!text-white'
+                  textclass='!text-imbue-purple-dark'
                 />
               ))}
             </div>
@@ -268,10 +292,10 @@ export const EditProposal = (): JSX.Element => {
         </fieldset>
 
         <fieldset>
-          <div className='buttons-container'>
+          <div className='buttons-container mb-[2rem]'>
             <button
               disabled={false}
-              className='primary-btn in-dark w-button w-full'
+              className='primary-btn in-dark w-button w-full !mr-0 hover:!bg-imbue-purple !text-[1rem] hover:!text-white h-[2.6rem]'
               onClick={() => handleSubmit()}
             >
               Submit

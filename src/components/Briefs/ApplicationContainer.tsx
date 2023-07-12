@@ -16,13 +16,13 @@ export const ApplicationContainer = ({
         <div className='flex items-center gap-5'>
           <Image
             src={require('@/assets/images/profile-image.png')}
-            className='h-[45px] w-[45px] lg:h-[60px] lg:w-[60px]  object-cover'
+            className='h-[45px] w-[45px] lg:h-[60px] lg:w-[60px] object-cover'
             alt={'profile-picture'}
-            height={45}
-            width={45}
+            height={70}
+            width={70}
           />
 
-          <div className='user-id text-primary text-[10px] lg:text-base max-w-[100px] lg:max-w-full break-words'>
+          <div className='user-id text-imbue-purple-dark text-[10px] lg:text-base max-w-[100px] lg:max-w-full break-words'>
             @{application?.freelancer?.username}
           </div>
         </div>
@@ -39,7 +39,7 @@ export const ApplicationContainer = ({
                                             </div>
                                         </div> */}
           <button
-            className='primary-btn in-dark w-button'
+            className='border border-imbue-purple rounded-full px-5 text-imbue-purple hover:bg-primary hover:border-primary font-medium'
             onClick={() => redirectToApplication(application?.id)}
           >
             View proposal
@@ -51,7 +51,7 @@ export const ApplicationContainer = ({
                 application?.freelancer
               )
             }
-            className='secondary-btn in-dark w-button'
+            className='primary-btn in-dark w-button'
           >
             Message
           </button>
@@ -71,43 +71,41 @@ export const ApplicationContainer = ({
         </div>
 
         <div className='flex flex-row items-center justify-between'>
-          <div className='font-bold text-white text-base w-[fit-content] max-w-[320px]'>
+          <div className='text-imbue-purple-dark text-base w-[fit-content] max-w-[320px]'>
             {application?.freelancer?.title}
           </div>
         </div>
 
-        <div className='text-base font-bold'>{application?.name}</div>
+        <div className='text-base text-imbue-purple-dark'>{application?.name}</div>
         <div className='text-base'>
-          <div>
-            <span className='font-bold '>Cover Letter - </span>
-            {/* TODO: Implement cover letters */}
+          {/* <div className='text-imbue-purple-dark'>
+            <span className=''>Cover Letter - </span>
             {/* {application.freelancer.bio
                                             .split("\n")
                                             .map((line, index) => (
                                                 <span key={index}>{line}</span>
-                                            ))} */}
+                                            ))} }
             Hello, I would like to help you! I have 4+ years Experience with web
             3, so i’ll make things work properly. Feel free to communicate!
-          </div>
+          </div> */}
         </div>
 
         <div className='flex items-center lg:items-start lg:justify-between'>
           <div className='text-base'>
-            <h3 className='text-base'>Attachment(s)</h3>
+            {/* <p className='text-base text-imbue-purple-dark'>Attachment(s)</p> */}
             <div className='flex py-3 gap-2'>
-              {/* TODO: Implement */}
-              <FaPaperclip color='#b2ff0b' />
-              <div className='text-[#ffffff80] w-4/5 lg:w-full text-xs lg:text-[16px] break-words'>
+              {/* <FaPaperclip color='#b2ff0b' />
+              <div className='text-imbue-purple w-4/5 lg:w-full text-xs lg:text-[16px] break-words'>
                 https://www.behance.net/abbioty
-              </div>
+              </div> */}
             </div>
           </div>
           <div>
             <div className='flex gap-2 flex-col items-center'>
-              <span className='font-bold text-primary text-xs lg:text-base'>
+              <span className='text-imbue-purple-dark text-xs lg:text-base'>
                 Milestones ({application?.milestones?.length})
               </span>
-              <div className='text-[#ffffff80] text-[16px]'>
+              <div className='text-imbue-purple text-[16px]'>
                 ${Number(application?.required_funds).toLocaleString()}
               </div>
             </div>

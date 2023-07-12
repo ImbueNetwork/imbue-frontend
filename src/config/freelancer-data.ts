@@ -7,6 +7,12 @@ export const stepData = [
     progress: 1,
   },
   {
+    heading: 'A few quick questions: first, have you freelanced before?',
+    content: `This tells us how much help to give you along the way.\n
+        (We won’t share your answer with anyone else, including potential clients.)`,
+    progress: 2,
+  },
+  {
     heading: 'A few quick questions: Have you freelanced before?',
     content: `This tells us how much help to give you along the way.\n
         (We won’t share your answer with anyone else, including potential clients.)`,
@@ -38,12 +44,12 @@ export const stepData = [
   //      the next page. `,
   //     progress: 6,
   // },
-  // {
-  //     heading: "Clients like to know what you know - add your education here.",
-  //     content: `You don’t have to have a degree. Adding any relevant education helps \n
-  //     make your profile more visible.`,
-  //     progress: 7,
-  // },
+  {
+      heading: "Clients like to know what you know - add your education here.",
+      content: `You don’t have to have a degree. Adding any relevant education helps \n
+      make your profile more visible.`,
+      progress: 7,
+  },
   {
     heading: 'Looking good. Next, tell us which languages you speak.',
     content: `Imbue is global, so clients are often interested to know what languages \n

@@ -81,6 +81,15 @@ export const fetchUser = async (id: number) => {
   }
 };
 
+export const fetchUserByUsernameOrAddress = async (usernameOrAddress: string) => {
+  try {
+      const resp = await fetch(`/api/users/search/${usernameOrAddress}`)
+      return await resp.json()
+  } catch (error) {
+      return []
+  }
+}
+
 export const badRouteEvent = (type: BadRoute) =>
   new CustomEvent(config.event.badRoute, {
     bubbles: true,

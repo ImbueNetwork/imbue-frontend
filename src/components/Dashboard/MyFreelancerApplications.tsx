@@ -52,32 +52,32 @@ const MyFreelancerApplications = ({
 
   return (
     <>
-      <h3 className='mb-3'>Applied Briefs</h3>
+      <p className='mb-3 text-xl text-imbue-purple-dark'>Applied Briefs</p>
       {appliedBriefs?.length ? (
-        <div className='bg-[#2c2c2c] border border-light-white relative rounded-[0.75rem] overflow-hidden'>
+        <div className='bg-white relative rounded-[0.75rem] overflow-hidden'>
           {myApplications?.map(
             (application: Project, index: number) =>
               !application?.chain_project_id && (
                 <div
                   key={index}
                   onClick={() => redirectToApplication(application)}
-                  className='hover:bg-secondary-dark-hover min-h-[100px] border-b border-b-light-white last:border-b-0 flex px-5 py-3 lg:px-[2.5rem] lg:py-[2rem] cursor-pointer gap-[2rem]'
+                  className='hover:bg-imbue-light-purple-hover min-h-[100px] border-b border-b-light-white last:border-b-0 flex px-5 py-3 lg:px-[2.5rem] lg:py-[2rem] cursor-pointer gap-[2rem]'
                 >
                   <div className='w-4/5 flex items-center'>
-                    <h3 className='text-sm lg:text-xl font-bold mb-3'>
+                    <p className='text-sm lg:text-xl mb-3 text-content'>
                       {application?.name}
-                    </h3>
+                    </p>
                   </div>
                   <div className='flex flex-col gap-2 justify-evenly items-center ml-auto'>
-                    <span className='text-xs lg:text-base'>
-                      {timeAgo?.format(new Date(application?.created))}
+                    <span className='text-xs lg:text-sm text-imbue-purple'>
+                      {timeAgo?.format(new Date(application?.created || 0))}
                     </span>
                     <div
-                      className={`px-4 py-2 w-fit rounded-full text-xs lg:text-base ${
-                        OffchainProjectState[application.status_id]
+                      className={`px-4 py-1 lg:py-2 w-fit rounded-full text-xs lg:text-base text-center ${
+                        OffchainProjectState[application?.status_id || 0]
                       }-button `}
                     >
-                      {displayState(application.status_id)}
+                      {displayState(application?.status_id || 0)}
                     </div>
                   </div>
                 </div>
@@ -101,30 +101,30 @@ const MyFreelancerApplications = ({
       {currentProject?.length ? (
         <>
           <h3 className='mb-3 mt-10'>Current Projects</h3>
-          <div className='bg-[#2c2c2c] border border-light-white relative rounded-[0.75rem] overflow-hidden'>
+          <div className='bg-background relative rounded-[0.75rem] overflow-hidden'>
             {myApplications?.map(
               (application: Project, index: number) =>
                 application?.chain_project_id && (
                   <div
                     key={index}
                     onClick={() => router.push(`/projects/${application?.id}`)}
-                    className='hover:bg-secondary-dark-hover min-h-[100px] border-b border-b-light-white last:border-b-0 flex px-5 py-3 lg:px-[2.5rem] lg:py-[2rem] cursor-pointer gap-[2rem]'
+                    className='hover:bg-imbue-light-purple-hover min-h-[100px] border-b border-b-light-white last:border-b-0 flex px-5 py-3 lg:px-[2.5rem] lg:py-[2rem] cursor-pointer gap-[2rem]'
                   >
                     <div className='w-4/5 flex items-center'>
-                      <h3 className='text-sm lg:text-xl font-bold mb-3'>
+                      <p className='text-sm lg:text-xl mb-3 text-content'>
                         {application?.name}
-                      </h3>
+                      </p>
                     </div>
                     <div className='flex flex-col gap-2 justify-evenly items-center ml-auto'>
-                      <span className='text-xs lg:text-base'>
-                        {timeAgo?.format(new Date(application?.created))}
+                      <span className='text-xs lg:text-sm text-content'>
+                        {timeAgo?.format(new Date(application?.created || 0))}
                       </span>
                       <div
                         className={`px-4 py-2 w-fit rounded-full text-xs lg:text-base ${
-                          OffchainProjectState[application.status_id]
+                          OffchainProjectState[application?.status_id || 0]
                         }-button `}
                       >
-                        {displayState(application.status_id)}
+                        {displayState(application?.status_id || 0)}
                       </div>
                     </div>
                   </div>

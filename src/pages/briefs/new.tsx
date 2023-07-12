@@ -26,15 +26,6 @@ import { RootState } from '@/redux/store/store';
 
 import styles from '../../styles/modules/newBrief.module.css';
 
-const getAPIHeaders = {
-  accept: 'application/json',
-};
-
-const postAPIHeaders = {
-  ...getAPIHeaders,
-  'content-type': 'application/json',
-};
-
 const NewBrief = (): JSX.Element => {
   const [step, setStep] = useState(0);
   const [headline, setHeadline] = useState('');
@@ -56,10 +47,9 @@ const NewBrief = (): JSX.Element => {
     <>
       <p className={styles.fieldName}>Write a headline for your brief</p>
       <div className={styles.namePanelInputWrapper}>
-        <textarea
+        <input
           className={styles.briefDetailFieldInput}
           data-testid='headline-input'
-          placeholder='Enter the name of your project'
           name='headline'
           value={headline}
           onChange={(e) => setHeadline(e.target.value)}
@@ -101,7 +91,7 @@ const NewBrief = (): JSX.Element => {
           value={description}
           name='description'
           maxLength={5000}
-          className='text-black'
+          className='text-black bg-white outline-none'
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
             setDescription(e.target.value)
           }
@@ -149,7 +139,11 @@ const NewBrief = (): JSX.Element => {
           onSelect={() => setScopeId(value)}
         >
           {description ? (
-            <div className={styles.scopeItemDescription}>{description}</div>
+            <div
+              className={`${styles.scopeItemDescription} font-Aeonik mt-[0.75rem]`}
+            >
+              {description}
+            </div>
           ) : (
             <></>
           )}
@@ -246,7 +240,7 @@ const NewBrief = (): JSX.Element => {
     try {
       const user_id = user?.id;
       const resp = await fetch(`${config.apiBase}/briefs/`, {
-        headers: postAPIHeaders,
+        headers: config.postAPIHeaders,
         method: 'post',
         body: JSON.stringify({
           headline,
@@ -272,7 +266,7 @@ const NewBrief = (): JSX.Element => {
     }
   };
   return (
-    <div className='h-[90%] flex'>
+    <div className='h-[90%] flex lg:mt-[1.5rem] rounded-[1.25rem]'>
       <div className={`${styles.newBriefContainer} hq-layout`}>
         <div className={styles.leftPanel}>
           <ProgressBar
@@ -281,7 +275,11 @@ const NewBrief = (): JSX.Element => {
           />
           <h1 className={styles.heading}>{stepData[step].heading}</h1>
           {stepData[step].content.split('\n').map((content, index) => (
-            <p className={styles.help} key={index}>
+            <p
+              className={styles.help}
+              style={{ marginTop: index === 1 ? '1rem' : '0px' }}
+              key={index}
+            >
               {content}
             </p>
           ))}
@@ -291,7 +289,7 @@ const NewBrief = (): JSX.Element => {
           <div className={styles.buttons}>
             {step >= 1 && (
               <button
-                className='secondary-btn !mt-0'
+                className='secondary-btn !mt-0 !border !border-imbue-purple-dark hover:!bg-white'
                 onClick={() => setStep(step - 1)}
               >
                 Back
@@ -316,7 +314,7 @@ const NewBrief = (): JSX.Element => {
               </button>
             ) : (
               <button
-                className='primary-btn in-dark w-button !mt-0'
+                className='primary-btn in-dark w-button !mt-0 hover:!bg-imbue-purple hover:!text-white'
                 data-testid='next-button'
                 onClick={() => setStep(step + 1)}
                 disabled={!validate()}

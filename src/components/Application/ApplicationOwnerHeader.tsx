@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-condition */
 import { useMediaQuery } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -98,10 +99,12 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           priority
           alt='profileImage'
         />
-        <p className='text-2xl font-bold'>{briefOwner?.display_name}</p>
+        <p className='text-[1.25rem] font-normal capitalize text-imbue-purple'>
+          {briefOwner?.display_name}
+        </p>
       </div>
       {
-        <p className='text-base text-primary break-words text-center ml-3'>
+        <p className='text-[1rem] text-imbue-purple max-w-[55%] text-center break-words'>
           @
           {mobileView && briefOwner?.username?.length > 16
             ? `${briefOwner?.username.substr(0, 16)}...`
@@ -109,7 +112,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         </p>
       }
 
-      <div className='ml-auto lg:ml-0'>
+      <div className='ml-auto lg:ml-0 flex items-center gap-2 mt-3 lg:mt-0'>
         <button
           className='primary-btn in-dark w-button !text-xs lg:!text-base'
           onClick={() =>
@@ -120,7 +123,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         </button>
         {application?.status_id === 4 ? (
           <button
-            className='Accepted-btn text-black in-dark text-xs lg:text-base rounded-full py-[7px] px-3 ml-3 lg:ml-0 lg:px-6 md:py-[14px]'
+            className='Accepted-btn h-[2.7rem] text-black in-dark text-xs lg:text-base rounded-full px-3 ml-3 lg:ml-0 lg:px-6'
             onClick={() => brief?.project_id && setOpenPopup(true)}
           >
             Start Work
@@ -129,7 +132,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           <button
             className={`${
               applicationStatusId[application?.status_id]
-            }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[14px]`}
+            }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[10px]`}
           >
             {applicationStatusId[application?.status_id]}
           </button>

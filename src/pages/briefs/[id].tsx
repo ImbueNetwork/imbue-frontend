@@ -128,9 +128,13 @@ const BriefDetails = (): JSX.Element => {
   };
 
   const ClientHistory = (
-    <div className='transparent-conatainer relative max-width-750px:!px-3'>
-      <div className='flex justify-between w-full'>
-        <h3>Client Contact History (4)</h3>
+    <div
+      className={`transparent-conatainer !bg-imbue-light-purple-three relative ${
+        showClientHistory ? '!pb-[3rem]' : ''
+      }`}
+    >
+      <div className='flex justify-between w-full lg:px-[4rem] px-[1rem]'>
+        <h3 className='text-imbue-purple-dark'>Client Contact History (4)</h3>
         <div
           className={`transition transform ease-in-out duration-600 ${
             showClientHistory && 'rotate-180'
@@ -139,16 +143,22 @@ const BriefDetails = (): JSX.Element => {
           <ArrowIcon
             onClick={() => setShowClientHistory(!showClientHistory)}
             className='scale-150'
+            sx={{
+              color: '#03116A',
+            }}
           />
         </div>
       </div>
       <div className={`${!showClientHistory && 'hidden'} my-6`}>
-        <hr className='separator' />
+        <hr className='h-[1.5px] bg-[rgba(3, 17, 106, 0.12)] w-full mb-[0.5rem]' />
         {/* FIXME: replace dummy array with client history data*/}
         {[3, 3, 3].map((history, index) => (
-          <div key={`${index}-similar-brief`} className='similar-brief'>
+          <div
+            key={`${index}-similar-brief`}
+            className='similar-brief lg:px-[4rem] px-[1rem]'
+          >
             <div className='flex flex-col gap-5'>
-              <h3>Imbue Project</h3>
+              <h3 className='text-imbue-purple-dark'>Imbue Project</h3>
               <div className='flex items-center'>
                 {[4, 4, 4, 4].map((star, index) => (
                   <StarIcon
@@ -156,20 +166,20 @@ const BriefDetails = (): JSX.Element => {
                     className={`${index <= 4 && 'primary-icon'}`}
                   />
                 ))}
-                <span className='ml-3'>
+                <span className='ml-3 text-imbue-purple-dark'>
                   Thanks for choosing me. All the best for your future works...
                 </span>
               </div>
             </div>
             <div className='flex flex-col gap-5'>
-              <p>January 24 , 2033</p>
-              <p>Budget $5000</p>
+              <p className='text-imbue-purple-dark'>January 24 , 2033</p>
+              <p className='text-imbue-purple-dark'>Budget $5000</p>
             </div>
           </div>
         ))}
       </div>
       {showClientHistory && (
-        <span className='primary-text font-bold absolute bottom-2 right-4 cursor-pointer'>
+        <span className='primary-text font-bold absolute bottom-7 lg:right-[4.5rem] right-6 cursor-pointer !text-imbue-coral'>
           View more (1)
         </span>
       )}
@@ -177,9 +187,13 @@ const BriefDetails = (): JSX.Element => {
   );
 
   const SimilarProjects = (
-    <div className='transparent-conatainer relative max-width-750px:!px-3'>
-      <div className='flex justify-between w-full'>
-        <h3>Similar projects on Imbue</h3>
+    <div
+      className={`transparent-conatainer !bg-imbue-light-purple-three relative ${
+        showSimilarBrief ? '!pb-[3rem]' : ''
+      } `}
+    >
+      <div className='flex justify-between w-full lg:px-[4rem] px-[1rem]'>
+        <h3 className='text-imbue-purple-dark'>Similar projects on Imbue</h3>
         <div
           className={`transition transform ease-in-out duration-600 ${
             showSimilarBrief && 'rotate-180'
@@ -188,19 +202,27 @@ const BriefDetails = (): JSX.Element => {
           <ArrowIcon
             onClick={() => setShowSimilarBrief(!showSimilarBrief)}
             className='scale-150'
+            sx={{
+              color: '#03116A',
+            }}
           />
         </div>
       </div>
 
       <div className={`${!showSimilarBrief && 'hidden'} my-6`}>
-        <hr className='separator' />
+        <hr className='h-[1.5px] bg-[rgba(3, 17, 106, 0.12)] w-full mb-[0.5rem]' />
         {/* TODO: Need an object for the list of similar projects */}
         {/* FIXME: replace dummy array with similar projects data*/}
         {[3, 3, 3].map((history, index) => (
-          <div key={`${index}-sim-brief`} className='similar-brief'>
+          <div
+            key={`${index}-sim-brief`}
+            className='similar-brief lg:px-[4rem] px-[1rem]'
+          >
             <div className='similar-brief-details'>
-              <h3 className='max-width-750px:!text-base'>NFT Mining</h3>
-              <span className='max-width-750px:!text-base max-width-750px:overflow-hidden max-width-750px:text-ellipsis max-width-750px:ml-3 max-width-750px:line-clamp-2'>
+              <h3 className='max-width-750px:!text-base text-imbue-purple-dark mr-[0.5rem]'>
+                NFT Mining
+              </h3>
+              <span className='max-width-750px:!text-base max-width-750px:overflow-hidden max-width-750px:text-ellipsis max-width-750px:ml-3 max-width-750px:line-clamp-2 !text-imbue-purple'>
                 Hi guys, I have an NFT I would like to design. The NFT has to
                 have a picture of......
               </span>
@@ -212,7 +234,7 @@ const BriefDetails = (): JSX.Element => {
         ))}
       </div>
       {showSimilarBrief && (
-        <span className='primary-text font-bold absolute bottom-2 right-4 cursor-pointer'>
+        <span className='primary-text font-bold absolute bottom-7 lg:right-[4.5rem] right-6 cursor-pointer !text-imbue-coral'>
           View more (1)
         </span>
       )}
@@ -220,7 +242,7 @@ const BriefDetails = (): JSX.Element => {
   );
 
   return (
-    <div className='brief-details-container hq-layout px-[15px] lg:px-[40px]'>
+    <div className='brief-details-container px-[15px] lg:px-0'>
       <div className='brief-info max-width-750px:!flex-col'>
         {/* TODO: Implement */}
         <BioPanel

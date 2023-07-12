@@ -48,6 +48,11 @@ export enum ButtonState {
   Done,
 }
 
+export enum ProjectType {
+  Brief = 0,
+  Grant = 1,
+}
+
 export type Project = {
   id?: string | number;
   name: string;
@@ -58,15 +63,15 @@ export type Project = {
   chain_project_id?: number;
   required_funds: number;
   currency_id: number;
-  status_id: number;
-  milestones: Milestone[];
   owner?: string;
   user_id?: string | number;
   brief_id?: string | number;
   total_cost_without_fee?: number;
   imbue_fee?: number;
-  created: Date;
-  modified?: Date;
+  status_id?: number;
+  // project_type: ProjectType;
+  approvers: string[];
+  created?: string;
 };
 
 export type ProjectOnChain = {
@@ -83,7 +88,7 @@ export type ProjectOnChain = {
   createBlockNumber: bigint;
   approvedForFunding: boolean;
   fundingThresholdMet: boolean;
-  roundKey: number | undefined;
+  roundKey?: number | undefined;
   cancelled: boolean;
   projectState: OnchainProjectState;
 };
@@ -97,6 +102,7 @@ export type Milestone = {
   percentage_to_unlock: number;
   is_approved: boolean;
   amount: number;
+  description: string;
 };
 
 export type Contribution = {

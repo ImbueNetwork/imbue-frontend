@@ -46,35 +46,35 @@ export const BriefLists = ({
     );
 
   if (briefs?.length === 0 && !showNewBriefButton)
-    return <h2 className='text-[16px]'>Nothing to show</h2>;
+    return <h2 className='text-[16px] text-imbue-purple'>Nothing to show</h2>;
 
   return (
-    <div className='bg-theme-grey-dark mb-8 border border-light-white overflow-hidden rounded-xl'>
+    <div className='bg-white mb-8 overflow-hidden rounded-xl'>
       {briefs?.map((brief, index) => (
         <div
           key={index}
           onClick={() => handleItemClick(brief)}
-          className={`flex cursor-pointer hover:bg-secondary-dark-hover px-5 py-3 lg:px-10 lg:py-8 justify-between border-b border-b-light-white last:border-b-0`}
+          className={`flex cursor-pointer hover:bg-imbue-light-purple-hover px-5 py-3 lg:px-10 lg:py-8 justify-between border-b border-b-imbue-light-purple last:border-b-0`}
         >
-          <div className='flex flex-col gap-1 lg:gap-3'>
-            <h3 className='text-sm lg:text-xl font-bold'>{brief.headline}</h3>
-            <p className='text-xs lg:text-[16px]'>
+          <div className='flex flex-col gap-2 lg:gap-3'>
+            <span className='text-sm text-imbue-purple-dark lg:text-xl'>{brief.headline}</span>
+            <p className='text-xs lg:text-[16px] text-imbue-purple'>
               Budget ${Number(brief.budget).toLocaleString()} - Public
             </p>
-            <p className='text-xs lg:text-[16px]'>
+            <p className='text-xs mt-2 lg:mt-3 text-imbue-purple'>
               Created {timeAgo.format(new Date(brief.created))}
             </p>
           </div>
           {brief.project_id ? (
             <div className='flex flex-col items-center w-1/3'>
-              <h3 className='text-sm lg:text-xl'>
+              <p className='text-sm lg:text-xl text-imbue-purple-dark'>
                 Milestones{' '}
                 <span className='primary-text'>
                   {brief.milestones?.filter((m: any) => m?.is_approved)?.length}
                   /{brief.milestones?.length}
                 </span>
-              </h3>
-              <div className='w-full bg-[#1C2608] h-1 relative my-auto'>
+              </p>
+              <div className='w-full bg-light-grey h-1 relative my-auto'>
                 <div
                   style={{
                     width: `${
@@ -91,7 +91,7 @@ export const BriefLists = ({
                     <div
                       key={i}
                       className={`h-3 w-3 lg:h-4 lg:w-4 rounded-full -mt-1 lg:-mt-1.5 ${
-                        m.is_approved ? 'Accepted-button' : 'bg-[#1C2608]'
+                        m.is_approved ? 'bg-primary' : 'bg-light-grey'
                       }`}
                     ></div>
                   ))}
@@ -100,7 +100,7 @@ export const BriefLists = ({
             </div>
           ) : (
             <div className='flex flex-col items-center gap-2 lg:gap-3'>
-              <h2 className='text-sm lg:ext-xl font-bold'>Proposals</h2>
+              <h2 className='text-sm lg:text-lg text-imbue-purple-dark'>Proposals</h2>
               <h2 className='text-sm lg:text-xl font-bold text-primary'>
                 {brief.number_of_applications}
               </h2>

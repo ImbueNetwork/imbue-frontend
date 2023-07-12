@@ -18,6 +18,6 @@
 .budgetInfo {
   display: flex;
   flex-direction: row;
-  align-items: flex-end;
+  align-items: center;
   margin-bottom: 20px;
 }

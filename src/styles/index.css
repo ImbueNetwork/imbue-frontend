@@ -18,7 +18,7 @@ ol {
 }
 
 textarea {
-  background: var(--theme-ink-color);
+  background: transparent;
   border: 1px solid black;
   border-radius: 8px;
   backdrop-filter: blur(8px);
@@ -105,6 +105,11 @@ ul li {
   color: var(--hq-dialog-content-color);
 }
 
+.aeonikFont {
+  font-family: Aeonik, sans-serif;
+  font-weight: 400;
+}
+
 .button-container {
   display: flex;
 }
@@ -112,7 +117,7 @@ ul li {
 .button-container button {
   border-radius: var(--hq-button-border-radius, 3px);
   background-color: var(--hq-secondary-button-background-color, inherit);
-  color: var(--hq-secondary-button-color);
+  color: var(--theme-content);
   /* border: var(--hq-secondary-button-border); */
   transition: var(--hq-base-transition);
   width: 100%;
@@ -123,8 +128,7 @@ ul li {
 
 .button-container button.primary {
   background-color: var(--theme-black-text);
-  font-weight: bold;
-  border: 2px solid transparent;
+  border: 1px solid var(--theme-content);
 }
 
 .button-container button:hover {
@@ -132,7 +136,7 @@ ul li {
 }
 
 .button-container button.primary:hover {
-  border: 2px solid var(--theme-primary);
+  border: 1px solid var(--theme-primary);
 }
 
 .w-button {
@@ -149,7 +153,7 @@ ul li {
 
 .primary-btn {
   margin-right: 16px;
-  padding: 12px 24px;
+  padding: 8px 24px;
   -webkit-align-self: center;
   -ms-flex-item-align: center;
   -ms-grid-row-align: center;
@@ -177,7 +181,7 @@ ul li {
   align-self: center;
   border-radius: 46px;
   background-color: #411dc9;
-  font-family: Aeoniktrial, sans-serif;
+  font-family: Aeonik, sans-serif;
   font-weight: 400;
   text-align: center;
 }
@@ -288,7 +292,7 @@ div#layout {
 .main-title {
   display: flex;
   align-items: center;
-  width: 160px;
+  width: 12.00125rem;
   height: 43px;
 }
 
@@ -592,16 +596,16 @@ input[type='radio'] {
 }
 
 .progress-step-circle.active {
-  background-color: var(--theme-primary);
+  background-color: var(--theme-purple);
 }
 
 .progress-step-circle.disabled {
-  background-color: var(--theme-grey-text);
+  background-color: #d2d2d2;
 }
 
 .progress-step-text {
-  color: var(--theme-grey-text);
-  font-size: 12px;
+  color: var(--theme-purple-dark);
+  font-size: 0.62rem;
   line-height: 1;
   position: absolute;
   padding-top: 12px;
@@ -618,7 +622,7 @@ input[type='radio'] {
 .progress-bar-back {
   position: absolute;
   height: 6px;
-  background: var(--theme-grey-text);
+  background: #d2d2d2;
   left: 4px;
   right: 4px;
   top: 6px;
@@ -628,7 +632,7 @@ input[type='radio'] {
 .progress-bar-progress {
   position: absolute;
   height: 6px;
-  background: var(--theme-primary);
+  background: var(--theme-purple);
   left: 4px;
   right: 4px;
   top: 6px;
@@ -643,7 +647,7 @@ input[type='radio'] {
   gap: 4px;
   /* background: var(--theme-ink-color); */
   border: 1px solid var(--theme-black-text);
-  border-radius: 20px;
+  border-radius: 0.25rem;
   backdrop-filter: blur(8px);
   padding: 8px 8px 8px 16px;
 }
@@ -686,13 +690,15 @@ input[type='radio'] {
   color: var(--theme-secondary);
   padding: 8px 12px;
   cursor: pointer;
+  background-color: #e1ddff;
 }
 
 .new-tag-input {
   border: 1px solid var(--theme-grey-text);
   padding: 10px;
-  border-radius: 20px;
+  border-radius: 0.25rem;
   background: white;
+  outline: none;
 }
 
 .tag-suggestion-text {
@@ -712,11 +718,11 @@ input[type='radio'] {
   text-align: right;
   font-size: 12px;
   line-height: 16px;
-  color: black;
+  color: var(--theme-content);
 }
 
 .secondary-btn {
-  padding: 12px 24px;
+  padding: 8px 24px;
   -webkit-align-self: center;
   -ms-flex-item-align: center;
   -ms-grid-row-align: center;
@@ -726,7 +732,7 @@ input[type='radio'] {
   -webkit-transition: color 0.3s, background-color 0.3s;
   transition: color 0.3s, background-color 0.3s;
   font-family: 'Space Grotesk', sans-serif;
-  color: var(--theme-secondary);
+  color: var(--theme-purple-dark);
   font-size: 16px;
   line-height: 22px;
   font-weight: 400;
@@ -751,12 +757,12 @@ input:-webkit-autofill:active {
 }
 
 input:-webkit-autofill {
-  -webkit-text-fill-color: white !important;
+  -webkit-text-fill-color: #03116a !important;
 }
 
-.profile-container .textarea-remaining {
+/* .profile-container .textarea-remaining {
   color: white;
-}
+} */
 
 @media screen and (max-width: 500px) {
   h2 {

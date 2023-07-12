@@ -23,7 +23,7 @@ const SuccessScreen = (props: SuccessScreenProps) => {
       aria-describedby='alert-dialog-description'
       className='p-14 errorDialogue'
     >
-      <div className='my-auto flex flex-col gap-3 items-center p-8'>
+      <div className='my-auto flex flex-col gap-3 items-center p-8 text-content'>
         <div className='f-modal-alert'>
           <div className='f-modal-icon f-modal-success animate'>
             <span className='f-modal-line f-modal-tip animateSuccessTip'></span>
@@ -34,12 +34,11 @@ const SuccessScreen = (props: SuccessScreenProps) => {
         </div>
 
         <div className='mt-2 lg:mt-5'>
-          <p className='text-center text-lg lg:text-2xl font-bold'>
+          <p className='text-center text-lg lg:text-2xl font-bold text-content-primary'>
             Congratulations!
           </p>
-          <p className='text-center lg:text-xl my-2 lg:my-5'>{title}</p>
+          <p className='text-center lg:text-xl my-2 lg:my-5 text-content'>{title}</p>
         </div>
-
         {props.children}
       </div>
     </Dialog>

@@ -40,7 +40,7 @@ function Layout({ children }: LayoutProps) {
       <Providers>
         <Navbar />
         <main
-          className={`padded lg:!px-[var(--hq-layout-padding)] !pt-32`}
+          className={`padded lg:!px-[var(--hq-layout-padding)] !pt-[100px]`}
           id='main-content'
         >
           {children}

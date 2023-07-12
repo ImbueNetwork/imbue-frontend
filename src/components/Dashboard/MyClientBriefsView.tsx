@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Skeleton } from '@mui/material';
 import { useRouter } from 'next/router';
@@ -50,12 +51,12 @@ const MyClientBriefsView = (props: ClientViewProps) => {
   return (
     <div>
       {briefId ? (
-        <div className='bg-theme-grey-dark border border-solid border-light-white relative rounded-[0.75rem] '>
+        <div className='bg-white relative rounded-[0.75rem] '>
           <div
             className='absolute top-2 left-2 cursor-pointer'
             onClick={goBack}
           >
-            <ArrowBackIcon />
+            <ArrowBackIcon htmlColor='#3B27C1' />
           </div>
           {loadingApplications ? (
             <ApplicationSkeleton />
@@ -76,19 +77,26 @@ const MyClientBriefsView = (props: ClientViewProps) => {
         </div>
       ) : (
         <div>
-          <h2 className='text-base lg:text-xl font-bold mb-3'>Open Briefs</h2>
+          <h2 className='text-imbue-purple-dark text-base lg:text-xl mb-3'>Open Briefs</h2>
           <BriefLists
             briefs={briefs?.briefsUnderReview}
             showNewBriefButton={true}
           />
 
-          <h2 className='text-base lg:text-xl font-bold mb-3 mt-4 lg:mt-10'>
-            Projects
-          </h2>
-          <BriefLists
-            briefs={briefs?.acceptedBriefs}
-            areAcceptedBriefs={true}
-          />
+          {
+            briefs?.acceptedBriefs?.length && (
+              <>
+                <p className='text-imbue-purple-dark text-base lg:text-xl mb-3 mt-4 lg:mt-10'>
+                  Projects
+                </p>
+                <BriefLists
+                  briefs={briefs?.acceptedBriefs}
+                  areAcceptedBriefs={true}
+                />
+              </>
+            )
+          }
+
         </div>
       )}
     </div>
@@ -97,11 +105,11 @@ const MyClientBriefsView = (props: ClientViewProps) => {
 
 export function ApplicationSkeleton() {
   return (
-    <div className='bg-theme-grey-dark border border-light-white overflow-hidden rounded-xl'>
+    <div className='bg-white overflow-hidden rounded-xl'>
       {[1, 2].map((v, i) => (
         <div
           key={i}
-          className='w-full px-5 py-3 lg:px-10 lg:py-8 border-b last:border-b-0 border-b-light-white'
+          className='w-full px-5 py-3 lg:px-10 lg:py-8 border-b last:border-b-0 border-b-imbue-light-purple'
         >
           <div className='flex justify-between items-center'>
             <div className='flex w-full items-center gap-4'>

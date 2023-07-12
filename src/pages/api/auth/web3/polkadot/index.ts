@@ -47,6 +47,14 @@ export default nextConnect().post(
               account.type,
               solution.challenge
             )(tx);
+
+            await models.upsertWeb3Challenge(
+              loggedInUser,
+              address,
+              account.type,
+              solution.challenge
+            )(tx);
+
             return res.send({ existingUser: loggedInUser, web3Account });
           });
         } else {

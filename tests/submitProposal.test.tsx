@@ -196,11 +196,15 @@ describe('SubmitProposal', () => {
     ) as HTMLInputElement;
     const amountInput = getByTestId('milestone-amount-0') as HTMLInputElement;
 
+    const titleInput = getByTestId('milestone-title-0') as HTMLInputElement;
+
     fireEvent.change(descriptionInput, {
       target: { value: 'Test description' },
     });
 
     fireEvent.change(amountInput, { target: { value: 20 } });
+
+    fireEvent.change(titleInput, { target: { value: 'Title one' } });
 
     fireEvent.click(getByText('Submit'));
 

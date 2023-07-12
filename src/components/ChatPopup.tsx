@@ -27,13 +27,13 @@ const ChatPopup = (props: ChatPopupProps) => {
         unmountOnExit
       >
         <Box>
-          <div className='relative h-full'>
-            <div
-              className='w-5 cursor-pointer absolute top-2 right-1 z-10 font-semibold'
+          <div className='relative h-full border border-imbue-light-purple'>
+            {/* <div
+              className='w-5 cursor-pointer absolute top-2 right-1 z-10 font-semibold text-content-primary'
               onClick={() => setShowMessageBox(false)}
             >
               x
-            </div>
+            </div> */}
             {browsingUser && targetUser ? (
               <ChatBox
                 user={browsingUser}

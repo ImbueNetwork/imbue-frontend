@@ -21,7 +21,7 @@ const ErrorScreen = (props: ErrorScreenProps) => {
       aria-describedby='alert-dialog-description'
       className='p-14 errorDialogue'
     >
-      <div className='my-auto flex flex-col gap-3 items-center p-8'>
+      <div className='my-auto flex flex-col gap-3 items-center p-8 text-content'>
         <div className='f-modal-icon f-modal-error animate'>
           <span className='f-modal-x-mark'>
             <span className='f-modal-line f-modal-left animateXLeft'></span>
@@ -32,10 +32,10 @@ const ErrorScreen = (props: ErrorScreenProps) => {
         </div>
 
         <div className='mt-2 lg:mt-5'>
-          <p className='text-center text-lg lg:text-2xl font-bold'>
+          <p className='text-center text-lg lg:text-2xl font-bold text-content-primary'>
             An unexpected error occured
           </p>
-          <p className='text-center lg:text-xl my-2 lg:my-5'>
+          <p className='text-center lg:text-xl my-2 lg:my-5 text-content'>
             {error?.message}
           </p>
         </div>

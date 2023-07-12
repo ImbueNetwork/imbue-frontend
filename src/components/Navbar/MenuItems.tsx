@@ -21,6 +21,13 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
       duplicate: true,
     },
     {
+      icon: 'account_balance',
+      text: 'Submit A Grant',
+      link: '/briefs/new',
+      needAuthentication: true,
+      duplicate: true,
+    },
+    {
       icon: 'search',
       text: 'Discover Briefs',
       link: '/briefs',
@@ -70,30 +77,31 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
     handleClose();
     if (needAuthentication && !user?.username) {
       setLoginModal(true);
+    } else if (link === "/login") {
+      setLoginModal(true)
     } else {
       router.push(link);
     }
   };
   return (
     <>
-      <div className='menuItems flex flex-col gap-2'>
+      <div className='menuItems flex flex-col lg:gap-2'>
         {linkItems.map((item, index) => (
           <MenuItem
-            className={`${item.duplicate && 'lg:hidden'} ${
-              item.needAuthentication && !user?.username && 'hidden'
-            }`}
+            className={`${item.duplicate && 'lg:hidden'} ${item.needAuthentication && !user?.username && 'hidden'
+              }`}
             key={index}
             onClick={() => navigateToPage(item.link, item.needAuthentication)}
           >
             <ListItemIcon>
               <i
-                className='material-icons relative top-[4px] text-white'
+                className='material-icons relative top-[4px] text-imbue-purple-dark'
                 aria-hidden='true'
               >
                 {item?.icon}
               </i>
             </ListItemIcon>
-            <p>{item?.text}</p>
+            <p className='text-imbue-purple-dark'>{item?.text}</p>
           </MenuItem>
         ))}
       </div>
