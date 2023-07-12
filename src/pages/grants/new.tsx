@@ -435,13 +435,14 @@ const GrantApplication = (): JSX.Element => {
                     <div className='flex flex-row relative'>
                       <span
                         onClick={() => onRemoveMilestone(index)}
-                        className='absolute top-0 right-2 text-sm lg:text-xl text-imbue-purple font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
+                        className='absolute top-[-1rem] right-2 text-sm lg:text-xl text-imbue-purple font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
                       >
                         x
                       </span>
                       <div className='text-base mr-4 lg:mr-9 text-content mt-0.5'>
                         {index + 1}.
                       </div>
+
                       <div className='flex flex-row justify-between w-full text-content'>
                         <div className='w-3/5'>
                           <h3 className=' text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
@@ -483,10 +484,11 @@ const GrantApplication = (): JSX.Element => {
                             }
                           />
                         </div>
-                        <div className='flex flex-col w-4/12'>
-                          <p className='mb-2 lg:mb-5 text-base lg:text-lg m-0 p-0'>
+
+                        <div className='flex flex-col w-4/12 mt-[-0.2rem]'>
+                          <h3 className=' text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
                             Amount
-                          </p>
+                          </h3>
                           <TextField
                             color='secondary'
                             id='outlined-start-adornment'
@@ -514,6 +516,7 @@ const GrantApplication = (): JSX.Element => {
                               ])
                             }
                           />
+
                           {totalCostWithoutFee !== 0 && (
                             <div className='flex flex-col items-end mt-3 gap-2 w-full'>
                               <div className='mt-2 text-base text-content-primary'>

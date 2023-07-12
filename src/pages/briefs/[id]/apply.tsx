@@ -296,12 +296,13 @@ export const SubmitProposal = (): JSX.Element => {
                       }
                     />
                   </div>
-                  <div className='flex flex-col lg:w-3/12 w-4/12 lg:items-start'>
-                    <h3 className='mb-2 lg:mb-5 text-left text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
+
+                  <div className='flex flex-col lg:w-3/12 w-4/12 lg:items-start lg:mt-[-0.5rem]'>
+                    <h3 className=' text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
                       Amount
                     </h3>
 
-                    <div className='w-full relative'>
+                    <div className='w-full relative p-0 m-0'>
                       <Image
                         src={dollarIcon}
                         alt='dollar icon'
@@ -312,7 +313,7 @@ export const SubmitProposal = (): JSX.Element => {
                       <input
                         type='number'
                         data-testid={`milestone-amount-${index}`}
-                        className='input-budget text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-right  pl-5'
+                        className='input-budget  text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-right pl-5'
                         value={amount || ''}
                         onChange={(e) =>
                           setMilestones([

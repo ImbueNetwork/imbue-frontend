@@ -482,7 +482,10 @@ class ChainService {
               projectOffChain.milestones[milestone.milestoneKey].description,
             modified:
               projectOffChain.milestones[milestone.milestoneKey].modified,
-            percentage_to_unlock: Number(milestone.percentageToUnlock),
+            percentage_to_unlock: Number(
+              projectOffChain.milestones[milestone.milestoneKey]
+                .percentage_to_unlock
+            ),
             amount: Number(
               projectOffChain.milestones[milestone.milestoneKey].amount
             ),

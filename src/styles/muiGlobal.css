@@ -103,7 +103,7 @@
   cursor: pointer;
 }
 
-.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected{
+.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected {
   background: var(--theme-purple-light);
 }
 
@@ -147,8 +147,13 @@
   max-width: 60%;
 }
 
-.amountInput .MuiInputBase-input{
+.amountInput .MuiInputBase-input {
   text-align: right;
+  height: 0.625rem;
+}
+
+.amountInput > div {
+  border-radius: 5px;
 }
 
 @media screen and (max-width: 470px) {
