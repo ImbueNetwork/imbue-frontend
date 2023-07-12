@@ -249,35 +249,6 @@ export const SubmitProposal = (): JSX.Element => {
                   onClick={() => onRemoveMilestone(index)}
                   className='absolute top-1 right-2 lg:right-4 text-sm lg:text-xl text-light-grey font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
                 >
-<<<<<<< HEAD
-                  <span
-                    onClick={() => onRemoveMilestone(index)}
-                    className='absolute top-1 right-2 lg:right-4 text-sm lg:text-xl text-light-grey font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
-                  >
-                    x
-                  </span>
-                  <div className='text-base mr-4 lg:mr-9'>{index + 1}.</div>
-                  <div className='flex flex-row justify-between w-full'>
-                    <div className='w-3/5'>
-                      <h3 className='mb-2 lg:mb-5 text-base lg:text-xl font-bold m-0 p-0'>
-                        Description
-                      </h3>
-                      <textarea
-                        data-testid='milestone-description-0'
-                        className='input-description text-base'
-                        data-testid={`milestone-description-${index}`}
-                        value={name}
-                        onChange={(e) =>
-                          setMilestones([
-                            ...milestones.slice(0, index),
-                            {
-                              ...milestones[index],
-                              name: e.target.value,
-                            },
-                            ...milestones.slice(index + 1),
-                          ])
-                        }
-=======
                   x
                 </span>
                 <div className='text-base mr-4 lg:mr-9 text-imbue-purple-dark font-normal'>
@@ -338,16 +309,11 @@ export const SubmitProposal = (): JSX.Element => {
                         height={12}
                         width={12}
                         className='h-fit absolute left-2 bottom-3'
->>>>>>> 8e67d0b89d812672445e3c74c4c58c2b45d547be
                       />
                       <input
                         type='number'
                         data-testid={`milestone-amount-${index}`}
-<<<<<<< HEAD
-                        className='input-budget bg-[#1a1a19] border border-white text-base leading-5 rounded-[5px] py-3 px-5'
-=======
                         className='input-budget  text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-right pl-5'
->>>>>>> 8e67d0b89d812672445e3c74c4c58c2b45d547be
                         value={amount || ''}
                         onChange={(e) =>
                           setMilestones([

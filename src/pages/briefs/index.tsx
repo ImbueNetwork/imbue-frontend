@@ -372,7 +372,7 @@ const Briefs = (): JSX.Element => {
               // eslint-disable-next-line no-console
               console.log(
                 'Invalid filter option selected or unimplemented. type:' +
-                filterType
+                  filterType
               );
           }
         }
@@ -460,9 +460,9 @@ const Briefs = (): JSX.Element => {
   };
 
   const cancelFilters = async () => {
-    reset()
-    setFilterVisible(false)
-  }
+    reset();
+    setFilterVisible(false);
+  };
 
   const FilterModal = ({ open, handleClose }: FilterModalProps) => {
     return (
@@ -497,12 +497,10 @@ const Briefs = (): JSX.Element => {
               ))}
           </div>
 
-          <div
-            className='h-[39px] text-center gap-5 flex items-center absolute md:bottom-10 bottom-5 right-10'
-          >
+          <div className='h-[39px] text-center gap-5 flex items-center absolute md:bottom-10 bottom-5 right-10'>
             <button
               onClick={cancelFilters}
-              data-testid='Apply'
+              data-testid='cancel'
               className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-coral flex items-center cursor-pointer hover:scale-105 hover:bg-primary hover:text-content'
             >
               Cancel
@@ -516,7 +514,6 @@ const Briefs = (): JSX.Element => {
               Apply
             </button>
           </div>
-
         </div>
       </CustomModal>
     );

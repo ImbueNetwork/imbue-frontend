@@ -65,7 +65,7 @@ const Freelancer = (): JSX.Element => {
       </div>
     </div>
   );
-  
+
   const FreelanceExperience2 = (
     <div className={styles.freelanceXpContainer}>
       <div className={styles.contentTextSmallFlex}>
@@ -80,8 +80,9 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-xp-${index}`}
-            className={`${styles.freelanceXpItem} ${freelancingBefore === value ? styles.active : ''
-              }`}
+            className={`${styles.freelanceXpItem} ${
+              freelancingBefore === value ? styles.active : ''
+            }`}
             onClick={() => setFreelancingBefore(value)}
           >
             {label}
@@ -103,8 +104,9 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-goal-${index}`}
-            className={`${styles.freelanceXpItem} ${goal === value ? styles.active : ''
-              }`}
+            className={`${styles.freelanceXpItem} ${
+              goal === value ? styles.active : ''
+            }`}
             onClick={() => setGoal(value)}
           >
             {label}
@@ -180,6 +182,7 @@ const Freelancer = (): JSX.Element => {
           className={`${styles.fieldInput} placeholder:text-imbue-light-purple`}
           placeholder='Enter your education'
           name='education'
+          data-testid='education'
           value={education}
           onChange={(e) => setEducation(e.target.value)}
         />
@@ -265,7 +268,9 @@ const Freelancer = (): JSX.Element => {
 
   const ConfirmPanel = (
     <div className={styles.descriptionPanel}>
-      <p className='mt-8 text-imbue-purple-dark'>Thank you for your submission!</p>
+      <p className='mt-8 text-imbue-purple-dark'>
+        Thank you for your submission!
+      </p>
     </div>
   );
 
@@ -428,7 +433,6 @@ const Freelancer = (): JSX.Element => {
             </div>
           )
         } */}
-
       </div>
       <ErrorScreen {...{ error, setError }}>
         <div className='flex flex-col gap-4 w-1/2'>
