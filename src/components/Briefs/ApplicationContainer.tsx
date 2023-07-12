@@ -78,28 +78,26 @@ export const ApplicationContainer = ({
 
         <div className='text-base text-imbue-purple-dark'>{application?.name}</div>
         <div className='text-base'>
-          <div className='text-imbue-purple-dark'>
+          {/* <div className='text-imbue-purple-dark'>
             <span className=''>Cover Letter - </span>
-            {/* TODO: Implement cover letters */}
             {/* {application.freelancer.bio
                                             .split("\n")
                                             .map((line, index) => (
                                                 <span key={index}>{line}</span>
-                                            ))} */}
+                                            ))} }
             Hello, I would like to help you! I have 4+ years Experience with web
             3, so i’ll make things work properly. Feel free to communicate!
-          </div>
+          </div> */}
         </div>
 
         <div className='flex items-center lg:items-start lg:justify-between'>
           <div className='text-base'>
-            <p className='text-base text-imbue-purple-dark'>Attachment(s)</p>
+            {/* <p className='text-base text-imbue-purple-dark'>Attachment(s)</p> */}
             <div className='flex py-3 gap-2'>
-              {/* TODO: Implement */}
-              <FaPaperclip color='#b2ff0b' />
+              {/* <FaPaperclip color='#b2ff0b' />
               <div className='text-imbue-purple w-4/5 lg:w-full text-xs lg:text-[16px] break-words'>
                 https://www.behance.net/abbioty
-              </div>
+              </div> */}
             </div>
           </div>
           <div>
