@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-condition */
 import { useMediaQuery } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -22,7 +23,7 @@ type ApplicationOwnerProps = {
   freelancer: Freelancer;
   application: Project | any;
   setLoading: (_loading: boolean) => void;
-  updateProject: (_chainProjectId?: number) => Promise<void>;
+  updateProject: (_chainProjectId?: number, _escrow_address?: string) => Promise<void>;
   user: User | any;
 };
 
@@ -67,18 +68,10 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
       if (result.status || result.txError) {
         if (result.status) {
           const projectId = parseInt(result.eventData[2]);
-          while (true) {
-            const projectIsOnChain = await chainService.getProjectOnChain(
-              projectId
-            );
-            if (projectIsOnChain) {
-              await updateProject(projectId);
-              setProjectId(applicationId);
-              setSuccess(true);
-              break;
-            }
-            await new Promise((f) => setTimeout(f, 1000));
-          }
+          const escrow_address = result.eventData[5];
+          setProjectId(applicationId);
+          await updateProject(projectId, escrow_address);
+          setSuccess(true);
         } else if (result.txError) {
           setError({ message: result.errorMessage });
         }
@@ -98,10 +91,12 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           priority
           alt='profileImage'
         />
-        <p className='text-2xl font-bold'>{briefOwner?.display_name}</p>
+        <p className='text-[1.25rem] font-normal capitalize text-imbue-purple'>
+          {briefOwner?.display_name}
+        </p>
       </div>
       {
-        <p className='text-base text-primary break-words text-center ml-3'>
+        <p className='text-[1rem] text-imbue-purple max-w-[55%] text-center break-words'>
           @
           {mobileView && briefOwner?.username?.length > 16
             ? `${briefOwner?.username.substr(0, 16)}...`
@@ -109,7 +104,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         </p>
       }
 
-      <div className='ml-auto lg:ml-0'>
+      <div className='ml-auto lg:ml-0 flex items-center gap-2 mt-3 lg:mt-0'>
         <button
           className='primary-btn in-dark w-button !text-xs lg:!text-base'
           onClick={() =>
@@ -120,7 +115,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         </button>
         {application?.status_id === 4 ? (
           <button
-            className='Accepted-btn text-black in-dark text-xs lg:text-base rounded-full py-[7px] px-3 ml-3 lg:ml-0 lg:px-6 md:py-[14px]'
+            className='Accepted-btn h-[2.7rem] text-black in-dark text-xs lg:text-base rounded-full px-3 ml-3 lg:ml-0 lg:px-6'
             onClick={() => brief?.project_id && setOpenPopup(true)}
           >
             Start Work
@@ -129,7 +124,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           <button
             className={`${
               applicationStatusId[application?.status_id]
-            }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[14px]`}
+            }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[10px]`}
           >
             {applicationStatusId[application?.status_id]}
           </button>
@@ -160,22 +155,16 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
       </ErrorScreen>
 
       <SuccessScreen
-        title={`You have successfully hired ${freelancer?.display_name} as a freelacer for your brief`}
+        title={`The brief funds have been successfully deposited into escrow. You can now begin your work!`}
         open={success}
         setOpen={setSuccess}
       >
         <div className='flex flex-col gap-4 w-1/2'>
           <button
-            onClick={() => router.push(`/projects/${projectId}`)}
+            onClick={() => router.push(`/dashboard`)}
             className='primary-btn in-dark w-button w-full !m-0'
           >
-            See Project
-          </button>
-          <button
-            onClick={() => setSuccess(false)}
-            className='underline text-xs lg:text-base font-bold'
-          >
-            Continue
+            Go To Dashboard
           </button>
         </div>
       </SuccessScreen>

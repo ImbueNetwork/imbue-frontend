@@ -1,90 +1,89 @@
-import styled from '@emotion/styled';
-import { Dialog, DialogContent, DialogTitle, TextField } from '@mui/material';
+/* eslint-disable no-console */
+import {
+  CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@mui/material';
 import { SignerResult } from '@polkadot/api/types';
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { WalletAccount } from '@talismn/connect-wallets';
-import Link from 'next/link';
-import React, { useState } from 'react';
+import Image from 'next/image';
+import React, { useRef, useState } from 'react';
+import customStyled from 'styled-components';
 
 import * as utils from '@/utils';
 
 import AccountChoice from '@/components/AccountChoice';
 
+import { walletIcon } from '@/assets/svgs';
 import { postAPIHeaders } from '@/config';
 import * as config from '@/config';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
+
+import SignUp from './SignUp';
+
 type LoginProps = {
   visible: boolean;
   redirectUrl: string;
   setVisible: (_visible: boolean) => void;
 };
 
-const CssTextField = styled(TextField)({
-  '& label.Mui-focused': {
-    color: '#aaa',
-  },
-
-  '& label.Mui-error': {
-    color: '#aaa',
-  },
-  '& .MuiInputLabel-root': {
-    color: '#aaa',
-  },
-  '& div.Mui-error': {
-    borderRadius: 10,
-    border: 2,
-  },
-  '& div.MuiOutlinedInput-root': {
-    backgroundColor: '#ebeae21c',
-  },
-  '& p.MuiFormHelperText-root': {
-    backgroundColor: '#282725',
-    color: 'white',
-  },
-  '& .MuiInputBase-formControl': {
-    '& input': {
-      color: 'white',
-    },
-  },
-  '& .MuiOutlinedInput-root': {
-    borderRadius: 10,
-    ':hover': {
-      borderColor: '#b2ff0b',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: '#b2ff0b',
-      borderRadius: 10,
-    },
-    '& fieldset:hover': {
-      borderRadius: 10,
-    },
-  },
-});
+const CustomInput = customStyled.input`
+  height: 2.6rem;
+  width: 100%;
+  border-width: 1px;
+  border-color: #03116a;
+  border-radius: 0.25rem !important;
+  padding: 0.62rem 1.25rem !important;
+  outline: none;
+  background-color: #fff;
+  color: #03116A !important;
+  
+  ::placeholder,
+  ::-webkit-input-placeholder {
+    color: rgba(3, 17, 106, 0.30);
+  }
+  :-ms-input-placeholder {
+     color: rgba(3, 17, 106, 0.30);
+  }
+`;
 
 const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   const [userOrEmail, setUserOrEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const [formContent, setFormContent] = useState<string>('login');
+
+  const googleParentRef = useRef<any>();
 
   const imbueLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     setErrorMessage(undefined);
+    setLoading(true);
     event.preventDefault();
 
-    const resp = await fetch(`${config.apiBase}auth/imbue/`, {
-      headers: postAPIHeaders,
-      method: 'post',
-      body: JSON.stringify({
-        userOrEmail,
-        password,
-      }),
-    });
+    try {
+      const resp = await fetch(`${config.apiBase}auth/imbue/`, {
+        headers: postAPIHeaders,
+        method: 'post',
+        body: JSON.stringify({
+          userOrEmail,
+          password,
+        }),
+      });
 
-    if (resp.ok) {
-      utils.redirect(redirectUrl);
-    } else {
-      setErrorMessage('incorrect username or password');
+      if (resp.ok) {
+        utils.redirect(redirectUrl);
+      } else {
+        setErrorMessage('incorrect username or password');
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -130,79 +129,133 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
         open={visible}
         onClose={() => setVisible(false)}
         aria-labelledby='responsive-dialog-title'
+        className='loginModal'
       >
         {
-          <div className='lg:min-w-[450px] py-2'>
-            <DialogTitle className='text-center' id='responsive-dialog-title'>
+          <div className='lg:min-w-[450px] m-auto py-2'>
+            <DialogTitle
+              className='text-center text-imbue-purple-dark text-[1.5rem] lg:text-[2rem] font-normal font-Aeonik'
+              id='responsive-dialog-title'
+            >
               {'You must be signed in to continue'}
             </DialogTitle>
-            <DialogContent>
-              <p className='text-base text-[#ebeae2] mb-7 relative text-center'>
+            <DialogContent className='mx-auto w-4/5'>
+              <p className='text-base lg:text-xl text-imbue-purple-dark mb-7 relative text-center'>
                 Please use the link below to sign in.
               </p>
               <div>
-                <form
-                  id='contribution-submission-form'
-                  name='contribution-submission-form'
-                  method='get'
-                  onSubmit={imbueLogin}
-                >
-                  <div className='login justify-center items-center w-full flex flex-col'>
-                    <div className='flex justify-center pb-[10px] w-[80%]'>
-                      <CssTextField
-                        label='Email/Username'
-                        onChange={(e: any) => setUserOrEmail(e.target.value)}
-                        className='mdc-text-field'
-                        required
-                      />
-                    </div>
-                    <div className='flex justify-center pb-[10px] w-[80%]'>
-                      <CssTextField
-                        label='Password'
-                        onChange={(e: any) => setPassword(e.target.value)}
-                        type='password'
-                        className='mdc-text-field'
-                        required
-                      />
-                    </div>
+                {formContent === 'login' ? (
+                  <form
+                    id='contribution-submission-form'
+                    name='contribution-submission-form'
+                    method='get'
+                    onSubmit={imbueLogin}
+                  >
+                    <div className='login justify-center items-center w-full flex flex-col'>
+                      <div className='flex flex-col justify-center pb-2 w-full'>
+                        <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
+                          Username/Email
+                        </label>
+                        <CustomInput
+                          placeholder='Enter your Username/Email'
+                          onChange={(e: any) => setUserOrEmail(e.target.value)}
+                          className='mdc-text-field'
+                          required
+                        />
+                      </div>
+                      <div className='flex flex-col justify-center pb-[10px] w-full mt-[1.2rem]'>
+                        <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
+                          Password
+                        </label>
+                        <CustomInput
+                          placeholder='Enter your password'
+                          onChange={(e: any) => setPassword(e.target.value)}
+                          type='password'
+                          className='mdc-text-field'
+                          required
+                        />
+                      </div>
 
-                    <div>
-                      <span className={!errorMessage ? 'hide' : 'error'}>
-                        {errorMessage}
+                      <div>
+                        <span className={!errorMessage ? 'hide' : 'error'}>
+                          {errorMessage}
+                        </span>
+                      </div>
+
+                      <span className='text-imbue-purple-dark text-base text-right hover:underline ml-auto cursor-pointer'>
+                        Forgot password?
                       </span>
-                    </div>
-                    <div className='w-[70%] mt-1 mb-5'>
-                      <button
-                        type='submit'
-                        // disabled={!this.state.creds.username && !this.state.creds.password}
-                        className='primary-btn in-dark confirm w-full !text-center'
-                        id='sign-in'
-                      >
-                        Sign In
-                      </button>
-                    </div>
 
-                    <div>
-                      <span>Don&apos;t have an account?</span>
-                      <Link
-                        href='/join'
-                        onClick={() => {
-                          setVisible(false);
-                        }}
-                        className='signup text-primary ml-1'
-                      >
-                        Sign up
-                      </Link>
+                      <div className='flex justify-center my-2 w-full cursor-pointer'>
+                        <button
+                          type='submit'
+                          disabled={loading}
+                          className='primary-btn in-dark w-full !text-center group !mx-0 relative'
+                          id='sign-in'
+                        >
+                          {loading && (
+                            <CircularProgress
+                              className='absolute left-2'
+                              thickness={5}
+                              size={24}
+                              color='info'
+                            />
+                          )}
+                          <span className='font-normal text-white group-hover:text-black'>
+                            {loading ? 'Signing In' : 'Sign In'}
+                          </span>
+                        </button>
+                      </div>
+
+                      <div>
+                        <span className='text-imbue-purple-dark text-base'>
+                          Don&apos;t have an account?
+                        </span>
+                        <span
+                          onClick={() => {
+                            setFormContent('join');
+                          }}
+                          className='signup text-imbue-coral ml-1 hover:underline cursor-pointer'
+                        >
+                          Sign up
+                        </span>
+                      </div>
+
+                      <div className='w-full mt-8 mb-5 flex justify-between items-center'>
+                        <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
+                        <p className='text-base text-imbue-purple-dark'>or</p>
+                        <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
+                      </div>
                     </div>
-                  </div>
-                </form>
+                  </form>
+                ) : (
+                  <SignUp {...{ setFormContent, redirectUrl }} />
+                )}
 
                 <div className='login justify-center items-center w-full flex flex-col'>
-                  <li className='lg:max-w-[65%] mt-1 mb-2'>
+                  <li
+                    ref={googleParentRef}
+                    className='mt-1 mb-2 w-full flex justify-center'
+                  >
                     <GoogleOAuthProvider clientId={config.googleClientId}>
+                      {/* <button
+                        // onClick={() => loginGoogleFunction()}
+                        className='h-[2.6rem] rounded-[1.56rem] border border-imbue-purple-dark w-full justify-center'
+                      >
+                        <div className='flex text-imbue-purple-dark text-base justify-center items-center'>
+                          <Image
+                            src={googleIcon}
+                            alt='Google-icon'
+                            className='relative right-2'
+                          />
+                          Login with Google
+                        </div>
+                      </button> */}
                       <GoogleLogin
-                        theme='filled_black'
-                        shape='rectangular'
+                        width={`${googleParentRef?.current?.clientWidth}`}
+                        logo_alignment='center'
+                        shape='circle'
+                        size='large'
                         useOneTap={true}
                         onSuccess={(creds: any) => googleLogin(creds)}
                         onError={() => {
@@ -216,13 +269,20 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
 
                 <div className='login justify-center items-center w-full flex flex-col'>
                   <li
-                    className='mt-4 flex flex-row items-center cursor-pointer'
+                    className='mt-4 flex flex-row items-center cursor-pointer w-full'
                     tabIndex={0}
                     data-mdc-dialog-action='web3'
                     onClick={() => closeModal()}
                   >
-                    <button className='pill-button primary'>
-                      {'Sign in with a wallet'}
+                    <button className='h-[2.6rem] rounded-[1.56rem] border border-imbue-purple-dark w-full justify-center bg-[#E1DDFF]'>
+                      <div className='flex text-imbue-purple-dark text-base justify-center items-center'>
+                        <Image
+                          src={walletIcon}
+                          alt='Wallet-icon'
+                          className='relative right-2'
+                        />
+                        Sign in with a wallet
+                      </div>
                     </button>
                   </li>
                 </div>

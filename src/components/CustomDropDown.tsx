@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 
-import { arrowDownIcon } from '@/assets/svgs';
+import { chevDownIcon } from '@/assets/svgs';
 
 import BriefFilter from './BriefFilter';
 
@@ -53,11 +53,11 @@ const CustomDropDown = React.memo(
           onClick={handleToggle}
           typeof='button'
           data-testid={name}
-          className='h-[39px] w-full border border-[#EBEAE2] rounded-xl flex justify-between items-center text-white font-normal text-sm p-3 cursor-pointer'
+          className='h-[39px] w-full border border-black rounded-xl flex justify-between items-center text-imbue-purple-dark font-normal text-sm p-3 cursor-pointer'
         >
           {name}
           <Image
-            src={arrowDownIcon}
+            src={chevDownIcon}
             alt={'filter-icon'}
             className='h-[12px] w-[12px]'
           />
@@ -65,7 +65,7 @@ const CustomDropDown = React.memo(
         {isOpen && (
           <div
             data-testid='filterOptions'
-            className='w-full bg-[#1B1B1B] rounded-[10px] rounded-t-none z-50 absolute  transition-all duration-300 ease-in-out shadow-md shadow-slate-800 !overflow-hidden'
+            className='w-full bg-white rounded-[10px] rounded-t-none z-50 absolute  transition-all duration-300 ease-in-out shadow-sm shadow-slate-300 !overflow-hidden'
           >
             <BriefFilter
               label=''

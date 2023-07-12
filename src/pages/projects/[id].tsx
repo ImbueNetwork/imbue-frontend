@@ -1,4 +1,7 @@
+/* eslint-disable no-constant-condition */
+/* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
+import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -9,6 +12,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import * as utils from '@/utils';
+import { getBalance } from '@/utils/helper';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import AccountChoice from '@/components/AccountChoice';
@@ -19,15 +23,14 @@ import FullScreenLoader from '@/components/FullScreenLoader';
 import Login from '@/components/Login';
 import SuccessScreen from '@/components/SuccessScreen';
 
+import { calenderIcon, shieldIcon, tagIcon } from '@/assets/svgs';
 import {
-  Freelancer,
   Milestone,
   OnchainProjectState,
   Project,
   ProjectOnChain,
-  User,
 } from '@/model';
-import { getProjectById } from '@/redux/services/briefService';
+import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { RootState } from '@/redux/store/store';
@@ -57,10 +60,10 @@ const openForVotingTag = (): JSX.Element => {
 const projectStateTag = (dateCreated: Date, text: string): JSX.Element => {
   return (
     <div className='flex flex-row items-center'>
-      <p className='text-[14px] font-normal leading-[16px] text-white'>
+      <p className='text-sm font-normal leading-[16px] text-white'>
         {moment(dateCreated)?.format('DD MMM YYYY')}
       </p>
-      <p className='text-xl font-normal leading-[23px] text-[#411DC9] mr-[27px] ml-[14px]'>
+      <p className='text-sm lg:text-xl font-normal leading-[23px] text-[#411DC9] mr-[27px] ml-[14px]'>
         {text}
       </p>
     </div>
@@ -70,11 +73,12 @@ const projectStateTag = (dateCreated: Date, text: string): JSX.Element => {
 function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
-  const [freelancer, setFreelancer] = useState<Freelancer | any>({});
+  const [targetUser, setTargetUser] = useState<any>({});
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
   // const [user, setUser] = useState<User | any>();
-  const { user } = useSelector((state: RootState) => state.userState);
-  const [chatTargetUser, setChatTargetUser] = useState<User | null>(null);
+  const { user, loading: userLoading } = useSelector(
+    (state: RootState) => state.userState
+  );
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
   const [submittingMilestone, setSubmittingMilestone] =
@@ -86,7 +90,7 @@ function Project() {
   >({});
   const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const projectId: any = router?.query?.id || 0;
   const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
@@ -95,27 +99,27 @@ function Project() {
   const [success, setSuccess] = useState<boolean>(false);
   const [successTitle, setSuccessTitle] = useState<string>('');
   const [error, setError] = useState<any>();
+  const [balance, setBalance] = useState<any>(0);
+  const [approversPreview, setApproverPreview] = useState<any>([]);
 
   // fetching the project data from api and from chain
   useEffect(() => {
-    if (projectId) {
+    if (projectId && !userLoading) {
       getProject();
     }
-  }, [projectId]);
+  }, [projectId, userLoading]);
 
   const getChainProject = async () => {
-    setLoading(true);
     const imbueApi = await initImbueAPIInfo();
-    // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
     const onChainProjectRes = await chainService.getProject(projectId);
 
     if (onChainProjectRes) {
       const isApplicant = onChainProjectRes.initiator == user.web3_address;
 
-      if (isApplicant) {
-        await getFreelancerData(user?.username);
-      }
+      // if (isApplicant) {
+      //   await getFreelancerData(user?.username);
+      // }
 
       setIsApplicant(isApplicant);
       if (onChainProjectRes.projectState == OnchainProjectState.OpenForVoting) {
@@ -128,21 +132,74 @@ function Project() {
 
       setOnChainProject(onChainProjectRes);
     }
-    setLoading(false);
   };
 
   const getProject = async () => {
-    const projectRes = await getProjectById(projectId);
-    setProject(projectRes);
-    // api  project response
-    // const userResponse = await utils.getCurrentUser();
-    // await setUser(userResponse);
-    await getChainProject();
+    try {
+      const projectRes = await getProjectById(projectId);
+
+      // showing owner profile if the current user if the applicant freelancer
+      const brief = await getBrief(projectRes.brief_id);
+      const owner = brief?.user_id
+        ? await utils.fetchUser(brief?.user_id)
+        : null;
+
+      if (projectRes?.user_id == user?.id) {
+        setTargetUser(owner);
+      } else {
+        await getFreelancerData(projectRes?.user_id);
+      }
+      setProject(projectRes);
+
+      // setting approver list
+      const approversPreviewList = [...approversPreview];
+
+      if (projectRes?.approvers?.length && approversPreviewList.length === 0) {
+        projectRes?.approvers.map(async (v: any) => {
+          const user = await utils.fetchUserByUsernameOrAddress(v);
+          if (user?.length) {
+            approversPreviewList.push(...user);
+          } else {
+            approversPreviewList.push({
+              // id: 6,
+              display_name: '',
+              profile_photo: null,
+              username: '',
+              web3_address: v,
+            });
+          }
+        });
+      } else {
+        approversPreviewList.push({
+          // id: 6,
+          display_name: owner?.display_name,
+          profile_photo: owner?.profile_photo,
+          username: owner?.username,
+          web3_address: owner?.web3_address,
+        });
+      }
+      setApproverPreview(approversPreviewList);
+
+      // api  project response
+      await getChainProject();
+
+      const balance = await getBalance(
+        projectRes?.escrow_address,
+        projectRes?.currency_id || 0,
+        user
+      );
+
+      setBalance(balance || 0);
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getFreelancerData = async (freelancerName: string) => {
     const freelanceRes = await getFreelancerProfile(freelancerName);
-    setFreelancer(freelanceRes);
+    setTargetUser(freelanceRes);
   };
 
   // voting on a mile stone
@@ -208,7 +265,6 @@ function Project() {
           setSuccess(true);
           setSuccessTitle('Withdraw successfull');
         } else if (result.txError) {
-          // TODO: show error screen
           setError({ message: result.errorMessage });
           console.log(result.errorMessage);
         }
@@ -217,6 +273,10 @@ function Project() {
       await new Promise((f) => setTimeout(f, 1000));
     }
     setLoading(false);
+  };
+
+  const handleRefund = async () => {
+    // TODO: create vote of no confidence for refund
   };
 
   const renderPolkadotJSModal = (
@@ -282,15 +342,6 @@ function Project() {
     ? timeAgo.format(new Date(project?.created))
     : 0;
 
-  const handleMessageBoxClick = async (user_id: number) => {
-    if (user_id) {
-      setShowMessageBox(true);
-      setChatTargetUser(await utils.fetchUser(user_id));
-    } else {
-      setLoginModal(true);
-    }
-  };
-
   const ExpandableDropDowns = ({
     milestone,
     index,
@@ -302,24 +353,13 @@ function Project() {
     const [expanded, setExpanded] = useState(false);
 
     return (
-      <div
-        className='
-      transparent-conatainer 
-      relative 
-      !bg-[#2c2c2c] 
-      !py-[20px] 
-      !border 
-      !border-white 
-      rounded-[20px]
-      max-lg:!px-[20px]
-      max-width-750px:!pb-[30px]
-      '
-      >
+      <div className='mt-8 relative bg-white px-5 border border-white rounded-2xl lg:px-12 max-width-750px:!pb-[30px]'>
         <div
           onClick={() => {
             setExpanded(!expanded);
           }}
           className='
+          py-6
           flex 
           justify-between 
           w-full 
@@ -328,10 +368,10 @@ function Project() {
           max-width-750px:flex'
         >
           <div className='flex flex-row max-width-750px:w-full'>
-            <h3 className='text-[39px] max-width-750px:text-[24px] font-normal leading-[60px]'>
+            <h3 className='text-[2rem] text-imbue-purple max-width-750px:text-[24px] font-normal leading-[60px]'>
               Milestone {index + 1}
             </h3>
-            <h3 className='text-[24px] ml-[32px] font-normal leading-[60px]'>
+            <h3 className='text-[1.5rem] text-imbue-purple ml-[32px] font-normal leading-[60px]'>
               {milestone?.name}
             </h3>
           </div>
@@ -353,37 +393,27 @@ function Project() {
           </div>
         </div>
 
-        <div className={`${!expanded && 'hidden'} my-6`}>
-          <p className='text-[14px] font-normal text-white'>
+        <div className={`${!expanded && 'hidden'} mb-6`}>
+          <p className='text-[14px] font-normal text-imbue-purple'>
             Percentage of funds to be released{' '}
-            <span className='text-[#BAFF36]'>
+            <span className=' text-imbue-lemon'>
               {milestone?.percentage_to_unlock}%
             </span>
           </p>
-          <p className='text-[14px] font-normal text-white'>
+          <p className='text-[14px] font-normal text-imbue-purple'>
             Funding to be released{' '}
-            <span className='text-[#BAFF36]'>
+            <span className='text-imbue-lemon'>
               {Number(milestone?.amount)?.toLocaleString?.()} $IMBU
             </span>
           </p>
 
-          <p className=' text-base font-normal text-[#a6a6a6] leading-[178.15%] mt-[23px] w-[80%]'>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
-            purus sit amet luctus venenatis, lectus magna fringilla urna,
-            porttitor rhoncus dolor purus non enim praesent elementum facilisis
-            leo, vel fringilla est ullamcorper eget nulla facilisi etiam
-            dignissim diam quis enim lobortis scelerisque fermentum dui faucibus
-            in ornare quam viverra orci sagittis eu volutpat odio facilisis
-            mauris sit amet massa vitae tortor condimentum lacinia quis vel eros
-            donec ac odio tempor orci dapibus ultrices in iaculis nunc sed augue
-            lacus, viverra vitae congue eu, consequat ac felis donec et odio
-            pellentesque diam volutpat commodo sed egestas egestas fringilla
-            phasellus faucibus
+          <p className=' text-base font-normal text-[#3B27C180] leading-[178.15%] mt-[23px] w-[80%]'>
+            {milestone?.description}
           </p>
 
           {!isApplicant && milestone.milestone_key == milestoneBeingVotedOn && (
             <button
-              className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
+              className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8'
               data-testid='next-button'
               onClick={() => vote()}
             >
@@ -426,17 +456,14 @@ function Project() {
             showMessageBox,
             setShowMessageBox,
             browsingUser: user,
-            targetUser: chatTargetUser,
+            targetUser,
           }}
         />
       )}
       <div
         className='flex 
       flex-row
-       bg-[#2c2c2c] 
-       border 
-       border-opacity-25 
-       -border--theme-light-white 
+       bg-white 
        rounded-[20px] 
        p-12
        max-lg:p-5
@@ -445,51 +472,58 @@ function Project() {
       >
         <div className='flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] max-lg:basis-[60%] mr-[5%]  max-lg:mr-0'>
           <div className='brief-title'>
-            <h3 className='text-[32px] max-lg:text-[24px] leading-[1.5] font-normal m-0 p-0'>
+            <h3 className='text-[2rem] max-lg:text-[24px] leading-[1.5] font-normal m-0 p-0 text-imbue-purple'>
               {project?.name}
             </h3>
-            <span
-              onClick={() => {
-                // project?.brief_id
-              }}
-              className='text-[#b2ff0b] cursor-pointer text-[20px]  max-lg: text-base  font-normal !m-0 !p-0 relative top-4'
-            >
-              View full brief
-            </span>
+            {project?.brief_id && (
+              <span
+                onClick={() => {
+                  // TODO:
+                }}
+                className=' text-imbue-lemon cursor-pointer text-[1.25rem]  max-lg:text-base  font-normal !m-0 !p-0 relative top-4'
+              >
+                {`View full brief`}
+              </span>
+            )}
           </div>
-          <div className='text-inactive w-[80%]'>
-            <p className=' text-base font-normal leading-[178.15%]'>
+          <div className='text-inactive lg:w-[80%]'>
+            <p className='text-[1rem] text-[#3B27C180] font-normal leading-[178.15%]'>
               {project?.description}
             </p>
           </div>
-          <p className='text-inactive  text-base font-normal leading-[1.5] m-0 p-0'>
+          <p className='text-[1rem] text-[#3B27C180] font-normalleading-[1.5] m-0 p-0'>
             Posted {timePosted}
           </p>
 
-          <p className='text-white text-xl font-normal leading-[1.5] mt-[16px] p-0'>
-            Freelancer hired
+          <p className='text-imbue-purple text-[1.25rem] font-normal leading-[1.5] mt-[16px] p-0'>
+            {isApplicant || project?.approvers?.length
+              ? 'Project Owner'
+              : 'Freelancer hired'}
           </p>
 
-          <div className='flex flex-row items-center max-lg:flex-wrap mt-5'>
+          <div className='flex flex-row items-center max-lg:flex-wrap'>
             <Image
-              src={require('@/assets/images/profile-image.png')}
+              src={
+                targetUser?.profile_image ||
+                targetUser?.profile_photo ||
+                require('@/assets/images/profile-image.png')
+              }
               alt='freelaner-icon'
               height={50}
               width={50}
-              className='border border-solid border-white rounded-[25px]'
+              className='rounded-full'
             />
 
-            <p className='text-white text-[20px] font-normal leading-[1.5] p-0 mx-7'>
-              {freelancer?.display_name}
+            <p className='text-imbue-purple text-[1.25rem] font-normal leading-[1.5] p-0 mx-7'>
+              {targetUser?.display_name}
             </p>
 
             <button
-              onClick={() => handleMessageBoxClick(project?.user_id)}
+              onClick={() => setShowMessageBox(true)}
               className='primary-btn 
               in-dark w-button 
               !mt-0 
               font-normal 
-              h-11
               max-lg:!w-full 
               max-lg:!text-center 
               max-lg:!ml-0 
@@ -499,89 +533,165 @@ function Project() {
               !py-0 ml-[40px] 
               px-8
               max-lg:!mr-0
+              h-[2.6rem]
               '
               data-testid='next-button'
             >
               Message
             </button>
+
+            {isApplicant && (
+              <button
+                className='border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors'
+                onClick={() => handleRefund()}
+              >
+                Refund
+              </button>
+            )}
           </div>
+
+          {project?.approvers && (
+            <>
+              <p className='text-imbue-purple-dark text-[1.25rem] font-normal leading-[1.5] mt-[16px] p-0'>
+                Approvers
+              </p>
+              {approversPreview?.length > 0 && (
+                <div className='flex flex-row flex-wrap gap-4'>
+                  {approversPreview?.map((approver: any, index: number) => (
+                    <div
+                      key={index}
+                      className='flex text-content gap-3 items-center border border-content-primary p-3 rounded-full'
+                    >
+                      <Image
+                        height={40}
+                        width={40}
+                        src={
+                          approver?.profile_photo ??
+                          'http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png'
+                        }
+                        alt=''
+                        className='rounded-full'
+                      />
+                      <div className='flex flex-col'>
+                        <span className='text-base'>
+                          {approver?.display_name}
+                        </span>
+                        <p className='text-xs break-all text-imbue-purple-dark text-opacity-40'>
+                          {approver?.web3_address}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
-        <div className='flex flex-col gap-[50px] flex-grow flex-shrink-0 basis-[20%]  max-lg:mt-10'>
+        <div className='flex flex-col gap-[30px] max-lg:mt-10 lg:w-56'>
           <div className='flex flex-col'>
-            <div className='flex flex-row'>
+            <div className='flex flex-row items-start gap-3'>
               <Image
-                src={require('@/assets/svgs/shield.svg')}
+                src={shieldIcon}
                 height={24}
                 width={24}
                 alt={'shieldIcon'}
+                className='mt-1'
               />
 
-              <h3 className='text-xl leading-[1.5] ml-6  font-normal m-0 p-0'>
-                Milestone{' '}
-                <span className='text-[#BAFF36]'>
-                  {approvedMilestones?.length}/{project?.milestones?.length}
-                </span>
-              </h3>
-            </div>
-            {/* mile stone step indicator */}
-            <div className='w-48 bg-[#1C2608] mt-5 h-1 relative my-auto'>
-              <div
-                style={{
-                  width: `${
-                    (onChainProject?.milestones?.filter?.(
-                      (m: any) => m?.is_approved
-                    )?.length /
-                      onChainProject?.milestones?.length) *
-                    100
-                  }%`,
-                }}
-                className='h-full rounded-xl Accepted-button absolute'
-              ></div>
-              <div className='flex justify-evenly'>
-                {onChainProject?.milestones?.map((m: any, i: number) => (
+              <div className='w-full'>
+                <h3 className='text-lg lg:text-[1.25rem] leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0 flex'>
+                  Milestone{' '}
+                  <span className='text-imbue-purple-dark  ml-2'>
+                    {approvedMilestones?.length}/{project?.milestones?.length}
+                  </span>
+                </h3>
+                {/* mile stone step indicator */}
+                <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
                   <div
-                    key={i}
-                    className={`h-4 w-4 ${
-                      m.is_approved ? 'Accepted-button' : 'bg-[#1C2608]'
-                    } rounded-full -mt-1.5`}
+                    style={{
+                      width: `${
+                        (onChainProject?.milestones?.filter?.(
+                          (m: any) => m?.is_approved
+                        )?.length /
+                          onChainProject?.milestones?.length) *
+                        100
+                      }%`,
+                    }}
+                    className='h-full rounded-xl Accepted-button absolute'
                   ></div>
-                ))}
+                  <div className='flex justify-evenly'>
+                    {onChainProject?.milestones?.map((m: any, i: number) => (
+                      <div
+                        key={i}
+                        className={`h-4 w-4 ${
+                          m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
+                        } rounded-full -mt-1.5`}
+                      ></div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           <div className='flex flex-col'>
-            <div className='flex flex-row'>
+            <div className='flex flex-row items-start gap-3'>
               <Image
-                src={require('@/assets/svgs/dollar_sign.svg')}
+                src={tagIcon}
                 height={24}
                 width={24}
                 alt={'dollarSign'}
+                className='mt-1'
               />
-              <h3 className='text-xl leading-[1.5] ml-6 font-normal m-0 p-0'>
-                {Number(project?.total_cost_without_fee)?.toLocaleString()}{' '}
-                $IMBU
-              </h3>
+              <div className='flex flex-col'>
+                <h3 className='text-xl leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0'>
+                  {Number(project?.total_cost_without_fee)?.toLocaleString()}{' '}
+                  $IMBU
+                </h3>
+                <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
+                  Budget - Fixed
+                </div>
+              </div>
             </div>
-
-            <div className='text-inactive ml-[20%] mt-2'>Budget - Fixed</div>
           </div>
 
+          {project?.escrow_address && (
+            <div className='flex flex-col'>
+              <div className='flex flex-row items-start gap-3'>
+                <AccountBalanceWalletOutlinedIcon className='mt-1 text-imbue-purple-dark' />
+                <div className='flex flex-col'>
+                  <h3 className='text-lg lg:text-[1.25rem] text-imbue-purple-dark leading-[1.5] font-normal m-0 p-0'>
+                    Wallet Address
+                  </h3>
+                  <div className='text-[1rem] text-imbue-light-purple-two mt-2 text-xs break-all'>
+                    {project?.escrow_address}
+                  </div>
+                  <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
+                    balance : {balance}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className='flex flex-col'>
-            <div className='flex flex-row '>
+            <div className='flex flex-row items-start gap-3'>
               <Image
-                src={require('@/assets/svgs/calendar_icon.svg')}
+                src={calenderIcon}
                 height={24}
                 width={24}
                 alt={'calenderIcon'}
+                className='mt-1'
               />
-
-              <h3 className='text-xl leading-[1.5] ml-6 font-normal m-0 p-0'>
-                1 to 3 months
-              </h3>
+              <div className='flex flex-col'>
+                <h3 className='text-lg lg:text-[1.25rem] text-imbue-purple-dark  font-normal'>
+                  1 to 3 months
+                </h3>
+                <div className='text-[1rem] text-imbue-light-purple-two'>
+                  Timeline
+                </div>
+              </div>
             </div>
-
-            <div className='text-inactive  ml-[20%] mt-2'>Timeline</div>
           </div>
         </div>
       </div>
@@ -671,3 +781,12 @@ function Project() {
 }
 
 export default Project;
+
+// const users = [
+//   { display_name: 'Sam', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pHK" },
+//   { display_name: 'Aala', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5HQXiQVj8C3Tfp6k4WEvZNNQqWe5k51nWoBrKZWuYTEkuzUk" },
+//   { display_name: 'Felix', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH3" },
+//   { display_name: '', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH4" },
+//   { display_name: 'Oliver', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH5" },
+//   { display_name: 'Michael', profile_photo: "http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png", web3_address: "5Ey5TNpdCa61XrXpgNRUAHor4Xvt25cHwmPM1BYUG1su2pH6" },
+// ];

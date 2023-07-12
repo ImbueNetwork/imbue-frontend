@@ -183,10 +183,13 @@ export const getFreelancerBrief = async (userId: number, briefId: number) => {
 };
 
 export const getProjectById = async (projectId: string | number) => {
-  const resp = await fetch(`${config.apiBase}project/${projectId}`, {
-    headers: postAPIHeaders,
-    method: 'get',
-  });
+  const resp = await fetch(
+    `${config.apiBase}project/${projectId}`,
+    {
+      headers: getAPIHeaders,
+      method: 'get',
+    }
+  );
 
   if (resp.ok) {
     return await resp.json();

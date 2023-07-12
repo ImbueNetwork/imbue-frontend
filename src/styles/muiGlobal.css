@@ -1,12 +1,12 @@
 /* navbar */
 .menuItems
   .MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.MuiMenuItem-root.MuiMenuItem-gutters:hover {
-  background: rgba(128, 128, 128, 0.3);
+  background: var(--theme-purple-light);
 }
 
 .navBar
   .MuiPaper-root.MuiMenu-paper.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation8.MuiPopover-paper {
-  background: var(--theme-black-text);
+  background: var(--theme-background);
   left: auto !important;
   right: 20px;
   border-radius: 15px;
@@ -24,21 +24,20 @@
 
 /* common.css */
 .MuiBottomNavigation-root {
-  background: var(--theme-grey-dark);
+  background: var(--theme-background);
   border-radius: 10px;
-  border: 1px solid var(--theme-light-white);
-  margin-bottom: 36px;
+  border: 1px solid var(--theme-purple-light);
+  margin-bottom: 32px;
   overflow: hidden;
 }
 
 .MuiButtonBase-root.MuiBottomNavigationAction-root.Mui-selected {
   background-color: var(--theme-primary);
-  color: black;
 }
 
 .MuiButtonBase-root.MuiBottomNavigationAction-root {
   max-width: 33.34%;
-  color: white;
+  color: var(--theme-purple-dark);
 }
 
 .MuiBottomNavigationAction-label,
@@ -50,6 +49,15 @@
 
 .MuiFormControl-root {
   margin-bottom: 24px;
+  margin-left: 0;
+}
+
+.approvers .MuiFormControl-root {
+  margin-bottom: 0;
+}
+
+.MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation1.MuiAutocomplete-paper {
+  background-color: var(--theme-background);
 }
 
 #demo-simple-select-helper-label,
@@ -69,7 +77,7 @@
 }
 
 .MuiOutlinedInput-notchedOutline {
-  border-color: var(--theme-light-white);
+  border-color: var(--theme-purple);
 }
 
 .applicationList .MuiFormControl-root {
@@ -78,27 +86,43 @@
 }
 
 .MuiPaper-root.MuiMenu-paper.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation8.MuiPopover-paper {
-  background: var(--theme-grey-dark);
-  color: white;
+  background: var(--theme-background);
+  color: var(--theme-purple);
 }
 
 .MuiFormLabel-root,
 .MuiInputBase-input,
 .MuiSvgIcon-root.MuiSvgIcon-fontSizeMedium.MuiSelect-icon.MuiSelect-iconStandard,
 .MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiInput-input {
-  color: white;
+  color: var(--theme-purple);
 }
 
 .profile-container
   .MuiInputAdornment-root.MuiInputAdornment-positionEnd.MuiInputAdornment-outlined.MuiInputAdornment-sizeMedium {
-  color: white;
+  color: var(--theme-purple);
   cursor: pointer;
 }
 
+.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected {
+  background: var(--theme-purple-light);
+}
+
 .MuiDialog-paper {
-  background-color: var(--theme-grey-dark);
+  background-color: var(--theme-background);
   color: white;
   margin: 7px auto;
+}
+
+.errorDialogue .MuiDialog-paper {
+  margin: 7px auto;
+}
+
+.loginModal .MuiDialog-paper {
+  /* margin: auto 6rem; */
+  border-radius: 20px;
+  max-height: fit-content;
+  max-width: fit-content;
+  padding: 2rem 4rem;
 }
 
 .freelancer .MuiSkeleton-root {
@@ -109,13 +133,27 @@
   cursor: pointer;
 }
 
-/* error screen */
-
 .errorDialogue .MuiDialog-paper {
   min-height: 300px;
   width: 100%;
   border-radius: 20px;
-  background-color: #1e1e1e;
+  background-color: var(--theme-background);
+}
+
+/* grants popup */
+
+.errorDialogue
+  .MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation24.MuiDialog-paper.MuiDialog-paperScrollPaper.MuiDialog-paperWidthSm {
+  max-width: 60%;
+}
+
+.amountInput .MuiInputBase-input {
+  text-align: right;
+  height: 0.625rem;
+}
+
+.amountInput > div {
+  border-radius: 5px;
 }
 
 @media screen and (max-width: 470px) {
@@ -139,5 +177,10 @@
   .navBar
     .MuiPaper-root.MuiMenu-paper.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation8.MuiPopover-paper {
     right: 10px;
+  }
+
+  .errorDialogue
+    .MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation24.MuiDialog-paper.MuiDialog-paperScrollPaper.MuiDialog-paperWidthSm {
+    max-width: 100%;
   }
 }

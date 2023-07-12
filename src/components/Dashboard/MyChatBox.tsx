@@ -102,11 +102,11 @@ function DashboardChatBox({
                   />
                 </div>
               </div>
-              <div className='text-white flex flex-col'>
-                <span className='text-[14px] lg:text-[16px] font-bold'>
+              <div className='flex flex-col'>
+                <span className='text-[14px] lg:text-[16px] font-bold text-imbue-purple-dark'>
                   {getUserName(index)}
                 </span>
-                <span className='str-chat__channel-preview-messenger--last-message'>
+                <span className='str-chat__channel-preview-messenger--last-message text-imbue-purple'>
                   {getLastMessage(index)}
                 </span>
               </div>
@@ -125,8 +125,8 @@ function DashboardChatBox({
   }
 
   return (
-    <div className='custom-chat-container w-full rounded-2xl h-[75vh] bg---theme-grey-dark border border-white border-opacity-25 overflow-hidden'>
-      <Chat client={client} theme='str-chat__theme-dark'>
+    <div className='custom-chat-container w-full rounded-2xl h-[75vh] bg---theme-grey-dark border border-white border-opacity-25 overflow-hidden -mt-4'>
+      <Chat client={client} theme='str-chat__theme-light'>
         {mobileView ? (
           <>
             {!router.query.chat ? (
