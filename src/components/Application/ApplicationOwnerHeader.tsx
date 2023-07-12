@@ -23,7 +23,7 @@ type ApplicationOwnerProps = {
   freelancer: Freelancer;
   application: Project | any;
   setLoading: (_loading: boolean) => void;
-  updateProject: (_chainProjectId?: number) => Promise<void>;
+  updateProject: (_chainProjectId?: number, _escrow_address?: string) => Promise<void>;
   user: User | any;
 };
 
@@ -68,18 +68,10 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
       if (result.status || result.txError) {
         if (result.status) {
           const projectId = parseInt(result.eventData[2]);
-          while (true) {
-            const projectIsOnChain = await chainService.getProjectOnChain(
-              projectId
-            );
-            if (projectIsOnChain) {
-              await updateProject(projectId);
-              setProjectId(applicationId);
-              setSuccess(true);
-              break;
-            }
-            await new Promise((f) => setTimeout(f, 1000));
-          }
+          const escrow_address = result.eventData[5];
+          setProjectId(applicationId);
+          await updateProject(projectId, escrow_address);
+          setSuccess(true);
         } else if (result.txError) {
           setError({ message: result.errorMessage });
         }
@@ -163,22 +155,16 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
       </ErrorScreen>
 
       <SuccessScreen
-        title={`You have successfully hired ${freelancer?.display_name} as a freelacer for your brief`}
+        title={`The brief funds have been successfully deposited into escrow. You can now begin your work!`}
         open={success}
         setOpen={setSuccess}
       >
         <div className='flex flex-col gap-4 w-1/2'>
           <button
-            onClick={() => router.push(`/projects/${projectId}`)}
+            onClick={() => router.push(`/dashboard`)}
             className='primary-btn in-dark w-button w-full !m-0'
           >
-            See Project
-          </button>
-          <button
-            onClick={() => setSuccess(false)}
-            className='underline text-xs lg:text-base font-bold'
-          >
-            Continue
+            Go To Dashboard
           </button>
         </div>
       </SuccessScreen>

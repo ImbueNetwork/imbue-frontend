@@ -278,23 +278,18 @@ export const HirePopup = ({
       </ErrorScreen>
 
       <SuccessScreen
-        title={`You have successfully hired ${freelancer?.display_name} as a freelacer for your brief`}
+        title={`You have successfully hired ${freelancer?.display_name}!`}
         open={success}
         setOpen={setSuccess}
       >
         <div className='flex flex-col gap-4 w-1/2'>
           <button
-            onClick={() => router.push(`/projects/${projectId}`)}
+            onClick={() => router.push(`/dashboard`)}
             className='primary-btn in-dark w-button w-full !m-0'
-          >
-            See Project
-          </button>
-          <button
-            onClick={() => setSuccess(false)}
-            className='underline text-xs lg:text-base font-bold'
           >
             Continue
           </button>
+
         </div>
       </SuccessScreen>
     </>

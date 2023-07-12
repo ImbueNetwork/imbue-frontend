@@ -57,6 +57,7 @@ export default nextConnect()
       total_cost_without_fee,
       imbue_fee,
       user_id,
+      escrow_address,
     } = body;
     db.transaction(async (tx) => {
       try {
@@ -83,6 +84,7 @@ export default nextConnect()
           owner,
           total_cost_without_fee,
           imbue_fee,
+          escrow_address
           // project_type: exists.project_type,
         })(tx);
 
