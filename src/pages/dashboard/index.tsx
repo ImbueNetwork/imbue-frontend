@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
@@ -92,7 +93,7 @@ const Dashboard = (): JSX.Element => {
   }, [user]);
 
   useEffect(() => {
-    if (client && user.username && !loadingStreamChat) {
+    if (client && user?.username && !loadingStreamChat) {
       client?.connectUser(
         {
           id: user.username,
@@ -107,12 +108,12 @@ const Dashboard = (): JSX.Element => {
         }
       });
     }
-  }, [client, user?.getstream_token, user?.username]);
+  }, [client, user?.getstream_token, user?.username, loadingStreamChat]);
 
   if (loadingStreamChat || loadingUser) return <FullScreenLoader />;
 
   return client ? (
-    <div className='hq-layout px-[15px]'>
+    <div className='px-[15px]'>
       <StyledEngineProvider injectFirst>
         <BottomNavigation
           showLabels

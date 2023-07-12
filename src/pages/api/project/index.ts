@@ -27,6 +27,7 @@ export default nextConnect().post(
       brief_id,
       total_cost_without_fee,
       imbue_fee,
+      // project_type,
     } = req.body;
 
     db.transaction(async (tx) => {
@@ -55,6 +56,7 @@ export default nextConnect().post(
           brief_id,
           total_cost_without_fee,
           imbue_fee,
+          // project_type: project_type ?? models.ProjectType.Brief
         })(tx);
 
         if (!project?.id) {

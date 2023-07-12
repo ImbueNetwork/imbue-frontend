@@ -1,8 +1,9 @@
+/* eslint-disable no-console */
 import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
 import * as models from '@/lib/models';
-import { fetchFreelancerDetailsByUsername, fetchItems } from '@/lib/models';
+import { fetchFreelancerClients, fetchFreelancerDetailsByUsername, fetchFreelancerMetadata } from '@/lib/models';
 
 import db from '@/db';
 
@@ -14,30 +15,64 @@ export default nextConnect()
 
     db.transaction(async (tx) => {
       try {
-        const freelancer = await fetchFreelancerDetailsByUsername(username)(tx);
+        let freelancer;
+        freelancer = await fetchFreelancerDetailsByUsername(username)(tx);
+
+        if (!freelancer)
+          freelancer = await models.fetchFreelancerDetailsByUserID(
+            Number(username)
+          )(tx);
 
         if (!freelancer) {
           return res.status(404).end();
         }
 
+
         await Promise.all([
-          (freelancer.skills = await fetchItems(
-            freelancer.skill_ids,
-            'skills'
+          (freelancer.skills = await fetchFreelancerMetadata(
+            'skill',
+            freelancer.id
           )(tx)),
-          (freelancer.client_images = await fetchItems(
-            freelancer.client_ids,
-            'clients'
+          (freelancer.languages = await fetchFreelancerMetadata(
+            'language',
+            freelancer.id
           )(tx)),
-          (freelancer.languages = await fetchItems(
-            freelancer.language_ids,
-            'languages'
+          (freelancer.services = await fetchFreelancerMetadata(
+            'service',
+            freelancer.id
           )(tx)),
-          (freelancer.services = await fetchItems(
-            freelancer.service_ids,
-            'services'
+          (freelancer.clients = await fetchFreelancerClients(
+            freelancer.id
           )(tx)),
         ]);
+        
+        
+
+        // await Promise.all([
+        //        freelancer.skills = await fetchFreelancerMetadata("skill",freelancer.id)(tx);
+        //        freelancer.services = await fetchFreelancerMetadata("service",freelancer.id)(tx);
+        //        freelancer.languages = await fetchFreelancerMetadata("language",freelancer.id)(tx);
+        //        freelancer.clients = await fetchFreelancerClients(freelancer.id)(tx);
+        // ]);
+
+        // await Promise.all([
+        //   (freelancer.skills = await fetchItems(
+        //     freelancer.skill_ids,
+        //     'skills'
+        //   )(tx)),
+        //   (freelancer.client_images = await fetchItems(
+        //     freelancer.client_ids,
+        //     'clients'
+        //   )(tx)),
+        //   (freelancer.languages = await fetchItems(
+        //     freelancer.language_ids,
+        //     'languages'
+        //   )(tx)),
+        //   (freelancer.services = await fetchItems(
+        //     freelancer.service_ids,
+        //     'services'
+        //   )(tx)),
+        // ]);
         const freelancer_profile = await tx
           .select('*')
           .from('freelancer_profile_image')
@@ -84,18 +119,18 @@ export default nextConnect()
           'skills'
         )(tx);
         const language_ids = await models.upsertItems(
-          freelancer.languages,
+          freelancer.languages.map((x:any)=>x.name),
           'languages'
         )(tx);
         const services_ids = await models.upsertItems(
-          freelancer.services,
+          freelancer.services.map((x:any)=>x.name),
           'services'
         )(tx);
         let client_ids: number[] = [];
 
         if (freelancer.clients) {
           client_ids = await models.upsertItems(
-            freelancer.clients,
+            freelancer.clients.map((x:any)=>x.name),
             'clients'
           )(tx);
         }

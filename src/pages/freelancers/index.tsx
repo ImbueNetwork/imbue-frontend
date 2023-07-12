@@ -1,5 +1,7 @@
+/* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
 import VerifiedIcon from '@mui/icons-material/Verified';
+import { Grid } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import Pagination from 'rc-pagination';
@@ -8,7 +10,12 @@ import React, { useEffect, useState } from 'react';
 import CustomDropDown from '@/components/CustomDropDown';
 import CustomModal from '@/components/CustomModal';
 
-import { filterIcon } from '@/assets/svgs';
+import {
+  chevLeftIcon,
+  chevRightIcon,
+  filterSvg,
+  searchSvg,
+} from '@/assets/svgs';
 import styles from '@/styles/modules/freelancers.module.css';
 
 import { strToIntRange } from '../briefs';
@@ -41,7 +48,7 @@ const Freelancers = (): JSX.Element => {
   const [languages, setLanguages] = useState<Item[]>();
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const [itemsPerPage, setNumItemsPerPage] = useState<number>(5);
+  const itemsPerPage = 12;
 
   const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
 
@@ -161,9 +168,6 @@ const Freelancers = (): JSX.Element => {
     freelancerInfoFilter,
   ];
 
-  const pageinationIconClassName =
-    'h-[32px] hover:bg-[--theme-primary] hover:text-black mr-6 cursor-pointer rounded-[4px] border border-primary w-[32px] pt-1 items-center text-center text-sm !font-bold text-primary';
-
   useEffect(() => {
     const fetchAndSetBriefs = async () => {
       if (Object.keys(router?.query).length) {
@@ -244,7 +248,6 @@ const Freelancers = (): JSX.Element => {
   ]);
 
   const onSearch = async () => {
-    setFilterVisible(!filterVisble);
     // The filter initially should return all values
     let is_search = false;
 
@@ -287,7 +290,7 @@ const Freelancers = (): JSX.Element => {
             default:
               console.log(
                 'Invalid filter option selected or unimplemented. type:' +
-                  filterType
+                filterType
               );
           }
         }
@@ -321,6 +324,9 @@ const Freelancers = (): JSX.Element => {
         page: currentPage,
         verified: freelancerInfo.verified,
       };
+      if (search_value.length === 0) {
+        setFilterVisible(!filterVisble);
+      }
       const filteredFreelancers: any = await callSearchFreelancers(filter);
       setFreelancers(filteredFreelancers?.currentData);
       setFreelancersTotal(filteredFreelancers?.totalFreelancers);
@@ -338,26 +344,6 @@ const Freelancers = (): JSX.Element => {
     setFilterVisible(!filterVisble);
   };
 
-  const PageItem = (props: any) => {
-    return (
-      <div
-        className={`h-[32px] rounded-[4px] hover:bg-[--theme-primary] hover:text-black border border-primary w-[32px] cursor-pointer pt-1 items-center text-center text-sm !font-bold mr-6 ${
-          currentPage === parseInt(props.page) ? 'text-black' : 'text-white'
-        }
-        ${
-          currentPage === parseInt(props.page)
-            ? 'bg-[--theme-primary]'
-            : 'bg-transparent'
-        }
-        `}
-      >
-        {props.page}
-      </div>
-    );
-  };
-
-  const dropDownValues = [5, 10, 20, 50];
-
   const FilterModal = ({ open, handleClose }: FilterModalProps) => {
     return (
       <CustomModal
@@ -369,9 +355,11 @@ const Freelancers = (): JSX.Element => {
           onClick={(e: any) => {
             e?.stopPropagation();
           }}
-          className='bg-[#1B1B1B] rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative'
+          className='bg-white rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative'
         >
-          <p className='font-normal text-base text-white !mb-9'>Filter</p>
+          <p className='font-normal text-base !text-imbue-purple-dark !mb-9'>
+            Filter
+          </p>
 
           <div className='grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5'>
             {customDropdownConfigs
@@ -388,12 +376,25 @@ const Freelancers = (): JSX.Element => {
               ))}
           </div>
 
-          <button
-            onClick={onSearch}
-            className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 absolute md:bottom-10 bottom-5 right-10'
+          <div
+            className='h-[39px] text-center gap-5 flex items-center absolute md:bottom-10 bottom-5 right-10'
           >
-            Apply
-          </button>
+            <button
+              onClick={cancelFilters}
+              data-testid='Apply'
+              className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-coral flex items-center cursor-pointer hover:scale-105 hover:bg-primary hover:text-content'
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={onSearch}
+              data-testid='Apply'
+              className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 hover:bg-primary hover:text-content'
+            >
+              Apply
+            </button>
+          </div>
         </div>
       </CustomModal>
     );
@@ -413,80 +414,77 @@ const Freelancers = (): JSX.Element => {
     setFreelancersTotal(allFreelancers?.totalFreelancers);
   };
 
+  const cancelFilters = async () => {
+    reset()
+    setFilterVisible(false)
+  }
+
   if (loading) return <LoadingFreelancers />;
 
   return (
-    <div className='px-[15px] lg:px-[40px]'>
+    <div>
       <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
         <FilterModal open={filterVisble} handleClose={() => toggleFilter()} />
-        <div className={`${styles.freelancersView} max-width-750px:!w-full`}>
-          <div className={`${styles.searchHeading} max-width-750px:!mx-0`}>
-            <div className={`${styles.tabSection} w-full justify-between`}>
-              <div className='tab-section'>
-                <button
-                  onClick={toggleFilter}
-                  className='h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105'
-                >
-                  Filter
-                  <Image
-                    src={filterIcon}
-                    alt={'filter-icon'}
-                    className='h-[14px] w-[14px] ml-2'
+        <div
+          className={`${styles.freelancersView} max-width-750px:!w-full max-width-750px:px-5`}
+        >
+          <div className='bg-white py-[1.5rem] px-[3.88rem] rounded-[1.25rem]'>
+            <div className='flex justify-between lg:flex-row flex-col items-start'>
+              <div>
+                <div className='flex items-center'>
+                  <input
+                    id='search-input'
+                    className='search-input px-[12px] !w-full lg:!w-[20rem] !h-[2.875rem] !rounded-tr-[0px] !rounded-br-[0px] !text-black'
+                    placeholder='Search'
                   />
-                </button>
+                  <div
+                    role='button'
+                    onClick={onSearch}
+                    className='h-[2.975rem] w-[3.0625rem] rounded-tr-[8px] rounded-br-[8px] bg-imbue-purple flex justify-center items-center cursor-pointer'
+                  >
+                    <Image src={searchSvg} alt='Search' role='button' />
+                  </div>
+                </div>
 
+                <p className='!text-[1rem] !text-imbue-purple-dark !mt-[0.75rem]'>
+                  {Number(freelancers_total) === 0 ? 'No' : freelancers_total}{' '}
+                  freelancer
+                  {Number(freelancers_total) === 1 ? '' : 's'} found
+                </p>
+              </div>
+
+              <div className='flex items-center mt-[2rem] lg:mt-0'>
                 {selectedFilterIds?.length > 0 && (
                   <button
                     onClick={reset}
-                    className='h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]'
+                    className='h-[43px] mr-4 px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]'
                   >
-                    Reset Filter X
+                    Reset
                   </button>
                 )}
-              </div>
-            </div>
-            <input
-              id='search-input'
-              className={`search-input`}
-              placeholder='Search'
-            />
-            <div className='search-result flex flex-col'>
-              <div>
-                <span className='result-count'>
-                  {Number(freelancers_total) === 0 ? 'No' : freelancers_total}
-                </span>
-                <span>
-                  {' '}
-                  freelancer{Number(freelancers_total) === 1 ? '' : 's'} found
-                </span>
-              </div>
 
-              <span className='max-width-500px:ml-8'>
-                Freelancers per page
-                <select
-                  className='ml-4 border-white border bg-[#2c2c2c] h-8 px-4 rounded-md focus:border-none focus:outline-none focus:outline-white'
-                  onChange={(e) => {
-                    setNumItemsPerPage(parseInt(e.target.value));
-                  }}
-                  value={itemsPerPage}
+                <div
+                  className='flex items-center cursor-pointer'
+                  onClick={toggleFilter}
+                  role='button'
                 >
-                  {dropDownValues.map((item, itemIndex) => (
-                    <option key={itemIndex} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </span>
+                  <p className='!mr-[0.25rem] !text-imbue-purple-dark text-[1rem]'>
+                    Filter
+                  </p>
+                  <Image src={filterSvg} alt='Filter Icon' />
+                </div>
+              </div>
             </div>
           </div>
-          <div className={`${styles.freelancers} max-width-750px:!px-0`}>
+
+          <Grid container spacing={4} sx={{ marginTop: '0.75rem' }}>
             {freelancers?.length &&
               freelancers
                 ?.slice?.(0, 10)
                 ?.map?.(
                   (
                     {
-                      title,
+                      bio,
                       username,
                       display_name,
                       skills,
@@ -495,66 +493,92 @@ const Freelancers = (): JSX.Element => {
                     }: Freelancer,
                     index: number
                   ) => (
-                    <div className={styles.freelancer} key={index}>
-                      <div className={styles.freelancerImageContainer}>
-                        <Image
-                          src={
-                            profile_image ??
-                            require('@/assets/images/profile-image.png')
-                          }
-                          className={styles.freelancerProfilePic}
-                          height={300}
-                          width={300}
-                          alt=''
-                        />
-                        {verified && (
-                          <VerifiedIcon className={styles.verifiedIcon} />
-                        )}
-                        <div className='dark-layer' />
-                      </div>
-                      <div className={styles.freelancerInfo}>
-                        <h3>{display_name}</h3>
-                        <h5>{title}</h5>
-                        <div className={styles.skills}>
-                          {skills
-                            ?.slice(0, 3)
-                            .map((skill: any, index: number) => (
-                              <p className={styles.skill} key={index}>
-                                {skill.name}
-                              </p>
-                            ))}
+                    <Grid item xs={12} sm={12} md={3} key={index}>
+                      <div className={`${styles.freelancer} py-[0.94rem]`}>
+                        <div className='flex items-center justify-center'>
+                          <Image
+                            src={
+                              profile_image ??
+                              require('@/assets/images/profile-image.png')
+                            }
+                            className={styles.freelancerProfilePic}
+                            height={94.921}
+                            width={93.597}
+                            alt=''
+                          />
+                          {verified && (
+                            <VerifiedIcon className={styles.verifiedIcon} />
+                          )}
+                        </div>
+                        <div className={`${styles.freelancerInfo} mt-[0.5rem]`}>
+                          <div className='px-[1.25rem]'>
+                            <h3 className='text-[1.25rem] font-medium text-imbue-purple-dark text-center'>
+                              {display_name}
+                            </h3>
+                            <h5 className='text-[0.75rem] text-imbue-purple-dark font-normal'>
+                              {bio}
+                            </h5>
+                          </div>
+                          <div
+                            className={`${styles.skills} ml-4 overflow-scroll`}
+                          >
+                            {skills
+                              ?.slice(0, 3)
+                              .map((skill: any, index: number) => (
+                                <p
+                                  className={`${styles.skill} !text-[0.75rem] !text-imbue-purple-dark`}
+                                  key={index}
+                                >
+                                  {skill.name}
+                                </p>
+                              ))}
+                          </div>
+                        </div>
+
+                        <div className='px-[1.25rem] mt-[1.25rem]'>
+                          <button
+                            className='w-full h-[2.6rem] border border-imbue-purple-dark rounded-[1.5rem] font-normal text-[1rem] text-imbue-purple-dark'
+                            onClick={() => redirectToProfile(username)}
+                          >
+                            View Freelancer
+                          </button>
                         </div>
                       </div>
-                      <button
-                        className={`${styles.primaryButton} w-2/3`}
-                        onClick={() => redirectToProfile(username)}
-                      >
-                        View
-                      </button>
-                    </div>
+                    </Grid>
                   )
                 )}
-          </div>
-          <Pagination
-            pageSize={itemsPerPage}
-            total={freelancers_total}
-            onChange={(page: number) => setCurrentPage(page)}
-            className='flex flex-row items-center my-10 px-10'
-            itemRender={(page, type, originalElement) => {
-              if (type === 'page') {
-                return <PageItem page={page} />;
+          </Grid>
+
+          <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center justify-between   self-center'>
+            <Pagination
+              pageSize={itemsPerPage}
+              total={freelancers_total}
+              onChange={(page: number) => setCurrentPage(page)}
+              className='flex flex-row items-center lg:px-10'
+              itemRender={(page, type, originalElement) => {
+                if (type === 'page') {
+                  return (
+                    <div className='mx-[1.62rem] text-[#5E5E5E] text-[0.7rem] lg:text-[1rem] font-normal'>
+                      {page} of {(freelancers_total / itemsPerPage).toFixed(0)}
+                    </div>
+                  );
+                }
+                return originalElement;
+              }}
+              prevIcon={
+                <button className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'>
+                  <Image src={chevLeftIcon} alt='chev left' />
+                  Previous
+                </button>
               }
-              return originalElement;
-            }}
-            prevIcon={<div className={pageinationIconClassName}>{'<'}</div>}
-            nextIcon={<div className={pageinationIconClassName}>{'>'}</div>}
-            jumpNextIcon={
-              <div className={pageinationIconClassName}>{'>>'}</div>
-            }
-            jumpPrevIcon={
-              <div className={pageinationIconClassName}>{'<<'}</div>
-            }
-          />
+              nextIcon={
+                <button className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'>
+                  Next
+                  <Image src={chevRightIcon} alt='chev right' />
+                </button>
+              }
+            />
+          </div>
         </div>
       </div>
     </div>

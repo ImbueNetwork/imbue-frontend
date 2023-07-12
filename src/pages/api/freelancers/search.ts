@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
 import * as models from '@/lib/models';
-import { fetchItems, Freelancer, searchFreelancers } from '@/lib/models';
+import { fetchFreelancerClients, fetchFreelancerMetadata, Freelancer, searchFreelancers } from '@/lib/models';
 
 import db from '@/db';
 
@@ -21,27 +21,14 @@ export default nextConnect().post(
           filter?.items_per_page || 5,
           freelancers
         );
-
         await Promise.all([
-          ...currentData.map(async (freelancer: any) => {
-            freelancer.skills = await fetchItems(
-              freelancer.skill_ids,
-              'skills'
-            )(tx);
-            freelancer.client_images = await fetchItems(
-              freelancer.client_ids,
-              'clients'
-            )(tx);
-            freelancer.languages = await fetchItems(
-              freelancer.language_ids,
-              'languages'
-            )(tx);
-            freelancer.services = await fetchItems(
-              freelancer.service_ids,
-              'services'
-            )(tx);
-          }),
-        ]);
+            ...currentData.map(async (freelancer: any) => {
+                 freelancer.skills = await fetchFreelancerMetadata("skill",freelancer.id)(tx);
+                 freelancer.services = await fetchFreelancerMetadata("service",freelancer.id)(tx);
+                 freelancer.languages = await fetchFreelancerMetadata("language",freelancer.id)(tx);
+                 freelancer.clients = await fetchFreelancerClients(freelancer.id)(tx);
+            }),
+          ]);
 
         res.status(200).json({ currentData, totalFreelancers: totalItems });
       } catch (e) {

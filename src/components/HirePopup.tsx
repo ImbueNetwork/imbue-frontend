@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useMediaQuery } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
@@ -49,8 +50,8 @@ export const HirePopup = ({
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: mobileView ? '98vw' : '65vw',
-    bgcolor: '#2c2c2c',
-    color: '#fff',
+    bgcolor: 'var(--theme-background)',
+    color: 'var(--theme-content)',
     pt: mobileView ? '10px' : '28px',
     pb: mobileView ? '10px' : '28px',
     boxShadow: 24,
@@ -87,6 +88,7 @@ export const HirePopup = ({
       milestones
     );
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
@@ -120,11 +122,11 @@ export const HirePopup = ({
             src={require('@/assets/images/profile-image.png')}
             alt='profileImage'
           />
-          <span className='text-xl font-bold'>{freelancer?.display_name}</span>
+          <span className='text-xl text-secondary-dark-hover'>{freelancer?.display_name}</span>
         </div>
-        <h3 className='absolute top-0 text-center w-full text-lg lg:text-xl font-bold primary-text'>
+        <p className='absolute top-0 text-center w-full text-lg lg:text-xl text-imbue-purple-dark'>
           Hire This Freelancer
-        </h3>
+        </p>
         <hr className='separator' />
 
         <div className='milestone-list px-5 lg:px-16 mb-5 max-h-96 overflow-y-scroll'>
@@ -132,14 +134,14 @@ export const HirePopup = ({
             // FIXME:
             return (
               <div className={styles.milestoneRow} key={index}>
-                <h3 className='mr-3 lg:mr-9 text-lg'>{index + 1}.</h3>
+                <p className='mr-3 lg:mr-9 text-lg'>{index + 1}.</p>
                 <div className='flex justify-between w-full'>
                   <div>
-                    <h3 className='text-lg mb-1'>Description</h3>
+                    <p className='text-lg mb-1 text-content'>Description</p>
                     <p className='text-base'>{m.name}</p>
                   </div>
                   <div className='budget-wrapper text-end'>
-                    <h3 className='text-lg mb-1'>Amount</h3>
+                    <p className='text-lg mb-1 text-content'>Amount</p>
                     <p>{m.amount}</p>
                   </div>
                 </div>
@@ -149,36 +151,35 @@ export const HirePopup = ({
         </div>
         <hr className='separator' />
 
-        <div className=''>
-          <div className={`${styles.budgetInfo} mx-5 lg:mx-16 lg:mt-7`}>
+        <div className='bg-overlay lg:mx-10 py-1 rounded-xl mb-5'>
+          <div className={`${styles.budgetInfo} mx-5 lg:mt-3`}>
             <div className={styles.budgetDescription}>
-              <h3 className='mb-2 text-lg'>Total price of the project</h3>
-              <div className='text-inactive'>
-                This includes all milestonees, and is the amount client will see
+              <p className='mb-2 text-lg'>Total price of the project</p>
+              <div className='text-imbue-purple text-sm'>
+                (This includes all milestonees, and is the amount client will see)
               </div>
             </div>
             <div className='budget-value'>
               ${Number?.(totalCostWithoutFee?.toFixed?.(2))?.toLocaleString()}
             </div>
           </div>
-          <div className={`${styles.budgetInfo} mx-5 lg:mx-16`}>
+          <div className={`${styles.budgetInfo} mx-5`}>
             <div className={styles.budgetDescription}>
-              <h3 className='text-lg'>Imbue Service Fee 5%</h3>
+              <p className='text-lg'>Imbue Service Fee 5%</p>
             </div>
             <div className='budget-value'>
               ${Number?.(imbueFee?.toFixed?.(2))?.toLocaleString?.()}
             </div>
           </div>
-          <div className={`${styles.budgetInfo} mx-5 lg:mx-16`}>
+          <div className={`${styles.budgetInfo} mx-5 !mb-3`}>
             <div className={styles.budgetDescription}>
-              <h3 className='text-lg'>Total</h3>
+              <p className='text-lg'>Total</p>
             </div>
             <div className='budget-value'>
               ${Number?.(totalCost?.toFixed?.(2))?.toLocaleString?.()}
             </div>
           </div>
         </div>
-        <hr className='separator' />
 
         <button
           onClick={() => setstage(1)}
@@ -192,24 +193,24 @@ export const HirePopup = ({
 
   const SecondContent = () => {
     return (
-      <div className='flex flex-col justify-center items-center modal-container px-5 lg:px-0 lg:w-2/3 mx-auto my-auto'>
-        <h3 className='text-center w-full text-lg lg:text-xl font-bold my-4 primary-text'>
+      <div className='flex flex-col justify-center items-center modal-container px-5 lg:px-0 lg:w-2/3 mx-auto my-auto text-content'>
+        <p className='text-center w-full text-lg lg:text-xl my-4 text-content-primary'>
           Deposit Fuds
-        </h3>
-        <p className='text-center w-full text-lg lg:text-xl font-bold my-4'>
+        </p>
+        <p className='text-center w-full text-lg lg:text-xl my-4'>
           Deposit the funds required for the project, these funds will be taken
           from your account once the freelancer starts the project.
         </p>
-        <p className='text-center w-full text-lg lg:text-xl font-bold my-4'>
+        <p className='text-center w-full text-lg lg:text-xl my-4'>
           The funds are then paid to the freelancer iin stages only when you
           approve the completion of each milestone
         </p>
-        <h3 className='mb-10'>
+        <p className='mb-10'>
           <span className='primary-text mr-1'>
             {Number(totalCost.toFixed(2)).toLocaleString()}
           </span>
           ${Currency[application.currency_id]}
-        </h3>
+        </p>
         <button
           onClick={() => {
             setstage(2);
@@ -277,23 +278,18 @@ export const HirePopup = ({
       </ErrorScreen>
 
       <SuccessScreen
-        title={`You have successfully hired ${freelancer?.display_name} as a freelacer for your brief`}
+        title={`You have successfully hired ${freelancer?.display_name}!`}
         open={success}
         setOpen={setSuccess}
       >
         <div className='flex flex-col gap-4 w-1/2'>
           <button
-            onClick={() => router.push(`/projects/${projectId}`)}
+            onClick={() => router.push(`/dashboard`)}
             className='primary-btn in-dark w-button w-full !m-0'
-          >
-            See Project
-          </button>
-          <button
-            onClick={() => setSuccess(false)}
-            className='underline text-xs lg:text-base font-bold'
           >
             Continue
           </button>
+
         </div>
       </SuccessScreen>
     </>

@@ -7,6 +7,7 @@ import db from '@/db';
 
 type ProjectPkg = models.Project & {
   milestones: models.Milestone[];
+  approvers?: string[];
 };
 
 export default nextConnect()
@@ -22,9 +23,13 @@ export default nextConnect()
           return res.status(404).end();
         }
 
+        const milestones = await models.fetchProjectMilestones(id)(tx);
+        const approvers = await models.fetchProjectApprovers(id)(tx);
+
         const pkg: ProjectPkg = {
           ...project,
-          milestones: await models.fetchProjectMilestones(id)(tx),
+          milestones,
+          approvers: approvers.map(({ approver }: any) => approver),
         };
 
         return res.send(pkg);
@@ -52,6 +57,7 @@ export default nextConnect()
       total_cost_without_fee,
       imbue_fee,
       user_id,
+      escrow_address,
     } = body;
     db.transaction(async (tx) => {
       try {
@@ -78,6 +84,8 @@ export default nextConnect()
           owner,
           total_cost_without_fee,
           imbue_fee,
+          escrow_address
+          // project_type: exists.project_type,
         })(tx);
 
         if (!project.id) {
