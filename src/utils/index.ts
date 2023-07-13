@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { StreamChat } from 'stream-chat';
 
 import * as config from '@/config';
@@ -81,14 +82,16 @@ export const fetchUser = async (id: number) => {
   }
 };
 
-export const fetchUserByUsernameOrAddress = async (usernameOrAddress: string) => {
+export const fetchUserByUsernameOrAddress = async (
+  usernameOrAddress: string
+) => {
   try {
-      const resp = await fetch(`/api/users/search/${usernameOrAddress}`)
-      return await resp.json()
+    const resp = await fetch(`/api/users/search/${usernameOrAddress}`);
+    return await resp.json();
   } catch (error) {
-      return []
+    return [];
   }
-}
+};
 
 export const badRouteEvent = (type: BadRoute) =>
   new CustomEvent(config.event.badRoute, {
@@ -114,6 +117,7 @@ export const getStreamChat = async () => {
   return new StreamChat(getstreamApiKey);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function reportValidity(input: HTMLInputElement, _submitting = false) {
   if (input.validity.valueMissing) {
     input.setAttribute('validationmessage', 'This field is required.');

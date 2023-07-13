@@ -23,7 +23,10 @@ type ApplicationOwnerProps = {
   freelancer: Freelancer;
   application: Project | any;
   setLoading: (_loading: boolean) => void;
-  updateProject: (_chainProjectId?: number, _escrow_address?: string) => Promise<void>;
+  updateProject: (
+    _chainProjectId?: number,
+    _escrow_address?: string
+  ) => Promise<void>;
   user: User | any;
 };
 
@@ -42,10 +45,10 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
   const [openPopup, setOpenPopup] = useState(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<any>();
-  const [projectId, setProjectId] = useState<string>();
+  // const [projectId, setProjectId] = useState<string>();
 
   const router = useRouter();
-  const { applicationId }: any = router.query;
+  // const { applicationId }: any = router.query;
 
   const applicationStatusId = [
     'Draft',
@@ -69,7 +72,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         if (result.status) {
           const projectId = parseInt(result.eventData[2]);
           const escrow_address = result.eventData[5];
-          setProjectId(applicationId);
+          // setProjectId(applicationId);
           await updateProject(projectId, escrow_address);
           setSuccess(true);
         } else if (result.txError) {

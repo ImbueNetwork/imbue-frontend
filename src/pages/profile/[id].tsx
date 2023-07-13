@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Divider, OutlinedInput, TextField } from '@mui/material';
 import { SignerResult } from '@polkadot/api/types';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -304,7 +305,9 @@ const Profile = ({ initUser, browsingUser }: any) => {
             <Divider />
 
             <div className='flex gap-14 items-center'>
-              <p className='w-24 lg:text-xl text-imbue-purple-dark'>Website :</p>
+              <p className='w-24 lg:text-xl text-imbue-purple-dark'>
+                Website :
+              </p>
               {isEditMode ? (
                 <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>
                   <OutlinedInput
@@ -318,7 +321,9 @@ const Profile = ({ initUser, browsingUser }: any) => {
               )}
             </div>
             <div className='flex gap-14 items-center'>
-              <p className='w-24 text-imbue-purple-dark lg:text-xl'>Industry :</p>
+              <p className='w-24 text-imbue-purple-dark lg:text-xl'>
+                Industry :
+              </p>
               {isEditMode ? (
                 <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>
                   <OutlinedInput
@@ -354,7 +359,9 @@ const Profile = ({ initUser, browsingUser }: any) => {
                       key={itemIndex}
                       onClick={() => router.push(`/briefs/${item?.id}/`)}
                     >
-                      <div className='brief-title !text-xl lg:!text-2xl'>{item.headline}</div>
+                      <div className='brief-title !text-xl lg:!text-2xl'>
+                        {item.headline}
+                      </div>
                       <div className='brief-time-info !text-sm lg:!text-base'>
                         {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
                       </div>

@@ -63,6 +63,7 @@ function Navbar() {
           setFreelancerProfile(res);
         }
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error(error);
       } finally {
         setLoading(false);
@@ -117,67 +118,50 @@ function Navbar() {
             </div>
 
             <div className='relative items-center z-0 hidden lg:flex'>
-                <div
-                  className={`${
-                    expanded
-                      ? 'translate-x-0 opacity-100 duration-700'
-                      : '-translate-x-full opacity-0 duration-1000'
-                  } flex items-center ml-1 transition-all`}
+              <div
+                className={`${
+                  expanded
+                    ? 'translate-x-0 opacity-100 duration-700'
+                    : '-translate-x-full opacity-0 duration-1000'
+                } flex items-center ml-1 transition-all`}
+              >
+                <Link
+                  onClick={() => setExpanded(false)}
+                  className={`mx-1 lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
+                  href='/briefs/new'
                 >
-                  <Link
-                    onClick={() => setExpanded(false)}
-                    className={`mx-1 lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
-                    href='/briefs/new'
-                  >
-                    Submit a Brief
-                  </Link>
+                  Submit a Brief
+                </Link>
 
-                  <Link
-                    onClick={() => setExpanded(false)}
-                    className={`mx-1 lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
-                    href='/grants/new'
-                  >
-                    Submit a Grant
-                  </Link>
+                <Link
+                  onClick={() => setExpanded(false)}
+                  className={`mx-1 lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
+                  href='/grants/new'
+                >
+                  Submit a Grant
+                </Link>
 
-                  <Link
-                    onClick={() => setExpanded(false)}
-                    className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer ${navPillclasses} nav-item nav-item-2`}
-                    href='/briefs/'
-                  >
-                    Discover Briefs
-                  </Link>
+                <Link
+                  onClick={() => setExpanded(false)}
+                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer ${navPillclasses} nav-item nav-item-2`}
+                  href='/briefs/'
+                >
+                  Discover Briefs
+                </Link>
 
-                  <Link
-                    onClick={() => setExpanded(false)}
-                    className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${navPillclasses}`}
-                    href='/freelancers'
-                  >
-                    Discover Freelancers
-                  </Link>
+                <Link
+                  onClick={() => setExpanded(false)}
+                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${navPillclasses}`}
+                  href='/freelancers'
+                >
+                  Discover Freelancers
+                </Link>
 
-                  <div
-                    onClick={() => {
-                      setExpanded(!expanded);
-                    }}
-                    className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${cancelClass}`}
-                  >
-                    <Image
-                      src={expanded ? cancelIcon : hamburgerIcon}
-                      alt={'cancel'}
-                      className='w-10 h-10'
-                    />
-                  </div>
-                </div>
                 <div
                   onClick={() => {
                     setExpanded(!expanded);
                   }}
-                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${
-                    !expanded && cancelClass
-                  } ${
-                    expanded ? 'lg:invisible' : 'visible delay-700'
-                  } absolute`}
+                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${cancelClass}`}
                 >
                   <Image
                     src={expanded ? cancelIcon : hamburgerIcon}
@@ -186,6 +170,21 @@ function Navbar() {
                   />
                 </div>
               </div>
+              <div
+                onClick={() => {
+                  setExpanded(!expanded);
+                }}
+                className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${
+                  !expanded && cancelClass
+                } ${expanded ? 'lg:invisible' : 'visible delay-700'} absolute`}
+              >
+                <Image
+                  src={expanded ? cancelIcon : hamburgerIcon}
+                  alt={'cancel'}
+                  className='w-10 h-10'
+                />
+              </div>
+            </div>
           </div>
 
           {/* <div className="context-menu" id="context-menu">

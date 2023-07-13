@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Brief, Item } from '@/model';
 
 export type FilterOption = {
