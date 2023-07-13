@@ -11,6 +11,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Tooltip,
 } from "@mui/material";
 import { StyledEngineProvider } from "@mui/system";
 import { SignerResult } from "@polkadot/api/types";
@@ -333,7 +334,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
       setCopied('');
     }, 3000);
   };
-
+  console.log(projects);
   return (
     <div className='profile-container overflow-x-hidden relative'>
       <div className='banner'>
@@ -568,9 +569,18 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                 <p className='text-xl text-imbue-purple-dark'>
                   Among my clients
                 </p>
-                <span className='h-4 w-4 flex justify-center items-center rounded-full bg-imbue-light-purple text-imbue-purple'>
-                  ?
-                </span>
+                <Tooltip
+                  title="Organizations or companiest that you have previously worked with. Add their name, website and logo for recongintion"
+                  enterTouchDelay={10}
+                  leaveTouchDelay={4000}
+                  arrow
+                  placement="bottom"
+                >
+                  <span className='h-4 w-4 flex justify-center items-center rounded-full bg-imbue-light-purple text-imbue-purple cursor-pointer'>
+                    ?
+                  </span>
+                </Tooltip>
+
               </div>
 
               <Clients
@@ -587,8 +597,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
             <hr className='separator' />
             <div className='w-full px-[30px] lg:px-[40px]'>
               <p className='text-xl text-imbue-purple-dark'>Wallet Address</p>
-              <div className='flex items-center mt-2 gap-3'>
-                <div className='break-words py-4 px-3 rounded-2xl bg-imbue-light-purple w-full text-imbue-purple'>
+              <div className='flex items-center mt-2 gap-3 w-full'>
+                <div className='break-words py-4 px-3 rounded-2xl bg-imbue-light-purple w-[90%] lg:w-full text-imbue-purple'>
                   {freelancer?.web3_address}
                 </div>
                 <div
@@ -790,7 +800,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                                         />
                                         <div className="dark-layer" />
                                     </div>
-                                    <div className="project-info">
+                                  <div className="project-info">
                                         <h5>{title}</h5>
                                         <div className="project-progress">
                                             <div
@@ -816,9 +826,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           </div>
 
           <div
-            className={`${styles.freelancerProfileSection} w-full py-[30px] 30px] lg:px-[40px]`}
+            className={`${styles.freelancerProfileSection} w-full py-[30px] lg:px-[40px]`}
           >
-            <div className='header-editable'>
+            <div className='header-editable lg:mx-10'>
               <h5 className='text-imbue-purple-dark'>About</h5>
             </div>
             {isEditMode ? (
@@ -840,21 +850,11 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                 />
               </>
             ) : (
-              <>
-                <div className='bio text-imbue-purple-dark'>
-                  {freelancer?.bio
-                    ?.split?.('\n')
-                    ?.map?.((line: any, index: number) => (
-                      <p className='leading-[1.2] text-base' key={index}>
-                        {line}
-                      </p>
-                    ))}
-                </div>
-              </>
+              <div className='bio text-content-primary text-base lg:mx-10'>{freelancer?.bio}</div>
             )}
             <hr className='separator' />
 
-            <div className='header-editable'>
+            <div className='header-editable lg:mx-10'>
               <h5 className='text-imbue-purple-dark'>Education</h5>
             </div>
             {isEditMode ? (
@@ -877,7 +877,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
               </>
             ) : (
               <>
-                <div className='bio text-imbue-purple'>
+                <div className='bio text-imbue-purple lg:mx-10'>
                   {/* TODO: Implementation */}
                   {/* {freelancer?.education
                   ?.split?.("\n")
@@ -1055,8 +1055,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         <div className="flex flex-col gap-4 w-1/2">
           <button
             onClick={() => {
-              flipEdit(), 
-              setSuccess(false);
+              flipEdit(),
+                setSuccess(false);
               window.location.reload();
             }}
             className="primary-btn in-dark w-button w-full !m-0"
