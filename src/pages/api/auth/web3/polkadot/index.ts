@@ -99,7 +99,9 @@ export default nextConnect().post(
                       account.type,
                       solution.challenge
                     )(tx);
-
+                  const payload = { id: user.id };
+                  const token = await jwt.sign(payload, jwtOptions.secretOrKey);
+                  await setTokenCookie(res, token);
                   if (isInsert) {
                     res.status(201);
                   }
