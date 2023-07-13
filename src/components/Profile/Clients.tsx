@@ -79,7 +79,6 @@ const Clients = ({ setFreelancer, isEditMode, clients, setClients }: ClientsProp
     setNewClient({})
   }
 
-
   return (
     <>
       <div className="grid grid-cols-2 justify-center md:grid-cols-3 w-full mt-2">
@@ -100,21 +99,6 @@ const Clients = ({ setFreelancer, isEditMode, clients, setClients }: ClientsProp
             </div>
           ))
         }
-        {/* {
-          isEditMode && (
-            <ToggleButton
-              className="w-11 h-11 my-auto border-content-primary"
-              value="check"
-              selected={openAddClient}
-              onChange={() => {
-                setOpen(true)
-                // addAClient()
-              }}
-            >
-              <span className="text-2xl text-content">+</span>
-            </ToggleButton>
-          )
-        } */}
 
         <Modal
           open={open}

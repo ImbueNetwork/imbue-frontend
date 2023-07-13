@@ -45,8 +45,7 @@ export default nextConnect()
             freelancer.id
           )(tx)),
         ]);
-        
-        
+                
 
         // await Promise.all([
         //        freelancer.skills = await fetchFreelancerMetadata("skill",freelancer.id)(tx);
@@ -101,7 +100,6 @@ export default nextConnect()
 
         return res.status(200).json(freelancer);
       } catch (e) {
-        console.log(e);
         new Error(
           `Failed to fetch freelancer details by username: ${username}`,
           {
@@ -132,10 +130,12 @@ export default nextConnect()
         let client_ids: number[] = [];
 
         if (freelancer.clients) {
+          console.log("clients");
           client_ids = await models.upsertFreelancerClientsItems(
             freelancer.clients,
             'clients'
           )(tx);
+          console.log(client_ids);
         }
 
         const profile_image = freelancer.profile_image;

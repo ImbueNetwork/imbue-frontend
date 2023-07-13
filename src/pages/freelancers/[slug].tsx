@@ -133,7 +133,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           skills: skills,
           clients: clients
         };
-
+        console.log(data);
         await updateFreelancer(data);
         setSuccess(true);
       }
@@ -193,8 +193,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     {
       label: 'Facebook',
       key: 'facebook_link',
-      // value: freelancer?.facebook_link,
-      value: 'facebook.com',
+      value: freelancer?.facebook_link,
+      // value: 'facebook.com',
       icon: (
         <FaFacebook
           color='#4267B2'
@@ -208,8 +208,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     {
       label: 'Twitter',
       key: 'twitter_link',
-      // value: freelancer?.twitter_link,
-      value: 'twitter.com',
+      value: freelancer?.twitter_link,
+      // value: 'twitter.com',
       icon: (
         <FaTwitter
           color='#1DA1F2'
@@ -679,7 +679,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                             />
                           </div>
                         ) : (
-                          <button className='bg-imbue-light-purple w-[32px] h-[32px] rounded-[10px] text-imbue-purple border-none text-[20px] font-semibold items-center justify-center'>
+                          <button
+                            onClick={() => !value && setIsEditMode(true)}
+                            className='bg-imbue-light-purple w-[32px] h-[32px] rounded-[10px] text-imbue-purple border-none text-[20px] font-semibold items-center justify-center'>
                             {socials && value ? icon : '+'}
                           </button>
                         )}
@@ -1081,9 +1083,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         </div>
       </ErrorScreen>
       <div
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${
-          copied ? 'right-5' : '-right-full'
-        }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
+          }`}
       >
         <Alert severity='success'>{`${copied} Copied to clipboard`}</Alert>
       </div>

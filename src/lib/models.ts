@@ -938,7 +938,7 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
       'display_name',
       'web3_accounts.address as web3_address',
       'freelancers.created',
-      'verified',
+      'verified'
       // tx.raw('ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills'),
       // tx.raw('ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids'),
 
@@ -948,7 +948,7 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
       // tx.raw('ARRAY_AGG(DISTINCT CAST(services.name as text)) as services'),
       // tx.raw('ARRAY_AGG(DISTINCT CAST(services.id as text)) as service_ids'),
 
-      // tx.raw('json_agg(clients.*) as clients'),
+      // tx.raw('json_agg(clients.*) as clients'),object
       // tx.raw('ARRAY_AGG(DISTINCT CAST(clients.id as text)) as client_ids'),
 
       // tx.raw('ARRAY_AGG(DISTINCT CAST(clients.img as text)) as client_images'),
@@ -1026,18 +1026,22 @@ export const fetchFreelancerClients =
       .raw(
         `SELECT ARRAY_AGG(DISTINCT metadata.id) as ids FROM freelancer_clients freelancer_metadata
    LEFT JOIN clients metadata on freelancer_metadata.client_id = metadata.id
-   WHERE freelancer_metadata.client_id = ${freelancer_id}`
+   WHERE freelancer_metadata.freelancer_id = ${freelancer_id}`
       )
       .then(async (results) => {
         const ids = results.rows[0].ids;
         if (ids) {
-          return await fetchItems(ids, `clients`)(tx);
+          return await fetchClients(ids, `clients`)(tx);
         }
       });
 
 export const fetchItems =
   (ids: number[], tableName: string) => async (tx: Knex.Transaction) =>
     tx(tableName).select('id', 'name').whereIn(`id`, ids);
+
+export const fetchClients =
+  (ids: number[], tableName: string) => async (tx: Knex.Transaction) =>
+    tx(tableName).select('id', 'name', 'logo', 'website').whereIn(`id`, ids);
 
 export const insertFreelancerDetails =
   (
