@@ -3,7 +3,12 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
 import * as models from '@/lib/models';
-import { fetchFreelancerClients, fetchFreelancerDetailsByUsername, fetchFreelancerMetadata } from '@/lib/models';
+import {
+  fetchFreelancerClients,
+  fetchFreelancerDetailsByUsername,
+  fetchFreelancerMetadata,
+  fetchUser,
+} from '@/lib/models';
 
 import db from '@/db';
 
@@ -17,6 +22,7 @@ export default nextConnect()
       try {
         let freelancer;
         freelancer = await fetchFreelancerDetailsByUsername(username)(tx);
+        const user = await fetchUser(freelancer?.id)(tx);
 
         if (!freelancer)
           freelancer = await models.fetchFreelancerDetailsByUserID(
@@ -26,7 +32,6 @@ export default nextConnect()
         if (!freelancer) {
           return res.status(404).end();
         }
-
 
         await Promise.all([
           (freelancer.skills = await fetchFreelancerMetadata(
@@ -41,12 +46,10 @@ export default nextConnect()
             'service',
             freelancer.id
           )(tx)),
-          (freelancer.clients = await fetchFreelancerClients(
-            freelancer.id
-          )(tx)),
+          (freelancer.clients = await fetchFreelancerClients(freelancer.id)(
+            tx
+          )),
         ]);
-        
-        
 
         // await Promise.all([
         //        freelancer.skills = await fetchFreelancerMetadata("skill",freelancer.id)(tx);
@@ -78,7 +81,8 @@ export default nextConnect()
           .from('freelancer_profile_image')
           .where({ freelancer_id: freelancer.id });
         if (freelancer_profile[0]) {
-          freelancer.profile_image = freelancer_profile[0].profile_image;
+          freelancer.profile_image =
+            freelancer_profile[0].profile_image || user?.profile_photo;
         }
 
         const country = await tx
@@ -119,18 +123,18 @@ export default nextConnect()
           'skills'
         )(tx);
         const language_ids = await models.upsertItems(
-          freelancer.languages.map((x:any)=>x.name),
+          freelancer.languages.map((x: any) => x.name),
           'languages'
         )(tx);
         const services_ids = await models.upsertItems(
-          freelancer.services.map((x:any)=>x.name),
+          freelancer.services.map((x: any) => x.name),
           'services'
         )(tx);
         let client_ids: number[] = [];
 
         if (freelancer.clients) {
           client_ids = await models.upsertItems(
-            freelancer.clients.map((x:any)=>x.name),
+            freelancer.clients.map((x: any) => x.name),
             'clients'
           )(tx);
         }
