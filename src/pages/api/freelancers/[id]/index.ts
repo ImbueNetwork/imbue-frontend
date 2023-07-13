@@ -86,19 +86,21 @@ export default nextConnect()
         }
 
         const country = await tx
-          .select('*')
+          .select('country')
           .from('freelancer_country')
-          .where({ freelancer_id: freelancer.id });
-        if (country[0]) {
-          freelancer.country = country[0].country;
+          .where({ freelancer_id: freelancer.id }).first();
+
+        if (country) {
+          freelancer.country = country;
         }
 
         const region = await tx
-          .select('*')
+          .select('region')
           .from('freelancer_country')
-          .where({ freelancer_id: freelancer.id });
-        if (region[0]) {
-          freelancer.region = region[0].region;
+          .where({ freelancer_id: freelancer.id }).first();
+
+        if (region) {
+          freelancer.region = region;
         }
 
         return res.status(200).json(freelancer);
@@ -115,7 +117,6 @@ export default nextConnect()
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
     const freelancer: models.Freelancer | any = req.body.freelancer;
     const loggedInUser = req.body.freelancer.logged_in_user;
-
     if (!loggedInUser) {
       return res.status(401).send({
         status: 'Failed',
@@ -125,26 +126,27 @@ export default nextConnect()
       let response;
       await db.transaction(async (tx: any) => {
         try {
-          const skill_ids = await models.upsertItems(
+          const skill_ids = freelancer.skills ? await models.upsertItems(
             freelancer.skills,
             'skills'
-          )(tx);
-          const language_ids = await models.upsertItems(
+          )(tx) : [];
+
+          const language_ids = freelancer.languages ? await models.upsertItems(
             freelancer.languages?.map((x: any) => x.name),
             'languages'
-          )(tx);
-          const services_ids = await models.upsertItems(
+          )(tx) : [];
+
+          const services_ids = freelancer.services ? await models.upsertItems(
             freelancer.services?.map((x: any) => x.name),
             'services'
-          )(tx);
+          )(tx) : [];
           let client_ids: number[] = [];
 
-          if (freelancer.clients) {
-            client_ids = await models.upsertFreelancerClientsItems(
-              freelancer.clients,
-              'clients'
-            )(tx);
-          }
+
+          client_ids = freelancer.clients ? await models.upsertFreelancerClientsItems(
+            freelancer.clients,
+            'clients'
+          )(tx) : [];
 
           const profile_image = freelancer.profile_image;
           const country = freelancer.country;

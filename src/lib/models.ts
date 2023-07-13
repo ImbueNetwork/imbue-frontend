@@ -1191,6 +1191,12 @@ export const updateFreelancerDetails =
               freelancer_id: ids[0],
               user_id: userId,
             });
+
+            await tx<User>('users')
+            .update({ 
+              profile_photo: profile_image
+            })
+            .where({ id: userId });
         }
 
         if (skill_ids) {
