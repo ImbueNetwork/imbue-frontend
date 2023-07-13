@@ -334,7 +334,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
       setCopied('');
     }, 3000);
   };
-  console.log(projects);
+
   return (
     <div className='profile-container overflow-x-hidden relative'>
       <div className='banner'>
@@ -850,7 +850,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                 />
               </>
             ) : (
-              <div className='bio text-content-primary text-base lg:mx-10'>{freelancer?.bio}</div>
+              <div className='bio text-content-primary text-base lg:mx-10 whitespace-pre-wrap'>{freelancer?.bio}</div>
             )}
             <hr className='separator' />
 
