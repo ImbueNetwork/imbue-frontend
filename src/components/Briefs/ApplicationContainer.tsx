@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import Image from 'next/image';
 import React from 'react';
-import { FaPaperclip } from 'react-icons/fa';
 
+// import { FaPaperclip } from 'react-icons/fa';
 import { ApplicationContainerProps } from '@/model';
 
 export const ApplicationContainer = ({
@@ -76,7 +76,9 @@ export const ApplicationContainer = ({
           </div>
         </div>
 
-        <div className='text-base text-imbue-purple-dark'>{application?.name}</div>
+        <div className='text-base text-imbue-purple-dark'>
+          {application?.name}
+        </div>
         <div className='text-base'>
           {/* <div className='text-imbue-purple-dark'>
             <span className=''>Cover Letter - </span>

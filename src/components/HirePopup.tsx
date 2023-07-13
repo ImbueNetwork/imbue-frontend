@@ -12,7 +12,7 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Currency, OffchainProjectState } from '@/model';
-import { changeBriefApplicationStatus } from '@/redux/services/briefService';
+// import { changeBriefApplicationStatus } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
 import { RootState } from '@/redux/store/store';
 
@@ -25,7 +25,7 @@ import { initImbueAPIInfo } from '../utils/polkadot';
 export const HirePopup = ({
   openPopup: openHirePopup,
   setOpenPopup: setOpenHirePopup,
-  brief,
+  // brief,
   freelancer,
   application,
   milestones,
@@ -39,7 +39,7 @@ export const HirePopup = ({
 
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<any>();
-  const [projectId, setProjectId] = useState<string>();
+  // const [projectId, setProjectId] = useState<string>();
   const router = useRouter();
 
   const { user } = useSelector((state: RootState) => state.userState);
@@ -93,13 +93,13 @@ export const HirePopup = ({
       if (result.status || result.txError) {
         if (result.status) {
           setSuccess(true);
-          const briefId = brief.id;
-          const resp = await changeBriefApplicationStatus(
-            briefId!,
-            application.id,
-            OffchainProjectState.Accepted
-          );
-          setProjectId(resp.project_id);
+          // const briefId = brief.id;
+          // const resp = await changeBriefApplicationStatus(
+          //   briefId!,
+          //   application.id,
+          //   OffchainProjectState.Accepted
+          // );
+          // setProjectId(resp.project_id);
         } else if (result.txError) {
           setError({ message: result.errorMessage });
           application.status_id = OffchainProjectState.PendingReview;
@@ -122,7 +122,9 @@ export const HirePopup = ({
             src={require('@/assets/images/profile-image.png')}
             alt='profileImage'
           />
-          <span className='text-xl text-secondary-dark-hover'>{freelancer?.display_name}</span>
+          <span className='text-xl text-secondary-dark-hover'>
+            {freelancer?.display_name}
+          </span>
         </div>
         <p className='absolute top-0 text-center w-full text-lg lg:text-xl text-imbue-purple-dark'>
           Hire This Freelancer
@@ -156,7 +158,8 @@ export const HirePopup = ({
             <div className={styles.budgetDescription}>
               <p className='mb-2 text-lg'>Total price of the project</p>
               <div className='text-imbue-purple text-sm'>
-                (This includes all milestonees, and is the amount client will see)
+                (This includes all milestonees, and is the amount client will
+                see)
               </div>
             </div>
             <div className='budget-value'>
@@ -289,7 +292,6 @@ export const HirePopup = ({
           >
             Continue
           </button>
-
         </div>
       </SuccessScreen>
     </>

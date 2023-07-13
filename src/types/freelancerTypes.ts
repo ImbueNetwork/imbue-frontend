@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Freelancer, User } from '@/model';
 
 export type FreelancerProps = {

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { checkEnvironment } from '@/utils';
 
 import * as config from '@/config';

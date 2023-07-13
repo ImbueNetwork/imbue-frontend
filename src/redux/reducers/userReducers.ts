@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 'use client';
 
 import { googleLogout } from '@react-oauth/google';
