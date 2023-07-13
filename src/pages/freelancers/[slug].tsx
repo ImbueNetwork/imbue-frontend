@@ -74,7 +74,6 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [projects, setProjects] = useState<Project[]>();
-  console.log(projects);
 
   const memberSince = moment(freelancer?.created).format('MMMM YYYY');
 
