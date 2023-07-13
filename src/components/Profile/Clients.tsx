@@ -2,7 +2,6 @@ import { Badge, ToggleButton } from '@mui/material';
 import Image from 'next/image';
 import React, { useState } from 'react';
 
-import fiverrIcon from '@/assets/images/fiverr.png';
 import ImbueIcon from '@/assets/svgs/loader.svg';
 import { Freelancer } from '@/model';
 
@@ -13,8 +12,8 @@ type ClientsProps = {
 
 const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
   const [clients, setClients] = useState([
-    { id: 1, name: 'Fiverr', icon: fiverrIcon },
-    { id: 2, name: 'Imbue', icon: ImbueIcon },
+    // { id: 1, name: 'Fiverr', icon: fiverrIcon },
+    { id: 1, name: 'Imbue', icon: ImbueIcon },
   ]);
   const [openAddClient, setOpenAddClient] = useState<boolean>(false);
 
@@ -70,14 +69,14 @@ const Clients = ({ setFreelancer, isEditMode }: ClientsProps) => {
       ))}
       {isEditMode && (
         <ToggleButton
-          className='w-11 h-11 my-auto border-light-white mx-auto'
+          className='w-11 h-11 my-auto border-content-primary mx-auto'
           value='check'
           selected={openAddClient}
           onChange={() => {
             addAClient();
           }}
         >
-          <span className='text-2xl text-white'>+</span>
+          <span className='text-2xl text-content-primary'>+</span>
         </ToggleButton>
       )}
     </div>

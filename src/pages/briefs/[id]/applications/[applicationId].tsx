@@ -35,7 +35,6 @@ import { RootState } from '@/redux/store/store';
 interface MilestoneItem {
   name: string;
   amount: number | undefined;
-  description: string;
 }
 
 export type ApplicationPreviewProps = {
@@ -113,7 +112,7 @@ const ApplicationPreview = (): JSX.Element => {
     router.push(`/briefs/${brief?.id}/`);
   };
 
-  const updateProject = async (chainProjectId?: number, escrow_address?: string) => {
+  const updateProject = async (chainProjectId?: number) => {
     setLoading(true);
     try {
       // const resp = await fetch(`${config.apiBase}/project/${application.id}`, {
@@ -141,7 +140,7 @@ const ApplicationPreview = (): JSX.Element => {
       //     chain_project_id: chainProjectId,
       //   }),
       // });
-
+      
       const resp = await createProject(application?.id, {
         user_id: user.id,
         name: `${brief.headline}`,
@@ -154,7 +153,6 @@ const ApplicationPreview = (): JSX.Element => {
             return {
               name: m.name,
               amount: m.amount,
-              description: m.description,
               percentage_to_unlock: (
                 ((m.amount ?? 0) / totalCostWithoutFee) *
                 100
@@ -163,8 +161,7 @@ const ApplicationPreview = (): JSX.Element => {
           }),
         required_funds: totalCost,
         chain_project_id: chainProjectId,
-        escrow_address: escrow_address,
-      });
+      })
 
       if (resp.status === 201 || resp.status === 200) {
         setSuccess(true);
@@ -182,11 +179,7 @@ const ApplicationPreview = (): JSX.Element => {
   const filteredApplication = application?.milestones
     ?.filter?.((m: any) => m?.amount !== undefined)
     ?.map?.((m: any) => {
-      return {
-        name: m?.name,
-        amount: Number(m?.amount),
-        description: m?.description,
-      };
+      return { name: m?.name, amount: Number(m?.amount) };
     });
 
   const imbueFeePercentage = 5;
@@ -216,10 +209,7 @@ const ApplicationPreview = (): JSX.Element => {
   const imbueFee = (totalCostWithoutFee * imbueFeePercentage) / 100;
   const totalCost = imbueFee + totalCostWithoutFee;
   const onAddMilestone = () => {
-    setMilestones([
-      ...milestones,
-      { name: '', amount: undefined, description: '' },
-    ]);
+    setMilestones([...milestones, { name: '', amount: undefined }]);
   };
 
   const onRemoveMilestone = (index: number) => {
@@ -262,7 +252,7 @@ const ApplicationPreview = (): JSX.Element => {
 
   const allAmountAndNamesHaveValue = () => {
     for (let i = 0; i < milestones.length; i++) {
-      const { amount, name, description } = milestones[i];
+      const { amount, name } = milestones[i];
 
       if (
         amount === undefined ||
@@ -270,10 +260,7 @@ const ApplicationPreview = (): JSX.Element => {
         amount === 0 ||
         name === undefined ||
         name === null ||
-        name.length === 0 ||
-        description === undefined ||
-        description === null ||
-        description.length === 0
+        name.length === 0
       ) {
         return false;
       }
@@ -376,7 +363,7 @@ const ApplicationPreview = (): JSX.Element => {
             <hr className='h-[1px] bg-[#E1DDFF] w-full' />
 
             <div className='milestone-list lg:mb-5'>
-              {milestones?.map?.(({ name, amount, description }, index) => {
+              {milestones?.map?.(({ name, amount }, index) => {
                 const percent = Number(
                   ((100 * (amount ?? 0)) / totalCostWithoutFee)?.toFixed?.(0)
                 );
@@ -398,18 +385,14 @@ const ApplicationPreview = (): JSX.Element => {
                     </div>
                     <div className='flex flex-row justify-between w-full'>
                       <div className='w-3/5 lg:w-1/2'>
-                        {isEditingBio && (
-                          <h3 className=' text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
-                            Title
-                          </h3>
-                        )}
-
+                        <h3 className='mb-2 lg:mb-5 text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
+                          Description
+                        </h3>
                         {isEditingBio ? (
-                          <input
-                            type='text'
-                            data-testid={`milestone-title-${index}`}
-                            className='input-budget  text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-left  pl-5 mb-8'
-                            value={name || ''}
+                          <textarea
+                            className='input-description'
+                            value={name}
+                            disabled={!isEditingBio}
                             onChange={(e) =>
                               setMilestones([
                                 ...milestones.slice(0, index),
@@ -422,36 +405,8 @@ const ApplicationPreview = (): JSX.Element => {
                             }
                           />
                         ) : (
-                          <h3 className=' text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
-                            {milestones[index]?.name}
-                          </h3>
-                        )}
-
-                        {isEditingBio && (
-                          <h3 className='mb-2 lg:mb-5 text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
-                            Description
-                          </h3>
-                        )}
-
-                        {isEditingBio ? (
-                          <textarea
-                            className='input-description'
-                            value={description}
-                            disabled={!isEditingBio}
-                            onChange={(e) =>
-                              setMilestones([
-                                ...milestones.slice(0, index),
-                                {
-                                  ...milestones[index],
-                                  description: e.target.value,
-                                },
-                                ...milestones.slice(index + 1),
-                              ])
-                            }
-                          />
-                        ) : (
                           <p className='text-[1rem] text-[#3B27C180] m-0'>
-                            {milestones[index]?.description}
+                            {milestones[index]?.name}
                           </p>
                         )}
                       </div>

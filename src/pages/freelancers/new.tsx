@@ -54,19 +54,7 @@ const Freelancer = (): JSX.Element => {
     </div>
   );
 
-  const FreelanceExperience1 = (
-    <div className={styles.freelanceXpContainer}>
-      <div className={styles.contentTextSmallFlex}>
-        {stepData[step].content
-          .split('\n')
-          .map((line: string, index: number) => (
-            <p key={index}>{line}</p>
-          ))}
-      </div>
-    </div>
-  );
-
-  const FreelanceExperience2 = (
+  const FreelanceExperience = (
     <div className={styles.freelanceXpContainer}>
       <div className={styles.contentTextSmallFlex}>
         {stepData[step].content
@@ -276,13 +264,12 @@ const Freelancer = (): JSX.Element => {
 
   const panels = [
     HelloPanel,
-    FreelanceExperience1,
-    FreelanceExperience2,
+    FreelanceExperience,
     FreelancingGoal,
     // ImportResume,
     TitlePanel,
     EducationPanel,
-    // ExperiencePanel,EducationPanel,
+    // ExperiencePanel,
     LanguagePanel,
     SkillsPanel,
     BioPanel,
@@ -292,26 +279,29 @@ const Freelancer = (): JSX.Element => {
 
   const validate = (): boolean => {
     // TODO: show notification
-    if (step === 2 && !freelancingBefore) {
+    if (step === 1 && !freelancingBefore) {
       return false;
     }
-    if (step === 3 && !goal) {
+    if (step === 2 && !goal) {
       return false;
     }
-    if (step === 4 && !title) {
+    if (step === 3 && !title) {
       // TODO: minimum required length for description
       return false;
     }
-    // if (step === 5 && !languages.length) {
-    //   return false;
-    // }
-    if (step === 7 && !skills.length) {
+    if (step === 4 && !education) {
       return false;
     }
-    if (step === 8 && !bio) {
+    if (step === 5 && !languages.length) {
       return false;
     }
-    if (step === 9 && !services.length) {
+    if (step === 6 && !skills.length) {
+      return false;
+    }
+    if (step === 7 && !bio) {
+      return false;
+    }
+    if (step === 8 && !services.length) {
       return false;
     }
     return true;
