@@ -12,7 +12,7 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Currency, OffchainProjectState } from '@/model';
-// import { changeBriefApplicationStatus } from '@/redux/services/briefService';
+import { changeBriefApplicationStatus } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
 import { RootState } from '@/redux/store/store';
 
@@ -25,7 +25,7 @@ import { initImbueAPIInfo } from '../utils/polkadot';
 export const HirePopup = ({
   openPopup: openHirePopup,
   setOpenPopup: setOpenHirePopup,
-  // brief,
+  brief,
   freelancer,
   application,
   milestones,
@@ -92,14 +92,13 @@ export const HirePopup = ({
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
+          const briefId = brief.id;
+          await changeBriefApplicationStatus(
+            briefId!,
+            application.id,
+            OffchainProjectState.Accepted
+          );
           setSuccess(true);
-          // const briefId = brief.id;
-          // const resp = await changeBriefApplicationStatus(
-          //   briefId!,
-          //   application.id,
-          //   OffchainProjectState.Accepted
-          // );
-          // setProjectId(resp.project_id);
         } else if (result.txError) {
           setError({ message: result.errorMessage });
           application.status_id = OffchainProjectState.PendingReview;
