@@ -142,7 +142,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
               {freelancer?.display_name}
             </p>
           </Badge>
-
+{/* 
           <div className='flex items-center mt-[1rem]'>
             <Image
               className='h-4 w-6 object-cover'
@@ -151,10 +151,11 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
               src='https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg'
               alt='Flag'
             />
+            
             <h3 className='ml-2 text-imbue-purple text-[1rem] !font-normal'>
               Los Angeles, United State
             </h3>
-          </div>
+          </div> */}
 
           <p className='text-sm mt-[1.25rem] text-imbue-purple'>
             {loadingWallet === "loading" && 'Loading Wallet...'}

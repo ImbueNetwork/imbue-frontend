@@ -45,7 +45,7 @@ const WaitingScreen = (props: WaitingScreenProps) => {
 
                 <div className='mt-2 lg:mt-5'>
                     <p className='text-center text-lg lg:text-2xl font-bold text-content-primary'>
-                        Please wait for a moment
+                        Project not ready
                     </p>
                     <p className='text-center lg:text-xl my-2 lg:my-5 text-content'>{title}</p>
                 </div>

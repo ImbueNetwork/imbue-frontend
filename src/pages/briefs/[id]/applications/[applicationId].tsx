@@ -112,7 +112,7 @@ const ApplicationPreview = (): JSX.Element => {
     router.push(`/briefs/${brief?.id}/`);
   };
 
-  const updateProject = async (chainProjectId?: number) => {
+  const updateProject = async (chainProjectId?: number, escrow_address?: string) => {
     setLoading(true);
     try {
       // const resp = await fetch(`${config.apiBase}/project/${application.id}`, {
@@ -161,6 +161,7 @@ const ApplicationPreview = (): JSX.Element => {
           }),
         required_funds: totalCost,
         chain_project_id: chainProjectId,
+        escrow_address: escrow_address,
       })
 
       if (resp.status === 201 || resp.status === 200) {

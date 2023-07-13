@@ -28,6 +28,7 @@ import { calenderIcon, shieldIcon, tagIcon } from '@/assets/svgs';
 import {
   Milestone,
   OnchainProjectState,
+  OffchainProjectState,
   Project,
   ProjectOnChain,
 } from '@/model';
@@ -98,6 +99,7 @@ function Project() {
   const [isApplicant, setIsApplicant] = useState<boolean>();
 
   const [wait, setWait] = useState<boolean>(false);
+  const [waitMessage, setWaitMessage] = useState<string>();
   const [success, setSuccess] = useState<boolean>(false);
   const [successTitle, setSuccessTitle] = useState<string>('');
   const [error, setError] = useState<any>();
@@ -111,18 +113,13 @@ function Project() {
     }
   }, [projectId, userLoading]);
 
-  const getChainProject = async () => {
+  const getChainProject = async (project: Project) => {
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
     const onChainProjectRes = await chainService.getProject(projectId);
 
     if (onChainProjectRes) {
       const isApplicant = onChainProjectRes.initiator == user.web3_address;
-
-      // if (isApplicant) {
-      //   await getFreelancerData(user?.username);
-      // }
-
       setIsApplicant(isApplicant);
       if (onChainProjectRes.projectState == OnchainProjectState.OpenForVoting) {
         const firstPendingMilestone =
@@ -134,6 +131,21 @@ function Project() {
 
       setOnChainProject(onChainProjectRes);
     } else {
+      switch (project.status_id){
+        case OffchainProjectState.PendingReview:
+          setWaitMessage("This project is pending review");
+          break;
+        case OffchainProjectState.ChangesRequested:
+          setWaitMessage("Changes have been requested");
+          break;
+        case OffchainProjectState.Accepted:
+          if(!project.chain_project_id) {
+            setWaitMessage(`Waiting for freelancer to start the work`);
+          } else {
+            setWaitMessage("Your project is being created on the chain. This may take up to 6 seconds");
+          }
+          break;
+      }
       setWait(true)
     }
   };
@@ -141,7 +153,6 @@ function Project() {
   const getProject = async () => {
     try {
       const projectRes = await getProjectById(projectId);
-
       // showing owner profile if the current user if the applicant freelancer
       const brief = await getBrief(projectRes.brief_id);
       const owner = brief?.user_id
@@ -154,6 +165,7 @@ function Project() {
         await getFreelancerData(projectRes?.user_id);
       }
       setProject(projectRes);
+
 
       // setting approver list
       const approversPreviewList = [...approversPreview];
@@ -185,7 +197,7 @@ function Project() {
       setApproverPreview(approversPreviewList);
 
       // api  project response
-      await getChainProject();
+      await getChainProject(projectRes);
 
       const balance = await getBalance(
         projectRes?.escrow_address,
@@ -247,7 +259,6 @@ function Project() {
         } else if (result.txError) {
           // TODO: show error screen
           setError({ message: result.errorMessage });
-          console.log(result.errorMessage);
         }
         break;
       }
@@ -270,7 +281,6 @@ function Project() {
           setSuccessTitle('Withdraw successfull');
         } else if (result.txError) {
           setError({ message: result.errorMessage });
-          console.log(result.errorMessage);
         }
         break;
       }
@@ -779,7 +789,7 @@ function Project() {
         </div>
       </SuccessScreen>
 
-      <WaitingScreen title={"Your project is being created on the chain. This may take minimum of 5 seconds."}
+      <WaitingScreen title={waitMessage}
         open={wait}
         setOpen={setWait}>
         <div className='flex flex-col gap-4 w-1/2'>

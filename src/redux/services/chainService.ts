@@ -352,10 +352,14 @@ class ChainService {
 
   async convertToOnChainProject(project: Project) {
     if (!project?.chain_project_id) return;
-
     const projectOnChain: any = await this.getProjectOnChain(
       project.chain_project_id
     );
+    
+    if(!projectOnChain) {
+      return;
+    }
+
     const raisedFunds = BigInt(
       projectOnChain?.raisedFunds?.replaceAll(',', '') || 0
     );
