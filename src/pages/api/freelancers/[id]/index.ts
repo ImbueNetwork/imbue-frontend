@@ -130,18 +130,18 @@ export default nextConnect()
             'skills'
           )(tx);
           const language_ids = await models.upsertItems(
-            freelancer.languages.map((x: any) => x.name),
+            freelancer.languages?.map((x: any) => x.name),
             'languages'
           )(tx);
           const services_ids = await models.upsertItems(
-            freelancer.services.map((x: any) => x.name),
+            freelancer.services?.map((x: any) => x.name),
             'services'
           )(tx);
           let client_ids: number[] = [];
 
           if (freelancer.clients) {
             client_ids = await models.upsertItems(
-              freelancer.clients.map((x: any) => x.name),
+              freelancer.clients?.map((x: any) => x.name),
               'clients'
             )(tx);
           }
