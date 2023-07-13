@@ -59,7 +59,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
   } = props;
 
   const [balance, setBalance] = useState<string>();
-  const [loadingWallet, setLoadingWallet] = useState<any>();
+  const [loadingWallet, setLoadingWallet] = useState<string>("");
   const [error, setError] = useState<any>();
 
   const [openPopup, setOpenPopup] = useState<boolean>(false);
@@ -76,7 +76,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
 
   const accountSelected = async (account: WalletAccount): Promise<any> => {
     try {
-      setLoadingWallet((prev: any) => ({ ...prev, connecting: true }));
+      setLoadingWallet('connecting');
       const result = await getAccountAndSign(account);
       const resp = await authorise(
         result?.signature as SignerResult,
@@ -96,14 +96,14 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
     } catch (error) {
       setError(error);
     } finally {
-      setLoadingWallet((prev: any) => ({ ...prev, connecting: false }));
+      setLoadingWallet('');
     }
   };
 
   useEffect(() => {
     const showBalance = async () => {
       try {
-        setLoadingWallet((prev: any) => ({ ...prev, balance: true }));
+        setLoadingWallet('loading');
         const balance = await getBalance(
           user?.web3_address,
           application?.currency_id ?? 0,
@@ -113,7 +113,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
       } catch (error) {
         setError(error);
       } finally {
-        setLoadingWallet((prev: any) => ({ ...prev, balance: false }));
+        setLoadingWallet('');
       }
     };
     user?.web3_address && showBalance();
@@ -157,10 +157,9 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
           </div>
 
           <p className='text-sm mt-[1.25rem] text-imbue-purple'>
-            {loadingWallet?.balance && 'Loading Wallet...'}
-            {loadingWallet?.connecting && 'Connecting Wallet...'}
-            {!loadingWallet?.balance &&
-              !loadingWallet?.connecting &&
+            {loadingWallet === "loading" && 'Loading Wallet...'}
+            {loadingWallet === "connecting" && 'Connecting Wallet...'}
+            {!loadingWallet &&
               (balance === undefined
                 ? 'No wallet found'
                 : `Balance: ${balance}`)}
@@ -205,7 +204,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
           Message
         </button>
 
-        {balance !== undefined ? (
+        {loadingWallet || balance !== undefined ? (
           <button
             id='demo-customized-button'
             aria-controls={open ? 'demo-customized-menu' : undefined}
@@ -213,9 +212,9 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
             aria-expanded={open ? 'true' : undefined}
             onClick={handleOptionsClick}
             className='primary-btn hover:!bg-imbue-purple hover:!text-white in-dark w-button !text-xs lg:!text-base'
-            disabled={loadingWallet?.balance || loadingWallet?.connecting}
+            disabled={loadingWallet ? true : false}
           >
-            {loadingWallet?.balance || loadingWallet?.connecting ? (
+            {loadingWallet ? (
               'Please Wait...'
             ) : (
               <>

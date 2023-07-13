@@ -31,7 +31,7 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
             {brief?.headline}
           </h3>
           <span
-            className=' text-imbue-lemon cursor-pointer text-base font-bold !m-0 !p-0 relative top-1'
+            className=' text-imbue-lemon cursor-pointer text-sm font-bold !m-0 !p-0 relative top-1'
             onClick={viewFullBrief}
           >
             View full brief
@@ -42,7 +42,7 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
             {brief?.description}
           </p>
         </div>
-        <p className=' text-imbue-light-purple-two text-xs lg:text-base leading-[1.5] font-bold m-0 p-0'>
+        <p className=' text-imbue-light-purple-two text-xs leading-[1.5] m-0 p-0'>
           Posted {timePosted}{' '}
         </p>
       </div>

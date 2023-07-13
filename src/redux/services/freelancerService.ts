@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { checkEnvironment } from '@/utils';
 
 import * as config from '@/config';
@@ -85,9 +86,15 @@ export async function updateFreelancer(freelancer: Freelancer) {
     }
   );
 
+  console.log(resp);
+
   if (resp.ok) {
     return (await resp.json()) as Freelancer;
   } else {
+    return {
+      status: false,
+      message: resp.statusText,
+    };
     // TODO:
     // console.log("Failed to update freelancer profile. status:" + resp.status);
   }

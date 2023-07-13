@@ -54,19 +54,7 @@ const Freelancer = (): JSX.Element => {
     </div>
   );
 
-  const FreelanceExperience1 = (
-    <div className={styles.freelanceXpContainer}>
-      <div className={styles.contentTextSmallFlex}>
-        {stepData[step].content
-          .split('\n')
-          .map((line: string, index: number) => (
-            <p key={index}>{line}</p>
-          ))}
-      </div>
-    </div>
-  );
-  
-  const FreelanceExperience2 = (
+  const FreelanceExperience = (
     <div className={styles.freelanceXpContainer}>
       <div className={styles.contentTextSmallFlex}>
         {stepData[step].content
@@ -80,8 +68,9 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-xp-${index}`}
-            className={`${styles.freelanceXpItem} ${freelancingBefore === value ? styles.active : ''
-              }`}
+            className={`${styles.freelanceXpItem} ${
+              freelancingBefore === value ? styles.active : ''
+            }`}
             onClick={() => setFreelancingBefore(value)}
           >
             {label}
@@ -103,8 +92,9 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-goal-${index}`}
-            className={`${styles.freelanceXpItem} ${goal === value ? styles.active : ''
-              }`}
+            className={`${styles.freelanceXpItem} ${
+              goal === value ? styles.active : ''
+            }`}
             onClick={() => setGoal(value)}
           >
             {label}
@@ -180,6 +170,7 @@ const Freelancer = (): JSX.Element => {
           className={`${styles.fieldInput} placeholder:text-imbue-light-purple`}
           placeholder='Enter your education'
           name='education'
+          data-testid='education'
           value={education}
           onChange={(e) => setEducation(e.target.value)}
         />
@@ -265,19 +256,20 @@ const Freelancer = (): JSX.Element => {
 
   const ConfirmPanel = (
     <div className={styles.descriptionPanel}>
-      <p className='mt-8 text-imbue-purple-dark'>Thank you for your submission!</p>
+      <p className='mt-8 text-imbue-purple-dark'>
+        Thank you for your submission!
+      </p>
     </div>
   );
 
   const panels = [
     HelloPanel,
-    FreelanceExperience1,
-    FreelanceExperience2,
+    FreelanceExperience,
     FreelancingGoal,
     // ImportResume,
     TitlePanel,
     EducationPanel,
-    // ExperiencePanel,EducationPanel,
+    // ExperiencePanel,
     LanguagePanel,
     SkillsPanel,
     BioPanel,
@@ -287,26 +279,30 @@ const Freelancer = (): JSX.Element => {
 
   const validate = (): boolean => {
     // TODO: show notification
-    if (step === 2 && !freelancingBefore) {
+    if (step === 1 && !freelancingBefore) {
       return false;
     }
-    if (step === 3 && !goal) {
+    if (step === 2 && !goal) {
       return false;
     }
-    if (step === 4 && !title) {
+    if (step === 3 && !title) {
       // TODO: minimum required length for description
       return false;
     }
+    if (step === 4 && !education) {
+      return false;
+    }
+    // Freelancers might only speak 1 language
     // if (step === 5 && !languages.length) {
     //   return false;
     // }
-    if (step === 7 && !skills.length) {
+    if (step === 6 && !skills.length) {
       return false;
     }
-    if (step === 8 && !bio) {
+    if (step === 7 && !bio) {
       return false;
     }
-    if (step === 9 && !services.length) {
+    if (step === 8 && !services.length) {
       return false;
     }
     return true;
@@ -428,7 +424,6 @@ const Freelancer = (): JSX.Element => {
             </div>
           )
         } */}
-
       </div>
       <ErrorScreen {...{ error, setError }}>
         <div className='flex flex-col gap-4 w-1/2'>

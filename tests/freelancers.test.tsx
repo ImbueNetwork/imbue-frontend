@@ -57,6 +57,7 @@ test('test freelancer validation failure not proceeding the next step', () => {
 test('test freelancer validation passing if the value is being entered ', () => {
   setUp();
   fireEvent.click(screen.getByTestId('get-started-button'));
+  fireEvent.click(screen.getByTestId('next-button'));
   fireEvent.click(screen.getByTestId('freelance-xp-1'));
   fireEvent.click(screen.getByTestId('next-button'));
   expect(
@@ -67,6 +68,7 @@ test('test freelancer validation passing if the value is being entered ', () => 
 test('test freelancer capturing the input textbox value', () => {
   setUp();
   fireEvent.click(screen.getByTestId('get-started-button'));
+  fireEvent.click(screen.getByTestId('next-button'));
   fireEvent.click(screen.getByTestId('freelance-xp-1'));
   fireEvent.click(screen.getByTestId('next-button'));
   fireEvent.click(screen.getByTestId('freelance-goal-2'));
@@ -82,12 +84,17 @@ test('test freelancer capturing the input textbox value', () => {
 test('test freelancer capturing the multiselect languages', () => {
   setUp();
   fireEvent.click(screen.getByTestId('get-started-button'));
+  fireEvent.click(screen.getByTestId('next-button'));
   fireEvent.click(screen.getByTestId('freelance-xp-1'));
   fireEvent.click(screen.getByTestId('next-button'));
   fireEvent.click(screen.getByTestId('freelance-goal-2'));
   fireEvent.click(screen.getByTestId('next-button'));
   fireEvent.change(screen.getByTestId('title'), {
     target: { value: 'imbueLegends' },
+  });
+  fireEvent.click(screen.getByTestId('next-button'));
+  fireEvent.change(screen.getByTestId('education'), {
+    target: { value: 'University of Russia' },
   });
   fireEvent.click(screen.getByTestId('next-button'));
   fireEvent.change(screen.getByTestId('tag-input'), {

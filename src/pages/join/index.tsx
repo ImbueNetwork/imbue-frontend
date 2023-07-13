@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { SignerResult } from '@polkadot/api/types';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -16,7 +17,6 @@ import { postAPIHeaders } from '@/config';
 import * as config from '@/config';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 
-
 const Join = (): JSX.Element => {
   const [user, setUser] = useState('');
   const [email, setEmail] = useState('');
@@ -26,7 +26,6 @@ const Join = (): JSX.Element => {
 
   const [visible, setVisible] = useState<boolean>(false);
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
-
 
   const salt = bcrypt.genSaltSync(10);
 
@@ -53,7 +52,6 @@ const Join = (): JSX.Element => {
       setError(error);
     }
   };
-
 
   const closeModal = (): void => {
     showPolkadotAccounts(true);
@@ -84,7 +82,7 @@ const Join = (): JSX.Element => {
     });
 
     if (resp.ok) {
-      utils.redirect("/dashboard");
+      utils.redirect('/dashboard');
     } else {
       setError('incorrect username or password');
     }
@@ -92,13 +90,17 @@ const Join = (): JSX.Element => {
 
   return (
     <div>
-      <div id='registration-form' className='registration-container bg-white w-[70%] py-5 -mt-3 rounded-2xl mx-auto'>
+      <div
+        id='registration-form'
+        className='registration-container bg-white w-[70%] py-5 -mt-3 rounded-2xl mx-auto'
+      >
         <div className='flex flex-col w-[75%] justify-center items-center mx-auto'>
           <div className='flex flex-col gap-4'>
             <h1>Create account with imbue</h1>
-            <p className='text-imbue-purple-dark text-center text-xl'>Please use the link below to sign in</p>
+            <p className='text-imbue-purple-dark text-center text-xl'>
+              Please use the link below to sign in
+            </p>
           </div>
-
 
           {/* <div className='flex flex-wrap flex-row justify-center'>
             <CssTextField
@@ -145,7 +147,6 @@ const Join = (): JSX.Element => {
               required
             />
           </div> */}
-
 
           <div className='w-full max-w-[50%] mx-auto mt-3'>
             <form
@@ -248,16 +249,15 @@ const Join = (): JSX.Element => {
                 <GoogleOAuthProvider clientId={config.googleClientId}>
                   <GoogleLogin
                     width={'400'}
-                    logo_alignment="center"
+                    logo_alignment='center'
                     shape='circle'
-                    size="large"
+                    size='large'
                     useOneTap={true}
                     onSuccess={(creds: any) => googleLogin(creds)}
                     onError={() => {
                       // FIXME: error handling
                       console.log('Login Failed');
                     }}
-
                   />
                 </GoogleOAuthProvider>
               </div>
@@ -278,11 +278,8 @@ const Join = (): JSX.Element => {
               </button>
             </div>
           </div>
-
-
         </div>
       </div>
-
 
       <AccountChoice
         accountSelected={(account: WalletAccount) => accountSelected(account)}
@@ -295,8 +292,7 @@ const Join = (): JSX.Element => {
         setVisible={setVisible}
         redirectUrl='/dashboard'
       />
-
-    </div >
+    </div>
   );
 };
 

@@ -13,7 +13,7 @@ export const initialState: { user: User; loading: boolean; error: any } = {
     username: '',
     getstream_token: '',
   },
-  loading: true,
+  loading: false,
   error: {},
 };
 

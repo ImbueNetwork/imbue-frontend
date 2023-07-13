@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Freelancer } from '@/model';
 
 export type DraftMilestone = {

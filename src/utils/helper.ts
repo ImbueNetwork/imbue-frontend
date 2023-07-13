@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import ChainService from '@/redux/services/chainService';
 
 import { initImbueAPIInfo } from './polkadot';
