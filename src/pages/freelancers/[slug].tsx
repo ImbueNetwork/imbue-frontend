@@ -131,11 +131,16 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         data = {
           ...data,
           skills: skills,
-          clients: clients
+          clients: clients,
+          logged_in_user: browsingUser,
         };
-        console.log(data);
-        await updateFreelancer(data);
-        setSuccess(true);
+
+        const resp: any = await updateFreelancer(data);
+        if (resp.status) {
+          setSuccess(true);
+        } else {
+          setError({ message: resp.message });
+        }
       }
     } catch (error) {
       setError(error);
@@ -1051,14 +1056,16 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         <div className="flex flex-col gap-4 w-1/2">
           <button
             onClick={() => {
-              flipEdit(), setSuccess(false);
+              flipEdit(), 
+              setSuccess(false);
+              window.location.reload();
             }}
             className="primary-btn in-dark w-button w-full !m-0"
           >
             See Profile
           </button>
           <button
-            onClick={() => router.push(`/dashboard`)}
+            onClick={() => window.location.href = `/dashboard`}
             className="underline text-xs lg:text-base font-bold"
           >
             Go to Dashboard
