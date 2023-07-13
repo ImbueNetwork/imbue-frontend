@@ -129,10 +129,15 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           ...data,
           skills: skills,
           clients: [],
+          logged_in_user: browsingUser,
         };
 
-        await updateFreelancer(data);
-        setSuccess(true);
+        const resp: any = await updateFreelancer(data);
+        if (resp.status) {
+          setSuccess(true);
+        } else {
+          setError({ message: resp.message });
+        }
       }
     } catch (error) {
       setError(error);

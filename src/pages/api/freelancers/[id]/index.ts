@@ -114,70 +114,78 @@ export default nextConnect()
   })
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
     const freelancer: models.Freelancer | any = req.body.freelancer;
+    const loggedInUser = req.body.freelancer.logged_in_user;
 
-    let response;
-    await db.transaction(async (tx: any) => {
-      try {
-        const skill_ids = await models.upsertItems(
-          freelancer.skills,
-          'skills'
-        )(tx);
-        const language_ids = await models.upsertItems(
-          freelancer.languages.map((x: any) => x.name),
-          'languages'
-        )(tx);
-        const services_ids = await models.upsertItems(
-          freelancer.services.map((x: any) => x.name),
-          'services'
-        )(tx);
-        let client_ids: number[] = [];
-
-        if (freelancer.clients) {
-          client_ids = await models.upsertItems(
-            freelancer.clients.map((x: any) => x.name),
-            'clients'
+    if (!loggedInUser) {
+      return res.status(401).send({
+        status: 'Failed',
+        error: new Error('You must be logged in to update your profile.'),
+      });
+    } else {
+      let response;
+      await db.transaction(async (tx: any) => {
+        try {
+          const skill_ids = await models.upsertItems(
+            freelancer.skills,
+            'skills'
           )(tx);
-        }
+          const language_ids = await models.upsertItems(
+            freelancer.languages.map((x: any) => x.name),
+            'languages'
+          )(tx);
+          const services_ids = await models.upsertItems(
+            freelancer.services.map((x: any) => x.name),
+            'services'
+          )(tx);
+          let client_ids: number[] = [];
 
-        const profile_image = freelancer.profile_image;
-        const country = freelancer.country;
-        const region = freelancer.region;
-        const web3_address = freelancer.web3_address;
-        const web3_type = freelancer.web3_type;
-        const web3_challenge = freelancer.web3_challenge;
+          if (freelancer.clients) {
+            client_ids = await models.upsertItems(
+              freelancer.clients.map((x: any) => x.name),
+              'clients'
+            )(tx);
+          }
 
-        const freelancer_id = await models.updateFreelancerDetails(
-          freelancer.user_id,
-          freelancer,
-          skill_ids,
-          language_ids,
-          client_ids,
-          services_ids,
-          profile_image,
-          country,
-          region,
-          web3_address,
-          web3_type,
-          web3_challenge
-        )(tx);
+          const profile_image = freelancer.profile_image;
+          const country = freelancer.country;
+          const region = freelancer.region;
+          const web3_address = freelancer.web3_address;
+          const web3_type = freelancer.web3_type;
+          const web3_challenge = freelancer.web3_challenge;
 
-        if (!freelancer_id) {
-          return res.status(401).send({
-            status: 'Failed',
-            error: new Error('Failed to update freelancer details.'),
+          const freelancer_id = await models.updateFreelancerDetails(
+            freelancer.user_id,
+            freelancer,
+            skill_ids,
+            language_ids,
+            client_ids,
+            services_ids,
+            profile_image,
+            country,
+            region,
+            web3_address,
+            web3_type,
+            web3_challenge
+          )(tx);
+
+          if (!freelancer_id) {
+            return res.status(401).send({
+              status: 'Failed',
+              error: new Error('Failed to update freelancer details.'),
+            });
+          }
+
+          return res.status(201).send({
+            status: 'Successful',
+            freelancer_id: freelancer_id,
           });
+        } catch (e) {
+          new Error(`Failed to update freelancer ${freelancer.display_name}`, {
+            cause: e as Error,
+          });
+          console.log(e);
         }
-
-        return res.status(201).send({
-          status: 'Successful',
-          freelancer_id: freelancer_id,
-        });
-      } catch (e) {
-        new Error(`Failed to update freelancer ${freelancer.display_name}`, {
-          cause: e as Error,
-        });
-        console.log(e);
-      }
-    });
-    return response;
+      });
+      return response;
+    }
   });
