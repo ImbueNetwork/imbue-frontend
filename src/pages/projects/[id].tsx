@@ -781,7 +781,7 @@ function Project() {
 
       <WaitingScreen title={"Your project is being created on the chain. This may take minimum of 5 seconds."}
         open={wait}
-        setOpen={setSuccess}>
+        setOpen={setWait}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => window.location.reload()}
