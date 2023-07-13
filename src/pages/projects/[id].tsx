@@ -99,7 +99,7 @@ function Project() {
   const [isApplicant, setIsApplicant] = useState<boolean>();
 
   const [wait, setWait] = useState<boolean>(false);
-  const [waitMessage, setWaitMessage] = useState<string>();
+  const [waitMessage, setWaitMessage] = useState<string>("");
   const [success, setSuccess] = useState<boolean>(false);
   const [successTitle, setSuccessTitle] = useState<string>('');
   const [error, setError] = useState<any>();
@@ -113,7 +113,7 @@ function Project() {
     }
   }, [projectId, userLoading]);
 
-  const getChainProject = async (project: Project) => {
+  const getChainProject = async (project: Project, freelancer: any) => {
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
     const onChainProjectRes = await chainService.getProject(projectId);
@@ -140,9 +140,9 @@ function Project() {
           break;
         case OffchainProjectState.Accepted:
           if(!project.chain_project_id) {
-            setWaitMessage(`Waiting for freelancer to start the work`);
+            setWaitMessage(`Waiting for ${freelancer.display_name} to start the work`);
           } else {
-            setWaitMessage("Your project is being created on the chain. This may take up to 6 seconds");
+            setWaitMessage(`Your project is being created on the chain. This may take up to 6 seconds`);
           }
           break;
       }
@@ -159,14 +159,13 @@ function Project() {
         ? await utils.fetchUser(brief?.user_id)
         : null;
 
+      const freelancerRes = await getFreelancerProfile(projectRes?.user_id);
       if (projectRes?.user_id == user?.id) {
         setTargetUser(owner);
       } else {
-        await getFreelancerData(projectRes?.user_id);
+        setTargetUser(freelancerRes);
       }
       setProject(projectRes);
-
-
       // setting approver list
       const approversPreviewList = [...approversPreview];
 
@@ -196,8 +195,9 @@ function Project() {
       }
       setApproverPreview(approversPreviewList);
 
+
       // api  project response
-      await getChainProject(projectRes);
+      await getChainProject(projectRes, freelancerRes);
 
       const balance = await getBalance(
         projectRes?.escrow_address,
@@ -211,11 +211,6 @@ function Project() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const getFreelancerData = async (freelancerName: string) => {
-    const freelanceRes = await getFreelancerProfile(freelancerName);
-    setTargetUser(freelanceRes);
   };
 
   // voting on a mile stone

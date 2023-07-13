@@ -140,7 +140,6 @@ const ApplicationPreview = (): JSX.Element => {
       //     chain_project_id: chainProjectId,
       //   }),
       // });
-      
       const resp = await createProject(application?.id, {
         user_id: user.id,
         name: `${brief.headline}`,
@@ -160,6 +159,7 @@ const ApplicationPreview = (): JSX.Element => {
             };
           }),
         required_funds: totalCost,
+        owner: user.web3_address,
         chain_project_id: chainProjectId,
         escrow_address: escrow_address,
       })
