@@ -292,9 +292,10 @@ const Freelancer = (): JSX.Element => {
     if (step === 4 && !education) {
       return false;
     }
-    if (step === 5 && !languages.length) {
-      return false;
-    }
+    // Freelancers might only speak 1 language
+    // if (step === 5 && !languages.length) {
+    //   return false;
+    // }
     if (step === 6 && !skills.length) {
       return false;
     }
