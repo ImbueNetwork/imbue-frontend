@@ -97,8 +97,11 @@ export default nextConnect()
           freelancer.region = region[0].region;
         }
 
+        console.log(freelancer);
+
         return res.status(200).json(freelancer);
       } catch (e) {
+        console.log(e);
         new Error(
           `Failed to fetch freelancer details by username: ${username}`,
           {
@@ -129,8 +132,8 @@ export default nextConnect()
         let client_ids: number[] = [];
 
         if (freelancer.clients) {
-          client_ids = await models.upsertItems(
-            freelancer.clients.map((x:any)=>x.name),
+          client_ids = await models.upsertFreelancerClientsItems(
+            freelancer.clients,
             'clients'
           )(tx);
         }
@@ -154,7 +157,8 @@ export default nextConnect()
           region,
           web3_address,
           web3_type,
-          web3_challenge
+          web3_challenge,
+          freelancer.clients
         )(tx);
 
         if (!freelancer_id) {

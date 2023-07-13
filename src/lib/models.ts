@@ -385,6 +385,22 @@ export const insertToTable =
         .returning('*')
     )[0];
 
+export const insertToFreelancerClientsTable =
+  (
+    item: { name: string; website?: string; logo?: string },
+    table_name: string
+  ) =>
+  async (tx: Knex.Transaction) =>
+    (
+      await tx(table_name)
+        .insert({
+          name: item.name.toLowerCase(),
+          website: item?.website || '',
+          logo: item?.logo || '',
+        })
+        .returning('*')
+    )[0];
+
 export const updateFederatedLoginUser =
   (user: User, username: string, email: string, password?: string) =>
   async (tx: Knex.Transaction) =>
@@ -811,6 +827,34 @@ export const upsertItems =
     return item_ids;
   };
 
+export const upsertFreelancerClientsItems =
+  (items: any, tableName: string) => async (tx: Knex.Transaction) => {
+    const item_ids: number[] = [];
+    try {
+      //TODO Convert to map
+      for (const item of items) {
+        let item_id: number;
+        const existing_item = await tx(tableName)
+          .select()
+          .where({
+            name: item?.name?.toLowerCase(),
+          })
+          .first();
+
+        if (!existing_item) {
+          item_id = await (
+            await insertToFreelancerClientsTable(item, tableName)(tx)
+          ).id;
+        } else item_id = existing_item.id;
+
+        item_ids.push(item_id);
+      }
+    } catch (err) {
+      console.log('Failed to insert new item ', err);
+    }
+    return item_ids;
+  };
+
 export const getOrCreateFederatedUser = (
   issuer: string,
   username: string,
@@ -894,7 +938,7 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
       'display_name',
       'web3_accounts.address as web3_address',
       'freelancers.created',
-      'verified'
+      'verified',
       // tx.raw('ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills'),
       // tx.raw('ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids'),
 
@@ -904,7 +948,7 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
       // tx.raw('ARRAY_AGG(DISTINCT CAST(services.name as text)) as services'),
       // tx.raw('ARRAY_AGG(DISTINCT CAST(services.id as text)) as service_ids'),
 
-      // tx.raw('ARRAY_AGG(DISTINCT CAST(clients.name as text)) as clients'),
+      // tx.raw('json_agg(clients.*) as clients'),
       // tx.raw('ARRAY_AGG(DISTINCT CAST(clients.id as text)) as client_ids'),
 
       // tx.raw('ARRAY_AGG(DISTINCT CAST(clients.img as text)) as client_images'),
@@ -1082,7 +1126,9 @@ export const updateFreelancerDetails =
     region: string,
     web3_address: string,
     web3_type: string,
-    web3_challenge: string
+    web3_challenge: string,
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    freelancer_clients: Array<{ id: number; name: string; img: string }>
   ) =>
   async (tx: Knex.Transaction) =>
     await tx<Freelancer>('freelancers')
