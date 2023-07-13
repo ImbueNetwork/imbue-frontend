@@ -23,7 +23,7 @@ export default nextConnect().get(
           username: user.username,
           getstream_token: user.getstream_token,
           web3_address: web3Account?.address || null,
-          profile_image: user.profile_photo,
+          profile_image: user?.profile_photo,
           country: user.country,
           region: user.region,
           about: user.about,

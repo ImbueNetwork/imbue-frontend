@@ -11,16 +11,16 @@ import {
   MenuItem,
   Select,
   TextField,
-} from '@mui/material';
-import { StyledEngineProvider } from '@mui/system';
-import { SignerResult } from '@polkadot/api/types';
-import { WalletAccount } from '@talismn/connect-wallets';
+} from "@mui/material";
+import { StyledEngineProvider } from "@mui/system";
+import { SignerResult } from "@polkadot/api/types";
+import { WalletAccount } from "@talismn/connect-wallets";
 import moment from 'moment';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ReactCountryFlag from 'react-country-flag';
-import { AiOutlineUser } from 'react-icons/ai';
+import { AiOutlineUser } from "react-icons/ai";
 import { BsPencilSquare } from 'react-icons/bs';
 import {
   FaDiscord,
@@ -39,21 +39,20 @@ import { IoPeople } from 'react-icons/io5';
 import { MdOutlineWatchLater } from 'react-icons/md';
 import { useSelector } from 'react-redux';
 
-import AccountChoice from '@/components/AccountChoice';
+import { checkEnvironment, fetchUser } from '@/utils';
+
+import AccountChoice from "@/components/AccountChoice";
 import { TextArea } from '@/components/Briefs/TextArea';
 import ChatPopup from '@/components/ChatPopup';
-import ErrorScreen from '@/components/ErrorScreen';
-import FullScreenLoader from '@/components/FullScreenLoader';
-import Clients from '@/components/Profile/Clients';
-import CountrySelector from '@/components/Profile/CountrySelector';
-import Skills from '@/components/Profile/Skills';
-import UploadImage from '@/components/Profile/UploadImage';
-import SuccessScreen from '@/components/SuccessScreen';
+import ErrorScreen from "@/components/ErrorScreen";
+import FullScreenLoader from "@/components/FullScreenLoader";
+import Clients from "@/components/Profile/Clients";
+import CountrySelector from "@/components/Profile/CountrySelector";
+import Skills from "@/components/Profile/Skills";
+import UploadImage from "@/components/Profile/UploadImage";
+import SuccessScreen from "@/components/SuccessScreen";
 
-import FiverrIcon from '@/assets/images/fiverr.png';
-import ImbueIcon from '@/assets/svgs/loader.svg';
-import { Freelancer, Project, User } from '@/model';
-import { Currency } from '@/model';
+import { Currency, Freelancer, Project, User } from '@/model';
 import {
   getFreelancerApplications,
   getFreelancerProfile,
@@ -63,7 +62,6 @@ import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 import { RootState } from '@/redux/store/store';
 import styles from '@/styles/modules/freelancers.module.css';
 
-import { checkEnvironment, fetchUser } from '../../utils';
 
 export type ProfileProps = {
   initFreelancer: Freelancer;
@@ -100,6 +98,11 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
   const [copied, setCopied] = useState<string>('');
 
+
+  const [clients, setClients] = useState<any>(
+    initFreelancer?.clients ? initFreelancer.clients : []
+  );
+
   function urlify(text: string) {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     if (!urlRegex.test(text)) {
@@ -117,7 +120,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
       }
     };
     setup();
-  }, [freelancer]);
+  }, []);
 
   //The fields must be pre populated correctly.
   const onSave = async () => {
@@ -128,11 +131,16 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         data = {
           ...data,
           skills: skills,
-          clients: [],
+          clients: clients,
+          logged_in_user: browsingUser,
         };
 
-        await updateFreelancer(data);
-        setSuccess(true);
+        const resp: any = await updateFreelancer(data);
+        if (resp.status) {
+          setSuccess(true);
+        } else {
+          setError({ message: resp.message });
+        }
       }
     } catch (error) {
       setError(error);
@@ -162,7 +170,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const cancelEdit = async () => {
     setFreelancer(initFreelancer);
     setIsEditMode(false);
-    setClients(clinetsData);
+    setClients(initFreelancer?.clients);
   };
 
   const accountSelected = async (account: WalletAccount): Promise<any> => {
@@ -182,6 +190,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
       }
     } catch (error) {
       setError(error);
+      console.log(error);
     }
   };
 
@@ -189,8 +198,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     {
       label: 'Facebook',
       key: 'facebook_link',
-      // value: freelancer?.facebook_link,
-      value: 'facebook.com',
+      value: freelancer?.facebook_link,
+      // value: 'facebook.com',
       icon: (
         <FaFacebook
           color='#4267B2'
@@ -204,8 +213,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     {
       label: 'Twitter',
       key: 'twitter_link',
-      // value: freelancer?.twitter_link,
-      value: 'twitter.com',
+      value: freelancer?.twitter_link,
+      // value: 'twitter.com',
       icon: (
         <FaTwitter
           color='#1DA1F2'
@@ -291,12 +300,19 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     },
   ];
 
-  const clinetsData = [
-    { id: 1, name: 'Fiverr', logo: FiverrIcon, website: 'fiverr.com' },
-    { id: 2, name: 'Imbue', logo: ImbueIcon, website: 'fiverr.com' },
-  ];
+  // const clinetsData = [
+  //   {
+  //     name: "Fiverr",
+  //     logo: "https://res.cloudinary.com/ssani7/image/upload/v1686857275/imbue/loader_mrgfrj.svg",
+  //     website: "fiverr.com",
+  //   },
+  //   {
+  //     name: "Imbue",
+  //     logo: "https://res.cloudinary.com/ssani7/image/upload/v1686857275/imbue/loader_mrgfrj.svg",
+  //     website: "imbue.com",
+  //   },
+  // ];
 
-  const [clients, setClients] = useState<any>(clinetsData);
 
   const copyToClipboard = ({
     text,
@@ -523,14 +539,14 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                  */}
                   {/* 
                 {!isEditMode && isCurrentFreelancer ? (
-                  <button onClick={copyProfile} className='share'>
-                    <FaRegShareSquare color='white' />
+                  <button onClick={copyProfile} className="share">
+                    <FaRegShareSquare color="white" />
                     Share Profile
                   </button>
                 ) : (
                   <button
                     onClick={() => cancelEdit()}
-                    className='message !bg-red-600'
+                    className="message !bg-red-600"
                   >
                     Cancel
                   </button>
@@ -668,7 +684,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                             />
                           </div>
                         ) : (
-                          <button className='bg-imbue-light-purple w-[32px] h-[32px] rounded-[10px] text-imbue-purple border-none text-[20px] font-semibold items-center justify-center'>
+                          <button
+                            onClick={() => !value && setIsEditMode(true)}
+                            className='bg-imbue-light-purple w-[32px] h-[32px] rounded-[10px] text-imbue-purple border-none text-[20px] font-semibold items-center justify-center'>
                             {socials && value ? icon : '+'}
                           </button>
                         )}
@@ -1035,18 +1053,20 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         open={success}
         setOpen={setSuccess}
       >
-        <div className='flex flex-col gap-4 w-1/2'>
+        <div className="flex flex-col gap-4 w-1/2">
           <button
             onClick={() => {
-              flipEdit(), setSuccess(false);
+              flipEdit(), 
+              setSuccess(false);
+              window.location.reload();
             }}
-            className='primary-btn in-dark w-button w-full !m-0'
+            className="primary-btn in-dark w-button w-full !m-0"
           >
             See Profile
           </button>
           <button
-            onClick={() => router.push(`/dashboard`)}
-            className='underline text-xs lg:text-base font-bold'
+            onClick={() => window.location.href = `/dashboard`}
+            className="underline text-xs lg:text-base font-bold"
           >
             Go to Dashboard
           </button>
@@ -1054,10 +1074,10 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
       </SuccessScreen>
 
       <ErrorScreen {...{ error, setError }}>
-        <div className='flex flex-col gap-4 w-1/2'>
+        <div className="flex flex-col gap-4 w-1/2">
           <button
             onClick={() => setError(null)}
-            className='primary-btn in-dark w-button w-full !m-0'
+            className="primary-btn in-dark w-button w-full !m-0"
           >
             Try Again
           </button>
@@ -1070,9 +1090,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         </div>
       </ErrorScreen>
       <div
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${
-          copied ? 'right-5' : '-right-full'
-        }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
+          }`}
       >
         <Alert severity='success'>{`${copied} Copied to clipboard`}</Alert>
       </div>

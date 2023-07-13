@@ -290,7 +290,7 @@ const Freelancers = (): JSX.Element => {
             default:
               console.log(
                 'Invalid filter option selected or unimplemented. type:' +
-                filterType
+                  filterType
               );
           }
         }
@@ -376,9 +376,7 @@ const Freelancers = (): JSX.Element => {
               ))}
           </div>
 
-          <div
-            className='h-[39px] text-center gap-5 flex items-center absolute md:bottom-10 bottom-5 right-10'
-          >
+          <div className='h-[39px] text-center gap-5 flex items-center absolute md:bottom-10 bottom-5 right-10'>
             <button
               onClick={cancelFilters}
               data-testid='Apply'
@@ -415,9 +413,9 @@ const Freelancers = (): JSX.Element => {
   };
 
   const cancelFilters = async () => {
-    reset()
-    setFilterVisible(false)
-  }
+    reset();
+    setFilterVisible(false);
+  };
 
   if (loading) return <LoadingFreelancers />;
 
@@ -501,9 +499,9 @@ const Freelancers = (): JSX.Element => {
                               profile_image ??
                               require('@/assets/images/profile-image.png')
                             }
-                            className={styles.freelancerProfilePic}
-                            height={94.921}
-                            width={93.597}
+                            className={`${styles.freelancerProfilePic} object-cover h-[100px] w-[100px] rounded-full`}
+                            height={100}
+                            width={100}
                             alt=''
                           />
                           {verified && (
