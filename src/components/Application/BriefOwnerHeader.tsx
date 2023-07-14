@@ -10,7 +10,7 @@ import { FaStar } from 'react-icons/fa';
 
 import { getBalance } from '@/utils/helper';
 
-import { Brief, Freelancer, OffchainProjectState, Project } from '@/model';
+import { Brief, Currency, Freelancer, OffchainProjectState, Project } from '@/model';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 
 import AccountChoice from '../AccountChoice';
@@ -142,7 +142,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
               {freelancer?.display_name}
             </p>
           </Badge>
-{/* 
+          {/* 
           <div className='flex items-center mt-[1rem]'>
             <Image
               className='h-4 w-6 object-cover'
@@ -163,7 +163,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
             {!loadingWallet &&
               (balance === undefined
                 ? 'No wallet found'
-                : `Balance: ${balance}`)}
+                : `Balance: ${balance} ${Currency[application?.currency_id ?? 0]}`)}
           </p>
         </div>
       </div>

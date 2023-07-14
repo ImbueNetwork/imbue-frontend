@@ -27,8 +27,8 @@ import WaitingScreen from '@/components/WaitingScreen';
 import { calenderIcon, shieldIcon, tagIcon } from '@/assets/svgs';
 import {
   Milestone,
-  OnchainProjectState,
   OffchainProjectState,
+  OnchainProjectState,
   Project,
   ProjectOnChain,
 } from '@/model';
