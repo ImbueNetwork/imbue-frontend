@@ -93,26 +93,17 @@ const Freelancers = (): JSX.Element => {
         data?.currentData?.map((x: any) => x.skills)
       ) as Item[];
 
-      console.log("**** combined is ");
-      console.log(combinedSkills);
       const dedupedSkills = combinedSkills.length > 0 ? await dedupeArray(combinedSkills) : [];
-
       const combinedServices = Array.prototype.concat.apply(
         [],
         data?.currentData?.map((x: any) => x.services)
       ) as Item[];
-      console.log(combinedServices);
-
       const dedupedServices = combinedServices ? await dedupeArray(combinedServices) : [];
-      console.log(dedupedServices);
-
       const combinedLanguages = Array.prototype.concat.apply(
         [],
         data?.currentData?.map((x: any) => x.languages)
       ) as Item[];
       const dedupedLanguages = combinedLanguages ? await dedupeArray(combinedLanguages) : [];
-      console.log(dedupedLanguages);
-
       setSkills(dedupedSkills);
       setServices(dedupedServices);
       setLanguages(dedupedLanguages);
