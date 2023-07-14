@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Badge, Menu, MenuItem, useMediaQuery } from '@mui/material';
@@ -10,7 +13,13 @@ import { FaStar } from 'react-icons/fa';
 
 import { getBalance } from '@/utils/helper';
 
-import { Brief, Currency, Freelancer, OffchainProjectState, Project } from '@/model';
+import {
+  Brief,
+  Currency,
+  Freelancer,
+  OffchainProjectState,
+  Project,
+} from '@/model';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 
 import AccountChoice from '../AccountChoice';
@@ -60,7 +69,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
 
   const [balance, setBalance] = useState<string>();
   const [imbueBalance, setImbueBalance] = useState<string>();
-  const [loadingWallet, setLoadingWallet] = useState<string>("");
+  const [loadingWallet, setLoadingWallet] = useState<string>('');
   const [error, setError] = useState<any>();
 
   const [openPopup, setOpenPopup] = useState<boolean>(false);
@@ -164,20 +173,22 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
             </h3>
           </div> */}
 
-          {application?.currency_id !== Currency.IMBU &&
-          <p className='text-sm mt-[1.25rem] text-imbue-purple'>
-            {loadingWallet === "loading" && 'Loading Wallet...'}
-            {loadingWallet === "connecting" && 'Connecting Wallet...'}
-            {!loadingWallet &&
-              (balance === undefined
-                ? 'No wallet found'
-                : `Requested Currency Balance: ${balance} $${Currency[application?.currency_id ?? 0]}`)}
-          </p>
-          }
+          {application?.currency_id !== Currency.IMBU && (
+            <p className='text-sm mt-[1.25rem] text-imbue-purple'>
+              {loadingWallet === 'loading' && 'Loading Wallet...'}
+              {loadingWallet === 'connecting' && 'Connecting Wallet...'}
+              {!loadingWallet &&
+                (balance === undefined
+                  ? 'No wallet found'
+                  : `Requested Currency Balance: ${balance} $${
+                      Currency[application?.currency_id ?? 0]
+                    }`)}
+            </p>
+          )}
 
           <p className='text-sm mt-[1.25rem] text-imbue-purple'>
-            {loadingWallet === "loading" && 'Loading Wallet...'}
-            {loadingWallet === "connecting" && 'Connecting Wallet...'}
+            {loadingWallet === 'loading' && 'Loading Wallet...'}
+            {loadingWallet === 'connecting' && 'Connecting Wallet...'}
             {!loadingWallet &&
               (balance === undefined
                 ? 'No wallet found'
