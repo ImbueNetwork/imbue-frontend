@@ -137,7 +137,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         accountSelected={(account) => startWork(account)}
         visible={openPopup}
         setVisible={setOpenPopup}
-        initiatorAddress={application?.initiator}
+        initiatorAddress={user?.web3_address}
         filterByInitiator
       />
       <ErrorScreen {...{ error, setError }}>
