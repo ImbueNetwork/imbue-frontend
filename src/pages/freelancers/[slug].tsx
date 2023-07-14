@@ -665,7 +665,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                 <div className='lg:mx-[40px] text-imbue-purple-dark'>
                   <h5>Linked Account</h5>
                   <div className='flex flex-col gap-[16px] mt-[24px]'>
-                    {socials?.map(({ label, key, value, icon }, index) => (
+                    {socials?.map(({ label, key, value, icon }: any, index: number) => (isCurrentFreelancer || value) && (
                       <div
                         className='h-auto flex justify-between items-center'
                         key={index}
@@ -694,7 +694,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                           </div>
                         ) : (
                           <button
-                            onClick={() => !value && setIsEditMode(true)}
+                            onClick={() => !value && isCurrentFreelancer && setIsEditMode(true)}
                             className='bg-imbue-light-purple w-[32px] h-[32px] rounded-[10px] text-imbue-purple border-none text-[20px] font-semibold items-center justify-center'>
                             {socials && value ? icon : '+'}
                           </button>
