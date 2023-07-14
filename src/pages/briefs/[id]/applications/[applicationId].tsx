@@ -84,6 +84,7 @@ const ApplicationPreview = (): JSX.Element => {
         setBrief(brief);
         setApplication(applicationResponse);
         setFreelancer(freelancerResponse);
+        setCurrencyId(applicationResponse?.currency_id)
       } catch (error) {
         setError(error);
       } finally {
@@ -515,19 +516,19 @@ const ApplicationPreview = (): JSX.Element => {
           </div>
         </div>
 
-        <div className='bg-white rounded-[20px] py-[1.5rem]'>
-          <h3 className='ml-8 mb-2 text-[1.25rem] text-imbue-purple-dark font-normal m-0 p-0 flex'>
+        <div className='bg-white rounded-[20px] py-5'>
+          <h3 className='ml-8 mb-2 text-[1.25rem] text-imbue-purple-dark font-normal mx-5 lg:mx-14 p-0 flex'>
             Payment terms
           </h3>
 
           <hr className='h-[1px] bg-[rgba(3, 17, 106, 0.12)] w-full mt-4' />
 
-          <div className='bg-white pt-5 rounded-[20px] flex flex-col lg:flex-row lg:justify-between gap-3 px-5'>
+          <div className='bg-white pt-5 rounded-[20px] flex flex-col lg:flex-row lg:justify-between gap-3 mx-5 lg:mx-14'>
             <div className='duration-selector'>
               <h3 className='text-lg lg:text-[1.25rem] font-normal m-0 p-0 text-imbue-purple-dark'>
                 How long will this project take?
               </h3>
-              <select
+              {/* <select
                 name='duration'
                 className='bg-white outline-none round border border-imbue-purple rounded-[0.5rem] text-base px-5 mt-4 h-[2.75rem] text-imbue-purple-dark'
                 placeholder='Select a duration'
@@ -538,7 +539,8 @@ const ApplicationPreview = (): JSX.Element => {
                     {label}
                   </option>
                 ))}
-              </select>
+              </select> */}
+              <p className='text-content-primary mt-2 w-full'>{durationOptions[brief?.duration_id || 0].label}</p>
             </div>
             <div className='payment-options'>
               <h3 className='text-lg lg:text-[1.25rem] font-normal m-0 p-0 text-imbue-purple-dark'>
@@ -546,23 +548,32 @@ const ApplicationPreview = (): JSX.Element => {
               </h3>
 
               <div className='network-amount'>
-                <select
-                  name='currencyId'
-                  onChange={handleChange}
-                  placeholder='Select a currency'
-                  className='bg-white outline-none round border border-imbue-purple rounded-[0.5rem] text-base px-5 mt-4 h-[2.75rem] text-imbue-purple-dark'
-                  required
-                >
-                  {currencies.map((currency: any) => (
-                    <option
-                      value={Currency[currency]}
-                      key={Currency[currency]}
-                      className='duration-option'
-                    >
-                      {currency}
-                    </option>
-                  ))}
-                </select>
+                {
+                  isApplicationOwner && isEditingBio
+                    ? (
+                      <select
+                        value={currencyId || 0}
+                        name='currencyId'
+                        onChange={handleChange}
+                        placeholder='Select a currency'
+                        className='bg-white outline-none round border border-imbue-purple rounded-[0.5rem] text-base px-5 mt-4 h-[2.75rem] text-imbue-purple-dark'
+                        required
+                      >
+                        {currencies.map((currency: any) => (
+                          <option
+                            value={Currency[currency]}
+                            key={Currency[currency]}
+                            className='duration-option'
+                          >
+                            {currency}
+                          </option>
+                        ))}
+                      </select>
+                    )
+                    : (
+                      <p className='text-content-primary mt-2 w-full'>{Currency[currencyId || 0]}</p>
+                    )
+                }
               </div>
             </div>
           </div>

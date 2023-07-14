@@ -10,7 +10,7 @@ import { FaStar } from 'react-icons/fa';
 
 import { getBalance } from '@/utils/helper';
 
-import { Brief, Freelancer, OffchainProjectState, Project } from '@/model';
+import { Brief, Currency, Freelancer, OffchainProjectState, Project } from '@/model';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 
 import AccountChoice from '../AccountChoice';
@@ -59,6 +59,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
   } = props;
 
   const [balance, setBalance] = useState<string>();
+  const [imbueBalance, setImbueBalance] = useState<string>();
   const [loadingWallet, setLoadingWallet] = useState<string>("");
   const [error, setError] = useState<any>();
 
@@ -106,10 +107,16 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         setLoadingWallet('loading');
         const balance = await getBalance(
           user?.web3_address,
-          application?.currency_id ?? 0,
+          application?.currency_id ?? Currency.IMBU,
           user
         );
-        setBalance(balance);
+        const imbueBalance = await getBalance(
+          user?.web3_address,
+          Currency.IMBU,
+          user
+        );
+        setBalance(balance.toLocaleString());
+        setImbueBalance(imbueBalance.toLocaleString());
       } catch (error) {
         setError(error);
       } finally {
@@ -142,7 +149,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
               {freelancer?.display_name}
             </p>
           </Badge>
-{/* 
+          {/* 
           <div className='flex items-center mt-[1rem]'>
             <Image
               className='h-4 w-6 object-cover'
@@ -157,13 +164,24 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
             </h3>
           </div> */}
 
+          {application?.currency_id !== Currency.IMBU &&
           <p className='text-sm mt-[1.25rem] text-imbue-purple'>
             {loadingWallet === "loading" && 'Loading Wallet...'}
             {loadingWallet === "connecting" && 'Connecting Wallet...'}
             {!loadingWallet &&
               (balance === undefined
                 ? 'No wallet found'
-                : `Balance: ${balance}`)}
+                : `Requested Currency Balance: ${balance} $${Currency[application?.currency_id ?? 0]}`)}
+          </p>
+          }
+
+          <p className='text-sm mt-[1.25rem] text-imbue-purple'>
+            {loadingWallet === "loading" && 'Loading Wallet...'}
+            {loadingWallet === "connecting" && 'Connecting Wallet...'}
+            {!loadingWallet &&
+              (balance === undefined
+                ? 'No wallet found'
+                : `Your Imbue Balance: ${balance} $${Currency[Currency.IMBU]}`)}
           </p>
         </div>
       </div>
