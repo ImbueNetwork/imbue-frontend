@@ -133,7 +133,7 @@ function Project() {
 
       setOnChainProject(onChainProjectRes);
     } else {
-      switch (project.status_id) {
+      switch (project.status_id){
         case OffchainProjectState.PendingReview:
           setWaitMessage("This project is pending review");
           break;
@@ -141,7 +141,7 @@ function Project() {
           setWaitMessage("Changes have been requested");
           break;
         case OffchainProjectState.Accepted:
-          if (!project.chain_project_id) {
+          if(!project.chain_project_id) {
             setWaitMessage(`Waiting for ${freelancer.display_name} to start the work`);
           } else {
             setWaitMessage(`Your project is being created on the chain. This may take up to 6 seconds`);
