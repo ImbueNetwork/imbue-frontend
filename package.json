@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "NODE_ENV=development jest --all --silent",
+    "test": "NODE_ENV=development jest --all --silent -u",
     "lint": "next lint"
   },
   "dependencies": {
