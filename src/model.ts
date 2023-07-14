@@ -7,6 +7,13 @@ export enum Currency {
   MGX = 4,
 }
 
+export enum Duration {
+  '1 to 3 months' = 0,
+  '3-6 months' = 1,
+  'More than 6 months' = 2,
+  'More than a year' = 3,
+}
+
 // ONCHAIN PROJECT STATE
 export enum OffchainProjectState {
   Draft = 0,
@@ -73,6 +80,7 @@ export type Project = {
   // project_type: ProjectType;
   approvers: string[];
   created?: string;
+  duration_id: number;
 };
 
 export type ProjectOnChain = {
