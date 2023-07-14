@@ -201,7 +201,7 @@ const ApplicationPreview = (): JSX.Element => {
   const currencies = Object.keys(Currency).filter(
     (key: any) => !isNaN(Number(Currency[key]))
   );
-  
+
   const durationOptions = Object.keys(Duration).filter(
     (key: any) => !isNaN(Number(Duration[key]))
   );
@@ -278,7 +278,7 @@ const ApplicationPreview = (): JSX.Element => {
   };
 
   const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
-  console.log(currencies);
+
   return (
     <div>
       <div className='application-container  px-4 mt-3 lg:mt-0 lg:px-0'>
@@ -351,7 +351,7 @@ const ApplicationPreview = (): JSX.Element => {
             <div className='flex flex-row justify-between mx-5 lg:mx-14'>
               <h3 className='flex text-lg lg:text-[1.25rem] text-imbue-purple font-normal leading-[1.5] m-0 p-0 mb-5'>
                 Milestones
-                {!isEditingBio && isApplicationOwner && (
+                {!isEditingBio && isApplicationOwner && (application.status_id !== 4) && (
                   <div
                     className='ml-[10px] relative top-[-2px] cursor-pointer'
                     onClick={() => setIsEditingBio(true)}
@@ -545,7 +545,7 @@ const ApplicationPreview = (): JSX.Element => {
                     required
                     onChange={(e) => setDurationId(e.target.value)}
                   >
-                    {durationOptions.map((duraion : any, index) => (
+                    {durationOptions.map((duraion: any, index) => (
                       <option value={Duration[duraion]} key={index} className='duration-option'>
                         {duraion}
                       </option>
