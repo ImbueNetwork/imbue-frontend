@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 export enum Currency {
   IMBU = 0,
   KSM = 1,
