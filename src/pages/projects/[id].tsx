@@ -25,9 +25,9 @@ import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
 
 import { calenderIcon, shieldIcon, tagIcon } from '@/assets/svgs';
+import { timeData } from '@/config/briefs-data';
 import {
   Currency,
-  Duration,
   Milestone,
   OffchainProjectState,
   OnchainProjectState,
@@ -133,7 +133,7 @@ function Project() {
 
       setOnChainProject(onChainProjectRes);
     } else {
-      switch (project.status_id){
+      switch (project.status_id) {
         case OffchainProjectState.PendingReview:
           setWaitMessage("This project is pending review");
           break;
@@ -141,7 +141,7 @@ function Project() {
           setWaitMessage("Changes have been requested");
           break;
         case OffchainProjectState.Accepted:
-          if(!project.chain_project_id) {
+          if (!project.chain_project_id) {
             setWaitMessage(`Waiting for ${freelancer.display_name} to start the work`);
           } else {
             setWaitMessage(`Your project is being created on the chain. This may take up to 6 seconds`);
@@ -694,7 +694,7 @@ function Project() {
               />
               <div className='flex flex-col'>
                 <h3 className='text-lg lg:text-[1.25rem] text-imbue-purple-dark  font-normal'>
-                  {Duration[project?.duration_id || 0]}
+                  {timeData[project?.duration_id || 0].label}
                 </h3>
                 <div className='text-[1rem] text-imbue-light-purple-two'>
                   Timeline

@@ -15,10 +15,10 @@ import ErrorScreen from '@/components/ErrorScreen';
 import Login from '@/components/Login';
 import SuccessScreen from '@/components/SuccessScreen';
 
+import { timeData } from '@/config/briefs-data';
 import {
   Brief,
   Currency,
-  Duration,
   Freelancer,
   OffchainProjectState,
   Project,
@@ -202,13 +202,9 @@ const ApplicationPreview = (): JSX.Element => {
     (key: any) => !isNaN(Number(Currency[key]))
   );
 
-  const durationOptions = Object.keys(Duration).filter(
-    (key: any) => !isNaN(Number(Duration[key]))
+  const durationOptions = timeData.sort((a, b) =>
+    a.value > b.value ? 1 : a.value < b.value ? -1 : 0
   );
-
-  // const durationOptions = timeData.sort((a, b) =>
-  //   a.value > b.value ? 1 : a.value < b.value ? -1 : 0
-  // );
 
   const totalCostWithoutFee = milestones?.reduce?.(
     (acc, { amount }) => acc + (amount ?? 0),
@@ -545,15 +541,15 @@ const ApplicationPreview = (): JSX.Element => {
                     required
                     onChange={(e) => setDurationId(e.target.value)}
                   >
-                    {durationOptions.map((duraion: any, index) => (
-                      <option value={Duration[duraion]} key={index} className='duration-option'>
-                        {duraion}
+                    {durationOptions.map(({ label, value }, index) => (
+                      <option value={value} key={index} className='duration-option'>
+                        {label}
                       </option>
                     ))}
                   </select>
                 )
                 : (
-                  <p className='text-content-primary mt-2 w-full'>{Duration[durationId || 0]}</p>
+                  <p className='text-content-primary mt-2 w-full'>{durationOptions[durationId || 0].label}</p>
                 )}
 
             </div>
