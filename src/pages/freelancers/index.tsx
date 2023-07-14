@@ -69,14 +69,14 @@ const Freelancers = (): JSX.Element => {
   };
 
   const dedupeArray = async (input: any[]) => {
-    if(input[0]) {
-    return input
-      .filter((thing: any, i: any, arr: any) => {
-        return  arr.indexOf(arr.find((t: any) => t.id === thing.id)) === i;
-      })
-      .sort(function (a: any, b: any) {
-        return a.name.localeCompare(b.name);
-      });
+    if (input[0]) {
+      return input
+        .filter((thing: any, i: any, arr: any) => {
+          return arr.indexOf(arr.find((t: any) => t.id === thing.id)) === i;
+        })
+        .sort(function (a: any, b: any) {
+          return a.name.localeCompare(b.name);
+        });
     }
   };
 
@@ -290,7 +290,7 @@ const Freelancers = (): JSX.Element => {
             default:
               console.log(
                 'Invalid filter option selected or unimplemented. type:' +
-                  filterType
+                filterType
               );
           }
         }
@@ -426,7 +426,7 @@ const Freelancers = (): JSX.Element => {
         <div
           className={`${styles.freelancersView} max-width-750px:!w-full max-width-750px:px-5`}
         >
-          <div className='bg-white py-[1.5rem] px-[3.88rem] rounded-[1.25rem]'>
+          <div className='bg-white py-[1.5rem] px-6 lg:px-[3.88rem] rounded-[1.25rem]'>
             <div className='flex justify-between lg:flex-row flex-col items-start'>
               <div>
                 <div className='flex items-center'>
@@ -492,7 +492,7 @@ const Freelancers = (): JSX.Element => {
                     index: number
                   ) => (
                     <Grid item xs={12} sm={12} md={3} key={index}>
-                      <div className={`${styles.freelancer} py-[0.94rem]`}>
+                      <div className={`${styles.freelancer} py-[0.94rem] h-full`}>
                         <div className='flex items-center justify-center'>
                           <Image
                             src={
@@ -510,15 +510,19 @@ const Freelancers = (): JSX.Element => {
                         </div>
                         <div className={`${styles.freelancerInfo} mt-[0.5rem]`}>
                           <div className='px-[1.25rem]'>
-                            <h3 className='text-[1.25rem] font-medium text-imbue-purple-dark text-center'>
+                            <h3 className='text-xl font-medium text-content text-center'>
                               {display_name}
                             </h3>
-                            <h5 className='text-[0.75rem] text-imbue-purple-dark font-normal'>
-                              {bio}
+                            <h5 className='text-xs lg:text-sm mt-2 text-imbue-purple-dark font-normal whitespace-pre-wrap'>
+                              {
+                                bio?.length > 299
+                                  ? bio.substring(0, 300) + "..."
+                                  : bio
+                              }
                             </h5>
                           </div>
                           <div
-                            className={`${styles.skills} ml-4 overflow-scroll`}
+                            className={`${styles.skills} ml-4 overflow-scroll mb-4`}
                           >
                             {skills
                               ?.slice(0, 3)
@@ -533,9 +537,9 @@ const Freelancers = (): JSX.Element => {
                           </div>
                         </div>
 
-                        <div className='px-[1.25rem] mt-[1.25rem]'>
+                        <div className='px-[1.25rem] mt-auto'>
                           <button
-                            className='w-full h-[2.6rem] border border-imbue-purple-dark rounded-[1.5rem] font-normal text-[1rem] text-imbue-purple-dark'
+                            className='w-full h-[2.6rem] border border-content rounded-[1.5rem] font-normal text-base text-content'
                             onClick={() => redirectToProfile(username)}
                           >
                             View Freelancer
