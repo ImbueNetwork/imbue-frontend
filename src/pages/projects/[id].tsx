@@ -482,7 +482,7 @@ function Project() {
        '
       >
         <div className='flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] max-lg:basis-[60%] mr-[5%]  max-lg:mr-0'>
-          <div className='brief-title'>
+          <div className='flex flex-wrap lg:gap-4 lg:items-center'>
             <h3 className='text-[2rem] max-lg:text-[24px] leading-[1.5] font-normal m-0 p-0 text-imbue-purple'>
               {project?.name}
             </h3>
@@ -491,18 +491,18 @@ function Project() {
                 onClick={() => {
                   // TODO:
                 }}
-                className=' text-imbue-lemon cursor-pointer text-[1.25rem]  max-lg:text-base  font-normal !m-0 !p-0 relative top-4'
+                className=' text-imbue-lemon cursor-pointer text-base max-lg:text-base font-normal !m-0 !p-0'
               >
                 {`View full brief`}
               </span>
             )}
           </div>
           <div className='text-inactive lg:w-[80%]'>
-            <p className='text-[1rem] text-[#3B27C180] font-normal leading-[178.15%]'>
+            <p className='text-[1rem] text-content font-normal leading-[178.15%]'>
               {project?.description}
             </p>
           </div>
-          <p className='text-[1rem] text-[#3B27C180] font-normalleading-[1.5] m-0 p-0'>
+          <p className='text-sm text-content-primary leading-[1.5] m-0 p-0'>
             Posted {timePosted}
           </p>
 
