@@ -79,6 +79,14 @@ const Clients = ({
     }
   };
 
+  const allClientsDataIsFilled = (): boolean => {
+    const usersClients = [newClient];
+    const isFilled = usersClients.every((client) => {
+      return client.name && client.logo && client.website;
+    });
+    return isFilled;
+  };
+
   const handleNewClientData = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -185,6 +193,7 @@ const Clients = ({
               name='website'
             />
             <button
+              disabled={!allClientsDataIsFilled()}
               onClick={handleSubmit}
               className='primary-btn in-dark w-button'
             >
