@@ -590,7 +590,7 @@ const ApplicationPreview = (): JSX.Element => {
           </div>
         </div>
 
-        <div className='mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center justify-between   self-center'>
+        <div className='mb-[0.5rem] bg-white rounded-2xl w-full p-[1rem] flex items-center justify-between   self-center'>
           <div className='buttons-container'>
             <button
               className='primary-btn in-dark w-button'

@@ -61,7 +61,7 @@ const MyFreelancerApplications = ({
                 <div
                   key={index}
                   onClick={() => redirectToApplication(application)}
-                  className='hover:bg-imbue-light-purple-hover min-h-[100px] border-b border-b-light-white last:border-b-0 flex px-5 py-3 lg:px-[2.5rem] lg:py-[2rem] cursor-pointer gap-[2rem]'
+                  className='hover:bg-imbue-light-purple-hover min-h-[100px] border-b border-b-imbue-light-purple last:border-b-0 flex px-5 py-3 lg:px-[2.5rem] lg:py-[2rem] cursor-pointer gap-[2rem]'
                 >
                   <div className='w-4/5 flex items-center'>
                     <p className='text-sm lg:text-xl mb-3 text-content'>
@@ -108,7 +108,7 @@ const MyFreelancerApplications = ({
                   <div
                     key={index}
                     onClick={() => router.push(`/projects/${application?.id}`)}
-                    className='hover:bg-imbue-light-purple-hover min-h-[100px] border-b border-b-light-white last:border-b-0 flex px-5 py-3 lg:px-[2.5rem] lg:py-[2rem] cursor-pointer gap-[2rem]'
+                    className='hover:bg-imbue-light-purple-hover min-h-[100px] border-b border-b-imbue-light-purple last:border-b-0 flex px-5 py-3 lg:px-[2.5rem] lg:py-[2rem] cursor-pointer gap-[2rem]'
                   >
                     <div className='w-4/5 flex items-center'>
                       <p className='text-sm lg:text-xl mb-3 text-content'>

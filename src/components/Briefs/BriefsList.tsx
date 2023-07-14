@@ -61,6 +61,13 @@ export const BriefLists = ({
             <p className='text-xs lg:text-[16px] text-imbue-purple'>
               Budget ${Number(brief.budget).toLocaleString()} - Public
             </p>
+            <p className='text-xs lg:text-sm w-4/5 text-content'>
+              {
+                brief?.description?.length > 150
+                  ? brief?.description?.substring(0,150) + "..."
+                  : brief?.description
+              }
+            </p>
             <p className='text-xs mt-2 lg:mt-3 text-imbue-purple'>
               Created {timeAgo.format(new Date(brief.created))}
             </p>
@@ -77,12 +84,11 @@ export const BriefLists = ({
               <div className='w-full bg-light-grey h-1 relative my-auto'>
                 <div
                   style={{
-                    width: `${
-                      (brief.milestones?.filter((m: any) => m?.is_approved)
+                    width: `${(brief.milestones?.filter((m: any) => m?.is_approved)
                         ?.length /
                         brief.milestones?.length) *
                       100
-                    }%`,
+                      }%`,
                   }}
                   className='h-full rounded-xl Accepted-button absolute'
                 ></div>
@@ -90,9 +96,8 @@ export const BriefLists = ({
                   {brief.milestones?.map((m: any, i: number) => (
                     <div
                       key={i}
-                      className={`h-3 w-3 lg:h-4 lg:w-4 rounded-full -mt-1 lg:-mt-1.5 ${
-                        m.is_approved ? 'bg-primary' : 'bg-light-grey'
-                      }`}
+                      className={`h-3 w-3 lg:h-4 lg:w-4 rounded-full -mt-1 lg:-mt-1.5 ${m.is_approved ? 'bg-primary' : 'bg-light-grey'
+                        }`}
                     ></div>
                   ))}
                 </div>

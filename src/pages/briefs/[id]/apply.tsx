@@ -165,7 +165,8 @@ export const SubmitProposal = (): JSX.Element => {
               };
             }),
           required_funds: totalCost,
-          duration_id: durationId
+          duration_id: durationId,
+          description : brief?.description
         }),
       });
 
@@ -454,7 +455,7 @@ export const SubmitProposal = (): JSX.Element => {
         </div>
       </div>
 
-      <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center justify-between   self-center'>
+      <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-2xl w-full p-[1rem] flex items-center justify-between   self-center'>
         <div className='buttons-container'>
           <button
             disabled={
