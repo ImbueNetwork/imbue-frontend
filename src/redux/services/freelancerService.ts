@@ -86,8 +86,6 @@ export async function updateFreelancer(freelancer: Freelancer) {
     }
   );
 
-  console.log(resp);
-
   if (resp.ok) {
     return (await resp.json()) as Freelancer;
   } else {

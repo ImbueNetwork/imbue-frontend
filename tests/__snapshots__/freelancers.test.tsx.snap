@@ -23,7 +23,7 @@ exports[`test freelancer onclick next snapshot matching 2`] = `
   class="text-theme-secondary"
   data-testid="heading"
 >
-  A few quick questions: first, have you freelanced before?
+  A few quick questions: Have you freelanced before?
 </h2>
 `;
 

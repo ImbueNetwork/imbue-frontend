@@ -123,6 +123,7 @@ export type Project = {
   status_id?: number;
   // project_type: number;
   escrow_address?: string;
+  duration_id: number;
 };
 
 export type ProjectProperties = {
@@ -1192,9 +1193,9 @@ export const updateFreelancerDetails =
               user_id: userId,
             });
 
-            await tx<User>('users')
-            .update({ 
-              profile_photo: profile_image
+          await tx<User>('users')
+            .update({
+              profile_photo: profile_image,
             })
             .where({ id: userId });
         }
@@ -1358,6 +1359,7 @@ export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
     chain_project_id,
     user_id,
     escrow_address,
+    duration_id,
   } = grant;
   const project = await insertProject({
     name: title,
@@ -1373,6 +1375,7 @@ export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
     user_id,
     total_cost_without_fee,
     imbue_fee,
+    duration_id,
     // project_type: project_type ?? models.ProjectType.Brief
   })(tx);
 

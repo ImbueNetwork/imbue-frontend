@@ -47,7 +47,7 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
         </p>
       </div>
       <div className='flex flex-col mt-3 lg:mt-0 gap-4 lg:gap-8 flex-grow flex-shrink-0 basis-[20%]'>
-        <div className='insight-item !gap-[6px]'>
+        <div className='insight-item !gap-3 lg:!gap-5'>
           <Image
             src={shieldIcon}
             alt='shild Icon'
@@ -65,7 +65,7 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
           </div>
         </div>
 
-        <div className='insight-item  !gap-[6px]'>
+        <div className='insight-item  !gap-3 lg:!gap-5'>
           <Image
             src={tagIcon}
             alt='tag Icon'
@@ -83,7 +83,7 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
           </div>
         </div>
 
-        <div className='insight-item  !gap-[6px]'>
+        <div className='insight-item  !gap-3 lg:!gap-5'>
           <Image
             src={calenderIcon}
             alt='calender Icon'

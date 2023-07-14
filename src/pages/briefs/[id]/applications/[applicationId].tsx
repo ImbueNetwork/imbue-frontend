@@ -51,6 +51,7 @@ const ApplicationPreview = (): JSX.Element => {
   const [freelancer, setFreelancer] = useState<Freelancer | any>();
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [currencyId, setCurrencyId] = useState(application?.currency_id);
+  const [durationId, setDurationId] = useState(application?.duration_id);
   const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
@@ -84,6 +85,8 @@ const ApplicationPreview = (): JSX.Element => {
         setBrief(brief);
         setApplication(applicationResponse);
         setFreelancer(freelancerResponse);
+        setCurrencyId(applicationResponse?.currency_id)
+        setDurationId(applicationResponse?.duration_id)
       } catch (error) {
         setError(error);
       } finally {
@@ -112,7 +115,7 @@ const ApplicationPreview = (): JSX.Element => {
     router.push(`/briefs/${brief?.id}/`);
   };
 
-  const updateProject = async (chainProjectId?: number) => {
+  const updateProject = async (chainProjectId?: number, escrow_address?: string) => {
     setLoading(true);
     try {
       // const resp = await fetch(`${config.apiBase}/project/${application.id}`, {
@@ -140,7 +143,6 @@ const ApplicationPreview = (): JSX.Element => {
       //     chain_project_id: chainProjectId,
       //   }),
       // });
-      
       const resp = await createProject(application?.id, {
         user_id: user.id,
         name: `${brief.headline}`,
@@ -160,7 +162,10 @@ const ApplicationPreview = (): JSX.Element => {
             };
           }),
         required_funds: totalCost,
+        owner: user.web3_address,
         chain_project_id: chainProjectId,
+        escrow_address: escrow_address,
+        duration_id: durationId
       })
 
       if (resp.status === 201 || resp.status === 200) {
@@ -342,9 +347,9 @@ const ApplicationPreview = (): JSX.Element => {
             <div className='flex flex-row justify-between mx-5 lg:mx-14'>
               <h3 className='flex text-lg lg:text-[1.25rem] text-imbue-purple font-normal leading-[1.5] m-0 p-0 mb-5'>
                 Milestones
-                {!isEditingBio && isApplicationOwner && (
+                {!isEditingBio && isApplicationOwner && (application.status_id !== 4) && (
                   <div
-                    className='ml-[10px] relative top-[-2px]'
+                    className='ml-[10px] relative top-[-2px] cursor-pointer'
                     onClick={() => setIsEditingBio(true)}
                   >
                     <FiEdit />
@@ -514,30 +519,39 @@ const ApplicationPreview = (): JSX.Element => {
           </div>
         </div>
 
-        <div className='bg-white rounded-[20px] py-[1.5rem]'>
-          <h3 className='ml-8 mb-2 text-[1.25rem] text-imbue-purple-dark font-normal m-0 p-0 flex'>
+        <div className='bg-white rounded-[20px] py-5'>
+          <h3 className='ml-8 mb-2 text-[1.25rem] text-imbue-purple-dark font-normal mx-5 lg:mx-14 p-0 flex'>
             Payment terms
           </h3>
 
           <hr className='h-[1px] bg-[rgba(3, 17, 106, 0.12)] w-full mt-4' />
 
-          <div className='bg-white pt-5 rounded-[20px] flex flex-col lg:flex-row lg:justify-between gap-3 px-5'>
+          <div className='bg-white pt-5 rounded-[20px] flex flex-col lg:flex-row lg:justify-between gap-3 mx-5 lg:mx-14'>
             <div className='duration-selector'>
               <h3 className='text-lg lg:text-[1.25rem] font-normal m-0 p-0 text-imbue-purple-dark'>
                 How long will this project take?
               </h3>
-              <select
-                name='duration'
-                className='bg-white outline-none round border border-imbue-purple rounded-[0.5rem] text-base px-5 mt-4 h-[2.75rem] text-imbue-purple-dark'
-                placeholder='Select a duration'
-                required
-              >
-                {durationOptions.map(({ label, value }, index) => (
-                  <option value={value} key={index} className='duration-option'>
-                    {label}
-                  </option>
-                ))}
-              </select>
+              {isApplicationOwner && isEditingBio
+                ? (
+                  <select
+                    value={durationId || 0}
+                    name='duration'
+                    className='bg-white outline-none round border border-content-primary rounded-[0.5rem] text-base px-5 mt-4 h-[2.75rem] text-content cursor-pointer'
+                    placeholder='Select a duration'
+                    required
+                    onChange={(e) => setDurationId(e.target.value)}
+                  >
+                    {durationOptions.map(({ label, value }, index) => (
+                      <option value={value} key={index} className='duration-option'>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                )
+                : (
+                  <p className='text-content-primary mt-2 w-full'>{durationOptions[durationId || 0].label}</p>
+                )}
+
             </div>
             <div className='payment-options'>
               <h3 className='text-lg lg:text-[1.25rem] font-normal m-0 p-0 text-imbue-purple-dark'>
@@ -545,23 +559,32 @@ const ApplicationPreview = (): JSX.Element => {
               </h3>
 
               <div className='network-amount'>
-                <select
-                  name='currencyId'
-                  onChange={handleChange}
-                  placeholder='Select a currency'
-                  className='bg-white outline-none round border border-imbue-purple rounded-[0.5rem] text-base px-5 mt-4 h-[2.75rem] text-imbue-purple-dark'
-                  required
-                >
-                  {currencies.map((currency: any) => (
-                    <option
-                      value={Currency[currency]}
-                      key={Currency[currency]}
-                      className='duration-option'
-                    >
-                      {currency}
-                    </option>
-                  ))}
-                </select>
+                {
+                  isApplicationOwner && isEditingBio
+                    ? (
+                      <select
+                        value={currencyId || 0}
+                        name='currencyId'
+                        onChange={handleChange}
+                        placeholder='Select a currency'
+                        className='bg-white outline-none round border border-content-primary rounded-[0.5rem] text-base px-5 mt-4 h-[2.75rem] text-content cursor-pointer'
+                        required
+                      >
+                        {currencies.map((currency: any) => (
+                          <option
+                            value={Currency[currency]}
+                            key={Currency[currency]}
+                            className='duration-option'
+                          >
+                            {currency}
+                          </option>
+                        ))}
+                      </select>
+                    )
+                    : (
+                      <p className='text-content-primary mt-2 w-full text-end'>{Currency[currencyId || 0]}</p>
+                    )
+                }
               </div>
             </div>
           </div>

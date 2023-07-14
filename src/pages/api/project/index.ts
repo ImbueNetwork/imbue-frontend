@@ -27,6 +27,7 @@ export default nextConnect().post(
       brief_id,
       total_cost_without_fee,
       imbue_fee,
+      duration_id,
       // project_type,
     } = req.body;
 
@@ -56,6 +57,7 @@ export default nextConnect().post(
           brief_id,
           total_cost_without_fee,
           imbue_fee,
+          duration_id,
           // project_type: project_type ?? models.ProjectType.Brief
         })(tx);
 
