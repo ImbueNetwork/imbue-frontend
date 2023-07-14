@@ -133,7 +133,7 @@ function Project() {
 
       setOnChainProject(onChainProjectRes);
     } else {
-      switch (project.status_id){
+      switch (project.status_id) {
         case OffchainProjectState.PendingReview:
           setWaitMessage("This project is pending review");
           break;
@@ -141,7 +141,7 @@ function Project() {
           setWaitMessage("Changes have been requested");
           break;
         case OffchainProjectState.Accepted:
-          if(!project.chain_project_id) {
+          if (!project.chain_project_id) {
             setWaitMessage(`Waiting for ${freelancer.display_name} to start the work`);
           } else {
             setWaitMessage(`Your project is being created on the chain. This may take up to 6 seconds`);
@@ -655,7 +655,7 @@ function Project() {
               <div className='flex flex-col'>
                 <h3 className='text-xl leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0'>
                   {Number(project?.total_cost_without_fee)?.toLocaleString()}{' '}
-                  {Currency[project?.currency_id || 0]}
+                  ${Currency[project?.currency_id || 0]}
                 </h3>
                 <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
                   Budget - Fixed

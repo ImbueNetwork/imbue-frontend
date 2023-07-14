@@ -68,14 +68,16 @@ const Freelancers = (): JSX.Element => {
     router.push(`/freelancers/${username}/`);
   };
 
-  const dedupeArray = async (input: any) => {
+  const dedupeArray = async (input: any[]) => {
+    if(input[0]) {
     return input
       .filter((thing: any, i: any, arr: any) => {
-        return arr.indexOf(arr.find((t: any) => t.id === thing.id)) === i;
+        return  arr.indexOf(arr.find((t: any) => t.id === thing.id)) === i;
       })
       .sort(function (a: any, b: any) {
         return a.name.localeCompare(b.name);
       });
+    }
   };
 
   useEffect(() => {
@@ -90,20 +92,18 @@ const Freelancers = (): JSX.Element => {
         [],
         data?.currentData?.map((x: any) => x.skills)
       ) as Item[];
-      const dedupedSkills = await dedupeArray(combinedSkills);
 
+      const dedupedSkills = combinedSkills.length > 0 ? await dedupeArray(combinedSkills) : [];
       const combinedServices = Array.prototype.concat.apply(
         [],
         data?.currentData?.map((x: any) => x.services)
       ) as Item[];
-      const dedupedServices = await dedupeArray(combinedServices);
-
+      const dedupedServices = combinedServices ? await dedupeArray(combinedServices) : [];
       const combinedLanguages = Array.prototype.concat.apply(
         [],
         data?.currentData?.map((x: any) => x.languages)
       ) as Item[];
-      const dedupedLanguages = await dedupeArray(combinedLanguages);
-
+      const dedupedLanguages = combinedLanguages ? await dedupeArray(combinedLanguages) : [];
       setSkills(dedupedSkills);
       setServices(dedupedServices);
       setLanguages(dedupedLanguages);
