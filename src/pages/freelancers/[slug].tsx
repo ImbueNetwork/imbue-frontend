@@ -665,51 +665,53 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           <div className='flex w-full'>
             <div className='flex flex-col gap-[36px] grow shrink-0 basis-[40%]'>
               <div className={`${styles.freelancerProfileSection}`}>
-                { !hideLinkedAccounts && (
+                {!hideLinkedAccounts && (
                   <>
-                               <div className='lg:mx-[40px] text-imbue-purple-dark'>
-                               <h5>Linked Account</h5>
-                               <div className='flex flex-col gap-[16px] mt-[24px]'>
-                                 {socials?.map(({ label, key, value, icon }: any, index: number) => (isCurrentFreelancer || value) && (
-                                   <div
-                                     className='h-auto flex justify-between items-center'
-                                     key={index}
-                                   >
-                                     <p className='text-base'>{label} </p>
-                                     {isEditMode ? (
-                                       <div
-                                         className='h-auto w-full lg:w-2/3 flex justify-between items-center'
-                                         key={index}
-                                       >
-                                         <TextField
-                                           color='secondary'
-                                           value={freelancer && freelancer[key]}
-                                           onChange={(e) => {
-                                             if (freelancer) {
-                                               setFreelancer({
-                                                 ...freelancer,
-                                                 [key]: e.target.value,
-                                               });
-                                             }
-                                           }}
-                                           //   className="bio-input"
-                                           className='bg-transparent text-imbue-purple border border-imbue-purple !m-0 w-full'
-                                           id='bio-input-id'
-                                         />
-                                       </div>
-                                     ) : (
-                                       <button
-                                         onClick={() => !value && isCurrentFreelancer && setIsEditMode(true)}
-                                         className='bg-imbue-light-purple w-[32px] h-[32px] rounded-[10px] text-imbue-purple border-none text-[20px] font-semibold items-center justify-center'>
-                                         {socials && value ? icon : '+'}
-                                       </button>
-                                     )}
-                                   </div>
-                                 ))}
-                               </div>
-                             </div>
-                      <hr className='separator' />
-                    </>
+                    <div className='lg:mx-[40px] text-imbue-purple-dark'>
+                      <h5>Linked Account</h5>
+                      <div className='flex flex-col gap-[16px] mt-[24px]'>
+                        {socials?.map(({ label, key, value, icon }: any, index: number) => (isCurrentFreelancer || value) && (
+                          <div
+                            className='h-auto flex justify-between items-center'
+                            key={index}
+                          >
+                            <p className='text-base'>{label} </p>
+                            {
+                              isEditMode ? (
+                                <div
+                                  className='h-auto w-full lg:w-2/3 flex justify-between items-center'
+                                  key={index}
+                                >
+                                  <TextField
+                                    color='secondary'
+                                    value={freelancer && freelancer[key]}
+                                    onChange={(e) => {
+                                      if (freelancer) {
+                                        setFreelancer({
+                                          ...freelancer,
+                                          [key]: e.target.value,
+                                        });
+                                      }
+                                    }}
+                                    //   className="bio-input"
+                                    className='bg-transparent text-imbue-purple border border-imbue-purple !m-0 w-full'
+                                    id='bio-input-id'
+                                  />
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => !value && isCurrentFreelancer && setIsEditMode(true)}
+                                  className='bg-imbue-light-purple w-[32px] h-[32px] rounded-[10px] text-imbue-purple border-none text-[20px] font-semibold items-center justify-center'>
+                                  {socials && value ? icon : '+'}
+                                </button>
+                              )
+                            }
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <hr className='separator' />
+                  </>
                 )}
 
                 <Skills
