@@ -18,7 +18,7 @@
   width: 30%;
 }
 
-.str-chat__channel-list-react .str-chat__channel-list-messenger-react{
+.str-chat__channel-list-react .str-chat__channel-list-messenger-react {
   padding-bottom: 0 !important;
 }
 
@@ -79,7 +79,7 @@
 }
 
 .str-chat ::-webkit-scrollbar-track {
-  background: var( --theme-light-grey);
+  background: var(--theme-light-grey);
   border-radius: 10px;
 }
 
@@ -119,10 +119,29 @@
   .str-chat__channel-search-input--clear-button
   svg
   path {
-    fill: var(--theme-purple) !important;
+  fill: var(--theme-purple) !important;
 }
 .str-chat svg path {
   fill: var(--theme-purple) !important;
+}
+
+.str-chat__message-input
+  .str-chat__message-textarea-container
+  .str-chat__message-textarea {
+  color: var(--theme-content) !important;
+}
+.str-chat__message
+  .str-chat__message-inner
+  .str-chat__message-bubble
+  .str-chat__message-text
+  p,
+.str-chat__quoted-message-preview
+  .str-chat__message-inner
+  .str-chat__message-bubble
+  .str-chat__message-text
+  p {
+  color: var(--theme-content) !important;
+  font-weight: 400;
 }
 
 @media screen and (max-width: 500px) {

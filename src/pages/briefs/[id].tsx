@@ -76,7 +76,8 @@ const BriefDetails = (): JSX.Element => {
       try {
         const briefData: Brief | Error | undefined = await getBrief(id);
         if (briefData?.id) {
-          const targetUser = await fetchUser(briefData.user_id);
+          const targetUserRes = await fetchUser(briefData.user_id);
+          setTargetUser(targetUserRes);
           setBrief(briefData);
           const _freelancer = await getFreelancerProfile(
             browsingUser?.username
@@ -86,7 +87,6 @@ const BriefDetails = (): JSX.Element => {
             browsingUser?.id
           );
           setIsSavedBrief(briefIsSaved.isSaved);
-          setTargetUser(targetUser);
           setFreelancer(_freelancer);
         } else {
           setError({ message: 'No Brief Found' });
