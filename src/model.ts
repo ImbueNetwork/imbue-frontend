@@ -133,6 +133,7 @@ export type User = {
   about?: string;
   website?: string;
   industry?: string;
+  created?: string;
 };
 export interface BasicTxResponse {
   errorMessage: string | null;

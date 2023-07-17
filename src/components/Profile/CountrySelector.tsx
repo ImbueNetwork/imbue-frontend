@@ -59,7 +59,7 @@ const CountrySelector = ({
             <>
               <ReactCountryFlag countryCode={findFlag() || ''} />
               <p className='text-base leading-[1.2] text-imbue-purple-dark'>
-                {region}, {country}
+                {region && `${region}, `} {country}
               </p>
             </>
           )}
