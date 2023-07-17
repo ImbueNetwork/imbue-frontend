@@ -4,15 +4,12 @@ import nextConnect from 'next-connect';
 
 import db from '@/db';
 
-import * as models from '../../../../lib/models';
 import { verifyUserIdFromJwt } from '../../auth/common';
+import * as models from '../../../../lib/models';
 
 export default nextConnect().put(
   async (req: NextApiRequest, res: NextApiResponse) => {
     const user: Partial<models.User> | any = req.body as Partial<models.User>;
-
-
-
     if (!user.id) {
       return res.status(400).json({
         status: 'Failed',
