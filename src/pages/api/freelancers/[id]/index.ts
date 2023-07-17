@@ -7,7 +7,6 @@ import {
   fetchFreelancerClients,
   fetchFreelancerDetailsByUsername,
   fetchFreelancerMetadata,
-  fetchUser,
 } from '@/lib/models';
 
 import db from '@/db';
@@ -31,7 +30,6 @@ export default nextConnect()
           return res.status(404).end();
         }
 
-        const user = await fetchUser(freelancer?.id)(tx);
         await Promise.all([
           (freelancer.skills = await fetchFreelancerMetadata(
             'skill',
@@ -75,14 +73,6 @@ export default nextConnect()
         //     'services'
         //   )(tx)),
         // ]);
-        const freelancer_profile = await tx
-          .select('*')
-          .from('freelancer_profile_image')
-          .where({ freelancer_id: freelancer.id });
-        if (freelancer_profile[0]) {
-          freelancer.profile_image =
-            freelancer_profile[0].profile_image || user?.profile_photo;
-        }
 
         const country = await tx
           .select('country')
