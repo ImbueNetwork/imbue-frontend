@@ -83,4 +83,44 @@ export default nextConnect()
         new Error(`Failed to fetch saved briefs`, { cause: e as Error });
       }
     });
+  })
+  .delete(async (req: NextApiRequest, res: NextApiResponse) => {
+    const data: any = req.body;
+
+    await db.transaction(async (tx: any) => {
+      try {
+        await models
+          .deleteSavedBrief(
+            data?.brief_id,
+            data?.user_id
+          )(tx)
+          .then(async (briefs: any) => {
+            const { currentData, totalItems } = await models.paginatedData(
+              Number(data?.page || 1),
+              Number(data?.items_per_page || 5),
+              briefs
+            );
+
+            await Promise.all([
+              currentData,
+              ...currentData.map(async (brief: any) => {
+                brief.skills = await models.fetchItems(
+                  brief.skill_ids,
+                  'skills'
+                )(tx);
+                brief.industries = await models.fetchItems(
+                  brief.industry_ids,
+                  'industries'
+                )(tx);
+              }),
+            ]);
+
+            console.log({ currentData }, { totalItems });
+
+            res.status(200).json({ currentData, totalBriefs: totalItems });
+          });
+      } catch (e) {
+        new Error(`Failed to delete saved briefs`, { cause: e as Error });
+      }
+    });
   });

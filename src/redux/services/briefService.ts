@@ -51,6 +51,28 @@ export const getAllBriefs = async (
   }
 };
 
+export const deleteSavedBrief = async (
+  brief_id: string | number,
+  user_id: string | number
+) => {
+  const resp = await fetch(`${config.apiBase}briefs/save`, {
+    headers: postAPIHeaders,
+    method: 'delete',
+    body: JSON.stringify({
+      brief_id,
+      user_id,
+    }),
+  });
+
+  if (resp.ok) {
+    return (await resp.json()) as PaginatedResponse;
+  } else {
+    throw new Error(
+      `Failed to delete brief with id ${brief_id} status:` + resp.status
+    );
+  }
+};
+
 export const getAllSavedBriefs = async (
   itemsPerPage: number,
   currentPage: number,

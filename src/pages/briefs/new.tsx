@@ -174,9 +174,16 @@ const NewBrief = (): JSX.Element => {
           className={styles.briefDetailFieldInput}
           style={{ paddingLeft: '24px', height: 'auto' }}
           type='number'
+          min='0'
           data-testid='budget-input'
           value={budget || ''}
-          onChange={(e) => setBudget(Number(e.target.value))}
+          onChange={(e) => {
+            if (Number(e.target.value) < 0) {
+              e.preventDefault();
+            } else {
+              setBudget(Number(e.target.value));
+            }
+          }}
         />
         <div className={styles.budgetCurrencyContainer}>$</div>
       </div>

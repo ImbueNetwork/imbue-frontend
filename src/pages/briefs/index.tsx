@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import Pagination from 'rc-pagination';
 import React, { useEffect, useState } from 'react';
+import { IoTrashBin } from 'react-icons/io5';
 import { useSelector } from 'react-redux';
 
 import CustomDropDown from '@/components/CustomDropDown';
@@ -23,6 +24,7 @@ import {
 import { Brief, BriefSqlFilter } from '@/model';
 import {
   callSearchBriefs,
+  deleteSavedBrief,
   getAllBriefs,
   getAllSavedBriefs,
 } from '@/redux/services/briefService';
@@ -58,6 +60,7 @@ const Briefs = (): JSX.Element => {
   const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
   // FIXME: openDropdown
   const [_openDropDown, setOpenDropDown] = useState<string>('');
+  const [savedBriefsActive, setSavedBriefsActive] = useState<boolean>(false);
 
   const [error, setError] = useState<any>();
   const { expRange, submitRange, lengthRange, heading } = router.query;
@@ -425,6 +428,7 @@ const Briefs = (): JSX.Element => {
   };
 
   const onSavedBriefs = async () => {
+    setSavedBriefsActive(true);
     const briefs_all: any = await getAllSavedBriefs(
       itemsPerPage,
       currentPage,
@@ -449,11 +453,19 @@ const Briefs = (): JSX.Element => {
   // };
 
   const reset = async () => {
+    setSavedBriefsActive(false);
     await router.push({
       pathname,
       query: {},
     });
     const allBriefs: any = await getAllBriefs(itemsPerPage, currentPage);
+    await setSlectedFilterIds([]);
+    setBriefs(allBriefs?.currentData);
+    setBriefsTotal(allBriefs?.totalFreelancers);
+  };
+
+  const deleteBrief = async (briefId: string | number) => {
+    const allBriefs: any = await deleteSavedBrief(briefId, currentUser?.id);
     await setSlectedFilterIds([]);
     setBriefs(allBriefs?.currentData);
     setBriefsTotal(allBriefs?.totalFreelancers);
@@ -555,9 +567,17 @@ const Briefs = (): JSX.Element => {
                 {selectedFilterIds?.length > 0 && (
                   <button
                     onClick={reset}
-                    className='h-[43px] lg:mr-4 px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 lg:ml-[44px]'
+                    className='h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 lg:ml-[44px]'
                   >
                     Reset
+                  </button>
+                )}
+                {savedBriefsActive && (
+                  <button
+                    onClick={reset}
+                    className='h-[43px] px-[20px] rounded-[10px] border bg-white border-imbue-purple text-imbue-purple-dark flex items-center cursor-pointer hover:scale-105 lg:ml-[44px]'
+                  >
+                    Back to Briefs
                   </button>
                 )}
 
@@ -565,7 +585,7 @@ const Briefs = (): JSX.Element => {
                   onClick={() => {
                     onSavedBriefs();
                   }}
-                  className='h-[43px] px-[20px] lg:mr-12 rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 lg:ml-[44px]'
+                  className='h-[43px] px-[20px] lg:mr-12 rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105'
                 >
                   Saved Briefs
                   <Image
@@ -593,37 +613,51 @@ const Briefs = (): JSX.Element => {
             {briefs?.map(
               (item, itemIndex) =>
                 !item?.project_id && (
-                  <div
-                    className='brief-item'
-                    key={itemIndex}
-                    onClick={() => router.push(`/briefs/${item?.id}/`)}
-                  >
-                    <div className='brief-title'>{item.headline}</div>
-                    <div className='brief-time-info'>
-                      {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
-                    </div>
-                    <div className='brief-description'>{item.description}</div>
+                  <div key={itemIndex} className='relative'>
+                    {savedBriefsActive && (
+                      <button
+                        className='absolute top-5 z-[1000] right-5 h-[30px] w-[30px] border border-red-500 rounded-full flex justify-center items-center bg-red-500'
+                        onClick={() => {
+                          deleteBrief(item?.id);
+                        }}
+                      >
+                        <IoTrashBin color='#fff' />
+                      </button>
+                    )}
 
-                    <div className='brief-tags'>
-                      {item.skills.map((skill: any, skillIndex: any) => (
-                        <div className='tag-item' key={skillIndex}>
-                          {skill.name}
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className='flex justify-between lg:flex-row flex-col lg:w-[400px] lg:items-center'>
-                      <div className='brief-proposals'>
-                        <span className='proposals-heading'>
-                          Proposals Submitted:{' '}
-                        </span>
-                        <span className='proposals-count'>
-                          Less than {item.number_of_briefs_submitted}
-                        </span>
+                    <div
+                      className='brief-item relative z-20'
+                      onClick={() => router.push(`/briefs/${item?.id}/`)}
+                    >
+                      <div className='brief-title'>{item.headline}</div>
+                      <div className='brief-time-info'>
+                        {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
+                      </div>
+                      <div className='brief-description'>
+                        {item.description}
                       </div>
 
-                      <div className='leading-none text-black mt-3 lg:mt-0'>
-                        {timeAgo.format(new Date(item?.created))}
+                      <div className='brief-tags'>
+                        {item.skills.map((skill: any, skillIndex: any) => (
+                          <div className='tag-item' key={skillIndex}>
+                            {skill.name}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className='flex justify-between lg:flex-row flex-col lg:w-[400px] lg:items-center'>
+                        <div className='brief-proposals'>
+                          <span className='proposals-heading'>
+                            Proposals Submitted:{' '}
+                          </span>
+                          <span className='proposals-count'>
+                            Less than {item.number_of_briefs_submitted}
+                          </span>
+                        </div>
+
+                        <div className='leading-none text-black mt-3 lg:mt-0'>
+                          {timeAgo.format(new Date(item?.created))}
+                        </div>
                       </div>
                     </div>
                   </div>
