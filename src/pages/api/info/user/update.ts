@@ -5,22 +5,48 @@ import nextConnect from 'next-connect';
 import db from '@/db';
 
 import * as models from '../../../../lib/models';
+import { verifyUserIdFromJwt } from '../../auth/common';
 
 export default nextConnect().put(
   async (req: NextApiRequest, res: NextApiResponse) => {
     const user: Partial<models.User> | any = req.body as Partial<models.User>;
+
+
+
     if (!user.id) {
-      res.status(400).json({
+      return res.status(400).json({
         status: 'Failed',
         message: 'No user data provided.',
       });
-      return;
     } else {
+      verifyUserIdFromJwt(req, res, user.id);
+
       let response;
       await db.transaction(async (tx: any) => {
         try {
-          const userData = await models.updateUserData(user.id, user)(tx);
 
+          const existingUsername = await models.fetchUserOrEmail(user.username)(tx);
+
+          if (existingUsername?.id !== user?.id) {
+            return res.status(400).json({
+              status: 'Failed',
+              message: 'Username already exists.',
+            });
+          }
+
+          if(user.email) {
+            const existingEmail =  await models.fetchUserOrEmail(user.email)(tx);
+            if (existingEmail?.id !== user?.id) {
+              console.log("***** email already exists");
+              return res.status(400).json({
+                status: 'Failed',
+                message: 'Email already exists.',
+              });
+            }
+          }
+
+
+          const userData = await models.updateUserData(user.id, user)(tx);
           if (!userData) {
             return new Error('User not found!.');
           }
