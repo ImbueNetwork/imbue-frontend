@@ -7,7 +7,6 @@ import {
   fetchFreelancerClients,
   fetchFreelancerDetailsByUsername,
   fetchFreelancerMetadata,
-  fetchUser,
 } from '@/lib/models';
 
 import db from '@/db';
@@ -31,7 +30,6 @@ export default nextConnect()
           return res.status(404).end();
         }
 
-        const user = await fetchUser(freelancer?.id)(tx);
         await Promise.all([
           (freelancer.skills = await fetchFreelancerMetadata(
             'skill',

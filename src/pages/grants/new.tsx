@@ -16,8 +16,8 @@ import { FaRegCopy } from 'react-icons/fa';
 import { FiPlusCircle } from 'react-icons/fi';
 
 import { getCurrentUser } from '@/utils';
-
 import { initImbueAPIInfo } from '@/utils/polkadot';
+
 import AccountChoice from '@/components/AccountChoice';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
