@@ -5,7 +5,7 @@ import {
   InputAdornment,
   TextField,
 } from '@mui/material';
-// import { blake2AsHex } from '@polkadot/util-crypto';
+import { blake2AsHex } from '@polkadot/util-crypto';
 import WalletIcon from '@svgs/wallet.svg';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
@@ -17,7 +17,7 @@ import { FiPlusCircle } from 'react-icons/fi';
 
 import { getCurrentUser } from '@/utils';
 
-// import { initImbueAPIInfo } from '@/utils/polkadot';
+import { initImbueAPIInfo } from '@/utils/polkadot';
 import AccountChoice from '@/components/AccountChoice';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
@@ -26,6 +26,7 @@ import Approvers from '@/components/Grant/Approvers';
 import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
 import { Currency } from '@/model';
+import ChainService from '@/redux/services/chainService';
 // import ChainService from '@/redux/services/chainService';
 
 interface MilestoneItem {
@@ -41,6 +42,7 @@ const GrantApplication = (): JSX.Element => {
   const [error, setError] = useState<any>();
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
+  const [escrowAddress, setEscrowAddress] = useState<string>('');
   const [approvers, setApprovers] = useState<string[]>([]);
   // const [newApprover, setNewApprover] = useState<string>();
   const [currencyId, setCurrencyId] = useState<number>(0);
@@ -60,9 +62,6 @@ const GrantApplication = (): JSX.Element => {
     }, 3000);
   };
 
-  const [escrow_address] = useState(
-    '5EYCAe5hKq6D9ACdEwwQxSSkWY9rqX4PqJyRBV3wA4NC8VSu'
-  );
 
   // const { user } = useSelector((state: RootState) => state.userState);
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
@@ -156,14 +155,14 @@ const GrantApplication = (): JSX.Element => {
     setLoading(true);
 
     try {
-      const user_id = (await getCurrentUser())?.id;
+      const user = await getCurrentUser();
       const grant = {
         title,
         description,
         duration_id: durationId, // TODO:
         required_funds: totalCost,
         currency_id: currencyId,
-        user_id,
+        user_id: user.id,
         owner: account.address,
         total_cost_without_fee: totalCostWithoutFee,
         imbue_fee: imbueFee,
@@ -177,31 +176,31 @@ const GrantApplication = (): JSX.Element => {
         approvers,
       };
 
-      // const imbueApi = await initImbueAPIInfo();
-      // const chainService = new ChainService(imbueApi, user)
+      const imbueApi = await initImbueAPIInfo();
+      const chainService = new ChainService(imbueApi, user)
 
-      // const grantMilestones = grant.milestones.map((m) => ({
-      //   percentageToUnlock: m.percentage_to_unlock,
-      // }));
+      const grantMilestones = grant.milestones.map((m) => ({
+        percentageToUnlock: m.percentage_to_unlock,
+      }));
 
-      // const grant_id = blake2AsHex(JSON.stringify(grant));
+      const grant_id = blake2AsHex(JSON.stringify(grant));
 
-      // if (!account) return
-      // const result = await chainService.submitInitialGrant(account, grantMilestones, approvers, currencyId, totalCost, "kusama", grant_id);
+      if (!account) return
+      const result = await chainService.submitInitialGrant(account, grantMilestones, approvers, currencyId, totalCost, "kusama", grant_id);
 
-      // // eslint-disable-next-line no-constant-condition
-      // while (true) {
-      //   if (result.status || result.txError) {
-      //     if (result.status) {
-      //       _setOnChainAddress(result?.eventData[5])
-      //       setSuccess(true);
-      //     } else if (result.txError) {
-      //       setError({ message: result.errorMessage });
-      //     }
-      //     break;
-      //   }
-      //   await new Promise((f) => setTimeout(f, 1000));
-      // }
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        if (result.status || result.txError) {
+          if (result.status) {
+            setEscrowAddress(result?.eventData[5])
+            setSuccess(true);
+          } else if (result.txError) {
+            setError({ message: result.errorMessage });
+          }
+          break;
+        }
+        await new Promise((f) => setTimeout(f, 1000));
+      }
 
       const resp = await fetch(`${config.apiBase}grants`, {
         headers: config.postAPIHeaders,
@@ -211,7 +210,7 @@ const GrantApplication = (): JSX.Element => {
           // chain_project_id: result?.eventData[2],
           // escrow_address: result?.eventData[5]
           chain_project_id: 217,
-          escrow_address: escrow_address,
+          escrow_address: escrowAddress,
         }),
       });
 
@@ -623,12 +622,12 @@ const GrantApplication = (): JSX.Element => {
             </p>
           </div>
 
-          <CopyToClipboard text={escrow_address}>
+          <CopyToClipboard text={escrowAddress}>
             <div className='flex flex-row gap-4 items-center rounded-[10px] border border-solid border-light-grey py-8 px-6 text-xl text-content'>
               <IconButton onClick={() => copyAddress()}>
                 <FaRegCopy className='text-content' />
               </IconButton>
-              <span>{escrow_address}</span>
+              <span>{escrowAddress}</span>
             </div>
           </CopyToClipboard>
           <div className='mt-6 mb-12 text-content text-lg text-center'>
