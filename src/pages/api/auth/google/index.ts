@@ -18,7 +18,7 @@ export default nextConnect().post(
         res.status(404);
       } else {
         const email = userInfo.email;
-        const username = email.replaceAll('.', '');
+        const username = email.split("@")[0].replaceAll('.', '');
         const displayname = userInfo.name;
         const issuer = userInfo.iss;
         const usernameExists = await fetchUserOrEmail(email)(tx) ?? await fetchUserOrEmail(username)(tx);
