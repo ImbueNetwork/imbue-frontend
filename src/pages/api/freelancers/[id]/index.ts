@@ -75,14 +75,6 @@ export default nextConnect()
         //     'services'
         //   )(tx)),
         // ]);
-        const freelancer_profile = await tx
-          .select('*')
-          .from('freelancer_profile_image')
-          .where({ freelancer_id: freelancer.id });
-        if (freelancer_profile[0]) {
-          freelancer.profile_image =
-            freelancer_profile[0].profile_image || user?.profile_photo;
-        }
 
         const country = await tx
           .select('country')
