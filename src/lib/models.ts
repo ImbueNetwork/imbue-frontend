@@ -208,6 +208,10 @@ export type PagerProps = {
   totalItems: number;
 };
 
+export const resetUserWeb3Addresses =
+  (address: string) => (tx: Knex.Transaction) =>
+    tx.raw(`UPDATE USERS SET web3_address=NULL WHERE web3_address='${address}'`);
+
 export const fetchWeb3AccountByAddress =
   (address: string) => (tx: Knex.Transaction) =>
     fetchAllWeb3Account()(tx).where({ address }).first();
@@ -264,10 +268,13 @@ export const upsertWeb3Challenge =
   async (
     tx: Knex.Transaction
   ): Promise<[web3Account: Web3Account, isInsert: boolean]> => {
-    const updatedUser = await tx<User>('users')
+    await resetUserWeb3Addresses(address)(tx);
+    await tx<User>('users')
       .update({ web3_address: address })
       .where({ id: user.id })
       .returning('*');
+
+
     const web3Account = await tx<Web3Account>('web3_accounts')
       .select()
       .where({
