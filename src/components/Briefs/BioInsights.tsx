@@ -30,6 +30,7 @@ type BioInsightsProps = {
   browsingUser: User | null;
   canSubmitProposal: boolean;
   isSavedBrief?: boolean;
+  unsaveBrief?: () => Promise<void>;
 };
 
 const BioInsights = ({
@@ -43,6 +44,7 @@ const BioInsights = ({
   targetUser,
   canSubmitProposal,
   saveBrief,
+  unsaveBrief,
   isSavedBrief,
 }: BioInsightsProps) => {
   const router = useRouter()
@@ -101,11 +103,10 @@ const BioInsights = ({
           </h3>
           <div className='flex gap-3 lg:items-center mt-4 md:flex-row flex-col'>
             <button
-              disabled={isSavedBrief}
-              onClick={() => saveBrief && saveBrief?.()}
-              className={` bg-transparent border border-imbue-purple-dark rounded-[1.5rem] h-[2.48rem] text-imbue-purple-dark text-[1rem] font-normal px-[2.5rem] max-width-1100px:w-full max-width-500px:w-auto `}
+              onClick={() => isSavedBrief ? unsaveBrief?.() : saveBrief?.()}
+              className={` ${isSavedBrief ? "bg-imbue-coral text-white border-imbue-coral" : "bg-transparent text-content border border-content"} rounded-3xl h-[2.48rem] text-base font-normal px-[2.5rem] max-width-1100px:w-full max-width-500px:w-auto `}
             >
-              Save
+              {isSavedBrief ? "Unsave" : "Save"}
             </button>
             <Tooltip
               title={!canSubmitProposal && "Only varified users are allowed to apply for a breif"}

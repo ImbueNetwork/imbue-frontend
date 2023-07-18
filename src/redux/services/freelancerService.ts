@@ -76,7 +76,7 @@ export async function freelancerExists(username: string): Promise<boolean> {
   }
 }
 
-export async function updateFreelancer(freelancer: Freelancer) {
+export async function updateFreelancer(freelancer: any) {
   const resp = await fetch(
     `${config.apiBase}freelancers/${freelancer.username}`,
     {

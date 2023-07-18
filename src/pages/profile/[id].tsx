@@ -49,24 +49,11 @@ const Profile = ({ initUser, browsingUser }: any) => {
     getBriefs();
   }, [user?.id]);
 
-  const onSave = async () => {
+  const onSave = async (user: any) => {
     try {
       if (user) {
-        const userData = {
-          id: user?.id,
-          display_name: user?.display_name,
-          username: user?.username,
-          getstream_token: user.getstream_token,
-          web3_address: user?.web3_address,
-          profile_photo: user?.profile_image,
-          country: user?.country,
-          region: user?.region,
-          about: user?.about,
-          website: user?.website,
-          industry: user?.industry,
-        };
         setLoading(true);
-        const userResponse: any = await updateUser(userData);
+        const userResponse: any = await updateUser(user);
 
         if (userResponse.status === 'Successful') {
           setSuccess(true);
@@ -81,9 +68,19 @@ const Profile = ({ initUser, browsingUser }: any) => {
     }
   };
 
-  const cancelEdit = () => {
-    setUser(initUser);
-    setIsEditMode(false);
+  const cancelEdit = async () => {
+    try {
+      const resp = await updateUser(initUser);
+      if (resp.status === "Successful") {
+        setUser(initUser);
+        setIsEditMode(false);
+      }
+      else {
+        setError({ message: "Could not revert to previous profile photo. Please try again" })
+      }
+    } catch (error) {
+      setError({ message: "Could not revert to previous profile photo. Please try again" })
+    }
   };
 
   // cs
@@ -136,6 +133,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                 setUser={setUser}
                 user={user}
                 isEditMode={isEditMode}
+                saveChanges={updateUser}
               />
             </div>
             <div className='w-full flex flex-col gap-4'>
@@ -311,6 +309,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
               {isEditMode ? (
                 <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>
                   <OutlinedInput
+                    defaultValue={user?.website}
                     name='website'
                     onChange={(e) => handleChange(e)}
                     className='w-full border border-imbue-purple'
@@ -327,6 +326,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
               {isEditMode ? (
                 <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>
                   <OutlinedInput
+                    defaultValue={user?.industry}
                     name='industry'
                     onChange={(e) => handleChange(e)}
                     className='w-full border border-imbue-purple'
@@ -400,7 +400,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
 
       {isEditMode && (
         <div className='mt-5'>
-          <button onClick={onSave} className='primary-btn in-dark w-button'>
+          <button onClick={() => onSave(user)} className='primary-btn in-dark w-button'>
             Save Changes
           </button>
           <button

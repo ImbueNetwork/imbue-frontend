@@ -41,14 +41,27 @@ export default nextConnect().put(
               });
             }
           }
+          
+          const userData = {
+            id: user?.id,
+            display_name: user?.display_name,
+            username: user?.username,
+            getstream_token: user.getstream_token,
+            web3_address: user?.web3_address,
+            profile_photo: user?.profile_photo,
+            country: user?.country,
+            region: user?.region,
+            about: user?.about,
+            website: user?.website,
+            industry: user?.industry,
+          };
 
-
-          const userData = await models.updateUserData(user.id, user)(tx);
-          if (!userData) {
+          const userResp = await models.updateUserData(user.id, userData)(tx);
+          if (!userResp) {
             return new Error('User not found!.');
           }
 
-          response = userData;
+          response = userResp;
         } catch (e) {
           new Error(`Failed to update user name: ${user.display_name}`, {
             cause: e as Error,

@@ -30,7 +30,7 @@ const Skills = ({
         <h5>Skills</h5>
       </div>
       {isEditMode ? (
-        <EditSkills {...{ skills, setSkills }} />
+        <EditSkills skills={skills || []} {...{ setSkills }} />
       ) : (
         <div className='flex flex-wrap gap-5 mt-6'>
           {user?.skills?.map?.((skill: any, skillIndex: string) => (

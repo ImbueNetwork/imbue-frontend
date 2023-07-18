@@ -9,10 +9,10 @@ type UploadImageProps = {
   isEditMode: boolean;
   setUser: (value: any) => void;
   user: any;
+  saveChanges?: (user: any) => Promise<any>;
 };
 
-const UploadImage = ({ isEditMode, setUser, user }: UploadImageProps) => {
-  const [image, setImage] = useState<any>(user?.profile_image);
+const UploadImage = ({ isEditMode, setUser, user, saveChanges }: UploadImageProps) => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleUpload = async (files: FileList | null) => {
@@ -20,9 +20,17 @@ const UploadImage = ({ isEditMode, setUser, user }: UploadImageProps) => {
       setLoading(true);
       const data = await uploadPhoto(files[0]);
       if (data.url) {
-        setImage(data.url);
+        await saveChanges?.({
+          ...user,
+          profile_photo: data.url,
+          profile_image: data.url
+        })
         setUser((prev: any) => {
-          return { ...prev, profile_image: data.url };
+          return {
+            ...prev,
+            profile_photo: data.url,
+            profile_image: data.url
+          };
         });
       }
     }
@@ -31,7 +39,7 @@ const UploadImage = ({ isEditMode, setUser, user }: UploadImageProps) => {
   return (
     <div className='h-32 w-32 bg-white rounded-full relative -mt-12 unset border border-light-purple'>
       <Image
-        src={image || require('@/assets/images/profile-image.png')}
+        src={user?.profile_photo || user?.profile_image || require('@/assets/images/profile-image.png')}
         alt='profile image'
         width={300}
         height={300}

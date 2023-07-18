@@ -172,9 +172,23 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   };
 
   const cancelEdit = async () => {
-    setFreelancer(initFreelancer);
-    setIsEditMode(false);
-    setClients(initFreelancer?.clients);
+    try {
+      await updateFreelancer({
+        ...initFreelancer,
+        skills: initFreelancer?.skills?.map(
+          (skill: { id: number; name: string }) =>
+            skill?.name?.charAt(0).toUpperCase() + skill?.name?.slice(1)
+        ),
+        clients: initFreelancer?.clients,
+        logged_in_user: browsingUser,
+      })
+
+      setFreelancer(initFreelancer);
+      setIsEditMode(false);
+      setClients(initFreelancer?.clients);
+    } catch (error) {
+      setError({ message: "Could not revert to previous profile photo. Please try again" })
+    }
   };
 
   const accountSelected = async (account: WalletAccount): Promise<any> => {
@@ -367,8 +381,14 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
 
               <UploadImage
                 isEditMode={isEditMode}
-                user={freelancer}
+                user={{
+                  ...freelancer,
+                  skills: skills,
+                  clients: clients,
+                  logged_in_user: browsingUser,
+                }}
                 setUser={setFreelancer}
+                saveChanges={updateFreelancer}
               />
               <div className='w-full flex flex-col gap-[16px] mt-5'>
                 {isEditMode ? (
