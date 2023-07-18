@@ -1397,6 +1397,7 @@ export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
     total_cost_without_fee,
     imbue_fee,
     duration_id,
+    status_id: ProjectStatus.Accepted
     // project_type: project_type ?? models.ProjectType.Brief
   })(tx);
 

@@ -87,6 +87,7 @@ function Project() {
     useState<boolean>(false);
   const [submittingMilestone, setSubmittingMilestone] =
     useState<boolean>(false);
+  const [raiseVoteOfNoConfidence, setRaiseVoteOfNoConfidence] = useState<boolean>(false);
   const [withdrawMilestone, setWithdrawMilestone] = useState<boolean>(false);
   const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
   const [votingWalletAccount, setVotingWalletAccount] = useState<
@@ -99,6 +100,7 @@ function Project() {
   const projectId: any = router?.query?.id || 0;
   const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
   const [isApplicant, setIsApplicant] = useState<boolean>();
+  const [showRefundButton, setShowRefundButton] = useState<boolean>();
 
   const [wait, setWait] = useState<boolean>(false);
   const [waitMessage, setWaitMessage] = useState<string>("");
@@ -123,6 +125,8 @@ function Project() {
     if (onChainProjectRes) {
       const isApplicant = onChainProjectRes.initiator == user.web3_address;
       setIsApplicant(isApplicant);
+      // TODO Enable refunds first
+      //setShowRefundButton(onChainProjectRes.fundingType.Grant)
       if (onChainProjectRes.projectState == OnchainProjectState.OpenForVoting) {
         const firstPendingMilestone =
           await chainService.findFirstPendingMilestone(
@@ -172,17 +176,17 @@ function Project() {
       const approversPreviewList = [...approversPreview];
 
       if (projectRes?.approvers?.length && approversPreviewList.length === 0) {
-        projectRes?.approvers.map(async (v: any) => {
-          const user = await utils.fetchUserByUsernameOrAddress(v);
-          if (user?.length) {
-            approversPreviewList.push(...user);
+        projectRes?.approvers.map(async (approverAddress: any) => {
+          const approver = await utils.fetchUserByUsernameOrAddress(approverAddress);
+          if (approver?.length) {
+            approversPreviewList.push(...approver);
           } else {
             approversPreviewList.push({
               // id: 6,
               display_name: '',
               profile_photo: null,
               username: '',
-              web3_address: v,
+              web3_address: approverAddress,
             });
           }
         });
@@ -286,9 +290,25 @@ function Project() {
     setLoading(false);
   };
 
-  const handleRefund = async () => {
-    // TODO: create vote of no confidence for refund
-  };
+  const refund = async (account: WalletAccount) => {
+    setLoading(true);
+    const imbueApi = await initImbueAPIInfo();
+    // const user: User | any = await utils.getCurrentUser();
+    const chainService = new ChainService(imbueApi, user);
+    const result = await chainService.raiseVoteOfNoConfidence(account, onChainProject);
+    while (true) {
+      if (result.status || result.txError) {
+        if (result.status) {
+          setSuccess(true);
+          setSuccessTitle('Vote of no confidence raised.');
+        } else if (result.txError) {
+          setError({ message: result.errorMessage });
+        }
+        break;
+      }
+      await new Promise((f) => setTimeout(f, 1000));
+    }
+    setLoading(false);  };
 
   const renderPolkadotJSModal = (
     <div>
@@ -296,6 +316,8 @@ function Project() {
         accountSelected={async (account: WalletAccount) => {
           if (submittingMilestone) {
             submitMilestone(account);
+          } else if (raiseVoteOfNoConfidence) {
+            refund(account);
           } else if (withdrawMilestone) {
             withdraw(account);
           } else {
@@ -551,10 +573,15 @@ function Project() {
               Message
             </button>
 
-            {isApplicant && (
+            {showRefundButton && (
               <button
                 className='border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors'
-                onClick={() => handleRefund()}
+                onClick={async () => {
+                  // set submitting mile stone to true
+                  await setRaiseVoteOfNoConfidence(true);
+                  // show polkadot account modal
+                  await setShowPolkadotAccounts(true);
+                }}
               >
                 Refund
               </button>

@@ -35,11 +35,13 @@ export enum OnchainProjectState {
   PendingMilestoneApproval = 4,
   OpenForVoting = 5,
   OpenForWithdraw = 6,
+  OpenForVotingOfNoConfidence = 7,
 }
 
 export enum RoundType {
   ContributionRound,
   VotingRound,
+  VoteOfNoConfidence,
 }
 
 export enum ButtonState {
@@ -92,6 +94,7 @@ export type ProjectOnChain = {
   roundKey?: number | undefined;
   cancelled: boolean;
   projectState: OnchainProjectState;
+  fundingType: any;
 };
 
 export type Milestone = {

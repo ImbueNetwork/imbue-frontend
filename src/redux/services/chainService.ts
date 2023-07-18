@@ -16,6 +16,7 @@ import {
   OnchainProjectState,
   Project,
   ProjectOnChain,
+  ProjectType,
   RoundType,
   User,
 } from '@/model';
@@ -29,6 +30,7 @@ const eventMapping: Record<string, EventDetails> = {
   submitMilestone: { eventName: 'MilestoneSubmitted' },
   voteOnMilestone: { eventName: 'VoteComplete' },
   approveMilestone: { eventName: 'MilestoneApproved' },
+  refund: { eventName: 'NoConfidenceRoundCreated' },
   withraw: { eventName: 'ProjectFundsWithdrawn' },
   createBrief: { eventName: 'BriefSubmitted' },
   commenceWork: { eventName: 'ProjectCreated' },
@@ -190,6 +192,20 @@ class ChainService {
       account,
       extrinsic,
       eventMapping['withraw'].eventName
+    );
+  }
+
+  public async raiseVoteOfNoConfidence(
+    account: WalletAccount,
+    projectOnChain: any
+  ): Promise<BasicTxResponse> {
+    const projectId = projectOnChain.milestones[0].project_chain_id;
+    const extrinsic =
+      this.imbueApi.imbue.api.tx.imbueProposals.raiseVoteOfNoConfidence(projectId);
+    return await this.submitImbueExtrinsic(
+      account,
+      extrinsic,
+      eventMapping['refund'].eventName
     );
   }
 
@@ -373,6 +389,7 @@ class ChainService {
     );
     let projectInContributionRound = false;
     let projectInVotingRound = false;
+    let projectInVoteOfNoConfidenceRound = false;
 
     const lastApprovedMilestoneKey = await this.findLastApprovedMilestone(
       milestones
@@ -400,6 +417,9 @@ class ChainService {
         } else if (roundTypeHuman == RoundType[RoundType.VotingRound]) {
           projectInVotingRound = true;
           break;
+        } else if (roundTypeHuman == RoundType[RoundType.VoteOfNoConfidence]) {
+          projectInVoteOfNoConfidenceRound = true;
+          break;
         }
       }
     }
@@ -416,6 +436,8 @@ class ChainService {
       }
     } else if (projectInVotingRound) {
       projectState = OnchainProjectState.OpenForVoting;
+    } else if (projectInVoteOfNoConfidenceRound) {
+      projectState = OnchainProjectState.OpenForVotingOfNoConfidence;
     } else {
       projectState = OnchainProjectState.PendingMilestoneSubmission;
     }
@@ -463,6 +485,7 @@ class ChainService {
       fundingThresholdMet: projectOnChain.fundingThresholdMet,
       cancelled: projectOnChain.cancelled,
       projectState,
+      fundingType: projectOnChain.fundingType,
       // roundKey,
     };
 
