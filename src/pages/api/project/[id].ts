@@ -1,16 +1,39 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
+import passport from 'passport';
 
 import * as models from '@/lib/models';
 
 import db from '@/db';
+
+import { verifyUserIdFromJwt } from '../auth/common';
 
 type ProjectPkg = models.Project & {
   milestones: models.Milestone[];
   approvers?: string[];
 };
 
+export const authenticate = (
+  method: string,
+  req: NextApiRequest,
+  res: NextApiResponse
+) =>
+  new Promise((resolve, reject) => {
+    passport.authenticate(
+      method,
+      { session: false },
+      (error: Error, token: any) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(token);
+        }
+      }
+    )(req, res);
+  });
+
 export default nextConnect()
+  .use(passport.initialize())
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
     const { query } = req;
     const id: any = query.id as string[];
@@ -43,6 +66,14 @@ export default nextConnect()
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
     const { query, body } = req;
     const id: any = query.id as string[];
+
+    const userAuth: Partial<models.User> | any = await authenticate(
+      'jwt',
+      req,
+      res
+    );
+    verifyUserIdFromJwt(req, res, userAuth.id);
+
     const {
       name,
       logo,
@@ -58,7 +89,7 @@ export default nextConnect()
       imbue_fee,
       user_id,
       escrow_address,
-      duration_id
+      duration_id,
     } = body;
     db.transaction(async (tx) => {
       try {
@@ -87,7 +118,7 @@ export default nextConnect()
           imbue_fee,
           escrow_address,
           // project_type: exists.project_type,
-          duration_id
+          duration_id,
         })(tx);
 
         if (!project.id) {

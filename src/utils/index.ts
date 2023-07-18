@@ -131,7 +131,7 @@ export const checkEnvironment = () => {
 };
 
 export const updateUser = async (user: User) => {
-  const resp = { status: 401, message: 'could not fetch' };
+  const resp = { status: 401, message: 'User is not Authenticated' };
   try {
     const update = await fetch(`${config.apiBase}/info/user/update`, {
       headers: config.postAPIHeaders,

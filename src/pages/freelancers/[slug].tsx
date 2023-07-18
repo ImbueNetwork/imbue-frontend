@@ -12,16 +12,16 @@ import {
   Select,
   TextField,
   Tooltip,
-} from "@mui/material";
-import { StyledEngineProvider } from "@mui/system";
-import { SignerResult } from "@polkadot/api/types";
-import { WalletAccount } from "@talismn/connect-wallets";
+} from '@mui/material';
+import { StyledEngineProvider } from '@mui/system';
+import { SignerResult } from '@polkadot/api/types';
+import { WalletAccount } from '@talismn/connect-wallets';
 import moment from 'moment';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import ReactCountryFlag from 'react-country-flag';
-import { AiOutlineUser } from "react-icons/ai";
+import { AiOutlineUser } from 'react-icons/ai';
 import { BsPencilSquare } from 'react-icons/bs';
 import {
   FaDiscord,
@@ -42,16 +42,16 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { checkEnvironment, fetchUser } from '@/utils';
 
-import AccountChoice from "@/components/AccountChoice";
+import AccountChoice from '@/components/AccountChoice';
 import { TextArea } from '@/components/Briefs/TextArea';
 import ChatPopup from '@/components/ChatPopup';
-import ErrorScreen from "@/components/ErrorScreen";
-import FullScreenLoader from "@/components/FullScreenLoader";
-import Clients from "@/components/Profile/Clients";
-import CountrySelector from "@/components/Profile/CountrySelector";
-import Skills from "@/components/Profile/Skills";
-import UploadImage from "@/components/Profile/UploadImage";
-import SuccessScreen from "@/components/SuccessScreen";
+import ErrorScreen from '@/components/ErrorScreen';
+import FullScreenLoader from '@/components/FullScreenLoader';
+import Clients from '@/components/Profile/Clients';
+import CountrySelector from '@/components/Profile/CountrySelector';
+import Skills from '@/components/Profile/Skills';
+import UploadImage from '@/components/Profile/UploadImage';
+import SuccessScreen from '@/components/SuccessScreen';
 
 import { Currency, Freelancer, Project, User } from '@/model';
 import { fetchUserRedux } from '@/redux/reducers/userReducers';
@@ -63,8 +63,6 @@ import {
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 import { AppDispatch, RootState } from '@/redux/store/store';
 import styles from '@/styles/modules/freelancers.module.css';
-
-
 
 export type ProfileProps = {
   initFreelancer: Freelancer;
@@ -93,7 +91,6 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   );
   const dispatch = useDispatch<AppDispatch>();
 
-
   const isCurrentFreelancer =
     browsingUser && browsingUser?.id === freelancer?.user_id;
 
@@ -102,7 +99,6 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [copied, setCopied] = useState<string>('');
-
 
   const [clients, setClients] = useState<any>(
     initFreelancer?.clients ? initFreelancer.clients : []
@@ -120,7 +116,11 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   useEffect(() => {
     const setup = async () => {
       if (freelancer) {
-        const userHasNoSocial = !freelancer.facebook_link && !freelancer.telegram_link && !freelancer.twitter_link && !freelancer.discord_link;
+        const userHasNoSocial =
+          !freelancer.facebook_link &&
+          !freelancer.telegram_link &&
+          !freelancer.twitter_link &&
+          !freelancer.discord_link;
         const hideLinkedAccounts = userHasNoSocial && !isCurrentFreelancer;
         setHideLinkedAccounts(hideLinkedAccounts);
         setTargetUser(await fetchUser(freelancer?.user_id));
@@ -140,7 +140,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           ...data,
           skills: skills,
           clients: clients,
-          logged_in_user: browsingUser,
+          logged_in_user: browsingUser.id === initFreelancer.user_id,
         };
 
         const resp: any = await updateFreelancer(data);
@@ -185,14 +185,16 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         ),
         clients: initFreelancer?.clients,
         logged_in_user: browsingUser,
-      })
+      });
 
       setFreelancer(initFreelancer);
       setIsEditMode(false);
       setClients(initFreelancer?.clients);
       dispatch(fetchUserRedux());
     } catch (error) {
-      setError({ message: "Could not revert to previous profile photo. Please try again" })
+      setError({
+        message: 'Could not revert to previous profile photo. Please try again',
+      });
     }
   };
 
@@ -598,17 +600,16 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   Among my clients
                 </p>
                 <Tooltip
-                  title="Organizations or companiest that you have previously worked with. Add their name, website and logo for recongintion"
+                  title='Organizations or companiest that you have previously worked with. Add their name, website and logo for recongintion'
                   enterTouchDelay={10}
                   leaveTouchDelay={4000}
                   arrow
-                  placement="bottom"
+                  placement='bottom'
                 >
                   <span className='h-4 w-4 flex justify-center items-center rounded-full bg-imbue-light-purple text-imbue-purple cursor-pointer'>
                     ?
                   </span>
                 </Tooltip>
-
               </div>
 
               <Clients
@@ -695,44 +696,50 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                     <div className='lg:mx-[40px] text-imbue-purple-dark'>
                       <h5>Linked Account</h5>
                       <div className='flex flex-col gap-[16px] mt-[24px]'>
-                        {socials?.map(({ label, key, value, icon }: any, index: number) => (isCurrentFreelancer || value) && (
-                          <div
-                            className='h-auto flex justify-between items-center'
-                            key={index}
-                          >
-                            <p className='text-base'>{label} </p>
-                            {
-                              isEditMode ? (
-                                <div
-                                  className='h-auto w-full lg:w-2/3 flex justify-between items-center'
-                                  key={index}
-                                >
-                                  <TextField
-                                    color='secondary'
-                                    value={freelancer && freelancer[key]}
-                                    onChange={(e) => {
-                                      if (freelancer) {
-                                        setFreelancer({
-                                          ...freelancer,
-                                          [key]: e.target.value,
-                                        });
-                                      }
-                                    }}
-                                    //   className="bio-input"
-                                    className='bg-transparent text-imbue-purple border border-imbue-purple !m-0 w-full'
-                                    id='bio-input-id'
-                                  />
-                                </div>
-                              ) : (
-                                <button
-                                  onClick={() => !value && isCurrentFreelancer && setIsEditMode(true)}
-                                  className='bg-imbue-light-purple w-[32px] h-[32px] rounded-[10px] text-imbue-purple border-none text-[20px] font-semibold items-center justify-center'>
-                                  {socials && value ? icon : '+'}
-                                </button>
-                              )
-                            }
-                          </div>
-                        ))}
+                        {socials?.map(
+                          ({ label, key, value, icon }: any, index: number) =>
+                            (isCurrentFreelancer || value) && (
+                              <div
+                                className='h-auto flex justify-between items-center'
+                                key={index}
+                              >
+                                <p className='text-base'>{label} </p>
+                                {isEditMode ? (
+                                  <div
+                                    className='h-auto w-full lg:w-2/3 flex justify-between items-center'
+                                    key={index}
+                                  >
+                                    <TextField
+                                      color='secondary'
+                                      value={freelancer && freelancer[key]}
+                                      onChange={(e) => {
+                                        if (freelancer) {
+                                          setFreelancer({
+                                            ...freelancer,
+                                            [key]: e.target.value,
+                                          });
+                                        }
+                                      }}
+                                      //   className="bio-input"
+                                      className='bg-transparent text-imbue-purple border border-imbue-purple !m-0 w-full'
+                                      id='bio-input-id'
+                                    />
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() =>
+                                      !value &&
+                                      isCurrentFreelancer &&
+                                      setIsEditMode(true)
+                                    }
+                                    className='bg-imbue-light-purple w-[32px] h-[32px] rounded-[10px] text-imbue-purple border-none text-[20px] font-semibold items-center justify-center'
+                                  >
+                                    {socials && value ? icon : '+'}
+                                  </button>
+                                )}
+                              </div>
+                            )
+                        )}
                       </div>
                     </div>
                     <hr className='separator' />
@@ -883,7 +890,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                 />
               </>
             ) : (
-              <div className='bio text-content-primary text-base lg:mx-10 whitespace-pre-wrap'>{freelancer?.bio}</div>
+              <div className='bio text-content-primary text-base lg:mx-10 whitespace-pre-wrap'>
+                {freelancer?.bio}
+              </div>
             )}
             <hr className='separator' />
 
@@ -1086,20 +1095,19 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         open={success}
         setOpen={setSuccess}
       >
-        <div className="flex flex-col gap-4 w-1/2">
+        <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => {
-              flipEdit(),
-                setSuccess(false);
+              flipEdit(), setSuccess(false);
               window.location.reload();
             }}
-            className="primary-btn in-dark w-button w-full !m-0"
+            className='primary-btn in-dark w-button w-full !m-0'
           >
             See Profile
           </button>
           <button
-            onClick={() => window.location.href = `/dashboard`}
-            className="underline text-xs lg:text-base font-bold"
+            onClick={() => (window.location.href = `/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
           >
             Go to Dashboard
           </button>
@@ -1107,10 +1115,10 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
       </SuccessScreen>
 
       <ErrorScreen {...{ error, setError }}>
-        <div className="flex flex-col gap-4 w-1/2">
+        <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => setError(null)}
-            className="primary-btn in-dark w-button w-full !m-0"
+            className='primary-btn in-dark w-button w-full !m-0'
           >
             Try Again
           </button>
@@ -1123,8 +1131,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         </div>
       </ErrorScreen>
       <div
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
-          }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${
+          copied ? 'right-5' : '-right-full'
+        }`}
       >
         <Alert severity='success'>{`${copied} Copied to clipboard`}</Alert>
       </div>

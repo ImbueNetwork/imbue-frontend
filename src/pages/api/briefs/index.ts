@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
+import passport from 'passport';
 
 import {
   fetchAllBriefs,
@@ -14,7 +15,29 @@ import * as models from '@/lib/models';
 import db from '@/db';
 import { Brief } from '@/model';
 
+import { verifyUserIdFromJwt } from '../auth/common';
+
+export const authenticate = (
+  method: string,
+  req: NextApiRequest,
+  res: NextApiResponse
+) =>
+  new Promise((resolve, reject) => {
+    passport.authenticate(
+      method,
+      { session: false },
+      (error: Error, token: any) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(token);
+        }
+      }
+    )(req, res);
+  });
+
 export default nextConnect()
+  .use(passport.initialize())
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
     const data = req.query;
     await db.transaction(async (tx: any) => {
@@ -54,6 +77,14 @@ export default nextConnect()
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
     const brief: Brief = req.body as Brief;
     let response;
+
+    const userAuth: Partial<models.User> | any = await authenticate(
+      'jwt',
+      req,
+      res
+    );
+    verifyUserIdFromJwt(req, res, userAuth.id);
+
     await db.transaction(async (tx: any) => {
       try {
         const skill_ids = await upsertItems(brief.skills, 'skills')(tx);
@@ -90,6 +121,15 @@ export default nextConnect()
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
     const brief: Brief = req.body as Brief;
     let response;
+
+    const userAuth: Partial<models.User> | any = await authenticate(
+      'jwt',
+      req,
+      res
+    );
+
+    verifyUserIdFromJwt(req, res, userAuth.id);
+
     await db.transaction(async (tx: any) => {
       try {
         const skill_ids = await upsertItems(brief.skills, 'skills')(tx);

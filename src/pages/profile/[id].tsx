@@ -39,6 +39,8 @@ const Profile = ({ initUser, browsingUser }: any) => {
   const [targetUser] = useState<User | null>(null);
   const [openBriefs, setOpenBriefs] = useState<Brief[]>([]);
 
+  const isProfileOwner = browsingUser && browsingUser?.id === initUser?.id;
+
   const [openAccountChoice, setOpenAccountChoice] = useState<boolean>(false);
   const [error, setError] = useState<any>();
   const [success, setSuccess] = useState<boolean>(false);
@@ -237,14 +239,16 @@ const Profile = ({ initUser, browsingUser }: any) => {
               </div>
             </div>
 
-            <div className='absolute top-5 right-5 cursor-pointer'>
-              <span className='text-imbue-purple mr-2'>Edit</span>
-              <BiEdit
-                onClick={() => setIsEditMode(!isEditMode)}
-                size={30}
-                color='#3B27C1'
-              />
-            </div>
+            {isProfileOwner && (
+              <div className='absolute top-5 right-5 cursor-pointer'>
+                <span className='text-imbue-purple mr-2'>Edit</span>
+                <BiEdit
+                  onClick={() => setIsEditMode(!isEditMode)}
+                  size={30}
+                  color='#3B27C1'
+                />
+              </div>
+            )}
 
             <AccountChoice
               accountSelected={(account: WalletAccount) =>

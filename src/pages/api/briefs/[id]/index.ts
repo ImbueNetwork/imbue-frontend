@@ -1,12 +1,35 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
+import passport from 'passport';
 
 import * as models from '@/lib/models';
 import { Brief, BriefSqlFilter, fetchItems } from '@/lib/models';
 
 import db from '@/db';
 
+import { verifyUserIdFromJwt } from '../../auth/common';
+
+export const authenticate = (
+  method: string,
+  req: NextApiRequest,
+  res: NextApiResponse
+) =>
+  new Promise((resolve, reject) => {
+    passport.authenticate(
+      method,
+      { session: false },
+      (error: Error, token: any) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(token);
+        }
+      }
+    )(req, res);
+  });
+
 export default nextConnect()
+  .use(passport.initialize())
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
     const { id } = req.query;
     if (!id) return;
@@ -32,6 +55,14 @@ export default nextConnect()
   })
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
     const data = req.body as BriefSqlFilter;
+
+    const userAuth: Partial<models.User> | any = await authenticate(
+      'jwt',
+      req,
+      res
+    );
+    verifyUserIdFromJwt(req, res, userAuth.id);
+
     await db.transaction(async (tx: any) => {
       try {
         const briefs: Array<Brief> = await models.searchBriefs(tx, data);
