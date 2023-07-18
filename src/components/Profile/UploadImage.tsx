@@ -2,8 +2,12 @@
 import { CircularProgress } from '@mui/material';
 import Image from 'next/image';
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import { uploadPhoto } from '@/utils/imageUpload';
+
+import { fetchUserRedux } from '@/redux/reducers/userReducers';
+import { AppDispatch } from '@/redux/store/store';
 
 type UploadImageProps = {
   isEditMode: boolean;
@@ -14,6 +18,8 @@ type UploadImageProps = {
 
 const UploadImage = ({ isEditMode, setUser, user, saveChanges }: UploadImageProps) => {
   const [loading, setLoading] = useState<boolean>(false);
+  const dispatch = useDispatch<AppDispatch>();
+
 
   const handleUpload = async (files: FileList | null) => {
     if (files?.length) {
@@ -32,6 +38,7 @@ const UploadImage = ({ isEditMode, setUser, user, saveChanges }: UploadImageProp
             profile_image: data.url
           };
         });
+        dispatch(fetchUserRedux());
       }
     }
   };

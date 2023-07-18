@@ -18,7 +18,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { appLogo, cancelIcon, hamburgerIcon } from '@/assets/svgs';
-import { fetchUser } from '@/redux/reducers/userReducers';
+import { fetchUserRedux } from '@/redux/reducers/userReducers';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { AppDispatch, RootState } from '@/redux/store/store';
 
@@ -56,7 +56,7 @@ function Navbar() {
 
   useEffect(() => {
     const setup = async () => {
-      dispatch(fetchUser());
+      dispatch(fetchUserRedux());
       try {
         if (user?.username) {
           const res = await getFreelancerProfile(user.username);

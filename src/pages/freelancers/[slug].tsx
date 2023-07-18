@@ -38,7 +38,7 @@ import { GrCertificate } from 'react-icons/gr';
 import { ImStack } from 'react-icons/im';
 import { IoPeople } from 'react-icons/io5';
 import { MdOutlineWatchLater } from 'react-icons/md';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { checkEnvironment, fetchUser } from '@/utils';
 
@@ -54,14 +54,16 @@ import UploadImage from "@/components/Profile/UploadImage";
 import SuccessScreen from "@/components/SuccessScreen";
 
 import { Currency, Freelancer, Project, User } from '@/model';
+import { fetchUserRedux } from '@/redux/reducers/userReducers';
 import {
   getFreelancerApplications,
   getFreelancerProfile,
   updateFreelancer,
 } from '@/redux/services/freelancerService';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
-import { RootState } from '@/redux/store/store';
+import { AppDispatch, RootState } from '@/redux/store/store';
 import styles from '@/styles/modules/freelancers.module.css';
+
 
 
 export type ProfileProps = {
@@ -89,6 +91,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const { user: browsingUser } = useSelector(
     (state: RootState) => state.userState
   );
+  const dispatch = useDispatch<AppDispatch>();
+
 
   const isCurrentFreelancer =
     browsingUser && browsingUser?.id === freelancer?.user_id;
@@ -186,6 +190,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
       setFreelancer(initFreelancer);
       setIsEditMode(false);
       setClients(initFreelancer?.clients);
+      dispatch(fetchUserRedux());
     } catch (error) {
       setError({ message: "Could not revert to previous profile photo. Please try again" })
     }

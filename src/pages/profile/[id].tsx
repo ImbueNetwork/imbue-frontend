@@ -2,11 +2,13 @@
 import { Divider, OutlinedInput, TextField } from '@mui/material';
 import { SignerResult } from '@polkadot/api/types';
 import { WalletAccount } from '@talismn/connect-wallets';
+import moment from 'moment';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { BiEdit } from 'react-icons/bi';
 import { FaStar } from 'react-icons/fa';
+import { useDispatch } from 'react-redux';
 
 import AccountChoice from '@/components/AccountChoice';
 import { TextArea } from '@/components/Briefs/TextArea';
@@ -20,8 +22,10 @@ import SuccessScreen from '@/components/SuccessScreen';
 import * as config from '@/config';
 import { Brief, User } from '@/model';
 import { authenticate } from '@/pages/api/info/user';
+import { fetchUserRedux } from '@/redux/reducers/userReducers';
 import { getUserBriefs } from '@/redux/services/briefService';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
+import { AppDispatch } from '@/redux/store/store';
 import styles from '@/styles/modules/freelancers.module.css';
 
 import { checkEnvironment, updateUser } from '../../utils';
@@ -39,6 +43,8 @@ const Profile = ({ initUser, browsingUser }: any) => {
   const [error, setError] = useState<any>();
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     const getBriefs = async () => {
@@ -74,6 +80,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
       if (resp.status === "Successful") {
         setUser(initUser);
         setIsEditMode(false);
+        dispatch(fetchUserRedux());
       }
       else {
         setError({ message: "Could not revert to previous profile photo. Please try again" })
@@ -139,6 +146,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
             <div className='w-full flex flex-col gap-4'>
               {isEditMode ? (
                 <TextField
+                  color='secondary'
                   onChange={(e) => handleChange(e)}
                   id='outlined-basic'
                   name='display_name'
@@ -154,6 +162,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
 
               {isEditMode ? (
                 <TextField
+                  color='secondary'
                   onChange={(e) => handleChange(e)}
                   className='w-full'
                   id='outlined-basic'
@@ -211,7 +220,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                     <p className='text-xl text-imbue-purple-dark'>
                       Wallet Address
                     </p>
-                    <div className='mt-3 border border-imbue-purple break-words p-3 mb-4 rounded-md text-content-primary'>
+                    <div className='mt-3 break-words p-4 mb-4 rounded-md text-content-primary bg-imbue-light-purple'>
                       {user?.web3_address}
                     </div>
                   </div>
@@ -249,42 +258,45 @@ const Profile = ({ initUser, browsingUser }: any) => {
           <div
             className={`${styles.freelancerProfileSection} w-full py-8 lg:!px-16`}
           >
-            <div className='header-editable'>
-              <h5 className='text-xl text-imbue-purple-dark'>About</h5>
-            </div>
+            {
+              (user?.about || isEditMode) && (
+                <>
+                  <div className='header-editable'>
+                    <h5 className='text-xl text-imbue-purple-dark'>About</h5>
+                  </div>
 
-            {isEditMode ? (
-              <>
-                <TextArea
-                  maxLength={1000}
-                  value={user?.bio}
-                  onChange={(e) => {
-                    if (user) {
-                      setUser({
-                        ...user,
-                        about: e.target.value,
-                      });
-                    }
-                  }}
-                  rows={8}
-                  className='bio-input px-4 py-2 bg-transparent text-imbue-purple-dark border border-imbue-purple'
-                  id='bio-input-id'
-                  defaultValue={user?.about}
-                />
-              </>
-            ) : (
-              <>
-                {user?.about && (
-                  <div className='bio text-imbue-purple'>
-                    {user?.about}
-                    {/* {user?.bio
+                  {isEditMode ? (
+                    <>
+                      <TextArea
+                        maxLength={1000}
+                        value={user?.bio}
+                        onChange={(e) => {
+                          if (user) {
+                            setUser({
+                              ...user,
+                              about: e.target.value,
+                            });
+                          }
+                        }}
+                        rows={8}
+                        className='bio-input px-4 py-2 bg-transparent text-imbue-purple-dark border border-imbue-purple'
+                        id='bio-input-id'
+                        defaultValue={user?.about}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      {user?.about && (
+                        <div className='bio text-imbue-purple'>
+                          {user?.about}
+                          {/* {user?.bio
                                         ?.split?.("\n")
                                         ?.map?.((line: any, index: number) => (
                                             <p className="leading-[1.2] text-base" key={index}>
                                                 {line}
                                             </p>
                                         ))} */}
-                    {/* Welcome to a vibrant and multiple award-winning
+                          {/* Welcome to a vibrant and multiple award-winning
                   telecommunications service provider. Our aim is to bring
                   people and businesses together in what we do best, by offering
                   mobile and fixed services, broadband connectivity and IPTV
@@ -295,50 +307,63 @@ const Profile = ({ initUser, browsingUser }: any) => {
                   Smart Contract | DApps | DeFi | Solidity | Hyperledger |
                   Polkadot Rust | C | C ++ | C# | Python | Golang | Java |
                   Javascript | Scala | Simplicity | Haskell | */}
-                  </div>
-                )}
-              </>
-            )}
+                        </div>
+                      )}
+                    </>
+                  )}
 
-            <Divider />
+                  <Divider />
+                </>
+              )
+            }
 
-            <div className='flex gap-14 items-center'>
-              <p className='w-24 lg:text-xl text-imbue-purple-dark'>
-                Website :
-              </p>
-              {isEditMode ? (
-                <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>
-                  <OutlinedInput
-                    defaultValue={user?.website}
-                    name='website'
-                    onChange={(e) => handleChange(e)}
-                    className='w-full border border-imbue-purple'
-                  />
+            {
+              (user?.website || isEditMode) && (
+                <div className='flex gap-14 items-center'>
+                  <p className='w-24 lg:text-xl text-imbue-purple-dark'>
+                    Website :
+                  </p>
+                  {isEditMode ? (
+                    <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>
+                      <OutlinedInput
+                        defaultValue={user?.website}
+                        name='website'
+                        onChange={(e) => handleChange(e)}
+                        className='w-full border border-imbue-purple'
+                      />
+                    </div>
+                  ) : (
+                    <span className='text-imbue-purple'>{user?.website}</span>
+                  )}
                 </div>
-              ) : (
-                <span className='text-imbue-purple'>{user?.website}</span>
-              )}
-            </div>
-            <div className='flex gap-14 items-center'>
-              <p className='w-24 text-imbue-purple-dark lg:text-xl'>
-                Industry :
-              </p>
-              {isEditMode ? (
-                <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>
-                  <OutlinedInput
-                    defaultValue={user?.industry}
-                    name='industry'
-                    onChange={(e) => handleChange(e)}
-                    className='w-full border border-imbue-purple'
-                  />
+              )
+            }
+
+            {
+              user?.industry && (
+                <div className='flex gap-14 items-center'>
+                  <p className='w-24 text-imbue-purple-dark lg:text-xl'>
+                    Industry :
+                  </p>
+                  {isEditMode ? (
+                    <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>
+                      <OutlinedInput
+                        defaultValue={user?.industry}
+                        name='industry'
+                        onChange={(e) => handleChange(e)}
+                        className='w-full border border-imbue-purple'
+                      />
+                    </div>
+                  ) : (
+                    <span className='text-imbue-purple'>{user?.industry}</span>
+                  )}
                 </div>
-              ) : (
-                <span className='text-imbue-purple'>{user?.industry}</span>
-              )}
-            </div>
+              )
+            }
+
             <div className='flex gap-14 items-center'>
               <p className='w-24 text-imbue-purple-dark lg:text-xl'>Member :</p>
-              <span className='text-imbue-purple'>Mar-12-2023</span>
+              <span className='text-imbue-purple'>{moment(user?.created).format("MMM DD, YYYY")}</span>
             </div>
             <div className='flex gap-14 items-center'>
               <p className='w-24 text-imbue-purple-dark lg:text-xl'>Hired :</p>
