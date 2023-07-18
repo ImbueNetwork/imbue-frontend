@@ -1,14 +1,22 @@
+import CancelIcon from '@mui/icons-material/Cancel';
 import MarkEmailUnreadOutlinedIcon from '@mui/icons-material/MarkEmailUnreadOutlined';
-import StarIcon from '@mui/icons-material/Star';
 import VerifiedIcon from '@mui/icons-material/Verified';
+import { Alert, Tooltip } from '@mui/material';
+import moment from 'moment';
 import Image from 'next/image';
-import React from 'react';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
 import { FaRegShareSquare } from 'react-icons/fa';
+
+import { checkEnvironment } from '@/utils';
 
 import ChatPopup from '@/components/ChatPopup';
 
 import { copyIcon } from '@/assets/svgs';
-import { Brief, User } from '@/model';
+import { Brief, Project, User } from '@/model';
+import { getBriefApplications, getUserBriefs } from '@/redux/services/briefService';
+
+import CountrySelector from '../Profile/CountrySelector';
 
 type BioInsightsProps = {
   redirectToApply: () => void;
@@ -37,6 +45,40 @@ const BioInsights = ({
   saveBrief,
   isSavedBrief,
 }: BioInsightsProps) => {
+  const router = useRouter()
+  const [copied, setCopied] = useState(false)
+
+  const [clientBriefs, setClientBrief] = useState<Brief[]>([])
+  const [openBriefs, setIOpenBriefs] = useState<Brief[]>([])
+  const [briefApplications, setBriefApplications] = useState<Project[]>([])
+  const lastApplication: Project = briefApplications[briefApplications?.length - 1]
+  const pendingApplciations: Project[] = briefApplications.filter((application) => application?.status_id === 1)
+
+  useEffect(() => {
+    const setUp = async () => {
+      if (!targetUser?.id) return
+      const res = await getUserBriefs(targetUser?.id)
+      const allBriefs = [...res.acceptedBriefs, ...res.briefsUnderReview]
+
+      setClientBrief(allBriefs)
+      setIOpenBriefs(res?.briefsUnderReview || [])
+      setBriefApplications(await getBriefApplications(brief?.id));
+    }
+
+    setUp()
+  }, [targetUser?.id, brief?.id])
+
+  const copyToClipboard = () => {
+    const textToCopy = checkEnvironment().concat(`${router.asPath}`);
+
+    navigator.clipboard.writeText(textToCopy);
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 3000);
+  };
+
   return (
     <div
       className='brief-insights 
@@ -65,25 +107,28 @@ const BioInsights = ({
             >
               Save
             </button>
-            <button
-              className='primary-btn 
+            <Tooltip
+              title={!canSubmitProposal && "Only varified users are allowed to apply for a breif"}
+              arrow
+              placement="bottom"
+              leaveTouchDelay={10}
+              followCursor
+            >
+              <button
+                className='primary-btn 
               in-dark
-              max-width-750px:!px-4 
-              flex 
-              items-center 
-              justify-center
-              gap-2
               !text-[1rem]
               !font-normal
-              w-full
-              md:w-auto
-              min-h-[2.48rem]
+              flex
+              items-center
+              gap-2
               '
-              onClick={() => redirectToApply()}
-              disabled={!canSubmitProposal}
-            >
-              Submit a Proposal <FaRegShareSquare />
-            </button>
+                onClick={() => canSubmitProposal && redirectToApply()}
+              // disabled={!canSubmitProposal}
+              >
+                Submit a Proposal <FaRegShareSquare />
+              </button>
+            </Tooltip>
           </div>
         </div>
       </div>
@@ -96,7 +141,7 @@ const BioInsights = ({
               ?
             </span>{' '}
             <span className='primary-text font-normal ml-2 !text-imbue-lemon'>
-              Less than 5
+              Less than {briefApplications?.length || 0}
             </span>
           </div>
         </div>
@@ -105,9 +150,13 @@ const BioInsights = ({
       <div className='subsection !mt-0 !mb-[0.75rem]'>
         <div className='brief-insights-stat'>
           <div className='flex items-center text-imbue-purple-dark'>
-            Last viewed by freelancers:
+            Last applied by freelancers:
             <span className='primary-text font-bold ml-2 !text-imbue-lemon'>
-              3 hrs ago
+              {
+                lastApplication?.created
+                  ? moment(lastApplication?.created, "YYYYMMDD").fromNow()
+                  : "Never"
+              }
             </span>
           </div>
         </div>
@@ -118,7 +167,7 @@ const BioInsights = ({
           <div className='text-imbue-purple-dark'>
             Currently Interviewing:
             <span className='primary-text font-bold ml-2 !text-imbue-lemon'>
-              2
+              {pendingApplciations?.length || 0}
             </span>
           </div>
         </div>
@@ -141,18 +190,34 @@ const BioInsights = ({
       <div className=' bg-imbue-light-purple-three p-[1rem] rounded-[0.5rem] mt-3'>
         <div className='subsection pb-2 !mt-0 !mb-[1.2rem] '>
           <div className='brief-insights-stat flex gap-2 justify-start items-center max-width-1800px:flex-wrap '>
-            <VerifiedIcon className='secondary-icon' sx={{ height: '1rem' }} />
-            <span className='font-normal text-imbue-purple-dark text-[1rem] mr-3'>
-              Payment method verified
-            </span>
-            <div>
-              {[4, 4, 4, 4].map((star, index) => (
-                <StarIcon
-                  key={`${index}-star-icon`}
-                  className={`${index <= 4 && 'primary-icon'}`}
-                />
-              ))}
-            </div>
+            {
+              targetUser?.web3_address
+                ? (
+                  <>
+                    <VerifiedIcon className='secondary-icon' sx={{ height: '1rem' }} />
+                    <span className='font-normal text-imbue-purple-dark text-[1rem] mr-3'>
+                      Payment method verified
+                    </span>
+                  </>
+                )
+                : (
+                  <>
+                    <CancelIcon color='error' sx={{ height: '1rem' }} />
+                    <span className='font-normal text-imbue-purple-dark text-[1rem] mr-3'>
+                      Payment method not verified
+                    </span>
+                  </>
+                )
+            }
+
+            {/* <div>
+                  {[4, 4, 4, 4].map((star, index) => (
+                    <StarIcon
+                      key={`${index}-star-icon`}
+                      className={`${index <= 4 && 'primary-icon'}`}
+                    />
+                  ))}
+                </div> */}
           </div>
         </div>
 
@@ -162,36 +227,58 @@ const BioInsights = ({
               <MarkEmailUnreadOutlinedIcon sx={{ height: '1rem' }} />
               <h3 className='ml-1 !font-normal'>
                 <span className='mr-2 '>
-                  {brief.number_of_briefs_submitted}
+                  {clientBriefs.length}
                 </span>
-                Projects Posted
+                {`Project${clientBriefs?.length > 1 ? "s" : ""} Posted`}
               </h3>
             </div>
             <p className='mt-2 text-imbue-purple text-[1rem]'>
-              1 hire rate, one open job{' '}
+              1 hire rate, {openBriefs?.length || 0} open job
             </p>
           </div>
         </div>
 
-        <div className='subsection pb-0 !my-0'>
-          <div className='brief-insights-stat flex flex-col'>
-            <div className='flex items-center'>
-              <Image
-                className='h-4 w-6 object-cover'
-                height={16}
-                width={24}
-                src='https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg'
-                alt='Flag'
-              />
-              <h3 className='ml-2 text-imbue-purple-dark !font-normal'>
-                United States
-              </h3>
+        {
+          targetUser?.country && (
+            <div className='subsection pb-0 !my-0'>
+              <div className='brief-insights-stat flex flex-col'>
+                <CountrySelector
+                  user={targetUser}
+                  setUser={() => null}
+                  isEditMode={false}
+                />
+              </div>
             </div>
-            <p className='mt-2 text-imbue-purple text-[1rem]'>
-              Member since Feb 19, 2023
-            </p>
-          </div>
-        </div>
+          )
+        }
+        <p className='mt-2 text-imbue-purple text-[1rem]'>
+          Member since {" "}
+          {moment(targetUser?.created).format("MMM DD, YYYY")}
+        </p>
+        {/* {
+          targetUser?.country && (
+            <div className='subsection pb-0 !my-0'>
+              <div className='brief-insights-stat flex flex-col'>
+                <div className='flex items-center'>
+                  <Image
+                    className='h-4 w-6 object-cover'
+                    height={16}
+                    width={24}
+                    src='https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg'
+                    alt='Flag'
+                  />
+                  <h3 className='ml-2 text-imbue-purple-dark !font-normal'>
+                    United States
+                  </h3>
+                </div>
+                <p className='mt-2 text-imbue-purple text-[1rem]'>
+                  Member since Feb 19, 2023
+                </p>
+              </div>
+            </div>
+          )
+        } */}
+
       </div>
 
       <div className='mt-auto'>
@@ -212,14 +299,19 @@ const BioInsights = ({
             </div>
           )}
           <h3 className='text-imbue-purple-dark !font-normal'>Job Link</h3>
-          <div className='flex justify-between items-center'>
-            <div className='h-[2.625rem] rounded-[6.18rem] flex items-center px-[2rem] bg-imbue-light-purple my-2'>
-              <span className='text-imbue-purple text-[1rem]'>
-                http://www.imbue.com
+          <div className='flex items-center gap-2'>
+            <div className='h-[2.625rem] rounded-[6.18rem] flex items-center px-[2rem] bg-imbue-light-purple my-2 w-full'>
+              <span className='text-imbue-purple text-[1rem] w-full'>
+                {checkEnvironment().concat(`${router.asPath}`)}
               </span>
             </div>
 
-            <Image src={copyIcon} alt='copyIcon' className='cursor-pointer' />
+            <Image
+              src={copyIcon}
+              alt='copyIcon'
+              className='cursor-pointer'
+              onClick={copyToClipboard}
+            />
           </div>
         </div>
         {browsingUser && showMessageBox && (
@@ -231,6 +323,14 @@ const BioInsights = ({
           />
         )}
       </div>
+
+      <Alert
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
+          }`}
+        severity='success'
+      >
+        {`Brief link copied to clipboard`}
+      </Alert>
     </div>
   );
 };

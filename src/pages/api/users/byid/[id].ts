@@ -29,6 +29,7 @@ export default nextConnect().get(
           about: user.about,
           website: user.website,
           industry: user.industry,
+          created: user.created,
         });
       } catch (e) {
         new Error(`Failed to fetch user ${id}`, { cause: e as Error });

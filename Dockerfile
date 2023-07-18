@@ -1,7 +1,7 @@
 FROM node:16-slim
 
 WORKDIR /
-ARG NODE_ENV
+ARG IMAGE_TAG
 
 RUN apt-get update
 RUN apt-get install -y make
