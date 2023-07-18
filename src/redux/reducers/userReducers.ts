@@ -8,7 +8,7 @@ import { getCurrentUser, redirect } from '@/utils';
 
 import { postAPIHeaders } from '@/config';
 
-export const fetchUser = createAsyncThunk('user/fetchUser', async () => {
+export const fetchUserRedux = createAsyncThunk('user/fetchUserRedux', async () => {
   try {
     const resp = await getCurrentUser();
     return resp;

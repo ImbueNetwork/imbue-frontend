@@ -42,7 +42,7 @@ export const TagsInput = ({
   return (
     <>
       <div className='selected-tags'>
-        {tags.map((tag, i) => (
+        {tags?.map((tag, i) => (
           <div
             key={i}
             className='selected-tag-item cursor-pointer !bg-white'
@@ -65,7 +65,7 @@ export const TagsInput = ({
       </div>
       <div className='tags-suggestion-container'>
         {suggestData
-          .filter((item: string) => vtags.indexOf(item) === -1)
+          .filter((item: string) => vtags?.indexOf(item) === -1)
           .map((item, index) => (
             <div
               className='tag-suggestion'

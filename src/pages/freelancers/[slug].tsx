@@ -38,7 +38,7 @@ import { GrCertificate } from 'react-icons/gr';
 import { ImStack } from 'react-icons/im';
 import { IoPeople } from 'react-icons/io5';
 import { MdOutlineWatchLater } from 'react-icons/md';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { checkEnvironment, fetchUser } from '@/utils';
 
@@ -54,13 +54,14 @@ import UploadImage from '@/components/Profile/UploadImage';
 import SuccessScreen from '@/components/SuccessScreen';
 
 import { Currency, Freelancer, Project, User } from '@/model';
+import { fetchUserRedux } from '@/redux/reducers/userReducers';
 import {
   getFreelancerApplications,
   getFreelancerProfile,
   updateFreelancer,
 } from '@/redux/services/freelancerService';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
-import { RootState } from '@/redux/store/store';
+import { AppDispatch, RootState } from '@/redux/store/store';
 import styles from '@/styles/modules/freelancers.module.css';
 
 export type ProfileProps = {
@@ -88,6 +89,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const { user: browsingUser } = useSelector(
     (state: RootState) => state.userState
   );
+  const dispatch = useDispatch<AppDispatch>();
 
   const isCurrentFreelancer =
     browsingUser && browsingUser?.id === freelancer?.user_id;
@@ -174,9 +176,26 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   };
 
   const cancelEdit = async () => {
-    setFreelancer(initFreelancer);
-    setIsEditMode(false);
-    setClients(initFreelancer?.clients);
+    try {
+      await updateFreelancer({
+        ...initFreelancer,
+        skills: initFreelancer?.skills?.map(
+          (skill: { id: number; name: string }) =>
+            skill?.name?.charAt(0).toUpperCase() + skill?.name?.slice(1)
+        ),
+        clients: initFreelancer?.clients,
+        logged_in_user: browsingUser,
+      });
+
+      setFreelancer(initFreelancer);
+      setIsEditMode(false);
+      setClients(initFreelancer?.clients);
+      dispatch(fetchUserRedux());
+    } catch (error) {
+      setError({
+        message: 'Could not revert to previous profile photo. Please try again',
+      });
+    }
   };
 
   const accountSelected = async (account: WalletAccount): Promise<any> => {
@@ -369,8 +388,14 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
 
               <UploadImage
                 isEditMode={isEditMode}
-                user={freelancer}
+                user={{
+                  ...freelancer,
+                  skills: skills,
+                  clients: clients,
+                  logged_in_user: browsingUser,
+                }}
                 setUser={setFreelancer}
+                saveChanges={updateFreelancer}
               />
               <div className='w-full flex flex-col gap-[16px] mt-5'>
                 {isEditMode ? (
