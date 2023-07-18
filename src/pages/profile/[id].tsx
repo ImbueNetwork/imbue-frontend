@@ -123,6 +123,14 @@ const Profile = ({ initUser, browsingUser }: any) => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
+  const navigateToLink = (link: string) => {
+    if (!link) return
+
+    const regEx = /^http/;
+    if (!regEx.test(link)) link = `https://${link}`
+    window.open(link, '_blank')
+  }
+
   return (
     <div className='profile-container'>
       <div className='banner absolute left-0 right-0'>
@@ -191,12 +199,19 @@ const Profile = ({ initUser, browsingUser }: any) => {
                 <div className='w-full lg:w-1/3'>
                   {!isEditMode && (
                     <div className='mt-5 flex items-center gap-4'>
-                      <button className='primary-btn in-dark w-button'>
-                        View Website
-                      </button>
-                      <button className='primary-btn in-dark w-button'>
+                      {
+                        user?.website && (
+                          <button 
+                          onClick={()=>navigateToLink(user.website)}
+                          className='primary-btn in-dark w-button'
+                          >
+                            View Website
+                          </button>
+                        )
+                      }
+                      {/* <button className='primary-btn in-dark w-button'>
                         Follow
-                      </button>
+                      </button> */}
                     </div>
                   )}
                 </div>
