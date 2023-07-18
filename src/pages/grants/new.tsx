@@ -25,7 +25,7 @@ import Approvers from '@/components/Grant/Approvers';
 
 import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
-import { Currency } from '@/model';
+import { Currency, OffchainProjectState } from '@/model';
 import ChainService from '@/redux/services/chainService';
 // import ChainService from '@/redux/services/chainService';
 
@@ -207,10 +207,9 @@ const GrantApplication = (): JSX.Element => {
         method: 'post',
         body: JSON.stringify({
           ...grant,
-          // chain_project_id: result?.eventData[2],
-          // escrow_address: result?.eventData[5]
-          chain_project_id: 217,
-          escrow_address: escrowAddress,
+          status_id: OffchainProjectState.Accepted,
+          chain_project_id: result?.eventData[2],
+          escrow_address: result?.eventData[5]
         }),
       });
 

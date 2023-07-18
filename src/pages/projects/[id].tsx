@@ -676,7 +676,7 @@ function Project() {
                     {project?.escrow_address}
                   </div>
                   <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
-                    balance : {balance}
+                    balance : {balance} ${Currency[project?.currency_id] }
                   </div>
                 </div>
               </div>
