@@ -210,7 +210,9 @@ export type PagerProps = {
 
 export const resetUserWeb3Addresses =
   (address: string) => (tx: Knex.Transaction) =>
-    tx.raw(`UPDATE USERS SET web3_address=NULL WHERE web3_address='${address}'`);
+    tx.raw(
+      `UPDATE USERS SET web3_address=NULL WHERE web3_address='${address}'`
+    );
 
 export const fetchWeb3AccountByAddress =
   (address: string) => (tx: Knex.Transaction) =>
@@ -257,11 +259,24 @@ export const updateUserData =
     (await tx<User>('users').update(data).where({ id }).returning('*'))[0];
 
 export const fetchUserOrEmail =
-  (userOrEmail: string) => (tx: Knex.Transaction) =>
-    tx<User>('users')
-      .where({ username: userOrEmail.toLocaleLowerCase() })
-      .orWhere({ email: userOrEmail.toLowerCase() })
-      .first();
+  (userOrEmail: string) => (tx: Knex.Transaction) => {
+    // get all db users
+    return tx<User>('users')
+      .select()
+      .then((users) => {
+        // check if userOrEmail is in db
+        const user = users.find(
+          (u) =>
+            u.username === userOrEmail.toLocaleLowerCase() ||
+            u.email === userOrEmail.toLowerCase()
+        );
+        if (user) {
+          return user;
+        } else {
+          return null;
+        }
+      });
+  };
 
 export const upsertWeb3Challenge =
   (user: User, address: string, type: string, challenge: string) =>
@@ -273,7 +288,6 @@ export const upsertWeb3Challenge =
       .update({ web3_address: address })
       .where({ id: user.id })
       .returning('*');
-
 
     const web3Account = await tx<Web3Account>('web3_accounts')
       .select()

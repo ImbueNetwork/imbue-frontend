@@ -18,10 +18,12 @@ export default nextConnect().post(
         res.status(404);
       } else {
         const email = userInfo.email;
-        const username = email.split("@")[0].replaceAll('.', '');
+        const username = email.split('@')[0].replaceAll('.', '');
         const displayname = userInfo.name;
         const issuer = userInfo.iss;
-        const usernameExists = await fetchUserOrEmail(email)(tx) ?? await fetchUserOrEmail(username)(tx);
+        const usernameExists =
+          (await fetchUserOrEmail(email)(tx)) ??
+          (await fetchUserOrEmail(username)(tx));
         if (usernameExists?.id) {
           const payload = { id: usernameExists?.id };
           const token = await jwt.sign(payload, jwtOptions.secretOrKey);
@@ -44,6 +46,7 @@ export default nextConnect().post(
                 }
                 db.transaction(async (tx) => {
                   await updateFederatedLoginUser(user, username, email)(tx);
+
                   const payload = { id: user.id };
                   const token = await jwt.sign(payload, jwtOptions.secretOrKey);
                   await setTokenCookie(res, token);

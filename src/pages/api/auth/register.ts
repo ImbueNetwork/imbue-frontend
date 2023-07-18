@@ -21,6 +21,7 @@ export default nextConnect().post(
     db.transaction(async (tx) => {
       const usernameExists = await fetchUserOrEmail(username)(tx);
       const emailExists = await fetchUserOrEmail(email)(tx);
+
       if (usernameExists) {
         return res.status(409).send(JSON.stringify('Username already exists.'));
       } else if (emailExists) {
