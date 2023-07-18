@@ -286,6 +286,7 @@ const ApplicationPreview = (): JSX.Element => {
               browsingUser: user,
               targetUser,
             }}
+            showFreelancerProfile={!isApplicationOwner}
           />
         )}
 

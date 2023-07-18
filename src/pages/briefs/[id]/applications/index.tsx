@@ -71,6 +71,7 @@ const BriefApplications = () => {
       {browsingUser && showMessageBox && (
         <ChatPopup
           {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser }}
+          showFreelancerProfile={true}
         />
       )}
       <p className={styles.sectionTitle + ' mb-4'}>Review proposals</p>
@@ -78,7 +79,7 @@ const BriefApplications = () => {
       <BriefInsights brief={brief} />
 
       <div className='w-full ml-auto flex items-center justify-between mt-6'>
-        <h3 className={styles.sectionTitle}>All applicants</h3>
+        <p className={`${styles.sectionTitle} text-content`}>All applicants</p>
         <FormControl>
           <InputLabel id='demo-simple-select-helper-label'>Sort</InputLabel>
           <Select

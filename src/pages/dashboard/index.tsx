@@ -156,6 +156,7 @@ const Dashboard = (): JSX.Element => {
           setShowMessageBox={setShowMessageBox}
           targetUser={targetUser}
           browsingUser={user}
+          showFreelancerProfile={true}
         />
       )}
 

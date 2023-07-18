@@ -321,6 +321,7 @@ const BioInsights = ({
             setShowMessageBox={setShowMessageBox}
             targetUser={targetUser}
             browsingUser={browsingUser}
+            showFreelancerProfile={false}
           />
         )}
       </div>

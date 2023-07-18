@@ -1075,6 +1075,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
       {browsingUser && showMessageBox && (
         <ChatPopup
           {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser }}
+          showFreelancerProfile={true}
         />
       )}
 

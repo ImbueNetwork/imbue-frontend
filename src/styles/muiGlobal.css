@@ -60,11 +60,11 @@
   background-color: var(--theme-background);
 }
 
-#demo-simple-select-helper-label,
+/* #demo-simple-select-helper-label,
 #demo-simple-select-helper,
 .MuiSvgIcon-root.MuiSvgIcon-fontSizeMedium.MuiSelect-icon.MuiSelect-iconOutlined {
   color: #fff;
-}
+} */
 
 .MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl:hover
   .MuiOutlinedInput-notchedOutline {

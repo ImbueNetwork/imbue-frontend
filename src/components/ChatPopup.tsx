@@ -12,10 +12,17 @@ interface ChatPopupProps {
   setShowMessageBox: (_visible: boolean) => void;
   browsingUser: User | null;
   targetUser: User | null;
+  showFreelancerProfile: boolean;
 }
 
 const ChatPopup = (props: ChatPopupProps) => {
-  const { showMessageBox, setShowMessageBox, browsingUser, targetUser } = props;
+  const {
+    showMessageBox,
+    setShowMessageBox,
+    browsingUser,
+    targetUser,
+    showFreelancerProfile
+  } = props;
 
   return (
     <StyledEngineProvider injectFirst>
@@ -41,6 +48,7 @@ const ChatPopup = (props: ChatPopupProps) => {
                 setShowMessageBox={setShowMessageBox}
                 showMessageBox={showMessageBox}
                 chatPopUp={true}
+                showFreelancerProfile={showFreelancerProfile}
               ></ChatBox>
             ) : (
               <p>GETSTREAM_API_KEY not found</p>

@@ -14,7 +14,7 @@ import {
   Window,
 } from 'stream-chat-react';
 
-import { CustomChannelHeader } from '@/components/Chat';
+import { CustomChannelHeader } from '../StreamChatComponents/CustomChannelHeader';
 
 function DashboardChatBox({
   client,
@@ -141,7 +141,7 @@ function DashboardChatBox({
             ) : (
               <Channel channel={channel}>
                 <Window>
-                  <CustomChannelHeader closeChat={closeChat} />
+                  <CustomChannelHeader showFreelancerProfile={false} closeChat={closeChat} />
                   <MessageList />
                   <MessageInput />
                 </Window>
@@ -161,7 +161,7 @@ function DashboardChatBox({
             </div>
             <Channel>
               <Window>
-                <CustomChannelHeader />
+                <CustomChannelHeader showFreelancerProfile={false}  />
                 <MessageList />
                 <MessageInput />
               </Window>

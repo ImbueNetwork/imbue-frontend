@@ -420,6 +420,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
       {user && showMessageBox && (
         <ChatPopup
           {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser }}
+          showFreelancerProfile={false}
         />
       )}
 

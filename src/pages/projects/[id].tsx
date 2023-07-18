@@ -100,7 +100,7 @@ function Project() {
   const projectId: any = router?.query?.id || 0;
   const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
   const [isApplicant, setIsApplicant] = useState<boolean>();
-  const [showRefundButton, setShowRefundButton] = useState<boolean>();
+  const [showRefundButton] = useState<boolean>();
 
   const [wait, setWait] = useState<boolean>(false);
   const [waitMessage, setWaitMessage] = useState<string>("");
@@ -491,6 +491,7 @@ function Project() {
             browsingUser: user,
             targetUser,
           }}
+          showFreelancerProfile={!isApplicant}
         />
       )}
       <div
