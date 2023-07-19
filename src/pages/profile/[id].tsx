@@ -66,7 +66,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
         if (userResponse.status === 'Successful') {
           setSuccess(true);
         } else {
-          setError(userResponse.message);
+          setError(userResponse);
         }
       }
     } catch (error) {
@@ -79,16 +79,20 @@ const Profile = ({ initUser, browsingUser }: any) => {
   const cancelEdit = async () => {
     try {
       const resp = await updateUser(initUser);
-      if (resp.status === "Successful") {
+      if (resp.status === 'Successful') {
         setUser(initUser);
         setIsEditMode(false);
         dispatch(fetchUserRedux());
-      }
-      else {
-        setError({ message: "Could not revert to previous profile photo. Please try again" })
+      } else {
+        setError({
+          message:
+            'Could not revert to previous profile photo. Please try again',
+        });
       }
     } catch (error) {
-      setError({ message: "Could not revert to previous profile photo. Please try again" })
+      setError({
+        message: 'Could not revert to previous profile photo. Please try again',
+      });
     }
   };
 
@@ -124,12 +128,12 @@ const Profile = ({ initUser, browsingUser }: any) => {
   };
 
   const navigateToLink = (link: string) => {
-    if (!link) return
+    if (!link) return;
 
     const regEx = /^http/;
-    if (!regEx.test(link)) link = `https://${link}`
-    window.open(link, '_blank')
-  }
+    if (!regEx.test(link)) link = `https://${link}`;
+    window.open(link, '_blank');
+  };
 
   return (
     <div className='profile-container'>
@@ -199,16 +203,14 @@ const Profile = ({ initUser, browsingUser }: any) => {
                 <div className='w-full lg:w-1/3'>
                   {!isEditMode && (
                     <div className='mt-5 flex items-center gap-4'>
-                      {
-                        user?.website && (
-                          <button 
-                          onClick={()=>navigateToLink(user.website)}
+                      {user?.website && (
+                        <button
+                          onClick={() => navigateToLink(user.website)}
                           className='primary-btn in-dark w-button'
-                          >
-                            View Website
-                          </button>
-                        )
-                      }
+                        >
+                          View Website
+                        </button>
+                      )}
                       {/* <button className='primary-btn in-dark w-button'>
                         Follow
                       </button> */}
@@ -277,45 +279,44 @@ const Profile = ({ initUser, browsingUser }: any) => {
           <div
             className={`${styles.freelancerProfileSection} w-full py-8 lg:!px-16`}
           >
-            {
-              (user?.about || isEditMode) && (
-                <>
-                  <div className='header-editable'>
-                    <h5 className='text-xl text-imbue-purple-dark'>About</h5>
-                  </div>
+            {(user?.about || isEditMode) && (
+              <>
+                <div className='header-editable'>
+                  <h5 className='text-xl text-imbue-purple-dark'>About</h5>
+                </div>
 
-                  {isEditMode ? (
-                    <>
-                      <TextArea
-                        maxLength={1000}
-                        value={user?.bio}
-                        onChange={(e) => {
-                          if (user) {
-                            setUser({
-                              ...user,
-                              about: e.target.value,
-                            });
-                          }
-                        }}
-                        rows={8}
-                        className='bio-input px-4 py-2 bg-transparent text-imbue-purple-dark border border-imbue-purple'
-                        id='bio-input-id'
-                        defaultValue={user?.about}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      {user?.about && (
-                        <div className='bio text-imbue-purple'>
-                          {user?.about}
-                          {/* {user?.bio
+                {isEditMode ? (
+                  <>
+                    <TextArea
+                      maxLength={1000}
+                      value={user?.bio}
+                      onChange={(e) => {
+                        if (user) {
+                          setUser({
+                            ...user,
+                            about: e.target.value,
+                          });
+                        }
+                      }}
+                      rows={8}
+                      className='bio-input px-4 py-2 bg-transparent text-imbue-purple-dark border border-imbue-purple'
+                      id='bio-input-id'
+                      defaultValue={user?.about}
+                    />
+                  </>
+                ) : (
+                  <>
+                    {user?.about && (
+                      <div className='bio text-imbue-purple'>
+                        {user?.about}
+                        {/* {user?.bio
                                         ?.split?.("\n")
                                         ?.map?.((line: any, index: number) => (
                                             <p className="leading-[1.2] text-base" key={index}>
                                                 {line}
                                             </p>
                                         ))} */}
-                          {/* Welcome to a vibrant and multiple award-winning
+                        {/* Welcome to a vibrant and multiple award-winning
                   telecommunications service provider. Our aim is to bring
                   people and businesses together in what we do best, by offering
                   mobile and fixed services, broadband connectivity and IPTV
@@ -326,63 +327,60 @@ const Profile = ({ initUser, browsingUser }: any) => {
                   Smart Contract | DApps | DeFi | Solidity | Hyperledger |
                   Polkadot Rust | C | C ++ | C# | Python | Golang | Java |
                   Javascript | Scala | Simplicity | Haskell | */}
-                        </div>
-                      )}
-                    </>
-                  )}
+                      </div>
+                    )}
+                  </>
+                )}
 
-                  <Divider />
-                </>
-              )
-            }
+                <Divider />
+              </>
+            )}
 
-            {
-              (user?.website || isEditMode) && (
-                <div className='flex gap-14 items-center'>
-                  <p className='w-24 lg:text-xl text-imbue-purple-dark'>
-                    Website :
-                  </p>
-                  {isEditMode ? (
-                    <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>
-                      <OutlinedInput
-                        defaultValue={user?.website}
-                        name='website'
-                        onChange={(e) => handleChange(e)}
-                        className='w-full border border-imbue-purple'
-                      />
-                    </div>
-                  ) : (
-                    <span className='text-imbue-purple'>{user?.website}</span>
-                  )}
-                </div>
-              )
-            }
+            {(user?.website || isEditMode) && (
+              <div className='flex gap-14 items-center'>
+                <p className='w-24 lg:text-xl text-imbue-purple-dark'>
+                  Website :
+                </p>
+                {isEditMode ? (
+                  <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>
+                    <OutlinedInput
+                      defaultValue={user?.website}
+                      name='website'
+                      onChange={(e) => handleChange(e)}
+                      className='w-full border border-imbue-purple'
+                    />
+                  </div>
+                ) : (
+                  <span className='text-imbue-purple'>{user?.website}</span>
+                )}
+              </div>
+            )}
 
-            {
-              user?.industry && (
-                <div className='flex gap-14 items-center'>
-                  <p className='w-24 text-imbue-purple-dark lg:text-xl'>
-                    Industry :
-                  </p>
-                  {isEditMode ? (
-                    <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>
-                      <OutlinedInput
-                        defaultValue={user?.industry}
-                        name='industry'
-                        onChange={(e) => handleChange(e)}
-                        className='w-full border border-imbue-purple'
-                      />
-                    </div>
-                  ) : (
-                    <span className='text-imbue-purple'>{user?.industry}</span>
-                  )}
-                </div>
-              )
-            }
+            {user?.industry && (
+              <div className='flex gap-14 items-center'>
+                <p className='w-24 text-imbue-purple-dark lg:text-xl'>
+                  Industry :
+                </p>
+                {isEditMode ? (
+                  <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>
+                    <OutlinedInput
+                      defaultValue={user?.industry}
+                      name='industry'
+                      onChange={(e) => handleChange(e)}
+                      className='w-full border border-imbue-purple'
+                    />
+                  </div>
+                ) : (
+                  <span className='text-imbue-purple'>{user?.industry}</span>
+                )}
+              </div>
+            )}
 
             <div className='flex gap-14 items-center'>
               <p className='w-24 text-imbue-purple-dark lg:text-xl'>Member :</p>
-              <span className='text-imbue-purple'>{moment(user?.created).format("MMM DD, YYYY")}</span>
+              <span className='text-imbue-purple'>
+                {moment(user?.created).format('MMM DD, YYYY')}
+              </span>
             </div>
             <div className='flex gap-14 items-center'>
               <p className='w-24 text-imbue-purple-dark lg:text-xl'>Hired :</p>
@@ -445,7 +443,10 @@ const Profile = ({ initUser, browsingUser }: any) => {
 
       {isEditMode && (
         <div className='mt-5'>
-          <button onClick={() => onSave(user)} className='primary-btn in-dark w-button'>
+          <button
+            onClick={() => onSave(user)}
+            className='primary-btn in-dark w-button'
+          >
             Save Changes
           </button>
           <button

@@ -1,17 +1,41 @@
 /* eslint-disable no-console */
 import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
+import passport from 'passport';
 
 import * as models from '@/lib/models';
 import {
   fetchFreelancerClients,
   fetchFreelancerDetailsByUsername,
   fetchFreelancerMetadata,
+  User,
 } from '@/lib/models';
 
 import db from '@/db';
 
+import { verifyUserIdFromJwt } from '../../auth/common';
+
+const authenticate = (
+  method: string,
+  req: NextApiRequest,
+  res: NextApiResponse
+) =>
+  new Promise((resolve, reject) => {
+    passport.authenticate(
+      method,
+      { session: false },
+      (error: Error, token: any) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(token);
+        }
+      }
+    )(req, res);
+  });
+
 export default nextConnect()
+  .use(passport.initialize())
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
     const { id: username } = req.query;
     if (!username) return res.status(404).end();
@@ -77,7 +101,8 @@ export default nextConnect()
         const country = await tx
           .select('country')
           .from('freelancer_country')
-          .where({ freelancer_id: freelancer.id }).first();
+          .where({ freelancer_id: freelancer.id })
+          .first();
 
         if (country) {
           freelancer.country = country;
@@ -86,7 +111,8 @@ export default nextConnect()
         const region = await tx
           .select('region')
           .from('freelancer_country')
-          .where({ freelancer_id: freelancer.id }).first();
+          .where({ freelancer_id: freelancer.id })
+          .first();
 
         if (region) {
           freelancer.region = region;
@@ -104,6 +130,10 @@ export default nextConnect()
     });
   })
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
+    const userAuth: Partial<User> | any = await authenticate('jwt', req, res);
+
+    verifyUserIdFromJwt(req, res, userAuth.id);
+
     const freelancer: models.Freelancer | any = req.body.freelancer;
     const loggedInUser = req.body.freelancer.logged_in_user;
     if (!loggedInUser) {
@@ -115,27 +145,31 @@ export default nextConnect()
       let response;
       await db.transaction(async (tx: any) => {
         try {
-          const skill_ids = freelancer.skills ? await models.upsertItems(
-            freelancer.skills,
-            'skills'
-          )(tx) : [];
+          const skill_ids = freelancer.skills
+            ? await models.upsertItems(freelancer.skills, 'skills')(tx)
+            : [];
 
-          const language_ids = freelancer.languages ? await models.upsertItems(
-            freelancer.languages?.map((x: any) => x.name),
-            'languages'
-          )(tx) : [];
+          const language_ids = freelancer.languages
+            ? await models.upsertItems(
+                freelancer.languages?.map((x: any) => x.name),
+                'languages'
+              )(tx)
+            : [];
 
-          const services_ids = freelancer.services ? await models.upsertItems(
-            freelancer.services?.map((x: any) => x.name),
-            'services'
-          )(tx) : [];
+          const services_ids = freelancer.services
+            ? await models.upsertItems(
+                freelancer.services?.map((x: any) => x.name),
+                'services'
+              )(tx)
+            : [];
           let client_ids: number[] = [];
 
-
-          client_ids = freelancer.clients ? await models.upsertFreelancerClientsItems(
-            freelancer.clients,
-            'clients'
-          )(tx) : [];
+          client_ids = freelancer.clients
+            ? await models.upsertFreelancerClientsItems(
+                freelancer.clients,
+                'clients'
+              )(tx)
+            : [];
 
           const profile_image = freelancer.profile_image;
           const country = freelancer.country;
@@ -143,7 +177,7 @@ export default nextConnect()
           const web3_address = freelancer.web3_address;
           const web3_type = freelancer.web3_type;
           const web3_challenge = freelancer.web3_challenge;
-          const freelancer_clients = freelancer?.clients
+          const freelancer_clients = freelancer?.clients;
 
           const freelancer_id = await models.updateFreelancerDetails(
             freelancer.user_id,

@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
+import passport from 'passport';
 
 import {
   acceptBriefApplication,
@@ -15,13 +16,37 @@ import db from '@/db';
 
 import { verifyUserIdFromJwt } from '../../auth/common';
 
-export default nextConnect().put(
-  async (req: NextApiRequest, res: NextApiResponse) => {
+const authenticate = (
+  method: string,
+  req: NextApiRequest,
+  res: NextApiResponse
+) =>
+  new Promise((resolve, reject) => {
+    passport.authenticate(
+      method,
+      { session: false },
+      (error: Error, token: any) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(token);
+        }
+      }
+    )(req, res);
+  });
+
+export default nextConnect()
+  .use(passport.initialize())
+  .put(async (req: NextApiRequest, res: NextApiResponse) => {
     const { body } = req;
     const { id }: any = req.query;
 
     const projectId = body?.project_id;
     const status_id = body?.status_id;
+
+    const userAuth: Partial<User> | any = await authenticate('jwt', req, res);
+
+    verifyUserIdFromJwt(req, res, userAuth.id);
 
     db.transaction(async (tx) => {
       try {
@@ -45,5 +70,4 @@ export default nextConnect().put(
         return new Error(`Failed to accept brief application: ${e.message}`);
       }
     });
-  }
-);
+  });

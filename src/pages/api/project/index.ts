@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import passport from 'passport';
 
 import * as models from '@/lib/models';
 
@@ -12,8 +13,11 @@ type ProjectPkg = models.Project & {
 
 import nextConnect from 'next-connect';
 
-export default nextConnect().post(
-  async (req: NextApiRequest, res: NextApiResponse) => {
+import { verifyUserIdFromJwt } from '../auth/common';
+
+export default nextConnect()
+  .use(passport.initialize())
+  .post(async (req: NextApiRequest, res: NextApiResponse) => {
     const {
       name,
       logo,
@@ -30,6 +34,14 @@ export default nextConnect().post(
       duration_id,
       // project_type,
     } = req.body;
+
+    const userAuth: Partial<models.User> | any = await authenticate(
+      'jwt',
+      req,
+      res
+    );
+
+    verifyUserIdFromJwt(req, res, userAuth.id);
 
     db.transaction(async (tx) => {
       try {
@@ -75,5 +87,4 @@ export default nextConnect().post(
         return res.status(500).send('Failed to insert project');
       }
     });
-  }
-);
+  });
