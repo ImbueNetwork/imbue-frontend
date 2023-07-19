@@ -16,7 +16,6 @@ import {
   OnchainProjectState,
   Project,
   ProjectOnChain,
-  ProjectType,
   RoundType,
   User,
 } from '@/model';
