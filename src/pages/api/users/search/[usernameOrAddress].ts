@@ -16,13 +16,13 @@ export default nextConnect().get(
 
     await db.transaction(async (tx) => {
       try {
-        const users: User[] = (await models.fetchUserWithUsernameOrAddress(
+        const user: User = (await models.fetchUserWithUsernameOrAddress(
           usernameOrAddress.toString()
-        )(tx)) as User[];
+        )(tx)) as User;
 
-        if (!users) return res.status(401).send({ error: 'No user found' });
+        if (!user) return res.status(401).send({ error: 'No user found' });
 
-        return res.status(201).send(users);
+        return res.status(201).send(user);
         
       } catch (e) {
         new Error(`Failed to fetch user ${usernameOrAddress}`, {

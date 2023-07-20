@@ -249,7 +249,7 @@ export const fetchUserWithUsernameOrAddress =
         'profile_photo',
         'username',
         'web3_address'
-      );
+      ).first();
 
 export const fetchUser = (id: number) => (tx: Knex.Transaction) =>
   tx<User>('users').where({ id }).first();
