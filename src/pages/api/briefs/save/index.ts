@@ -153,8 +153,6 @@ export default nextConnect()
               }),
             ]);
 
-            console.log({ currentData }, { totalItems });
-
             res.status(200).json({ currentData, totalBriefs: totalItems });
           });
       } catch (e) {
