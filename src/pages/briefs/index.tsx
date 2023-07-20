@@ -374,7 +374,7 @@ const Briefs = (): JSX.Element => {
               // eslint-disable-next-line no-console
               console.log(
                 'Invalid filter option selected or unimplemented. type:' +
-                  filterType
+                filterType
               );
           }
         }
@@ -628,12 +628,22 @@ const Briefs = (): JSX.Element => {
                       className='brief-item relative z-20'
                       onClick={() => router.push(`/briefs/${item?.id}/`)}
                     >
-                      <div className='brief-title'>{item.headline}</div>
+                      <div className='brief-title'>
+                        {
+                          item.headline.length > 50
+                            ? `${item.headline.substring(0, 50)}...`
+                            : item.headline
+                        }
+                      </div>
                       <div className='brief-time-info'>
                         {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
                       </div>
-                      <div className='brief-description'>
-                        {item.description}
+                      <div className='brief-description lg:w-10/12'>
+                        {
+                          item.description.length > 500
+                            ? `${item.description.substring(0, 500)}...`
+                            : item.description
+                        }
                       </div>
 
                       <div className='brief-tags'>

@@ -10,6 +10,7 @@ import { fetchProject, fetchUser } from '@/utils';
 import ApplicationOwnerHeader from '@/components/Application/ApplicationOwnerHeader';
 import BriefOwnerHeader from '@/components/Application/BriefOwnerHeader';
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
+import { TextArea } from '@/components/Briefs/TextArea';
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
 import Login from '@/components/Login';
@@ -348,14 +349,6 @@ const ApplicationPreview = (): JSX.Element => {
             <div className='flex flex-row justify-between mx-5 lg:mx-14'>
               <h3 className='flex text-lg lg:text-[1.25rem] text-imbue-purple font-normal leading-[1.5] m-0 p-0 mb-5'>
                 Milestones
-                {!isEditingBio && isApplicationOwner && (application.status_id !== 4) && (
-                  <div
-                    className='ml-[10px] relative top-[-2px] cursor-pointer'
-                    onClick={() => setIsEditingBio(true)}
-                  >
-                    <FiEdit />
-                  </div>
-                )}
               </h3>
 
               <h3 className='text-lg lg:text-[1.25rem] text-imbue-light-purple-two leading-[1.5] font-normal m-0 p-0'>
@@ -390,13 +383,15 @@ const ApplicationPreview = (): JSX.Element => {
                       {index + 1}.
                     </div>
                     <div className='flex flex-row justify-between w-full'>
-                      <div className='w-3/5 lg:w-1/2'>
+                      <div className='w-3/5 lg:w-1/2 h-fit'>
                         <h3 className='mb-2 lg:mb-5 text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
                           Description
                         </h3>
                         {isEditingBio ? (
-                          <textarea
-                            className='input-description'
+                          <TextArea
+                            maxLength={500}
+                            className='text-content'
+                            rows={7}
                             value={name}
                             disabled={!isEditingBio}
                             onChange={(e) =>
@@ -467,7 +462,7 @@ const ApplicationPreview = (): JSX.Element => {
             {isEditingBio && (
               <p
                 typeof='button'
-                className='clickable-text btn-add-milestone mx-5 lg:mx-14 !mb-0 text-base lg:text-xl font-bold !text-imbue-lemon'
+                className='clickable-text btn-add-milestone mx-5 lg:mx-14 !mb-0 text-base lg:text-xl font-bold !text-imbue-lemon w-fit'
                 onClick={onAddMilestone}
               >
                 <FiPlusCircle color='#7AA822' />
@@ -599,17 +594,28 @@ const ApplicationPreview = (): JSX.Element => {
             >
               Back To Brief
             </button>
-            {isEditingBio && (
-              <button
-                className='primary-btn in-dark w-button'
-                disabled={
-                  totalPercent !== 100 || !milestoneAmountsAndNamesHaveValue
-                }
-                onClick={() => updateProject()}
-              >
-                Update
-              </button>
-            )}
+            {
+              !isEditingBio && isApplicationOwner && (application.status_id !== 4) && (
+                <button
+                  className='primary-btn in-dark w-button !flex items-center gap-2'
+                  onClick={() => setIsEditingBio(true)}
+                >
+                  <span>Edit Application</span>
+                  <FiEdit />
+                </button>)
+            }
+            {
+              isEditingBio && (
+                <button
+                  className='primary-btn in-dark w-button'
+                  disabled={
+                    totalPercent !== 100 || !milestoneAmountsAndNamesHaveValue
+                  }
+                  onClick={() => updateProject()}
+                >
+                  Update
+                </button>)
+            }
 
             {/* TODO: Add Drafts Functionality */}
             {/* <button className="secondary-btn">Save draft</button> */}

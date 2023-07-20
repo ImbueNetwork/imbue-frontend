@@ -1,3 +1,4 @@
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CancelIcon from '@mui/icons-material/Cancel';
 import MarkEmailUnreadOutlinedIcon from '@mui/icons-material/MarkEmailUnreadOutlined';
 import VerifiedIcon from '@mui/icons-material/Verified';
@@ -56,6 +57,10 @@ const BioInsights = ({
   const lastApplication: Project = briefApplications[briefApplications?.length - 1]
   const pendingApplciations: Project[] = briefApplications.filter((application) => application?.status_id === 1)
 
+  let hint = ""
+  if (!canSubmitProposal) hint = "Only varified users are allowed to apply for a breif"
+  else if (isOwnerOfBrief) hint = "Your are not allowed to submit proposal for your own brief"
+
   useEffect(() => {
     const setUp = async () => {
       if (!targetUser?.id) return
@@ -94,6 +99,7 @@ const BioInsights = ({
       lg:mt-0
       w-full
       md:w-[35%]
+      relative
     '
     >
       <div className='subsection max-width-750px:!my-0'>
@@ -101,15 +107,15 @@ const BioInsights = ({
           <h3 className='text-imbue-purple-dark !font-normal'>
             Activities on this job
           </h3>
-          <div className='flex gap-3 lg:items-center mt-4 md:flex-row flex-col'>
+          <div className='flex gap-3 lg:items-center mt-4 flex-wrap'>
             <button
               onClick={() => isSavedBrief ? unsaveBrief?.() : saveBrief?.()}
-              className={` ${isSavedBrief ? "bg-imbue-coral text-white border-imbue-coral" : "bg-transparent text-content border border-content"} rounded-3xl h-[2.48rem] text-base font-normal px-[2.5rem] max-width-1100px:w-full max-width-500px:w-auto `}
+              className={` ${isSavedBrief ? "bg-imbue-coral text-white border-imbue-coral" : "bg-transparent text-content border border-content"} rounded-3xl h-[2.48rem] text-base font-normal px-5 max-width-1100px:w-full max-width-500px:w-auto `}
             >
               {isSavedBrief ? "Unsave" : "Save"}
             </button>
             <Tooltip
-              title={!canSubmitProposal && "Only varified users are allowed to apply for a breif"}
+              title={hint}
               arrow
               placement="bottom"
               leaveTouchDelay={10}
@@ -123,12 +129,29 @@ const BioInsights = ({
               flex
               items-center
               gap-2
+              !m-0
+              !px-4
               '
-                onClick={() => canSubmitProposal && redirectToApply()}
+                onClick={() => (canSubmitProposal && !isOwnerOfBrief) && redirectToApply()}
               // disabled={!canSubmitProposal}
               >
                 Submit a Proposal <FaRegShareSquare />
               </button>
+            </Tooltip>
+
+            <Tooltip
+              title="Go back to previous page"
+              followCursor
+              leaveTouchDelay={10}
+              enterDelay={500}
+              className='cursor-pointer'
+            >
+              <div
+                onClick={() => router.back()}
+                className='border border-content rounded-full p-1 flex items-center justify-center absolute right-5 top-5'
+              >
+                <ArrowBackIcon className='h-5 w-5' color='secondary' />
+              </div>
             </Tooltip>
           </div>
         </div>
@@ -138,9 +161,16 @@ const BioInsights = ({
         <div className='brief-insights-stat'>
           <div className='flex items-center text-imbue-purple-dark '>
             Applications:
-            <span className='bg-indigo-700 ml-2 h-5 w-5 py-1 px-1.5 cursor-pointer text-xs !text-white rounded-full flex justify-center items-center'>
-              ?
-            </span>{' '}
+            <Tooltip
+              title="An approximate number of applications for this brief"
+              followCursor
+              leaveTouchDelay={10}
+              className='cursor-pointer'
+            >
+              <span className='bg-indigo-700 ml-2 h-5 w-5 py-1 px-1.5 cursor-pointer text-xs !text-white rounded-full flex justify-center items-center'>
+                ?
+              </span>
+            </Tooltip>
             <span className='primary-text font-normal ml-2 !text-imbue-lemon'>
               Less than {briefApplications?.length || 0}
             </span>

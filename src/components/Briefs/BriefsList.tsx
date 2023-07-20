@@ -57,14 +57,20 @@ export const BriefLists = ({
           className={`flex cursor-pointer hover:bg-imbue-light-purple-hover px-5 py-3 lg:px-10 lg:py-8 justify-between border-b border-b-imbue-light-purple last:border-b-0`}
         >
           <div className='flex flex-col gap-2 lg:gap-3'>
-            <span className='text-sm text-imbue-purple-dark lg:text-xl'>{brief.headline}</span>
+            <span className='text-sm text-imbue-purple-dark lg:text-xl'>
+              {
+                brief.headline.length > 50
+                  ? `${brief.headline.substring(0, 50)}...`
+                  : brief.headline
+              }
+            </span>
             <p className='text-xs lg:text-[16px] text-imbue-purple'>
               Budget ${Number(brief.budget).toLocaleString()} - Public
             </p>
             <p className='text-xs lg:text-sm w-4/5 text-content'>
               {
-                brief?.description?.length > 150
-                  ? brief?.description?.substring(0,150) + "..."
+                brief?.description?.length > 500
+                  ? brief?.description?.substring(0, 500) + "..."
                   : brief?.description
               }
             </p>
@@ -85,8 +91,8 @@ export const BriefLists = ({
                 <div
                   style={{
                     width: `${(brief.milestones?.filter((m: any) => m?.is_approved)
-                        ?.length /
-                        brief.milestones?.length) *
+                      ?.length /
+                      brief.milestones?.length) *
                       100
                       }%`,
                   }}

@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
-import { Divider, OutlinedInput, TextField } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Divider, OutlinedInput, TextField, Tooltip } from '@mui/material';
 import { SignerResult } from '@polkadot/api/types';
 import { WalletAccount } from '@talismn/connect-wallets';
 import moment from 'moment';
@@ -137,6 +138,21 @@ const Profile = ({ initUser, browsingUser }: any) => {
 
   return (
     <div className='profile-container'>
+      <div className='cursor-pointer absolute top-28 left-16 lg:left-24 z-[1]'>
+        <Tooltip
+          title="Go back to previous page"
+          followCursor
+          leaveTouchDelay={10}
+          enterDelay={500}
+        >
+          <div
+            onClick={() => router.back()}
+            className='border rounded-full p-1 flex items-center justify-center absolute right-5 top-5 group hover:bg-white'
+          >
+            <ArrowBackIcon className='h-6 w-6 text-white group-hover:text-black' />
+          </div>
+        </Tooltip>
+      </div>
       <div className='banner absolute left-0 right-0'>
         <Image
           src={require('@/assets/images/profile-banner.png')}
@@ -405,13 +421,21 @@ const Profile = ({ initUser, browsingUser }: any) => {
                       onClick={() => router.push(`/briefs/${item?.id}/`)}
                     >
                       <div className='brief-title !text-xl lg:!text-2xl'>
-                        {item.headline}
+                        {
+                          item.headline.length > 50
+                            ? `${item.headline.substring(0, 50)}...`
+                            : item.headline
+                        }
                       </div>
                       <div className='brief-time-info !text-sm lg:!text-base'>
                         {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
                       </div>
                       <div className='brief-description !text-sm lg:!text-base'>
-                        {item.description}
+                        {
+                          item.description.length > 400
+                            ? `${item.description.substring(0, 400)}...`
+                            : item.description
+                        }
                       </div>
 
                       <div className='brief-tags'>

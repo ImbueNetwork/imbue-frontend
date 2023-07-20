@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SearchIcon from '@mui/icons-material/Search';
 import VerifiedIcon from '@mui/icons-material/Verified';
@@ -63,6 +64,7 @@ import {
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 import { AppDispatch, RootState } from '@/redux/store/store';
 import styles from '@/styles/modules/freelancers.module.css';
+
 
 export type ProfileProps = {
   initFreelancer: Freelancer;
@@ -360,14 +362,30 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   };
 
   return (
-    <div className='profile-container overflow-x-hidden relative'>
-      <div className='banner'>
+    <div className='profile-container'>
+      <div className='h-[242px]'>
         <Image
           src={require('@/assets/images/profile_banner.png')}
           priority
           alt='profile banner'
-          className='banner-image w-full object-cover h-[242px]'
+          className='banner-image w-full object-cover h-[242px] absolute left-0 right-0'
         />
+      </div>
+
+      <div className='cursor-pointer absolute top-28 left-16 lg:left-24 z-[1]'>
+        <Tooltip
+          title="Go back to previous page"
+          followCursor
+          leaveTouchDelay={10}
+          enterDelay={500}
+        >
+          <div
+            onClick={() => router.back()}
+            className='border rounded-full p-1 flex items-center justify-center absolute right-5 top-5 group hover:bg-white'
+          >
+            <ArrowBackIcon className='h-6 w-6 text-white group-hover:text-black' />
+          </div>
+        </Tooltip>
       </div>
 
       <div className='flex flex-col lg:flex-row justify-evenly lg:mx-[40px] px-[30px] lg:px-[40px]'>
@@ -1051,7 +1069,14 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                     />
                   </div>
                   <div>
-                    <p>{review.name}</p>
+                    <p>
+                      {review.name}
+                      {
+                        review.name.length > 50
+                          ? `${review.name.substring(0, 50)}...`
+                          : review.name
+                      }
+                    </p>
                     <div className='flex gap-2 items-center'>
                       <ReactCountryFlag countryCode={review.countryCode} />
                       <span>{review.country}</span>
@@ -1075,7 +1100,13 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                     | {review.time}
                   </span>
                 </div>
-                <p className='mt-2'>{review.description}</p>
+                <p className='mt-2'>
+                  {
+                    review.description.length > 500
+                      ? `${review.description.substring(0, 500)}...`
+                      : review.description
+                  }
+                </p>
                 <div className='flex gap-4'>
                   <p>Helpful?</p>
                   <div className='flex gap-3'>

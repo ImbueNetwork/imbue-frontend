@@ -250,10 +250,14 @@ const GrantApplication = (): JSX.Element => {
                 <div>Title</div>
                 <input
                   value={title}
+                  maxLength={50}
                   placeholder='Input title'
                   onChange={(e) => setTitle(e.target.value)}
                   className='bg-transparent border border-imbue-purple rounded-md p-3 placeholder:text-imbue-light-purple text-imbue-purple outline-primary'
                 />
+                <div className='text-imbue-purple text-sm ml-auto'>
+                  {`${description?.length || 0}/50`}
+                </div>
               </div>
               <div className='flex flex-col gap-4 text-imbue-purple-dark'>
                 <div>Description</div>
@@ -264,9 +268,9 @@ const GrantApplication = (): JSX.Element => {
                   onChange={(e) => setDescription(e.target.value)}
                   className='bg-transparent border border-imbue-purple rounded-md placeholder:text-imbue-light-purple text-imbue-purple outline-primary min-h-[160px] p-3'
                 />
-                <div className='text-imbue-purple text-sm'>{`${
-                  description?.length || 0
-                }/300`}</div>
+                <div className='text-imbue-purple text-sm ml-auto'>
+                  {`${description?.length || 0}/500`}
+                </div>
               </div>
             </div>
             <div className='flex flex-col gap-[50px] lg:mt-10 lg:w-60'>
@@ -441,50 +445,63 @@ const GrantApplication = (): JSX.Element => {
                         {index + 1}.
                       </div>
 
-                      <div className='flex flex-row justify-between w-full text-content'>
-                        <div className='w-3/5'>
+                      <div className='flex flex-col lg:flex-row justify-between w-full text-content'>
+                        <div className='lg:w-3/5'>
                           <h3 className=' text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
                             Title
                           </h3>
 
-                          <input
-                            type='text'
-                            data-testid={`milestone-title-${index}`}
-                            className='input-budget  text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-left  pl-5 mb-8'
-                            value={name || ''}
-                            onChange={(e) =>
-                              setMilestones([
-                                ...milestones.slice(0, index),
-                                {
-                                  ...milestones[index],
-                                  name: e.target.value,
-                                },
-                                ...milestones.slice(index + 1),
-                              ])
-                            }
-                          />
+                          <div className='mb-8'>
+                            <input
+                              type='text'
+                              maxLength={50}
+                              data-testid={`milestone-title-${index}`}
+                              className='input-budget  text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-left pl-3 my-3'
+                              value={name || ''}
+                              onChange={(e) =>
+                                setMilestones([
+                                  ...milestones.slice(0, index),
+                                  {
+                                    ...milestones[index],
+                                    name: e.target.value,
+                                  },
+                                  ...milestones.slice(index + 1),
+                                ])
+                              }
+                            />
+
+                            <div className='text-imbue-purple text-sm ml-auto text-right'>
+                              {`${milestones[index].name?.length || 0}/50`}
+                            </div>
+                          </div>
 
                           <p className='mb-2 lg:mb-5 text-base lg:text-lg'>
                             Description
                           </p>
-                          <textarea
-                            className='input-description text-base'
-                            value={milestoneDescription}
-                            onChange={(e) =>
-                              setMilestones([
-                                ...milestones.slice(0, index),
-                                {
-                                  ...milestones[index],
-                                  description: e.target.value,
-                                },
-                                ...milestones.slice(index + 1),
-                              ])
-                            }
-                          />
+                          <div>
+                            <textarea
+                              maxLength={500}
+                              className='input-description text-base'
+                              value={milestoneDescription}
+                              onChange={(e) =>
+                                setMilestones([
+                                  ...milestones.slice(0, index),
+                                  {
+                                    ...milestones[index],
+                                    description: e.target.value,
+                                  },
+                                  ...milestones.slice(index + 1),
+                                ])
+                              }
+                            />
+                            <div className='text-imbue-purple text-sm ml-auto text-right'>
+                              {`${milestones[index].description?.length || 0}/500`}
+                            </div>
+                          </div>
                         </div>
 
-                        <div className='flex flex-col w-4/12 mt-[-0.2rem]'>
-                          <h3 className=' text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
+                        <div className='flex flex-col lg:w-4/12 mt-5 lg:mt-[-0.2rem]'>
+                          <h3 className=' text-base lg:text-xl mb-2 p-0 text-imbue-purple-dark font-normal'>
                             Amount
                           </h3>
                           <TextField
@@ -516,11 +533,11 @@ const GrantApplication = (): JSX.Element => {
                           />
 
                           {totalCostWithoutFee !== 0 && (
-                            <div className='flex flex-col items-end mt-3 gap-2 w-full'>
+                            <div className='flex flex-col lg:items-end mt-3 gap-2 w-full'>
                               <div className='mt-2 text-base text-content-primary'>
                                 {percent}%
                               </div>
-                              <div className='progress-bar'>
+                              <div className='progress-bar !w-full'>
                                 <div
                                   className='progress'
                                   style={{
@@ -557,9 +574,8 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${
-                  currencies[currencyId]
-                }`}
+                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
+                  }`}
               </div>
             </div>
 
@@ -572,9 +588,8 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${
-                  currencies[currencyId]
-                }`}
+                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
+                  }`}
               </div>
             </div>
 
@@ -641,9 +656,8 @@ const GrantApplication = (): JSX.Element => {
           </button>
         </div>
         <Alert
-          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${
-            copied ? 'flex' : 'hidden'
-          }`}
+          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${copied ? 'flex' : 'hidden'
+            }`}
           severity='success'
         >
           Grant Wallet Address Copied to clipboard

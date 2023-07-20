@@ -23,10 +23,9 @@ const BioPanel = ({
 }: BioPanelData) => {
   const timePosted = timeAgo.format(new Date(brief.created));
   const router = useRouter();
-
   return (
-    <div className='brief-bio py-5 px-10 max-width-750px:!p-5 max-width-750px:!w-full max-width-1100px:p-[1rem]'>
-      <div className='subsection max-width-750px:!my-0'>
+    <div className='brief-bio py-5 px-10 max-width-750px:!p-5 max-width-750px:!w-full max-width-1100px:p-[1rem] relative'>
+      <div className='mb-6'>
         <div className='flex flex-wrap flex-col items-start'>
           <div className='header'>
             <h2 className='text-[1.875rem] text-imbue-purple-dark !font-normal'>
@@ -58,7 +57,13 @@ const BioPanel = ({
           )}
         </div>
         <span className='time_posted primary-text mt-3 !text-imbue-lemon mt-[0.75rem]'>
-          Posted {timePosted} by {brief.created_by}
+          Posted {timePosted} by {" "}
+          <span
+            onClick={() => router.push(`/profile/${brief.user_id}`)}
+            className='hover:underline cursor-pointer'
+          > 
+          {brief.created_by}
+          </span>
         </span>
       </div>
 
