@@ -552,27 +552,31 @@ function Project() {
               {targetUser?.display_name}
             </p>
 
-            <button
-              onClick={() => setShowMessageBox(true)}
-              className='primary-btn 
-              in-dark w-button 
-              !mt-0 
-              font-normal 
-              max-lg:!w-full 
-              max-lg:!text-center 
-              max-lg:!ml-0 
-              max-lg:!mt-5 
-              items-center 
-              content-center 
-              !py-0 ml-[40px] 
-              px-8
-              max-lg:!mr-0
-              h-[2.6rem]
-              '
-              data-testid='next-button'
-            >
-              Message
-            </button>
+            {(targetUser?.id && targetUser?.id !== user?.id) && (
+              <button
+                onClick={() => setShowMessageBox(true)}
+                className='primary-btn 
+        in-dark w-button 
+        !mt-0 
+        font-normal 
+        max-lg:!w-full 
+        max-lg:!text-center 
+        max-lg:!ml-0 
+        max-lg:!mt-5 
+        items-center 
+        content-center 
+        !py-0 ml-[40px] 
+        px-8
+        max-lg:!mr-0
+        h-[2.6rem]
+        '
+                data-testid='next-button'
+              >
+                Message
+              </button>
+
+            )}
+
 
             {showRefundButton && (
               <button

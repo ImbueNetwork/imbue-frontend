@@ -235,14 +235,17 @@ const Profile = ({ initUser, browsingUser }: any) => {
                 </div>
 
                 <div className='w-full lg:w-3/12'>
-                  <div className='w-full'>
-                    <p className='text-xl text-imbue-purple-dark'>
-                      Wallet Address
-                    </p>
-                    <div className='mt-3 break-words p-4 mb-4 rounded-md text-content-primary bg-imbue-light-purple'>
-                      {user?.web3_address}
+                  {user?.web3_address && (
+                    <div className='w-full'>
+                      <p className='text-xl text-imbue-purple-dark'>
+                        Wallet Address
+                      </p>
+                      <div className='mt-3 break-words p-4 mb-4 rounded-md text-content-primary bg-imbue-light-purple'>
+                        {user?.web3_address}
+                      </div>
                     </div>
-                  </div>
+                  )}
+
 
                   {isEditMode && (
                     <button
@@ -508,7 +511,7 @@ export const getServerSideProps = async (context: any) => {
 
   try {
     const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}users/byid/${query?.id}`),
+      checkEnvironment().concat(`${config.apiBase}users/${query?.id}`),
       {
         headers: config.getAPIHeaders,
       }
