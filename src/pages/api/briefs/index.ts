@@ -43,7 +43,7 @@ export default nextConnect()
 
           res.status(200).json({
             currentData: filteredOutProjects,
-            totalBriefs: filteredOutProjects.length,
+            totalBriefs: briefs.length,
           });
         });
       } catch (e) {
