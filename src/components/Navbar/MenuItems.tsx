@@ -44,7 +44,7 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
     {
       icon: 'person',
       text: 'Profile',
-      link: `/profile/${user?.id}/`,
+      link: `/profile/${user?.username}/`,
       needAuthentication: true,
       duplicate: false,
     },
