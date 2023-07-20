@@ -592,57 +592,70 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
               </div>
             </div>
 
-            <hr className='separator' />
 
-            <div className='px-10 flex flex-col gap-4'>
-              <div className='flex items-center gap-3'>
-                <p className='text-xl text-imbue-purple-dark'>
-                  Among my clients
-                </p>
-                <Tooltip
-                  title='Organizations or companiest that you have previously worked with. Add their name, website and logo for recongintion'
-                  enterTouchDelay={10}
-                  leaveTouchDelay={4000}
-                  arrow
-                  placement='bottom'
-                >
-                  <span className='h-4 w-4 flex justify-center items-center rounded-full bg-imbue-light-purple text-imbue-purple cursor-pointer'>
-                    ?
-                  </span>
-                </Tooltip>
-              </div>
+            {(clients.length > 0 || isEditMode) && (
+              <>
+                <hr className='separator' />
+                <div className='px-10 flex flex-col gap-4'>
 
-              <Clients
-                {...{
-                  setFreelancer,
-                  isEditMode,
-                  setIsEditMode,
-                  clients,
-                  setClients,
-                }}
-              />
-            </div>
+                  <div className='flex items-center gap-3'>
+                    <p className='text-xl text-imbue-purple-dark'>
+                      Among my clients
+                    </p>
+                    <Tooltip
+                      title='Organizations or companiest that you have previously worked with. Add their name, website and logo for recongintion'
+                      enterTouchDelay={10}
+                      leaveTouchDelay={4000}
+                      arrow
+                      placement='bottom'
+                    >
+                      <span className='h-4 w-4 flex justify-center items-center rounded-full bg-imbue-light-purple text-imbue-purple cursor-pointer'>
+                        ?
+                      </span>
+                    </Tooltip>
+                  </div>
 
-            <hr className='separator' />
-            <div className='w-full px-[30px] lg:px-[40px]'>
-              <p className='text-xl text-imbue-purple-dark'>Wallet Address</p>
-              <div className='flex items-center mt-2 gap-3 w-full'>
-                <div className='break-words py-4 px-3 rounded-2xl bg-imbue-light-purple w-[90%] lg:w-full text-imbue-purple'>
-                  {freelancer?.web3_address}
+                  <Clients
+                    {...{
+                      setFreelancer,
+                      isEditMode,
+                      setIsEditMode,
+                      clients,
+                      setClients,
+                    }}
+                  />
                 </div>
-                <div
-                  onClick={() =>
-                    copyToClipboard({
-                      text: freelancer?.web3_address || '',
-                      title: 'Web 3 address',
-                    })
-                  }
-                  className='p-1 border border-imbue-purple rounded-full cursor-pointer'
-                >
-                  <ContentCopyIcon htmlColor='#3b27c1' />
+              </>
+
+            )}
+
+
+            {freelancer?.web3_address && (
+              <>
+                <hr className='separator' />
+                <div className='w-full px-[30px] lg:px-[40px]'>
+                  <p className='text-xl text-imbue-purple-dark'>Wallet Address</p>
+                  <div className='flex items-center mt-2 gap-3 w-full'>
+                    <div className='break-words py-4 px-3 rounded-2xl bg-imbue-light-purple w-[90%] lg:w-full text-imbue-purple'>
+                      {freelancer?.web3_address}
+                    </div>
+                    <div
+                      onClick={() =>
+                        copyToClipboard({
+                          text: freelancer?.web3_address || '',
+                          title: 'Web 3 address',
+                        })
+                      }
+                      className='p-1 border border-imbue-purple rounded-full cursor-pointer'
+                    >
+                      <ContentCopyIcon htmlColor='#3b27c1' />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </>
+
+            )}
+
 
             {isEditMode && (
               <button
@@ -1131,9 +1144,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         </div>
       </ErrorScreen>
       <div
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${
-          copied ? 'right-5' : '-right-full'
-        }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
+          }`}
       >
         <Alert severity='success'>{`${copied} Copied to clipboard`}</Alert>
       </div>
