@@ -4,7 +4,6 @@ import VerifiedIcon from '@mui/icons-material/Verified';
 import { Grid } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import Pagination from 'rc-pagination';
 import React, { useEffect, useState } from 'react';
 
 import CustomDropDown from '@/components/CustomDropDown';
@@ -69,14 +68,14 @@ const Freelancers = (): JSX.Element => {
   };
 
   const dedupeArray = async (input: any[]) => {
-    if(input[0]) {
-    return input
-      .filter((thing: any, i: any, arr: any) => {
-        return  arr.indexOf(arr.find((t: any) => t.id === thing.id)) === i;
-      })
-      .sort(function (a: any, b: any) {
-        return a.name.localeCompare(b.name);
-      });
+    if (input[0]) {
+      return input
+        .filter((thing: any, i: any, arr: any) => {
+          return arr.indexOf(arr.find((t: any) => t.id === thing.id)) === i;
+        })
+        .sort(function (a: any, b: any) {
+          return a.name.localeCompare(b.name);
+        });
     }
   };
 
@@ -93,17 +92,22 @@ const Freelancers = (): JSX.Element => {
         data?.currentData?.map((x: any) => x.skills)
       ) as Item[];
 
-      const dedupedSkills = combinedSkills.length > 0 ? await dedupeArray(combinedSkills) : [];
+      const dedupedSkills =
+        combinedSkills.length > 0 ? await dedupeArray(combinedSkills) : [];
       const combinedServices = Array.prototype.concat.apply(
         [],
         data?.currentData?.map((x: any) => x.services)
       ) as Item[];
-      const dedupedServices = combinedServices ? await dedupeArray(combinedServices) : [];
+      const dedupedServices = combinedServices
+        ? await dedupeArray(combinedServices)
+        : [];
       const combinedLanguages = Array.prototype.concat.apply(
         [],
         data?.currentData?.map((x: any) => x.languages)
       ) as Item[];
-      const dedupedLanguages = combinedLanguages ? await dedupeArray(combinedLanguages) : [];
+      const dedupedLanguages = combinedLanguages
+        ? await dedupeArray(combinedLanguages)
+        : [];
       setSkills(dedupedSkills);
       setServices(dedupedServices);
       setLanguages(dedupedLanguages);
@@ -547,35 +551,32 @@ const Freelancers = (): JSX.Element => {
                 )}
           </Grid>
 
-          <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center justify-between   self-center'>
-            <Pagination
-              pageSize={itemsPerPage}
-              total={freelancers_total}
-              onChange={(page: number) => setCurrentPage(page)}
-              className='flex flex-row items-center lg:px-10'
-              itemRender={(page, type, originalElement) => {
-                if (type === 'page') {
-                  return (
-                    <div className='mx-[1.62rem] text-[#5E5E5E] text-[0.7rem] lg:text-[1rem] font-normal'>
-                      {page} of {(freelancers_total / itemsPerPage).toFixed(0)}
-                    </div>
-                  );
-                }
-                return originalElement;
+          <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-[97%] p-[1rem] flex items-center  max-width-868px:w-[90%] self-center fixed bottom-[2rem]'>
+            <button
+              onClick={() => {
+                if (currentPage > 1) setCurrentPage(currentPage - 1);
               }}
-              prevIcon={
-                <button className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'>
-                  <Image src={chevLeftIcon} alt='chev left' />
-                  Previous
-                </button>
-              }
-              nextIcon={
-                <button className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'>
-                  Next
-                  <Image src={chevRightIcon} alt='chev right' />
-                </button>
-              }
-            />
+              className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'
+            >
+              <Image src={chevLeftIcon} alt='chev left' />
+              Previous
+            </button>
+
+            <div className='mx-[1.62rem] text-[#5E5E5E] text-[0.7rem] lg:text-[1rem] font-normal'>
+              {currentPage} of {Math.ceil(freelancers_total / itemsPerPage)}
+            </div>
+
+            <button
+              onClick={() => {
+                if (freelancers_total > currentPage * itemsPerPage) {
+                  setCurrentPage(currentPage + 1);
+                }
+              }}
+              className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'
+            >
+              Next
+              <Image src={chevRightIcon} alt='chev right' />
+            </button>
           </div>
         </div>
       </div>
