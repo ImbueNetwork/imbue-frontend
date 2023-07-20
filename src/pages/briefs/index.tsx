@@ -608,11 +608,11 @@ const Briefs = (): JSX.Element => {
             </div>
           </div>
 
-          <div className='briefs-list !overflow-hidden'>
+          <div className='briefs-list !overflow-hidden z-10'>
             {briefs?.map(
               (item, itemIndex) =>
                 !item?.project_id && (
-                  <div key={itemIndex} className='relative'>
+                  <div key={itemIndex} className='relative z-0'>
                     {savedBriefsActive && (
                       <button
                         className='absolute top-5 z-[1000] right-5 h-[30px] w-[30px] border border-red-500 rounded-full flex justify-center items-center bg-red-500'
