@@ -352,10 +352,14 @@ class ChainService {
 
   async convertToOnChainProject(project: Project) {
     if (!project?.chain_project_id) return;
-
     const projectOnChain: any = await this.getProjectOnChain(
       project.chain_project_id
     );
+
+    if (!projectOnChain) {
+      return;
+    }
+
     const raisedFunds = BigInt(
       projectOnChain?.raisedFunds?.replaceAll(',', '') || 0
     );
@@ -548,21 +552,30 @@ class ChainService {
 
   public async getBalance(accountAddress: string, currencyId: number) {
     switch (currencyId) {
-      case 0: {
+      case Currency.IMBU: {
         const balance: any = await this.imbueApi.imbue.api.query.system.account(
           accountAddress
         );
         const imbueBalance = balance?.data?.free / 1e12;
-        return `${imbueBalance.toFixed(2)} IMBU`;
+        return Number(imbueBalance.toFixed(2));
       }
-      case 1: {
-        const ksmResponse: any =
+      case Currency.MGX: {
+        const mgxResponse: any =
           await this.imbueApi.imbue.api.query.ormlTokens.accounts(
             accountAddress,
             currencyId
           );
-        const ksmBalance = ksmResponse.free / 1e12;
-        return `${ksmBalance.toFixed(2)} KSM`;
+        const mgxBalance = mgxResponse.free / 1e18;
+        return Number(mgxBalance.toFixed(2));
+      }
+      default: {
+        const accountResponse: any =
+          await this.imbueApi.imbue.api.query.ormlTokens.accounts(
+            accountAddress,
+            currencyId
+          );
+        const accountBalance = accountResponse.free / 1e12;
+        return Number(accountBalance.toFixed(2));
       }
     }
   }

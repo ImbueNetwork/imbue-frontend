@@ -30,6 +30,7 @@ interface MilestoneItem {
 
 export const SubmitProposal = (): JSX.Element => {
   const [currencyId, setCurrencyId] = useState(0);
+  const [durationId, setDurationId] = useState(0);
   const [brief, setBrief] = useState<Brief | any>();
   // const [user, setUser] = useState<User>();
   const { user } = useSelector((state: RootState) => state.userState);
@@ -164,6 +165,7 @@ export const SubmitProposal = (): JSX.Element => {
               };
             }),
           required_funds: totalCost,
+          duration_id: durationId
         }),
       });
 
@@ -414,6 +416,8 @@ export const SubmitProposal = (): JSX.Element => {
               className='bg-white outline-none round border border-imbue-purple rounded-[0.5rem] text-base px-5 mt-4 h-[2.75rem] text-imbue-purple-dark'
               placeholder='Select a duration'
               required
+              onChange={(e)=>setDurationId(Number(e.target.value))}
+              value={durationId}
             >
               {durationOptions.map(({ label, value }, index) => (
                 <option value={value} key={index} className='duration-option'>

@@ -15,14 +15,12 @@ import db from '@/db';
 export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
     const { id: username } = req.query;
-
     if (!username) return res.status(404).end();
 
     db.transaction(async (tx) => {
       try {
         let freelancer;
         freelancer = await fetchFreelancerDetailsByUsername(username)(tx);
-        const user = await fetchUser(freelancer?.id)(tx);
 
         if (!freelancer)
           freelancer = await models.fetchFreelancerDetailsByUserID(
@@ -33,6 +31,7 @@ export default nextConnect()
           return res.status(404).end();
         }
 
+        const user = await fetchUser(freelancer?.id)(tx);
         await Promise.all([
           (freelancer.skills = await fetchFreelancerMetadata(
             'skill',

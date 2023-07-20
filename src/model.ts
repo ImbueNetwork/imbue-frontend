@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 export enum Currency {
   IMBU = 0,
   KSM = 1,
@@ -73,6 +72,7 @@ export type Project = {
   // project_type: ProjectType;
   approvers: string[];
   created?: string;
+  duration_id: number;
 };
 
 export type ProjectOnChain = {
