@@ -4,7 +4,6 @@ import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import Pagination from 'rc-pagination';
 import React, { useEffect, useState } from 'react';
 import { IoTrashBin } from 'react-icons/io5';
 import { useSelector } from 'react-redux';
@@ -683,35 +682,32 @@ const Briefs = (): JSX.Element => {
           </div>
         </ErrorScreen>
       </div>
-      <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center justify-between  max-width-868px:w-[90%] self-center'>
-        <Pagination
-          pageSize={itemsPerPage}
-          total={briefs_total}
-          onChange={(page: number) => setCurrentPage(page)}
-          className='flex flex-row items-center lg:px-10'
-          itemRender={(page, type, originalElement) => {
-            if (type === 'page') {
-              return (
-                <div className='mx-[1.62rem] text-[#5E5E5E] text-[0.7rem] lg:text-[1rem] font-normal'>
-                  {page} of {(briefs_total / itemsPerPage).toFixed(0)}
-                </div>
-              );
-            }
-            return originalElement;
+      <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center  max-width-868px:w-[90%] self-center'>
+        <button
+          onClick={() => {
+            if (currentPage > 1) setCurrentPage(currentPage - 1);
           }}
-          prevIcon={
-            <button className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'>
-              <Image src={chevLeftIcon} alt='chev left' />
-              Previous
-            </button>
-          }
-          nextIcon={
-            <button className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'>
-              Next
-              <Image src={chevRightIcon} alt='chev right' />
-            </button>
-          }
-        />
+          className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'
+        >
+          <Image src={chevLeftIcon} alt='chev left' />
+          Previous
+        </button>
+
+        <div className='mx-[1.62rem] text-[#5E5E5E] text-[0.7rem] lg:text-[1rem] font-normal'>
+          {currentPage} of {Math.ceil(briefs_total / itemsPerPage)}
+        </div>
+
+        <button
+          onClick={() => {
+            if (briefs_total > currentPage * itemsPerPage) {
+              setCurrentPage(currentPage + 1);
+            }
+          }}
+          className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'
+        >
+          Next
+          <Image src={chevRightIcon} alt='chev right' />
+        </button>
       </div>
     </div>
   );

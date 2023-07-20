@@ -52,7 +52,7 @@ export default nextConnect()
           filter
         );
 
-        const { currentData, totalItems } = await models.paginatedData(
+        const { currentData } = await models.paginatedData(
           filter?.page || 1,
           filter?.items_per_page || 5,
           freelancers
@@ -77,7 +77,9 @@ export default nextConnect()
           }),
         ]);
 
-        res.status(200).json({ currentData, totalFreelancers: totalItems });
+        res
+          .status(200)
+          .json({ currentData, totalFreelancers: freelancers.length });
       } catch (e) {
         new Error(`Failed to search all freelancers`, { cause: e as Error });
       }

@@ -20,20 +20,33 @@ export default nextConnect()
     db.transaction(async (tx) => {
       try {
         await fetchAllFreelancers()(tx).then(async (freelancers: any) => {
-          const { currentData, totalItems } = await paginatedData(
+          const { currentData } = await paginatedData(
             Number(data?.page || 1),
             Number(data?.items_per_page || 5),
             freelancers
           );
           await Promise.all([
             ...currentData.map(async (freelancer: any) => {
-                 freelancer.skills = await fetchFreelancerMetadata("skill",freelancer.id)(tx);
-                 freelancer.services = await fetchFreelancerMetadata("service",freelancer.id)(tx);
-                 freelancer.languages = await fetchFreelancerMetadata("language",freelancer.id)(tx);
-                 freelancer.clients = await fetchFreelancerClients(freelancer.id)(tx);
+              freelancer.skills = await fetchFreelancerMetadata(
+                'skill',
+                freelancer.id
+              )(tx);
+              freelancer.services = await fetchFreelancerMetadata(
+                'service',
+                freelancer.id
+              )(tx);
+              freelancer.languages = await fetchFreelancerMetadata(
+                'language',
+                freelancer.id
+              )(tx);
+              freelancer.clients = await fetchFreelancerClients(freelancer.id)(
+                tx
+              );
             }),
           ]);
-          res.status(200).json({ currentData, totalFreelancers: totalItems });
+          res
+            .status(200)
+            .json({ currentData, totalFreelancers: freelancers.length });
         });
       } catch (e) {
         new Error(`Failed to fetch all freelancers`, { cause: e as Error });
