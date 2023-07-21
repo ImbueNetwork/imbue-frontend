@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import { getServerSideProps } from '@/utils/serverSideProps';
 
 const Relay = () => {
-  const [_value, setValue] = useState('');
+  const [_value, setValue] = useState<any>();
   return (
     <div className='bg-background p-10 rounded-2xl'>
       <h1 className='fund-h1'>My funds</h1>

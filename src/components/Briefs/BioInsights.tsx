@@ -64,10 +64,9 @@ const BioInsights = ({
   );
 
   let hint = '';
-  if (!canSubmitProposal)
-    hint = 'Only varified users are allowed to apply for a breif';
+  if (!canSubmitProposal) hint = 'Only verfied freelancers can apply to briefs';
   else if (isOwnerOfBrief)
-    hint = 'Your are not allowed to submit proposal for your own brief';
+    hint = 'You are not allowed to submit proposal to your own brief';
 
   useEffect(() => {
     const setUp = async () => {
@@ -126,13 +125,7 @@ const BioInsights = ({
             >
               {isSavedBrief ? 'Unsave' : 'Save'}
             </button>
-            <Tooltip
-              title={hint}
-              arrow
-              placement='bottom'
-              leaveTouchDelay={10}
-              followCursor
-            >
+            <Tooltip title={hint} arrow placement='bottom' leaveTouchDelay={10}>
               <button
                 className='primary-btn 
               in-dark
@@ -147,7 +140,7 @@ const BioInsights = ({
                 onClick={() =>
                   canSubmitProposal && !isOwnerOfBrief && redirectToApply()
                 }
-                // disabled={!canSubmitProposal}
+                disabled={!canSubmitProposal}
               >
                 Submit a Proposal <FaRegShareSquare />
               </button>

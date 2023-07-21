@@ -95,7 +95,7 @@ const BriefDetails = (): JSX.Element => {
           setError({ message: 'No Brief Found' });
         }
       } catch (error) {
-        setError(error);
+        setError({message: error});
       }
     }
   };

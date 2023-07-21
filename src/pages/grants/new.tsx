@@ -139,7 +139,7 @@ const GrantApplication = (): JSX.Element => {
       setLoading(true);
       await submitGrant(account);
     } catch (error) {
-      setError(error);
+      setError({ message: error });
     } finally {
       setLoading(false);
       setShowPolkadotAccounts(false);
@@ -194,34 +194,35 @@ const GrantApplication = (): JSX.Element => {
           if (result.status) {
             setEscrowAddress(result?.eventData[5])
             setSuccess(true);
+            const resp = await fetch(`${config.apiBase}grants`, {
+              headers: config.postAPIHeaders,
+              method: 'post',
+              body: JSON.stringify({
+                ...grant,
+                status_id: OffchainProjectState.Accepted,
+                chain_project_id: result?.eventData[2],
+                escrow_address: result?.eventData[5]
+              }),
+            });
+
+            if (resp.status === 200 || resp.status === 201) {
+              const { grant_id } = (await resp.json()) as any;
+              setProjectId(grant_id);
+              setSuccess(true);
+            } else {
+              setError({ message: 'Failed to submit a grant' });
+            }
+            break;
           } else if (result.txError) {
             setError({ message: result.errorMessage });
+            break;
           }
           break;
         }
         await new Promise((f) => setTimeout(f, 1000));
       }
-
-      const resp = await fetch(`${config.apiBase}grants`, {
-        headers: config.postAPIHeaders,
-        method: 'post',
-        body: JSON.stringify({
-          ...grant,
-          status_id: OffchainProjectState.Accepted,
-          chain_project_id: result?.eventData[2],
-          escrow_address: result?.eventData[5]
-        }),
-      });
-
-      if (resp.status === 200 || resp.status === 201) {
-        const { grant_id } = (await resp.json()) as any;
-        setProjectId(grant_id);
-        setSuccess(true);
-      } else {
-        setError({ message: 'Failed to submit a grant' });
-      }
     } catch (error) {
-      setError(error);
+      setError({ message: error });
     } finally {
       setLoading(false);
     }

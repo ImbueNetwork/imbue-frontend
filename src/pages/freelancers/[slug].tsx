@@ -152,7 +152,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         }
       }
     } catch (error) {
-      setError(error);
+      setError({message: error});
     } finally {
       setLoading(false);
     }
@@ -215,7 +215,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         });
       }
     } catch (error) {
-      setError(error);
+      setError({message: error});
       console.log(error);
     }
   };

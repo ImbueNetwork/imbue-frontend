@@ -30,14 +30,14 @@ const Freelancer = (): JSX.Element => {
     (state: RootState) => state.userState
   );
   const displayName = user?.display_name;
-  const [freelancingBefore, setFreelancingBefore] = useState('');
-  const [goal, setGoal] = useState('');
-  // const [resume, setResume] = useState('');
-  const [title, setTitle] = useState('');
+  const [freelancingBefore, setFreelancingBefore] = useState<any>();
+  const [goal, setGoal] = useState<any>();
+  // const [resume, setResume] = useState<any>();
+  const [title, setTitle] = useState<any>();
   const [education, setEducation] = useState<string>('');
   const [languages, setLanguages] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
-  const [bio, setBio] = useState('');
+  const [bio, setBio] = useState<any>();
   const [services, setServices] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<any>();
@@ -344,7 +344,7 @@ const Freelancer = (): JSX.Element => {
         });
       }
     } catch (error) {
-      setError(error);
+      setError({message: error});
     } finally {
       setLoading(false);
     }

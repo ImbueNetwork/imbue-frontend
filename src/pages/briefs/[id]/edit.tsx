@@ -45,8 +45,8 @@ export const EditProposal = (): JSX.Element => {
   // FIXME: user
   const { user } = useSelector((state: RootState) => state.userState);
   const [industries, setIndustries] = useState<string[]>([]);
-  const [description, setDescription] = useState('');
-  const [headline, setHeadline] = useState('');
+  const [description, setDescription] = useState<any>();
+  const [headline, setHeadline] = useState<any>();
   const [expId, setExpId] = useState<number>();
   const [scopeId, setScopeId] = useState<number>();
   const [durationId, setDurationId] = useState<number>();

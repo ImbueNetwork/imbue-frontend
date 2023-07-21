@@ -3,7 +3,7 @@ import Image from 'next/image';
 import React from 'react';
 
 // import { FaPaperclip } from 'react-icons/fa';
-import { ApplicationContainerProps } from '@/model';
+import { ApplicationContainerProps, applicationStatusId } from '@/model';
 
 export const ApplicationContainer = ({
   application,
@@ -38,6 +38,8 @@ export const ApplicationContainer = ({
                                                 No
                                             </div>
                                         </div> */}
+
+          
           <button
             className='border border-imbue-purple rounded-full px-5 text-imbue-purple hover:bg-primary hover:border-primary font-medium'
             onClick={() => redirectToApplication(application?.id)}
@@ -54,6 +56,13 @@ export const ApplicationContainer = ({
             className='primary-btn in-dark w-button'
           >
             Message
+          </button>
+          <button
+            className={`${
+              applicationStatusId[application?.status_id]
+            }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[10px]`}
+          >
+            {applicationStatusId[application?.status_id]}
           </button>
         </div>
       </div>

@@ -16,11 +16,11 @@ type SignUpFormProps = {
 };
 
 const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
-  const [user, setUser] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [matchPassword, setMatchPassword] = useState('');
-  const [error, setError] = useState('');
+  const [user, setUser] = useState<any>();
+  const [email, setEmail] = useState<any>();
+  const [password, setPassword] = useState<any>();
+  const [matchPassword, setMatchPassword] = useState<any>();
+  const [error, setError] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
 
   const salt = bcrypt.genSaltSync(10);
@@ -47,7 +47,7 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
         utils.redirect(redirectUrl);
       } else {
         const error = await resp.json();
-        setError(error);
+        setError({message: error});
       }
     } catch (error: any) {
       setError(error.message);
