@@ -58,8 +58,8 @@ const BioInsights = ({
   const pendingApplciations: Project[] = briefApplications.filter((application) => application?.status_id === 1)
 
   let hint = ""
-  if (!canSubmitProposal) hint = "Only varified users are allowed to apply for a breif"
-  else if (isOwnerOfBrief) hint = "Your are not allowed to submit proposal for your own brief"
+  if (!canSubmitProposal) hint = "Only verfied freelancers can apply to briefs"
+  else if (isOwnerOfBrief) hint = "You are not allowed to submit proposal to your own brief"
 
   useEffect(() => {
     const setUp = async () => {
@@ -119,7 +119,6 @@ const BioInsights = ({
               arrow
               placement="bottom"
               leaveTouchDelay={10}
-              followCursor
             >
               <button
                 className='primary-btn 
@@ -133,7 +132,7 @@ const BioInsights = ({
               !px-4
               '
                 onClick={() => (canSubmitProposal && !isOwnerOfBrief) && redirectToApply()}
-              // disabled={!canSubmitProposal}
+                disabled={!canSubmitProposal}
               >
                 Submit a Proposal <FaRegShareSquare />
               </button>
