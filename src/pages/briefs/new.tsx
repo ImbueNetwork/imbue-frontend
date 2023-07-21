@@ -273,7 +273,7 @@ const NewBrief = (): JSX.Element => {
         setError({ message: 'Failed to submit the brief' });
       }
     } catch (error) {
-      setError({ message: error });
+      setError(error);
     } finally {
       setLoading(false);
     }
