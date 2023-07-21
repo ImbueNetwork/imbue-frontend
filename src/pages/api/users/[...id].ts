@@ -61,7 +61,7 @@ export async function fetchProject(projectId: string) {
   let response;
   await db.transaction(async (tx) => {
     try {
-      const project = await models.fetchProject(projectId)(tx);
+      const project = await models.fetchProjectById(projectId)(tx);
 
       if (!project) {
         return project;
@@ -132,7 +132,7 @@ export async function fetchAllUserBriefs(userId: string) {
         briefsWithProjects.map(async (brief) => {
           return {
             ...brief,
-            project: await models.fetchProject(brief.project_id)(tx),
+            project: await models.fetchProjectById(brief.project_id)(tx),
             milestones: await models.fetchProjectMilestones(brief.project_id)(
               tx
             ),

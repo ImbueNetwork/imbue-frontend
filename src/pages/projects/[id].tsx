@@ -166,12 +166,14 @@ function Project() {
       const projectRes = await getProjectById(projectId);
       // showing owner profile if the current user if the applicant freelancer
       const brief = await getBrief(projectRes.brief_id);
+      
       const owner = brief?.user_id
-        ? await utils.fetchUser(brief?.user_id)
-        : null;
+      ? await utils.fetchUser(brief?.user_id)
+      : await utils.fetchUser(projectRes?.user_id);
 
       const freelancerRes = await getFreelancerProfile(projectRes?.user_id);
-      if (projectRes?.user_id == user?.id) {
+
+      if (freelancerRes?.user_id == user?.id) {
         setTargetUser(owner);
       } else {
         setTargetUser(freelancerRes);
@@ -612,7 +614,8 @@ function Project() {
                   {approversPreview?.map((approver: any, index: number) => (
                     <div
                       key={index}
-                      className='flex text-content gap-3 items-center border border-content-primary p-3 rounded-full'
+                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${approver?.display_name && 'cursor-pointer'}`}
+                      onClick={()=>approver.display_name && router.push(`/profile/${approver.username}`)}
                     >
                       <Image
                         height={40}

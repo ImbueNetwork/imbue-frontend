@@ -6,7 +6,7 @@ import {
   acceptBriefApplication,
   Brief,
   fetchBrief,
-  fetchProject,
+  fetchProjectById,
   fetchUser,
   ProjectStatus,
   updateProject,
@@ -57,7 +57,7 @@ export default nextConnect()
         }
         const briefOwner = (await fetchUser(brief.user_id)(tx)) as User;
         verifyUserIdFromJwt(req, res, briefOwner?.id);
-        const project = await fetchProject(projectId)(tx);
+        const project = await fetchProjectById(projectId)(tx);
         if (!project) {
           return new Error('Project does not exist.');
         }

@@ -122,7 +122,7 @@ export const SubmitProposal = (): JSX.Element => {
       await selectAccount(account);
       await insertProject();
     } catch (error) {
-      setError({message: error});
+      setError({ message: error });
     } finally {
       setLoading(false);
       setShowPolkadotAccounts(false);
@@ -166,7 +166,7 @@ export const SubmitProposal = (): JSX.Element => {
             }),
           required_funds: totalCost,
           duration_id: durationId,
-          description : brief?.description
+          description: brief?.description
         }),
       });
 
@@ -177,7 +177,7 @@ export const SubmitProposal = (): JSX.Element => {
         setError({ message: 'Failed to submit the proposal' });
       }
     } catch (error) {
-      setError({message: error});
+      setError({ message: error });
     } finally {
       setLoading(false);
     }
@@ -266,7 +266,8 @@ export const SubmitProposal = (): JSX.Element => {
                     <input
                       type='text'
                       data-testid={`milestone-title-${index}`}
-                      className='input-budget  text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-left  pl-5 mb-8'
+                      className='input-budget text-base rounded-md py-3 px-5 text-imbue-purple text-left mb-8 placeholder:text-imbue-light-purple'
+                      placeholder='Add milestone name here'
                       value={name || ''}
                       onChange={(e) =>
                         setMilestones([
@@ -284,7 +285,8 @@ export const SubmitProposal = (): JSX.Element => {
                       Description
                     </h3>
                     <textarea
-                      className='input-description text-base'
+                      placeholder='Add milestone description here'
+                      className='input-description text-base placeholder:text-imbue-light-purple'
                       data-testid={`milestone-description-${index}`}
                       value={description}
                       onChange={(e) =>
@@ -316,18 +318,20 @@ export const SubmitProposal = (): JSX.Element => {
                       <input
                         type='number'
                         data-testid={`milestone-amount-${index}`}
-                        className='input-budget  text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-right pl-5'
+                        placeholder='Add an amount'
+                        className='input-budget text-base rounded-[5px] py-3 px-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
                         value={amount || ''}
-                        onChange={(e) =>
-                          setMilestones([
-                            ...milestones.slice(0, index),
-                            {
-                              ...milestones[index],
-                              amount: Number(e.target.value),
-                            },
-                            ...milestones.slice(index + 1),
-                          ])
-                        }
+                        onChange={(e) => {
+                          if (Number(e.target.value) >= 0)
+                            setMilestones([
+                              ...milestones.slice(0, index),
+                              {
+                                ...milestones[index],
+                                amount: Number(e.target.value),
+                              },
+                              ...milestones.slice(index + 1),
+                            ])
+                        }}
                       />
                     </div>
                     {totalCostWithoutFee !== 0 && (
@@ -417,7 +421,7 @@ export const SubmitProposal = (): JSX.Element => {
               className='bg-white outline-none round border border-imbue-purple rounded-[0.5rem] text-base px-5 mt-4 h-[2.75rem] text-imbue-purple-dark'
               placeholder='Select a duration'
               required
-              onChange={(e)=>setDurationId(Number(e.target.value))}
+              onChange={(e) => setDurationId(Number(e.target.value))}
               value={durationId}
             >
               {durationOptions.map(({ label, value }, index) => (

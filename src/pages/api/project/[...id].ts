@@ -35,19 +35,26 @@ export const authenticate = (
 export default nextConnect()
   .use(passport.initialize())
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
-    const { query } = req;
-    const id: any = query.id as string[];
+    const { id } = req.query;
+    const projectId = id ? id[0] : "";
+    const briefId = id ? id[1] : "";
+    
+    if(!projectId) return res.status(404).end();
 
     db.transaction(async (tx) => {
       try {
-        const project = await models.fetchProject(id)(tx);
+
+        let project;
+
+        if(briefId) project = await models.fetchBriefProject(projectId, briefId)(tx);
+        else project = await models.fetchProjectById(projectId)(tx)
 
         if (!project) {
           return res.status(404).end();
         }
 
-        const milestones = await models.fetchProjectMilestones(id)(tx);
-        const approvers = await models.fetchProjectApprovers(id)(tx);
+        const milestones = await models.fetchProjectMilestones(projectId)(tx);
+        const approvers = await models.fetchProjectApprovers(projectId)(tx);
 
         const pkg: ProjectPkg = {
           ...project,
@@ -57,6 +64,7 @@ export default nextConnect()
 
         return res.send(pkg);
       } catch (e) {
+        return res.status(404).end();
         new Error(`Failed to fetch project by id: ${id}`, {
           cause: e as Error,
         });
@@ -66,6 +74,7 @@ export default nextConnect()
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
     const { query, body } = req;
     const id: any = query.id as string[];
+    // const brief_id: any = query.brief_id as string[];
 
     const userAuth: Partial<models.User> | any = await authenticate(
       'jwt',
@@ -94,7 +103,7 @@ export default nextConnect()
     db.transaction(async (tx) => {
       try {
         // ensure the project exists first
-        const exists = await models.fetchProject(id)(tx);
+        const exists = await models.fetchProjectById(id)(tx);
 
         if (!exists) {
           return res.status(404).end();

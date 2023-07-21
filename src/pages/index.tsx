@@ -17,7 +17,7 @@ export default function Home() {
 
   useEffect(() => {
     !loading && getLogedInUser();
-  }, [user]);
+  }, [user, loading]);
 
   const getLogedInUser = async () => {
     try {

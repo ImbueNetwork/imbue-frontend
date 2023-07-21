@@ -236,7 +236,8 @@ export const fetchAllUser = () => (tx: Knex.Transaction) =>
     'profile_photo',
     'username',
     'web3_address'
-  );
+  )
+  .orderBy('web3_address')
 
 export const fetchUserWithUsernameOrAddress =
   (usernameOrAddress: string) => (tx: Knex.Transaction) =>
@@ -245,6 +246,14 @@ export const fetchUserWithUsernameOrAddress =
       .orWhere('web3_address', 'ilike', `%${usernameOrAddress}%`)
       .select('id', 'display_name', 'profile_photo', 'username', 'web3_address')
       .first();
+
+export const searchUserWithUsernameOrAddress =
+  (usernameOrAddress: string) => (tx: Knex.Transaction) =>
+    tx<User>('users')
+      .where('username', 'ilike', `%${usernameOrAddress}%`)
+      .orWhere('web3_address', 'ilike', `%${usernameOrAddress}%`)
+      .select('id', 'display_name', 'profile_photo', 'username', 'web3_address')
+      .orderBy('web3_address', 'asc')
 
 export const fetchUser = (id: number) => (tx: Knex.Transaction) =>
   tx<User>('users').where({ id }).first();
@@ -459,8 +468,21 @@ export const fetchUserBriefApplications =
   (tx: Knex.Transaction) =>
     tx<Project>('projects').select().where({ user_id, brief_id }).first();
 
-export const fetchProject = (id: string | number) => (tx: Knex.Transaction) =>
-  tx<Project>('projects').select().where({ id: id }).first();
+export const fetchBriefProject =
+  (id: string | number, brief_id: string | undefined) =>
+  (tx: Knex.Transaction) =>
+    tx<Project>('projects')
+      .select()
+      .where({ id: id, brief_id: brief_id })
+      .first();
+
+export const fetchProjectById =
+  (id: string | number) =>
+  (tx: Knex.Transaction) =>
+    tx<Project>('projects')
+      .select()
+      .where({ id: id })
+      .first();
 
 export const fetchGrantProject =
   (project_id: number) => (tx: Knex.Transaction) =>

@@ -361,7 +361,7 @@ class ChainService {
   }
 
   public async getProject(projectId: string | number) {
-    const project: Project | any = await utils.fetchProject(projectId);
+    const project: Project | any = await utils.fetchProjectById(projectId);
     return await this.convertToOnChainProject(project);
   }
 

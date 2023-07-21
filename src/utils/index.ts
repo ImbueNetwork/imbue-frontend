@@ -58,9 +58,23 @@ export const getProjectId = async () => {
   return null;
 };
 
-export const fetchProject = async (projectId: string | number | null) => {
+export const fetchProjectById = async (projectId: string | number | null) => {
   try {
     const resp = await fetch(`${config.apiBase}project/${projectId}`, {
+      headers: config.getAPIHeaders,
+      method: 'get',
+    });
+    if (resp.ok) {
+      return (await resp.json()) as Project;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const fetchProject = async (projectId: string | number | null, brief_id: string | number | null) => {
+  try {
+    const resp = await fetch(`${config.apiBase}project/${projectId}/${brief_id}`, {
       headers: config.getAPIHeaders,
       method: 'get',
     });
@@ -83,6 +97,17 @@ export const fetchUser = async (id: number) => {
 };
 
 export const fetchUserByUsernameOrAddress = async (
+  usernameOrAddress: string
+) => {
+  try {
+    const resp = await fetch(`/api/users/byUsernameOrAddress/${usernameOrAddress}`);
+    return await resp.json();
+  } catch (error) {
+    return [];
+  }
+};
+
+export const searchUserByUsernameOrAddress = async (
   usernameOrAddress: string
 ) => {
   try {

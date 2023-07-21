@@ -16,9 +16,9 @@ export default nextConnect().get(
 
     await db.transaction(async (tx) => {
       try {
-        const user = (await models.searchUserWithUsernameOrAddress(
+        const user: User = (await models.fetchUserWithUsernameOrAddress(
           usernameOrAddress.toString()
-        )(tx)) as User[];
+        )(tx)) as User;
 
         if (!user) return res.status(401).send({ error: 'No user found' });
 

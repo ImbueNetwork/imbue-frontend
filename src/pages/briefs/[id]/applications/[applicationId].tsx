@@ -35,6 +35,7 @@ import { RootState } from '@/redux/store/store';
 
 interface MilestoneItem {
   name: string;
+  description: string;
   amount: number | undefined;
 }
 
@@ -74,7 +75,9 @@ const ApplicationPreview = (): JSX.Element => {
     const getSetUpData = async () => {
       try {
         const brief: Brief | undefined = await getBrief(briefId);
-        const applicationResponse = await fetchProject(applicationId);
+        const applicationResponse = await fetchProject(applicationId, briefId);
+
+        if(!applicationResponse) return setError({message : "Could not find any application"})
 
         const freelancerUser = await fetchUser(
           Number(applicationResponse?.user_id)
@@ -89,7 +92,7 @@ const ApplicationPreview = (): JSX.Element => {
         setCurrencyId(applicationResponse?.currency_id)
         setDurationId(applicationResponse?.duration_id)
       } catch (error) {
-        setError({message: error});
+        setError({ message: "Could not find application" });
       } finally {
         setLoading(false);
       }
@@ -156,6 +159,7 @@ const ApplicationPreview = (): JSX.Element => {
             return {
               name: m.name,
               amount: m.amount,
+              description: m.description,
               percentage_to_unlock: (
                 ((m.amount ?? 0) / totalCostWithoutFee) *
                 100
@@ -176,7 +180,7 @@ const ApplicationPreview = (): JSX.Element => {
         setError({ message: `${resp.status} ${resp.statusText}` });
       }
     } catch (error) {
-      setError({message: error});
+      setError({ message: error });
     } finally {
       setLoading(false);
     }
@@ -185,7 +189,7 @@ const ApplicationPreview = (): JSX.Element => {
   const filteredApplication = application?.milestones
     ?.filter?.((m: any) => m?.amount !== undefined)
     ?.map?.((m: any) => {
-      return { name: m?.name, amount: Number(m?.amount) };
+      return { name: m?.name, description: m?.description, amount: Number(m?.amount) };
     });
 
   const imbueFeePercentage = 5;
@@ -215,7 +219,7 @@ const ApplicationPreview = (): JSX.Element => {
   const imbueFee = (totalCostWithoutFee * imbueFeePercentage) / 100;
   const totalCost = imbueFee + totalCostWithoutFee;
   const onAddMilestone = () => {
-    setMilestones([...milestones, { name: '', amount: undefined }]);
+    setMilestones([...milestones, { name: '', description: '', amount: undefined }]);
   };
 
   const onRemoveMilestone = (index: number) => {
@@ -362,7 +366,7 @@ const ApplicationPreview = (): JSX.Element => {
             <hr className='h-[1px] bg-[#E1DDFF] w-full' />
 
             <div className='milestone-list lg:mb-5'>
-              {milestones?.map?.(({ name, amount }, index) => {
+              {milestones?.map?.(({ name, description, amount }, index) => {
                 const percent = Number(
                   ((100 * (amount ?? 0)) / totalCostWithoutFee)?.toFixed?.(0)
                 );
@@ -384,22 +388,45 @@ const ApplicationPreview = (): JSX.Element => {
                     </div>
                     <div className='flex flex-row justify-between w-full'>
                       <div className='w-3/5 lg:w-1/2 h-fit'>
-                        <h3 className='mb-2 lg:mb-5 text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
-                          Description
-                        </h3>
+                        {
+                          isEditingBio
+                            ? (
+                              <input
+                                type='text'
+                                data-testid={`milestone-title-${index}`}
+                                className='input-budget !pl-3 text-base leading-5 rounded-[5px] py-3 text-imbue-purple text-[1rem] text-left mb-8'
+                                value={name || ''}
+                                onChange={(e) =>
+                                  setMilestones([
+                                    ...milestones.slice(0, index),
+                                    {
+                                      ...milestones[index],
+                                      name: e.target.value,
+                                    },
+                                    ...milestones.slice(index + 1),
+                                  ])
+                                }
+                              />
+                            )
+                            : (
+                              <h3 className='mb-2 lg:mb-5 text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
+                                {name}
+                              </h3>
+                            )
+                        }
                         {isEditingBio ? (
                           <TextArea
                             maxLength={500}
                             className='text-content'
                             rows={7}
-                            value={name}
+                            value={description}
                             disabled={!isEditingBio}
                             onChange={(e) =>
                               setMilestones([
                                 ...milestones.slice(0, index),
                                 {
                                   ...milestones[index],
-                                  name: e.target.value,
+                                  description: e.target.value,
                                 },
                                 ...milestones.slice(index + 1),
                               ])
@@ -407,7 +434,7 @@ const ApplicationPreview = (): JSX.Element => {
                           />
                         ) : (
                           <p className='text-[1rem] text-[#3B27C180] m-0'>
-                            {milestones[index]?.name}
+                            {description}
                           </p>
                         )}
                       </div>
