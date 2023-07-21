@@ -173,7 +173,7 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
                           </span>
                         </div>
                       )}
-                      {regUsers?.map((user: any, index: number) => (
+                      {regUsers.length > 0 && regUsers?.map((user: any, index: number) => (
                         <div
                           key={index}
                           onClick={() =>
