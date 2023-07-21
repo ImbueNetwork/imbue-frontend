@@ -66,7 +66,8 @@ export default nextConnect()
 
           res.status(200).json({
             currentData: filteredOutProjects,
-            totalBriefs: briefs.length,
+            totalBriefs: briefs?.filter((brief: any) => !brief?.project_id)
+              .length,
           });
         });
       } catch (e) {

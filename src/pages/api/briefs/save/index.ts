@@ -108,7 +108,11 @@ export default nextConnect()
               }),
             ]);
 
-            res.status(200).json({ currentData, totalBriefs: briefs?.length });
+            res.status(200).json({
+              currentData,
+              totalBriefs: briefs?.filter((brief: any) => !brief?.project_id)
+                .length,
+            });
           });
       } catch (e) {
         new Error(`Failed to fetch saved briefs`, { cause: e as Error });
@@ -153,7 +157,11 @@ export default nextConnect()
               }),
             ]);
 
-            res.status(200).json({ currentData, totalBriefs: briefs.length });
+            res.status(200).json({
+              currentData,
+              totalBriefs: briefs?.filter((brief: any) => !brief?.project_id)
+                .length,
+            });
           });
       } catch (e) {
         new Error(`Failed to delete saved briefs`, { cause: e as Error });
