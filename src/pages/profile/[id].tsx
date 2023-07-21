@@ -71,7 +71,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
         }
       }
     } catch (error) {
-      setError({message: error});
+      setError({ message: error });
     } finally {
       setLoading(false);
     }
@@ -119,7 +119,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
         });
       }
     } catch (error) {
-      setError({message: error});
+      setError({ message: error });
       console.log(error);
     }
   };
@@ -140,7 +140,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
     <div className='profile-container'>
       <div className='cursor-pointer absolute top-28 left-16 lg:left-24 z-[1]'>
         <Tooltip
-          title="Go back to previous page"
+          title='Go back to previous page'
           followCursor
           leaveTouchDelay={10}
           enterDelay={500}
@@ -262,7 +262,6 @@ const Profile = ({ initUser, browsingUser }: any) => {
                     </div>
                   )}
 
-
                   {isEditMode && (
                     <button
                       onClick={() => setOpenAccountChoice(true)}
@@ -370,7 +369,13 @@ const Profile = ({ initUser, browsingUser }: any) => {
                     />
                   </div>
                 ) : (
-                  <span className='text-imbue-purple'>{user?.website}</span>
+                  <a
+                    href={user?.website}
+                    className=' no-underline'
+                    target='_blank'
+                  >
+                    <span className='text-imbue-purple'>{user?.website}</span>
+                  </a>
                 )}
               </div>
             )}
@@ -421,21 +426,17 @@ const Profile = ({ initUser, browsingUser }: any) => {
                       onClick={() => router.push(`/briefs/${item?.id}/`)}
                     >
                       <div className='brief-title !text-xl lg:!text-2xl'>
-                        {
-                          item.headline.length > 50
-                            ? `${item.headline.substring(0, 50)}...`
-                            : item.headline
-                        }
+                        {item.headline.length > 50
+                          ? `${item.headline.substring(0, 50)}...`
+                          : item.headline}
                       </div>
                       <div className='brief-time-info !text-sm lg:!text-base'>
                         {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
                       </div>
                       <div className='brief-description !text-sm lg:!text-base'>
-                        {
-                          item.description.length > 400
-                            ? `${item.description.substring(0, 400)}...`
-                            : item.description
-                        }
+                        {item.description.length > 400
+                          ? `${item.description.substring(0, 400)}...`
+                          : item.description}
                       </div>
 
                       <div className='brief-tags'>

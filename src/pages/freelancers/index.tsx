@@ -47,7 +47,7 @@ const Freelancers = (): JSX.Element => {
   const [languages, setLanguages] = useState<Item[]>();
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const itemsPerPage = 12;
+  const [itemsPerPage, setItemsPerPage] = useState<number>(12);
 
   const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
 
@@ -171,6 +171,8 @@ const Freelancers = (): JSX.Element => {
     languagesFilter,
     freelancerInfoFilter,
   ];
+
+  const pageItems = [12, 18, 24, 30];
 
   useEffect(() => {
     const fetchAndSetBriefs = async () => {
@@ -555,32 +557,55 @@ const Freelancers = (): JSX.Element => {
                 )}
           </Grid>
 
-          <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center  max-width-868px:w-[90%] self-center'>
-            <button
-              onClick={() => {
-                if (currentPage > 1) setCurrentPage(currentPage - 1);
-              }}
-              className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'
-            >
-              <Image src={chevLeftIcon} alt='chev left' />
-              Previous
-            </button>
+          <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center justify-between  max-width-868px:w-[90%] self-center'>
+            <div className='flex items-center'>
+              <button
+                onClick={() => {
+                  if (currentPage > 1) setCurrentPage(currentPage - 1);
+                }}
+                className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'
+              >
+                <Image src={chevLeftIcon} alt='chev left' />
+                Previous
+              </button>
 
-            <div className='mx-[1.62rem] text-[#5E5E5E] text-[0.7rem] lg:text-[1rem] font-normal'>
-              {currentPage} of {Math.ceil(freelancers_total / itemsPerPage)}
+              <div className='mx-[1.62rem] text-[#5E5E5E] text-[0.7rem] lg:text-[1rem] font-normal'>
+                {currentPage} of {Math.ceil(freelancers_total / itemsPerPage)}
+              </div>
+
+              <button
+                onClick={() => {
+                  if (freelancers_total > currentPage * itemsPerPage) {
+                    setCurrentPage(currentPage + 1);
+                  }
+                }}
+                className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'
+              >
+                Next
+                <Image src={chevRightIcon} alt='chev right' />
+              </button>
             </div>
 
-            <button
-              onClick={() => {
-                if (freelancers_total > currentPage * itemsPerPage) {
-                  setCurrentPage(currentPage + 1);
-                }
-              }}
-              className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'
-            >
-              Next
-              <Image src={chevRightIcon} alt='chev right' />
-            </button>
+            <div className='flex items-center'>
+              <p className='!text-imbue-purple !mr-[10px]'>Items per page:</p>
+              <div className='network-amount'>
+                <select
+                  name='currencyId'
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value));
+                  }}
+                  placeholder='Select a currency'
+                  className='bg-white outline-none round border border-imbue-purple rounded-[0.5rem] text-base px-5 h-[2.75rem] text-imbue-purple-dark'
+                  required
+                >
+                  {[...pageItems].map((item: any) => (
+                    <option value={item} key={item} className='duration-option'>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
         </div>
       </div>

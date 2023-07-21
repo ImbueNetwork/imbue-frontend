@@ -77,7 +77,8 @@ const ApplicationPreview = (): JSX.Element => {
         const brief: Brief | undefined = await getBrief(briefId);
         const applicationResponse = await fetchProject(applicationId, briefId);
 
-        if(!applicationResponse) return setError({message : "Could not find any application"})
+        if (!applicationResponse)
+          return setError({ message: 'Could not find any application' });
 
         const freelancerUser = await fetchUser(
           Number(applicationResponse?.user_id)
@@ -89,10 +90,10 @@ const ApplicationPreview = (): JSX.Element => {
         setBrief(brief);
         setApplication(applicationResponse);
         setFreelancer(freelancerResponse);
-        setCurrencyId(applicationResponse?.currency_id)
-        setDurationId(applicationResponse?.duration_id)
+        setCurrencyId(applicationResponse?.currency_id);
+        setDurationId(applicationResponse?.duration_id);
       } catch (error) {
-        setError({ message: "Could not find application" });
+        setError({ message: 'Could not find application' });
       } finally {
         setLoading(false);
       }
@@ -119,7 +120,10 @@ const ApplicationPreview = (): JSX.Element => {
     router.push(`/briefs/${brief?.id}/`);
   };
 
-  const updateProject = async (chainProjectId?: number, escrow_address?: string) => {
+  const updateProject = async (
+    chainProjectId?: number,
+    escrow_address?: string
+  ) => {
     setLoading(true);
     try {
       // const resp = await fetch(`${config.apiBase}/project/${application.id}`, {
@@ -170,8 +174,8 @@ const ApplicationPreview = (): JSX.Element => {
         owner: user.web3_address,
         chain_project_id: chainProjectId,
         escrow_address: escrow_address,
-        duration_id: durationId
-      })
+        duration_id: durationId,
+      });
 
       if (resp.status === 201 || resp.status === 200) {
         setSuccess(true);
@@ -189,7 +193,11 @@ const ApplicationPreview = (): JSX.Element => {
   const filteredApplication = application?.milestones
     ?.filter?.((m: any) => m?.amount !== undefined)
     ?.map?.((m: any) => {
-      return { name: m?.name, description: m?.description, amount: Number(m?.amount) };
+      return {
+        name: m?.name,
+        description: m?.description,
+        amount: Number(m?.amount),
+      };
     });
 
   const imbueFeePercentage = 5;
@@ -219,7 +227,10 @@ const ApplicationPreview = (): JSX.Element => {
   const imbueFee = (totalCostWithoutFee * imbueFeePercentage) / 100;
   const totalCost = imbueFee + totalCostWithoutFee;
   const onAddMilestone = () => {
-    setMilestones([...milestones, { name: '', description: '', amount: undefined }]);
+    setMilestones([
+      ...milestones,
+      { name: '', description: '', amount: undefined },
+    ]);
   };
 
   const onRemoveMilestone = (index: number) => {
@@ -378,7 +389,7 @@ const ApplicationPreview = (): JSX.Element => {
                     {isEditingBio && (
                       <span
                         onClick={() => onRemoveMilestone(index)}
-                        className='absolute top-1 right-2 lg:right-4 text-sm lg:text-xl text-light-grey font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
+                        className='absolute top-1 right-2 lg:right-4 text-sm lg:text-xl font-bold hover:border-red-500 text-red-500 cursor-pointer'
                       >
                         x
                       </span>
@@ -388,32 +399,28 @@ const ApplicationPreview = (): JSX.Element => {
                     </div>
                     <div className='flex flex-row justify-between w-full'>
                       <div className='w-3/5 lg:w-1/2 h-fit'>
-                        {
-                          isEditingBio
-                            ? (
-                              <input
-                                type='text'
-                                data-testid={`milestone-title-${index}`}
-                                className='input-budget !pl-3 text-base leading-5 rounded-[5px] py-3 text-imbue-purple text-[1rem] text-left mb-8'
-                                value={name || ''}
-                                onChange={(e) =>
-                                  setMilestones([
-                                    ...milestones.slice(0, index),
-                                    {
-                                      ...milestones[index],
-                                      name: e.target.value,
-                                    },
-                                    ...milestones.slice(index + 1),
-                                  ])
-                                }
-                              />
-                            )
-                            : (
-                              <h3 className='mb-2 lg:mb-5 text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
-                                {name}
-                              </h3>
-                            )
-                        }
+                        {isEditingBio ? (
+                          <input
+                            type='text'
+                            data-testid={`milestone-title-${index}`}
+                            className='input-budget !pl-3 text-base leading-5 rounded-[5px] py-3 text-imbue-purple text-[1rem] text-left mb-8'
+                            value={name || ''}
+                            onChange={(e) =>
+                              setMilestones([
+                                ...milestones.slice(0, index),
+                                {
+                                  ...milestones[index],
+                                  name: e.target.value,
+                                },
+                                ...milestones.slice(index + 1),
+                              ])
+                            }
+                          />
+                        ) : (
+                          <h3 className='mb-2 lg:mb-5 text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
+                            {name}
+                          </h3>
+                        )}
                         {isEditingBio ? (
                           <TextArea
                             maxLength={500}
@@ -543,7 +550,7 @@ const ApplicationPreview = (): JSX.Element => {
         </div>
 
         <div className='bg-white rounded-[20px] py-5'>
-          <h3 className='ml-8 mb-2 text-[1.25rem] text-imbue-purple-dark font-normal mx-5 lg:mx-14 p-0 flex'>
+          <h3 className='ml-4 mb-2 text-[1.25rem] text-imbue-purple-dark font-normal mx-5 lg:mx-14 p-0 flex'>
             Payment terms
           </h3>
 
@@ -554,27 +561,30 @@ const ApplicationPreview = (): JSX.Element => {
               <h3 className='text-lg lg:text-[1.25rem] font-normal m-0 p-0 text-imbue-purple-dark'>
                 How long will this project take?
               </h3>
-              {isApplicationOwner && isEditingBio
-                ? (
-                  <select
-                    value={durationId || 0}
-                    name='duration'
-                    className='bg-white outline-none round border border-content-primary rounded-[0.5rem] text-base px-5 mt-4 h-[2.75rem] text-content cursor-pointer'
-                    placeholder='Select a duration'
-                    required
-                    onChange={(e) => setDurationId(e.target.value)}
-                  >
-                    {durationOptions.map(({ label, value }, index) => (
-                      <option value={value} key={index} className='duration-option'>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                )
-                : (
-                  <p className='text-content-primary mt-2 w-full'>{durationOptions[durationId || 0].label}</p>
-                )}
-
+              {isApplicationOwner && isEditingBio ? (
+                <select
+                  value={durationId || 0}
+                  name='duration'
+                  className='bg-white outline-none round border border-content-primary rounded-[0.5rem] text-base px-5 mt-4 h-[2.75rem] text-content cursor-pointer'
+                  placeholder='Select a duration'
+                  required
+                  onChange={(e) => setDurationId(e.target.value)}
+                >
+                  {durationOptions.map(({ label, value }, index) => (
+                    <option
+                      value={value}
+                      key={index}
+                      className='duration-option'
+                    >
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <p className='text-content-primary mt-2 w-full'>
+                  {durationOptions[durationId || 0].label}
+                </p>
+              )}
             </div>
             <div className='payment-options'>
               <h3 className='text-lg lg:text-[1.25rem] font-normal m-0 p-0 text-imbue-purple-dark'>
@@ -582,32 +592,30 @@ const ApplicationPreview = (): JSX.Element => {
               </h3>
 
               <div className='network-amount'>
-                {
-                  isApplicationOwner && isEditingBio
-                    ? (
-                      <select
-                        value={currencyId || 0}
-                        name='currencyId'
-                        onChange={handleChange}
-                        placeholder='Select a currency'
-                        className='bg-white outline-none round border border-content-primary rounded-[0.5rem] text-base px-5 mt-4 h-[2.75rem] text-content cursor-pointer'
-                        required
+                {isApplicationOwner && isEditingBio ? (
+                  <select
+                    value={currencyId || 0}
+                    name='currencyId'
+                    onChange={handleChange}
+                    placeholder='Select a currency'
+                    className='bg-white outline-none round border border-content-primary rounded-[0.5rem] text-base px-5 mt-4 h-[2.75rem] text-content cursor-pointer'
+                    required
+                  >
+                    {currencies.map((currency: any) => (
+                      <option
+                        value={Currency[currency]}
+                        key={Currency[currency]}
+                        className='duration-option'
                       >
-                        {currencies.map((currency: any) => (
-                          <option
-                            value={Currency[currency]}
-                            key={Currency[currency]}
-                            className='duration-option'
-                          >
-                            {currency}
-                          </option>
-                        ))}
-                      </select>
-                    )
-                    : (
-                      <p className='text-content-primary mt-2 w-full text-end'>{Currency[currencyId || 0]}</p>
-                    )
-                }
+                        {currency}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <p className='text-content-primary mt-2 w-full text-end'>
+                    {Currency[currencyId || 0]}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -621,28 +629,28 @@ const ApplicationPreview = (): JSX.Element => {
             >
               Back To Brief
             </button>
-            {
-              !isEditingBio && isApplicationOwner && (application.status_id !== 4) && (
+            {!isEditingBio &&
+              isApplicationOwner &&
+              application.status_id !== 4 && (
                 <button
                   className='primary-btn in-dark w-button !flex items-center gap-2'
                   onClick={() => setIsEditingBio(true)}
                 >
                   <span>Edit Application</span>
                   <FiEdit />
-                </button>)
-            }
-            {
-              isEditingBio && (
-                <button
-                  className='primary-btn in-dark w-button'
-                  disabled={
-                    totalPercent !== 100 || !milestoneAmountsAndNamesHaveValue
-                  }
-                  onClick={() => updateProject()}
-                >
-                  Update
-                </button>)
-            }
+                </button>
+              )}
+            {isEditingBio && (
+              <button
+                className='primary-btn in-dark w-button'
+                disabled={
+                  totalPercent !== 100 || !milestoneAmountsAndNamesHaveValue
+                }
+                onClick={() => updateProject()}
+              >
+                Update
+              </button>
+            )}
 
             {/* TODO: Add Drafts Functionality */}
             {/* <button className="secondary-btn">Save draft</button> */}

@@ -1,14 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`test Freelancer rendering and matching the snapshot 1`] = `
-<button
-  class="primary-btn in-dark w-button mr-auto mt-6"
-  data-testid="get-started-button"
->
-  Get Started!
-</button>
-`;
-
 exports[`test freelancer onclick next snapshot matching 1`] = `
 <button
   class="primary-btn in-dark w-button mr-auto mt-6"

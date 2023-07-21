@@ -34,7 +34,9 @@ export const SubmitProposal = (): JSX.Element => {
   const [durationId, setDurationId] = useState(0);
   const [brief, setBrief] = useState<Brief | any>();
   // const [user, setUser] = useState<User>();
-  const { user, loading: loadingUser } = useSelector((state: RootState) => state.userState);
+  const { user, loading: loadingUser } = useSelector(
+    (state: RootState) => state.userState
+  );
   // FIXME: freelancer
   const [_freelancer, setFreelancer] = useState<Freelancer>();
   // const userHasWeb3Addresss = !!user?.web3_address;
@@ -63,26 +65,25 @@ export const SubmitProposal = (): JSX.Element => {
 
   const getUserAndFreelancer = async () => {
     const freelancer = await getFreelancerProfile(user?.username);
-      if (!freelancer?.id) redirectToBreif()
-      setFreelancer(freelancer);
+    if (!freelancer?.id) redirectToBreif();
+    setFreelancer(freelancer);
 
-      const userApplication: any = await getFreelancerBrief(user?.id, briefId);
-      if (userApplication) {
-        router.push(`/briefs/${briefId}/applications/${userApplication?.id}/`);
-      }
+    const userApplication: any = await getFreelancerBrief(user?.id, briefId);
+    if (userApplication) {
+      router.push(`/briefs/${briefId}/applications/${userApplication?.id}/`);
+    }
   };
 
   const getCurrentUserBrief = async () => {
     if (briefId && user) {
-      setLoading(true)
+      setLoading(true);
       try {
         const briefResponse: Brief | undefined = await getBrief(briefId);
-        if(briefResponse?.user_id === user.id) redirectToBreif()
+        if (briefResponse?.user_id === user.id) redirectToBreif();
         setBrief(briefResponse);
       } catch (error) {
-        setError({ message: "could not find brief" })
-      }
-      finally {
+        setError({ message: 'could not find brief' });
+      } finally {
         setLoading(false);
       }
     }
@@ -90,7 +91,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   const redirectToBreif = () => {
     router.push(`/briefs/${briefId}`);
-  }
+  };
 
   const currencies = Object.keys(Currency).filter(
     (key: any) => !isNaN(Number(Currency[key]))
@@ -179,7 +180,7 @@ export const SubmitProposal = (): JSX.Element => {
             }),
           required_funds: totalCost,
           duration_id: durationId,
-          description: brief?.description
+          description: brief?.description,
         }),
       });
 
@@ -227,7 +228,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
 
-  if (loadingUser || loading) <FullScreenLoader />
+  if (loadingUser || loading) <FullScreenLoader />;
 
   return (
     <div className='flex flex-col gap-10 text-base leading-[1.5] !mx-3 lg:!mx-auto'>
@@ -265,7 +266,7 @@ export const SubmitProposal = (): JSX.Element => {
               >
                 <span
                   onClick={() => onRemoveMilestone(index)}
-                  className='absolute top-1 right-2 lg:right-4 text-sm lg:text-xl text-light-grey font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
+                  className='absolute top-1 right-2 lg:right-4 text-sm lg:text-xl font-bold hover:border-red-500 text-red-500 cursor-pointer'
                 >
                   x
                 </span>
@@ -345,7 +346,7 @@ export const SubmitProposal = (): JSX.Element => {
                                 amount: Number(e.target.value),
                               },
                               ...milestones.slice(index + 1),
-                            ])
+                            ]);
                         }}
                       />
                     </div>
@@ -420,7 +421,7 @@ export const SubmitProposal = (): JSX.Element => {
       </div>
 
       <div className='bg-white rounded-[20px] py-[1.5rem]'>
-        <h3 className='ml-8 mb-2 text-[1.25rem] text-imbue-purple-dark font-normal m-0 p-0 flex'>
+        <h3 className='ml-4 mb-2 text-[1.25rem] text-imbue-purple-dark font-normal m-0 p-0 flex'>
           Payment terms
         </h3>
 

@@ -76,6 +76,7 @@ export const TagsInput = ({
             className='new-tag-input text-black'
             data-testid='tag-input'
             value={input}
+            maxLength={25}
             onChange={(e) => handleChange(e.target.value)}
             onKeyDown={handleKeyDown}
           />
