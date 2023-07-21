@@ -61,6 +61,9 @@ const Briefs = (): JSX.Element => {
   const [_openDropDown, setOpenDropDown] = useState<string>('');
   const [savedBriefsActive, setSavedBriefsActive] = useState<boolean>(false);
 
+  // search input value
+  const [searchInput, setSearchInput] = useState<string>('');
+
   const [error, setError] = useState<any>();
   const { expRange, submitRange, lengthRange, heading } = router.query;
 
@@ -422,7 +425,7 @@ const Briefs = (): JSX.Element => {
         setBriefsTotal(briefs_all?.totalBriefs);
       }
     } catch (error) {
-      setError({message: error});
+      setError({ message: error });
     }
   };
 
@@ -461,6 +464,7 @@ const Briefs = (): JSX.Element => {
     await setSlectedFilterIds([]);
     setBriefs(allBriefs?.currentData);
     setBriefsTotal(allBriefs?.totalBriefs);
+    setSearchInput('');
   };
 
   const deleteBrief = async (briefId: string | number) => {
@@ -546,6 +550,8 @@ const Briefs = (): JSX.Element => {
                     id='search-input'
                     className='search-input px-[12px] !w-full  lg:!w-[20rem] !h-[2.875rem] !rounded-tr-[0px] !rounded-br-[0px]'
                     placeholder='Search'
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
                   />
                   <div
                     role='button'
@@ -563,7 +569,7 @@ const Briefs = (): JSX.Element => {
               </div>
 
               <div className='flex items-center mt-[2rem] lg:mt-0 gap-4'>
-                {selectedFilterIds?.length > 0 && (
+                {(selectedFilterIds?.length > 0 || searchInput.length > 0) && (
                   <button
                     onClick={reset}
                     className='h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 lg:ml-[44px]'

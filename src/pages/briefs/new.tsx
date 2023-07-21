@@ -75,7 +75,7 @@ const NewBrief = (): JSX.Element => {
           data-testid='industries-input'
           tags={industries}
           onChange={(tags: string[]) => setIndustries(tags)}
-          limit={5}
+          limit={10}
         />
       </div>
     </>
@@ -110,7 +110,7 @@ const NewBrief = (): JSX.Element => {
           tags={skills}
           data-testid='skills-input'
           onChange={(tags: string[]) => setSkills(tags)}
-          limit={5}
+          limit={10}
         />
       </div>
     </>

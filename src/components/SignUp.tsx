@@ -47,13 +47,27 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
         utils.redirect(redirectUrl);
       } else {
         const error = await resp.json();
-        setError({message: error});
+        setError({ message: error });
       }
     } catch (error: any) {
       setError(error.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const isValidEmail = (val: string) => {
+    return /\S+@\S+\.\S+/.test(val);
+  };
+
+  const handleChange = (event: any) => {
+    if (!isValidEmail(event.target.value)) {
+      setError('Email is invalid');
+    } else {
+      setError(null);
+    }
+
+    setEmail(event.target.value);
   };
 
   return (
@@ -84,7 +98,7 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
 
         <input
           placeholder='Enter your Email'
-          onChange={(e: any) => setEmail(e.target.value)}
+          onChange={(e: any) => handleChange(e)}
           className='outlinedInput'
           required
           onError={(err) => console.log(err)}
@@ -127,7 +141,7 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
       <div className='flex justify-center mt-2 w-full cursor-pointer'>
         <button
           type='submit'
-          disabled={password != matchPassword || loading}
+          disabled={password != matchPassword || loading || error}
           className='primary-btn in-dark w-full !text-center relative group !mx-0'
           id='create-account'
         >

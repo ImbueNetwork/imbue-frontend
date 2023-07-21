@@ -175,6 +175,7 @@ export const EditProposal = (): JSX.Element => {
               suggestData={filterStrings(suggestedSkills, skills)}
               tags={skills}
               onChange={(tags: string[]) => setSkills([...tags])}
+              limit={10}
             />
           </div>
 
@@ -189,6 +190,7 @@ export const EditProposal = (): JSX.Element => {
               onChange={(tags: string[]) => {
                 setIndustries([...tags]);
               }}
+              limit={10}
             />
           </div>
 
@@ -208,8 +210,19 @@ export const EditProposal = (): JSX.Element => {
                   height: 'auto',
                 }}
                 type='number'
+                min='0'
+                max={1000000000}
                 value={budget || ''}
-                onChange={(e) => setBudget(Number(e.target.value))}
+                onChange={(e) => {
+                  if (
+                    Number(e.target.value) < 0 ||
+                    Number(e.target.value) > 1000000000
+                  ) {
+                    e.preventDefault();
+                  } else {
+                    setBudget(Number(e.target.value));
+                  }
+                }}
               />
               <div className={styles.budgetCurrencyContainer}>$</div>
             </div>
