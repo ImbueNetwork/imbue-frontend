@@ -54,7 +54,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   useEffect(() => {
     getUserAndFreelancer();
-  }, [briefId]);
+  }, [briefId, user?.username]);
 
   useEffect(() => {
     getCurrentUserBrief();
@@ -62,8 +62,9 @@ export const SubmitProposal = (): JSX.Element => {
 
   const getUserAndFreelancer = async () => {
     const freelancer = await getFreelancerProfile(user?.username);
-    if (!freelancer?.id) {
-      router.push(`/freelancers/new`);
+    const shouldRedirectToBriefDetails = (!freelancer?.id || (freelancer.user_id === user?.id));
+    if (shouldRedirectToBriefDetails) {
+      router.push(`/briefs/${briefId}`);
     }
     setFreelancer(freelancer);
   };
