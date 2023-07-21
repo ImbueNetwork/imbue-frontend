@@ -1,8 +1,8 @@
 export enum Currency {
   IMBU = 0,
   KSM = 1,
-  AUSD = 2,
-  KAR = 3,
+  // AUSD = 2,
+  // KAR = 3,
   MGX = 4,
 }
 

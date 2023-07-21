@@ -69,14 +69,17 @@ export const TagsInput = ({
             </div>
           </div>
         ))}
-        <input
-          type='text'
-          className='new-tag-input text-black'
-          data-testid='tag-input'
-          value={input}
-          onChange={(e) => handleChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
+
+        {limit && vtags.length >= limit ? null : (
+          <input
+            type='text'
+            className='new-tag-input text-black'
+            data-testid='tag-input'
+            value={input}
+            onChange={(e) => handleChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+        )}
       </div>
       <div className='tags-suggestion-container'>
         {suggestData
