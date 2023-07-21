@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import { Brief } from '@/lib/models';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
-import { Freelancer, Project, User } from '@/model';
+import { applicationStatusId,Freelancer, OffchainProjectState, Project, User } from '@/model';
 import ChainService from '@/redux/services/chainService';
 
 import AccountChoice from '../AccountChoice';
@@ -50,13 +50,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
   const router = useRouter();
   // const { applicationId }: any = router.query;
 
-  const applicationStatusId = [
-    'Draft',
-    'Pending Review',
-    'Changes Requested',
-    'Rejected',
-    'Accepted',
-  ];
+
   const mobileView = useMediaQuery('(max-width:480px)');
 
   const startWork = async (account: WalletAccount) => {
@@ -116,7 +110,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         >
           Message
         </button>
-        {application?.status_id === 4 ? (
+        {application?.status_id === OffchainProjectState.Accepted ? (
           <button
             className='Accepted-btn h-[2.7rem] text-black in-dark text-xs lg:text-base rounded-full px-3 ml-3 lg:ml-0 lg:px-6'
             onClick={() => brief?.project_id && setOpenPopup(true)}

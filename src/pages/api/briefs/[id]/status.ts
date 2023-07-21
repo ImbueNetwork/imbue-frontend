@@ -8,6 +8,7 @@ import {
   fetchBrief,
   fetchProject,
   fetchUser,
+  ProjectStatus,
   updateProject,
   User,
 } from '@/lib/models';
@@ -64,8 +65,13 @@ export default nextConnect()
         // FIXME:
         await updateProject(project.id ?? '', project)(tx);
 
-        const updatedBrief = await acceptBriefApplication(id, projectId)(tx);
-        return res.send(updatedBrief);
+
+        if(status_id == ProjectStatus.Accepted) {
+          const updatedBrief = await acceptBriefApplication(id, projectId)(tx);
+          return res.send(updatedBrief);
+        } else {
+          return res.send(brief);
+        }
       } catch (e: any) {
         return new Error(`Failed to accept brief application: ${e.message}`);
       }

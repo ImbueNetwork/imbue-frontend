@@ -14,6 +14,7 @@ import { FaStar } from 'react-icons/fa';
 import { getBalance } from '@/utils/helper';
 
 import {
+  applicationStatusId,
   Brief,
   Currency,
   Freelancer,
@@ -180,9 +181,8 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
               {!loadingWallet &&
                 (balance === undefined
                   ? 'No wallet found'
-                  : `Requested Currency Balance: ${balance} $${
-                      Currency[application?.currency_id ?? 0]
-                    }`)}
+                  : `Requested Currency Balance: ${balance} $${Currency[application?.currency_id ?? 0]
+                  }`)}
             </p>
           )}
 
@@ -234,25 +234,36 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
           Message
         </button>
 
+
+
         {loadingWallet || balance !== undefined ? (
-          <button
-            id='demo-customized-button'
-            aria-controls={open ? 'demo-customized-menu' : undefined}
-            aria-haspopup='true'
-            aria-expanded={open ? 'true' : undefined}
-            onClick={handleOptionsClick}
-            className='primary-btn hover:!bg-imbue-purple hover:!text-white in-dark w-button !text-xs lg:!text-base'
-            disabled={loadingWallet ? true : false}
-          >
-            {loadingWallet ? (
-              'Please Wait...'
-            ) : (
-              <>
-                Options
-                <KeyboardArrowDownIcon fontSize='small' className='ml-2' />
-              </>
-            )}
-          </button>
+          <>
+            <button
+              id='demo-customized-button'
+              aria-controls={open ? 'demo-customized-menu' : undefined}
+              aria-haspopup='true'
+              aria-expanded={open ? 'true' : undefined}
+              onClick={handleOptionsClick}
+              className='primary-btn hover:!bg-imbue-purple hover:!text-white in-dark w-button !text-xs lg:!text-base'
+              disabled={loadingWallet ? true : false}
+            >
+              {loadingWallet ? (
+                'Please Wait...'
+              ) : (
+                <>
+                  Options
+                  <KeyboardArrowDownIcon fontSize='small' className='ml-2' />
+                </>
+              )}
+            </button>
+            <button
+              className={`${applicationStatusId[application?.status_id]
+                }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[10px]`}
+            >
+              {applicationStatusId[application?.status_id]}
+            </button>
+          </>
+
         ) : (
           <button
             onClick={() => setOpenAccountChoice(true)}
@@ -279,8 +290,9 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
           >
             Freelancer Profile
           </MenuItem>
-          {application?.status_id == OffchainProjectState.PendingReview && (
-            <div>
+          <div>
+            {application?.status_id !== OffchainProjectState.Accepted && (
+
               <MenuItem
                 onClick={() => {
                   handleOptionsClose();
@@ -290,18 +302,23 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
               >
                 Hire
               </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  handleOptionsClose();
-                  updateApplicationState(
-                    application,
-                    OffchainProjectState.ChangesRequested
-                  );
-                }}
-                className='!text-imbue-purple'
-              >
-                Request Changes
-              </MenuItem>
+            )}
+
+            <MenuItem
+              onClick={() => {
+                handleOptionsClose();
+                updateApplicationState(
+                  application,
+                  OffchainProjectState.ChangesRequested
+                );
+              }}
+              className='!text-imbue-purple'
+            >
+              Request Changes
+            </MenuItem>
+
+            {application?.status_id !== OffchainProjectState.Rejected && (
+
               <MenuItem
                 onClick={() => {
                   handleOptionsClose();
@@ -314,8 +331,9 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
               >
                 Reject
               </MenuItem>
-            </div>
-          )}
+            )}
+
+          </div>
         </Menu>
       </div>
 

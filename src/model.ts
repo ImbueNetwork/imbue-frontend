@@ -15,6 +15,15 @@ export enum OffchainProjectState {
   Accepted = 4,
 }
 
+
+export const applicationStatusId = [
+  'Draft',
+  'Pending Review',
+  'Changes Requested',
+  'Rejected',
+  'Accepted',
+];
+
 export function displayState(state: OffchainProjectState) {
   switch (state) {
     case OffchainProjectState.PendingReview:
