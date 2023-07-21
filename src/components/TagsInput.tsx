@@ -5,12 +5,14 @@ export type TagsInputProps = {
   tags: string[];
   suggestData: string[];
   onChange: (_tags: string[]) => void;
+  limit?: number;
 };
 
 export const TagsInput = ({
   tags,
   suggestData,
   onChange,
+  limit,
 }: TagsInputProps): JSX.Element => {
   const [vtags, setTags] = useState<string[]>(tags);
   const [input, setInput] = useState('');
@@ -26,6 +28,7 @@ export const TagsInput = ({
       e.preventDefault();
     }
     if (['Tab', 'Enter'].includes(e.key) && input) {
+      if (limit && vtags.length >= limit) return;
       const newTags = [...vtags, input];
       setTags(newTags);
       setInput('');
@@ -34,9 +37,21 @@ export const TagsInput = ({
   };
 
   const addItem = (item: string) => {
+    if (limit && vtags.length >= limit) return;
     const newTags = [...tags, item];
     setTags(newTags);
     onChange(newTags);
+  };
+
+  const handleChange = (text: string) => {
+    const value = text;
+    const sanitizedValue = value.replace(/[^\w\s]/gi, ''); // Regex to remove special characters
+
+    setInput(sanitizedValue);
+
+    if (sanitizedValue === '') {
+      return;
+    }
   };
 
   return (
@@ -59,7 +74,7 @@ export const TagsInput = ({
           className='new-tag-input text-black'
           data-testid='tag-input'
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => handleChange(e.target.value)}
           onKeyDown={handleKeyDown}
         />
       </div>

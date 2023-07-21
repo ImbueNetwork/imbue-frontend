@@ -243,13 +243,8 @@ export const fetchUserWithUsernameOrAddress =
     tx<User>('users')
       .where('username', 'ilike', `%${usernameOrAddress}%`)
       .orWhere('web3_address', 'ilike', `%${usernameOrAddress}%`)
-      .select(
-        'id',
-        'display_name',
-        'profile_photo',
-        'username',
-        'web3_address'
-      ).first();
+      .select('id', 'display_name', 'profile_photo', 'username', 'web3_address')
+      .first();
 
 export const fetchUser = (id: number) => (tx: Knex.Transaction) =>
   tx<User>('users').where({ id }).first();
@@ -1397,7 +1392,7 @@ export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
     total_cost_without_fee,
     imbue_fee,
     duration_id,
-    status_id: ProjectStatus.Accepted
+    status_id: ProjectStatus.Accepted,
     // project_type: project_type ?? models.ProjectType.Brief
   })(tx);
 

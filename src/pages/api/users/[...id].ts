@@ -7,17 +7,27 @@ import db from '@/db';
 import { User } from '@/model';
 
 export default nextConnect()
-.get(
-  async (req: NextApiRequest, res: NextApiResponse) => {
+  .get(async (req: NextApiRequest, res: NextApiResponse) => {
     const { query } = req;
     const id: any = query.id;
     db.transaction(async (tx) => {
       try {
-        const user: User = ((await models.fetchUserWithUsernameOrAddress(id.toString())(tx)) ?? (await models.fetchUser(id)(tx))) as User;
+        const usernameRes: User = (await models.fetchUserWithUsernameOrAddress(
+          id.toString()
+        )(tx)) as User;
+
+        if (!usernameRes) {
+          return res.status(404).end();
+        }
+
+        const user: User = (await models.fetchUser(usernameRes?.id)(
+          tx
+        )) as User;
+
         if (!user) {
           return res.status(404).end();
         }
-        const web3Account = (await models.fetchWeb3AccountByUserId(user?.id)(tx));
+        const web3Account = await models.fetchWeb3AccountByUserId(user?.id)(tx);
 
         return res.status(200).send({
           id: user.id,
@@ -38,17 +48,14 @@ export default nextConnect()
         res.status(404).end();
       }
     });
-  }
-)
-.put(
-  async (req: NextApiRequest, res: NextApiResponse) => {
+  })
+  .put(async (req: NextApiRequest, res: NextApiResponse) => {
     const { query } = req;
 
     const id: string[] = query.id as string[];
     const name = query.name as string;
     res.status(200).json({ name: name || `User ${id}` });
-  }
-);
+  });
 
 export async function fetchProject(projectId: string) {
   let response;

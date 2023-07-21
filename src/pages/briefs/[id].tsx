@@ -70,7 +70,9 @@ const BriefDetails = (): JSX.Element => {
 
   const projectCategories = brief?.industries?.map?.((item) => item?.name);
 
-  const id: any = router?.query?.id || 0;
+  const { query } = router;
+
+  const id: any = query?.id || 0;
 
   const fetchData = async () => {
     if (id && browsingUser?.username) {
@@ -130,21 +132,23 @@ const BriefDetails = (): JSX.Element => {
 
   const unsaveBrief = async () => {
     await deleteSavedBrief(id, browsingUser?.id);
-    setIsSavedBrief(false)
+    setIsSavedBrief(false);
     setSuccess(true);
     setSuccessTitle('Brief Unsaved Successfully');
   };
 
   const ClientHistory = (
     <div
-      className={`transparent-conatainer !bg-imbue-light-purple-three relative ${showClientHistory ? '!pb-[3rem]' : ''
-        }`}
+      className={`transparent-conatainer !bg-imbue-light-purple-three relative ${
+        showClientHistory ? '!pb-[3rem]' : ''
+      }`}
     >
       <div className='flex justify-between w-full lg:px-[4rem] px-[1rem]'>
         <h3 className='text-imbue-purple-dark'>Client Contact History (4)</h3>
         <div
-          className={`transition transform ease-in-out duration-600 ${showClientHistory && 'rotate-180'
-            } cursor-pointer`}
+          className={`transition transform ease-in-out duration-600 ${
+            showClientHistory && 'rotate-180'
+          } cursor-pointer`}
         >
           <ArrowIcon
             onClick={() => setShowClientHistory(!showClientHistory)}
@@ -194,14 +198,16 @@ const BriefDetails = (): JSX.Element => {
 
   const SimilarProjects = (
     <div
-      className={`transparent-conatainer !bg-imbue-light-purple-three relative ${showSimilarBrief ? '!pb-[3rem]' : ''
-        } `}
+      className={`transparent-conatainer !bg-imbue-light-purple-three relative ${
+        showSimilarBrief ? '!pb-[3rem]' : ''
+      } `}
     >
       <div className='flex justify-between w-full lg:px-[4rem] px-[1rem]'>
         <h3 className='text-imbue-purple-dark'>Similar projects on Imbue</h3>
         <div
-          className={`transition transform ease-in-out duration-600 ${showSimilarBrief && 'rotate-180'
-            } cursor-pointer`}
+          className={`transition transform ease-in-out duration-600 ${
+            showSimilarBrief && 'rotate-180'
+          } cursor-pointer`}
         >
           <ArrowIcon
             onClick={() => setShowSimilarBrief(!showSimilarBrief)}

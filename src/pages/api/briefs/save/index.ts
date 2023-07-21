@@ -88,7 +88,7 @@ export default nextConnect()
         await models
           .getSavedBriefs(data?.user_id)(tx)
           .then(async (briefs: any) => {
-            const { currentData, totalItems } = await models.paginatedData(
+            const { currentData } = await models.paginatedData(
               Number(data?.page || 1),
               Number(data?.items_per_page || 5),
               briefs
@@ -108,7 +108,7 @@ export default nextConnect()
               }),
             ]);
 
-            res.status(200).json({ currentData, totalBriefs: totalItems });
+            res.status(200).json({ currentData, totalBriefs: briefs?.length });
           });
       } catch (e) {
         new Error(`Failed to fetch saved briefs`, { cause: e as Error });
@@ -133,7 +133,7 @@ export default nextConnect()
             data?.user_id
           )(tx)
           .then(async (briefs: any) => {
-            const { currentData, totalItems } = await models.paginatedData(
+            const { currentData } = await models.paginatedData(
               Number(data?.page || 1),
               Number(data?.items_per_page || 5),
               briefs
@@ -153,7 +153,7 @@ export default nextConnect()
               }),
             ]);
 
-            res.status(200).json({ currentData, totalBriefs: totalItems });
+            res.status(200).json({ currentData, totalBriefs: briefs.length });
           });
       } catch (e) {
         new Error(`Failed to delete saved briefs`, { cause: e as Error });

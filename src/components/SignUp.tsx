@@ -4,6 +4,7 @@ import { CircularProgress } from '@mui/material';
 import bcrypt from 'bcryptjs';
 import React from 'react';
 import { useState } from 'react';
+import PasswordStrengthBar from 'react-password-strength-bar';
 
 import * as utils from '@/utils';
 
@@ -103,9 +104,10 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
           required
           type='password'
         />
+        <PasswordStrengthBar password={password} />
       </div>
 
-      <div className='flex flex-col justify-center pb-[10px] w-full mt-2'>
+      <div className='flex flex-col justify-center pb-[10px] w-full mt-0'>
         <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
           Confirm Password
         </label>

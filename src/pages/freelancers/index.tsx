@@ -294,7 +294,7 @@ const Freelancers = (): JSX.Element => {
             default:
               console.log(
                 'Invalid filter option selected or unimplemented. type:' +
-                filterType
+                  filterType
               );
           }
         }
@@ -496,7 +496,9 @@ const Freelancers = (): JSX.Element => {
                     index: number
                   ) => (
                     <Grid item xs={12} sm={12} md={3} key={index}>
-                      <div className={`${styles.freelancer} py-[0.94rem] h-full`}>
+                      <div
+                        className={`${styles.freelancer} py-[0.94rem] h-full`}
+                      >
                         <div className='flex items-center justify-center'>
                           <Image
                             src={
@@ -518,11 +520,9 @@ const Freelancers = (): JSX.Element => {
                               {display_name}
                             </h3>
                             <h5 className='text-xs lg:text-sm mt-2 text-imbue-purple-dark font-normal whitespace-pre-wrap'>
-                              {
-                                bio?.length > 299
-                                  ? bio.substring(0, 300) + "..."
-                                  : bio
-                              }
+                              {bio?.length > 299
+                                ? bio.substring(0, 300) + '...'
+                                : bio}
                             </h5>
                           </div>
                           <div
@@ -555,7 +555,7 @@ const Freelancers = (): JSX.Element => {
                 )}
           </Grid>
 
-          <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-[97%] p-[1rem] flex items-center  max-width-868px:w-[90%] self-center fixed bottom-[2rem]'>
+          <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center  max-width-868px:w-[90%] self-center'>
             <button
               onClick={() => {
                 if (currentPage > 1) setCurrentPage(currentPage - 1);

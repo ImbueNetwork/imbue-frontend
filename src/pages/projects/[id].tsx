@@ -87,7 +87,8 @@ function Project() {
     useState<boolean>(false);
   const [submittingMilestone, setSubmittingMilestone] =
     useState<boolean>(false);
-  const [raiseVoteOfNoConfidence, setRaiseVoteOfNoConfidence] = useState<boolean>(false);
+  const [raiseVoteOfNoConfidence, setRaiseVoteOfNoConfidence] =
+    useState<boolean>(false);
   const [withdrawMilestone, setWithdrawMilestone] = useState<boolean>(false);
   const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
   const [votingWalletAccount, setVotingWalletAccount] = useState<
@@ -103,7 +104,7 @@ function Project() {
   const [showRefundButton] = useState<boolean>();
 
   const [wait, setWait] = useState<boolean>(false);
-  const [waitMessage, setWaitMessage] = useState<string>("");
+  const [waitMessage, setWaitMessage] = useState<string>('');
   const [success, setSuccess] = useState<boolean>(false);
   const [successTitle, setSuccessTitle] = useState<string>('');
   const [error, setError] = useState<any>();
@@ -139,20 +140,24 @@ function Project() {
     } else {
       switch (project.status_id) {
         case OffchainProjectState.PendingReview:
-          setWaitMessage("This project is pending review");
+          setWaitMessage('This project is pending review');
           break;
         case OffchainProjectState.ChangesRequested:
-          setWaitMessage("Changes have been requested");
+          setWaitMessage('Changes have been requested');
           break;
         case OffchainProjectState.Accepted:
           if (!project.chain_project_id) {
-            setWaitMessage(`Waiting for ${freelancer.display_name} to start the work`);
+            setWaitMessage(
+              `Waiting for ${freelancer.display_name} to start the work`
+            );
           } else {
-            setWaitMessage(`Your project is being created on the chain. This may take up to 6 seconds`);
+            setWaitMessage(
+              `Your project is being created on the chain. This may take up to 6 seconds`
+            );
           }
           break;
       }
-      setWait(true)
+      setWait(true);
     }
   };
 
@@ -177,7 +182,9 @@ function Project() {
 
       if (projectRes?.approvers?.length && approversPreviewList.length === 0) {
         projectRes?.approvers.map(async (approverAddress: any) => {
-          const approver = await utils.fetchUserByUsernameOrAddress(approverAddress);
+          const approver = await utils.fetchUserByUsernameOrAddress(
+            approverAddress
+          );
           if (approver?.length) {
             approversPreviewList.push(...approver);
           } else {
@@ -200,7 +207,6 @@ function Project() {
         });
       }
       setApproverPreview(approversPreviewList);
-
 
       // api  project response
       await getChainProject(projectRes, freelancerRes);
@@ -295,7 +301,10 @@ function Project() {
     const imbueApi = await initImbueAPIInfo();
     // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
-    const result = await chainService.raiseVoteOfNoConfidence(account, onChainProject);
+    const result = await chainService.raiseVoteOfNoConfidence(
+      account,
+      onChainProject
+    );
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
@@ -308,7 +317,8 @@ function Project() {
       }
       await new Promise((f) => setTimeout(f, 1000));
     }
-    setLoading(false);  };
+    setLoading(false);
+  };
 
   const renderPolkadotJSModal = (
     <div>
@@ -412,8 +422,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, 'Completed')
               : milestone?.milestone_key == milestoneBeingVotedOn
-                ? openForVotingTag()
-                : projectStateTag(modified, 'Not Started')}
+              ? openForVotingTag()
+              : projectStateTag(modified, 'Not Started')}
 
             <Image
               src={require(expanded
@@ -456,7 +466,8 @@ function Project() {
 
           {isApplicant &&
             onChainProject?.projectState !==
-            OnchainProjectState.OpenForVoting && (
+              OnchainProjectState.OpenForVoting &&
+            !milestone?.is_approved && (
               <button
                 className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
                 data-testid='next-button'
@@ -552,7 +563,7 @@ function Project() {
               {targetUser?.display_name}
             </p>
 
-            {(targetUser?.id && targetUser?.id !== user?.id) && (
+            {targetUser?.id && targetUser?.id !== user?.id && (
               <button
                 onClick={() => setShowMessageBox(true)}
                 className='primary-btn 
@@ -574,9 +585,7 @@ function Project() {
               >
                 Message
               </button>
-
             )}
-
 
             {showRefundButton && (
               <button
@@ -652,12 +661,13 @@ function Project() {
                 <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
                   <div
                     style={{
-                      width: `${(onChainProject?.milestones?.filter?.(
-                        (m: any) => m?.is_approved
-                      )?.length /
-                        onChainProject?.milestones?.length) *
+                      width: `${
+                        (onChainProject?.milestones?.filter?.(
+                          (m: any) => m?.is_approved
+                        )?.length /
+                          onChainProject?.milestones?.length) *
                         100
-                        }%`,
+                      }%`,
                     }}
                     className='h-full rounded-xl Accepted-button absolute'
                   ></div>
@@ -665,8 +675,9 @@ function Project() {
                     {onChainProject?.milestones?.map((m: any, i: number) => (
                       <div
                         key={i}
-                        className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
-                          } rounded-full -mt-1.5`}
+                        className={`h-4 w-4 ${
+                          m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
+                        } rounded-full -mt-1.5`}
                       ></div>
                     ))}
                   </div>
@@ -686,8 +697,8 @@ function Project() {
               />
               <div className='flex flex-col'>
                 <h3 className='text-xl leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0'>
-                  {Number(project?.total_cost_without_fee)?.toLocaleString()}{' '}
-                  ${Currency[project?.currency_id || 0]}
+                  {Number(project?.total_cost_without_fee)?.toLocaleString()} $
+                  {Currency[project?.currency_id || 0]}
                 </h3>
                 <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
                   Budget - Fixed
@@ -708,7 +719,7 @@ function Project() {
                     {project?.escrow_address}
                   </div>
                   <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
-                    balance : {balance} ${Currency[project?.currency_id] }
+                    balance : {balance} ${Currency[project?.currency_id]}
                   </div>
                 </div>
               </div>
@@ -818,9 +829,7 @@ function Project() {
         </div>
       </SuccessScreen>
 
-      <WaitingScreen title={waitMessage}
-        open={wait}
-        setOpen={setWait}>
+      <WaitingScreen title={waitMessage} open={wait} setOpen={setWait}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => window.location.reload()}
@@ -841,4 +850,3 @@ function Project() {
 }
 
 export default Project;
-

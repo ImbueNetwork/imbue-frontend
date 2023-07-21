@@ -56,13 +56,13 @@ const BioPanel = ({
             </button>
           )}
         </div>
-        <span className='time_posted primary-text mt-3 !text-imbue-lemon mt-[0.75rem]'>
-          Posted {timePosted} by {" "}
+        <span className='time_posted primary-text !text-imbue-lemon mt-[0.75rem]'>
+          Posted {timePosted} by{' '}
           <span
             onClick={() => router.push(`/profile/${brief.user_id}`)}
             className='hover:underline cursor-pointer'
-          > 
-          {brief.created_by}
+          >
+            {brief.created_by}
           </span>
         </span>
       </div>

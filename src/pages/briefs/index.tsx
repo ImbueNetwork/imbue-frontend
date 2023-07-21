@@ -374,7 +374,7 @@ const Briefs = (): JSX.Element => {
               // eslint-disable-next-line no-console
               console.log(
                 'Invalid filter option selected or unimplemented. type:' +
-                filterType
+                  filterType
               );
           }
         }
@@ -460,14 +460,14 @@ const Briefs = (): JSX.Element => {
     const allBriefs: any = await getAllBriefs(itemsPerPage, currentPage);
     await setSlectedFilterIds([]);
     setBriefs(allBriefs?.currentData);
-    setBriefsTotal(allBriefs?.totalFreelancers);
+    setBriefsTotal(allBriefs?.totalBriefs);
   };
 
   const deleteBrief = async (briefId: string | number) => {
     const allBriefs: any = await deleteSavedBrief(briefId, currentUser?.id);
     await setSlectedFilterIds([]);
     setBriefs(allBriefs?.currentData);
-    setBriefsTotal(allBriefs?.totalFreelancers);
+    setBriefsTotal(allBriefs?.totalBriefs);
   };
 
   const cancelFilters = async () => {
@@ -626,24 +626,22 @@ const Briefs = (): JSX.Element => {
 
                     <div
                       className='brief-item relative z-20'
-                      onClick={() => router.push(`/briefs/${item?.id}/`)}
+                      onClick={() =>
+                        router.push(`/briefs/${item?.id}?page=${currentPage}`)
+                      }
                     >
                       <div className='brief-title'>
-                        {
-                          item.headline.length > 50
-                            ? `${item.headline.substring(0, 50)}...`
-                            : item.headline
-                        }
+                        {item.headline.length > 50
+                          ? `${item.headline.substring(0, 50)}...`
+                          : item.headline}
                       </div>
                       <div className='brief-time-info'>
                         {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
                       </div>
                       <div className='brief-description lg:w-10/12'>
-                        {
-                          item.description.length > 500
-                            ? `${item.description.substring(0, 500)}...`
-                            : item.description
-                        }
+                        {item.description.length > 500
+                          ? `${item.description.substring(0, 500)}...`
+                          : item.description}
                       </div>
 
                       <div className='brief-tags'>

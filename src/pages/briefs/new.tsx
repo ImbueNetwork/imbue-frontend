@@ -75,6 +75,7 @@ const NewBrief = (): JSX.Element => {
           data-testid='industries-input'
           tags={industries}
           onChange={(tags: string[]) => setIndustries(tags)}
+          limit={5}
         />
       </div>
     </>
@@ -109,6 +110,7 @@ const NewBrief = (): JSX.Element => {
           tags={skills}
           data-testid='skills-input'
           onChange={(tags: string[]) => setSkills(tags)}
+          limit={5}
         />
       </div>
     </>
@@ -177,8 +179,12 @@ const NewBrief = (): JSX.Element => {
           min='0'
           data-testid='budget-input'
           value={budget || ''}
+          max={1000000000}
           onChange={(e) => {
-            if (Number(e.target.value) < 0) {
+            if (
+              Number(e.target.value) < 0 ||
+              Number(e.target.value) > 1000000000
+            ) {
               e.preventDefault();
             } else {
               setBudget(Number(e.target.value));

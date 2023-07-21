@@ -38,6 +38,8 @@ export default nextConnect()
       res
     );
 
+    verifyUserIdFromJwt(req, res, userAuth.id);
+
     const isAuthenticatedUer = userAuth?.id === user?.id;
 
     if (!isAuthenticatedUer) {
@@ -52,8 +54,6 @@ export default nextConnect()
           message: 'No user data provided.',
         });
       } else {
-        verifyUserIdFromJwt(req, res, user.id);
-
         let response;
         await db.transaction(async (tx: any) => {
           try {

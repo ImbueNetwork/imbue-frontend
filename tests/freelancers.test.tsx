@@ -98,9 +98,9 @@ test('test freelancer capturing the multiselect languages', () => {
   });
   fireEvent.click(screen.getByTestId('next-button'));
   fireEvent.change(screen.getByTestId('tag-input'), {
-    target: { value: ['German', 'French'] },
+    target: { value: ['German'] },
   });
   expect((screen.getByTestId('tag-input') as HTMLInputElement).value).toEqual(
-    'German,French'
+    'German'
   );
 });

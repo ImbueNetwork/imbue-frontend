@@ -9064,6 +9064,13 @@ react-markdown@^8.0.3:
     unist-util-visit "^4.0.0"
     vfile "^5.0.0"
 
+react-password-strength-bar@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/react-password-strength-bar/-/react-password-strength-bar-0.4.1.tgz#381073552a99d3401b884195c5fa9a7d56913dd0"
+  integrity sha512-2NvYz4IUU8k7KDZgsXKoJWreKCZLKGaqF5QhIVhc09OsPBFXFMh0BeghNkBIRkaxLeI7/xjivknDCYfluBCXKA==
+  dependencies:
+    zxcvbn "4.4.2"
+
 react-player@2.10.1:
   version "2.10.1"
   resolved "https://registry.yarnpkg.com/react-player/-/react-player-2.10.1.tgz#f2ee3ec31393d7042f727737545414b951ffc7e4"
@@ -11026,3 +11033,8 @@ zwitch@^2.0.0:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/zwitch/-/zwitch-2.0.4.tgz#c827d4b0acb76fc3e685a4c6ec2902d51070e9d7"
   integrity sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==
+
+zxcvbn@4.4.2:
+  version "4.4.2"
+  resolved "https://registry.yarnpkg.com/zxcvbn/-/zxcvbn-4.4.2.tgz#28ec17cf09743edcab056ddd8b1b06262cc73c30"
+  integrity sha512-Bq0B+ixT/DMyG8kgX2xWcI5jUvCwqrMxSFam7m0lAf78nf04hv6lNCsyLYdyYTrCVMqNDY/206K7eExYCeSyUQ==

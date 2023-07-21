@@ -15,7 +15,10 @@ import ChatPopup from '@/components/ChatPopup';
 
 import { copyIcon } from '@/assets/svgs';
 import { Brief, Project, User } from '@/model';
-import { getBriefApplications, getUserBriefs } from '@/redux/services/briefService';
+import {
+  getBriefApplications,
+  getUserBriefs,
+} from '@/redux/services/briefService';
 
 import CountrySelector from '../Profile/CountrySelector';
 
@@ -48,32 +51,37 @@ const BioInsights = ({
   unsaveBrief,
   isSavedBrief,
 }: BioInsightsProps) => {
-  const router = useRouter()
-  const [copied, setCopied] = useState(false)
+  const router = useRouter();
+  const [copied, setCopied] = useState(false);
 
-  const [clientBriefs, setClientBrief] = useState<Brief[]>([])
-  const [openBriefs, setIOpenBriefs] = useState<Brief[]>([])
-  const [briefApplications, setBriefApplications] = useState<Project[]>([])
-  const lastApplication: Project = briefApplications[briefApplications?.length - 1]
-  const pendingApplciations: Project[] = briefApplications.filter((application) => application?.status_id === 1)
+  const [clientBriefs, setClientBrief] = useState<Brief[]>([]);
+  const [openBriefs, setIOpenBriefs] = useState<Brief[]>([]);
+  const [briefApplications, setBriefApplications] = useState<Project[]>([]);
+  const lastApplication: Project =
+    briefApplications[briefApplications?.length - 1];
+  const pendingApplciations: Project[] = briefApplications.filter(
+    (application) => application?.status_id === 1
+  );
 
-  let hint = ""
-  if (!canSubmitProposal) hint = "Only varified users are allowed to apply for a breif"
-  else if (isOwnerOfBrief) hint = "Your are not allowed to submit proposal for your own brief"
+  let hint = '';
+  if (!canSubmitProposal)
+    hint = 'Only varified users are allowed to apply for a breif';
+  else if (isOwnerOfBrief)
+    hint = 'Your are not allowed to submit proposal for your own brief';
 
   useEffect(() => {
     const setUp = async () => {
-      if (!targetUser?.id) return
-      const res = await getUserBriefs(targetUser?.id)
-      const allBriefs = [...res.acceptedBriefs, ...res.briefsUnderReview]
+      if (!targetUser?.id) return;
+      const res = await getUserBriefs(targetUser?.id);
+      const allBriefs = [...res.acceptedBriefs, ...res.briefsUnderReview];
 
-      setClientBrief(allBriefs)
-      setIOpenBriefs(res?.briefsUnderReview || [])
+      setClientBrief(allBriefs);
+      setIOpenBriefs(res?.briefsUnderReview || []);
       setBriefApplications(await getBriefApplications(brief?.id));
-    }
+    };
 
-    setUp()
-  }, [targetUser?.id, brief?.id])
+    setUp();
+  }, [targetUser?.id, brief?.id]);
 
   const copyToClipboard = () => {
     const textToCopy = checkEnvironment().concat(`${router.asPath}`);
@@ -109,15 +117,19 @@ const BioInsights = ({
           </h3>
           <div className='flex gap-3 lg:items-center mt-4 flex-wrap'>
             <button
-              onClick={() => isSavedBrief ? unsaveBrief?.() : saveBrief?.()}
-              className={` ${isSavedBrief ? "bg-imbue-coral text-white border-imbue-coral" : "bg-transparent text-content border border-content"} rounded-3xl h-[2.48rem] text-base font-normal px-5 max-width-1100px:w-full max-width-500px:w-auto `}
+              onClick={() => (isSavedBrief ? unsaveBrief?.() : saveBrief?.())}
+              className={` ${
+                isSavedBrief
+                  ? 'bg-imbue-coral text-white border-imbue-coral'
+                  : 'bg-transparent text-content border border-content'
+              } rounded-3xl h-[2.48rem] text-base font-normal px-5 max-width-1100px:w-full max-width-500px:w-auto `}
             >
-              {isSavedBrief ? "Unsave" : "Save"}
+              {isSavedBrief ? 'Unsave' : 'Save'}
             </button>
             <Tooltip
               title={hint}
               arrow
-              placement="bottom"
+              placement='bottom'
               leaveTouchDelay={10}
               followCursor
             >
@@ -132,15 +144,17 @@ const BioInsights = ({
               !m-0
               !px-4
               '
-                onClick={() => (canSubmitProposal && !isOwnerOfBrief) && redirectToApply()}
-              // disabled={!canSubmitProposal}
+                onClick={() =>
+                  canSubmitProposal && !isOwnerOfBrief && redirectToApply()
+                }
+                // disabled={!canSubmitProposal}
               >
                 Submit a Proposal <FaRegShareSquare />
               </button>
             </Tooltip>
 
             <Tooltip
-              title="Go back to previous page"
+              title='Go back to previous page'
               followCursor
               leaveTouchDelay={10}
               enterDelay={500}
@@ -162,7 +176,7 @@ const BioInsights = ({
           <div className='flex items-center text-imbue-purple-dark '>
             Applications:
             <Tooltip
-              title="An approximate number of applications for this brief"
+              title='An approximate number of applications for this brief'
               followCursor
               leaveTouchDelay={10}
               className='cursor-pointer'
@@ -183,11 +197,9 @@ const BioInsights = ({
           <div className='flex items-center text-imbue-purple-dark'>
             Last applied by freelancers:
             <span className='primary-text font-bold ml-2 !text-imbue-lemon'>
-              {
-                lastApplication?.created
-                  ? moment(lastApplication?.created, "YYYYMMDD").fromNow()
-                  : "Never"
-              }
+              {lastApplication?.created
+                ? moment(lastApplication?.created, 'YYYYMMDD').fromNow()
+                : 'Never'}
             </span>
           </div>
         </div>
@@ -221,25 +233,24 @@ const BioInsights = ({
       <div className=' bg-imbue-light-purple-three p-[1rem] rounded-[0.5rem] mt-3'>
         <div className='subsection pb-2 !mt-0 !mb-[1.2rem] '>
           <div className='brief-insights-stat flex gap-2 justify-start items-center max-width-1800px:flex-wrap '>
-            {
-              targetUser?.web3_address
-                ? (
-                  <>
-                    <VerifiedIcon className='secondary-icon' sx={{ height: '1rem' }} />
-                    <span className='font-normal text-imbue-purple-dark text-[1rem] mr-3'>
-                      Payment method verified
-                    </span>
-                  </>
-                )
-                : (
-                  <>
-                    <CancelIcon color='error' sx={{ height: '1rem' }} />
-                    <span className='font-normal text-imbue-purple-dark text-[1rem] mr-3'>
-                      Payment method not verified
-                    </span>
-                  </>
-                )
-            }
+            {targetUser?.web3_address ? (
+              <>
+                <VerifiedIcon
+                  className='secondary-icon'
+                  sx={{ height: '1rem' }}
+                />
+                <span className='font-normal text-imbue-purple-dark text-[1rem] mr-3'>
+                  Payment method verified
+                </span>
+              </>
+            ) : (
+              <>
+                <CancelIcon color='error' sx={{ height: '1rem' }} />
+                <span className='font-normal text-imbue-purple-dark text-[1rem] mr-3'>
+                  Payment method not verified
+                </span>
+              </>
+            )}
 
             {/* <div>
                   {[4, 4, 4, 4].map((star, index) => (
@@ -257,10 +268,8 @@ const BioInsights = ({
             <div className='flex items-center text-imbue-purple-dark !font-normal'>
               <MarkEmailUnreadOutlinedIcon sx={{ height: '1rem' }} />
               <h3 className='ml-1 !font-normal'>
-                <span className='mr-2 '>
-                  {clientBriefs.length}
-                </span>
-                {`Project${clientBriefs?.length > 1 ? "s" : ""} Posted`}
+                <span className='mr-2 '>{clientBriefs.length}</span>
+                {`Project${clientBriefs?.length > 1 ? 's' : ''} Posted`}
               </h3>
             </div>
             <p className='mt-2 text-imbue-purple text-[1rem]'>
@@ -269,22 +278,19 @@ const BioInsights = ({
           </div>
         </div>
 
-        {
-          targetUser?.country && (
-            <div className='subsection pb-0 !my-0'>
-              <div className='brief-insights-stat flex flex-col'>
-                <CountrySelector
-                  user={targetUser}
-                  setUser={() => null}
-                  isEditMode={false}
-                />
-              </div>
+        {targetUser?.country && (
+          <div className='subsection pb-0 !my-0'>
+            <div className='brief-insights-stat flex flex-col'>
+              <CountrySelector
+                user={targetUser}
+                setUser={() => null}
+                isEditMode={false}
+              />
             </div>
-          )
-        }
+          </div>
+        )}
         <p className='mt-2 text-imbue-purple text-[1rem]'>
-          Member since {" "}
-          {moment(targetUser?.created).format("MMM DD, YYYY")}
+          Member since {moment(targetUser?.created).format('MMM DD, YYYY')}
         </p>
         {/* {
           targetUser?.country && (
@@ -309,7 +315,6 @@ const BioInsights = ({
             </div>
           )
         } */}
-
       </div>
 
       <div className='mt-auto'>
@@ -357,8 +362,9 @@ const BioInsights = ({
       </div>
 
       <Alert
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
-          }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${
+          copied ? 'right-5' : '-right-full'
+        }`}
         severity='success'
       >
         {`Brief link copied to clipboard`}

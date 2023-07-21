@@ -65,7 +65,6 @@ import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 import { AppDispatch, RootState } from '@/redux/store/store';
 import styles from '@/styles/modules/freelancers.module.css';
 
-
 export type ProfileProps = {
   initFreelancer: Freelancer;
 };
@@ -374,7 +373,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
 
       <div className='cursor-pointer absolute top-28 left-16 lg:left-24 z-[1]'>
         <Tooltip
-          title="Go back to previous page"
+          title='Go back to previous page'
           followCursor
           leaveTouchDelay={10}
           enterDelay={500}
@@ -610,12 +609,10 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
               </div>
             </div>
 
-
-            {(clients.length > 0 || isEditMode) && (
+            {((clients && clients?.length > 0) || isEditMode) && (
               <>
                 <hr className='separator' />
                 <div className='px-10 flex flex-col gap-4'>
-
                   <div className='flex items-center gap-3'>
                     <p className='text-xl text-imbue-purple-dark'>
                       Among my clients
@@ -644,15 +641,15 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   />
                 </div>
               </>
-
             )}
-
 
             {freelancer?.web3_address && (
               <>
                 <hr className='separator' />
                 <div className='w-full px-[30px] lg:px-[40px]'>
-                  <p className='text-xl text-imbue-purple-dark'>Wallet Address</p>
+                  <p className='text-xl text-imbue-purple-dark'>
+                    Wallet Address
+                  </p>
                   <div className='flex items-center mt-2 gap-3 w-full'>
                     <div className='break-words py-4 px-3 rounded-2xl bg-imbue-light-purple w-[90%] lg:w-full text-imbue-purple'>
                       {freelancer?.web3_address}
@@ -671,9 +668,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   </div>
                 </div>
               </>
-
             )}
-
 
             {isEditMode && (
               <button
@@ -1071,11 +1066,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   <div>
                     <p>
                       {review.name}
-                      {
-                        review.name.length > 50
-                          ? `${review.name.substring(0, 50)}...`
-                          : review.name
-                      }
+                      {review.name.length > 50
+                        ? `${review.name.substring(0, 50)}...`
+                        : review.name}
                     </p>
                     <div className='flex gap-2 items-center'>
                       <ReactCountryFlag countryCode={review.countryCode} />
@@ -1101,11 +1094,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   </span>
                 </div>
                 <p className='mt-2'>
-                  {
-                    review.description.length > 500
-                      ? `${review.description.substring(0, 500)}...`
-                      : review.description
-                  }
+                  {review.description.length > 500
+                    ? `${review.description.substring(0, 500)}...`
+                    : review.description}
                 </p>
                 <div className='flex gap-4'>
                   <p>Helpful?</p>
@@ -1175,8 +1166,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         </div>
       </ErrorScreen>
       <div
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
-          }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${
+          copied ? 'right-5' : '-right-full'
+        }`}
       >
         <Alert severity='success'>{`${copied} Copied to clipboard`}</Alert>
       </div>
