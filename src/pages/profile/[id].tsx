@@ -71,7 +71,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
         }
       }
     } catch (error) {
-      setError(error);
+      setError({message: error});
     } finally {
       setLoading(false);
     }
@@ -119,7 +119,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
         });
       }
     } catch (error) {
-      setError(error);
+      setError({message: error});
       console.log(error);
     }
   };

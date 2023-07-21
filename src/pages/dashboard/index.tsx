@@ -83,7 +83,7 @@ const Dashboard = (): JSX.Element => {
         _setBriefs(await getUserBriefs(user?.id));
         _setMyApplications(await getFreelancerApplications(user?.id));
       } catch (error) {
-        setError(error);
+        setError({message: error});
       } finally {
         setLoadingStreamChat(false);
       }

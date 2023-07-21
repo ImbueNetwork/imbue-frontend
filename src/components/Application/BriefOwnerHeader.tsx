@@ -105,7 +105,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         setError({ message: 'Could not connect wallet. Please Try again' });
       }
     } catch (error) {
-      setError(error);
+      setError({message: error});
     } finally {
       setLoadingWallet('');
     }
@@ -128,7 +128,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         setBalance(balance.toLocaleString());
         setImbueBalance(imbueBalance.toLocaleString());
       } catch (error) {
-        setError(error);
+        setError({message: error});
       } finally {
         setLoadingWallet('');
       }

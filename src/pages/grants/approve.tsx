@@ -36,7 +36,7 @@ const Approvers = () => {
                 const totalGrants: any = await getAllBriefs(5, 1)
                 setGrants(totalGrants?.currentData);
             } catch (error) {
-                setError(error);
+                setError({message: error});
             } finally {
                 setLoadingStreamChat(false);
             }

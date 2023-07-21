@@ -213,7 +213,7 @@ function Project() {
 
       setBalance(balance || 0);
     } catch (error) {
-      setError(error);
+      setError({message: error});
     } finally {
       setLoading(false);
     }

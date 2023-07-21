@@ -122,7 +122,7 @@ export const SubmitProposal = (): JSX.Element => {
       await selectAccount(account);
       await insertProject();
     } catch (error) {
-      setError(error);
+      setError({message: error});
     } finally {
       setLoading(false);
       setShowPolkadotAccounts(false);
@@ -177,7 +177,7 @@ export const SubmitProposal = (): JSX.Element => {
         setError({ message: 'Failed to submit the proposal' });
       }
     } catch (error) {
-      setError(error);
+      setError({message: error});
     } finally {
       setLoading(false);
     }

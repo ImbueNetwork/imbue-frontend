@@ -13,7 +13,7 @@ export const TagsInput = ({
   onChange,
 }: TagsInputProps): JSX.Element => {
   const [vtags, setTags] = useState<string[]>(tags);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState<any>();
 
   const handleDelete = (targetIndex: number) => {
     const newTags = tags.filter((_, index) => index !== targetIndex);

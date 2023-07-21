@@ -28,9 +28,9 @@ import styles from '../../styles/modules/newBrief.module.css';
 
 const NewBrief = (): JSX.Element => {
   const [step, setStep] = useState(0);
-  const [headline, setHeadline] = useState('');
+  const [headline, setHeadline] = useState<any>();
   const [industries, setIndustries] = useState<string[]>([]);
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState<any>();
   const [skills, setSkills] = useState<string[]>([]);
   const [expId, setExpId] = useState<number>();
   const [scopeId, setScopeId] = useState<number>();
@@ -267,7 +267,7 @@ const NewBrief = (): JSX.Element => {
         setError({ message: 'Failed to submit the brief' });
       }
     } catch (error) {
-      setError(error);
+      setError({message: error});
     } finally {
       setLoading(false);
     }

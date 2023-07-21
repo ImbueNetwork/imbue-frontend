@@ -422,7 +422,7 @@ const Briefs = (): JSX.Element => {
         setBriefsTotal(briefs_all?.totalBriefs);
       }
     } catch (error) {
-      setError(error);
+      setError({message: error});
     }
   };
 

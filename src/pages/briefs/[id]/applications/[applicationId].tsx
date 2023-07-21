@@ -89,7 +89,7 @@ const ApplicationPreview = (): JSX.Element => {
         setCurrencyId(applicationResponse?.currency_id)
         setDurationId(applicationResponse?.duration_id)
       } catch (error) {
-        setError(error);
+        setError({message: error});
       } finally {
         setLoading(false);
       }
@@ -176,7 +176,7 @@ const ApplicationPreview = (): JSX.Element => {
         setError({ message: `${resp.status} ${resp.statusText}` });
       }
     } catch (error) {
-      setError(error);
+      setError({message: error});
     } finally {
       setLoading(false);
     }
