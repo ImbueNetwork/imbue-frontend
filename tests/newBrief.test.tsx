@@ -456,6 +456,7 @@ describe('Test case for API call', () => {
     fireEvent.change(budgetInput, { target: { value: '1000' } });
 
     const submitBtn = screen.getByTestId('submit-button');
+
     fireEvent.click(submitBtn);
 
     waitFor(() => {
