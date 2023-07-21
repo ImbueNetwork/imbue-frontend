@@ -17,7 +17,8 @@ import { dollarIcon } from '@/assets/svgs';
 import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
 import { Brief, Currency, Freelancer } from '@/model';
-import { getBrief, getFreelancerBrief } from '@/redux/services/briefService';
+import { getBrief } from '@/redux/services/briefService';
+import { getFreelancerBrief } from '@/redux/services/briefService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { selectAccount } from '@/redux/services/polkadotService';
 import { RootState } from '@/redux/store/store';
@@ -33,7 +34,7 @@ export const SubmitProposal = (): JSX.Element => {
   const [durationId, setDurationId] = useState(0);
   const [brief, setBrief] = useState<Brief | any>();
   // const [user, setUser] = useState<User>();
-  const { user } = useSelector((state: RootState) => state.userState);
+  const { user, loading: loadingUser } = useSelector((state: RootState) => state.userState);
   // FIXME: freelancer
   const [_freelancer, setFreelancer] = useState<Freelancer>();
   // const userHasWeb3Addresss = !!user?.web3_address;
@@ -53,32 +54,43 @@ export const SubmitProposal = (): JSX.Element => {
   }, [applicationId]);
 
   useEffect(() => {
-    getUserAndFreelancer();
-  }, [briefId, user?.username]);
+    !loadingUser && getUserAndFreelancer();
+  }, [briefId, user?.username, loadingUser]);
 
   useEffect(() => {
-    getCurrentUserBrief();
-  }, [user]);
+    router?.isReady && getCurrentUserBrief();
+  }, [user, router.isReady]);
 
   const getUserAndFreelancer = async () => {
     const freelancer = await getFreelancerProfile(user?.username);
-    const shouldRedirectToBriefDetails = (!freelancer?.id || (freelancer.user_id === user?.id));
-    if (shouldRedirectToBriefDetails) {
-      router.push(`/briefs/${briefId}`);
-    }
-    setFreelancer(freelancer);
-  };
+      if (!freelancer?.id) redirectToBreif()
+      setFreelancer(freelancer);
 
-  const getCurrentUserBrief = async () => {
-    if (briefId && user) {
       const userApplication: any = await getFreelancerBrief(user?.id, briefId);
       if (userApplication) {
         router.push(`/briefs/${briefId}/applications/${userApplication?.id}/`);
       }
-      const briefResponse: Brief | undefined = await getBrief(briefId);
-      setBrief(briefResponse);
+  };
+
+  const getCurrentUserBrief = async () => {
+    if (briefId && user) {
+      setLoading(true)
+      try {
+        const briefResponse: Brief | undefined = await getBrief(briefId);
+        if(briefResponse?.user_id === user.id) redirectToBreif()
+        setBrief(briefResponse);
+      } catch (error) {
+        setError({ message: "could not find brief" })
+      }
+      finally {
+        setLoading(false);
+      }
     }
   };
+
+  const redirectToBreif = () => {
+    router.push(`/briefs/${briefId}`);
+  }
 
   const currencies = Object.keys(Currency).filter(
     (key: any) => !isNaN(Number(Currency[key]))
@@ -214,6 +226,8 @@ export const SubmitProposal = (): JSX.Element => {
   };
 
   const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
+
+  if (loadingUser || loading) <FullScreenLoader />
 
   return (
     <div className='flex flex-col gap-10 text-base leading-[1.5] !mx-3 lg:!mx-auto'>
