@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useChannelStateContext, useChatContext } from 'stream-chat-react';
 
 export function CustomChannelHeader(props: any) {
-    const { closeChat, chatPopUp, targetUser, showFreelancerProfile } = props;
+    const { closeChat, chatPopUp, targetUser } = props;
     const router = useRouter()
   
     const { members = {}, watcher_count } = useChannelStateContext();
@@ -15,13 +15,11 @@ export function CustomChannelHeader(props: any) {
     Object.keys(members).forEach(function (key) {
       if (membersCount === 2 && key !== client.userID) chatTitle = key;
     });
-
+    console.log(chatTitle)
     return (
       <div className='py-2 lg:py-3 border-b border-b-imbue-light-purple'>
         <div
-          onClick={() => router.push(showFreelancerProfile
-            ? `/freelancers/${targetUser?.username}`
-            : `/profile/${targetUser?.id}`)}
+          onClick={() => router.push(`/profile/${chatTitle}`)}
           className='w-fit flex gap-2 lg:gap-3 items-center ml-3 cursor-pointer'
         >
           {!chatPopUp && (
