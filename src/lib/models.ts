@@ -230,14 +230,9 @@ export const fetchWeb3AccountsByUserId =
     fetchAllWeb3Account()(tx).where({ user_id }).select();
 
 export const fetchAllUser = () => (tx: Knex.Transaction) =>
-  tx<User>('users').select(
-    'id',
-    'display_name',
-    'profile_photo',
-    'username',
-    'web3_address'
-  )
-  .orderBy('web3_address')
+  tx<User>('users')
+    .select('id', 'display_name', 'profile_photo', 'username', 'web3_address')
+    .orderBy('web3_address');
 
 export const fetchUserWithUsernameOrAddress =
   (usernameOrAddress: string) => (tx: Knex.Transaction) =>
@@ -253,7 +248,7 @@ export const searchUserWithUsernameOrAddress =
       .where('username', 'ilike', `%${usernameOrAddress}%`)
       .orWhere('web3_address', 'ilike', `%${usernameOrAddress}%`)
       .select('id', 'display_name', 'profile_photo', 'username', 'web3_address')
-      .orderBy('web3_address', 'asc')
+      .orderBy('web3_address', 'asc');
 
 export const fetchUser = (id: number) => (tx: Knex.Transaction) =>
   tx<User>('users').where({ id }).first();
@@ -477,12 +472,8 @@ export const fetchBriefProject =
       .first();
 
 export const fetchProjectById =
-  (id: string | number) =>
-  (tx: Knex.Transaction) =>
-    tx<Project>('projects')
-      .select()
-      .where({ id: id })
-      .first();
+  (id: string | number) => (tx: Knex.Transaction) =>
+    tx<Project>('projects').select().where({ id: id }).first();
 
 export const fetchGrantProject =
   (project_id: number) => (tx: Knex.Transaction) =>
@@ -1345,10 +1336,13 @@ export const paginatedData = (
   itemsPerPage: number,
   data: any[]
 ): PagerProps => {
-  const indexOfLastBrief = currentPage * itemsPerPage;
-  const indexOfFirstBrief = indexOfLastBrief - itemsPerPage;
-  const currentData = data.slice(indexOfFirstBrief, indexOfLastBrief);
-  return { currentData, totalItems: data.length };
+  const offset = (currentPage - 1) * itemsPerPage;
+  const paginatedItems = data.slice(offset).slice(0, itemsPerPage);
+
+  return {
+    totalItems: data.length,
+    currentData: paginatedItems,
+  };
 };
 
 export const searchFreelancers = async (
