@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Backdrop, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FiEdit, FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 
@@ -10,7 +10,6 @@ import { fetchProject, fetchUser } from '@/utils';
 import ApplicationOwnerHeader from '@/components/Application/ApplicationOwnerHeader';
 import BriefOwnerHeader from '@/components/Application/BriefOwnerHeader';
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
-import { TextArea } from '@/components/Briefs/TextArea';
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
 import Login from '@/components/Login';
@@ -37,6 +36,11 @@ interface MilestoneItem {
   name: string;
   description: string;
   amount: number | undefined;
+  error?: {
+    name?: string;
+    description?: string;
+    amount?: string;
+  }
 }
 
 export type ApplicationPreviewProps = {
@@ -120,76 +124,6 @@ const ApplicationPreview = (): JSX.Element => {
     router.push(`/briefs/${brief?.id}/`);
   };
 
-  const updateProject = async (
-    chainProjectId?: number,
-    escrow_address?: string
-  ) => {
-    setLoading(true);
-    try {
-      // const resp = await fetch(`${config.apiBase}/project/${application.id}`, {
-      //   headers: config.postAPIHeaders,
-      //   method: 'put',
-      //   body: JSON.stringify({
-      //     user_id: user.id,
-      //     name: `${brief.headline}`,
-      //     total_cost_without_fee: totalCostWithoutFee,
-      //     imbue_fee: imbueFee,
-      //     currency_id: currencyId,
-      //     milestones: milestones
-      //       .filter((m) => m.amount !== undefined)
-      //       .map((m) => {
-      //         return {
-      //           name: m.name,
-      //           amount: m.amount,
-      //           percentage_to_unlock: (
-      //             ((m.amount ?? 0) / totalCostWithoutFee) *
-      //             100
-      //           ).toFixed(0),
-      //         };
-      //       }),
-      //     required_funds: totalCost,
-      //     chain_project_id: chainProjectId,
-      //   }),
-      // });
-      const resp = await createProject(application?.id, {
-        user_id: user.id,
-        name: `${brief.headline}`,
-        total_cost_without_fee: totalCostWithoutFee,
-        imbue_fee: imbueFee,
-        currency_id: currencyId,
-        milestones: milestones
-          .filter((m) => m.amount !== undefined)
-          .map((m) => {
-            return {
-              name: m.name,
-              amount: m.amount,
-              description: m.description,
-              percentage_to_unlock: (
-                ((m.amount ?? 0) / totalCostWithoutFee) *
-                100
-              ).toFixed(0),
-            };
-          }),
-        required_funds: totalCost,
-        owner: user.web3_address,
-        chain_project_id: chainProjectId,
-        escrow_address: escrow_address,
-        duration_id: durationId,
-      });
-
-      if (resp.status === 201 || resp.status === 200) {
-        setSuccess(true);
-        setIsEditingBio(false);
-      } else {
-        setError({ message: `${resp.status} ${resp.statusText}` });
-      }
-    } catch (error) {
-      setError({ message: error });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const filteredApplication = application?.milestones
     ?.filter?.((m: any) => m?.amount !== undefined)
     ?.map?.((m: any) => {
@@ -271,25 +205,144 @@ const ApplicationPreview = (): JSX.Element => {
     return sum + percent;
   }, 0);
 
+  const milestonesRef = useRef<any>([])
+
   const allAmountAndNamesHaveValue = () => {
+    let hasValue = true;
+    let firstErrorIndex = -1;
+    const newMilestones = [...milestones]
+    const blockUnicodeRegex = /^[\x20-\x7E]*$/;
+
     for (let i = 0; i < milestones.length; i++) {
-      const { amount, name } = milestones[i];
+      const { amount, name, description } = milestones[i];
+      newMilestones[i].error = {}
+
+      if (
+        name === undefined ||
+        name === null ||
+        name.length === 0 ||
+        !blockUnicodeRegex.test(name)
+      ) {
+        newMilestones[i].error = {
+          ...newMilestones[i].error,
+          name: "A valid name is required"
+        }
+        hasValue = false
+        firstErrorIndex = (firstErrorIndex === -1) ? i : firstErrorIndex
+      }
 
       if (
         amount === undefined ||
         amount === null ||
-        amount === 0 ||
-        name === undefined ||
-        name === null ||
-        name.length === 0
+        amount === 0
       ) {
-        return false;
+        newMilestones[i].error = {
+          ...newMilestones[i].error,
+          amount: "A valid amount is required"
+        }
+        hasValue = false;
+        firstErrorIndex = (firstErrorIndex === -1) ? i : firstErrorIndex
+      }
+
+      if (
+        description === undefined ||
+        description === null ||
+        description.length === 0
+      ) {
+        newMilestones[i].error = {
+          ...newMilestones[i].error,
+          description: "A valid description is required."
+        }
+        hasValue = false
+        firstErrorIndex = (firstErrorIndex === -1) ? i : firstErrorIndex
       }
     }
-    return true;
+
+    setMilestones(newMilestones)
+
+    if (firstErrorIndex !== -1) milestonesRef.current[firstErrorIndex]?.scrollIntoView({
+      behavior: 'auto',
+      block: 'center',
+      inline: 'center'
+    })
+
+    return hasValue;
   };
 
-  const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
+  const updateProject = async (
+    chainProjectId?: number,
+    escrow_address?: string
+  ) => {
+    if (!allAmountAndNamesHaveValue()) return setError({ message: "Please fill all the required fields" })
+    if (totalPercent !== 100) return setError({ message: "totalPercent must be 100%" });
+
+    setLoading(true);
+    try {
+      // const resp = await fetch(`${config.apiBase}/project/${application.id}`, {
+      //   headers: config.postAPIHeaders,
+      //   method: 'put',
+      //   body: JSON.stringify({
+      //     user_id: user.id,
+      //     name: `${brief.headline}`,
+      //     total_cost_without_fee: totalCostWithoutFee,
+      //     imbue_fee: imbueFee,
+      //     currency_id: currencyId,
+      //     milestones: milestones
+      //       .filter((m) => m.amount !== undefined)
+      //       .map((m) => {
+      //         return {
+      //           name: m.name,
+      //           amount: m.amount,
+      //           percentage_to_unlock: (
+      //             ((m.amount ?? 0) / totalCostWithoutFee) *
+      //             100
+      //           ).toFixed(0),
+      //         };
+      //       }),
+      //     required_funds: totalCost,
+      //     chain_project_id: chainProjectId,
+      //   }),
+      // });
+      const resp = await createProject(application?.id, {
+        user_id: user.id,
+        name: `${brief.headline}`,
+        total_cost_without_fee: totalCostWithoutFee,
+        imbue_fee: imbueFee,
+        currency_id: currencyId,
+        milestones: milestones
+          .filter((m) => m.amount !== undefined)
+          .map((m) => {
+            return {
+              name: m.name,
+              amount: m.amount,
+              description: m.description,
+              percentage_to_unlock: (
+                ((m.amount ?? 0) / totalCostWithoutFee) *
+                100
+              ).toFixed(0),
+            };
+          }),
+        required_funds: totalCost,
+        owner: user.web3_address,
+        chain_project_id: chainProjectId,
+        escrow_address: escrow_address,
+        duration_id: durationId,
+      });
+
+      if (resp.status === 201 || resp.status === 200) {
+        setSuccess(true);
+        setIsEditingBio(false);
+      } else {
+        setError({ message: `${resp.status} ${resp.statusText}` });
+      }
+    } catch (error) {
+      setError({ message: error });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
 
   return (
     <div>
@@ -377,14 +430,15 @@ const ApplicationPreview = (): JSX.Element => {
             <hr className='h-[1px] bg-[#E1DDFF] w-full' />
 
             <div className='milestone-list lg:mb-5'>
-              {milestones?.map?.(({ name, description, amount }, index) => {
+              {milestones?.map?.(({ name, description, amount, error }, index) => {
                 const percent = Number(
                   ((100 * (amount ?? 0)) / totalCostWithoutFee)?.toFixed?.(0)
                 );
                 return (
                   <div
-                    className='flex flex-row items-start w-full border-t border-t-light-white last:border-b-0 px-5 py-9 lg:px-14 relative  border-b border-b-[#03116A1F]'
+                    className={`flex items-start w-full px-5 py-9 lg:px-14 relative border-b border-b-imbue-light-purple last:border-b-0`}
                     key={index}
+                    ref={el => milestonesRef.current[index] = el}
                   >
                     {isEditingBio && (
                       <span
@@ -394,78 +448,126 @@ const ApplicationPreview = (): JSX.Element => {
                         x
                       </span>
                     )}
-                    <div className='mr-4 lg:mr-9 text-[1.25rem] text-imbue-purple font-normal'>
+                    <div className='mr-4 lg:mr-9 text-base lg:text-[1.25rem] text-imbue-purple font-normal'>
                       {index + 1}.
                     </div>
-                    <div className='flex flex-row justify-between w-full'>
-                      <div className='w-3/5 lg:w-1/2 h-fit'>
+                    <div className={`flex ${isEditingBio ? 'flex-col lg:flex-row' : 'flex-row' } justify-between w-full`}>
+                      <div className='w-full lg:w-1/2 h-fit'>
                         {isEditingBio ? (
-                          <input
-                            type='text'
-                            data-testid={`milestone-title-${index}`}
-                            className='input-budget !pl-3 text-base leading-5 rounded-[5px] py-3 text-imbue-purple text-[1rem] text-left mb-8'
-                            value={name || ''}
-                            onChange={(e) =>
-                              setMilestones([
-                                ...milestones.slice(0, index),
-                                {
-                                  ...milestones[index],
-                                  name: e.target.value,
-                                },
-                                ...milestones.slice(index + 1),
-                              ])
-                            }
-                          />
+                          <>
+                            <h3 className='text-base lg:text-xl mb-2 lg:mb-5 p-0 text-imbue-purple-dark font-normal'>
+                              Title
+                            </h3>
+                            <input
+                              type='text'
+                              placeholder='Add Milestone Name'
+                              className='input-budget !pl-3 text-base rounded-[5px] py-3 text-imbue-purple mb-2 placeholder:text-imbue-light-purple'
+                              value={name || ''}
+                              onChange={(e) =>
+                                setMilestones([
+                                  ...milestones.slice(0, index),
+                                  {
+                                    ...milestones[index],
+                                    name: e.target.value,
+                                  },
+                                  ...milestones.slice(index + 1),
+                                ])
+                              }
+                            />
+                            <div className='flex items-center justify-between mb-4'>
+                              <p className='text-sm text-content my-2'>{name?.length}/50</p>
+                              <p className='text-sm text-imbue-coral'>{error?.name}</p>
+                            </div>
+                          </>
                         ) : (
                           <h3 className='mb-2 lg:mb-5 text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
                             {name}
                           </h3>
                         )}
                         {isEditingBio ? (
-                          <TextArea
-                            maxLength={500}
-                            className='text-content'
-                            rows={7}
-                            value={description}
-                            disabled={!isEditingBio}
-                            onChange={(e) =>
-                              setMilestones([
-                                ...milestones.slice(0, index),
-                                {
-                                  ...milestones[index],
-                                  description: e.target.value,
-                                },
-                                ...milestones.slice(index + 1),
-                              ])
-                            }
-                          />
+                          <>
+                            <h3 className='text-base lg:text-xl mb-2 lg:mb-5 p-0 text-imbue-purple-dark font-normal'>
+                              Description
+                            </h3>
+                            <textarea
+                              maxLength={500}
+                              className='text-content !p-3 placeholder:text-imbue-light-purple'
+                              placeholder='Add Milestone Description'
+                              rows={7}
+                              value={description}
+                              disabled={!isEditingBio}
+                              onChange={(e) =>
+                                setMilestones([
+                                  ...milestones.slice(0, index),
+                                  {
+                                    ...milestones[index],
+                                    description: e.target.value,
+                                  },
+                                  ...milestones.slice(index + 1),
+                                ])
+                              }
+                            />
+                            <div className='flex items-center justify-between mb-4'>
+                              <p className='text-sm text-content my-2'>{description?.length}/500</p>
+                              <p className='text-sm text-imbue-coral'>{error?.description}</p>
+                            </div>
+                          </>
                         ) : (
                           <p className='text-[1rem] text-[#3B27C180] m-0'>
                             {description}
                           </p>
                         )}
                       </div>
-                      <div className='flex flex-col w-1/3 lg:w-1/5 items-end'>
+                      <div className='flex flex-col w-full lg:w-1/5 items-end'>
                         <h3 className='mb-2 lg:mb-5 text-right text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
                           Amount
                         </h3>
                         {isEditingBio ? (
-                          <input
-                            type='number'
-                            className='input-budget text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-right  pl-5'
-                            disabled={!isEditingBio}
-                            value={amount || ''}
-                            onChange={(e) =>
-                              setMilestones([
-                                ...milestones.slice(0, index),
-                                {
-                                  ...milestones[index],
-                                  amount: Number(e.target.value),
-                                },
-                                ...milestones.slice(index + 1),
-                              ])
-                            }
-                          />
+                          <>
+                            {/* <input
+                              type='number'
+                              className='input-budget text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-right  pl-5'
+                              disabled={!isEditingBio}
+                              value={amount || ''}
+                              onChange={(e) =>
+                                setMilestones([
+                                  ...milestones.slice(0, index),
+                                  {
+                                    ...milestones[index],
+                                    amount: Number(e.target.value),
+                                  },
+                                  ...milestones.slice(index + 1),
+                                ])
+                              }
+                            /> */}
+                            <div className='w-full relative p-0 m-0'>
+                              <span
+                                className='h-fit absolute left-5 bottom-3 text-base text-content'
+                              >
+                                {Currency[currencyId]}
+                              </span>
+
+                              <input
+                                type='number'
+                                disabled={!isEditingBio}
+                                placeholder='Add an amount'
+                                className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
+                                value={amount || ''}
+                                onChange={(e) => {
+                                  if (Number(e.target.value) >= 0)
+                                    setMilestones([
+                                      ...milestones.slice(0, index),
+                                      {
+                                        ...milestones[index],
+                                        amount: Number(e.target.value),
+                                      },
+                                      ...milestones.slice(index + 1),
+                                    ]);
+                                }}
+                              />
+                            </div>
+                            <p className='text-sm text-imbue-coral w-full text-right'>{error?.amount}</p>
+                          </>
                         ) : (
                           <p className='text-[1rem] text-[#3B27C180] m-0'>
                             ${milestones[index]?.amount}
@@ -512,23 +614,23 @@ const ApplicationPreview = (): JSX.Element => {
           </p>
           <hr className='h-[1px] bg-[#E1DDFF] w-full' />
 
-          <div className='flex flex-row items-center mb-[20px] mx-5 lg:mx-14 mt-7'>
-            <div className='flex flex-col flex-grow'>
-              <h3 className='text-lg lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
+          <div className='flex flex-row lg:items-center mb-[20px] mx-5 lg:mx-14 mt-7 gap-5'>
+            <div className='flex flex-col flex-grow gap-1'>
+              <h3 className='text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
                 Total price of the project
               </h3>
-              <div className='text-inactive text-sm !font-normal lg:text-[1rem] !text-imbue-light-purple-two'>
+              <div className='text-inactive text-xs !font-normal lg:text-base !text-imbue-light-purple-two'>
                 This includes all milestones, and is the amount client will see
               </div>
             </div>
-            <div className='budget-value text-[1.25rem] text-imbue-purple-dark font-normal'>
+            <div className='budget-value text-xl text-imbue-purple-dark font-normal'>
               ${Number(totalCostWithoutFee?.toFixed?.(2)).toLocaleString()}
             </div>
           </div>
 
           <div className='flex flex-row items-center mb-[20px] mx-5 lg:mx-14'>
             <div className='flex flex-col flex-grow'>
-              <h3 className='text-lg lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
+              <h3 className='text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
                 Imbue Service Fee 5%
               </h3>
             </div>
@@ -539,7 +641,7 @@ const ApplicationPreview = (): JSX.Element => {
 
           <div className='flex flex-row items-center mb-[20px] mx-5 lg:mx-14'>
             <div className='flex flex-col flex-grow'>
-              <h3 className='text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
+              <h3 className='text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
                 Total
               </h3>
             </div>
@@ -612,7 +714,7 @@ const ApplicationPreview = (): JSX.Element => {
                     ))}
                   </select>
                 ) : (
-                  <p className='text-content-primary mt-2 w-full text-end'>
+                  <p className='text-content-primary mt-2 w-full lg:text-end'>
                     {Currency[currencyId || 0]}
                   </p>
                 )}
@@ -633,7 +735,7 @@ const ApplicationPreview = (): JSX.Element => {
               isApplicationOwner &&
               application.status_id !== 4 && (
                 <button
-                  className='primary-btn in-dark w-button !flex items-center gap-2'
+                  className='primary-btn in-dark w-button !flex items-center gap-1 lg:gap-2'
                   onClick={() => setIsEditingBio(true)}
                 >
                   <span>Edit Application</span>
@@ -643,9 +745,9 @@ const ApplicationPreview = (): JSX.Element => {
             {isEditingBio && (
               <button
                 className='primary-btn in-dark w-button'
-                disabled={
-                  totalPercent !== 100 || !milestoneAmountsAndNamesHaveValue
-                }
+                // disabled={
+                //   totalPercent !== 100 || !milestoneAmountsAndNamesHaveValue
+                // }
                 onClick={() => updateProject()}
               >
                 Update

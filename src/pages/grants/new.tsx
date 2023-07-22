@@ -2,15 +2,13 @@ import {
   Alert,
   Dialog,
   IconButton,
-  InputAdornment,
-  TextField,
 } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import WalletIcon from '@svgs/wallet.svg';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { FaRegCopy } from 'react-icons/fa';
 import { FiPlusCircle } from 'react-icons/fi';
@@ -33,6 +31,17 @@ interface MilestoneItem {
   name: string;
   amount: number | undefined;
   description: string;
+  error?: {
+    name?: string;
+    description?: string;
+    amount?: string;
+  }
+}
+
+interface InputErrorType {
+  title?: string;
+  description?: string;
+  approvers?: string;
 }
 
 const GrantApplication = (): JSX.Element => {
@@ -40,6 +49,9 @@ const GrantApplication = (): JSX.Element => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<any>();
+  const [inputErrors, setInputErrors] = useState<InputErrorType>({
+    title: "", description: "", approvers: ""
+  });
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [escrowAddress, setEscrowAddress] = useState<string>('');
@@ -111,28 +123,99 @@ const GrantApplication = (): JSX.Element => {
   //   setApprovers(newApprovers);
   // };
 
+  const milestonesRef = useRef<any>([])
+
   const validateFormData = () => {
+    let isValid = true;
+    let firstErrorIndex = -1;
+    const newMilestones = [...milestones]
+    const blockUnicodeRegex = /^[\x20-\x7E]*$/;
+    setInputErrors({})
+
+    if (
+      title === undefined ||
+      title === null ||
+      title.length === 0 ||
+      !blockUnicodeRegex.test(title)
+    ) {
+      isValid = false;
+      firstErrorIndex = 0;
+      setInputErrors((prev: any) => ({ ...prev, title: "Please enter a valid grant title" }))
+    }
+
+    if (
+      description === undefined ||
+      description === null ||
+      description.length === 0
+    ) {
+      isValid = false;
+      firstErrorIndex = (firstErrorIndex === -1) ? 1 : firstErrorIndex;
+      setInputErrors((prev: any) => ({ ...prev, description: "Please enter a valid grant description" }))
+    }
+
+    if (approvers.length === 0) {
+      isValid = false
+      firstErrorIndex = (firstErrorIndex === -1) ? 2 : firstErrorIndex;
+      setInputErrors((prev: any) => ({ ...prev, approvers: "Please select atleast one valid grant approver" }))
+    }
+
     for (let i = 0; i < milestones.length; i++) {
-      const { amount, name } = milestones[i];
+      const { amount, name, description } = milestones[i];
+      newMilestones[i].error = {}
+
+      if (
+        name === undefined ||
+        name === null ||
+        name.length === 0 ||
+        !blockUnicodeRegex.test(name)
+      ) {
+        newMilestones[i].error = {
+          ...newMilestones[i].error,
+          name: "A valid name is required"
+        }
+        isValid = false
+        firstErrorIndex = (firstErrorIndex === -1) ? i + 3 : firstErrorIndex
+      }
 
       if (
         amount === undefined ||
         amount === null ||
-        amount === 0 ||
-        name === undefined ||
-        name === null ||
-        name.length === 0
+        amount === 0
       ) {
-        return false;
+        newMilestones[i].error = {
+          ...newMilestones[i].error,
+          amount: "A valid amount is required"
+        }
+        isValid = false;
+        firstErrorIndex = (firstErrorIndex === -1) ? i + 3 : firstErrorIndex
+      }
+
+      if (
+        description === undefined ||
+        description === null ||
+        description.length === 0
+      ) {
+        newMilestones[i].error = {
+          ...newMilestones[i].error,
+          description: "A valid description is required."
+        }
+        isValid = false
+        firstErrorIndex = (firstErrorIndex === -1) ? i + 3 : firstErrorIndex
       }
     }
 
-    if (approvers.length === 0) return false;
+    setMilestones(newMilestones)
 
-    return true;
+    if (firstErrorIndex !== -1) milestonesRef.current[firstErrorIndex]?.scrollIntoView({
+      behavior: 'auto',
+      block: 'center',
+      inline: 'center'
+    })
+
+    return isValid;
   };
 
-  const formDataValid = validateFormData();
+  // const formDataValid = validateFormData();
 
   const handleSelectAccount = async (account: WalletAccount) => {
     try {
@@ -152,6 +235,7 @@ const GrantApplication = (): JSX.Element => {
 
   const submitGrant = async (account: WalletAccount) => {
     if (!account) return;
+    if (!validateFormData()) return setError({ message: "Please fill the required fields fields" })
     setLoading(true);
 
     try {
@@ -239,7 +323,7 @@ const GrantApplication = (): JSX.Element => {
   };
 
   return (
-    <div className='flex flex-col gap-10 leading-[1.5] hq-layout !mx-3 lg:!mx-auto'>
+    <div className='flex flex-col gap-10 leading-[1.5] !mx-3 lg:!mx-auto'>
       <div className='rounded-[20px] border border-solid border-white bg-background'>
         <p className='px-6 lg:px-12 py-5 text-[20px] text-imbue-purple-dark border-b border-imbue-light-purple'>
           Grant description
@@ -247,30 +331,42 @@ const GrantApplication = (): JSX.Element => {
         <div className='px-6 lg:px-12 py-5 lg:py-8 text-base leading-[1.2]'>
           <div className='flex flex-col-reverse lg:flex-row justify-between gap-10 lg:gap-0'>
             <div className='flex flex-col gap-8 w-full lg:w-3/5'>
-              <div className='flex flex-col gap-4 text-imbue-purple-dark'>
+              <div
+                ref={el => milestonesRef.current[0] = el}
+                className='flex flex-col gap-4 text-imbue-purple-dark'
+              >
                 <div>Title</div>
                 <input
                   value={title}
                   maxLength={50}
                   placeholder='Input title'
                   onChange={(e) => setTitle(e.target.value)}
-                  className='bg-transparent border border-imbue-purple rounded-md p-3 placeholder:text-imbue-light-purple text-imbue-purple outline-primary'
+                  className='bg-transparent border border-imbue-purple rounded-md p-3 placeholder:text-imbue-light-purple text-imbue-purple outline-content-primary'
                 />
-                <div className='text-imbue-purple text-sm ml-auto'>
-                  {`${description?.length || 0}/50`}
+                <div className='flex items-center justify-between'>
+                  <p className='text-sm text-imbue-coral'>{inputErrors?.title}</p>
+                  <div className='text-imbue-purple text-sm ml-auto'>
+                    {`${title?.length || 0}/50`}
+                  </div>
                 </div>
               </div>
-              <div className='flex flex-col gap-4 text-imbue-purple-dark'>
+              <div
+                ref={el => milestonesRef.current[1] = el}
+                className='flex flex-col gap-4 text-imbue-purple-dark'
+              >
                 <div>Description</div>
                 <textarea
                   maxLength={500}
                   value={description}
                   placeholder='Input description'
                   onChange={(e) => setDescription(e.target.value)}
-                  className='bg-transparent border border-imbue-purple rounded-md placeholder:text-imbue-light-purple text-imbue-purple outline-primary min-h-[160px] p-3'
+                  className='bg-transparent border border-imbue-purple rounded-md placeholder:text-imbue-light-purple text-imbue-purple outline-content-primary min-h-[160px] p-3'
                 />
-                <div className='text-imbue-purple text-sm ml-auto'>
-                  {`${description?.length || 0}/500`}
+                <div className='flex items-center justify-between'>
+                  <p className='text-sm text-imbue-coral'>{inputErrors?.description}</p>
+                  <div className='text-imbue-purple text-sm text-right'>
+                    {`${description?.length || 0}/500`}
+                  </div>
                 </div>
               </div>
             </div>
@@ -361,16 +457,12 @@ const GrantApplication = (): JSX.Element => {
                   </div>
                 ))}
               </div>
-              <div className='flex flex-col'>
+              <div
+                ref={el => milestonesRef.current[2] = el}
+                className='flex flex-col gap-2'
+              >
                 <Approvers approvers={approvers} setApprovers={setApprovers} />
-                {/* <div
-                  className='flex flex-row items-center gap-2 clickable-text cursor-pointer active:scale-105 origin-top-left ml-2 my-10'
-                  onClick={onAddApprover}
-                >
-                  <FiPlusCircle color='var(--theme-primary)' />
-                  <p className='w-full'>Add approver</p>
-
-                </div> */}
+                <p className='text-sm text-imbue-coral'>{inputErrors?.approvers}</p>
               </div>
             </div>
           </div>
@@ -423,18 +515,22 @@ const GrantApplication = (): JSX.Element => {
             </div>
           </div>
         </div>
-        <div className='flex flex-col px-6 lg:px-7 py-5'>
-          <div className='text-[20px] text-content lg:ml-5 mb-8'>
-            Milestones
-          </div>
+        <div className='text-[20px] text-content lg:pl-12 py-5 border-b'>
+          Milestones
+        </div>
+        <div className='flex flex-col px-6 lg:px-12 py-8'>
           <div className='flex flex-col gap-4'>
             {milestones.map(
-              ({ name, amount, description: milestoneDescription }, index) => {
+              ({ name, amount, description: milestoneDescription, error }, index) => {
                 const percent = Number(
                   ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
                 );
                 return (
-                  <div key={index} className='flex flex-col gap-0'>
+                  <div
+                    ref={el => milestonesRef.current[index + 3] = el}
+                    key={index}
+                    className='flex flex-col gap-0'
+                  >
                     <div className='flex flex-row relative'>
                       <span
                         onClick={() => onRemoveMilestone(index)}
@@ -442,13 +538,13 @@ const GrantApplication = (): JSX.Element => {
                       >
                         x
                       </span>
-                      <div className='text-base mr-4 lg:mr-9 text-content mt-0.5'>
+                      <div className='text-base mr-2 lg:mr-9 text-content mt-0.5'>
                         {index + 1}.
                       </div>
 
                       <div className='flex flex-col lg:flex-row justify-between w-full text-content'>
                         <div className='lg:w-3/5'>
-                          <h3 className=' text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
+                          <h3 className='text-base lg:text-xl mb-1 p-0 text-imbue-purple-dark font-normal'>
                             Title
                           </h3>
 
@@ -457,7 +553,8 @@ const GrantApplication = (): JSX.Element => {
                               type='text'
                               maxLength={50}
                               data-testid={`milestone-title-${index}`}
-                              className='input-budget  text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-left pl-3 my-3'
+                              placeholder='Add milestone title'
+                              className='input-budget text-base leading-5 rounded-[5px] !p-3 text-content-primary mb-3 outline-content-primary placeholder:text-imbue-light-purple'
                               value={name || ''}
                               onChange={(e) =>
                                 setMilestones([
@@ -470,9 +567,11 @@ const GrantApplication = (): JSX.Element => {
                                 ])
                               }
                             />
-
-                            <div className='text-imbue-purple text-sm ml-auto text-right'>
-                              {`${milestones[index].name?.length || 0}/50`}
+                            <div className='flex items-center justify-between'>
+                              <p className='text-sm text-imbue-coral'>{error?.name}</p>
+                              <div className='text-imbue-purple text-sm ml-auto text-right'>
+                                {`${milestones[index].name?.length || 0}/50`}
+                              </div>
                             </div>
                           </div>
 
@@ -482,7 +581,8 @@ const GrantApplication = (): JSX.Element => {
                           <div>
                             <textarea
                               maxLength={500}
-                              className='input-description text-base'
+                              placeholder='Add milestone description'
+                              className='input-description text-base outline-content-primary placeholder:text-imbue-light-purple'
                               value={milestoneDescription}
                               onChange={(e) =>
                                 setMilestones([
@@ -495,8 +595,11 @@ const GrantApplication = (): JSX.Element => {
                                 ])
                               }
                             />
-                            <div className='text-imbue-purple text-sm ml-auto text-right'>
-                              {`${milestones[index].description?.length || 0}/500`}
+                            <div className='flex items-center justify-between'>
+                              <p className='text-sm text-imbue-coral'>{error?.description}</p>
+                              <div className='text-imbue-purple text-sm ml-auto text-right'>
+                                {`${milestones[index].description?.length || 0}/500`}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -505,33 +608,33 @@ const GrantApplication = (): JSX.Element => {
                           <h3 className=' text-base lg:text-xl mb-2 p-0 text-imbue-purple-dark font-normal'>
                             Amount
                           </h3>
-                          <TextField
-                            color='secondary'
-                            id='outlined-start-adornment'
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment
-                                  sx={{ color: 'var(--theme-purple)' }}
-                                  position='start'
-                                >
-                                  {currencies[currencyId]}
-                                </InputAdornment>
-                              ),
-                            }}
-                            className='amountInput'
-                            type='number'
-                            value={amount || ''}
-                            onChange={(e) =>
-                              setMilestones([
-                                ...milestones.slice(0, index),
-                                {
-                                  ...milestones[index],
-                                  amount: Number(e.target.value),
-                                },
-                                ...milestones.slice(index + 1),
-                              ])
-                            }
-                          />
+                          <div className='w-full relative p-0 m-0'>
+                            <span
+                              className='h-fit absolute left-5 bottom-3 text-base text-content'
+                            >
+                              {Currency[currencyId]}
+                            </span>
+
+                            <input
+                              type='number'
+                              data-testid={`milestone-amount-${index}`}
+                              placeholder='Add an amount'
+                              className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple outline-content-primary'
+                              value={amount || ''}
+                              onChange={(e) => {
+                                if (Number(e.target.value) >= 0)
+                                  setMilestones([
+                                    ...milestones.slice(0, index),
+                                    {
+                                      ...milestones[index],
+                                      amount: Number(e.target.value),
+                                    },
+                                    ...milestones.slice(index + 1),
+                                  ]);
+                              }}
+                            />
+                          </div>
+                          <p className='text-sm text-imbue-coral'>{error?.amount}</p>
 
                           {totalCostWithoutFee !== 0 && (
                             <div className='flex flex-col lg:items-end mt-3 gap-2 w-full'>
@@ -610,7 +713,7 @@ const GrantApplication = (): JSX.Element => {
 
       <div className='buttons-container'>
         <button
-          disabled={!formDataValid}
+          // disabled={!formDataValid}
           className='primary-btn in-dark w-button'
           onClick={() => handleSubmit()}
         >

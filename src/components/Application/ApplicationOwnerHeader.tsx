@@ -93,7 +93,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         </p>
       </div>
       {
-        <p className='text-[1rem] text-imbue-purple max-w-[55%] text-center break-words'>
+        <p className='text-[1rem] text-imbue-purple max-w-[55%] text-center break-words mt-3 lg:mt-0'>
           @
           {mobileView && briefOwner?.username?.length > 16
             ? `${briefOwner?.username.substr(0, 16)}...`
@@ -121,7 +121,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           <button
             className={`${
               applicationStatusId[application?.status_id]
-            }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[10px]`}
+            }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
           >
             {applicationStatusId[application?.status_id]}
           </button>

@@ -73,8 +73,10 @@ export default nextConnect()
   })
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
     const { query, body } = req;
-    const id: any = query.id as string[];
+    const projectId = query?.id ? query.id[0] : null;
     // const brief_id: any = query.brief_id as string[];
+
+    if(projectId === null ) return res.status(404).end();
 
     const userAuth: Partial<models.User> | any = await authenticate(
       'jwt',
@@ -100,10 +102,11 @@ export default nextConnect()
       escrow_address,
       duration_id,
     } = body;
+    
     db.transaction(async (tx) => {
       try {
         // ensure the project exists first
-        const exists = await models.fetchProjectById(id)(tx);
+        const exists = await models.fetchProjectById(projectId)(tx);
 
         if (!exists) {
           return res.status(404).end();
@@ -113,7 +116,7 @@ export default nextConnect()
           return res.status(403).end();
         }
 
-        const project = await models.updateProject(id, {
+        const project = await models.updateProject(projectId, {
           name,
           logo,
           description,
@@ -135,7 +138,7 @@ export default nextConnect()
         }
 
         // drop then recreate
-        await models.deleteMilestones(id)(tx);
+        await models.deleteMilestones(projectId)(tx);
 
         const pkg: ProjectPkg = {
           ...project,

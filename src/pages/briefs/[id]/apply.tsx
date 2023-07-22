@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { WalletAccount } from '@talismn/connect-wallets';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
@@ -13,7 +12,6 @@ import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 import SuccessScreen from '@/components/SuccessScreen';
 
-import { dollarIcon } from '@/assets/svgs';
 import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
 import { Brief, Currency, Freelancer } from '@/model';
@@ -103,7 +101,7 @@ export const SubmitProposal = (): JSX.Element => {
   );
   const imbueFeePercentage = 5;
 
-  const milestonesRef = useRef<any>(null)
+  const milestonesRef = useRef<any>([])
   const [milestones, setMilestones] = useState<MilestoneItem[]>([
     { name: '', amount: undefined, description: '', error: {} },
   ]);
@@ -157,13 +155,74 @@ export const SubmitProposal = (): JSX.Element => {
     }
   }
 
+  const allInputsValid = () => {
+    let hasValue = true;
+    let firstErrorIndex = -1;
+    const newMilestones = [...milestones]
+    const blockUnicodeRegex = /^[\x20-\x7E]*$/;
+
+    for (let i = 0; i < milestones.length; i++) {
+      const { amount, name, description } = milestones[i];
+      newMilestones[i].error = {}
+
+      if (
+        name === undefined ||
+        name === null ||
+        name.length === 0 ||
+        !blockUnicodeRegex.test(name)
+      ) {
+        newMilestones[i].error = {
+          ...newMilestones[i].error,
+          name: "A valid name is required"
+        }
+        hasValue = false
+        firstErrorIndex = (firstErrorIndex === -1) ? i : firstErrorIndex
+      }
+
+      if (
+        amount === undefined ||
+        amount === null ||
+        amount === 0
+      ) {
+        newMilestones[i].error = {
+          ...newMilestones[i].error,
+          amount: "A valid amount is required"
+        }
+        hasValue = false;
+        firstErrorIndex = (firstErrorIndex === -1) ? i : firstErrorIndex
+      }
+
+      if (
+        description === undefined ||
+        description === null ||
+        description.length === 0
+      ) {
+        newMilestones[i].error = {
+          ...newMilestones[i].error,
+          description: "A valid description is required."
+        }
+        hasValue = false
+        firstErrorIndex = (firstErrorIndex === -1) ? i : firstErrorIndex
+      }
+    }
+
+    setMilestones(newMilestones)
+
+    if (firstErrorIndex !== -1) milestonesRef.current[firstErrorIndex]?.scrollIntoView({
+      behavior: 'auto',
+      block: 'center',
+      inline: 'center'
+    })
+
+    return hasValue;
+  };
+  
   async function insertProject() {
 
-    if (!allAmountAndNamesHaveValue()) {
-      milestonesRef?.current?.scrollIntoView()
+    if (!allInputsValid()) {
       return setError({ message: "Please fill all the required fields fields" })
     }
-    if(totalPercent !== 100) return setError({message: "Total percentage must be 100%"})
+    if (totalPercent !== 100) return setError({ message: "Total percentage must be 100%" })
 
     setLoading(true);
     try {
@@ -216,61 +275,6 @@ export const SubmitProposal = (): JSX.Element => {
     return sum + percent;
   }, 0);
 
-  const allAmountAndNamesHaveValue = () => {
-    let hasValue = true;
-    for (let i = 0; i < milestones.length; i++) {
-      const { amount, name, description } = milestones[i];
-
-      const newMilestones = [...milestones]
-      newMilestones[i].error = {}
-      setMilestones(newMilestones)
-
-      if (
-        name === undefined ||
-        name === null ||
-        name.length === 0
-      ) {
-        const newMilestones = [...milestones]
-        newMilestones[i].error = {
-          ...newMilestones[i].error,
-          name: "A valid name is required"
-        }
-        setMilestones(newMilestones)
-        hasValue = false
-      }
-
-      if (
-        amount === undefined ||
-        amount === null ||
-        amount === 0
-      ) {
-        const newMilestones = [...milestones]
-        newMilestones[i].error = {
-          ...newMilestones[i].error,
-          amount: "A valid amount is required"
-        }
-        setMilestones(newMilestones)
-        hasValue = false;
-      }
-
-      if (
-        description === undefined ||
-        description === null ||
-        description.length === 0
-      ) {
-        const newMilestones = [...milestones]
-        newMilestones[i].error = {
-          ...newMilestones[i].error,
-          description: "A valid description is required."
-        }
-        setMilestones(newMilestones)
-        hasValue = false
-      }
-    }
-
-    return hasValue;
-  };
-
   // const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
 
   if (loadingUser || loading) <FullScreenLoader />;
@@ -284,7 +288,7 @@ export const SubmitProposal = (): JSX.Element => {
         {brief && <BriefInsights brief={brief} />}
       </div>
 
-      <div ref={milestonesRef} className='milestones border border-white py-[2rem] rounded-[20px] bg-white'>
+      <div className='milestones border border-white py-[2rem] rounded-[20px] bg-white'>
         <div className='flex flex-row justify-between mx-5 lg:mx-14 -mb-3'>
           <h3 className='text-lg lg:text-[1.25rem] leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0 flex'>
             Milestones
@@ -308,6 +312,7 @@ export const SubmitProposal = (): JSX.Element => {
               <div
                 className='milestone-row !px-4 !py-7 !m-0 lg:!px-14 relative border-t border-light-white border-b border-b-[#03116A1F]'
                 key={index}
+                ref={el => milestonesRef.current[index] = el}
               >
                 <span
                   onClick={() => onRemoveMilestone(index)}
@@ -378,18 +383,17 @@ export const SubmitProposal = (): JSX.Element => {
                     </h3>
 
                     <div className='w-full relative p-0 m-0'>
-                      <Image
-                        src={dollarIcon}
-                        alt='dollar icon'
-                        height={12}
-                        width={12}
-                        className='h-fit absolute left-2 bottom-3'
-                      />
+                      <span
+                        className='h-fit absolute left-5 bottom-3 text-base text-content'
+                      >
+                        {Currency[currencyId]}
+                      </span>
+
                       <input
                         type='number'
                         data-testid={`milestone-amount-${index}`}
                         placeholder='Add an amount'
-                        className='input-budget text-base rounded-[5px] py-3 px-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
+                        className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
                         value={amount || ''}
                         onChange={(e) => {
                           if (Number(e.target.value) >= 0)
