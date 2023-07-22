@@ -82,7 +82,7 @@ const ApplicationPreview = (): JSX.Element => {
         const applicationResponse = await fetchProject(applicationId, briefId);
 
         if (!applicationResponse)
-          return setError({ message: 'Could not find any application' });
+          return setError({ noRetry: true, message: 'Could not find any application' });
 
         const freelancerUser = await fetchUser(
           Number(applicationResponse?.user_id)
@@ -451,7 +451,7 @@ const ApplicationPreview = (): JSX.Element => {
                     <div className='mr-4 lg:mr-9 text-base lg:text-[1.25rem] text-imbue-purple font-normal'>
                       {index + 1}.
                     </div>
-                    <div className={`flex ${isEditingBio ? 'flex-col lg:flex-row' : 'flex-row' } justify-between w-full`}>
+                    <div className={`flex ${isEditingBio ? 'flex-col lg:flex-row' : 'flex-row'} justify-between w-full`}>
                       <div className='w-full lg:w-1/2 h-fit'>
                         {isEditingBio ? (
                           <>
@@ -790,12 +790,16 @@ const ApplicationPreview = (): JSX.Element => {
 
       <ErrorScreen {...{ error, setError }}>
         <div className='flex flex-col gap-4 w-1/2'>
-          <button
-            onClick={() => setError(null)}
-            className='primary-btn in-dark w-button w-full !m-0'
-          >
-            Try Again
-          </button>
+          {
+            !error?.noRetry && (
+              <button
+                onClick={() => setError(null)}
+                className='primary-btn in-dark w-button w-full !m-0'
+              >
+                Try Again
+              </button>
+            )
+          }
           <button
             onClick={() => router.push(`/dashboard`)}
             className='underline text-xs lg:text-base font-bold'

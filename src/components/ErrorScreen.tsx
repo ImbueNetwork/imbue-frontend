@@ -10,6 +10,8 @@ type ErrorScreenProps = {
 const ErrorScreen = (props: ErrorScreenProps) => {
   const { error, setError } = props;
   const handleClose = () => {
+    if(error.noRetry) return
+    
     setError && setError(null);
   };
 
