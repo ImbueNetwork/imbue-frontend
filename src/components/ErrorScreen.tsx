@@ -15,6 +15,7 @@ const ErrorScreen = (props: ErrorScreenProps) => {
 
   return (
     <Dialog
+      disableRestoreFocus
       open={error?.message ? true : false}
       onClose={handleClose}
       aria-labelledby='alert-dialog-title'

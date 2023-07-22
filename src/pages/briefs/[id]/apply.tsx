@@ -3,7 +3,7 @@
 import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 
@@ -27,6 +27,11 @@ interface MilestoneItem {
   name: string;
   amount: number | undefined;
   description: string;
+  error?: {
+    name?: string;
+    description?: string;
+    amount?: string;
+  }
 }
 
 export const SubmitProposal = (): JSX.Element => {
@@ -98,8 +103,9 @@ export const SubmitProposal = (): JSX.Element => {
   );
   const imbueFeePercentage = 5;
 
+  const milestonesRef = useRef<any>(null)
   const [milestones, setMilestones] = useState<MilestoneItem[]>([
-    { name: '', amount: undefined, description: '' },
+    { name: '', amount: undefined, description: '', error: {} },
   ]);
 
   const durationOptions = timeData.sort((a, b) =>
@@ -116,7 +122,7 @@ export const SubmitProposal = (): JSX.Element => {
   const onAddMilestone = () => {
     setMilestones([
       ...milestones,
-      { name: '', amount: undefined, description: '' },
+      { name: '', amount: undefined, description: '', error: {} },
     ]);
   };
 
@@ -152,7 +158,13 @@ export const SubmitProposal = (): JSX.Element => {
   }
 
   async function insertProject() {
-    //TODO: validate all milestone sum up to 100%
+
+    if (!allAmountAndNamesHaveValue()) {
+      milestonesRef?.current?.scrollIntoView()
+      return setError({ message: "Please fill all the required fields fields" })
+    }
+    if(totalPercent !== 100) return setError({message: "Total percentage must be 100%"})
+
     setLoading(true);
     try {
       const resp = await fetch(`${config.apiBase}/project`, {
@@ -205,41 +217,74 @@ export const SubmitProposal = (): JSX.Element => {
   }, 0);
 
   const allAmountAndNamesHaveValue = () => {
+    let hasValue = true;
     for (let i = 0; i < milestones.length; i++) {
       const { amount, name, description } = milestones[i];
+
+      const newMilestones = [...milestones]
+      newMilestones[i].error = {}
+      setMilestones(newMilestones)
+
+      if (
+        name === undefined ||
+        name === null ||
+        name.length === 0
+      ) {
+        const newMilestones = [...milestones]
+        newMilestones[i].error = {
+          ...newMilestones[i].error,
+          name: "A valid name is required"
+        }
+        setMilestones(newMilestones)
+        hasValue = false
+      }
 
       if (
         amount === undefined ||
         amount === null ||
-        amount === 0 ||
-        name === undefined ||
-        name === null ||
-        name.length === 0 ||
+        amount === 0
+      ) {
+        const newMilestones = [...milestones]
+        newMilestones[i].error = {
+          ...newMilestones[i].error,
+          amount: "A valid amount is required"
+        }
+        setMilestones(newMilestones)
+        hasValue = false;
+      }
+
+      if (
         description === undefined ||
         description === null ||
         description.length === 0
       ) {
-        return false;
+        const newMilestones = [...milestones]
+        newMilestones[i].error = {
+          ...newMilestones[i].error,
+          description: "A valid description is required."
+        }
+        setMilestones(newMilestones)
+        hasValue = false
       }
     }
 
-    return true;
+    return hasValue;
   };
 
-  const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
+  // const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
 
   if (loadingUser || loading) <FullScreenLoader />;
 
   return (
     <div className='flex flex-col gap-10 text-base leading-[1.5] !mx-3 lg:!mx-auto'>
       <div className='bg-white rounded-[20px]'>
-        <h3 className='ml-4 lg:ml-[3rem] text-xl leading-[1.5] m-0 p-0  mt-[1.2rem] flex text-imbue-purple-dark font-normal'>
+        <h3 className='ml-7 lg:ml-12 text-xl leading-[1.5] m-0 p-0  mt-[1.2rem] flex text-imbue-purple-dark font-normal'>
           Job description
         </h3>
         {brief && <BriefInsights brief={brief} />}
       </div>
 
-      <div className='milestones border border-white py-[2rem] rounded-[20px] bg-white'>
+      <div ref={milestonesRef} className='milestones border border-white py-[2rem] rounded-[20px] bg-white'>
         <div className='flex flex-row justify-between mx-5 lg:mx-14 -mb-3'>
           <h3 className='text-lg lg:text-[1.25rem] leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0 flex'>
             Milestones
@@ -255,7 +300,7 @@ export const SubmitProposal = (): JSX.Element => {
         <hr className='h-[1px] bg-[rgba(3, 17, 106, 0.12)] w-full mt-4' />
 
         <div className='milestone-list !gap-0'>
-          {milestones.map(({ name, amount, description }, index) => {
+          {milestones.map(({ name, amount, description, error }, index) => {
             const percent = Number(
               ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
             );
@@ -273,8 +318,8 @@ export const SubmitProposal = (): JSX.Element => {
                 <div className='text-base mr-4 lg:mr-9 text-imbue-purple-dark font-normal'>
                   {index + 1}.
                 </div>
-                <div className='flex flex-row justify-between w-full'>
-                  <div className='lg:w-2/5 w-3/5'>
+                <div className='flex flex-col lg:flex-row justify-between w-full'>
+                  <div className='lg:w-2/5 w-full'>
                     <h3 className=' text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
                       Title
                     </h3>
@@ -282,7 +327,7 @@ export const SubmitProposal = (): JSX.Element => {
                     <input
                       type='text'
                       data-testid={`milestone-title-${index}`}
-                      className='input-budget text-base rounded-md py-3 px-5 text-imbue-purple text-left mb-8 placeholder:text-imbue-light-purple'
+                      className='input-budget text-base rounded-md py-3 px-5 text-imbue-purple text-left placeholder:text-imbue-light-purple mb-1'
                       placeholder='Add milestone name here'
                       value={name || ''}
                       onChange={(e) =>
@@ -296,11 +341,16 @@ export const SubmitProposal = (): JSX.Element => {
                         ])
                       }
                     />
+                    <div className='flex items-center justify-between mb-4'>
+                      <p className='text-sm text-content my-2'>{name?.length}/50</p>
+                      <p className='text-sm text-imbue-coral'>{error?.name}</p>
+                    </div>
 
                     <h3 className='mb-2 lg:mb-5 text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
                       Description
                     </h3>
                     <textarea
+                      maxLength={500}
                       placeholder='Add milestone description here'
                       className='input-description text-base placeholder:text-imbue-light-purple'
                       data-testid={`milestone-description-${index}`}
@@ -316,9 +366,13 @@ export const SubmitProposal = (): JSX.Element => {
                         ])
                       }
                     />
+                    <div className='flex items-center justify-between'>
+                      <p className='text-sm text-content my-2'>{description?.length}/500</p>
+                      <p className='text-sm text-imbue-coral'>{error?.description}</p>
+                    </div>
                   </div>
 
-                  <div className='flex flex-col lg:w-3/12 w-4/12 lg:items-start lg:mt-[-0.5rem]'>
+                  <div className='flex flex-col lg:w-3/12 w-full lg:items-start mt-4 lg:mt-[-0.5rem]'>
                     <h3 className=' text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
                       Amount
                     </h3>
@@ -350,6 +404,7 @@ export const SubmitProposal = (): JSX.Element => {
                         }}
                       />
                     </div>
+                    <p className='text-sm text-imbue-coral my-2 text-right w-full'>{error?.amount}</p>
                     {totalCostWithoutFee !== 0 && (
                       <div className='flex flex-col items-end mt-3 gap-2 w-full'>
                         <div className='progress-value text-base !text-imbue-purple-dark'>
@@ -398,8 +453,15 @@ export const SubmitProposal = (): JSX.Element => {
 
           <div className='flex flex-row items-center mb-5'>
             <div className='flex flex-col flex-grow'>
-              <h3 className='text-lg lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
-                Imbue Service Fee 5% - Learn more about Imbue’s fees
+              <h3 className='text-lg lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal flex  items-center'>
+                Imbue Service Fee 5% -
+                <a
+                  href='https://www.imbue.network/faq'
+                  target='_blank'
+                  className='hover:underline ml-2 text-sm cursor-pointer'
+                >
+                  Learn more about Imbue’s fees
+                </a>
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-purple-dark font-normal'>
@@ -478,9 +540,9 @@ export const SubmitProposal = (): JSX.Element => {
       <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-2xl w-full p-[1rem] flex items-center justify-between   self-center'>
         <div className='buttons-container'>
           <button
-            disabled={
-              totalPercent !== 100 || !milestoneAmountsAndNamesHaveValue
-            }
+            // disabled={
+            //   totalPercent !== 100 || !milestoneAmountsAndNamesHaveValue
+            // }
             className='primary-btn in-dark w-button hover:!bg-imbue-purple hover:!text-white'
             onClick={() => handleSubmit()}
           >
