@@ -744,7 +744,7 @@ const GrantApplication = (): JSX.Element => {
         onClose={() => router.push(`/projects/${projectId}`)}
         aria-labelledby='alert-dialog-title'
         aria-describedby='alert-dialog-description'
-        className='p-14 errorDialogue'
+        className='px-5 md:p-0 errorDialogue'
       >
         <div className='my-auto flex flex-col gap-3 items-center p-8'>
           <div className='f-modal-alert'>
@@ -752,21 +752,21 @@ const GrantApplication = (): JSX.Element => {
               <Image src={WalletIcon} alt='wallet icon' className='w-24 h-24' />
             </div>
           </div>
-          <div className='my-2 lg:my-10'>
+          <div className='my-2 lg:my-4'>
             <p className='text-center text-lg lg:text-3xl text-content'>
               Grant Created Successfully
             </p>
           </div>
 
           <CopyToClipboard text={escrowAddress}>
-            <div className='flex flex-row gap-4 items-center rounded-[10px] border border-solid border-light-grey py-8 px-6 text-xl text-content'>
+            <div className='flex flex-row gap-4 items-center rounded-[10px] border border-solid border-light-grey p-6 text-xl text-content'>
               <IconButton onClick={() => copyAddress()}>
                 <FaRegCopy className='text-content' />
               </IconButton>
               <span>{escrowAddress}</span>
             </div>
           </CopyToClipboard>
-          <div className='mt-6 mb-12 text-content text-lg text-center'>
+          <div className='my-6 text-content text-lg text-center'>
             Please use this given address to create a proposal in your Kusama
             treasury. After the voting is passed your project will be created
           </div>

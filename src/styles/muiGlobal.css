@@ -144,7 +144,7 @@
 
 .errorDialogue
   .MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation24.MuiDialog-paper.MuiDialog-paperScrollPaper.MuiDialog-paperWidthSm {
-  max-width: 60%;
+  min-width: 60%;
 }
 
 .amountInput .MuiInputBase-input {
