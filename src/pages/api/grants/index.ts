@@ -61,7 +61,6 @@ export default nextConnect()
 
     const userAuth: Partial<User> | any = await authenticate('jwt', req, res);
     verifyUserIdFromJwt(req, res, userAuth.id);
-
     await db.transaction(async (tx: any) => {
       try {
         const grant_id = await insertGrant(grant)(tx);

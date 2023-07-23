@@ -269,7 +269,6 @@ const GrantApplication = (): JSX.Element => {
 
       const grant_id = blake2AsHex(JSON.stringify(grant));
 
-      if (!account) return
       const result = await chainService.submitInitialGrant(account, grantMilestones, approvers, currencyId, totalCost, "kusama", grant_id);
 
       // eslint-disable-next-line no-constant-condition
@@ -277,13 +276,25 @@ const GrantApplication = (): JSX.Element => {
         if (result.status || result.txError) {
           if (result.status) {
             setEscrowAddress(result?.eventData[5])
-            setSuccess(true);
             const resp = await fetch(`${config.apiBase}grants`, {
               headers: config.postAPIHeaders,
               method: 'post',
               body: JSON.stringify({
                 ...grant,
                 status_id: OffchainProjectState.Accepted,
+                milestones: milestones
+                  .filter((m) => m.amount !== undefined)
+                  .map((m) => {
+                    return {
+                      name: m.name,
+                      amount: m.amount,
+                      description: m.description,
+                      percentage_to_unlock: (
+                        ((m.amount ?? 0) / totalCostWithoutFee) *
+                        100
+                      ).toFixed(0),
+                    };
+                  }),
                 chain_project_id: result?.eventData[2],
                 escrow_address: result?.eventData[5]
               }),
@@ -687,8 +698,15 @@ const GrantApplication = (): JSX.Element => {
 
             <div className='flex flex-row items-center mb-5'>
               <div className='flex flex-col flex-grow'>
-                <p className='text-lg lg:text-xl text-content m-0 p-0'>
-                  Imbue Service Fee 5% - Learn more about Imbue’s fees
+                <p className='text-lg lg:text-xl text-content m-0 p-0 flex items-center'>
+                  Imbue Service Fee 5% -
+                  <a
+                    href='https://www.imbue.network/faq'
+                    target='_blank'
+                    className='hover:underline ml-2 text-sm cursor-pointer'
+                  >
+                    Learn more about Imbue’s fees
+                  </a>
                 </p>
               </div>
               <div className='text-content-primary'>
@@ -735,7 +753,7 @@ const GrantApplication = (): JSX.Element => {
             </div>
           </div>
           <div className='my-2 lg:my-10'>
-            <p className='text-center text-lg lg:text-3xl font-bold'>
+            <p className='text-center text-lg lg:text-3xl text-content'>
               Grant Created Successfully
             </p>
           </div>
