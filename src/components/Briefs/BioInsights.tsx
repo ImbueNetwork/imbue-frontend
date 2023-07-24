@@ -64,7 +64,7 @@ const BioInsights = ({
   );
 
   let hint = '';
-  if (!canSubmitProposal) hint = 'Only verfied freelancers can apply to briefs';
+  if (!canSubmitProposal) hint = 'Only verified freelancers can apply to briefs';
   else if (isOwnerOfBrief)
     hint = 'You are not allowed to submit proposal to your own brief';
 

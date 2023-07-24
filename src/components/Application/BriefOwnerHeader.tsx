@@ -9,7 +9,6 @@ import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { FaStar } from 'react-icons/fa';
 
 import { getBalance } from '@/utils/helper';
 
@@ -140,10 +139,13 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
 
   return (
     <div className='flex items-center w-full md:justify-between lg:px-10 flex-wrap gap-4'>
-      <div className='flex gap-[3rem] items-start'>
+      <div className='flex gap-6 items-start'>
         <Image
-          className='w-[3rem] h-[3rem] rounded-full object-cover cursor-pointer'
-          src={require('@/assets/images/profile-image.png')}
+          onClick={()=>router.push(`/freelancers/${freelancer?.username}`)}
+          className='w-16 h-16 rounded-full object-cover cursor-pointer'
+          src={freelancer?.profile_image ?? require('@/assets/images/profile-image.png')}
+          height={200}
+          width={200}
           priority
           alt='profileImage'
         />
@@ -175,7 +177,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
           </div> */}
 
           {application?.currency_id !== Currency.IMBU && (
-            <p className='text-sm mt-[1.25rem] text-imbue-purple'>
+            <p className='text-sm mt-4 text-imbue-purple'>
               {loadingWallet === 'loading' && 'Loading Wallet...'}
               {loadingWallet === 'connecting' && 'Connecting Wallet...'}
               {!loadingWallet &&
@@ -186,7 +188,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
             </p>
           )}
 
-          <p className='text-sm mt-[1.25rem] text-imbue-purple'>
+          <p className='text-sm mt-2 text-imbue-purple'>
             {loadingWallet === 'loading' && 'Loading Wallet...'}
             {loadingWallet === 'connecting' && 'Connecting Wallet...'}
             {!loadingWallet &&
@@ -197,17 +199,17 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         </div>
       </div>
 
-      <div className='flex flex-col justify-center items-center'>
+      <div className='flex flex-col justify-center lg:items-center'>
         {
-          <p className='text-[1rem] text-imbue-purple max-w-[55%] text-center break-words'>
+          <p className='text-[1rem] text-content-primary lg:text-center break-words'>
             @
             {mobileView && freelancer?.username?.length > 16
-              ? `${freelancer?.username?.substr(0, 16)}...`
+              ? `${freelancer?.username?.substring(0, 16)}...`
               : freelancer?.username}
           </p>
         }
 
-        <div className='rating flex justify-center gap-[1.25rem] mt-[1.5rem]'>
+        {/* <div className='rating flex justify-center gap-4 mt-2 lg:mt-6'>
           <p className=''>
             <FaStar color='#BAFF36' />
             <FaStar color='#BAFF36' />
@@ -217,15 +219,15 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
           <p className='text-imbue-purple font-normal'>
             <span>Top Rated</span>
             <span className='review-count ml-1 text-imbue-purple font-normal'>
-              (1434 reviews)
+              (1,434 reviews)
             </span>
           </p>
-        </div>
+        </div> */}
       </div>
 
-      <div className='relative flex gap-3'>
+      <div className='relative flex flex-wrap items-center gap-3'>
         <button
-          className='Pending Review-btn !bg-[#BAFF36] !text-imbue-purple in-dark h-[2.68rem] text-xs lg:text-base rounded-full px-6 lg:px-6'
+          className='primary-btn in-dark w-button !px-5 !mr-0 !bg-[#BAFF36] !text-imbue-purple in-dark'
           onClick={() =>
             application.user_id &&
             handleMessageBoxClick(application?.user_id, freelancer?.username)
@@ -244,7 +246,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
               aria-haspopup='true'
               aria-expanded={open ? 'true' : undefined}
               onClick={handleOptionsClick}
-              className='primary-btn hover:!bg-imbue-purple hover:!text-white in-dark w-button !text-xs lg:!text-base'
+              className='primary-btn in-dark w-button !mr-0 hover:!bg-content-primary hover:!text-white'
               disabled={loadingWallet ? true : false}
             >
               {loadingWallet ? (
