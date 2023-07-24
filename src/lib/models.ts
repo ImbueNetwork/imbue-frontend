@@ -950,6 +950,13 @@ export const fetchFreelancerDetailsByUsername =
   (username: string | string[]) => (tx: Knex.Transaction) =>
     fetchAllFreelancers()(tx).where({ username: username }).first();
 
+export const searchFreelancerProfile =
+  (query: any) => (tx: Knex.Transaction) =>
+    fetchAllFreelancers()(tx)
+    .where({ 
+      display_name: query?.search_input
+     })
+
 export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
   tx
     .select(
@@ -1373,9 +1380,7 @@ export const searchFreelancers = async (
         this.where('verified', true);
       }
     })
-    .where('username', 'ilike', '%' + filter.search_input + '%')
-    .where('title', 'ilike', '%' + filter.search_input + '%')
-    .where('bio', 'ilike', '%' + filter.search_input + '%');
+    .where('display_name', 'ilike', '%' + filter.search_input + '%')
 
 export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
   const {

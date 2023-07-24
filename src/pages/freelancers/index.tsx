@@ -58,7 +58,7 @@ const Freelancers = (): JSX.Element => {
     servicesRangeProps,
     languagesRangeProps,
     freelancerInfoProps,
-    heading,
+    name,
   } = router.query;
 
   const { pathname } = router;
@@ -175,7 +175,7 @@ const Freelancers = (): JSX.Element => {
   const pageItems = [12, 18, 24, 30];
 
   useEffect(() => {
-    const fetchAndSetBriefs = async () => {
+    const fetchAndSetFreelancers = async () => {
       if (Object.keys(router?.query).length) {
         let filter: FreelancerSqlFilter = {
           skills_range: [],
@@ -184,12 +184,12 @@ const Freelancers = (): JSX.Element => {
           search_input: '',
         };
 
-        if (heading) {
-          filter = { ...filter, search_input: heading };
+        if (name) {
+          filter = { ...filter, search_input: name };
           const input = document.getElementById(
             'search-input'
           ) as HTMLInputElement;
-          if (input) input.value = heading.toString();
+          if (input) input.value = name.toString();
         }
 
         if (skillsRangeProps) {
@@ -234,20 +234,20 @@ const Freelancers = (): JSX.Element => {
 
         const { currentData, totalFreelancers } = await callSearchFreelancers(
           filter
-        );
+          );
         setFreelancers(currentData);
         setFreelancersTotal(totalFreelancers);
       }
     };
 
-    router.isReady && fetchAndSetBriefs();
+    router.isReady && fetchAndSetFreelancers();
   }, [
     router,
     skills,
     services,
     languages,
     skillsRangeProps,
-    heading,
+    name,
     languagesRangeProps,
     servicesRangeProps,
     freelancerInfoProps,
@@ -303,7 +303,7 @@ const Freelancers = (): JSX.Element => {
       }
     }
 
-    router.query.heading = search_value !== '' ? search_value : [];
+    router.query.name = search_value !== '' ? search_value : [];
     router.query.skillsRangeProps = skillsRange.length
       ? skillsRange.toString()
       : [];
