@@ -29,7 +29,7 @@ interface MilestoneItem {
     name?: string;
     description?: string;
     amount?: string;
-  }
+  };
 }
 
 export const SubmitProposal = (): JSX.Element => {
@@ -101,7 +101,7 @@ export const SubmitProposal = (): JSX.Element => {
   );
   const imbueFeePercentage = 5;
 
-  const milestonesRef = useRef<any>([])
+  const milestonesRef = useRef<any>([]);
   const [milestones, setMilestones] = useState<MilestoneItem[]>([
     { name: '', amount: undefined, description: '', error: {} },
   ]);
@@ -158,12 +158,12 @@ export const SubmitProposal = (): JSX.Element => {
   const allInputsValid = () => {
     let hasValue = true;
     let firstErrorIndex = -1;
-    const newMilestones = [...milestones]
+    const newMilestones = [...milestones];
     const blockUnicodeRegex = /^[\x20-\x7E]*$/;
 
     for (let i = 0; i < milestones.length; i++) {
       const { amount, name, description } = milestones[i];
-      newMilestones[i].error = {}
+      newMilestones[i].error = {};
 
       if (
         name === undefined ||
@@ -173,23 +173,19 @@ export const SubmitProposal = (): JSX.Element => {
       ) {
         newMilestones[i].error = {
           ...newMilestones[i].error,
-          name: "A valid name is required"
-        }
-        hasValue = false
-        firstErrorIndex = (firstErrorIndex === -1) ? i : firstErrorIndex
+          name: 'A valid name is required',
+        };
+        hasValue = false;
+        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
       }
 
-      if (
-        amount === undefined ||
-        amount === null ||
-        amount === 0
-      ) {
+      if (amount === undefined || amount === null || amount === 0) {
         newMilestones[i].error = {
           ...newMilestones[i].error,
-          amount: "A valid amount is required"
-        }
+          amount: 'A valid amount is required',
+        };
         hasValue = false;
-        firstErrorIndex = (firstErrorIndex === -1) ? i : firstErrorIndex
+        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
       }
 
       if (
@@ -199,30 +195,33 @@ export const SubmitProposal = (): JSX.Element => {
       ) {
         newMilestones[i].error = {
           ...newMilestones[i].error,
-          description: "A valid description is required."
-        }
-        hasValue = false
-        firstErrorIndex = (firstErrorIndex === -1) ? i : firstErrorIndex
+          description: 'A valid description is required.',
+        };
+        hasValue = false;
+        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
       }
     }
 
-    setMilestones(newMilestones)
+    setMilestones(newMilestones);
 
-    if (firstErrorIndex !== -1) milestonesRef.current[firstErrorIndex]?.scrollIntoView({
-      behavior: 'auto',
-      block: 'center',
-      inline: 'center'
-    })
+    if (firstErrorIndex !== -1)
+      milestonesRef.current[firstErrorIndex]?.scrollIntoView({
+        behavior: 'auto',
+        block: 'center',
+        inline: 'center',
+      });
 
     return hasValue;
   };
-  
-  async function insertProject() {
 
+  async function insertProject() {
     if (!allInputsValid()) {
-      return setError({ message: "Please fill all the required fields fields" })
+      return setError({
+        message: 'Please fill all the required fields fields',
+      });
     }
-    if (totalPercent !== 100) return setError({ message: "Total percentage must be 100%" })
+    if (totalPercent !== 100)
+      return setError({ message: 'Total percentage must be 100%' });
 
     setLoading(true);
     try {
@@ -312,14 +311,17 @@ export const SubmitProposal = (): JSX.Element => {
               <div
                 className='milestone-row !px-4 !py-7 !m-0 lg:!px-14 relative border-t border-light-white border-b border-b-[#03116A1F]'
                 key={index}
-                ref={el => milestonesRef.current[index] = el}
+                ref={(el) => (milestonesRef.current[index] = el)}
               >
-                <span
-                  onClick={() => onRemoveMilestone(index)}
-                  className='absolute top-1 right-2 lg:right-4 text-sm lg:text-xl font-bold hover:border-red-500 text-red-500 cursor-pointer'
-                >
-                  x
-                </span>
+                {index !== 0 && (
+                  <span
+                    onClick={() => onRemoveMilestone(index)}
+                    className='absolute top-1 right-2 lg:right-4 text-sm lg:text-xl font-bold hover:border-red-500 text-red-500 cursor-pointer'
+                  >
+                    x
+                  </span>
+                )}
+
                 <div className='text-base mr-4 lg:mr-9 text-imbue-purple-dark font-normal'>
                   {index + 1}.
                 </div>
@@ -347,7 +349,9 @@ export const SubmitProposal = (): JSX.Element => {
                       }
                     />
                     <div className='flex items-center justify-between mb-4'>
-                      <p className='text-sm text-content my-2'>{name?.length}/50</p>
+                      <p className='text-sm text-content my-2'>
+                        {name?.length}/50
+                      </p>
                       <p className='text-sm text-imbue-coral'>{error?.name}</p>
                     </div>
 
@@ -372,8 +376,12 @@ export const SubmitProposal = (): JSX.Element => {
                       }
                     />
                     <div className='flex items-center justify-between'>
-                      <p className='text-sm text-content my-2'>{description?.length}/500</p>
-                      <p className='text-sm text-imbue-coral'>{error?.description}</p>
+                      <p className='text-sm text-content my-2'>
+                        {description?.length}/500
+                      </p>
+                      <p className='text-sm text-imbue-coral'>
+                        {error?.description}
+                      </p>
                     </div>
                   </div>
 
@@ -383,9 +391,7 @@ export const SubmitProposal = (): JSX.Element => {
                     </h3>
 
                     <div className='w-full relative p-0 m-0'>
-                      <span
-                        className='h-fit absolute left-5 bottom-3 text-base text-content'
-                      >
+                      <span className='h-fit absolute left-5 bottom-3 text-base text-content'>
                         {Currency[currencyId]}
                       </span>
 
@@ -408,7 +414,9 @@ export const SubmitProposal = (): JSX.Element => {
                         }}
                       />
                     </div>
-                    <p className='text-sm text-imbue-coral my-2 text-right w-full'>{error?.amount}</p>
+                    <p className='text-sm text-imbue-coral my-2 text-right w-full'>
+                      {error?.amount}
+                    </p>
                     {totalCostWithoutFee !== 0 && (
                       <div className='flex flex-col items-end mt-3 gap-2 w-full'>
                         <div className='progress-value text-base !text-imbue-purple-dark'>

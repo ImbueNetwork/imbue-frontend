@@ -208,7 +208,7 @@ export const HirePopup = ({
           approve the completion of each milestone
         </p>
         <p className='mb-10'>
-          <span className='primary-text mr-1'>
+          <span className='text-lg lg:text-xl text-imbue-lemon mr-1'>
             {Number(totalCost.toFixed(2)).toLocaleString()}
           </span>
           ${Currency[application.currency_id]}
