@@ -14,7 +14,7 @@ module.exports = {
   ],
   rules: {
     'no-unused-vars': [
-      'warn',
+      'off',
       {
         vars: 'all',
         varsIgnorePattern: '^_',
@@ -23,13 +23,21 @@ module.exports = {
       },
     ],
     'no-console': 'warn',
-    'no-constant-condition': 'warn',
+    'no-constant-condition': 'error',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-var-requires': 'off',
-    '@typescript-eslint/ban-ts-comment': 'warn',
+    '@typescript-eslint/ban-ts-comment': 'error',
     'react/display-name': 'off',
-    '@typescript-eslint/no-unused-vars': 'warn',
+    '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          vars: 'all',
+          varsIgnorePattern: '^_',
+          args: 'after-used',
+          argsIgnorePattern: '^_',
+        },
+    ],
     //#region  //*=========== Unused Import ===========
     'unused-imports/no-unused-imports': 'error',
     'unused-imports/no-unused-vars': [
