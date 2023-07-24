@@ -118,7 +118,7 @@ export const HirePopup = ({
         <div className='flex w-full justify-start items-center px-5 gap-5 pt-8 md:px-10 lg:gap-11 lg:px-16 lg:pb-2'>
           <Image
             className='w-12 h-12 md:w-16 md:h-16 rounded-full object-cover'
-            src={require('@/assets/images/profile-image.png')}
+            src={freelancer?.profile_image || require('@/assets/images/profile-image.png')}
             alt='profileImage'
           />
           <span className='text-xl text-secondary-dark-hover'>
@@ -204,7 +204,7 @@ export const HirePopup = ({
           from your account once the freelancer starts the project.
         </p>
         <p className='text-center w-full text-lg lg:text-xl my-4'>
-          The funds are then paid to the freelancer iin stages only when you
+          The funds are then paid to the freelancer in stages only when you
           approve the completion of each milestone
         </p>
         <p className='mb-10'>

@@ -11,22 +11,24 @@ export const ApplicationContainer = ({
   handleMessageBoxClick,
 }: ApplicationContainerProps) => {
   return (
-    <div className='flex flex-col p-[20px] lg:px-[60px] lg:py-[35px] border-b border-b-light-white last:border-b-0'>
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center gap-5'>
+    <div className='flex flex-col px-5 py-5 lg:px-[60px] lg:py-[35px] border-b border-b-light-white last:border-b-0'>
+      <div className='flex flex-col gap-5 lg:flex-row lg:items-center justify-between mb-4'>
+        <div className='flex items-start gap-5 ml-4 lg:ml-0'>
           <Image
-            src={require('@/assets/images/profile-image.png')}
-            className='h-[45px] w-[45px] lg:h-[60px] lg:w-[60px] object-cover'
+            src={application?.freelancer?.profile_image ?? require('@/assets/images/profile-image.png')}
+            className='h-[60px] w-[60px] object-cover rounded-full'
             alt={'profile-picture'}
             height={70}
             width={70}
           />
 
-          <div className='user-id text-imbue-purple-dark text-[10px] lg:text-base max-w-[100px] lg:max-w-full break-words'>
-            @{application?.freelancer?.username}
+          <div className='user-id text-content max-w-[70%] lg:max-w-full flex flex-col gap-2'>
+            <span className='text-lg'>{application?.freelancer?.display_name}</span>
+            <span className='text-sm text-content-primary break-words'>@{application?.freelancer?.username}</span>
+            <span className='text-sm w-[fit-content]'>{application?.freelancer?.title}</span>
           </div>
         </div>
-        <div className='ctas-container flex flex-col lg:flex-row gap-2'>
+        <div className='ctas-container flex flex-row flex-wrap gap-2 pb-4'>
           {/* TODO: Like/unlike feature. On hold */}
           {/* <div className="cta-votes">
                                             <div className="cta-vote">
@@ -39,9 +41,9 @@ export const ApplicationContainer = ({
                                             </div>
                                         </div> */}
 
-          
+
           <button
-            className='border border-imbue-purple rounded-full px-5 text-imbue-purple hover:bg-primary hover:border-primary font-medium'
+            className='border border-imbue-purple rounded-full px-5 text-imbue-purple hover:bg-primary hover:border-primary font-medium py-[6px] md:py-2 !text-sm lg:!text-base'
             onClick={() => redirectToApplication(application?.id)}
           >
             View proposal
@@ -53,14 +55,13 @@ export const ApplicationContainer = ({
                 application?.freelancer
               )
             }
-            className='primary-btn in-dark w-button'
+            className='primary-btn in-dark w-button !px-5 !text-sm lg:!text-base'
           >
             Message
           </button>
           <button
-            className={`${
-              applicationStatusId[application?.status_id]
-            }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[10px]`}
+            className={`${applicationStatusId[application?.status_id]
+              }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[10px]`}
           >
             {applicationStatusId[application?.status_id]}
           </button>
@@ -79,15 +80,16 @@ export const ApplicationContainer = ({
                     </div> */}
         </div>
 
-        <div className='flex flex-row items-center justify-between'>
-          <div className='text-imbue-purple-dark text-base w-[fit-content] max-w-[320px]'>
-            {application?.freelancer?.title}
-          </div>
-        </div>
-
-        <div className='text-base text-imbue-purple-dark'>
+        <p className='text-xl text-content'>
           {application?.name}
-        </div>
+        </p>
+        <p className='text-base text-content'>
+          {
+            application?.description?.length > 500
+              ? application?.description.substring(0, 500) + "..."
+              : application.description
+          }
+        </p>
         <div className='text-base'>
           {/* <div className='text-imbue-purple-dark'>
             <span className=''>Cover Letter - </span>
@@ -112,7 +114,7 @@ export const ApplicationContainer = ({
             </div>
           </div>
           <div>
-            <div className='flex gap-2 flex-col items-center'>
+            <div className='flex gap-2 flex-col lg:items-center'>
               <span className='text-imbue-purple-dark text-xs lg:text-base'>
                 Milestones ({application?.milestones?.length})
               </span>

@@ -274,7 +274,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
               </div>
             </div>
 
-            {isProfileOwner && (
+            {isProfileOwner && !isEditMode && (
               <div className='absolute top-5 right-5 cursor-pointer'>
                 <span className='text-imbue-purple mr-2'>Edit</span>
                 <BiEdit
