@@ -83,6 +83,11 @@ describe('SubmitProposal', () => {
   });
 
   test('displays brief insights if brief exists', async () => {
+    (useRouter as jest.Mock).mockReturnValue({
+      query: { id: '1' },
+      isReady: true,
+    });
+
     const { getByText } = render(
       <Providers>
         <SubmitProposal />

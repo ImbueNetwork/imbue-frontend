@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 import { CircularProgress } from '@mui/material';
 import bcrypt from 'bcryptjs';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
 import PasswordStrengthBar from 'react-password-strength-bar';
 
@@ -24,6 +24,15 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const salt = bcrypt.genSaltSync(10);
+
+  const invalidUsernames = [
+    'username',
+    'imbue',
+    'imbuenetwork',
+    'polkadot',
+    'password',
+    'admin',
+  ];
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -69,6 +78,32 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
 
     setEmail(event.target.value);
   };
+
+  useEffect(() => {
+    if (password != matchPassword) {
+      setError('Passwords do not match');
+    } else {
+      setError(null);
+    }
+
+    if (password?.length < 5) {
+      setError('Password must be at least 5 characters');
+    }
+
+    if (user?.length < 4) {
+      setError('Username must be at least 4 characters');
+    }
+
+    if (invalidUsernames.includes(user)) {
+      setError('Username is not allowed');
+    }
+
+    if (user === password) {
+      setError('Username and password cannot be the same');
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchPassword, password, user]);
 
   return (
     <form

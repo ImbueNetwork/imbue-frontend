@@ -1,8 +1,4 @@
-import {
-  Alert,
-  Dialog,
-  IconButton,
-} from '@mui/material';
+import { Alert, Dialog, IconButton } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import WalletIcon from '@svgs/wallet.svg';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -15,6 +11,7 @@ import { FiPlusCircle } from 'react-icons/fi';
 
 import { getCurrentUser } from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
+import { getServerSideProps } from '@/utils/serverSideProps';
 
 import AccountChoice from '@/components/AccountChoice';
 import ErrorScreen from '@/components/ErrorScreen';
@@ -35,7 +32,7 @@ interface MilestoneItem {
     name?: string;
     description?: string;
     amount?: string;
-  }
+  };
 }
 
 interface InputErrorType {
@@ -50,7 +47,9 @@ const GrantApplication = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<any>();
   const [inputErrors, setInputErrors] = useState<InputErrorType>({
-    title: "", description: "", approvers: ""
+    title: '',
+    description: '',
+    approvers: '',
   });
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
@@ -73,7 +72,6 @@ const GrantApplication = (): JSX.Element => {
       setCopied(false);
     }, 3000);
   };
-
 
   // const { user } = useSelector((state: RootState) => state.userState);
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
@@ -123,14 +121,14 @@ const GrantApplication = (): JSX.Element => {
   //   setApprovers(newApprovers);
   // };
 
-  const milestonesRef = useRef<any>([])
+  const milestonesRef = useRef<any>([]);
 
   const validateFormData = () => {
     let isValid = true;
     let firstErrorIndex = -1;
-    const newMilestones = [...milestones]
+    const newMilestones = [...milestones];
     const blockUnicodeRegex = /^[\x20-\x7E]*$/;
-    setInputErrors({})
+    setInputErrors({});
 
     if (
       title === undefined ||
@@ -140,7 +138,10 @@ const GrantApplication = (): JSX.Element => {
     ) {
       isValid = false;
       firstErrorIndex = 0;
-      setInputErrors((prev: any) => ({ ...prev, title: "Please enter a valid grant title" }))
+      setInputErrors((prev: any) => ({
+        ...prev,
+        title: 'Please enter a valid grant title',
+      }));
     }
 
     if (
@@ -149,19 +150,25 @@ const GrantApplication = (): JSX.Element => {
       description.length === 0
     ) {
       isValid = false;
-      firstErrorIndex = (firstErrorIndex === -1) ? 1 : firstErrorIndex;
-      setInputErrors((prev: any) => ({ ...prev, description: "Please enter a valid grant description" }))
+      firstErrorIndex = firstErrorIndex === -1 ? 1 : firstErrorIndex;
+      setInputErrors((prev: any) => ({
+        ...prev,
+        description: 'Please enter a valid grant description',
+      }));
     }
 
     if (approvers.length === 0) {
-      isValid = false
-      firstErrorIndex = (firstErrorIndex === -1) ? 2 : firstErrorIndex;
-      setInputErrors((prev: any) => ({ ...prev, approvers: "Please select atleast one valid grant approver" }))
+      isValid = false;
+      firstErrorIndex = firstErrorIndex === -1 ? 2 : firstErrorIndex;
+      setInputErrors((prev: any) => ({
+        ...prev,
+        approvers: 'Please select atleast one valid grant approver',
+      }));
     }
 
     for (let i = 0; i < milestones.length; i++) {
       const { amount, name, description } = milestones[i];
-      newMilestones[i].error = {}
+      newMilestones[i].error = {};
 
       if (
         name === undefined ||
@@ -171,23 +178,19 @@ const GrantApplication = (): JSX.Element => {
       ) {
         newMilestones[i].error = {
           ...newMilestones[i].error,
-          name: "A valid name is required"
-        }
-        isValid = false
-        firstErrorIndex = (firstErrorIndex === -1) ? i + 3 : firstErrorIndex
+          name: 'A valid name is required',
+        };
+        isValid = false;
+        firstErrorIndex = firstErrorIndex === -1 ? i + 3 : firstErrorIndex;
       }
 
-      if (
-        amount === undefined ||
-        amount === null ||
-        amount === 0
-      ) {
+      if (amount === undefined || amount === null || amount === 0) {
         newMilestones[i].error = {
           ...newMilestones[i].error,
-          amount: "A valid amount is required"
-        }
+          amount: 'A valid amount is required',
+        };
         isValid = false;
-        firstErrorIndex = (firstErrorIndex === -1) ? i + 3 : firstErrorIndex
+        firstErrorIndex = firstErrorIndex === -1 ? i + 3 : firstErrorIndex;
       }
 
       if (
@@ -197,20 +200,21 @@ const GrantApplication = (): JSX.Element => {
       ) {
         newMilestones[i].error = {
           ...newMilestones[i].error,
-          description: "A valid description is required."
-        }
-        isValid = false
-        firstErrorIndex = (firstErrorIndex === -1) ? i + 3 : firstErrorIndex
+          description: 'A valid description is required.',
+        };
+        isValid = false;
+        firstErrorIndex = firstErrorIndex === -1 ? i + 3 : firstErrorIndex;
       }
     }
 
-    setMilestones(newMilestones)
+    setMilestones(newMilestones);
 
-    if (firstErrorIndex !== -1) milestonesRef.current[firstErrorIndex]?.scrollIntoView({
-      behavior: 'auto',
-      block: 'center',
-      inline: 'center'
-    })
+    if (firstErrorIndex !== -1)
+      milestonesRef.current[firstErrorIndex]?.scrollIntoView({
+        behavior: 'auto',
+        block: 'center',
+        inline: 'center',
+      });
 
     return isValid;
   };
@@ -235,7 +239,8 @@ const GrantApplication = (): JSX.Element => {
 
   const submitGrant = async (account: WalletAccount) => {
     if (!account) return;
-    if (!validateFormData()) return setError({ message: "Please fill the required fields fields" })
+    if (!validateFormData())
+      return setError({ message: 'Please fill the required fields fields' });
     setLoading(true);
 
     try {
@@ -261,7 +266,7 @@ const GrantApplication = (): JSX.Element => {
       };
 
       const imbueApi = await initImbueAPIInfo();
-      const chainService = new ChainService(imbueApi, user)
+      const chainService = new ChainService(imbueApi, user);
 
       const grantMilestones = grant.milestones.map((m) => ({
         percentageToUnlock: m.percentage_to_unlock,
@@ -269,13 +274,21 @@ const GrantApplication = (): JSX.Element => {
 
       const grant_id = blake2AsHex(JSON.stringify(grant));
 
-      const result = await chainService.submitInitialGrant(account, grantMilestones, approvers, currencyId, totalCost, "kusama", grant_id);
+      const result = await chainService.submitInitialGrant(
+        account,
+        grantMilestones,
+        approvers,
+        currencyId,
+        totalCost,
+        'kusama',
+        grant_id
+      );
 
       // eslint-disable-next-line no-constant-condition
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
-            setEscrowAddress(result?.eventData[5])
+            setEscrowAddress(result?.eventData[5]);
             const resp = await fetch(`${config.apiBase}grants`, {
               headers: config.postAPIHeaders,
               method: 'post',
@@ -296,7 +309,7 @@ const GrantApplication = (): JSX.Element => {
                     };
                   }),
                 chain_project_id: result?.eventData[2],
-                escrow_address: result?.eventData[5]
+                escrow_address: result?.eventData[5],
               }),
             });
 
@@ -343,7 +356,7 @@ const GrantApplication = (): JSX.Element => {
           <div className='flex flex-col-reverse lg:flex-row justify-between gap-10 lg:gap-0'>
             <div className='flex flex-col gap-8 w-full lg:w-3/5'>
               <div
-                ref={el => milestonesRef.current[0] = el}
+                ref={(el) => (milestonesRef.current[0] = el)}
                 className='flex flex-col gap-4 text-imbue-purple-dark'
               >
                 <div>Title</div>
@@ -355,14 +368,16 @@ const GrantApplication = (): JSX.Element => {
                   className='bg-transparent border border-imbue-purple rounded-md p-3 placeholder:text-imbue-light-purple text-imbue-purple outline-content-primary'
                 />
                 <div className='flex items-center justify-between'>
-                  <p className='text-sm text-imbue-coral'>{inputErrors?.title}</p>
+                  <p className='text-sm text-imbue-coral'>
+                    {inputErrors?.title}
+                  </p>
                   <div className='text-imbue-purple text-sm ml-auto'>
                     {`${title?.length || 0}/50`}
                   </div>
                 </div>
               </div>
               <div
-                ref={el => milestonesRef.current[1] = el}
+                ref={(el) => (milestonesRef.current[1] = el)}
                 className='flex flex-col gap-4 text-imbue-purple-dark'
               >
                 <div>Description</div>
@@ -374,7 +389,9 @@ const GrantApplication = (): JSX.Element => {
                   className='bg-transparent border border-imbue-purple rounded-md placeholder:text-imbue-light-purple text-imbue-purple outline-content-primary min-h-[160px] p-3'
                 />
                 <div className='flex items-center justify-between'>
-                  <p className='text-sm text-imbue-coral'>{inputErrors?.description}</p>
+                  <p className='text-sm text-imbue-coral'>
+                    {inputErrors?.description}
+                  </p>
                   <div className='text-imbue-purple text-sm text-right'>
                     {`${description?.length || 0}/500`}
                   </div>
@@ -469,11 +486,13 @@ const GrantApplication = (): JSX.Element => {
                 ))}
               </div>
               <div
-                ref={el => milestonesRef.current[2] = el}
+                ref={(el) => (milestonesRef.current[2] = el)}
                 className='flex flex-col gap-2'
               >
                 <Approvers approvers={approvers} setApprovers={setApprovers} />
-                <p className='text-sm text-imbue-coral'>{inputErrors?.approvers}</p>
+                <p className='text-sm text-imbue-coral'>
+                  {inputErrors?.approvers}
+                </p>
               </div>
             </div>
           </div>
@@ -532,23 +551,29 @@ const GrantApplication = (): JSX.Element => {
         <div className='flex flex-col px-6 lg:px-12 py-8'>
           <div className='flex flex-col gap-4'>
             {milestones.map(
-              ({ name, amount, description: milestoneDescription, error }, index) => {
+              (
+                { name, amount, description: milestoneDescription, error },
+                index
+              ) => {
                 const percent = Number(
                   ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
                 );
                 return (
                   <div
-                    ref={el => milestonesRef.current[index + 3] = el}
+                    ref={(el) => (milestonesRef.current[index + 3] = el)}
                     key={index}
                     className='flex flex-col gap-0'
                   >
                     <div className='flex flex-row relative'>
-                      <span
-                        onClick={() => onRemoveMilestone(index)}
-                        className='absolute top-[-1rem] right-2 text-sm lg:text-xl text-imbue-purple font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
-                      >
-                        x
-                      </span>
+                      {index !== 0 && (
+                        <span
+                          onClick={() => onRemoveMilestone(index)}
+                          className='absolute top-[-1rem] right-2 text-sm lg:text-xl text-imbue-purple font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
+                        >
+                          x
+                        </span>
+                      )}
+
                       <div className='text-base mr-2 lg:mr-9 text-content mt-0.5'>
                         {index + 1}.
                       </div>
@@ -579,7 +604,9 @@ const GrantApplication = (): JSX.Element => {
                               }
                             />
                             <div className='flex items-center justify-between'>
-                              <p className='text-sm text-imbue-coral'>{error?.name}</p>
+                              <p className='text-sm text-imbue-coral'>
+                                {error?.name}
+                              </p>
                               <div className='text-imbue-purple text-sm ml-auto text-right'>
                                 {`${milestones[index].name?.length || 0}/50`}
                               </div>
@@ -607,9 +634,13 @@ const GrantApplication = (): JSX.Element => {
                               }
                             />
                             <div className='flex items-center justify-between'>
-                              <p className='text-sm text-imbue-coral'>{error?.description}</p>
+                              <p className='text-sm text-imbue-coral'>
+                                {error?.description}
+                              </p>
                               <div className='text-imbue-purple text-sm ml-auto text-right'>
-                                {`${milestones[index].description?.length || 0}/500`}
+                                {`${
+                                  milestones[index].description?.length || 0
+                                }/500`}
                               </div>
                             </div>
                           </div>
@@ -620,9 +651,7 @@ const GrantApplication = (): JSX.Element => {
                             Amount
                           </h3>
                           <div className='w-full relative p-0 m-0'>
-                            <span
-                              className='h-fit absolute left-5 bottom-3 text-base text-content'
-                            >
+                            <span className='h-fit absolute left-5 bottom-3 text-base text-content'>
                               {Currency[currencyId]}
                             </span>
 
@@ -645,7 +674,9 @@ const GrantApplication = (): JSX.Element => {
                               }}
                             />
                           </div>
-                          <p className='text-sm text-imbue-coral'>{error?.amount}</p>
+                          <p className='text-sm text-imbue-coral'>
+                            {error?.amount}
+                          </p>
 
                           {totalCostWithoutFee !== 0 && (
                             <div className='flex flex-col lg:items-end mt-3 gap-2 w-full'>
@@ -689,8 +720,9 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
-                  }`}
+                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${
+                  currencies[currencyId]
+                }`}
               </div>
             </div>
 
@@ -710,8 +742,9 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
-                  }`}
+                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${
+                  currencies[currencyId]
+                }`}
               </div>
             </div>
 
@@ -778,8 +811,9 @@ const GrantApplication = (): JSX.Element => {
           </button>
         </div>
         <Alert
-          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${copied ? 'flex' : 'hidden'
-            }`}
+          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${
+            copied ? 'flex' : 'hidden'
+          }`}
           severity='success'
         >
           Grant Wallet Address Copied to clipboard
@@ -806,5 +840,7 @@ const GrantApplication = (): JSX.Element => {
     </div>
   );
 };
+
+export { getServerSideProps };
 
 export default GrantApplication;

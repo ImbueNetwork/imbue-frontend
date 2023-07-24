@@ -57,7 +57,9 @@ const CountrySelector = ({
         <div className='flex gap-3'>
           {country && (
             <>
-              <ReactCountryFlag countryCode={findFlag() || ''} />
+              {country && country?.length > 0 && (
+                <ReactCountryFlag countryCode={findFlag() || ''} />
+              )}
               <p className='text-base leading-[1.2] text-imbue-purple-dark'>
                 {region && `${region}, `} {country}
               </p>

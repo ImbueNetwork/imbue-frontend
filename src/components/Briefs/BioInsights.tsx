@@ -329,7 +329,7 @@ const BioInsights = ({
           )}
           <h3 className='text-imbue-purple-dark !font-normal'>Job Link</h3>
           <div className='flex items-center gap-2'>
-            <div className='h-[2.625rem] rounded-[6.18rem] flex items-center px-[2rem] bg-imbue-light-purple my-2 w-full'>
+            <div className=' min-h-[2.625rem] rounded-[6.18rem] flex py-2 items-center px-[2rem] bg-imbue-light-purple my-2 w-full'>
               <span className='text-imbue-purple text-[1rem] w-full'>
                 {checkEnvironment().concat(`${router.asPath}`)}
               </span>

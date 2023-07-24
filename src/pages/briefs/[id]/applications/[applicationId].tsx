@@ -40,7 +40,7 @@ interface MilestoneItem {
     name?: string;
     description?: string;
     amount?: string;
-  }
+  };
 }
 
 export type ApplicationPreviewProps = {
@@ -82,7 +82,10 @@ const ApplicationPreview = (): JSX.Element => {
         const applicationResponse = await fetchProject(applicationId, briefId);
 
         if (!applicationResponse)
-          return setError({ noRetry: true, message: 'Could not find any application' });
+          return setError({
+            noRetry: true,
+            message: 'Could not find any application',
+          });
 
         const freelancerUser = await fetchUser(
           Number(applicationResponse?.user_id)
@@ -205,17 +208,17 @@ const ApplicationPreview = (): JSX.Element => {
     return sum + percent;
   }, 0);
 
-  const milestonesRef = useRef<any>([])
+  const milestonesRef = useRef<any>([]);
 
   const allAmountAndNamesHaveValue = () => {
     let hasValue = true;
     let firstErrorIndex = -1;
-    const newMilestones = [...milestones]
+    const newMilestones = [...milestones];
     const blockUnicodeRegex = /^[\x20-\x7E]*$/;
 
     for (let i = 0; i < milestones.length; i++) {
       const { amount, name, description } = milestones[i];
-      newMilestones[i].error = {}
+      newMilestones[i].error = {};
 
       if (
         name === undefined ||
@@ -225,23 +228,19 @@ const ApplicationPreview = (): JSX.Element => {
       ) {
         newMilestones[i].error = {
           ...newMilestones[i].error,
-          name: "A valid name is required"
-        }
-        hasValue = false
-        firstErrorIndex = (firstErrorIndex === -1) ? i : firstErrorIndex
+          name: 'A valid name is required',
+        };
+        hasValue = false;
+        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
       }
 
-      if (
-        amount === undefined ||
-        amount === null ||
-        amount === 0
-      ) {
+      if (amount === undefined || amount === null || amount === 0) {
         newMilestones[i].error = {
           ...newMilestones[i].error,
-          amount: "A valid amount is required"
-        }
+          amount: 'A valid amount is required',
+        };
         hasValue = false;
-        firstErrorIndex = (firstErrorIndex === -1) ? i : firstErrorIndex
+        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
       }
 
       if (
@@ -251,20 +250,21 @@ const ApplicationPreview = (): JSX.Element => {
       ) {
         newMilestones[i].error = {
           ...newMilestones[i].error,
-          description: "A valid description is required."
-        }
-        hasValue = false
-        firstErrorIndex = (firstErrorIndex === -1) ? i : firstErrorIndex
+          description: 'A valid description is required.',
+        };
+        hasValue = false;
+        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
       }
     }
 
-    setMilestones(newMilestones)
+    setMilestones(newMilestones);
 
-    if (firstErrorIndex !== -1) milestonesRef.current[firstErrorIndex]?.scrollIntoView({
-      behavior: 'auto',
-      block: 'center',
-      inline: 'center'
-    })
+    if (firstErrorIndex !== -1)
+      milestonesRef.current[firstErrorIndex]?.scrollIntoView({
+        behavior: 'auto',
+        block: 'center',
+        inline: 'center',
+      });
 
     return hasValue;
   };
@@ -273,8 +273,10 @@ const ApplicationPreview = (): JSX.Element => {
     chainProjectId?: number,
     escrow_address?: string
   ) => {
-    if (!allAmountAndNamesHaveValue()) return setError({ message: "Please fill all the required fields" })
-    if (totalPercent !== 100) return setError({ message: "totalPercent must be 100%" });
+    if (!allAmountAndNamesHaveValue())
+      return setError({ message: 'Please fill all the required fields' });
+    if (totalPercent !== 100)
+      return setError({ message: 'totalPercent must be 100%' });
 
     setLoading(true);
     try {
@@ -430,101 +432,114 @@ const ApplicationPreview = (): JSX.Element => {
             <hr className='h-[1px] bg-[#E1DDFF] w-full' />
 
             <div className='milestone-list lg:mb-5'>
-              {milestones?.map?.(({ name, description, amount, error }, index) => {
-                const percent = Number(
-                  ((100 * (amount ?? 0)) / totalCostWithoutFee)?.toFixed?.(0)
-                );
-                return (
-                  <div
-                    className={`flex items-start w-full px-5 py-9 lg:px-14 relative border-b border-b-imbue-light-purple last:border-b-0`}
-                    key={index}
-                    ref={el => milestonesRef.current[index] = el}
-                  >
-                    {isEditingBio && (
-                      <span
-                        onClick={() => onRemoveMilestone(index)}
-                        className='absolute top-1 right-2 lg:right-4 text-sm lg:text-xl font-bold hover:border-red-500 text-red-500 cursor-pointer'
-                      >
-                        x
-                      </span>
-                    )}
-                    <div className='mr-4 lg:mr-9 text-base lg:text-[1.25rem] text-imbue-purple font-normal'>
-                      {index + 1}.
-                    </div>
-                    <div className={`flex ${isEditingBio ? 'flex-col lg:flex-row' : 'flex-row'} justify-between w-full`}>
-                      <div className='w-full lg:w-1/2 h-fit'>
-                        {isEditingBio ? (
-                          <>
-                            <h3 className='text-base lg:text-xl mb-2 lg:mb-5 p-0 text-imbue-purple-dark font-normal'>
-                              Title
-                            </h3>
-                            <input
-                              type='text'
-                              placeholder='Add Milestone Name'
-                              className='input-budget !pl-3 text-base rounded-[5px] py-3 text-imbue-purple mb-2 placeholder:text-imbue-light-purple'
-                              value={name || ''}
-                              onChange={(e) =>
-                                setMilestones([
-                                  ...milestones.slice(0, index),
-                                  {
-                                    ...milestones[index],
-                                    name: e.target.value,
-                                  },
-                                  ...milestones.slice(index + 1),
-                                ])
-                              }
-                            />
-                            <div className='flex items-center justify-between mb-4'>
-                              <p className='text-sm text-content my-2'>{name?.length}/50</p>
-                              <p className='text-sm text-imbue-coral'>{error?.name}</p>
-                            </div>
-                          </>
-                        ) : (
-                          <h3 className='mb-2 lg:mb-5 text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
-                            {name}
-                          </h3>
-                        )}
-                        {isEditingBio ? (
-                          <>
-                            <h3 className='text-base lg:text-xl mb-2 lg:mb-5 p-0 text-imbue-purple-dark font-normal'>
-                              Description
-                            </h3>
-                            <textarea
-                              maxLength={500}
-                              className='text-content !p-3 placeholder:text-imbue-light-purple'
-                              placeholder='Add Milestone Description'
-                              rows={7}
-                              value={description}
-                              disabled={!isEditingBio}
-                              onChange={(e) =>
-                                setMilestones([
-                                  ...milestones.slice(0, index),
-                                  {
-                                    ...milestones[index],
-                                    description: e.target.value,
-                                  },
-                                  ...milestones.slice(index + 1),
-                                ])
-                              }
-                            />
-                            <div className='flex items-center justify-between mb-4'>
-                              <p className='text-sm text-content my-2'>{description?.length}/500</p>
-                              <p className='text-sm text-imbue-coral'>{error?.description}</p>
-                            </div>
-                          </>
-                        ) : (
-                          <p className='text-[1rem] text-[#3B27C180] m-0'>
-                            {description}
-                          </p>
-                        )}
+              {milestones?.map?.(
+                ({ name, description, amount, error }, index) => {
+                  const percent = Number(
+                    ((100 * (amount ?? 0)) / totalCostWithoutFee)?.toFixed?.(0)
+                  );
+                  return (
+                    <div
+                      className={`flex items-start w-full px-5 py-9 lg:px-14 relative border-b border-b-imbue-light-purple last:border-b-0`}
+                      key={index}
+                      ref={(el) => (milestonesRef.current[index] = el)}
+                    >
+                      {isEditingBio && index !== 0 && (
+                        <span
+                          onClick={() => onRemoveMilestone(index)}
+                          className='absolute top-1 right-2 lg:right-4 text-sm lg:text-xl font-bold hover:border-red-500 text-red-500 cursor-pointer'
+                        >
+                          x
+                        </span>
+                      )}
+                      <div className='mr-4 lg:mr-9 text-base lg:text-[1.25rem] text-imbue-purple font-normal'>
+                        {index + 1}.
                       </div>
-                      <div className='flex flex-col w-full lg:w-1/5 items-end'>
-                        <h3 className='mb-2 lg:mb-5 text-right text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
-                          Amount
-                        </h3>
-                        {isEditingBio ? (
-                          <>
-                            {/* <input
+                      <div
+                        className={`flex ${
+                          isEditingBio ? 'flex-col lg:flex-row' : 'flex-row'
+                        } justify-between w-full`}
+                      >
+                        <div className='w-full lg:w-1/2 h-fit'>
+                          {isEditingBio ? (
+                            <>
+                              <h3 className='text-base lg:text-xl mb-2 lg:mb-5 p-0 text-imbue-purple-dark font-normal'>
+                                Title
+                              </h3>
+                              <input
+                                type='text'
+                                placeholder='Add Milestone Name'
+                                className='input-budget !pl-3 text-base rounded-[5px] py-3 text-imbue-purple mb-2 placeholder:text-imbue-light-purple'
+                                value={name || ''}
+                                onChange={(e) =>
+                                  setMilestones([
+                                    ...milestones.slice(0, index),
+                                    {
+                                      ...milestones[index],
+                                      name: e.target.value,
+                                    },
+                                    ...milestones.slice(index + 1),
+                                  ])
+                                }
+                              />
+                              <div className='flex items-center justify-between mb-4'>
+                                <p className='text-sm text-content my-2'>
+                                  {name?.length}/50
+                                </p>
+                                <p className='text-sm text-imbue-coral'>
+                                  {error?.name}
+                                </p>
+                              </div>
+                            </>
+                          ) : (
+                            <h3 className='mb-2 lg:mb-5 text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
+                              {name}
+                            </h3>
+                          )}
+                          {isEditingBio ? (
+                            <>
+                              <h3 className='text-base lg:text-xl mb-2 lg:mb-5 p-0 text-imbue-purple-dark font-normal'>
+                                Description
+                              </h3>
+                              <textarea
+                                maxLength={500}
+                                className='text-content !p-3 placeholder:text-imbue-light-purple'
+                                placeholder='Add Milestone Description'
+                                rows={7}
+                                value={description}
+                                disabled={!isEditingBio}
+                                onChange={(e) =>
+                                  setMilestones([
+                                    ...milestones.slice(0, index),
+                                    {
+                                      ...milestones[index],
+                                      description: e.target.value,
+                                    },
+                                    ...milestones.slice(index + 1),
+                                  ])
+                                }
+                              />
+                              <div className='flex items-center justify-between mb-4'>
+                                <p className='text-sm text-content my-2'>
+                                  {description?.length}/500
+                                </p>
+                                <p className='text-sm text-imbue-coral'>
+                                  {error?.description}
+                                </p>
+                              </div>
+                            </>
+                          ) : (
+                            <p className='text-[1rem] text-[#3B27C180] m-0'>
+                              {description}
+                            </p>
+                          )}
+                        </div>
+                        <div className='flex flex-col w-full lg:w-1/5 items-end'>
+                          <h3 className='mb-2 lg:mb-5 text-right text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
+                            Amount
+                          </h3>
+                          {isEditingBio ? (
+                            <>
+                              {/* <input
                               type='number'
                               className='input-budget text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-right  pl-5'
                               disabled={!isEditingBio}
@@ -540,60 +555,61 @@ const ApplicationPreview = (): JSX.Element => {
                                 ])
                               }
                             /> */}
-                            <div className='w-full relative p-0 m-0'>
-                              <span
-                                className='h-fit absolute left-5 bottom-3 text-base text-content'
-                              >
-                                {Currency[currencyId]}
-                              </span>
+                              <div className='w-full relative p-0 m-0'>
+                                <span className='h-fit absolute left-5 bottom-3 text-base text-content'>
+                                  {Currency[currencyId]}
+                                </span>
 
-                              <input
-                                type='number'
-                                disabled={!isEditingBio}
-                                placeholder='Add an amount'
-                                className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
-                                value={amount || ''}
-                                onChange={(e) => {
-                                  if (Number(e.target.value) >= 0)
-                                    setMilestones([
-                                      ...milestones.slice(0, index),
-                                      {
-                                        ...milestones[index],
-                                        amount: Number(e.target.value),
-                                      },
-                                      ...milestones.slice(index + 1),
-                                    ]);
-                                }}
-                              />
-                            </div>
-                            <p className='text-sm text-imbue-coral w-full text-right'>{error?.amount}</p>
-                          </>
-                        ) : (
-                          <p className='text-[1rem] text-[#3B27C180] m-0'>
-                            ${milestones[index]?.amount}
-                          </p>
-                        )}
+                                <input
+                                  type='number'
+                                  disabled={!isEditingBio}
+                                  placeholder='Add an amount'
+                                  className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
+                                  value={amount || ''}
+                                  onChange={(e) => {
+                                    if (Number(e.target.value) >= 0)
+                                      setMilestones([
+                                        ...milestones.slice(0, index),
+                                        {
+                                          ...milestones[index],
+                                          amount: Number(e.target.value),
+                                        },
+                                        ...milestones.slice(index + 1),
+                                      ]);
+                                  }}
+                                />
+                              </div>
+                              <p className='text-sm text-imbue-coral w-full text-right'>
+                                {error?.amount}
+                              </p>
+                            </>
+                          ) : (
+                            <p className='text-[1rem] text-[#3B27C180] m-0'>
+                              ${milestones[index]?.amount}
+                            </p>
+                          )}
 
-                        {totalCostWithoutFee !== 0 && isEditingBio && (
-                          <div className='flex flex-col items-end mt-[auto] gap-[8px] w-full'>
-                            <div className='progress-value text-base !text-imbue-purple-dark'>
-                              {percent}%
+                          {totalCostWithoutFee !== 0 && isEditingBio && (
+                            <div className='flex flex-col items-end mt-[auto] gap-[8px] w-full'>
+                              <div className='progress-value text-base !text-imbue-purple-dark'>
+                                {percent}%
+                              </div>
+                              <div className='progress-bar'>
+                                <div
+                                  className='progress'
+                                  style={{
+                                    width: `${percent}%`,
+                                  }}
+                                ></div>
+                              </div>
                             </div>
-                            <div className='progress-bar'>
-                              <div
-                                className='progress'
-                                style={{
-                                  width: `${percent}%`,
-                                }}
-                              ></div>
-                            </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                }
+              )}
             </div>
             {isEditingBio && (
               <p
@@ -790,16 +806,14 @@ const ApplicationPreview = (): JSX.Element => {
 
       <ErrorScreen {...{ error, setError }}>
         <div className='flex flex-col gap-4 w-1/2'>
-          {
-            !error?.noRetry && (
-              <button
-                onClick={() => setError(null)}
-                className='primary-btn in-dark w-button w-full !m-0'
-              >
-                Try Again
-              </button>
-            )
-          }
+          {!error?.noRetry && (
+            <button
+              onClick={() => setError(null)}
+              className='primary-btn in-dark w-button w-full !m-0'
+            >
+              Try Again
+            </button>
+          )}
           <button
             onClick={() => router.push(`/dashboard`)}
             className='underline text-xs lg:text-base font-bold'
