@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 import { Freelancer, Project } from '@/model';
-import { getBriefApplications } from '@/redux/services/briefService';
+import { getBriefApplications, getUserBriefs } from '@/redux/services/briefService';
 
 import { ApplicationContainer } from '../Briefs/ApplicationContainer';
 import { BriefLists } from '../Briefs/BriefsList';
@@ -14,20 +14,28 @@ type ClientViewProps = {
   briefId: string | string[] | undefined;
   handleMessageBoxClick: (_userId: number, _freelander: Freelancer) => void;
   redirectToBriefApplications: (_applicationId: string) => void;
-  briefs: any;
+  user: any;
 };
 
 const MyClientBriefsView = (props: ClientViewProps) => {
   const {
-    briefs,
+    user,
     briefId,
     handleMessageBoxClick,
     redirectToBriefApplications,
   } = props;
-
+  console.log(briefId);
+  const [briefs, _setBriefs] = useState<any>();
   const [briefApplications, setBriefApplications] = useState<Project[]>([]);
   const [loadingApplications, setLoadingApplications] = useState<boolean>(true);
   const router = useRouter();
+
+  useEffect(() => {
+    const setUserBriefs = async () => {
+      if (user?.id) _setBriefs(await getUserBriefs(user?.id));
+    }
+    setUserBriefs();
+  }, [user?.id])
 
   useEffect(() => {
     const getApplications = async (id: string | number) => {
@@ -41,7 +49,7 @@ const MyClientBriefsView = (props: ClientViewProps) => {
       }
     };
     briefId && getApplications(briefId.toString());
-  }, [briefId]);
+  }, [briefId, user?.id]);
 
   const goBack = () => {
     router.query.briefId = [];

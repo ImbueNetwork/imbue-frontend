@@ -21,7 +21,6 @@ import Login from '@/components/Login';
 
 import { Freelancer, Project, User } from '@/model';
 import { Brief } from '@/model';
-import { getUserBriefs } from '@/redux/services/briefService';
 import { getFreelancerApplications } from '@/redux/services/freelancerService';
 import { RootState } from '@/redux/store/store';
 
@@ -43,12 +42,8 @@ const Dashboard = (): JSX.Element => {
   const filters = { members: { $in: [user?.username] } };
   const [selectedOption, setSelectedOption] = useState<number>(1);
   const [unreadMessages, setUnreadMsg] = useState<number>(0);
-  // FIXME: setBriefs
-  const [briefs, _setBriefs] = useState<any>();
-  // const [briefId, setBriefId] = useState<number | undefined>();
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
-  // FIXME: setMyApplications
   const [myApplications, _setMyApplications] = useState<Project[]>();
   const [loadingStreamChat, setLoadingStreamChat] = useState<boolean>(true);
 
@@ -78,9 +73,7 @@ const Dashboard = (): JSX.Element => {
     const setupStreamChat = async () => {
       try {
         if (!user?.username && !loadingUser) return router.push('/');
-
         setClient(await getStreamChat());
-        _setBriefs(await getUserBriefs(user?.id));
         _setMyApplications(await getFreelancerApplications(user?.id));
       } catch (error) {
         setError({message: error});
@@ -136,7 +129,7 @@ const Dashboard = (): JSX.Element => {
       {selectedOption === 1 && (
         <MyClientBriefsView
           {...{
-            briefs,
+            user,
             briefId,
             handleMessageBoxClick,
             redirectToBriefApplications,

@@ -152,7 +152,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         }
       }
     } catch (error) {
-      setError({message: error});
+      setError({ message: error });
     } finally {
       setLoading(false);
     }
@@ -215,7 +215,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         });
       }
     } catch (error) {
-      setError({message: error});
+      setError({ message: error });
       console.log(error);
     }
   };
@@ -995,7 +995,13 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                       {moment(v?.created).format('Do MMM YYYY')}
                     </p>
                   </div>
-                  <p className='text-imbue-purple-dark'>{v?.description}</p>
+                  <p className='text-imbue-purple-dark'>
+                    {
+                      v?.description?.length > 500
+                        ? v?.description.substring(0, 500)
+                        : v?.description
+                    }
+                  </p>
                   <div className='flex gap-1  text-imbue-purple'>
                     <p className=''>{v?.required_funds}</p>
                     <p className=''>{Currency[v?.currency_id]}</p>
@@ -1166,9 +1172,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         </div>
       </ErrorScreen>
       <div
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${
-          copied ? 'right-5' : '-right-full'
-        }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
+          }`}
       >
         <Alert severity='success'>{`${copied} Copied to clipboard`}</Alert>
       </div>
