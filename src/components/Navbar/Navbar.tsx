@@ -119,11 +119,10 @@ function Navbar() {
 
             <div className='relative items-center z-0 hidden lg:flex'>
               <div
-                className={`${
-                  expanded
+                className={`${expanded
                     ? 'translate-x-0 opacity-100 duration-700'
                     : '-translate-x-full opacity-0 duration-1000'
-                } flex items-center ml-1 transition-all`}
+                  } flex items-center ml-1 transition-all`}
               >
                 <Link
                   onClick={() => setExpanded(false)}
@@ -133,13 +132,17 @@ function Navbar() {
                   Submit a Brief
                 </Link>
 
-                <Link
-                  onClick={() => setExpanded(false)}
-                  className={`mx-1 lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
-                  href='/grants/new'
-                >
-                  Submit a Grant
-                </Link>
+                {
+                  user?.id && (
+                    <Link
+                      onClick={() => setExpanded(false)}
+                      className={`mx-1 lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
+                      href='/grants/new'
+                    >
+                      Submit a Grant
+                    </Link>
+                  )
+                }
 
                 <Link
                   onClick={() => setExpanded(false)}
@@ -174,9 +177,8 @@ function Navbar() {
                 onClick={() => {
                   setExpanded(!expanded);
                 }}
-                className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${
-                  !expanded && cancelClass
-                } ${expanded ? 'lg:invisible' : 'visible delay-700'} absolute`}
+                className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${!expanded && cancelClass
+                  } ${expanded ? 'lg:invisible' : 'visible delay-700'} absolute`}
               >
                 <Image
                   src={expanded ? cancelIcon : hamburgerIcon}

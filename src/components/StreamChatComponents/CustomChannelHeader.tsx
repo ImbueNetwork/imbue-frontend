@@ -18,7 +18,7 @@ export function CustomChannelHeader(props: any) {
 
   const navigateToProfile = () => {
     if (chatTitle !== 'Not Found') {
-      if (showFreelancerProfile) router.push(`/freelancer/${chatTitle}`)
+      if (showFreelancerProfile) router.push(`/freelancers/${chatTitle}`)
       else router.push(`/profile/${chatTitle}`)
     }
   }

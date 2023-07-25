@@ -4,12 +4,12 @@ import WalletIcon from '@svgs/wallet.svg';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { FaRegCopy } from 'react-icons/fa';
 import { FiPlusCircle } from 'react-icons/fi';
+import { useSelector } from 'react-redux';
 
-import { getCurrentUser } from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 import { getServerSideProps } from '@/utils/serverSideProps';
 
@@ -22,6 +22,7 @@ import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
 import { Currency, OffchainProjectState } from '@/model';
 import ChainService from '@/redux/services/chainService';
+import { RootState } from '@/redux/store/store';
 // import ChainService from '@/redux/services/chainService';
 
 interface MilestoneItem {
@@ -73,9 +74,13 @@ const GrantApplication = (): JSX.Element => {
     }, 3000);
   };
 
-  // const { user } = useSelector((state: RootState) => state.userState);
+  const { user, loading: userLoading } = useSelector((state: RootState) => state.userState);
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
+
+  useEffect(() => {
+    !user.id && !userLoading && router.push("/")
+  }, [user.id, userLoading, router])
 
   const durationOptions = timeData.sort((a, b) =>
     a.value > b.value ? 1 : a.value < b.value ? -1 : 0
@@ -240,11 +245,11 @@ const GrantApplication = (): JSX.Element => {
   const submitGrant = async (account: WalletAccount) => {
     if (!account) return;
     if (!validateFormData())
-      return setError({ message: 'Please fill the required fields fields' });
+      return setError({ message: 'Please fill the required fields first' });
     setLoading(true);
 
     try {
-      const user = await getCurrentUser();
+      // const user = await getCurrentUser();
       const grant = {
         title,
         description,
@@ -345,6 +350,8 @@ const GrantApplication = (): JSX.Element => {
     setApprovers(newApprovers.map((v: any) => v?.web3_address));
     setApproverPreview(newApprovers);
   };
+
+  if (userLoading) return <FullScreenLoader />
 
   return (
     <div className='flex flex-col gap-10 leading-[1.5] !mx-3 lg:!mx-auto'>
@@ -489,7 +496,7 @@ const GrantApplication = (): JSX.Element => {
                 ref={(el) => (milestonesRef.current[2] = el)}
                 className='flex flex-col gap-2'
               >
-                <Approvers approvers={approvers} setApprovers={setApprovers} />
+                <Approvers approvers={approvers} setApprovers={setApprovers} user={user} />
                 <p className='text-sm text-imbue-coral'>
                   {inputErrors?.approvers}
                 </p>
@@ -638,9 +645,8 @@ const GrantApplication = (): JSX.Element => {
                                 {error?.description}
                               </p>
                               <div className='text-imbue-purple text-sm ml-auto text-right'>
-                                {`${
-                                  milestones[index].description?.length || 0
-                                }/500`}
+                                {`${milestones[index].description?.length || 0
+                                  }/500`}
                               </div>
                             </div>
                           </div>
@@ -720,9 +726,8 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${
-                  currencies[currencyId]
-                }`}
+                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
+                  }`}
               </div>
             </div>
 
@@ -742,9 +747,8 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${
-                  currencies[currencyId]
-                }`}
+                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
+                  }`}
               </div>
             </div>
 
@@ -811,9 +815,8 @@ const GrantApplication = (): JSX.Element => {
           </button>
         </div>
         <Alert
-          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${
-            copied ? 'flex' : 'hidden'
-          }`}
+          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${copied ? 'flex' : 'hidden'
+            }`}
           severity='success'
         >
           Grant Wallet Address Copied to clipboard
