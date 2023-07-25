@@ -563,7 +563,7 @@ const Briefs = (): JSX.Element => {
                   />
                   <div
                     role='button'
-                    onClick={() => !setSavedBriefsActive && onSearch()}
+                    onClick={() => !savedBriefsActive && onSearch()}
                     className='h-[2.975rem] w-[3.0625rem] rounded-tr-[8px] rounded-br-[8px] bg-imbue-purple flex justify-center items-center cursor-pointer'
                   >
                     <Image src={searchSvg} alt='Search' role='button' />
