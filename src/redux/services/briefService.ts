@@ -265,3 +265,15 @@ export const saveBriefData = async (brief: Brief) => {
     throw new Error('Failed to save briefs ..... status:' + resp.status);
   }
 };
+
+export const getAllSkills = async () => {
+  const resp = await fetch(`${config.apiBase}briefs/skills`, {
+    headers: getAPIHeaders,
+    method: 'get',
+  });
+  if (resp.ok) {
+    return (await resp.json()) as { skills: Array<{ name: string }> };
+  } else {
+    throw new Error('Failed to get skills ..... status:' + resp.status);
+  }
+};

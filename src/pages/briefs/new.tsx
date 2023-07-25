@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import * as utils from '@/utils';
@@ -19,9 +19,9 @@ import {
   scopeData,
   stepData,
   suggestedIndustries,
-  suggestedSkills,
   timeData,
 } from '@/config/briefs-data';
+import { getAllSkills } from '@/redux/services/briefService';
 import { RootState } from '@/redux/store/store';
 
 import styles from '../../styles/modules/newBrief.module.css';
@@ -36,12 +36,24 @@ const NewBrief = (): JSX.Element => {
   const [scopeId, setScopeId] = useState<number>();
   const [durationId, setDurationId] = useState<number>();
   const [budget, setBudget] = useState<number>();
+  const [suggestedSkills, setSuggestedSkills] = useState<string[]>([]);
 
   const [error, setError] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
   const { user } = useSelector((state: RootState) => state.userState);
+
+  useEffect(() => {
+    fetchSuggestedSkills();
+  }, []);
+
+  const fetchSuggestedSkills = async () => {
+    const skillsRes = await getAllSkills();
+    if (skillsRes) {
+      setSuggestedSkills(skillsRes?.skills.map((skill) => skill.name));
+    }
+  };
 
   const NamePanel = (
     <>
@@ -111,6 +123,7 @@ const NewBrief = (): JSX.Element => {
           data-testid='skills-input'
           onChange={(tags: string[]) => setSkills(tags)}
           limit={10}
+          hideInput
         />
       </div>
     </>
@@ -193,6 +206,11 @@ const NewBrief = (): JSX.Element => {
         />
         <div className={styles.budgetCurrencyContainer}>$</div>
       </div>
+      {Number(budget) < 30 && (
+        <div className={`${styles.budgetDescription} text-red-600`}>
+          We recommend a minimum budget of $30 for a brief.
+        </div>
+      )}
       <div className={styles.budgetDescription}>
         You will be able to set milestones which divide your project into
         manageable phases.
@@ -241,7 +259,7 @@ const NewBrief = (): JSX.Element => {
     if (step === 6 && durationId === undefined) {
       return false;
     }
-    if (step === 7 && !budget) {
+    if ((step === 7 && !budget) || Number(budget) < 30) {
       return false;
     }
     return true;

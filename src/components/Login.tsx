@@ -234,23 +234,10 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
 
                 <div className='login justify-center items-center w-full flex flex-col'>
                   <li
-                    ref={googleParentRef}
+                    // ref={googleParentRef}
                     className='mt-1 mb-2 w-full flex justify-center'
                   >
-                    <GoogleOAuthProvider clientId={config.googleClientId}>
-                      {/* <button
-                        // onClick={() => loginGoogleFunction()}
-                        className='h-[2.6rem] rounded-[1.56rem] border border-imbue-purple-dark w-full justify-center'
-                      >
-                        <div className='flex text-imbue-purple-dark text-base justify-center items-center'>
-                          <Image
-                            src={googleIcon}
-                            alt='Google-icon'
-                            className='relative right-2'
-                          />
-                          Login with Google
-                        </div>
-                      </button> */}
+                    <GoogleOAuthProvider clientId={config?.googleClientId}>
                       <GoogleLogin
                         width={`${googleParentRef?.current?.clientWidth}`}
                         logo_alignment='center'

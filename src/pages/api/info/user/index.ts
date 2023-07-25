@@ -23,6 +23,7 @@ export const imbueStrategy = new JwtStrategy(jwtOptions, async function (
   try {
     db.transaction(async (tx) => {
       const user = await fetchUser(id)(tx);
+      // console.log({ user, id });
       const web3Account = await models.fetchWeb3AccountByUserId(id)(tx);
       if (!user) {
         next(`No user found with id: ${id}`, false);

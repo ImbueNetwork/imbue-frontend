@@ -2,6 +2,8 @@
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -166,10 +168,10 @@ function Project() {
       const projectRes = await getProjectById(projectId);
       // showing owner profile if the current user if the applicant freelancer
       const brief = await getBrief(projectRes.brief_id);
-      
+
       const owner = brief?.user_id
-      ? await utils.fetchUser(brief?.user_id)
-      : await utils.fetchUser(projectRes?.user_id);
+        ? await utils.fetchUser(brief?.user_id)
+        : await utils.fetchUser(projectRes?.user_id);
 
       const freelancerRes = await getFreelancerProfile(projectRes?.user_id);
 
@@ -221,7 +223,7 @@ function Project() {
 
       setBalance(balance || 0);
     } catch (error) {
-      setError({message: error});
+      setError({ message: error });
     } finally {
       setLoading(false);
     }
@@ -519,9 +521,24 @@ function Project() {
       >
         <div className='flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] max-lg:basis-[60%] mr-[5%]  max-lg:mr-0'>
           <div className='flex flex-wrap lg:gap-4 lg:items-center'>
+            <Tooltip
+              title='Go back to previous page'
+              followCursor
+              leaveTouchDelay={10}
+              enterDelay={500}
+              className='cursor-pointer'
+            >
+              <div
+                onClick={() => router.back()}
+                className='border border-content rounded-full p-1 flex items-center justify-center absolute right-5 top-5'
+              >
+                <ArrowBackIcon className='h-5 w-5' color='secondary' />
+              </div>
+            </Tooltip>
             <h3 className='text-[2rem] max-lg:text-[24px] leading-[1.5] font-normal m-0 p-0 text-imbue-purple'>
               {project?.name}
             </h3>
+
             {project?.brief_id && (
               <span
                 onClick={() => {
@@ -614,8 +631,13 @@ function Project() {
                   {approversPreview?.map((approver: any, index: number) => (
                     <div
                       key={index}
-                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${approver?.display_name && 'cursor-pointer'}`}
-                      onClick={()=>approver.display_name && router.push(`/profile/${approver.username}`)}
+                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${
+                        approver?.display_name && 'cursor-pointer'
+                      }`}
+                      onClick={() =>
+                        approver.display_name &&
+                        router.push(`/profile/${approver.username}`)
+                      }
                     >
                       <Image
                         height={40}

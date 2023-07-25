@@ -18,10 +18,13 @@ import {
   experiencedLevel,
   scopeData,
   suggestedIndustries,
-  suggestedSkills,
 } from '@/config/briefs-data';
 import { Brief } from '@/model';
-import { getBrief, updateBriefById } from '@/redux/services/briefService';
+import {
+  getAllSkills,
+  getBrief,
+  updateBriefById,
+} from '@/redux/services/briefService';
 import { RootState } from '@/redux/store/store';
 import styles from '@/styles/modules/newBrief.module.css';
 
@@ -55,6 +58,7 @@ export const EditProposal = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<any>();
   const [success, setSuccess] = useState<boolean>(false);
+  const [suggestedSkills, setSuggestedSkills] = useState<string[]>([]);
 
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
@@ -62,6 +66,17 @@ export const EditProposal = (): JSX.Element => {
   useEffect(() => {
     router.isReady && getCurrentUserBrief();
   }, [briefId]);
+
+  useEffect(() => {
+    fetchSuggestedSkills();
+  }, []);
+
+  const fetchSuggestedSkills = async () => {
+    const skillsRes = await getAllSkills();
+    if (skillsRes) {
+      setSuggestedSkills(skillsRes?.skills.map((skill) => skill.name));
+    }
+  };
 
   const getCurrentUserBrief = async () => {
     try {
@@ -176,6 +191,7 @@ export const EditProposal = (): JSX.Element => {
               tags={skills}
               onChange={(tags: string[]) => setSkills([...tags])}
               limit={10}
+              hideInput
             />
           </div>
 

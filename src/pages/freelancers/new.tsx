@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import * as utils from '@/utils';
@@ -13,10 +13,10 @@ import {
   freelancingGoal,
   // importInformation,
   stepData,
-  suggestedFreelancingSkills,
   suggestedLanguages,
   suggestedServices,
 } from '@/config/freelancer-data';
+import { getAllSkills } from '@/redux/services/briefService';
 import { createFreelancingProfile } from '@/redux/services/freelancerService';
 import { RootState } from '@/redux/store/store';
 
@@ -41,6 +41,20 @@ const Freelancer = (): JSX.Element => {
   const [services, setServices] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<any>();
+  const [suggestedFreelancingSkills, setSuggestedSkills] = useState<string[]>(
+    []
+  );
+
+  useEffect(() => {
+    fetchSuggestedSkills();
+  }, []);
+
+  const fetchSuggestedSkills = async () => {
+    const skillsRes = await getAllSkills();
+    if (skillsRes) {
+      setSuggestedSkills(skillsRes?.skills.map((skill) => skill.name));
+    }
+  };
 
   const HelloPanel = (
     <div className={styles.helloPanel}>
@@ -209,6 +223,7 @@ const Freelancer = (): JSX.Element => {
           suggestData={suggestedFreelancingSkills}
           tags={skills}
           onChange={(tags: string[]) => setSkills(tags)}
+          hideInput
         />
       </div>
     </div>
@@ -344,7 +359,7 @@ const Freelancer = (): JSX.Element => {
         });
       }
     } catch (error) {
-      setError({message: error});
+      setError({ message: error });
     } finally {
       setLoading(false);
     }

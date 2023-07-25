@@ -65,7 +65,7 @@ const CustomDropDown = React.memo(
         {isOpen && (
           <div
             data-testid='filterOptions'
-            className='w-full bg-white rounded-[10px] rounded-t-none z-50 absolute  transition-all duration-300 ease-in-out shadow-sm shadow-slate-300 !overflow-hidden'
+            className='w-full bg-white rounded-[10px] rounded-t-none z-50 absolute  transition-all duration-300 ease-in-out shadow-sm shadow-slate-300 !overflow-scroll overflow-y-scroll max-h-[180px]'
           >
             <BriefFilter
               label=''

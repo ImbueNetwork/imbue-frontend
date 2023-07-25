@@ -98,12 +98,12 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
       setError('Username is not allowed');
     }
 
-    if (user === password) {
+    if (user?.toLowerCase() === password?.toLowerCase()) {
       setError('Username and password cannot be the same');
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [matchPassword, password, user]);
+  }, [matchPassword, password, user, email]);
 
   return (
     <form

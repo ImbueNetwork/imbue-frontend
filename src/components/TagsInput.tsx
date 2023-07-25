@@ -6,6 +6,7 @@ export type TagsInputProps = {
   suggestData: string[];
   onChange: (_tags: string[]) => void;
   limit?: number;
+  hideInput?: boolean;
 };
 
 export const TagsInput = ({
@@ -13,6 +14,7 @@ export const TagsInput = ({
   suggestData,
   onChange,
   limit,
+  hideInput,
 }: TagsInputProps): JSX.Element => {
   const [vtags, setTags] = useState<string[]>(tags);
   const [input, setInput] = useState<any>();
@@ -56,7 +58,7 @@ export const TagsInput = ({
 
   return (
     <>
-      <div className='selected-tags'>
+      <div className='selected-tags min-h-[3.5rem]'>
         {tags?.map((tag, i) => (
           <div
             key={i}
@@ -70,10 +72,10 @@ export const TagsInput = ({
           </div>
         ))}
 
-        {limit && vtags.length >= limit ? null : (
+        {(limit && vtags.length >= limit) || hideInput ? null : (
           <input
             type='text'
-            className='new-tag-input text-black'
+            className='new-tag-input text-black '
             data-testid='tag-input'
             value={input}
             maxLength={25}

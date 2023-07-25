@@ -659,6 +659,9 @@ export const fetchProfileImages =
   (id: number, tableName: string) => async (tx: Knex.Transaction) =>
     tx(tableName).select('profile_image').where({ user_id: id }).first();
 
+export const fetchAllImbueSkills = () => (tx: Knex.Transaction) =>
+  tx<Skill>('imbue_skills').select();
+
 // Insert a brief and their respective skill and industry_ids.
 export const insertBrief =
   (
@@ -950,12 +953,10 @@ export const fetchFreelancerDetailsByUsername =
   (username: string | string[]) => (tx: Knex.Transaction) =>
     fetchAllFreelancers()(tx).where({ username: username }).first();
 
-export const searchFreelancerProfile =
-  (query: any) => (tx: Knex.Transaction) =>
-    fetchAllFreelancers()(tx)
-    .where({ 
-      display_name: query?.search_input
-     })
+export const searchFreelancerProfile = (query: any) => (tx: Knex.Transaction) =>
+  fetchAllFreelancers()(tx).where({
+    display_name: query?.search_input,
+  });
 
 export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
   tx
@@ -1380,7 +1381,7 @@ export const searchFreelancers = async (
         this.where('verified', true);
       }
     })
-    .where('display_name', 'ilike', '%' + filter.search_input + '%')
+    .where('display_name', 'ilike', '%' + filter.search_input + '%');
 
 export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
   const {

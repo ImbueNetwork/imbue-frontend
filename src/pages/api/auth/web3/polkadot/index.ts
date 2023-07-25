@@ -106,13 +106,13 @@ export default nextConnect().post(
                     res.status(201);
                   }
 
-                  await tx<User>("users")
-                  .update({
-                    web3_address: address
-                  })
-                  .where({
-                    id: user.id,
-                  });
+                  await tx<User>('users')
+                    .update({
+                      web3_address: address,
+                    })
+                    .where({
+                      id: user.id,
+                    });
                   res.send({ user, web3Account });
                 } catch (e) {
                   await tx.rollback();

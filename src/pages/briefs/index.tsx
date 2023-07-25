@@ -536,6 +536,12 @@ const Briefs = (): JSX.Element => {
     );
   };
 
+  const briefsData = savedBriefsActive
+    ? briefs?.filter((brief) =>
+        brief?.headline.toLocaleLowerCase().includes(searchInput)
+      )
+    : briefs;
+
   if (loading) return <FullScreenLoader />;
 
   return (
@@ -557,7 +563,7 @@ const Briefs = (): JSX.Element => {
                   />
                   <div
                     role='button'
-                    onClick={onSearch}
+                    onClick={() => !setSavedBriefsActive && onSearch()}
                     className='h-[2.975rem] w-[3.0625rem] rounded-tr-[8px] rounded-br-[8px] bg-imbue-purple flex justify-center items-center cursor-pointer'
                   >
                     <Image src={searchSvg} alt='Search' role='button' />
@@ -602,22 +608,24 @@ const Briefs = (): JSX.Element => {
                   />
                 </button>
 
-                <div
-                  className='flex items-center cursor-pointer'
-                  onClick={toggleFilter}
-                  role='button'
-                >
-                  <p className='mr-[0.25rem] text-imbue-purple-dark text-[1rem]'>
-                    Filter
-                  </p>
-                  <Image src={filterSvg} alt='Filter Icon' />
-                </div>
+                {!savedBriefsActive && (
+                  <div
+                    className='flex items-center cursor-pointer'
+                    onClick={toggleFilter}
+                    role='button'
+                  >
+                    <p className='mr-[0.25rem] text-imbue-purple-dark text-[1rem]'>
+                      Filter
+                    </p>
+                    <Image src={filterSvg} alt='Filter Icon' />
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
           <div className='briefs-list !overflow-hidden z-10'>
-            {briefs?.map(
+            {briefsData?.map(
               (item, itemIndex) =>
                 !item?.project_id && (
                   <div key={itemIndex} className='relative z-0'>
