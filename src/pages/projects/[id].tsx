@@ -166,10 +166,10 @@ function Project() {
       const projectRes = await getProjectById(projectId);
       // showing owner profile if the current user if the applicant freelancer
       const brief = await getBrief(projectRes.brief_id);
-      
+
       const owner = brief?.user_id
-      ? await utils.fetchUser(brief?.user_id)
-      : await utils.fetchUser(projectRes?.user_id);
+        ? await utils.fetchUser(brief?.user_id)
+        : await utils.fetchUser(projectRes?.user_id);
 
       const freelancerRes = await getFreelancerProfile(projectRes?.user_id);
 
@@ -187,8 +187,8 @@ function Project() {
           const approver = await utils.fetchUserByUsernameOrAddress(
             approverAddress
           );
-          if (approver?.length) {
-            approversPreviewList.push(...approver);
+          if (approver?.id) {
+            approversPreviewList.push(approver);
           } else {
             approversPreviewList.push({
               // id: 6,
@@ -221,7 +221,7 @@ function Project() {
 
       setBalance(balance || 0);
     } catch (error) {
-      setError({message: error});
+      setError({ message: error });
     } finally {
       setLoading(false);
     }
@@ -424,8 +424,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, 'Completed')
               : milestone?.milestone_key == milestoneBeingVotedOn
-              ? openForVotingTag()
-              : projectStateTag(modified, 'Not Started')}
+                ? openForVotingTag()
+                : projectStateTag(modified, 'Not Started')}
 
             <Image
               src={require(expanded
@@ -468,7 +468,7 @@ function Project() {
 
           {isApplicant &&
             onChainProject?.projectState !==
-              OnchainProjectState.OpenForVoting &&
+            OnchainProjectState.OpenForVoting &&
             !milestone?.is_approved && (
               <button
                 className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
@@ -492,6 +492,8 @@ function Project() {
       </div>
     );
   };
+
+  console.log(approversPreview);
 
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)]'>
@@ -615,7 +617,7 @@ function Project() {
                     <div
                       key={index}
                       className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${approver?.display_name && 'cursor-pointer'}`}
-                      onClick={()=>approver.display_name && router.push(`/profile/${approver.username}`)}
+                      onClick={() => approver.display_name && router.push(`/profile/${approver.username}`)}
                     >
                       <Image
                         height={40}
@@ -664,13 +666,12 @@ function Project() {
                 <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
                   <div
                     style={{
-                      width: `${
-                        (onChainProject?.milestones?.filter?.(
-                          (m: any) => m?.is_approved
-                        )?.length /
+                      width: `${(onChainProject?.milestones?.filter?.(
+                        (m: any) => m?.is_approved
+                      )?.length /
                           onChainProject?.milestones?.length) *
                         100
-                      }%`,
+                        }%`,
                     }}
                     className='h-full rounded-xl Accepted-button absolute'
                   ></div>
@@ -678,9 +679,8 @@ function Project() {
                     {onChainProject?.milestones?.map((m: any, i: number) => (
                       <div
                         key={i}
-                        className={`h-4 w-4 ${
-                          m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
-                        } rounded-full -mt-1.5`}
+                        className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
+                          } rounded-full -mt-1.5`}
                       ></div>
                     ))}
                   </div>

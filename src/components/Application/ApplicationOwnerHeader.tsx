@@ -83,7 +83,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
     <div className='flex items-center w-full lg:justify-between lg:px-10 flex-wrap'>
       <div className='flex gap-5 items-center'>
         <Image
-        onClick={()=>router.push(`/profile/${briefOwner?.id}`)}
+        onClick={()=>router.push(`/profile/${briefOwner?.username}`)}
           className='w-16 h-16 rounded-full object-cover cursor-pointer'
           src={briefOwner?.profile_photo ?? require('@/assets/images/profile-image.png')}
           height={200}

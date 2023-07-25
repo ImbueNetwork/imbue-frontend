@@ -68,7 +68,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   const getUserAndFreelancer = async () => {
     const freelancer = await getFreelancerProfile(user?.username);
-    if (!freelancer?.id) redirectToBreif();
+    if (!freelancer?.id) router.push(`/freelancers/new`);
     setFreelancer(freelancer);
 
     const userApplication: any = await getFreelancerBrief(user?.id, briefId);
@@ -217,7 +217,7 @@ export const SubmitProposal = (): JSX.Element => {
   async function insertProject() {
     if (!allInputsValid()) {
       return setError({
-        message: 'Please fill all the required fields fields',
+        message: 'Please fill all the required fields first',
       });
     }
     if (totalPercent !== 100)

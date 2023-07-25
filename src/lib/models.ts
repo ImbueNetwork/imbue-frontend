@@ -242,10 +242,10 @@ export const fetchUserWithUsernameOrAddress =
       .select('id', 'display_name', 'profile_photo', 'username', 'web3_address')
       .first();
 
-export const searchUserWithUsernameOrAddress =
+export const searchUserWithNameOrAddress =
   (usernameOrAddress: string) => (tx: Knex.Transaction) =>
     tx<User>('users')
-      .where('username', 'ilike', `%${usernameOrAddress}%`)
+      .where('display_name', 'ilike', `%${usernameOrAddress}%`)
       .orWhere('web3_address', 'ilike', `%${usernameOrAddress}%`)
       .select('id', 'display_name', 'profile_photo', 'username', 'web3_address')
       .orderBy('web3_address', 'asc');

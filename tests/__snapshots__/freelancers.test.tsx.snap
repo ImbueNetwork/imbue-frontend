@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`test freelancer onclick next snapshot matching 1`] = `
+exports[`Join Freelancers test Freelancer rendering and matching the snapshot 1`] = `
 <button
   class="primary-btn in-dark w-button mr-auto mt-6"
   data-testid="get-started-button"
@@ -9,7 +9,16 @@ exports[`test freelancer onclick next snapshot matching 1`] = `
 </button>
 `;
 
-exports[`test freelancer onclick next snapshot matching 2`] = `
+exports[`Join Freelancers test freelancer onclick next snapshot matching 1`] = `
+<button
+  class="primary-btn in-dark w-button mr-auto mt-6"
+  data-testid="get-started-button"
+>
+  Get Started!
+</button>
+`;
+
+exports[`Join Freelancers test freelancer onclick next snapshot matching 2`] = `
 <h2
   class="text-theme-secondary"
   data-testid="heading"
@@ -18,7 +27,7 @@ exports[`test freelancer onclick next snapshot matching 2`] = `
 </h2>
 `;
 
-exports[`test freelancer validation failure not proceeding the next step 1`] = `
+exports[`Join Freelancers test freelancer validation failure not proceeding the next step 1`] = `
 <h2
   class="text-theme-secondary"
   data-testid="heading"
@@ -27,7 +36,7 @@ exports[`test freelancer validation failure not proceeding the next step 1`] = `
 </h2>
 `;
 
-exports[`test freelancer validation passing if the value is being entered  1`] = `
+exports[`Join Freelancers test freelancer validation passing if the value is being entered  1`] = `
 <h2
   class="text-theme-secondary"
   data-testid="heading"

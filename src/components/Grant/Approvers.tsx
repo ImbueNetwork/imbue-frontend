@@ -9,12 +9,12 @@ import { isValidAddressPolkadotAddress } from '@/utils/helper';
 type ApproverProps = {
   approvers: string[];
   setApprovers: (value: string[]) => void;
+  user: any;
 };
 
-const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
+const Approvers = ({ setApprovers, approvers, user }: ApproverProps) => {
   const [open, setOpen] = useState<boolean>(false);
   const [regUsers, setRegUsers] = useState<any>([]);
-  // const [approvers, setApprovers] = useState<string[]>([])
   const [approversPreview, setApproversPreview] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [input, setInput] = useState<string>('');
@@ -32,7 +32,10 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
   const getAllUsers = async (e: any) => {
     setOpen(true);
     if (e.target.value === '') {
-      setRegUsers(await searchUserByUsernameOrAddress(''));
+      const allUsers = await searchUserByUsernameOrAddress('')
+      const excludeUser = allUsers.filter((u: any) => u.web3_address !== user?.web3_address)
+
+      setRegUsers(excludeUser);
       setLoading(false);
     }
   };
@@ -45,10 +48,11 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
     const input = e.target.value;
     setInput(input);
     const allUsers = await searchUserByUsernameOrAddress(input);
+    const excludeUser = allUsers.filter((u: any) => u.web3_address !== user?.web3_address)
 
     const isValid = isValidAddressPolkadotAddress(input);
     setValidAddress(isValid);
-    setRegUsers(allUsers);
+    setRegUsers(excludeUser);
   };
 
   const addApprover = (newApprover: any) => {
@@ -102,6 +106,7 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
       <ClickAwayListener onClickAway={handleClose}>
         <div className='relative h-14 mt-6 lg:mt-0'>
           <TextField
+            autoComplete='off'
             color='secondary'
             onClick={(e) => getAllUsers(e)}
             id='outlined-basic'
@@ -174,7 +179,7 @@ const Approvers = ({ setApprovers, approvers }: ApproverProps) => {
                       )}
                       {(regUsers.length > 0) && (
                         <>
-                        <p className='ml-5 my-3 text-content text-sm font-semibold'>Suggested Results</p>
+                          <p className='ml-5 my-3 text-content text-sm font-semibold'>Suggested Results</p>
                           {
                             regUsers.map((user: any, index: number) => (
                               <div

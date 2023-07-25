@@ -101,7 +101,7 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
                 {item?.icon}
               </i>
             </ListItemIcon>
-            <p className='text-imbue-purple-dark'>{item?.text}</p>
+            <p className='text-imbue-purple-dark text-sm lg:text-base'>{item?.text}</p>
           </MenuItem>
         ))}
       </div>
