@@ -40,4 +40,21 @@ export default nextConnect()
         new Error(`Failed to fetch skills`, { cause: e as Error });
       }
     });
+  })
+  .post(async (req: NextApiRequest, res: NextApiResponse) => {
+    await db.transaction(async (tx: any) => {
+      try {
+        const skillsList: Array<string> = req.body;
+
+        await models
+          .insertImbueSkills(skillsList)(tx)
+          .then(async (skill: any) => {
+            if (skill) {
+              res.status(200).json({ message: 'Successfully added skills' });
+            }
+          });
+      } catch (e) {
+        new Error(`Failed to create skill`, { cause: e as Error });
+      }
+    });
   });

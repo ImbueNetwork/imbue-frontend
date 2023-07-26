@@ -192,6 +192,7 @@ export const EditProposal = (): JSX.Element => {
               onChange={(tags: string[]) => setSkills([...tags])}
               limit={10}
               hideInput
+              showSearch
             />
           </div>
 

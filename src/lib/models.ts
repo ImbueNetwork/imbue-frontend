@@ -662,6 +662,19 @@ export const fetchProfileImages =
 export const fetchAllImbueSkills = () => (tx: Knex.Transaction) =>
   tx<Skill>('imbue_skills').select();
 
+export const insertImbueSkills =
+  (skills: string[]) => async (tx: Knex.Transaction) =>
+    await fetchAllImbueSkills()(tx).then(async (allSkills) => {
+      const skillNames = allSkills.map((skill) => skill.name);
+      const newSkills = skills.filter((skill) => !skillNames.includes(skill));
+
+      newSkills.map(async (skill) => {
+        return await insertToTable(skill, 'imbue_skills')(tx);
+      });
+
+      return await fetchAllImbueSkills()(tx);
+    });
+
 // Insert a brief and their respective skill and industry_ids.
 export const insertBrief =
   (

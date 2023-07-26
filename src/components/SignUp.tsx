@@ -55,8 +55,9 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
       if (resp.ok) {
         utils.redirect(redirectUrl);
       } else {
-        const error = await resp.json();
-        setError({ message: error });
+        const errorMessage = await resp.json();
+
+        setError(errorMessage);
       }
     } catch (error: any) {
       setError(error.message);

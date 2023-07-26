@@ -224,6 +224,7 @@ const Freelancer = (): JSX.Element => {
           tags={skills}
           onChange={(tags: string[]) => setSkills(tags)}
           hideInput
+          showSearch
         />
       </div>
     </div>

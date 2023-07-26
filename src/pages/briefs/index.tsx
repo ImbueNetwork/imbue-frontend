@@ -571,8 +571,20 @@ const Briefs = (): JSX.Element => {
                 </div>
 
                 <p className='text-[1rem] text-imbue-purple-dark mt-[0.75rem]'>
-                  {Number(briefs_total) === 0 ? 'No' : briefs_total} brief
-                  {Number(briefs_total) === 1 ? '' : 's'} found
+                  {Number(
+                    savedBriefsActive ? briefsData?.length : briefs_total
+                  ) === 0
+                    ? 'No'
+                    : savedBriefsActive
+                    ? briefsData?.length
+                    : briefs_total}{' '}
+                  brief
+                  {Number(
+                    savedBriefsActive ? briefsData?.length : briefs_total
+                  ) === 1
+                    ? ''
+                    : 's'}{' '}
+                  found
                 </p>
               </div>
 

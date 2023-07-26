@@ -7,6 +7,7 @@ export type TagsInputProps = {
   onChange: (_tags: string[]) => void;
   limit?: number;
   hideInput?: boolean;
+  showSearch?: boolean;
 };
 
 export const TagsInput = ({
@@ -15,9 +16,12 @@ export const TagsInput = ({
   onChange,
   limit,
   hideInput,
+  showSearch = false,
 }: TagsInputProps): JSX.Element => {
   const [vtags, setTags] = useState<string[]>(tags);
   const [input, setInput] = useState<any>();
+
+  const [searchText, setSearchText] = useState<string>('');
 
   const handleDelete = (targetIndex: number) => {
     const newTags = tags.filter((_, index) => index !== targetIndex);
@@ -84,21 +88,46 @@ export const TagsInput = ({
           />
         )}
       </div>
-      <div className='tags-suggestion-container'>
-        {suggestData
-          .filter((item: string) => vtags?.indexOf(item) === -1)
-          .map((item, index) => (
-            <div
-              className='tag-suggestion'
-              key={index}
-              onClick={() => addItem(item)}
-            >
-              <span className='tag-suggestion-text font-extralight text-[0.875rem] text-[#3B27C1]'>
-                {item}
-              </span>
-              <span className='tag-suggest-button'>+</span>
-            </div>
-          ))}
+
+      {showSearch && (
+        <input
+          type='text'
+          placeholder='Search for skills'
+          className='new-tag-input text-black !mt-5 !rounded-3xl !w-full !px-6'
+          data-testid='tag-input'
+          value={searchText}
+          maxLength={25}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
+      )}
+
+      <div className=' overflow-x-scroll'>
+        <div
+          className={`tags-suggestion-container max-h-[10rem] ${
+            showSearch ? 'w-[300%]' : 'w-auto'
+          }`}
+        >
+          {suggestData
+            .filter(
+              (item: string) =>
+                vtags?.indexOf(item) === -1 &&
+                item
+                  .toLocaleLowerCase()
+                  .includes(searchText.toLocaleLowerCase())
+            )
+            .map((item, index) => (
+              <div
+                className='tag-suggestion'
+                key={index}
+                onClick={() => addItem(item)}
+              >
+                <span className='tag-suggestion-text font-extralight text-[0.875rem] text-[#3B27C1]'>
+                  {item}
+                </span>
+                <span className='tag-suggest-button'>+</span>
+              </div>
+            ))}
+        </div>
       </div>
     </>
   );
