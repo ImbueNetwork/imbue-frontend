@@ -93,7 +93,10 @@ export const TagsInput = ({
               key={index}
               onClick={() => addItem(item)}
             >
-              <span className='tag-suggestion-text font-extralight text-[0.875rem] text-[#3B27C1]'>
+              <span
+                data-testid={`skill-${item}`}
+                className='tag-suggestion-text font-extralight text-[0.875rem] text-[#3B27C1]'
+              >
                 {item}
               </span>
               <span className='tag-suggest-button'>+</span>
