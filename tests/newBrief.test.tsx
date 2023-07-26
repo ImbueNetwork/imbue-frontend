@@ -9,6 +9,8 @@ import { Providers } from '@/redux/providers/userProviders';
 
 import { dummyUser, getServerSideData } from './__mocks__/userData';
 
+import { getAllSkills } from '@/redux/services/briefService';
+
 jest.mock('@/utils', () => ({
   getCurrentUser: jest.fn(),
 }));
@@ -16,18 +18,30 @@ jest.mock('@/utils/serverSideProps', () => ({
   getServerSideProps: jest.fn(),
 }));
 
+jest.mock('@/redux/services/briefService', () => ({
+  getAllSkills: jest.fn(),
+}));
+
+const skills = [{ name: 'java' }, { name: 'c++' }, { name: 'python' }];
+
 describe('NewBrief', () => {
   beforeAll(() => {
     // Mock the utils.getCurrentUser method to return a fixed array of briefs
     const mockGetAllBriefs = utils.getCurrentUser as jest.MockedFunction<
       typeof utils.getCurrentUser
     >;
+
+    const mockgetAllSkills = getAllSkills as jest.MockedFunction<
+      typeof getAllSkills
+    >;
+
     mockGetAllBriefs.mockResolvedValue(dummyUser);
     // Mock the utils.getCurrentUser method to return a fixed array of briefs
     const mockGetServerSideProps = getServerSideProps as jest.MockedFunction<
       typeof getServerSideProps
     >;
     mockGetServerSideProps.mockResolvedValue(getServerSideData);
+    mockgetAllSkills.mockResolvedValue({ skills });
   });
 
   beforeEach(() => {

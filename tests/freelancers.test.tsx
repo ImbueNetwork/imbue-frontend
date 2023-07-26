@@ -1,8 +1,20 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
+import * as reactRedux from 'react-redux';
 
 import Freelancers from '@/pages/freelancers/new';
 import { Providers } from '@/redux/providers/userProviders';
+import { getAllSkills } from '@/redux/services/briefService';
+import { dummyUser } from './__mocks__/userData';
+
+jest.mock('@/redux/services/briefService', () => ({
+  getAllSkills: jest.fn(),
+}));
+
+jest.mock('react-redux', () => ({
+  ...jest.requireActual('react-redux'),
+  useSelector: jest.fn(),
+}));
 
 function setUp() {
   // const user = {
@@ -20,6 +32,22 @@ function setUp() {
     </Providers>
   );
 }
+
+const skills = [{ name: 'java' }, { name: 'c++' }, { name: 'python' }];
+
+beforeEach(() => {
+  const useSelectorMock = jest.spyOn(reactRedux, 'useSelector');
+  const mockgetAllSkills = getAllSkills as jest.MockedFunction<
+    typeof getAllSkills
+  >;
+  mockgetAllSkills.mockResolvedValue({ skills });
+
+  useSelectorMock.mockReturnValue({ user: dummyUser, loading: false });
+});
+
+afterEach(() => {
+  jest.clearAllMocks();
+});
 
 test('test Freelancer rendering', () => {
   expect(
