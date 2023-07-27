@@ -46,7 +46,7 @@ export default nextConnect()
           const { currentData } = models.paginatedData(
             Number(data?.page || 1),
             Number(data?.items_per_page || 5),
-            briefs?.filter((brief: any) => !brief?.project_id)
+            briefs
           );
 
           const filteredOutProjects = currentData.filter(

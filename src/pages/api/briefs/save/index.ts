@@ -110,8 +110,7 @@ export default nextConnect()
 
             res.status(200).json({
               currentData,
-              totalBriefs: briefs?.filter((brief: any) => !brief?.project_id)
-                .length,
+              totalBriefs: briefs.length,
             });
           });
       } catch (e) {

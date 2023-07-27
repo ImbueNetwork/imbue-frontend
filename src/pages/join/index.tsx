@@ -1,10 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
 import { SignerResult } from '@polkadot/api/types';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { WalletAccount } from '@talismn/connect-wallets';
 import bcrypt from 'bcryptjs';
 import Image from 'next/image';
-import React from 'react';
+import React, { useRef } from 'react';
 import { useState } from 'react';
 
 import * as utils from '@/utils';
@@ -15,6 +16,7 @@ import Login from '@/components/Login';
 import { walletIcon } from '@/assets/svgs';
 import { postAPIHeaders } from '@/config';
 import * as config from '@/config';
+import { authenticate } from '@/pages/api/info/user';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 
 const Join = (): JSX.Element => {
@@ -26,6 +28,9 @@ const Join = (): JSX.Element => {
 
   const [visible, setVisible] = useState<boolean>(false);
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
+  const googleParentRef = useRef<any>();
+
+  // const router = useRouter();
 
   const salt = bcrypt.genSaltSync(10);
 
@@ -49,7 +54,7 @@ const Join = (): JSX.Element => {
       await utils.redirectBack();
     } else {
       const error = await resp.json();
-      setError({message: error});
+      setError({ message: error });
     }
   };
 
@@ -246,9 +251,9 @@ const Join = (): JSX.Element => {
               </div>
 
               <div className='login flex flex-col justify-center items-center w-full'>
-                <GoogleOAuthProvider clientId={config.googleClientId}>
+                <GoogleOAuthProvider clientId={config?.googleClientId}>
                   <GoogleLogin
-                    width={'400'}
+                    width={`${googleParentRef?.current?.clientWidth}`}
                     logo_alignment='center'
                     shape='circle'
                     size='large'
@@ -294,6 +299,28 @@ const Join = (): JSX.Element => {
       />
     </div>
   );
+};
+
+export const getServerSideProps = async (context: any) => {
+  const { req, res } = context;
+  // Check the authentication state here.
+  const user = await authenticate('jwt', req, res);
+
+  const isAuthenticated = user; // Replace this with your actual authentication check
+
+  if (isAuthenticated) {
+    // If the user is logged in, redirect them to another page (e.g., dashboard)
+    return {
+      redirect: {
+        destination: '/dashboard',
+        permanent: false,
+      },
+    };
+  }
+  // If the user is unauthenticated, they can access this page.
+  return {
+    props: {},
+  };
 };
 
 export default Join;

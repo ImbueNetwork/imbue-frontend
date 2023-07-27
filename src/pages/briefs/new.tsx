@@ -230,13 +230,13 @@ const NewBrief = (): JSX.Element => {
         />
         <div className={styles.budgetCurrencyContainer}>$</div>
       </div>
-      <div className={styles.budgetDescription + " !my-2"}>
+      <div className={styles.budgetDescription + ' !my-2'}>
         You will be able to set milestones which divide your project into
         manageable phases.
       </div>
-      {Number(budget) < 30 && (
+      {Number(budget) < 10 && (
         <div className={`${styles.budgetDescription} !my-5 !text-red-600`}>
-          We recommend a minimum budget of $30 for a brief.
+          We recommend a minimum budget of $10 for a brief.
         </div>
       )}
     </div>
@@ -283,7 +283,7 @@ const NewBrief = (): JSX.Element => {
     if (step === 6 && durationId === undefined) {
       return false;
     }
-    if ((step === 7 && !budget) || Number(budget) < 30) {
+    if ((step === 7 && !budget) || Number(budget) < 10) {
       return false;
     }
     return true;
