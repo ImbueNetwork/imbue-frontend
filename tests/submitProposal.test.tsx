@@ -42,6 +42,9 @@ describe('SubmitProposal', () => {
     const mockGetCurrentUser = getCurrentUser as jest.MockedFunction<
       typeof getCurrentUser
     >;
+
+    useSelectorMock.mockReturnValue({ user: dummyUser, loading: false });
+
     mockGetCurrentUser.mockResolvedValue(dummyUser);
 
     useSelectorMock.mockReturnValue({ user: dummyUser });
@@ -101,6 +104,11 @@ describe('SubmitProposal', () => {
     const mockGetFreelancerProfile =
       getFreelancerProfile as jest.MockedFunction<typeof getFreelancerProfile>;
     mockGetFreelancerProfile.mockResolvedValue(undefined);
+    const mockPush = jest.fn();
+    (useRouter as jest.Mock).mockReturnValue({
+      push: mockPush,
+      isReady: true,
+    });
 
     render(
       <Providers>
@@ -118,7 +126,12 @@ describe('SubmitProposal', () => {
       typeof getFreelancerBrief
     >;
     mockGetFreelancerBrief.mockResolvedValue(briefsData[0]);
-
+    const mockPush = jest.fn();
+    (useRouter as jest.Mock).mockReturnValue({
+      push: mockPush,
+      query: { id: 1 },
+      isReady: true,
+    });
     render(
       <Providers>
         <SubmitProposal />
@@ -131,6 +144,10 @@ describe('SubmitProposal', () => {
   });
 
   test('calls getCurrentUser and getFreelancerProfile on component mount', async () => {
+    (useRouter as jest.Mock).mockReturnValue({
+      isReady: true,
+    });
+
     render(
       <Providers>
         <SubmitProposal />
@@ -148,7 +165,12 @@ describe('SubmitProposal', () => {
   test('calls getBrief when user exists and brief does not exist', async () => {
     const mockgetBrief = getBrief as jest.MockedFunction<typeof getBrief>;
     mockgetBrief.mockResolvedValue(undefined);
-
+    const pushMock = jest.fn();
+    (useRouter as jest.Mock).mockReturnValue({
+      query: { id: 1 },
+      push: pushMock,
+      isReady: true,
+    });
     render(
       <Providers>
         <SubmitProposal />
@@ -157,13 +179,20 @@ describe('SubmitProposal', () => {
 
     await waitFor(() => {
       expect(getBrief).toHaveBeenCalledTimes(1);
-      expect(getBrief).toHaveBeenCalledWith('1');
+      expect(getBrief).toHaveBeenCalledWith(1);
     });
   });
 
   test('calls getFreelancerBrief when user exists and brief exists', async () => {
     const mockgetBrief = getBrief as jest.MockedFunction<typeof getBrief>;
     mockgetBrief.mockResolvedValue(briefsData[1]);
+
+    (useRouter as jest.Mock).mockReturnValue({
+      isReady: true,
+      query: {
+        id: '1',
+      },
+    });
 
     render(
       <Providers>
@@ -178,6 +207,10 @@ describe('SubmitProposal', () => {
   });
 
   test('adds milestone field on click of add milestone button', async () => {
+    (useRouter as jest.Mock).mockReturnValue({
+      isReady: true,
+    });
+
     const { getByText, getAllByText } = render(
       <Providers>
         <SubmitProposal />
@@ -190,6 +223,9 @@ describe('SubmitProposal', () => {
   });
 
   test('fills input fields and clicks submit button', async () => {
+    (useRouter as jest.Mock).mockReturnValue({
+      isReady: true,
+    });
     const { getByText, getByTestId } = render(
       <Providers>
         <SubmitProposal />

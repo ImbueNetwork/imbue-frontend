@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { Autocomplete, TextField } from '@mui/material';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -16,7 +17,7 @@ import {
   suggestedLanguages,
   suggestedServices,
 } from '@/config/freelancer-data';
-import { getAllSkills } from '@/redux/services/briefService';
+import { searchSkills } from '@/redux/services/briefService';
 import { createFreelancingProfile } from '@/redux/services/freelancerService';
 import { RootState } from '@/redux/store/store';
 
@@ -50,10 +51,16 @@ const Freelancer = (): JSX.Element => {
   }, []);
 
   const fetchSuggestedSkills = async () => {
-    const skillsRes = await getAllSkills();
+    const skillsRes = await searchSkills('');
     if (skillsRes) {
       setSuggestedSkills(skillsRes?.skills.map((skill) => skill.name));
     }
+  };
+
+  const searchSkill = async (name: string) => {
+    const skillRes = await searchSkills(name);
+    if (!skillRes || !skillRes?.skills.length) return;
+    setSuggestedSkills(skillRes?.skills.map((skill) => skill.name));
   };
 
   const HelloPanel = (
@@ -219,12 +226,27 @@ const Freelancer = (): JSX.Element => {
       </div>
       <h3 className='text-lg text-black mt-5'>Your Skills</h3>
       <div className='mt-5 mb-20'>
-        <TagsInput
+        {/* <TagsInput
           suggestData={suggestedFreelancingSkills}
           tags={skills}
           onChange={(tags: string[]) => setSkills(tags)}
           hideInput
-          showSearch
+        /> */}
+        <Autocomplete
+          id='tags-standard'
+          multiple
+          getOptionLabel={(option) => option}
+          options={suggestedFreelancingSkills}
+          sx={{ width: '100%' }}
+          onChange={(e, value) => setSkills(value)}
+          defaultValue={skills}
+          renderInput={(params) => (
+            <TextField
+              color='secondary'
+              onChange={(e) => searchSkill(e.target.value)}
+              {...params}
+            />
+          )}
         />
       </div>
     </div>

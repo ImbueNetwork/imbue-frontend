@@ -277,3 +277,15 @@ export const getAllSkills = async () => {
     throw new Error('Failed to get skills ..... status:' + resp.status);
   }
 };
+
+export const searchSkills = async (name: string) => {
+  const resp = await fetch(`${config.apiBase}skills/${name}`, {
+    headers: getAPIHeaders,
+    method: 'get',
+  });
+  if (resp.ok) {
+    return (await resp.json()) as { skills: Array<{ name: string }> };
+  } else {
+    throw new Error('Failed to get skills ..... status:' + resp.status);
+  }
+};

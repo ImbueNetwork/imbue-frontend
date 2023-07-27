@@ -1,3 +1,4 @@
+import { Autocomplete, TextField } from '@mui/material';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -21,7 +22,7 @@ import {
   suggestedIndustries,
   timeData,
 } from '@/config/briefs-data';
-import { getAllSkills } from '@/redux/services/briefService';
+import { searchSkills } from '@/redux/services/briefService';
 import { RootState } from '@/redux/store/store';
 
 import styles from '../../styles/modules/newBrief.module.css';
@@ -49,10 +50,16 @@ const NewBrief = (): JSX.Element => {
   }, []);
 
   const fetchSuggestedSkills = async () => {
-    const skillsRes = await getAllSkills();
+    const skillsRes = await searchSkills('');
     if (skillsRes) {
       setSuggestedSkills(skillsRes?.skills.map((skill) => skill.name));
     }
+  };
+
+  const searchSkill = async (name: string) => {
+    const skillRes = await searchSkills(name);
+    if (!skillRes || !skillRes?.skills.length) return;
+    setSuggestedSkills(skillRes?.skills.map((skill) => skill.name));
   };
 
   const NamePanel = (
@@ -117,14 +124,30 @@ const NewBrief = (): JSX.Element => {
     <>
       <p className={styles.fieldName}>Search the skills</p>
       <div className={styles.skillsContainer}>
-        <TagsInput
+        {/* <TagsInput
           suggestData={suggestedSkills}
           tags={skills}
           data-testid='skills-input'
           onChange={(tags: string[]) => setSkills(tags)}
           limit={10}
           hideInput
-          showSearch
+        /> */}
+        <Autocomplete
+          id='tags-standard'
+          data-testid='skills-input'
+          multiple
+          getOptionLabel={(option) => option}
+          options={suggestedSkills}
+          sx={{ width: '100%' }}
+          onChange={(e, value) => setSkills(value)}
+          defaultValue={skills}
+          renderInput={(params) => (
+            <TextField
+              color='secondary'
+              onChange={(e) => searchSkill(e.target.value)}
+              {...params}
+            />
+          )}
         />
       </div>
     </>
