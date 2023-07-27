@@ -62,7 +62,7 @@ export default nextConnect()
             )(tx);
 
             if (existingUsername?.id !== user?.id) {
-              return res.status(400).json({
+              return res.status(409).send({
                 status: 'Failed',
                 message: 'Username already exists.',
               });
@@ -72,6 +72,7 @@ export default nextConnect()
               const existingEmail = await models.fetchUserOrEmail(user.email)(
                 tx
               );
+
               if (existingEmail?.id !== user?.id) {
                 console.log('***** email already exists');
                 return res.status(400).json({
@@ -96,6 +97,7 @@ export default nextConnect()
             };
 
             const userResp = await models.updateUserData(user.id, userData)(tx);
+
             if (!userResp) {
               return new Error('User not found!.');
             }

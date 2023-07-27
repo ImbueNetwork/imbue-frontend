@@ -72,12 +72,18 @@ export const fetchProjectById = async (projectId: string | number | null) => {
   }
 };
 
-export const fetchProject = async (projectId: string | number | null, brief_id: string | number | null) => {
+export const fetchProject = async (
+  projectId: string | number | null,
+  brief_id: string | number | null
+) => {
   try {
-    const resp = await fetch(`${config.apiBase}project/${projectId}/${brief_id}`, {
-      headers: config.getAPIHeaders,
-      method: 'get',
-    });
+    const resp = await fetch(
+      `${config.apiBase}project/${projectId}/${brief_id}`,
+      {
+        headers: config.getAPIHeaders,
+        method: 'get',
+      }
+    );
     if (resp.ok) {
       return (await resp.json()) as Project;
     }
@@ -100,7 +106,9 @@ export const fetchUserByUsernameOrAddress = async (
   usernameOrAddress: string
 ) => {
   try {
-    const resp = await fetch(`/api/users/byUsernameOrAddress/${usernameOrAddress}`);
+    const resp = await fetch(
+      `/api/users/byUsernameOrAddress/${usernameOrAddress}`
+    );
     return await resp.json();
   } catch (error) {
     return [];
@@ -167,7 +175,7 @@ export const updateUser = async (user: User) => {
     if (update.status === 200) {
       return update.json();
     } else {
-      return resp;
+      return { status: update.status, message: update.statusText };
     }
   } catch (error) {
     return resp;

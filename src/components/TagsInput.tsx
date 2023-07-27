@@ -7,6 +7,7 @@ export type TagsInputProps = {
   onChange: (_tags: string[]) => void;
   limit?: number;
   hideInput?: boolean;
+  showSearch?: boolean;
 };
 
 export const TagsInput = ({
