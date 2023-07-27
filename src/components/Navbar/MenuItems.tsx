@@ -77,8 +77,8 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
     handleClose();
     if (needAuthentication && !user?.username) {
       setLoginModal(true);
-    } else if (link === "/login") {
-      setLoginModal(true)
+    } else if (link === '/login') {
+      setLoginModal(true);
     } else {
       router.push(link);
     }
@@ -88,10 +88,16 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
       <div className='menuItems flex flex-col lg:gap-2'>
         {linkItems.map((item, index) => (
           <MenuItem
-            className={`${item.duplicate && 'lg:hidden'} ${item.needAuthentication && !user?.username && 'hidden'
-              }`}
+            className={`${item.duplicate && 'lg:hidden'} ${
+              item.needAuthentication && !user?.username && 'hidden'
+            }`}
             key={index}
-            onClick={() => navigateToPage(item.link, item.needAuthentication)}
+            onClick={() => {
+              navigateToPage(item.link, item.needAuthentication);
+              if (item.link === '/logout') {
+                localStorage.clear();
+              }
+            }}
           >
             <ListItemIcon>
               <i
@@ -101,7 +107,9 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
                 {item?.icon}
               </i>
             </ListItemIcon>
-            <p className='text-imbue-purple-dark text-sm lg:text-base'>{item?.text}</p>
+            <p className='text-imbue-purple-dark text-sm lg:text-base'>
+              {item?.text}
+            </p>
           </MenuItem>
         ))}
       </div>

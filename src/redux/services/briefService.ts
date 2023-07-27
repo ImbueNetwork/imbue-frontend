@@ -2,6 +2,7 @@
 import { checkEnvironment } from '@/utils';
 
 import * as config from '@/config';
+import { FETCHED_SKILLS } from '@/constants/constants';
 import { Brief, BriefSqlFilter, OffchainProjectState } from '@/model';
 
 import { BriefInfo, PaginatedResponse } from '@/types/briefTypes';
@@ -275,5 +276,41 @@ export const getAllSkills = async () => {
     return (await resp.json()) as { skills: Array<{ name: string }> };
   } else {
     throw new Error('Failed to get skills ..... status:' + resp.status);
+  }
+};
+
+export const getLinkedInSkills = async () => {
+  try {
+    // Fetch the data from the GitHub URL
+    const response = await fetch(
+      'https://raw.githubusercontent.com/varadchoudhari/LinkedIn-Skills-Crawler/master/output/all_skills.txt'
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch data from GitHub.');
+    }
+
+    const textData = await response.text();
+    const dataArray = textData.split('\n');
+    const skills = dataArray.map((skill) => skill.trim());
+
+    // Make a request to the server-side route to insert the data
+    const postResponse = await fetch('/api/briefs/skills', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(skills),
+    });
+
+    if (!postResponse.ok) {
+      throw new Error('Failed to insert data using the API.');
+    }
+
+    const data = await postResponse.json();
+    console.log(data.message, '<<<<<< here');
+    localStorage.setItem(FETCHED_SKILLS, 'true');
+  } catch (error: any) {
+    console.error('Error:', error.message);
   }
 };

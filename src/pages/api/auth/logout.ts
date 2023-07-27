@@ -7,7 +7,6 @@ export default async function logout(
   res: NextApiResponse
 ) {
   removeTokenCookie(res);
-  // localStorage.clear();
   res.writeHead(302, { Location: '/' });
   res.end();
 }

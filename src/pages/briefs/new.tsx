@@ -208,7 +208,7 @@ const NewBrief = (): JSX.Element => {
         <div className={styles.budgetCurrencyContainer}>$</div>
       </div>
       {Number(budget) < 30 && (
-        <div className={`${styles.budgetDescription} text-red-600`}>
+        <div className={`${styles.budgetDescription} text-red-600 !mb-10 !p-0`}>
           We recommend a minimum budget of $30 for a brief.
         </div>
       )}

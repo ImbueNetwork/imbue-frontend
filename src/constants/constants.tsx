@@ -187,3 +187,5 @@ export const proposalsDummyData = [
     created: 'ieknldf',
   },
 ];
+
+export const FETCHED_SKILLS = 'hasFetchedSkills';

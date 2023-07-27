@@ -102,11 +102,7 @@ export const TagsInput = ({
       )}
 
       <div className=' overflow-x-scroll'>
-        <div
-          className={`tags-suggestion-container max-h-[10rem] ${
-            showSearch ? 'w-[300%]' : 'w-auto'
-          }`}
-        >
+        <div className={`tags-suggestion-container w-auto`}>
           {suggestData
             .filter(
               (item: string) =>
@@ -115,6 +111,7 @@ export const TagsInput = ({
                   .toLocaleLowerCase()
                   .includes(searchText.toLocaleLowerCase())
             )
+            .slice(0, 15)
             .map((item, index) => (
               <div
                 className='tag-suggestion'
