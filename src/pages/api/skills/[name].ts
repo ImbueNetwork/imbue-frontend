@@ -39,7 +39,6 @@ export default nextConnect()
         await models
           .searchImbueSkillsByName(String(name))(tx)
           .then(async (skills: any) => {
-            console.log(skills);
             res.status(200).json({ skills });
           });
       } catch (e) {
