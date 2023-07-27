@@ -4,12 +4,12 @@ import * as reactRedux from 'react-redux';
 
 import Freelancers from '@/pages/freelancers/new';
 import { Providers } from '@/redux/providers/userProviders';
-import { getAllSkills } from '@/redux/services/briefService';
+import { searchSkills } from '@/redux/services/briefService';
 
 import { dummyUser } from './__mocks__/userData';
 
 jest.mock('@/redux/services/briefService', () => ({
-  getAllSkills: jest.fn(),
+  searchSkills: jest.fn(),
 }));
 
 jest.mock('react-redux', () => ({
@@ -38,8 +38,8 @@ const skills = [{ name: 'java' }, { name: 'c++' }, { name: 'python' }];
 
 beforeEach(() => {
   const useSelectorMock = jest.spyOn(reactRedux, 'useSelector');
-  const mockgetAllSkills = getAllSkills as jest.MockedFunction<
-    typeof getAllSkills
+  const mockgetAllSkills = searchSkills as jest.MockedFunction<
+    typeof searchSkills
   >;
   mockgetAllSkills.mockResolvedValue({ skills });
 

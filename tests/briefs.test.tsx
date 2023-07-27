@@ -8,7 +8,7 @@ import {
   deleteSavedBrief,
   getAllBriefs,
   getAllSavedBriefs,
-  getAllSkills,
+  searchSkills,
 } from '@/redux/services/briefService';
 
 import {
@@ -22,7 +22,7 @@ jest.mock('@/redux/services/briefService', () => ({
   callSearchBriefs: jest.fn(),
   deleteSavedBrief: jest.fn(),
   getAllSavedBriefs: jest.fn(),
-  getAllSkills: jest.fn(),
+  searchSkills: jest.fn(),
 }));
 
 jest.mock('next/router', () => ({
@@ -53,8 +53,8 @@ beforeEach(() => {
   const mockGetAllSavedBriefs = getAllSavedBriefs as jest.MockedFunction<
     typeof getAllSavedBriefs
   >;
-  const mockgetAllSkills = getAllSkills as jest.MockedFunction<
-    typeof getAllSkills
+  const mockgetAllSkills = searchSkills as jest.MockedFunction<
+    typeof searchSkills
   >;
 
   mockGetAllBriefs.mockResolvedValue(mockBriefs);

@@ -6,7 +6,7 @@ import { getServerSideProps } from '@/utils/serverSideProps';
 
 import NewBrief from '@/pages/briefs/new';
 import { Providers } from '@/redux/providers/userProviders';
-import { getAllSkills } from '@/redux/services/briefService';
+import { searchSkills } from '@/redux/services/briefService';
 
 import { dummyUser, getServerSideData } from './__mocks__/userData';
 
@@ -18,7 +18,7 @@ jest.mock('@/utils/serverSideProps', () => ({
 }));
 
 jest.mock('@/redux/services/briefService', () => ({
-  getAllSkills: jest.fn(),
+  searchSkills: jest.fn(),
 }));
 
 const skills = [{ name: 'java' }, { name: 'c++' }, { name: 'python' }];
@@ -30,8 +30,8 @@ describe('NewBrief', () => {
       typeof utils.getCurrentUser
     >;
 
-    const mockgetAllSkills = getAllSkills as jest.MockedFunction<
-      typeof getAllSkills
+    const mockgetAllSkills = searchSkills as jest.MockedFunction<
+      typeof searchSkills
     >;
 
     mockGetAllBriefs.mockResolvedValue(dummyUser);
@@ -151,11 +151,14 @@ describe('NewBrief', () => {
 
     //navigate to skills screen
     fireEvent.click(nextBtn);
+    const skillInput = document.getElementById(
+      'tags-standard'
+    ) as HTMLInputElement;
+    fireEvent.change(skillInput, { target: { value: 'python' } });
+    const pythonOption = screen.getByText('python');
+    fireEvent.click(pythonOption);
 
-    const skill = screen.getByTestId('skill-java') as HTMLInputElement;
-    fireEvent.click(skill);
-
-    const selectedTags = screen.getAllByTestId('unselect-tag');
+    const selectedTags = screen.getAllByTestId('CancelIcon');
     expect(selectedTags).toHaveLength(1);
     fireEvent.click(nextBtn);
   });
@@ -188,10 +191,14 @@ describe('NewBrief', () => {
     //navigate to skills screen
     fireEvent.click(nextBtn);
 
-    const skill = screen.getByTestId('skill-java') as HTMLInputElement;
-    fireEvent.click(skill);
+    const skillInput = document.getElementById(
+      'tags-standard'
+    ) as HTMLInputElement;
+    fireEvent.change(skillInput, { target: { value: 'python' } });
+    const pythonOption = screen.getByText('python');
+    fireEvent.click(pythonOption);
 
-    const selectedTags = screen.getAllByTestId('unselect-tag');
+    const selectedTags = screen.getAllByTestId('CancelIcon');
     expect(selectedTags).toHaveLength(1);
     fireEvent.click(nextBtn);
 
@@ -231,10 +238,14 @@ describe('NewBrief', () => {
     //navigate to skills screen
     fireEvent.click(nextBtn);
 
-    const skill = screen.getByTestId('skill-java') as HTMLInputElement;
-    fireEvent.click(skill);
+    const skillInput = document.getElementById(
+      'tags-standard'
+    ) as HTMLInputElement;
+    fireEvent.change(skillInput, { target: { value: 'python' } });
+    const pythonOption = screen.getByText('python');
+    fireEvent.click(pythonOption);
 
-    const selectedTags = screen.getAllByTestId('unselect-tag');
+    const selectedTags = screen.getAllByTestId('CancelIcon');
     expect(selectedTags).toHaveLength(1);
 
     //navigate to experience level screen
@@ -280,12 +291,15 @@ describe('NewBrief', () => {
     //navigate to skills screen
     fireEvent.click(nextBtn);
 
-    const skill = screen.getByTestId('skill-java') as HTMLInputElement;
-    fireEvent.click(skill);
+    const skillInput = document.getElementById(
+      'tags-standard'
+    ) as HTMLInputElement;
+    fireEvent.change(skillInput, { target: { value: 'python' } });
+    const pythonOption = screen.getByText('python');
+    fireEvent.click(pythonOption);
 
-    const selectedTags = screen.getAllByTestId('unselect-tag');
+    const selectedTags = screen.getAllByTestId('CancelIcon');
     expect(selectedTags).toHaveLength(1);
-    fireEvent.click(nextBtn);
 
     //navigate to experience level screen
     fireEvent.click(nextBtn);
@@ -338,12 +352,15 @@ describe('NewBrief', () => {
     //navigate to skills screen
     fireEvent.click(nextBtn);
 
-    const skill = screen.getByTestId('skill-java') as HTMLInputElement;
-    fireEvent.click(skill);
+    const skillInput = document.getElementById(
+      'tags-standard'
+    ) as HTMLInputElement;
+    fireEvent.change(skillInput, { target: { value: 'python' } });
+    const pythonOption = screen.getByText('python');
+    fireEvent.click(pythonOption);
 
-    const selectedTags = screen.getAllByTestId('unselect-tag');
+    const selectedTags = screen.getAllByTestId('CancelIcon');
     expect(selectedTags).toHaveLength(1);
-    fireEvent.click(nextBtn);
 
     //navigate to experience level screen
     fireEvent.click(nextBtn);
@@ -431,11 +448,16 @@ describe('Test case for API call', () => {
     //navigate to skills screen
     fireEvent.click(nextBtn);
 
-    const skill = screen.getByTestId('skill-java') as HTMLInputElement;
-    fireEvent.click(skill);
+    const skillInput = document.getElementById(
+      'tags-standard'
+    ) as HTMLInputElement;
+    fireEvent.change(skillInput, { target: { value: 'python' } });
+    const pythonOption = screen.getByText('python');
+    fireEvent.click(pythonOption);
 
-    const selectedTags = screen.getAllByTestId('unselect-tag');
+    const selectedTags = screen.getAllByTestId('CancelIcon');
     expect(selectedTags).toHaveLength(1);
+    fireEvent.click(nextBtn);
 
     //navigate to experience level screen
     fireEvent.click(nextBtn);

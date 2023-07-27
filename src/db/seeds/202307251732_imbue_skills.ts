@@ -12,7 +12,7 @@ const result: skills[] = [];
 
 fs.createReadStream(pathtofile)
   .pipe(parser({}))
-  .on('data', (data) => result.push(data));
+  .on('data', (data:skills) => result.push(data));
 
 export async function seed(knex: Knex): Promise<void> {
   await knex('imbue_skills').insert(result);
