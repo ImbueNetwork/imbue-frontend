@@ -5,6 +5,7 @@ import * as reactRedux from 'react-redux';
 import Freelancers from '@/pages/freelancers/new';
 import { Providers } from '@/redux/providers/userProviders';
 import { getAllSkills } from '@/redux/services/briefService';
+
 import { dummyUser } from './__mocks__/userData';
 
 jest.mock('@/redux/services/briefService', () => ({

@@ -151,13 +151,7 @@ describe('NewBrief', () => {
 
     //navigate to skills screen
     fireEvent.click(nextBtn);
-    // const skillsInput = screen.getByTestId('tag-input') as HTMLInputElement;
-    // expect(descriptionInput.value).toBe('create a new mobile application');
-    // fireEvent.change(skillsInput, { target: { value: 'Kusama' } });
-    // fireEvent.keyDown(skillsInput, { key: 'Enter' });
-    // fireEvent.change(skillsInput, { target: { value: 'Polkadot' } });
-    // fireEvent.keyDown(skillsInput, { key: 'Enter' });
-    // expect(skillsInput.value).toBe('');
+
     const skill = screen.getByTestId('skill-java') as HTMLInputElement;
     fireEvent.click(skill);
 
@@ -193,15 +187,7 @@ describe('NewBrief', () => {
 
     //navigate to skills screen
     fireEvent.click(nextBtn);
-    // const skillsInput = screen.getByTestId('tag-input') as HTMLInputElement;
-    // expect(descriptionInput.value).toBe('create a new mobile application');
-    // fireEvent.change(skillsInput, { target: { value: 'Kusama' } });
-    // fireEvent.keyDown(skillsInput, { key: 'Enter' });
-    // fireEvent.change(skillsInput, { target: { value: 'Polkadot' } });
-    // fireEvent.keyDown(skillsInput, { key: 'Enter' });
-    // expect(skillsInput.value).toBe('');
-    // const selectedTags = screen.getAllByTestId('unselect-tag');
-    // expect(selectedTags).toHaveLength(2);
+
     const skill = screen.getByTestId('skill-java') as HTMLInputElement;
     fireEvent.click(skill);
 
@@ -244,15 +230,7 @@ describe('NewBrief', () => {
 
     //navigate to skills screen
     fireEvent.click(nextBtn);
-    // const skillsInput = screen.getByTestId('tag-input') as HTMLInputElement;
-    // expect(descriptionInput.value).toBe('create a new mobile application');
-    // fireEvent.change(skillsInput, { target: { value: 'Kusama' } });
-    // fireEvent.keyDown(skillsInput, { key: 'Enter' });
-    // fireEvent.change(skillsInput, { target: { value: 'Polkadot' } });
-    // fireEvent.keyDown(skillsInput, { key: 'Enter' });
-    // expect(skillsInput.value).toBe('');
-    // const selectedTags = screen.getAllByTestId('unselect-tag');
-    // expect(selectedTags).toHaveLength(2);
+
     const skill = screen.getByTestId('skill-java') as HTMLInputElement;
     fireEvent.click(skill);
 
@@ -301,15 +279,7 @@ describe('NewBrief', () => {
 
     //navigate to skills screen
     fireEvent.click(nextBtn);
-    // const skillsInput = screen.getByTestId('tag-input') as HTMLInputElement;
-    // expect(descriptionInput.value).toBe('create a new mobile application');
-    // fireEvent.change(skillsInput, { target: { value: 'Kusama' } });
-    // fireEvent.keyDown(skillsInput, { key: 'Enter' });
-    // fireEvent.change(skillsInput, { target: { value: 'Polkadot' } });
-    // fireEvent.keyDown(skillsInput, { key: 'Enter' });
-    // expect(skillsInput.value).toBe('');
-    // const selectedTags = screen.getAllByTestId('unselect-tag');
-    // expect(selectedTags).toHaveLength(2);
+
     const skill = screen.getByTestId('skill-java') as HTMLInputElement;
     fireEvent.click(skill);
 
@@ -367,15 +337,6 @@ describe('NewBrief', () => {
 
     //navigate to skills screen
     fireEvent.click(nextBtn);
-    // const skillsInput = screen.getByTestId('tag-input') as HTMLInputElement;
-    // expect(descriptionInput.value).toBe('create a new mobile application');
-    // fireEvent.change(skillsInput, { target: { value: 'Kusama' } });
-    // fireEvent.keyDown(skillsInput, { key: 'Enter' });
-    // fireEvent.change(skillsInput, { target: { value: 'Polkadot' } });
-    // fireEvent.keyDown(skillsInput, { key: 'Enter' });
-    // expect(skillsInput.value).toBe('');
-    // const selectedTags = screen.getAllByTestId('unselect-tag');
-    // expect(selectedTags).toHaveLength(2);
 
     const skill = screen.getByTestId('skill-java') as HTMLInputElement;
     fireEvent.click(skill);
@@ -469,11 +430,7 @@ describe('Test case for API call', () => {
     fireEvent.change(descriptionInput, { target: { value: 'Description' } });
     //navigate to skills screen
     fireEvent.click(nextBtn);
-    // const skillsInput = screen.getByTestId('tag-input') as HTMLInputElement;
-    // fireEvent.change(skillsInput, { target: { value: 'Skill1' } });
-    // fireEvent.keyDown(skillsInput, { key: 'Enter' });
-    // fireEvent.change(skillsInput, { target: { value: 'Skill2' } });
-    // fireEvent.keyDown(skillsInput, { key: 'Enter' });
+
     const skill = screen.getByTestId('skill-java') as HTMLInputElement;
     fireEvent.click(skill);
 
