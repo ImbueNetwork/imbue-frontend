@@ -670,7 +670,7 @@ export const searchImbueSkillsByName =
   (name: string) => (tx: Knex.Transaction) =>
     tx<Skill>('imbue_skills')
       .select()
-      .where('name', 'ilike', `%${name}%`)
+      .where('name', 'ilike', `${name}%`)
       .limit(10);
 
 // Insert a brief and their respective skill and industry_ids.
