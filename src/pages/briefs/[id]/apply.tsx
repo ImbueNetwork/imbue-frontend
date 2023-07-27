@@ -202,6 +202,8 @@ export const SubmitProposal = (): JSX.Element => {
       }
     }
 
+    // if(totalCost > )
+
     setMilestones(newMilestones);
 
     if (firstErrorIndex !== -1)
@@ -397,6 +399,7 @@ export const SubmitProposal = (): JSX.Element => {
 
                       <input
                         type='number'
+                        onWheel={(e) => (e.target as HTMLElement).blur()}
                         data-testid={`milestone-amount-${index}`}
                         placeholder='Add an amount'
                         className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
@@ -576,6 +579,7 @@ export const SubmitProposal = (): JSX.Element => {
         title={'You have successfully applied for this brief'}
         open={open}
         setOpen={setOpen}
+        noRetry
       >
         <div className='flex flex-col gap-4 w-1/2'>
           <button

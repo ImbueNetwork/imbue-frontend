@@ -206,7 +206,7 @@ const NewBrief = (): JSX.Element => {
   );
 
   const BudgetPanel = (
-    <div>
+    <div className='mb-auto'>
       <p className={styles.fieldName}>Maximum project budget (USD)</p>
       <div className={styles.budgetInputContainer}>
         <input
@@ -230,15 +230,15 @@ const NewBrief = (): JSX.Element => {
         />
         <div className={styles.budgetCurrencyContainer}>$</div>
       </div>
-      {Number(budget) < 30 && (
-        <div className={`${styles.budgetDescription} text-red-600`}>
-          We recommend a minimum budget of $30 for a brief.
-        </div>
-      )}
-      <div className={styles.budgetDescription}>
+      <div className={styles.budgetDescription + " !my-2"}>
         You will be able to set milestones which divide your project into
         manageable phases.
       </div>
+      {Number(budget) < 30 && (
+        <div className={`${styles.budgetDescription} !my-5 !text-red-600`}>
+          We recommend a minimum budget of $30 for a brief.
+        </div>
+      )}
     </div>
   );
 

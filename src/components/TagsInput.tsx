@@ -32,6 +32,8 @@ export const TagsInput = ({
     }
     if (['Tab', 'Enter'].includes(e.key) && input) {
       if (limit && vtags.length >= limit) return;
+      if (vtags.includes(input)) return;
+
       const newTags = [...vtags, input];
       setTags(newTags);
       setInput('');
@@ -75,6 +77,7 @@ export const TagsInput = ({
 
         {(limit && vtags.length >= limit) || hideInput ? null : (
           <input
+            autoFocus
             type='text'
             className='new-tag-input text-black '
             data-testid='tag-input'

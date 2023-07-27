@@ -100,7 +100,11 @@ export const HirePopup = ({
           );
           setSuccess(true);
         } else if (result.txError) {
-          setError({ message: result.errorMessage });
+          let errorMessage = result.errorMessage
+          if(result.errorMessage?.includes('1010:')) {
+            errorMessage = `${result.errorMessage}.\nYou must have minimum balance of 500 $IMBUE`
+          }
+          setError({ message: errorMessage });
           application.status_id = OffchainProjectState.PendingReview;
         }
         break;

@@ -242,10 +242,20 @@ const GrantApplication = (): JSX.Element => {
     setShowPolkadotAccounts(true);
   }
 
+  const totalPercent = milestones.reduce((sum, { amount }) => {
+    const percent = Number(
+      ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
+    );
+    return sum + percent;
+  }, 0);
+
   const submitGrant = async (account: WalletAccount) => {
     if (!account) return;
     if (!validateFormData())
       return setError({ message: 'Please fill the required fields first' });
+    if (totalPercent < 100)
+      return setError({ message: 'Total Percentage of milelstones must be equal to 100%' });
+
     setLoading(true);
 
     try {
@@ -663,6 +673,7 @@ const GrantApplication = (): JSX.Element => {
 
                             <input
                               type='number'
+                              onWheel={(e)=>(e.target as HTMLElement).blur()}
                               data-testid={`milestone-amount-${index}`}
                               placeholder='Add an amount'
                               className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple outline-content-primary'

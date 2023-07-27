@@ -23,7 +23,7 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
     {
       icon: 'account_balance',
       text: 'Submit A Grant',
-      link: '/briefs/new',
+      link: '/grants/new',
       needAuthentication: true,
       duplicate: true,
     },

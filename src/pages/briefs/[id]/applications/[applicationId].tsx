@@ -330,12 +330,12 @@ const ApplicationPreview = (): JSX.Element => {
         escrow_address: escrow_address,
         duration_id: durationId,
       });
-
+      
       if (resp.status === 201 || resp.status === 200) {
         setSuccess(true);
         setIsEditingBio(false);
       } else {
-        setError({ message: `${resp.status} ${resp.statusText}` });
+        setError({ message: `${resp.status} ${resp.message}` });
       }
     } catch (error) {
       setError({ message: error });
