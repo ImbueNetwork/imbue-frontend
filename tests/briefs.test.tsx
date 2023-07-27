@@ -3,20 +3,26 @@ import userEvent from '@testing-library/user-event';
 
 import Briefs from '@/pages/briefs';
 import { Providers } from '@/redux/providers/userProviders';
+import {
+  callSearchBriefs,
+  deleteSavedBrief,
+  getAllBriefs,
+  getAllSavedBriefs,
+  searchSkills,
+} from '@/redux/services/briefService';
 
 import {
   briefsData,
   expertExpData,
   // intermediateExpData,
 } from './__mocks__/briefsData';
-import {
-  callSearchBriefs,
-  getAllBriefs,
-} from '../src/redux/services/briefService';
 
-jest.mock('../src/redux/services/briefService', () => ({
+jest.mock('@/redux/services/briefService', () => ({
   getAllBriefs: jest.fn(),
   callSearchBriefs: jest.fn(),
+  deleteSavedBrief: jest.fn(),
+  getAllSavedBriefs: jest.fn(),
+  searchSkills: jest.fn(),
 }));
 
 jest.mock('next/router', () => ({
@@ -31,6 +37,36 @@ const mockBriefs = {
   currentData: briefsData,
   totalBriefs: 3,
 };
+
+const skills = [{ name: 'java' }, { name: 'c++' }, { name: 'python' }];
+
+beforeEach(() => {
+  const mockGetAllBriefs = getAllBriefs as jest.MockedFunction<
+    typeof getAllBriefs
+  >;
+  const mockCallSearchBriefs = callSearchBriefs as jest.MockedFunction<
+    typeof callSearchBriefs
+  >;
+  const mockDeleteSavedBriefs = deleteSavedBrief as jest.MockedFunction<
+    typeof deleteSavedBrief
+  >;
+  const mockGetAllSavedBriefs = getAllSavedBriefs as jest.MockedFunction<
+    typeof getAllSavedBriefs
+  >;
+  const mockgetAllSkills = searchSkills as jest.MockedFunction<
+    typeof searchSkills
+  >;
+
+  mockGetAllBriefs.mockResolvedValue(mockBriefs);
+  mockCallSearchBriefs.mockResolvedValue(mockBriefs);
+  mockDeleteSavedBriefs.mockResolvedValue(mockBriefs);
+  mockGetAllSavedBriefs.mockResolvedValue(mockBriefs);
+  mockgetAllSkills.mockResolvedValue({ skills });
+});
+
+afterEach(() => {
+  jest.clearAllMocks();
+});
 
 describe('Briefs Page', () => {
   test('renders without errors', () => {
@@ -138,7 +174,7 @@ describe('Briefs Page', () => {
     await screen.findByText('briefThree');
 
     // Assert that the updated briefs are displayed correctly
-    await expect(screen.getByText('finance brief three')).toBeInTheDocument();
-    await expect(screen.getByText('briefThree')).toBeInTheDocument();
+    expect(screen.getByText('finance brief three')).toBeInTheDocument();
+    expect(screen.getByText('briefThree')).toBeInTheDocument();
   });
 });

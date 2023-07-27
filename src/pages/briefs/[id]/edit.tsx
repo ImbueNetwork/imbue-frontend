@@ -21,8 +21,8 @@ import {
 } from '@/config/briefs-data';
 import { Brief } from '@/model';
 import {
-  getAllSkills,
   getBrief,
+  searchSkills,
   updateBriefById,
 } from '@/redux/services/briefService';
 import { RootState } from '@/redux/store/store';
@@ -72,7 +72,7 @@ export const EditProposal = (): JSX.Element => {
   }, []);
 
   const fetchSuggestedSkills = async () => {
-    const skillsRes = await getAllSkills();
+    const skillsRes = await searchSkills('');
     if (skillsRes) {
       setSuggestedSkills(skillsRes?.skills.map((skill) => skill.name));
     }

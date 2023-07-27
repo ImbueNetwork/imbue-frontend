@@ -659,8 +659,19 @@ export const fetchProfileImages =
   (id: number, tableName: string) => async (tx: Knex.Transaction) =>
     tx(tableName).select('profile_image').where({ user_id: id }).first();
 
-export const fetchAllImbueSkills = () => (tx: Knex.Transaction) =>
-  tx<Skill>('imbue_skills').select();
+export const fetchAllImbueSkills = (limit: number) => (tx: Knex.Transaction) =>
+  tx<Skill>('imbue_skills').select().limit(limit);
+
+export const allImbueSkillsSuggestion =
+  (limit: number) => (tx: Knex.Transaction) =>
+    tx<Skill>('imbue_skills').select().offset(980).limit(limit);
+
+export const searchImbueSkillsByName =
+  (name: string) => (tx: Knex.Transaction) =>
+    tx<Skill>('imbue_skills')
+      .select()
+      .where('name', 'ilike', `%${name}%`)
+      .limit(10);
 
 // Insert a brief and their respective skill and industry_ids.
 export const insertBrief =

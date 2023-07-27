@@ -33,7 +33,7 @@ export default nextConnect()
       try {
         const { limit = 10 } = req.query;
         await models
-          .fetchAllImbueSkills(Number(limit))(tx)
+          .allImbueSkillsSuggestion(Number(limit))(tx)
           .then(async (skills: any) => {
             res.status(200).json({ skills });
           });
