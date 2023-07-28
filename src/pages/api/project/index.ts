@@ -84,7 +84,7 @@ export default nextConnect()
 
         return res.status(201).json(pkg);
       } catch (cause) {
-        return res.status(500).send('Failed to insert project');
+        return res.status(401).json(cause);
       }
     });
   });

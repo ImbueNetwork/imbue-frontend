@@ -29,7 +29,7 @@ import {
   getBrief,
 } from '@/redux/services/briefService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
-import { createProject } from '@/redux/services/projectServices';
+import { updateProject } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 interface MilestoneItem {
@@ -269,43 +269,20 @@ const ApplicationPreview = (): JSX.Element => {
     return hasValue;
   };
 
-  const updateProject = async (
+  const handleUpdateProject = async (
     chainProjectId?: number,
     escrow_address?: string
   ) => {
     if (!allAmountAndNamesHaveValue())
       return setError({ message: 'Please fill all the required fields' });
     if (totalPercent !== 100)
-      return setError({ message: 'totalPercent must be 100%' });
+      return setError({ message: 'TotalPercent must be 100%' });
+    if (totalCostWithoutFee > 100000000)
+      return setError({ message: 'Total price of the project must be less than 100,000,000' });
 
     setLoading(true);
     try {
-      // const resp = await fetch(`${config.apiBase}/project/${application.id}`, {
-      //   headers: config.postAPIHeaders,
-      //   method: 'put',
-      //   body: JSON.stringify({
-      //     user_id: user.id,
-      //     name: `${brief.headline}`,
-      //     total_cost_without_fee: totalCostWithoutFee,
-      //     imbue_fee: imbueFee,
-      //     currency_id: currencyId,
-      //     milestones: milestones
-      //       .filter((m) => m.amount !== undefined)
-      //       .map((m) => {
-      //         return {
-      //           name: m.name,
-      //           amount: m.amount,
-      //           percentage_to_unlock: (
-      //             ((m.amount ?? 0) / totalCostWithoutFee) *
-      //             100
-      //           ).toFixed(0),
-      //         };
-      //       }),
-      //     required_funds: totalCost,
-      //     chain_project_id: chainProjectId,
-      //   }),
-      // });
-      const resp = await createProject(application?.id, {
+      const resp = await updateProject(application?.id, {
         user_id: user.id,
         name: `${brief.headline}`,
         total_cost_without_fee: totalCostWithoutFee,
@@ -331,7 +308,7 @@ const ApplicationPreview = (): JSX.Element => {
         duration_id: durationId,
       });
 
-      if (resp.status === 201 || resp.status === 200) {
+      if (resp.id) {
         setSuccess(true);
         setIsEditingBio(false);
       } else {
@@ -393,7 +370,7 @@ const ApplicationPreview = (): JSX.Element => {
                 freelancer,
                 application,
                 setLoading,
-                updateProject,
+                updateProject: handleUpdateProject,
                 user,
               }}
             />
@@ -562,12 +539,13 @@ const ApplicationPreview = (): JSX.Element => {
 
                                 <input
                                   type='number'
+                                  onWheel={(e)=>(e.target as HTMLElement).blur()}
                                   disabled={!isEditingBio}
                                   placeholder='Add an amount'
                                   className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
                                   value={amount || ''}
                                   onChange={(e) => {
-                                    if (Number(e.target.value) >= 0)
+                                    if (Number(e.target.value) >= 0 && Number(e.target.value) < 1e12)
                                       setMilestones([
                                         ...milestones.slice(0, index),
                                         {
@@ -585,7 +563,7 @@ const ApplicationPreview = (): JSX.Element => {
                             </>
                           ) : (
                             <p className='text-[1rem] text-[#3B27C180] m-0'>
-                              ${milestones[index]?.amount}
+                              ${Number(milestones[index]?.amount?.toFixed(2))?.toLocaleString?.()}
                             </p>
                           )}
 
@@ -764,7 +742,7 @@ const ApplicationPreview = (): JSX.Element => {
                 // disabled={
                 //   totalPercent !== 100 || !milestoneAmountsAndNamesHaveValue
                 // }
-                onClick={() => updateProject()}
+                onClick={() => handleUpdateProject()}
               >
                 Update
               </button>
