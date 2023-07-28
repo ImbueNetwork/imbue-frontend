@@ -1,4 +1,5 @@
 import { Autocomplete, TextField } from '@mui/material';
+import Filter from 'bad-words';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -28,6 +29,7 @@ import { RootState } from '@/redux/store/store';
 import styles from '../../styles/modules/newBrief.module.css';
 
 const NewBrief = (): JSX.Element => {
+  const filter = new Filter();
   const [step, setStep] = useState(0);
   const [headline, setHeadline] = useState<any>();
   const [industries, setIndustries] = useState<string[]>([]);
@@ -293,14 +295,17 @@ const NewBrief = (): JSX.Element => {
     //TODO: implement api call
     setLoading(true);
     try {
+      if (filter.isProfane(headline)) {
+        throw new Error('remove bad word from the title');
+      }
       const user_id = user?.id;
       const resp = await fetch(`${config.apiBase}/briefs/`, {
         headers: config.postAPIHeaders,
         method: 'post',
         body: JSON.stringify({
-          headline,
-          industries,
-          description,
+          headline: filter.clean(headline),
+          industries: industries.map((item) => filter.clean(item)),
+          description: filter.clean(description),
           scope_id: scopeId,
           experience_id: expId,
           duration_id: durationId,

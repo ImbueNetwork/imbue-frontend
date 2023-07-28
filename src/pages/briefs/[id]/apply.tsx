@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { WalletAccount } from '@talismn/connect-wallets';
+import Filter from 'bad-words';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
@@ -33,6 +34,7 @@ interface MilestoneItem {
 }
 
 export const SubmitProposal = (): JSX.Element => {
+  const filter = new Filter();
   const [currencyId, setCurrencyId] = useState(0);
   const [durationId, setDurationId] = useState(0);
   const [brief, setBrief] = useState<Brief | any>();
@@ -229,11 +231,12 @@ export const SubmitProposal = (): JSX.Element => {
       return setError({ message: 'Total cost must be less than 100,000,000' });
 
     setLoading(true);
+
     try {
 
       const resp = await createProject({
         user_id: user?.id,
-        name: `Brief Application: ${brief?.headline}`,
+        name: `${brief?.headline}`,
         brief_id: brief?.id,
         total_cost_without_fee: totalCostWithoutFee,
         imbue_fee: imbueFee,
@@ -242,9 +245,9 @@ export const SubmitProposal = (): JSX.Element => {
           .filter((m) => m.amount !== undefined)
           .map((m) => {
             return {
-              name: m.name,
+              name: filter.clean(m.name),
               amount: m.amount,
-              description: m.description,
+              description: filter.clean(m.description),
               percentage_to_unlock: (
                 ((m.amount ?? 0) / totalCostWithoutFee) *
                 100
@@ -255,7 +258,7 @@ export const SubmitProposal = (): JSX.Element => {
         duration_id: durationId,
         description: brief?.description,
       })
-      
+
       if (resp.id) {
         const applicationId = resp.id;
         applicationId && setapplicationId(applicationId);
