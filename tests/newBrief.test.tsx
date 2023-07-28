@@ -146,7 +146,7 @@ describe('NewBrief', () => {
       'description-input'
     ) as HTMLInputElement;
     fireEvent.change(descriptionInput, {
-      target: { value: 'create a new mobile application' },
+      target: { value: 'Description rvjknruvorvnrvrnvrnvlrv eicneoeicneconi' },
     });
 
     //navigate to skills screen
@@ -185,7 +185,7 @@ describe('NewBrief', () => {
       'description-input'
     ) as HTMLInputElement;
     fireEvent.change(descriptionInput, {
-      target: { value: 'create a new mobile application' },
+      target: { value: 'Description rvjknruvorvnrvrnvrnvlrv eicneoeicneconi' },
     });
 
     //navigate to skills screen
@@ -232,7 +232,7 @@ describe('NewBrief', () => {
       'description-input'
     ) as HTMLInputElement;
     fireEvent.change(descriptionInput, {
-      target: { value: 'create a new mobile application' },
+      target: { value: 'Description rvjknruvorvnrvrnvrnvlrv eicneoeicneconi' },
     });
 
     //navigate to skills screen
@@ -285,7 +285,7 @@ describe('NewBrief', () => {
       'description-input'
     ) as HTMLInputElement;
     fireEvent.change(descriptionInput, {
-      target: { value: 'create a new mobile application' },
+      target: { value: 'Description rvjknruvorvnrvrnvrnvlrv eicneoeicneconi' },
     });
 
     //navigate to skills screen
@@ -346,7 +346,7 @@ describe('NewBrief', () => {
       'description-input'
     ) as HTMLInputElement;
     fireEvent.change(descriptionInput, {
-      target: { value: 'create a new mobile application' },
+      target: { value: 'Description rvjknruvorvnrvrnvrnvlrv eicneoeicneconi' },
     });
 
     //navigate to skills screen
@@ -444,7 +444,9 @@ describe('Test case for API call', () => {
     const descriptionInput = screen.getByTestId(
       'description-input'
     ) as HTMLInputElement;
-    fireEvent.change(descriptionInput, { target: { value: 'Description' } });
+    fireEvent.change(descriptionInput, {
+      target: { value: 'Description rvjknruvorvnrvrnvrnvlrv eicneoeicneconi' },
+    });
     //navigate to skills screen
     fireEvent.click(nextBtn);
 

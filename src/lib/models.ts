@@ -239,8 +239,11 @@ export const fetchUserWithUsernameOrAddress =
     tx<User>('users')
       .where((builder) =>
         builder
-          .where('username', 'ilike', `%${usernameOrAddress}%`)
-          .orWhere('web3_address', 'ilike', `%${usernameOrAddress}%`)
+          .whereRaw('LOWER(username) = ?', usernameOrAddress.toLowerCase())
+          .orWhereRaw(
+            'LOWER(web3_address) = ?',
+            usernameOrAddress.toLowerCase()
+          )
       )
       .select('id', 'display_name', 'profile_photo', 'username', 'web3_address')
       .limit(1);

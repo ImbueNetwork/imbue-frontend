@@ -42,6 +42,7 @@ const NewBrief = (): JSX.Element => {
   const [suggestedSkills, setSuggestedSkills] = useState<string[]>([]);
 
   const [error, setError] = useState<any>();
+  const [inputError, setInputError] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
@@ -64,6 +65,42 @@ const NewBrief = (): JSX.Element => {
     setSuggestedSkills(skillRes?.skills.map((skill) => skill.name));
   };
 
+  const validateInputLength = (
+    text: string,
+    min: number,
+    max: number
+  ): boolean => {
+    return text.length >= min && text.length <= max;
+  };
+
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = event.target;
+    switch (name) {
+      case 'headline':
+        if (validateInputLength(value, 10, 50)) {
+          setHeadline(value);
+          setInputError('');
+        } else {
+          setHeadline(value);
+          setInputError('Headline must be between 10 and 50 characters');
+        }
+        break;
+      case 'description':
+        if (validateInputLength(value, 50, 500)) {
+          setDescription(value);
+          setInputError('');
+        } else {
+          setInputError('Description must be between 50 and 500 characters');
+          setDescription(value);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
   const NamePanel = (
     <>
       <p className={styles.fieldName}>Write a headline for your brief</p>
@@ -73,7 +110,7 @@ const NewBrief = (): JSX.Element => {
           data-testid='headline-input'
           name='headline'
           value={headline}
-          onChange={(e) => setHeadline(e.target.value)}
+          onChange={handleChange}
         />
       </div>
       <p className={styles.fieldName}>Examples</p>
@@ -114,9 +151,7 @@ const NewBrief = (): JSX.Element => {
           name='description'
           maxLength={5000}
           className='text-black bg-white outline-none'
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-            setDescription(e.target.value)
-          }
+          onChange={handleChange}
         />
       </div>
     </div>
@@ -269,7 +304,7 @@ const NewBrief = (): JSX.Element => {
     if (step === 1 && !industries.length) {
       return false;
     }
-    if (step === 2 && !description) {
+    if (step === 2 && !description && inputError) {
       // TODO: minimum required length for description
       return false;
     }
@@ -377,11 +412,14 @@ const NewBrief = (): JSX.Element => {
                 className='primary-btn in-dark w-button !mt-0 hover:!bg-imbue-purple hover:!text-white'
                 data-testid='next-button'
                 onClick={() => setStep(step + 1)}
-                disabled={!validate()}
+                disabled={!validate() || inputError}
               >
                 {stepData[step].next ? `Next: ${stepData[step].next}` : 'Next'}
               </button>
             )}
+          </div>
+          <div className='flex flex-wrap flex-row justify-center relative top-10'>
+            <span className={!inputError ? 'hide' : 'error'}>{inputError}</span>
           </div>
         </div>
       </div>
