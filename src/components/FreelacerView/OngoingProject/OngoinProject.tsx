@@ -1,4 +1,5 @@
 import { Divider } from '@mui/material';
+import classNames from 'classnames';
 import TimeAgo from 'javascript-time-ago';
 import router from 'next/router';
 
@@ -55,12 +56,17 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
                   />
                 </div>
                 <p className='text-[#7AA822]'>3/5</p>
-                <button className='bg-light-grey text-black flex px-5 py-3 text-sm ml-auto rounded-full'>
-                  In progress
+                <button
+                  className={classNames(
+                    ' text-black flex px-5 py-3 text-sm ml-auto rounded-full',
+                    !item.completed ? 'bg-light-grey' : 'bg-primary'
+                  )}
+                >
+                  {item.complete ? 'completed' : 'In progress'}
                 </button>
               </div>
               <p className='text-imbue-purple-dark text-sm sm:text-lg'>
-                {item.name.split(':')[1]}
+                {item.name}
               </p>
               <p className='text-xs sm:text-sm'>
                 {timeAgo?.format(new Date(item?.created || 0))}
@@ -73,7 +79,7 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
             </div>
             <div className='flex pb-9 justify-between'>
               <div className='flex space-x-5 text-sm text-imbue-purple-dark'>
-                <p>$24000</p>
+                <p>${item.required_funds}</p>
                 <p>Fixed price</p>
               </div>
             </div>

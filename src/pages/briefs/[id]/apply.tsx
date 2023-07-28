@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { WalletAccount } from '@talismn/connect-wallets';
+import Filter from 'bad-words';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
@@ -33,6 +34,7 @@ interface MilestoneItem {
 }
 
 export const SubmitProposal = (): JSX.Element => {
+  const filter = new Filter();
   const [currencyId, setCurrencyId] = useState(0);
   const [durationId, setDurationId] = useState(0);
   const [brief, setBrief] = useState<Brief | any>();
@@ -226,6 +228,7 @@ export const SubmitProposal = (): JSX.Element => {
       return setError({ message: 'Total percentage must be 100%' });
 
     setLoading(true);
+
     try {
       const resp = await fetch(`${config.apiBase}/project`, {
         headers: config.postAPIHeaders,
@@ -241,9 +244,9 @@ export const SubmitProposal = (): JSX.Element => {
             .filter((m) => m.amount !== undefined)
             .map((m) => {
               return {
-                name: m.name,
+                name: filter.clean(m.name),
                 amount: m.amount,
-                description: m.description,
+                description: filter.clean(m.description),
                 percentage_to_unlock: (
                   ((m.amount ?? 0) / totalCostWithoutFee) *
                   100
@@ -255,7 +258,6 @@ export const SubmitProposal = (): JSX.Element => {
           description: brief?.description,
         }),
       });
-
       if (resp.ok) {
         const applicationId = (await resp.json()).id;
         applicationId && setapplicationId(applicationId);

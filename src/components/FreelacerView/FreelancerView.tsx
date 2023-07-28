@@ -51,7 +51,7 @@ const FreelancerView: React.FC<FreelacerViewProps> = ({
           onClick={() => setSwitcher('ongoingproject')}
         >
           Ongoing project
-          <span className='text-sm ml-2'>(0)</span>
+          <span className='text-sm ml-2'>({currentProject.length})</span>
         </p>
       </div>
       <Divider />

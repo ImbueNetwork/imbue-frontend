@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import Filter from 'bad-words';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import passport from 'passport';
@@ -16,6 +17,8 @@ import db from '@/db';
 import { Brief } from '@/model';
 
 import { verifyUserIdFromJwt } from '../auth/common';
+
+const filter = new Filter();
 
 export const authenticate = (
   method: string,
@@ -87,6 +90,9 @@ export default nextConnect()
 
     await db.transaction(async (tx: any) => {
       try {
+        if (filter.isProfane(brief.headline)) {
+          throw new Error('Bad word is not allowed');
+        }
         const skill_ids = await upsertItems(brief.skills, 'skills')(tx);
         const industry_ids = await upsertItems(
           brief.industries,

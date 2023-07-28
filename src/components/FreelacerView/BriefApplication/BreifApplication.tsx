@@ -51,7 +51,7 @@ const BreifApplication: React.FC<BreifApplicationProps> = ({
           >
             <div className='flex pt-7 items-center justify-between'>
               <p className='text-imbue-purple text-sm sm:text-lg'>
-                {item.name.split(':')[1]}
+                {item.name}
               </p>
               <p className='text-xs sm:text-sm'>
                 {timeAgo?.format(new Date(item?.created || 0))}
