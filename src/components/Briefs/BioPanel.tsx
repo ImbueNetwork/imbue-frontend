@@ -36,7 +36,7 @@ const BioPanel = ({
             </h2>
           </div>
 
-          {isOwnerOfBrief && (
+          {isOwnerOfBrief && !brief?.project_id && (
             <button
               className='primary-btn 
               in-dark w-[auto] 

@@ -14,7 +14,7 @@ export const createProject = async (
     if (resp.status === 201 || resp.status === 200) {
       return resp as any;
     } else {
-      return { message: `${resp.status} ${resp.statusText}` };
+      return { status: resp.status, message: `${resp.statusText}` };
     }
   } catch (error: any) {
     return { message: `${error?.message}` };

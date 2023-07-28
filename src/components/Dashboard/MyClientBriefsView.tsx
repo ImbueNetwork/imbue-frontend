@@ -24,7 +24,7 @@ const MyClientBriefsView = (props: ClientViewProps) => {
     handleMessageBoxClick,
     redirectToBriefApplications,
   } = props;
-  console.log(briefId);
+  
   const [briefs, _setBriefs] = useState<any>();
   const [briefApplications, setBriefApplications] = useState<Project[]>([]);
   const [loadingApplications, setLoadingApplications] = useState<boolean>(true);

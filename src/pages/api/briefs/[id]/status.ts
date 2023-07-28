@@ -55,7 +55,7 @@ export default nextConnect()
         if (!brief) {
           return new Error('Brief does not exist.');
         }
-        const briefOwner = (await fetchUser(brief.user_id)(tx)) as User;
+        const briefOwner = (await fetchUser(brief.user_id)(tx))[0] as User;
         verifyUserIdFromJwt(req, res, briefOwner?.id);
         const project = await fetchProjectById(projectId)(tx);
         if (!project) {
@@ -65,8 +65,7 @@ export default nextConnect()
         // FIXME:
         await updateProject(project.id ?? '', project)(tx);
 
-
-        if(status_id == ProjectStatus.Accepted) {
+        if (status_id == ProjectStatus.Accepted) {
           const updatedBrief = await acceptBriefApplication(id, projectId)(tx);
           return res.send(updatedBrief);
         } else {

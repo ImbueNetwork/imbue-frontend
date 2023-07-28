@@ -335,7 +335,7 @@ const ApplicationPreview = (): JSX.Element => {
         setSuccess(true);
         setIsEditingBio(false);
       } else {
-        setError({ message: `${resp.status} ${resp.statusText}` });
+        setError({ message: `${resp.status} ${resp.message}` });
       }
     } catch (error) {
       setError({ message: error });

@@ -104,7 +104,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         setError({ message: 'Could not connect wallet. Please Try again' });
       }
     } catch (error) {
-      setError({message: error});
+      setError({ message: error });
     } finally {
       setLoadingWallet('');
     }
@@ -127,7 +127,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         setBalance(balance.toLocaleString());
         setImbueBalance(imbueBalance.toLocaleString());
       } catch (error) {
-        setError({message: error});
+        setError({ message: error });
       } finally {
         setLoadingWallet('');
       }
@@ -141,7 +141,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
     <div className='flex items-center w-full md:justify-between lg:px-10 flex-wrap gap-4'>
       <div className='flex gap-6 items-start'>
         <Image
-          onClick={()=>router.push(`/freelancers/${freelancer?.username}`)}
+          onClick={() => router.push(`/freelancers/${freelancer?.username}`)}
           className='w-16 h-16 rounded-full object-cover cursor-pointer'
           src={freelancer?.profile_image ?? require('@/assets/images/profile-image.png')}
           height={200}
@@ -176,37 +176,40 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
             </h3>
           </div> */}
 
-          {application?.currency_id !== Currency.IMBU && (
+          <p className='text-sm text-content-primary lg:text-center break-words'>
+            @
+            {mobileView && freelancer?.username?.length > 16
+              ? `${freelancer?.username?.substring(0, 16)}...`
+              : freelancer?.username}
+          </p>
+
+
+        </div>
+      </div>
+
+      <div className='flex flex-col justify-center lg:items-center'>
+        {application?.currency_id !== Currency.IMBU
+          ? (
             <p className='text-sm mt-4 text-imbue-purple'>
               {loadingWallet === 'loading' && 'Loading Wallet...'}
               {loadingWallet === 'connecting' && 'Connecting Wallet...'}
               {!loadingWallet &&
                 (balance === undefined
                   ? 'No wallet found'
-                  : `Requested Currency Balance: ${balance} $${Currency[application?.currency_id ?? 0]
+                  : `Your Balance: ${balance} $${Currency[application?.currency_id ?? 0]
                   }`)}
             </p>
-          )}
-
-          <p className='text-sm mt-2 text-imbue-purple'>
-            {loadingWallet === 'loading' && 'Loading Wallet...'}
-            {loadingWallet === 'connecting' && 'Connecting Wallet...'}
-            {!loadingWallet &&
-              (balance === undefined
-                ? 'No wallet found'
-                : `Your Imbue Balance: ${imbueBalance} $${Currency[Currency.IMBU]}`)}
-          </p>
-        </div>
-      </div>
-
-      <div className='flex flex-col justify-center lg:items-center'>
-        {
-          <p className='text-[1rem] text-content-primary lg:text-center break-words'>
-            @
-            {mobileView && freelancer?.username?.length > 16
-              ? `${freelancer?.username?.substring(0, 16)}...`
-              : freelancer?.username}
-          </p>
+          )
+          : (
+            <p className='text-sm lg:text-base mt-2 text-imbue-purple'>
+              {loadingWallet === 'loading' && 'Loading Wallet...'}
+              {loadingWallet === 'connecting' && 'Connecting Wallet...'}
+              {!loadingWallet &&
+                (balance === undefined
+                  ? 'No wallet found'
+                  : `Your Balance: ${imbueBalance} $${Currency[Currency.IMBU]}`)}
+            </p>
+          )
         }
 
         {/* <div className='rating flex justify-center gap-4 mt-2 lg:mt-6'>

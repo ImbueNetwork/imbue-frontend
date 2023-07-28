@@ -237,10 +237,13 @@ export const fetchAllUser = () => (tx: Knex.Transaction) =>
 export const fetchUserWithUsernameOrAddress =
   (usernameOrAddress: string) => (tx: Knex.Transaction) =>
     tx<User>('users')
-      .where('username', 'ilike', `%${usernameOrAddress}%`)
-      .orWhere('web3_address', 'ilike', `%${usernameOrAddress}%`)
+      .where((builder) =>
+        builder
+          .where('username', 'ilike', `%${usernameOrAddress}%`)
+          .orWhere('web3_address', 'ilike', `%${usernameOrAddress}%`)
+      )
       .select('id', 'display_name', 'profile_photo', 'username', 'web3_address')
-      .first();
+      .limit(1);
 
 export const searchUserWithNameOrAddress =
   (usernameOrAddress: string) => (tx: Knex.Transaction) =>
@@ -250,8 +253,9 @@ export const searchUserWithNameOrAddress =
       .select('id', 'display_name', 'profile_photo', 'username', 'web3_address')
       .orderBy('web3_address', 'asc');
 
-export const fetchUser = (id: number) => (tx: Knex.Transaction) =>
-  tx<User>('users').where({ id }).first();
+export const fetchUser = (id: number) => (tx: Knex.Transaction) => {
+  return tx<User>('users').where({ id }).limit(1);
+};
 
 export const updateUserData =
   (id: number, data: Partial<User>) => async (tx: Knex.Transaction) =>
@@ -670,7 +674,7 @@ export const searchImbueSkillsByName =
   (name: string) => (tx: Knex.Transaction) =>
     tx<Skill>('imbue_skills')
       .select()
-      .where('name', 'ilike', `%${name}%`)
+      .where('name', 'ilike', `${name}%`)
       .limit(10);
 
 // Insert a brief and their respective skill and industry_ids.
