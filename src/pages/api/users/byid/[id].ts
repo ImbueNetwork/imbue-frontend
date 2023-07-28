@@ -12,7 +12,7 @@ export default nextConnect().get(
     const id: any = query.id;
     db.transaction(async (tx) => {
       try {
-        const user: User = (await models.fetchUser(id)(tx)) as User;
+        const user: User = (await models.fetchUser(id)(tx))[0] as User;
         const web3Account = await models.fetchWeb3AccountByUserId(id)(tx);
         if (!user) {
           return res.status(404).end();

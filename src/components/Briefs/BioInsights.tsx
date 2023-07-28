@@ -64,7 +64,8 @@ const BioInsights = ({
   );
 
   let hint = '';
-  if (!canSubmitProposal) hint = 'Only verified freelancers can apply to briefs';
+  if (!canSubmitProposal)
+    hint = 'Only verified freelancers can apply to briefs';
   else if (isOwnerOfBrief)
     hint = 'You are not allowed to submit proposal to your own brief';
 
@@ -114,20 +115,28 @@ const BioInsights = ({
           <h3 className='text-imbue-purple-dark !font-normal'>
             Activities on this job
           </h3>
-          <div className='flex gap-3 lg:items-center mt-4 flex-wrap'>
-            <button
-              onClick={() => (isSavedBrief ? unsaveBrief?.() : saveBrief?.())}
-              className={` ${
-                isSavedBrief
-                  ? 'bg-imbue-coral text-white border-imbue-coral'
-                  : 'bg-transparent text-content border border-content'
-              } rounded-3xl h-[2.48rem] text-base font-normal px-5 max-width-1100px:w-full max-width-500px:w-auto `}
-            >
-              {isSavedBrief ? 'Unsave' : 'Save'}
-            </button>
-            <Tooltip title={hint} arrow placement='bottom' leaveTouchDelay={10}>
+
+          {!brief?.project_id && (
+            <div className='flex gap-3 lg:items-center mt-4 flex-wrap'>
               <button
-                className='primary-btn 
+                onClick={() => (isSavedBrief ? unsaveBrief?.() : saveBrief?.())}
+                className={` ${
+                  isSavedBrief
+                    ? 'bg-imbue-coral text-white border-imbue-coral'
+                    : 'bg-transparent text-content border border-content'
+                } rounded-3xl h-[2.48rem] text-base font-normal px-5 max-width-1100px:w-full max-width-500px:w-auto `}
+              >
+                {isSavedBrief ? 'Unsave' : 'Save'}
+              </button>
+
+              <Tooltip
+                title={hint}
+                arrow
+                placement='bottom'
+                leaveTouchDelay={10}
+              >
+                <button
+                  className='primary-btn 
               in-dark
               !text-[1rem]
               !font-normal
@@ -137,30 +146,31 @@ const BioInsights = ({
               !m-0
               !px-4
               '
-                onClick={() =>
-                  canSubmitProposal && !isOwnerOfBrief && redirectToApply()
-                }
-                disabled={!canSubmitProposal}
-              >
-                Submit a Proposal <FaRegShareSquare />
-              </button>
-            </Tooltip>
+                  onClick={() =>
+                    canSubmitProposal && !isOwnerOfBrief && redirectToApply()
+                  }
+                  disabled={!canSubmitProposal}
+                >
+                  Submit a Proposal <FaRegShareSquare />
+                </button>
+              </Tooltip>
 
-            <Tooltip
-              title='Go back to previous page'
-              followCursor
-              leaveTouchDelay={10}
-              enterDelay={500}
-              className='cursor-pointer'
-            >
-              <div
-                onClick={() => router.back()}
-                className='border border-content rounded-full p-1 flex items-center justify-center absolute right-5 top-5'
+              <Tooltip
+                title='Go back to previous page'
+                followCursor
+                leaveTouchDelay={10}
+                enterDelay={500}
+                className='cursor-pointer'
               >
-                <ArrowBackIcon className='h-5 w-5' color='secondary' />
-              </div>
-            </Tooltip>
-          </div>
+                <div
+                  onClick={() => router.back()}
+                  className='border border-content rounded-full p-1 flex items-center justify-center absolute right-5 top-5'
+                >
+                  <ArrowBackIcon className='h-5 w-5' color='secondary' />
+                </div>
+              </Tooltip>
+            </div>
+          )}
         </div>
       </div>
 

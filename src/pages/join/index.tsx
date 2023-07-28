@@ -93,6 +93,32 @@ const Join = (): JSX.Element => {
     }
   };
 
+  // const validateInputLength = (
+  //   text: string,
+  //   min: number,
+  //   max: number
+  // ): boolean => {
+  //   return text.length >= 10 && text.length <= 30;
+  // };
+
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+    switch (name) {
+      case 'user':
+        setUser(value);
+        break;
+      case 'email':
+        setEmail(value);
+        break;
+      case 'password':
+        setPassword(value);
+        break;
+      case 'matchPassword':
+        setMatchPassword(value);
+        break;
+    }
+  };
+
   return (
     <div>
       <div
@@ -106,52 +132,6 @@ const Join = (): JSX.Element => {
               Please use the link below to sign in
             </p>
           </div>
-
-          {/* <div className='flex flex-wrap flex-row justify-center'>
-            <CssTextField
-              value={user}
-              onChange={(e: any) => setUser(e.target.value)}
-              id='username'
-              type='text'
-              label='Username'
-              className='mdc-text-field !rounded-[10px] !w-[70%]'
-              required
-            />
-          </div>
-
-          <div className='flex flex-wrap flex-row justify-center'>
-            <CssTextField
-              type='email'
-              label='Email'
-              onChange={(e: any) => setEmail(e.target.value)}
-              className='mdc-text-field  !rounded-[10px] !w-[70%]'
-              required
-            />
-          </div>
-          <div className='flex flex-wrap flex-row justify-center'>
-            <CssTextField
-              label='Password'
-              helperText='Min 8 chars, at least one uppercase, lowercase, number and one special character'
-              onChange={(e: any) => setPassword(e.target.value)}
-              type='password'
-              className='mdc-text-field !rounded-[10px] !w-[70%]'
-              required
-            />
-          </div>
-
-          <div className='flex flex-wrap flex-row justify-center'>
-            <CssTextField
-              label='Confirm Password'
-              error={matchPassword.length > 0 && password != matchPassword}
-              onChange={(e: any) => setMatchPassword(e.target.value)}
-              helperText={
-                password != matchPassword ? 'Please match password' : ''
-              }
-              type='password'
-              className='mdc-text-field  !rounded-[10px] !w-[70%]'
-              required
-            />
-          </div> */}
 
           <div className='w-full max-w-[50%] mx-auto mt-3'>
             <form
@@ -168,9 +148,10 @@ const Join = (): JSX.Element => {
 
                 <input
                   placeholder='Enter your Username'
-                  onChange={(e: any) => setUser(e.target.value)}
+                  onChange={handleChange}
                   required
                   className='outlinedInput'
+                  name='user'
                 />
               </div>
 
@@ -181,11 +162,12 @@ const Join = (): JSX.Element => {
 
                 <input
                   placeholder='Enter your Email'
-                  onChange={(e: any) => setEmail(e.target.value)}
+                  onChange={handleChange}
                   className='outlinedInput'
                   required
                   onError={(err) => console.log(err)}
                   type='email'
+                  name='email'
                 />
               </div>
 
@@ -196,10 +178,11 @@ const Join = (): JSX.Element => {
 
                 <input
                   placeholder='Enter your Password'
-                  onChange={(e: any) => setPassword(e.target.value)}
+                  onChange={handleChange}
                   className='outlinedInput'
                   required
                   type='password'
+                  name='password'
                 />
               </div>
 
@@ -210,10 +193,11 @@ const Join = (): JSX.Element => {
 
                 <input
                   placeholder='Confirm your Password'
-                  onChange={(e: any) => setMatchPassword(e.target.value)}
+                  onChange={handleChange}
                   className='outlinedInput'
                   required
                   type='password'
+                  name='matchPassword'
                 />
               </div>
 

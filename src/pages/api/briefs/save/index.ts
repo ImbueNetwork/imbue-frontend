@@ -88,10 +88,14 @@ export default nextConnect()
         await models
           .getSavedBriefs(data?.user_id)(tx)
           .then(async (briefs: any) => {
+            const filteredOutProjects = briefs.filter(
+              (brief: any) => !brief.project_id
+            );
+
             const { currentData } = await models.paginatedData(
               Number(data?.page || 1),
               Number(data?.items_per_page || 5),
-              briefs
+              filteredOutProjects
             );
 
             await Promise.all([
@@ -110,7 +114,7 @@ export default nextConnect()
 
             res.status(200).json({
               currentData,
-              totalBriefs: briefs.length,
+              totalBriefs: filteredOutProjects.length,
             });
           });
       } catch (e) {

@@ -100,9 +100,9 @@ export const HirePopup = ({
           );
           setSuccess(true);
         } else if (result.txError) {
-          let errorMessage = result.errorMessage
-          if(result.errorMessage?.includes('1010:')) {
-            errorMessage = `${result.errorMessage}.\nYou must have minimum balance of 500 $IMBUE`
+          let errorMessage = result.errorMessage;
+          if (result.errorMessage?.includes('1010:')) {
+            errorMessage = `${result.errorMessage}.\nYou must have minimum balance of 500 $IMBUE`;
           }
           setError({ message: errorMessage });
           application.status_id = OffchainProjectState.PendingReview;
@@ -122,8 +122,13 @@ export const HirePopup = ({
         <div className='flex w-full justify-start items-center px-5 gap-5 pt-8 md:px-10 lg:gap-11 lg:px-16 lg:pb-2'>
           <Image
             className='w-12 h-12 md:w-16 md:h-16 rounded-full object-cover'
-            src={freelancer?.profile_image || require('@/assets/images/profile-image.png')}
+            src={
+              freelancer?.profile_image ||
+              require('@/assets/images/profile-image.png')
+            }
             alt='profileImage'
+            width={70}
+            height={70}
           />
           <span className='text-xl text-secondary-dark-hover'>
             {freelancer?.display_name}

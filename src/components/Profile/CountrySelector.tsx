@@ -15,8 +15,8 @@ const CountrySelector = ({
   user,
   isEditMode,
 }: CountrySelectorProps) => {
-  const [country, setCountry] = useState<string>(user?.country || '');
-  const [region, setRegion] = useState(user?.region || '');
+  const [country, setCountry] = useState<string>(user?.country?.country || '');
+  const [region, setRegion] = useState(user?.region?.region || '');
 
   const handleCountry = (countryName: string) => {
     setCountry(countryName);

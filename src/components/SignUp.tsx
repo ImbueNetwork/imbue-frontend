@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
 import { CircularProgress } from '@mui/material';
@@ -79,31 +80,43 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
 
     setEmail(event.target.value);
   };
-
   useEffect(() => {
-    if (password != matchPassword) {
+    if (password !== matchPassword) {
       setError('Passwords do not match');
-    } else {
-      setError(null);
+      return;
     }
 
-    if (password?.length < 5) {
+    if (user && email && user.toLowerCase() === email.toLowerCase()) {
+      setError('Username and email cannot be the same');
+      return;
+    }
+
+    if (user && isValidEmail(user)) {
+      setError('Username cannot be an email');
+      return;
+    }
+
+    if (password && password.length < 5) {
       setError('Password must be at least 5 characters');
+      return;
     }
 
-    if (user?.length < 4) {
+    if (user && user.length < 4) {
       setError('Username must be at least 4 characters');
+      return;
     }
 
-    if (invalidUsernames.includes(user)) {
+    if (user && invalidUsernames.includes(user)) {
       setError('Username is not allowed');
+      return;
     }
 
-    if (user?.toLowerCase() === password?.toLowerCase()) {
+    if (user && password && user.toLowerCase() === password.toLowerCase()) {
       setError('Username and password cannot be the same');
+      return;
     }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setError(null);
   }, [matchPassword, password, user, email]);
 
   return (

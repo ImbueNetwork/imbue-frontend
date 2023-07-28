@@ -43,19 +43,19 @@ export default nextConnect()
     await db.transaction(async (tx: any) => {
       try {
         await fetchAllBriefs()(tx).then(async (briefs: any) => {
-          const { currentData } = models.paginatedData(
-            Number(data?.page || 1),
-            Number(data?.items_per_page || 5),
-            briefs
-          );
-
-          const filteredOutProjects = currentData.filter(
+          const filteredOutProjects = briefs.filter(
             (brief: any) => !brief.project_id
           );
 
+          const { currentData } = models.paginatedData(
+            Number(data?.page || 1),
+            Number(data?.items_per_page || 5),
+            filteredOutProjects
+          );
+
           await Promise.all([
-            filteredOutProjects,
-            ...filteredOutProjects.map(async (brief: any) => {
+            currentData,
+            ...currentData.map(async (brief: any) => {
               brief.skills = await fetchItems(brief.skill_ids, 'skills')(tx);
               brief.industries = await fetchItems(
                 brief.industry_ids,
@@ -65,9 +65,8 @@ export default nextConnect()
           ]);
 
           res.status(200).json({
-            currentData: filteredOutProjects,
-            totalBriefs: briefs?.filter((brief: any) => !brief?.project_id)
-              .length,
+            currentData: currentData,
+            totalBriefs: filteredOutProjects?.length,
           });
         });
       } catch (e) {

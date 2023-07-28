@@ -138,26 +138,28 @@ const BriefDetails = (): JSX.Element => {
 
   const SimilarProjects = () => {
     const [showSimilarBrief, setShowSimilarBrief] = useState<boolean>(false);
-    const [similarBriefs, setSimilarBriefs] = useState<Brief[]>([])
+    const [similarBriefs, setSimilarBriefs] = useState<Brief[]>([]);
 
     useEffect(() => {
       const setUpBriefs = async () => {
         const briefs_all: any = await getAllBriefs(4, 1);
         setSimilarBriefs(briefs_all?.currentData);
-      }
+      };
       setUpBriefs();
-    }, [])
+    }, []);
 
     return (
       <div
-        className={`transparent-conatainer !bg-imbue-light-purple-three relative ${showSimilarBrief ? '!pb-[3rem]' : ''
-          } `}
+        className={`transparent-conatainer !bg-imbue-light-purple-three relative ${
+          showSimilarBrief ? '!pb-[3rem]' : ''
+        } `}
       >
         <div className='flex justify-between w-full lg:px-[4rem] px-[1rem]'>
           <h3 className='text-imbue-purple-dark'>Similar projects on Imbue</h3>
           <div
-            className={`transition transform ease-in-out duration-600 ${showSimilarBrief && 'rotate-180'
-              } cursor-pointer`}
+            className={`transition transform ease-in-out duration-600 ${
+              showSimilarBrief && 'rotate-180'
+            } cursor-pointer`}
           >
             <ArrowIcon
               onClick={() => setShowSimilarBrief(!showSimilarBrief)}
@@ -183,11 +185,9 @@ const BriefDetails = (): JSX.Element => {
                   {brief?.headline}
                 </h3>
                 <span className='max-width-750px:!text-base max-width-750px:overflow-hidden max-width-750px:text-ellipsis max-width-750px:ml-3 max-width-750px:line-clamp-2 !text-imbue-purple'>
-                  {
-                    brief?.description?.length > 300
-                      ? brief?.description.substring(0, 300) + "..."
-                      : brief?.description
-                  }
+                  {brief?.description?.length > 300
+                    ? brief?.description.substring(0, 300) + '...'
+                    : brief?.description}
                 </span>
               </div>
               <button
@@ -208,8 +208,8 @@ const BriefDetails = (): JSX.Element => {
           </span>
         )}
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className='brief-details-container px-[15px] lg:px-0'>
