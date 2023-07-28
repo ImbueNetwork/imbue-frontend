@@ -33,6 +33,7 @@
     "@typescript-eslint/eslint-plugin": "^5.59.11",
     "@typescript-eslint/parser": "^5.59.11",
     "bcryptjs": "^2.4.3",
+    "classnames": "^2.3.2",
     "cookies-next": "^2.1.1",
     "country-list": "^2.3.0",
     "csv-parser": "^3.0.0",
