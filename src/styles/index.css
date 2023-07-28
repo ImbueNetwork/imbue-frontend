@@ -595,8 +595,18 @@ input[type='radio'] {
   border-radius: 100%;
 }
 
+.progress-step-circle-primary {
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+}
+
 .progress-step-circle.active {
   background-color: var(--theme-purple);
+}
+
+.progress-step-circle-primary.active {
+  background-color: #7aa822;
 }
 
 .progress-step-circle.disabled {
@@ -633,6 +643,17 @@ input[type='radio'] {
   position: absolute;
   height: 6px;
   background: var(--theme-purple);
+  left: 4px;
+  right: 4px;
+  top: 6px;
+  bottom: 6px;
+  z-index: 1;
+}
+
+.progress-bar-progress--primary {
+  position: absolute;
+  height: 6px;
+  background: #7aa822;
   left: 4px;
   right: 4px;
   top: 6px;
