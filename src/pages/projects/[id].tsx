@@ -479,7 +479,7 @@ function Project() {
             {milestone?.description}
           </p>
 
-          {(isApprover || (project?.brief_id && isProjectOwner)) && milestone.milestone_key == milestoneBeingVotedOn && (
+          {(isApprover || (projectType === "brief" && isProjectOwner)) && milestone.milestone_key == milestoneBeingVotedOn && (
             <button
               className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8'
               data-testid='next-button'
