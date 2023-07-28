@@ -54,7 +54,7 @@ export const BriefLists = ({
         <div
           key={index}
           onClick={() => handleItemClick(brief)}
-          className={`flex cursor-pointer hover:bg-imbue-light-purple-hover px-5 py-3 lg:px-10 lg:py-8 justify-between border-b border-b-imbue-light-purple last:border-b-0`}
+          className={`flex cursor-pointer group hover:bg-imbue-light-purple-hover px-5 py-3 lg:px-10 lg:py-8 justify-between border-b border-b-imbue-light-purple last:border-b-0`}
         >
           <div className='flex flex-col gap-2 lg:gap-3'>
             <span className='text-sm text-imbue-purple-dark lg:text-xl'>
@@ -83,7 +83,7 @@ export const BriefLists = ({
                   /{brief.milestones?.length}
                 </span>
               </p>
-              <div className='w-full bg-light-grey h-1 relative my-auto'>
+              <div className='w-full group-hover:bg-white bg-light-grey h-1 relative my-auto'>
                 <div
                   style={{
                     width: `${
@@ -100,7 +100,7 @@ export const BriefLists = ({
                     <div
                       key={i}
                       className={`h-3 w-3 lg:h-4 lg:w-4 rounded-full -mt-1 lg:-mt-1.5 ${
-                        m.is_approved ? 'bg-primary' : 'bg-light-grey'
+                        m.is_approved ? 'bg-primary' : 'bg-light-grey group-hover:bg-white'
                       }`}
                     ></div>
                   ))}

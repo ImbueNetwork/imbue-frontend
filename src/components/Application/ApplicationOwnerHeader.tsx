@@ -71,11 +71,12 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           await updateProject(projectId, escrow_address);
           setSuccess(true);
         } else if (result.txError) {
-          let errorMessage = result.errorMessage;
+          let errorMessage = showErrorMessage(result.errorMessage);
 
           if (result?.errorMessage?.includes("1010:")) {
             errorMessage = showErrorMessage(1010)
           }
+          
           setError({ message: errorMessage });
         }
         break;
