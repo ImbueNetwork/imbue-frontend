@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import { Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -114,6 +115,7 @@ function Project() {
   const [isApprover, setIsApprover] = useState<boolean>(false)
 
   const [projectType, setProjectType] = useState<"grant" | "brief" | null>(null)
+  const canVote = isApprover || (projectType === "brief" && isProjectOwner)
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -249,7 +251,7 @@ function Project() {
   // voting on a mile stone
   const voteOnMilestone = async (account: WalletAccount, vote: boolean) => {
     setLoading(true);
-    
+
     try {
       const imbueApi = await initImbueAPIInfo();
       // const userRes: User | any = await utils.getCurrentUser();
@@ -272,7 +274,7 @@ function Project() {
   // submitting a milestone
   const submitMilestone = async (account: WalletAccount) => {
     setLoading(true);
-    
+
     const imbueApi = await initImbueAPIInfo();
     // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
@@ -304,7 +306,7 @@ function Project() {
     // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
     const result = await chainService.withdraw(account, onChainProject);
-    
+
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
@@ -479,14 +481,17 @@ function Project() {
             {milestone?.description}
           </p>
 
-          {(isApprover || (projectType === "brief" && isProjectOwner)) && milestone.milestone_key == milestoneBeingVotedOn && (
-            <button
-              className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8'
-              data-testid='next-button'
-              onClick={() => vote()}
-            >
-              Vote
-            </button>
+          {(!isApplicant) && milestone.milestone_key == milestoneBeingVotedOn && (
+            <Tooltip followCursor title={!canVote && "Only approvers are allowed to vote on a milestone"}>
+              <button
+                className={`primary-btn in-dark w-button ${!canVote && "!bg-gray-300 !text-gray-400"} font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
+                data-testid='next-button'
+                onClick={() => canVote && vote()}
+              >
+                Vote
+              </button>
+            </Tooltip>
+
           )}
 
           {isApplicant &&
@@ -504,9 +509,10 @@ function Project() {
 
           {isApplicant && milestone.is_approved && (
             <button
-              className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
+              className={`primary-btn in-dark w-button ${!balance && "!bg-gray-300 !text-gray-400"} font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
               data-testid='next-button'
               onClick={() => withdraw()}
+              disabled={!balance}
             >
               Withdraw
             </button>
@@ -558,7 +564,7 @@ function Project() {
           <p className='text-sm lg:text-base text-content font-normal leading-[178.15%] lg:w-[80%]'>
             Project Type : <span className='ml-1 capitalize'>{projectType}</span>
           </p>
-          
+
           <p className='text-base text-content font-normal leading-[178.15%] lg:w-[80%]'>
             {project?.description}
           </p>
