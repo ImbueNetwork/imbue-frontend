@@ -13,13 +13,13 @@ import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 import SuccessScreen from '@/components/SuccessScreen';
 
-import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
 import { Brief, Currency, Freelancer } from '@/model';
 import { getBrief } from '@/redux/services/briefService';
 import { getFreelancerBrief } from '@/redux/services/briefService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { selectAccount } from '@/redux/services/polkadotService';
+import { createProject } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 interface MilestoneItem {
@@ -227,42 +227,43 @@ export const SubmitProposal = (): JSX.Element => {
     if (totalPercent !== 100)
       return setError({ message: 'Total percentage must be 100%' });
 
+    if (totalCostWithoutFee > 100000000)
+      return setError({ message: 'Total cost must be less than 100,000,000' });
+
     setLoading(true);
 
     try {
-      const resp = await fetch(`${config.apiBase}/project`, {
-        headers: config.postAPIHeaders,
-        method: 'post',
-        body: JSON.stringify({
-          user_id: user?.id,
-          name: `Brief Application: ${brief?.headline}`,
-          brief_id: brief?.id,
-          total_cost_without_fee: totalCostWithoutFee,
-          imbue_fee: imbueFee,
-          currency_id: currencyId,
-          milestones: milestones
-            .filter((m) => m.amount !== undefined)
-            .map((m) => {
-              return {
-                name: filter.clean(m.name),
-                amount: m.amount,
-                description: filter.clean(m.description),
-                percentage_to_unlock: (
-                  ((m.amount ?? 0) / totalCostWithoutFee) *
-                  100
-                ).toFixed(0),
-              };
-            }),
-          required_funds: totalCost,
-          duration_id: durationId,
-          description: brief?.description,
-        }),
-      });
-      if (resp.ok) {
-        const applicationId = (await resp.json()).id;
+
+      const resp = await createProject({
+        user_id: user?.id,
+        name: `${brief?.headline}`,
+        brief_id: brief?.id,
+        total_cost_without_fee: totalCostWithoutFee,
+        imbue_fee: imbueFee,
+        currency_id: currencyId,
+        milestones: milestones
+          .filter((m) => m.amount !== undefined)
+          .map((m) => {
+            return {
+              name: filter.clean(m.name),
+              amount: m.amount,
+              description: filter.clean(m.description),
+              percentage_to_unlock: (
+                ((m.amount ?? 0) / totalCostWithoutFee) *
+                100
+              ).toFixed(0),
+            };
+          }),
+        required_funds: totalCost,
+        duration_id: durationId,
+        description: brief?.description,
+      })
+
+      if (resp.id) {
+        const applicationId = resp.id;
         applicationId && setapplicationId(applicationId);
       } else {
-        setError({ message: 'Failed to submit the proposal' });
+        setError({ message: resp.message });
       }
     } catch (error) {
       setError({ message: error });
@@ -407,7 +408,7 @@ export const SubmitProposal = (): JSX.Element => {
                         className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
                         value={amount || ''}
                         onChange={(e) => {
-                          if (Number(e.target.value) >= 0)
+                          if (Number(e.target.value) >= 0 && Number(e.target.value) < 1e12)
                             setMilestones([
                               ...milestones.slice(0, index),
                               {
