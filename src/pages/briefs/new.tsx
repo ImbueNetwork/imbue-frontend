@@ -149,7 +149,7 @@ const NewBrief = (): JSX.Element => {
           data-testid='description-input'
           value={description}
           name='description'
-          maxLength={5000}
+          maxLength={500}
           className='text-black bg-white outline-none'
           onChange={handleChange}
         />

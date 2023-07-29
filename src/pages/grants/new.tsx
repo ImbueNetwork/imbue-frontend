@@ -295,7 +295,6 @@ const GrantApplication = (): JSX.Element => {
   const submitGrant = async (account: WalletAccount) => {
     if (!account) return;
     const { isValid, firstErrorIndex } = validateFormData()
-    console.log("🚀 ~ file: new.tsx:299 ~ submitGrant ~ firstErrorIndex:", firstErrorIndex)
     if (!isValid) {
       setEnteredInvalid(true)
       milestonesRef.current[firstErrorIndex]?.scrollIntoView({

@@ -26,11 +26,6 @@ interface MilestoneItem {
   name: string;
   amount: number | undefined;
   description: string;
-  error?: {
-    name?: string;
-    description?: string;
-    amount?: string;
-  };
 }
 
 export const SubmitProposal = (): JSX.Element => {
@@ -55,6 +50,8 @@ export const SubmitProposal = (): JSX.Element => {
   const [applicationId, setapplicationId] = useState();
   const [error, setError] = useState<any>();
   const [open, setOpen] = useState(false);
+  const [enteredInvalid, setEnteredInvalid] = useState<boolean>(false);
+  const [inputError, setInputError] = useState<any>([])
 
   useEffect(() => {
     setOpen(applicationId ? true : false);
@@ -105,7 +102,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   const milestonesRef = useRef<any>([]);
   const [milestones, setMilestones] = useState<MilestoneItem[]>([
-    { name: '', amount: undefined, description: '', error: {} },
+    { name: '', amount: undefined, description: '' },
   ]);
 
   const durationOptions = timeData.sort((a, b) =>
@@ -122,7 +119,7 @@ export const SubmitProposal = (): JSX.Element => {
   const onAddMilestone = () => {
     setMilestones([
       ...milestones,
-      { name: '', amount: undefined, description: '', error: {} },
+      { name: '', amount: undefined, description: '' },
     ]);
   };
 
@@ -157,15 +154,14 @@ export const SubmitProposal = (): JSX.Element => {
     }
   }
 
-  const allInputsValid = () => {
+  const allInputsValid = (): { hasValue: boolean, firstErrorIndex: number } => {
     let hasValue = true;
     let firstErrorIndex = -1;
-    const newMilestones = [...milestones];
+    const newMilestones: any = [];
     const blockUnicodeRegex = /^[\x20-\x7E]*$/;
 
     for (let i = 0; i < milestones.length; i++) {
       const { amount, name, description } = milestones[i];
-      newMilestones[i].error = {};
 
       if (
         name === undefined ||
@@ -173,17 +169,25 @@ export const SubmitProposal = (): JSX.Element => {
         name.length === 0 ||
         !blockUnicodeRegex.test(name)
       ) {
-        newMilestones[i].error = {
-          ...newMilestones[i].error,
+        newMilestones[i] = {
+          ...newMilestones[i],
           name: 'A valid name is required',
+        };
+        hasValue = false;
+        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
+      }
+      else if (name.length < 10) {
+        newMilestones[i] = {
+          ...newMilestones[i],
+          name: 'Milestone title should be between 10 - 50 characters',
         };
         hasValue = false;
         firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
       }
 
       if (amount === undefined || amount === null || amount === 0) {
-        newMilestones[i].error = {
-          ...newMilestones[i].error,
+        newMilestones[i] = {
+          ...newMilestones[i],
           amount: 'A valid amount is required',
         };
         hasValue = false;
@@ -195,31 +199,41 @@ export const SubmitProposal = (): JSX.Element => {
         description === null ||
         description.length === 0
       ) {
-        newMilestones[i].error = {
-          ...newMilestones[i].error,
+        newMilestones[i] = {
+          ...newMilestones[i],
           description: 'A valid description is required.',
+        };
+        hasValue = false;
+        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
+      }
+      else if (description.length < 50) {
+        newMilestones[i] = {
+          ...newMilestones[i],
+          description: 'Milestone description should be between 100 - 500 characters.',
         };
         hasValue = false;
         firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
       }
     }
 
-    // if(totalCost > )
+    setInputError(newMilestones);
 
-    setMilestones(newMilestones);
+    return { hasValue, firstErrorIndex };
+  };
 
-    if (firstErrorIndex !== -1)
+  useEffect(() => {
+    enteredInvalid && allInputsValid()
+  }, [milestones])
+
+  async function insertProject() {
+    const { hasValue, firstErrorIndex } = allInputsValid()
+    if (!hasValue) {
       milestonesRef.current[firstErrorIndex]?.scrollIntoView({
         behavior: 'auto',
         block: 'center',
         inline: 'center',
       });
-
-    return hasValue;
-  };
-
-  async function insertProject() {
-    if (!allInputsValid()) {
+      setEnteredInvalid(true);
       return setError({
         message: 'Please fill all the required fields first',
       });
@@ -308,7 +322,7 @@ export const SubmitProposal = (): JSX.Element => {
         <hr className='h-[1px] bg-[rgba(3, 17, 106, 0.12)] w-full mt-4' />
 
         <div className='milestone-list !gap-0'>
-          {milestones.map(({ name, amount, description, error }, index) => {
+          {milestones.map(({ name, amount, description }, index) => {
             const percent = Number(
               ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
             );
@@ -338,6 +352,7 @@ export const SubmitProposal = (): JSX.Element => {
 
                     <input
                       type='text'
+                      maxLength={50}
                       data-testid={`milestone-title-${index}`}
                       className='input-budget text-base rounded-md py-3 px-5 text-imbue-purple text-left placeholder:text-imbue-light-purple mb-1'
                       placeholder='Add milestone name here'
@@ -357,7 +372,7 @@ export const SubmitProposal = (): JSX.Element => {
                       <p className='text-sm text-content my-2'>
                         {name?.length}/50
                       </p>
-                      <p className='text-sm text-imbue-coral'>{error?.name}</p>
+                      <p className='text-sm text-imbue-coral'>{enteredInvalid && inputError[index]?.name}</p>
                     </div>
 
                     <h3 className='mb-2 lg:mb-5 text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
@@ -385,7 +400,7 @@ export const SubmitProposal = (): JSX.Element => {
                         {description?.length}/500
                       </p>
                       <p className='text-sm text-imbue-coral'>
-                        {error?.description}
+                        {enteredInvalid && inputError[index]?.description}
                       </p>
                     </div>
                   </div>
@@ -421,7 +436,7 @@ export const SubmitProposal = (): JSX.Element => {
                       />
                     </div>
                     <p className='text-sm text-imbue-coral my-2 text-right w-full'>
-                      {error?.amount}
+                      {enteredInvalid && inputError[index]?.amount}
                     </p>
                     {totalCostWithoutFee !== 0 && (
                       <div className='flex flex-col items-end mt-3 gap-2 w-full'>
