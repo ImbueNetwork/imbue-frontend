@@ -16,7 +16,7 @@ const FreelancerView: React.FC<FreelacerViewProps> = ({
   myApplications,
   currentProject,
 }) => {
-  const [switcher, setSwitcher] = useState('application');
+  const [switcher, setSwitcher] = useState<'application' | 'ongoingproject'>('application');
   const acceptedApplication = useMemo(() => {
     let num = 0;
     myApplications.filter((item: any) => {

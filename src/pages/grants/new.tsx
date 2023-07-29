@@ -345,7 +345,8 @@ const GrantApplication = (): JSX.Element => {
         await new Promise((f) => setTimeout(f, 1000));
       }
     } catch (error) {
-      setError({ message: error });
+      console.error(error);
+      setError({ message: "Could not submit grant. Please Try again" });
     } finally {
       setLoading(false);
     }
@@ -679,7 +680,7 @@ const GrantApplication = (): JSX.Element => {
                               className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple outline-content-primary'
                               value={amount || ''}
                               onChange={(e) => {
-                                if (Number(e.target.value) >= 0)
+                                if (Number(e.target.value) >= 0 && Number(e.target.value) < 1e12)
                                   setMilestones([
                                     ...milestones.slice(0, index),
                                     {

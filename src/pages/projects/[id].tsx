@@ -80,6 +80,7 @@ function Project() {
   const [project, setProject] = useState<Project | any>({});
   const [targetUser, setTargetUser] = useState<any>({});
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
+  console.log("🚀 ~ file: [id].tsx:83 ~ Project ~ onChainProject:", onChainProject)
   // const [user, setUser] = useState<User | any>();
   const { user, loading: userLoading } = useSelector(
     (state: RootState) => state.userState
@@ -116,6 +117,8 @@ function Project() {
 
   const [projectType, setProjectType] = useState<"grant" | "brief" | null>(null)
   const canVote = isApprover || (projectType === "brief" && isProjectOwner)
+  const [expandPorjectDesc, setExpandProjectDesc] = useState<number>(500)
+
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -372,7 +375,7 @@ function Project() {
   const renderVotingModal = (
     <Dialogue
       title='Want to appove milestone?'
-      closeDialouge={() => setShowVotingModal(false)}
+      // closeDialouge={() => setShowVotingModal(false)}
       actionList={
         <>
           <li className='button-container !bg-transparent !hover:bg-gray-950  !border !border-solid !border-white'>
@@ -494,7 +497,7 @@ function Project() {
 
           )}
 
-          {isApplicant &&
+          {(isApplicant || (projectType === 'grant' && isProjectOwner)) &&
             onChainProject?.projectState !==
             OnchainProjectState.OpenForVoting &&
             !milestone?.is_approved && (
@@ -565,8 +568,23 @@ function Project() {
             Project Type : <span className='ml-1 capitalize'>{projectType}</span>
           </p>
 
-          <p className='text-base text-content font-normal leading-[178.15%] lg:w-[80%]'>
-            {project?.description}
+          <p className='text-base text-content font-normal leading-[178.15%] lg:w-[80%] whitespace-pre-wrap'>
+            {
+              project?.description?.length > expandPorjectDesc
+                ? project?.description?.substring(0, expandPorjectDesc) + " ..."
+                : project?.description
+            }
+            {
+              project?.description?.length > 500 && (
+                <span>
+                  {
+                    (project?.description?.length > expandPorjectDesc)
+                      ? <button onClick={() => setExpandProjectDesc((prev) => prev + 500)} className='mt-3 ml-2 w-fit text-sm hover:underline text-imbue-lemon'>Show more</button>
+                      : <button onClick={() => setExpandProjectDesc(500)} className='mt-3 ml-2 w-fit text-sm hover:underline text-imbue-lemon'>Show Less</button>
+                  }
+                </span>
+              )
+            }
           </p>
 
           <p className='text-sm text-content-primary leading-[1.5] m-0 p-0'>
@@ -574,7 +592,7 @@ function Project() {
           </p>
 
           <p className='text-imbue-purple text-[1.25rem] font-normal leading-[1.5] mt-[16px] p-0'>
-            {isProjectOwner
+            {isProjectOwner && projectType === 'brief'
               ? 'Freelancer hired'
               : 'Project Owner'}
           </p>

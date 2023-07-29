@@ -56,7 +56,7 @@ export const BriefLists = ({
           onClick={() => handleItemClick(brief)}
           className={`flex cursor-pointer group hover:bg-imbue-light-purple-hover px-5 py-3 lg:px-10 lg:py-8 justify-between border-b border-b-imbue-light-purple last:border-b-0`}
         >
-          <div className='flex flex-col gap-2 lg:gap-3'>
+          <div className='flex flex-col gap-2 lg:gap-3 w-2/3'>
             <span className='text-sm text-imbue-purple-dark lg:text-xl'>
               {brief.headline.length > 50
                 ? `${brief.headline.substring(0, 50)}...`
@@ -65,7 +65,7 @@ export const BriefLists = ({
             <p className='text-xs lg:text-[16px] text-imbue-purple'>
               Budget ${Number(brief.budget).toLocaleString()}
             </p>
-            <p className='text-xs lg:text-sm w-4/5 text-content'>
+            <p className='text-xs lg:text-sm w-4/5 text-content whitespace-pre-wrap'>
               {brief?.description?.length > 500
                 ? brief?.description?.substring(0, 500) + '...'
                 : brief?.description}
@@ -75,8 +75,8 @@ export const BriefLists = ({
             </p>
           </div>
           {brief.project_id ? (
-            <div className='flex flex-col items-center w-1/3'>
-              <p className='text-sm lg:text-xl text-imbue-purple-dark'>
+            <div className='flex flex-col items-center w-1/4'>
+              <p className='text-sm lg:text-xl text-imbue-purple-dark flex flex-col items-center lg:flex-row gap-2'>
                 Milestones{' '}
                 <span className='primary-text'>
                   {brief.milestones?.filter((m: any) => m?.is_approved)?.length}
