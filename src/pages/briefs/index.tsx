@@ -668,7 +668,7 @@ const Briefs = (): JSX.Element => {
                           : item.description}
                       </div>
 
-                      <div className='brief-tags'>
+                      <div className='brief-tags !flex-wrap'>
                         {item.skills.map((skill: any, skillIndex: any) => (
                           <div className='tag-item' key={skillIndex}>
                             {skill.name}

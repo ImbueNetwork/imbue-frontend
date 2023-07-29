@@ -157,31 +157,32 @@
 }
 
 /* transfer funds */
-.transferFund .MuiTypography-root.MuiTypography-body1{
+.transferFund .MuiTypography-root.MuiTypography-body1 {
   margin-top: 2.5px;
 }
 
-.Mui-focused .MuiTypography-root.MuiTypography-body1{
-  color: var(--theme-content-primary)
-}
-
-.transferFund .MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-filled.MuiFormLabel-colorSecondary.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-filled.Mui-focused{
+.Mui-focused .MuiTypography-root.MuiTypography-body1 {
   color: var(--theme-content-primary);
 }
 
-.transferFund .MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-filled.MuiFormLabel-colorSecondary.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-filled{
+.transferFund
+  .MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-filled.MuiFormLabel-colorSecondary.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-filled.Mui-focused {
+  color: var(--theme-content-primary);
+}
+
+.transferFund
+  .MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-filled.MuiFormLabel-colorSecondary.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-filled {
   color: black;
 }
 
-.transferFund .MuiInputBase-input{
+.transferFund .MuiInputBase-input {
   color: rgba(0, 0, 0, 0.6);
   margin-left: 5px;
 }
 
-.transferFund .Mui-focused .MuiInputBase-input{
+.transferFund .Mui-focused .MuiInputBase-input {
   color: var(--theme-content-primary);
 }
-
 
 @media screen and (max-width: 470px) {
   .MuiBottomNavigation-root {

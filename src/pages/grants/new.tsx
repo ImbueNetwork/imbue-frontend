@@ -74,13 +74,15 @@ const GrantApplication = (): JSX.Element => {
     }, 3000);
   };
 
-  const { user, loading: userLoading } = useSelector((state: RootState) => state.userState);
+  const { user, loading: userLoading } = useSelector(
+    (state: RootState) => state.userState
+  );
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
 
   useEffect(() => {
-    !user.id && !userLoading && router.push("/")
-  }, [user.id, userLoading, router])
+    !user.id && !userLoading && router.push('/');
+  }, [user.id, userLoading, router]);
 
   const durationOptions = timeData.sort((a, b) =>
     a.value > b.value ? 1 : a.value < b.value ? -1 : 0
@@ -221,6 +223,25 @@ const GrantApplication = (): JSX.Element => {
         inline: 'center',
       });
 
+    if (title.length <= 10) {
+      isValid = false;
+      firstErrorIndex = 0;
+      setInputErrors((prev: any) => ({
+        ...prev,
+        title: 'Please milestone title should be greater than 10 characters',
+      }));
+    }
+
+    if (description.length <= 100) {
+      isValid = false;
+      firstErrorIndex = 0;
+      setInputErrors((prev: any) => ({
+        ...prev,
+        description:
+          'Please milestone description should be greater than 100 characters',
+      }));
+    }
+
     return isValid;
   };
 
@@ -254,7 +275,9 @@ const GrantApplication = (): JSX.Element => {
     if (!validateFormData())
       return setError({ message: 'Please fill the required fields first' });
     if (totalPercent < 100)
-      return setError({ message: 'Total Percentage of milelstones must be equal to 100%' });
+      return setError({
+        message: 'Total Percentage of milelstones must be equal to 100%',
+      });
 
     setLoading(true);
 
@@ -362,7 +385,49 @@ const GrantApplication = (): JSX.Element => {
     setApproverPreview(newApprovers);
   };
 
-  if (userLoading) return <FullScreenLoader />
+  const validateInputLength = (
+    text: string,
+    min: number,
+    max: number
+  ): boolean => {
+    return text.length >= min && text.length <= max;
+  };
+
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = event.target;
+
+    switch (name) {
+      case 'mainTitle':
+        setTitle(value);
+        if (validateInputLength(value, 10, 50)) {
+          setInputErrors({ ...inputErrors, title: '' });
+        } else {
+          setInputErrors({
+            ...inputErrors,
+            title: 'Grant title should be between 10 - 50 characters',
+          });
+        }
+        break;
+      case 'mainDescription':
+        setDescription(value);
+        if (validateInputLength(value, 100, 500)) {
+          setInputErrors({ ...inputErrors, description: '' });
+        } else {
+          setInputErrors({
+            ...inputErrors,
+            description:
+              'Grant description should be between 100 - 500 characters',
+          });
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
+  if (userLoading) return <FullScreenLoader />;
 
   return (
     <div className='flex flex-col gap-10 leading-[1.5] !mx-3 lg:!mx-auto'>
@@ -382,7 +447,8 @@ const GrantApplication = (): JSX.Element => {
                   value={title}
                   maxLength={50}
                   placeholder='Input title'
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={handleChange}
+                  name='mainTitle'
                   className='bg-transparent border border-imbue-purple rounded-md p-3 placeholder:text-imbue-light-purple text-imbue-purple outline-content-primary'
                 />
                 <div className='flex items-center justify-between'>
@@ -403,7 +469,8 @@ const GrantApplication = (): JSX.Element => {
                   maxLength={500}
                   value={description}
                   placeholder='Input description'
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={handleChange}
+                  name='mainDescription'
                   className='bg-transparent border border-imbue-purple rounded-md placeholder:text-imbue-light-purple text-imbue-purple outline-content-primary min-h-[160px] p-3'
                 />
                 <div className='flex items-center justify-between'>
@@ -507,7 +574,11 @@ const GrantApplication = (): JSX.Element => {
                 ref={(el) => (milestonesRef.current[2] = el)}
                 className='flex flex-col gap-2'
               >
-                <Approvers approvers={approvers} setApprovers={setApprovers} user={user} />
+                <Approvers
+                  approvers={approvers}
+                  setApprovers={setApprovers}
+                  user={user}
+                />
                 <p className='text-sm text-imbue-coral'>
                   {inputErrors?.approvers}
                 </p>
@@ -656,8 +727,9 @@ const GrantApplication = (): JSX.Element => {
                                 {error?.description}
                               </p>
                               <div className='text-imbue-purple text-sm ml-auto text-right'>
-                                {`${milestones[index].description?.length || 0
-                                  }/500`}
+                                {`${
+                                  milestones[index].description?.length || 0
+                                }/500`}
                               </div>
                             </div>
                           </div>
@@ -674,7 +746,7 @@ const GrantApplication = (): JSX.Element => {
 
                             <input
                               type='number'
-                              onWheel={(e)=>(e.target as HTMLElement).blur()}
+                              onWheel={(e) => (e.target as HTMLElement).blur()}
                               data-testid={`milestone-amount-${index}`}
                               placeholder='Add an amount'
                               className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple outline-content-primary'
@@ -738,8 +810,9 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
-                  }`}
+                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${
+                  currencies[currencyId]
+                }`}
               </div>
             </div>
 
@@ -759,8 +832,9 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
-                  }`}
+                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${
+                  currencies[currencyId]
+                }`}
               </div>
             </div>
 
@@ -827,8 +901,9 @@ const GrantApplication = (): JSX.Element => {
           </button>
         </div>
         <Alert
-          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${copied ? 'flex' : 'hidden'
-            }`}
+          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${
+            copied ? 'flex' : 'hidden'
+          }`}
           severity='success'
         >
           Grant Wallet Address Copied to clipboard
