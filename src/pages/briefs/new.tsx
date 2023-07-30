@@ -112,6 +112,9 @@ const NewBrief = (): JSX.Element => {
           value={headline}
           onChange={handleChange}
         />
+        <div className='flex flex-wrap flex-row justify-center relative top-4'>
+          <span className={!inputError ? 'hide' : 'error'}>{inputError}</span>
+        </div>
       </div>
       <p className={styles.fieldName}>Examples</p>
       <div className={styles.namePanelNameExamples}>
@@ -153,6 +156,9 @@ const NewBrief = (): JSX.Element => {
           className='text-black bg-white outline-none'
           onChange={handleChange}
         />
+        <div className='flex flex-wrap flex-row justify-center relative top-4'>
+          <span className={!inputError ? 'hide' : 'error'}>{inputError}</span>
+        </div>
       </div>
     </div>
   );
@@ -380,7 +386,7 @@ const NewBrief = (): JSX.Element => {
           ))}
         </div>
         <div className={styles.rightPanel}>
-          <div className={styles.contents}>{panels[step] ?? <></>}</div>
+          <div className={styles.contents}>{panels[step] ?? <></>} </div>
           <div className={styles.buttons}>
             {step >= 1 && (
               <button
@@ -417,9 +423,6 @@ const NewBrief = (): JSX.Element => {
                 {stepData[step].next ? `Next: ${stepData[step].next}` : 'Next'}
               </button>
             )}
-          </div>
-          <div className='flex flex-wrap flex-row justify-center relative top-10'>
-            <span className={!inputError ? 'hide' : 'error'}>{inputError}</span>
           </div>
         </div>
       </div>

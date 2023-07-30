@@ -104,14 +104,7 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
         }
         break;
       case 'password':
-        if (!validatePassword(value)) {
-          setError(
-            'Password must be between 6 and 15 characters and contain at least one number and one special character'
-          );
-        } else {
-          setPassword(value);
-          setError(null);
-        }
+        setPassword(value);
         break;
       case 'matchPassword':
         if (value !== password) {
@@ -159,6 +152,13 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
 
     if (user && password && user.toLowerCase() === password.toLowerCase()) {
       setError('Username and password cannot be the same');
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setError(
+        'Password must be between 6 and 15 characters and contain at least one number and one special character'
+      );
       return;
     }
 
@@ -233,8 +233,8 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
         />
       </div>
 
-      <div className='flex flex-wrap flex-row justify-center break-words'>
-        <span className={!error ? 'hide' : 'error'}>{error}</span>
+      <div className='flex flex-wrap flex-row justify-center break-words w-fit px-4'>
+        <span className={`${!error ? 'hide' : 'error'} w-fit`}>{error}</span>
       </div>
       <div className='flex justify-center mt-2 w-full cursor-pointer'>
         <button
