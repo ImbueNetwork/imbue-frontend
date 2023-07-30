@@ -81,7 +81,6 @@ function Project() {
   const [project, setProject] = useState<Project | any>({});
   const [targetUser, setTargetUser] = useState<any>({});
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
-  console.log("🚀 ~ file: [id].tsx:83 ~ Project ~ onChainProject:", onChainProject)
   // const [user, setUser] = useState<User | any>();
   const { user, loading: userLoading } = useSelector(
     (state: RootState) => state.userState
@@ -173,13 +172,13 @@ function Project() {
 
   const getProject = async () => {
     try {
-      const projectRes = await getProjectById(projectId);
+      const projectRes: Project = await getProjectById(projectId);
       // showing owner profile if the current user if the applicant freelancer
 
       let owner;
       let freelancerRes;
 
-      if (projectRes?.brief_id) {
+      if (projectRes?.brief_id && projectRes?.user_id) {
         setProjectType('brief');
 
         const brief = await getBrief(projectRes.brief_id);
@@ -192,7 +191,8 @@ function Project() {
           setTargetUser(owner);
         }
       } else {
-        setProjectType('grant');
+        setProjectType('grant')
+        if (!projectRes?.user_id) return
 
         owner = await utils.fetchUser(projectRes?.user_id);
         setTargetUser(owner);
@@ -258,14 +258,19 @@ function Project() {
       const imbueApi = await initImbueAPIInfo();
       // const userRes: User | any = await utils.getCurrentUser();
       const chainService = new ChainService(imbueApi, user);
-      await chainService.voteOnMilestone(
+      const result = await chainService.voteOnMilestone(
         account,
         onChainProject,
         milestoneKeyInView,
         vote
       );
-      setSuccess(true);
-      setSuccessTitle('Your vote was successfull');
+      if (!result.txError) {
+        setSuccess(true);
+        setSuccessTitle('Your vote was successfull');
+      }
+      else {
+        setError({ message: result.errorMessage })
+      }
     } catch (error) {
       setError({ message: 'Could not vote. Please try again later' });
     } finally {
@@ -451,8 +456,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, 'Completed')
               : milestone?.milestone_key == milestoneBeingVotedOn
-              ? openForVotingTag()
-              : projectStateTag(modified, 'Not Started')}
+                ? openForVotingTag()
+                : projectStateTag(modified, 'Not Started')}
 
             <Image
               src={require(expanded
@@ -491,9 +496,8 @@ function Project() {
               }
             >
               <button
-                className={`primary-btn in-dark w-button ${
-                  !canVote && '!bg-gray-300 !text-gray-400'
-                } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
+                className={`primary-btn in-dark w-button ${!canVote && '!bg-gray-300 !text-gray-400'
+                  } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
                 data-testid='next-button'
                 onClick={() => canVote && vote()}
               >
@@ -504,7 +508,7 @@ function Project() {
 
           {(isApplicant || (projectType === 'grant' && isProjectOwner)) &&
             onChainProject?.projectState !==
-              OnchainProjectState.OpenForVoting &&
+            OnchainProjectState.OpenForVoting &&
             !milestone?.is_approved && (
               <button
                 className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
@@ -517,9 +521,8 @@ function Project() {
 
           {isApplicant && milestone.is_approved && (
             <button
-              className={`primary-btn in-dark w-button ${
-                !balance && '!bg-gray-300 !text-gray-400'
-              } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
+              className={`primary-btn in-dark w-button ${!balance && '!bg-gray-300 !text-gray-400'
+                } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
               data-testid='next-button'
               onClick={() => withdraw()}
               disabled={!balance}
@@ -697,9 +700,8 @@ function Project() {
                   {approversPreview?.map((approver: any, index: number) => (
                     <div
                       key={index}
-                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${
-                        approver?.display_name && 'cursor-pointer'
-                      }`}
+                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${approver?.display_name && 'cursor-pointer'
+                        }`}
                       onClick={() =>
                         approver.display_name &&
                         router.push(`/profile/${approver.username}`)
@@ -753,13 +755,12 @@ function Project() {
                 <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
                   <div
                     style={{
-                      width: `${
-                        (onChainProject?.milestones?.filter?.(
-                          (m: any) => m?.is_approved
-                        )?.length /
-                          onChainProject?.milestones?.length) *
+                      width: `${(onChainProject?.milestones?.filter?.(
+                        (m: any) => m?.is_approved
+                      )?.length /
+                        onChainProject?.milestones?.length) *
                         100
-                      }%`,
+                        }%`,
                     }}
                     className='h-full rounded-xl Accepted-button absolute'
                   ></div>
@@ -767,9 +768,8 @@ function Project() {
                     {onChainProject?.milestones?.map((m: any, i: number) => (
                       <div
                         key={i}
-                        className={`h-4 w-4 ${
-                          m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
-                        } rounded-full -mt-1.5`}
+                        className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
+                          } rounded-full -mt-1.5`}
                       ></div>
                     ))}
                   </div>

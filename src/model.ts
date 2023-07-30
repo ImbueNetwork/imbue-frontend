@@ -84,6 +84,7 @@ export type Project = {
   approvers: string[];
   created?: string;
   duration_id: number;
+  escrow_address: string;
 };
 
 export type ProjectOnChain = {
