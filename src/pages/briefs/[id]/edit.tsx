@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import styled from '@emotion/styled';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -219,9 +221,25 @@ export const EditProposal = (): JSX.Element => {
       self-start
       '
       >
-        <h1 className='lg:text-4xl text-[1.5rem] leading-[50px] !text-imbue-purple m-0 font-normal mx-0'>
-          Edit Brief Details
-        </h1>
+        <div className='flex gap-5 items-center'>
+          <Tooltip
+            title='Go back to previous page'
+            followCursor
+            leaveTouchDelay={10}
+            enterDelay={500}
+            className='cursor-pointer'
+          >
+            <div
+              onClick={() => router.back()}
+              className='border border-content rounded-full p-1 flex items-center justify-center cursor-pointer relative '
+            >
+              <ArrowBackIcon className='h-5 w-5' color='secondary' />
+            </div>
+          </Tooltip>
+          <h1 className='lg:text-3xl text-[1.5rem] leading-[50px] !text-imbue-purple m-0 font-normal mx-0'>
+            Edit Brief Details
+          </h1>
+        </div>
       </header>
       <div className='imbu-proposals-draft-submission-form'>
         <fieldset className='bg-white p-[1rem] lg:p-[2rem] rounded-[1.25rem]'>
@@ -239,7 +257,9 @@ export const EditProposal = (): JSX.Element => {
               onChange={handleChange}
               name='headline'
             />
-            <span className={!inputError?.headline ? 'hide' : 'error'}>
+            <span
+              className={`text-xs ${'text-imbue-light-purple-two'} mt-[-10px]`}
+            >
               {inputError?.headline}
             </span>
           </div>
@@ -300,12 +320,12 @@ export const EditProposal = (): JSX.Element => {
             </div>
 
             {inputError?.budget ? (
-              <span className={!inputError?.budget ? 'hide' : 'error'}>
+              <span className={`!text-imbue-purple text-xs`}>
                 {inputError?.budget}
               </span>
             ) : (
               <div
-                className={`${styles.budgetDescription} !text-imbue-purple !mb-0 !mt-0`}
+                className={`${styles.budgetDescription} !text-imbue-purple !mb-0 !mt-0 text-xs`}
               >
                 You will be able to set milestones which divide your project
                 into manageable phases.
@@ -327,7 +347,9 @@ export const EditProposal = (): JSX.Element => {
               rows={10}
               onChange={handleChange}
             />
-            <span className={!inputError?.description ? 'hide' : 'error'}>
+            <span
+              className={`text-xs ${'text-imbue-light-purple-two'} mt-[-10px]`}
+            >
               {inputError?.description}
             </span>
           </div>
