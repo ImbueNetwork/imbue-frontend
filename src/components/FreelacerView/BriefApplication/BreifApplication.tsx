@@ -105,7 +105,7 @@ const BreifApplication: React.FC<BreifApplicationProps> = ({
           </div>
         </div>
       )}
-      {loadValue > applications.length && (
+      {loadValue > applications.length && applications.length > 10 && (
         <div className='flex justify-center my-7 items-center '>
           <div className='w-full flex justify-center py-6'>
             <button
