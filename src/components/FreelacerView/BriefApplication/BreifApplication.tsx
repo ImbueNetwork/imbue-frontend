@@ -47,10 +47,10 @@ const BreifApplication: React.FC<BreifApplicationProps> = ({
           <div
             key={item.id}
             onClick={() => redirectToApplication(item)}
-            className=' hover:bg-imbue-light-purple cursor-pointer px-9 text-imbue-light-purple-two'
+            className=' hover:bg-imbue-light-purple cursor-pointer px-9 text-imbue-purple'
           >
             <div className='flex pt-7 items-center justify-between'>
-              <p className='text-imbue-purple text-sm sm:text-lg'>
+              <p className='text-imbue-purple-dark text-sm sm:text-lg'>
                 {item.name}
               </p>
               <p className='text-xs sm:text-sm'>

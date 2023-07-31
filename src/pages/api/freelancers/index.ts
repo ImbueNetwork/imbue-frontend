@@ -1,3 +1,4 @@
+import Filter from 'bad-words';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
@@ -13,7 +14,6 @@ import {
 import db from '@/db';
 
 import { verifyUserIdFromJwt } from '../auth/common';
-
 export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
     const { query: data } = req;
@@ -54,6 +54,7 @@ export default nextConnect()
     });
   })
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
+    const filter = new Filter({ placeHolder: ' ' });
     const { body } = req;
     const freelancer = body.freelancer;
 
@@ -74,8 +75,24 @@ export default nextConnect()
         if (freelancer.clients) {
           client_ids = await upsertItems(freelancer.clients, 'services')(tx);
         }
+        const filterdData = {
+          ...freelancer,
+          bio: filter.clean(freelancer.bio).trim(),
+          education: filter.clean(freelancer.education).trim(),
+          skills: freelancer.skills.map((item: string) =>
+            item.trim().length ? filter.clean(item).trim() : ''
+          ),
+          title: filter.clean(freelancer.title).trim(),
+          languages: freelancer.languages.map((item: string) =>
+            item.trim().length ? filter.clean(item).trim() : ''
+          ),
+          services: freelancer.services.map((item: string) =>
+            item.trim().length ? filter.clean(item).trim() : ''
+          ),
+        };
+
         const freelancer_id = await insertFreelancerDetails(
-          freelancer,
+          filterdData,
           skill_ids,
           language_ids,
           client_ids,
