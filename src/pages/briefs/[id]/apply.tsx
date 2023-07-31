@@ -309,7 +309,7 @@ export const SubmitProposal = (): JSX.Element => {
         const applicationId = (await resp.json()).id;
         applicationId && setapplicationId(applicationId);
       } else {
-        setError({ message: resp.message });
+        setError({ message: resp });
       }
     } catch (error) {
       setError({ message: error });
