@@ -59,6 +59,11 @@ const Profile = ({ initUser, browsingUser }: any) => {
   }, [user?.id]);
 
   const onSave = async (user: any) => {
+    if (error?.display_name || error?.username) {
+      setError({ message: 'Please fix the errors before saving' });
+      return;
+    }
+
     try {
       if (user) {
         setLoading(true);
@@ -124,8 +129,47 @@ const Profile = ({ initUser, browsingUser }: any) => {
     }
   };
 
+  const validateInputLength = (
+    text: string,
+    min: number,
+    max: number
+  ): boolean => {
+    return text.length >= min && text.length <= max;
+  };
+
   const handleChange = (e: any) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    switch (name) {
+      case 'display_name':
+        if (validateInputLength(value, 5, 30)) {
+          setUser({ ...user, display_name: value });
+          setError({ display_name: '' });
+        } else {
+          setError({
+            display_name: 'Name must be between 5 and 30 characters',
+          });
+        }
+        break;
+      case 'username':
+        if (validateInputLength(value, 5, 30)) {
+          setUser({ ...user, username: value });
+          setError({ username: '' });
+        } else {
+          setError({
+            username: 'Username must be between 5 and 30 characters',
+          });
+          setUser({ ...user, username: value });
+        }
+        break;
+      case 'website':
+        setUser({ ...user, website: value });
+        break;
+
+      default:
+        break;
+    }
+    // setUser({ ...user, [e.target.name]: e.target.value });
   };
 
   const navigateToLink = (link: string) => {
@@ -175,15 +219,23 @@ const Profile = ({ initUser, browsingUser }: any) => {
             </div>
             <div className='w-full flex flex-col gap-4'>
               {isEditMode ? (
-                <TextField
-                  color='secondary'
-                  onChange={(e) => handleChange(e)}
-                  id='outlined-basic'
-                  name='display_name'
-                  label='Name'
-                  variant='outlined'
-                  defaultValue={user?.display_name}
-                />
+                <>
+                  <TextField
+                    color='secondary'
+                    onChange={handleChange}
+                    id='outlined-basic'
+                    name='display_name'
+                    label='Name'
+                    variant='outlined'
+                    defaultValue={user?.display_name}
+                  />
+                  <p
+                    className={`text-xs text-imbue-light-purple-two mt-[-32px]
+                    `}
+                  >
+                    {error?.display_name || ''}
+                  </p>
+                </>
               ) : (
                 <p className='!text-2xl capitalize text-imbue-purple-dark'>
                   {user?.display_name}
@@ -191,16 +243,24 @@ const Profile = ({ initUser, browsingUser }: any) => {
               )}
 
               {isEditMode ? (
-                <TextField
-                  color='secondary'
-                  onChange={(e) => handleChange(e)}
-                  className='w-full'
-                  id='outlined-basic'
-                  name='username'
-                  label='Username'
-                  variant='outlined'
-                  defaultValue={user?.username}
-                />
+                <>
+                  <TextField
+                    color='secondary'
+                    onChange={handleChange}
+                    className='w-full'
+                    id='outlined-basic'
+                    name='username'
+                    label='Username'
+                    variant='outlined'
+                    defaultValue={user?.username}
+                  />
+                  <p
+                    className={`text-xs text-imbue-light-purple-two mt-[-32px]
+                    `}
+                  >
+                    {error?.username || ''}
+                  </p>
+                </>
               ) : (
                 <p className='text-base text-primary max-w-full break-words'>
                   @{user?.username}

@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Filter from 'bad-words';
 import { useRouter } from 'next/router';
@@ -342,9 +344,26 @@ export const SubmitProposal = (): JSX.Element => {
   return (
     <div className='flex flex-col gap-10 text-base leading-[1.5] !mx-3 lg:!mx-auto'>
       <div className='bg-white rounded-[20px]'>
-        <h3 className='ml-7 lg:ml-12 text-xl leading-[1.5] m-0 p-0  mt-[1.2rem] flex text-imbue-purple-dark font-normal'>
-          Job description
-        </h3>
+        <div className='flex gap-5 items-center'>
+          <Tooltip
+            title='Go back to previous page'
+            followCursor
+            leaveTouchDelay={10}
+            enterDelay={500}
+            className='cursor-pointer'
+          >
+            <div
+              onClick={() => router.back()}
+              className='border border-content rounded-full p-1 flex items-center justify-center cursor-pointer relative top-2 ml-7'
+            >
+              <ArrowBackIcon className='h-5 w-5' color='secondary' />
+            </div>
+          </Tooltip>
+          <h3 className='ml-7 lg:ml-0 text-xl leading-[1.5] m-0 p-0  mt-[1.2rem] flex text-imbue-purple-dark font-normal'>
+            Job description
+          </h3>
+        </div>
+
         {brief && <BriefInsights brief={brief} />}
       </div>
 
@@ -400,17 +419,7 @@ export const SubmitProposal = (): JSX.Element => {
                       placeholder='Add milestone name here'
                       value={name || ''}
                       name='milestoneTitle'
-                      onChange={
-                        (e) => handleMilestoneChange(e, index)
-                        // setMilestones([
-                        //   ...milestones.slice(0, index),
-                        //   {
-                        //     ...milestones[index],
-                        //     name: e.target.value,
-                        //   },
-                        //   ...milestones.slice(index + 1),
-                        // ])
-                      }
+                      onChange={(e) => handleMilestoneChange(e, index)}
                     />
                     <div className='flex items-center justify-between mb-4'>
                       {/* <p className='text-sm text-imbue-coral'>{enteredInvalid && inputError[index]?.name}</p> */}

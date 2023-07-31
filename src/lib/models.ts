@@ -266,6 +266,7 @@ export const updateUserData =
 
 export const fetchUserOrEmail =
   (userOrEmail: string) => (tx: Knex.Transaction) => {
+    console.log({ userOrEmail });
     // get all db users
     return tx<User>('users')
       .select()
@@ -273,7 +274,7 @@ export const fetchUserOrEmail =
         // check if userOrEmail is in db
         const user = users.find(
           (u) =>
-            u.username === userOrEmail.toLocaleLowerCase() ||
+            u.username === userOrEmail.toLowerCase() ||
             u.email === userOrEmail.toLowerCase()
         );
         if (user) {

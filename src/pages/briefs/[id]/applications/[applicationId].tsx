@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+
 import { Backdrop, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -6,6 +7,10 @@ import { FiEdit, FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 
 import { fetchProject, fetchUser } from '@/utils';
+import {
+  handleApplicationInput,
+  validateApplicationInput,
+} from '@/utils/helper';
 
 import ApplicationOwnerHeader from '@/components/Application/ApplicationOwnerHeader';
 import BriefOwnerHeader from '@/components/Application/BriefOwnerHeader';
@@ -43,6 +48,13 @@ interface MilestoneItem {
   };
 }
 
+interface InputErrorType {
+  title?: string;
+  description?: string;
+  approvers?: string;
+  milestones: Array<{ name?: string; amount?: string; description?: string }>;
+}
+
 export type ApplicationPreviewProps = {
   brief: Brief;
   user: User;
@@ -63,6 +75,13 @@ const ApplicationPreview = (): JSX.Element => {
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [briefOwner, setBriefOwner] = useState<any>();
   const [loading, setLoading] = useState<boolean>(true);
+  const [inputErrors, setInputErrors] = useState<InputErrorType>({
+    title: '',
+    description: '',
+    approvers: '',
+    milestones: [],
+  });
+  const [enteredInvalid, setEnteredInvalid] = useState<boolean>(false);
 
   const isApplicationOwner =
     user && application && user?.id == application?.user_id;
@@ -201,6 +220,22 @@ const ApplicationPreview = (): JSX.Element => {
     window.location.reload();
   };
 
+  const handleMilestoneChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    milestoneIndex: number | undefined = undefined
+  ) => {
+    const { milestonesRes, errors } = handleApplicationInput(
+      event,
+      milestoneIndex,
+      inputErrors,
+      milestones,
+      brief?.headline,
+      brief?.description
+    );
+    setMilestones(milestonesRes);
+    setInputErrors(errors);
+  };
+
   const totalPercent = milestones.reduce((sum, { amount }) => {
     const percent = Number(
       ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
@@ -273,12 +308,36 @@ const ApplicationPreview = (): JSX.Element => {
     chainProjectId?: number,
     escrow_address?: string
   ) => {
+    const { isValid, firstErrorIndex } = validateApplicationInput(
+      'brief',
+      inputErrors,
+      setInputErrors,
+      milestones,
+      brief?.headline,
+      brief?.description,
+      []
+    );
+
+    if (!isValid) {
+      milestonesRef.current[firstErrorIndex]?.scrollIntoView({
+        behavior: 'auto',
+        block: 'center',
+        inline: 'center',
+      });
+      setEnteredInvalid(true);
+      return setError({
+        message: 'Please fill all the required fields first',
+      });
+    }
+
     if (!allAmountAndNamesHaveValue())
       return setError({ message: 'Please fill all the required fields' });
     if (totalPercent !== 100)
       return setError({ message: 'TotalPercent must be 100%' });
     if (totalCostWithoutFee > 100000000)
-      return setError({ message: 'Total price of the project must be less than 100,000,000' });
+      return setError({
+        message: 'Total price of the project must be less than 100,000,000',
+      });
 
     setLoading(true);
     try {
@@ -447,23 +506,25 @@ const ApplicationPreview = (): JSX.Element => {
                                 placeholder='Add Milestone Name'
                                 className='input-budget !pl-3 text-base rounded-[5px] py-3 text-imbue-purple mb-2 placeholder:text-imbue-light-purple'
                                 value={name || ''}
+                                name='milestoneTitle'
                                 onChange={(e) =>
-                                  setMilestones([
-                                    ...milestones.slice(0, index),
-                                    {
-                                      ...milestones[index],
-                                      name: e.target.value,
-                                    },
-                                    ...milestones.slice(index + 1),
-                                  ])
+                                  handleMilestoneChange(e, index)
                                 }
                               />
                               <div className='flex items-center justify-between mb-4'>
                                 <p className='text-sm text-content my-2'>
                                   {name?.length}/50
                                 </p>
-                                <p className='text-sm text-imbue-coral'>
-                                  {error?.name}
+                                <p
+                                  className={`text-xs ${
+                                    enteredInvalid
+                                      ? 'text-imbue-coral'
+                                      : 'text-imbue-light-purple-two'
+                                  }`}
+                                >
+                                  {inputErrors?.milestones[index]?.name ||
+                                    error?.name ||
+                                    ''}
                                 </p>
                               </div>
                             </>
@@ -484,23 +545,26 @@ const ApplicationPreview = (): JSX.Element => {
                                 rows={7}
                                 value={description}
                                 disabled={!isEditingBio}
+                                name='milestoneDescription'
                                 onChange={(e) =>
-                                  setMilestones([
-                                    ...milestones.slice(0, index),
-                                    {
-                                      ...milestones[index],
-                                      description: e.target.value,
-                                    },
-                                    ...milestones.slice(index + 1),
-                                  ])
+                                  handleMilestoneChange(e, index)
                                 }
                               />
                               <div className='flex items-center justify-between mb-4'>
                                 <p className='text-sm text-content my-2'>
                                   {description?.length}/500
                                 </p>
-                                <p className='text-sm text-imbue-coral'>
-                                  {error?.description}
+                                <p
+                                  className={`text-xs ${
+                                    enteredInvalid
+                                      ? 'text-imbue-coral'
+                                      : 'text-imbue-light-purple-two'
+                                  }`}
+                                >
+                                  {inputErrors?.milestones[index]
+                                    ?.description ||
+                                    error?.description ||
+                                    ''}
                                 </p>
                               </div>
                             </>
@@ -539,31 +603,37 @@ const ApplicationPreview = (): JSX.Element => {
 
                                 <input
                                   type='number'
-                                  onWheel={(e)=>(e.target as HTMLElement).blur()}
+                                  onWheel={(e) =>
+                                    (e.target as HTMLElement).blur()
+                                  }
                                   disabled={!isEditingBio}
                                   placeholder='Add an amount'
                                   className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
                                   value={amount || ''}
-                                  onChange={(e) => {
-                                    if (Number(e.target.value) >= 0 && Number(e.target.value) < 1e12)
-                                      setMilestones([
-                                        ...milestones.slice(0, index),
-                                        {
-                                          ...milestones[index],
-                                          amount: Number(e.target.value),
-                                        },
-                                        ...milestones.slice(index + 1),
-                                      ]);
-                                  }}
+                                  onChange={(e) =>
+                                    handleMilestoneChange(e, index)
+                                  }
+                                  name='milestoneAmount'
                                 />
                               </div>
-                              <p className='text-sm text-imbue-coral w-full text-right'>
-                                {error?.amount}
+                              <p
+                                className={`text-xs ${
+                                  enteredInvalid
+                                    ? 'text-imbue-coral'
+                                    : 'text-imbue-light-purple-two'
+                                } mt-2`}
+                              >
+                                {inputErrors?.milestones[index]?.amount ||
+                                  error?.amount ||
+                                  ''}
                               </p>
                             </>
                           ) : (
                             <p className='text-[1rem] text-[#3B27C180] m-0'>
-                              ${Number(milestones[index]?.amount?.toFixed(2))?.toLocaleString?.()}
+                              $
+                              {Number(
+                                milestones[index]?.amount?.toFixed(2)
+                              )?.toLocaleString?.()}
                             </p>
                           )}
 

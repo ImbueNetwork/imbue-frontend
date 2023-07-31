@@ -57,8 +57,10 @@ export default nextConnect()
         let response;
         await db.transaction(async (tx: any) => {
           try {
+            const existingUser: any = await models.fetchUser(user.id)(tx);
+
             const existingUsername = await models.fetchUserOrEmail(
-              user.username
+              existingUser[0]?.username
             )(tx);
 
             if (existingUsername?.id !== user?.id) {

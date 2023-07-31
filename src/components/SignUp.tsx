@@ -80,7 +80,7 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
   };
 
   const validatePassword = (passwordString: string): boolean => {
-    const passwordRegex = /^(?=.*[A-Za-z0-9])(?=.*[@#£&?]).{6,15}$/;
+    const passwordRegex = /^(?=.*[A-Za-z0-9])(?=.*[@#£&?.]).{6,15}$/;
     return passwordRegex.test(passwordString);
   };
 
@@ -119,7 +119,7 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
     }
   };
 
-  useEffect(() => {
+  const validateInput = () => {
     if (password !== matchPassword) {
       setError('Passwords do not match');
       return;
@@ -163,6 +163,10 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
     }
 
     setError(null);
+  };
+
+  useEffect(() => {
+    validateInput();
   }, [matchPassword, password, user, email]);
 
   return (

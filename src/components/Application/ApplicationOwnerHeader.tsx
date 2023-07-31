@@ -1,5 +1,6 @@
 /* eslint-disable no-constant-condition */
-import { useMediaQuery } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Tooltip, useMediaQuery } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
@@ -10,7 +11,13 @@ import { Brief } from '@/lib/models';
 import { showErrorMessage } from '@/utils/errorMessages';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
-import { applicationStatusId, Freelancer, OffchainProjectState, Project, User } from '@/model';
+import {
+  applicationStatusId,
+  Freelancer,
+  OffchainProjectState,
+  Project,
+  User,
+} from '@/model';
 import ChainService from '@/redux/services/chainService';
 
 import AccountChoice from '../AccountChoice';
@@ -51,7 +58,6 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
   const router = useRouter();
   // const { applicationId }: any = router.query;
 
-
   const mobileView = useMediaQuery('(max-width:480px)');
 
   const startWork = async (account: WalletAccount) => {
@@ -73,10 +79,10 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         } else if (result.txError) {
           let errorMessage = showErrorMessage(result.errorMessage);
 
-          if (result?.errorMessage?.includes("1010:")) {
-            errorMessage = showErrorMessage(1010)
+          if (result?.errorMessage?.includes('1010:')) {
+            errorMessage = showErrorMessage(1010);
           }
-          
+
           setError({ message: errorMessage });
         }
         break;
@@ -89,10 +95,28 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
   return (
     <div className='flex items-center w-full lg:justify-between lg:px-10 flex-wrap'>
       <div className='flex gap-5 items-center'>
+        <Tooltip
+          title='Go back to previous page'
+          followCursor
+          leaveTouchDelay={10}
+          enterDelay={500}
+          className='cursor-pointer'
+        >
+          <div
+            onClick={() => router.back()}
+            className='border border-content rounded-full p-1 flex items-center justify-center relative cursor-pointer right-10'
+          >
+            <ArrowBackIcon className='h-5 w-5' color='secondary' />
+          </div>
+        </Tooltip>
+
         <Image
           onClick={() => router.push(`/profile/${briefOwner?.username}`)}
           className='w-16 h-16 rounded-full object-cover cursor-pointer'
-          src={briefOwner?.profile_photo ?? require('@/assets/images/profile-image.png')}
+          src={
+            briefOwner?.profile_photo ??
+            require('@/assets/images/profile-image.png')
+          }
           height={200}
           width={200}
           priority
@@ -129,8 +153,9 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           </button>
         ) : (
           <button
-            className={`${applicationStatusId[application?.status_id]
-              }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
+            className={`${
+              applicationStatusId[application?.status_id]
+            }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
           >
             {applicationStatusId[application?.status_id]}
           </button>
