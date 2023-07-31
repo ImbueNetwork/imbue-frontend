@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Autocomplete, TextField } from '@mui/material';
+import Filter from 'bad-words';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,6 +28,7 @@ import styles from '../../styles/modules/Freelancers/new-Freelancer.module.css';
 
 const Freelancer = (): JSX.Element => {
   const router = useRouter();
+  const filter = new Filter({ placeHolder: ' ' });
   const [step, setStep] = useState(0);
   const { user, loading: userLoading } = useSelector(
     (state: RootState) => state.userState
@@ -35,7 +37,7 @@ const Freelancer = (): JSX.Element => {
   const [freelancingBefore, setFreelancingBefore] = useState<any>();
   const [goal, setGoal] = useState<any>();
   // const [resume, setResume] = useState<any>();
-  const [title, setTitle] = useState<string>("");
+  const [title, setTitle] = useState<string>('');
   const [education, setEducation] = useState<string>('');
   const [languages, setLanguages] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
@@ -46,7 +48,7 @@ const Freelancer = (): JSX.Element => {
   const [suggestedFreelancingSkills, setSuggestedSkills] = useState<string[]>(
     []
   );
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     fetchSuggestedSkills();
@@ -91,8 +93,9 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-xp-${index}`}
-            className={`${styles.freelanceXpItem} ${freelancingBefore === value ? styles.active : ''
-              }`}
+            className={`${styles.freelanceXpItem} ${
+              freelancingBefore === value ? styles.active : ''
+            }`}
             onClick={() => setFreelancingBefore(value)}
           >
             {label}
@@ -114,8 +117,9 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-goal-${index}`}
-            className={`${styles.freelanceXpItem} ${goal === value ? styles.active : ''
-              }`}
+            className={`${styles.freelanceXpItem} ${
+              goal === value ? styles.active : ''
+            }`}
             onClick={() => setGoal(value)}
           >
             {label}
@@ -166,7 +170,9 @@ const Freelancer = (): JSX.Element => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
-        <p className='mt-2 text-content-primary text-sm text-right'>{title?.length}/50</p>
+        <p className='mt-2 text-content-primary text-sm text-right'>
+          {title?.length}/50
+        </p>
       </div>
     </div>
   );
@@ -198,7 +204,9 @@ const Freelancer = (): JSX.Element => {
           value={education}
           onChange={(e) => setEducation(e.target.value)}
         />
-        <p className='mt-2 text-content-primary text-sm text-right'>{education?.length}/100</p>
+        <p className='mt-2 text-content-primary text-sm text-right'>
+          {education?.length}/100
+        </p>
       </div>
     </div>
   );
@@ -275,7 +283,9 @@ const Freelancer = (): JSX.Element => {
           value={bio}
           onChange={(e) => setBio(e.target.value)}
         />
-        <p className='mt-2 text-content-primary text-sm text-right'>{bio?.length}/5000</p>
+        <p className='mt-2 text-content-primary text-sm text-right'>
+          {bio?.length}/5000
+        </p>
       </div>
     </div>
   );
@@ -354,18 +364,25 @@ const Freelancer = (): JSX.Element => {
   async function createProfile() {
     try {
       setLoading(true);
-      const response: any = await createFreelancingProfile({
+
+      const freelancerData = {
         id: 0,
-        bio,
-        education: education,
+        bio: filter.clean(bio).trim(),
+        education: filter.clean(education).trim(),
         experience: freelancingBefore,
         freelanced_before: freelancingBefore,
         freelancing_goal: goal,
         work_type: '',
-        skills,
-        title,
-        languages,
-        services,
+        skills: skills.map((item) =>
+          item.trim().length ? filter.clean(item).trim() : ''
+        ),
+        title: filter.clean(title).trim(),
+        languages: languages.map((item) =>
+          item.trim().length ? filter.clean(item).trim() : ''
+        ),
+        services: services.map((item) =>
+          item.trim().length ? filter.clean(item).trim() : ''
+        ),
         user_id: user?.id,
         username: user?.display_name,
         display_name: user?.display_name,
@@ -377,10 +394,12 @@ const Freelancer = (): JSX.Element => {
         client_images: [],
         num_ratings: 0,
         profileImageUrl: require('@/assets/images/profile-image.png'),
-      });
+      };
+
+      const response: any = await createFreelancingProfile(freelancerData);
 
       if (response.status === 201) {
-        dispatch(fetchUserRedux())
+        dispatch(fetchUserRedux());
         setStep(step + 1);
       } else {
         setError({

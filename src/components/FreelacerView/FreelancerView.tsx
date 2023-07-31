@@ -16,7 +16,7 @@ const FreelancerView: React.FC<FreelacerViewProps> = ({
   myApplications,
   currentProject,
 }) => {
-  const [switcher, setSwitcher] = useState<'application' | 'ongoingproject'>('application');
+  const [switcher, setSwitcher] = useState('application');
   const acceptedApplication = useMemo(() => {
     let num = 0;
     myApplications.filter((item: any) => {
@@ -24,6 +24,7 @@ const FreelancerView: React.FC<FreelacerViewProps> = ({
     });
     return num;
   }, [myApplications]);
+
   return (
     <div className='bg-white rounded-2xl  '>
       <div className='text-imbue-purple py-7  px-9 flex   text-sm space-x-9'>

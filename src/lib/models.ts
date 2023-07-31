@@ -527,6 +527,15 @@ export const fetchUserProjects =
   (id: string | number) => (tx: Knex.Transaction) =>
     fetchAllProjects()(tx).where({ user_id: id });
 
+export const fetchUserOnGoingProjects =
+  (id: string | number, skip: number, limit: number) =>
+  (tx: Knex.Transaction) =>
+    fetchAllProjects()(tx)
+      .where({ user_id: id })
+      .whereNot({ chain_project_id: null })
+      .offset(skip)
+      .limit(limit);
+
 export const insertMilestones = (
   milestones: ProposedMilestone[],
   project_id: string | number

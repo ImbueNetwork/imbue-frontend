@@ -3,6 +3,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Divider, OutlinedInput, TextField, Tooltip } from '@mui/material';
 import { SignerResult } from '@polkadot/api/types';
 import { WalletAccount } from '@talismn/connect-wallets';
+import Filter from 'bad-words';
 import moment from 'moment';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -32,6 +33,7 @@ import styles from '@/styles/modules/freelancers.module.css';
 import { checkEnvironment, updateUser } from '../../utils';
 
 const Profile = ({ initUser, browsingUser }: any) => {
+  const filter = new Filter({ placeHolder: ' ' });
   const router = useRouter();
   // const slug = router.query.slug as string;
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
@@ -65,9 +67,34 @@ const Profile = ({ initUser, browsingUser }: any) => {
     }
 
     try {
-      if (user) {
+      if (filter.isProfane(user.display_name)) {
+        setError({ message: 'remove bad word from display name' });
+        return;
+      } else if (filter.isProfane(user.username)) {
+        setError({ message: 'remove bad word from username' });
+        return;
+      } else if (user) {
         setLoading(true);
-        const userResponse: any = await updateUser(user);
+
+        const filterdUser = {
+          ...user,
+          description:
+            user.description && user.description.trim().length
+              ? filter.clean(user.description).trim()
+              : '',
+          website:
+            user.website && user.website.trim().length
+              ? filter.clean(user.website).trim()
+              : '',
+          about:
+            user.about && user.about.trim().length
+              ? filter.clean(user.about).trim()
+              : '',
+        };
+
+        setUser(filterdUser);
+
+        const userResponse: any = await updateUser(filterdUser);
 
         if (userResponse.status === 'Successful') {
           setSuccess(true);
@@ -76,7 +103,8 @@ const Profile = ({ initUser, browsingUser }: any) => {
         }
       }
     } catch (error) {
-      setError({ message: error });
+      // setError({ message: error });
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -129,47 +157,19 @@ const Profile = ({ initUser, browsingUser }: any) => {
     }
   };
 
-  const validateInputLength = (
-    text: string,
-    min: number,
-    max: number
-  ): boolean => {
-    return text.length >= min && text.length <= max;
-  };
+  // const validateInputLength = (
+  //   text: string,
+  //   min: number,
+  //   max: number
+  // ): boolean => {
+  //   return text.length >= min && text.length <= max;
+  // };
 
   const handleChange = (e: any) => {
-    const { name, value } = e.target;
-
-    switch (name) {
-      case 'display_name':
-        if (validateInputLength(value, 5, 30)) {
-          setUser({ ...user, display_name: value });
-          setError({ display_name: '' });
-        } else {
-          setError({
-            display_name: 'Name must be between 5 and 30 characters',
-          });
-        }
-        break;
-      case 'username':
-        if (validateInputLength(value, 5, 30)) {
-          setUser({ ...user, username: value });
-          setError({ username: '' });
-        } else {
-          setError({
-            username: 'Username must be between 5 and 30 characters',
-          });
-          setUser({ ...user, username: value });
-        }
-        break;
-      case 'website':
-        setUser({ ...user, website: value });
-        break;
-
-      default:
-        break;
-    }
-    // setUser({ ...user, [e.target.name]: e.target.value });
+    setUser({
+      ...user,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const navigateToLink = (link: string) => {
@@ -335,7 +335,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
             </div>
 
             {isProfileOwner && !isEditMode && (
-              <div className='absolute top-5 right-5 cursor-pointer'>
+              <div className='absolute flex items-center top-5 right-5 cursor-pointer'>
                 <span className='text-imbue-purple mr-2'>Edit</span>
                 <BiEdit
                   onClick={() => setIsEditMode(!isEditMode)}

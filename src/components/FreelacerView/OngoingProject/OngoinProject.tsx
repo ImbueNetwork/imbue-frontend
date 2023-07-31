@@ -2,27 +2,28 @@ import { Divider } from '@mui/material';
 import classNames from 'classnames';
 import TimeAgo from 'javascript-time-ago';
 import router from 'next/router';
+import { useState } from 'react';
 
 import { ProgressBar } from '@/components/ProgressBar';
 
 import { Project } from '@/model';
 
 interface OnGoinProjectProps {
-  projects: any;
+  projects: Project[];
 }
+
 const timeAgo = new TimeAgo('en-US');
 const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
-
-  const redirectToApplication = (project: Project) => {
+  const [value, setValue] = useState(10);
+  const redirectToApplication = (application: Project) => {
     router.push(
-      `/projects/${project.id}`
+      `/briefs/${application.brief_id}/applications/${application.id}/`
     );
   };
 
   const redirectToDiscoverBriefs = () => {
     router.push(`/briefs`);
   };
-
   if (projects?.length === 0)
     return (
       <div className='w-full flex justify-center py-6'>
@@ -40,54 +41,87 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
 
   return (
     <>
-      {projects?.map((project: any, index: number) => (
-        <>
-          <div
-            key={project.id}
-            onClick={() => redirectToApplication(project)}
-            className=' hover:bg-imbue-light-purple cursor-pointer px-9 text-imbue-purple'
-          >
-            <div className='flex flex-col pt-7 gap-y-5 '>
-              <div className='flex gap-x-3 items-center'>
-                <div className='w-48'>
-                  <ProgressBar
-                    isPrimary={true}
-                    titleArray={['', '', '', '']}
-                    currentValue={2}
-                  />
+      {projects?.map(
+        (item: any, index: number) =>
+          index < Math.min(Math.max(value, 10), projects.length) && (
+            <>
+              <div
+                key={item.id}
+                onClick={() => redirectToApplication(item)}
+                className=' hover:bg-imbue-light-purple cursor-pointer px-9 text-imbue-purple'
+              >
+                <div className='flex flex-col pt-7 gap-y-5 '>
+                  <div className='flex gap-x-3 items-center'>
+                    <div className='w-48'>
+                      <ProgressBar
+                        isPrimary={true}
+                        titleArray={['', '', '', '']}
+                        currentValue={2}
+                      />
+                    </div>
+                    <p className='text-[#7AA822]'>3/4</p>
+                    <button
+                      className={classNames(
+                        ' text-black flex px-5 py-3 text-sm ml-auto rounded-full',
+                        !item.completed ? 'bg-light-grey' : 'bg-primary'
+                      )}
+                    >
+                      {item.complete ? 'completed' : 'In progress'}
+                    </button>
+                  </div>
+                  <p className='text-imbue-purple-dark text-sm sm:text-lg'>
+                    {item.name}
+                  </p>
+                  <p className='text-xs sm:text-sm'>
+                    {timeAgo?.format(new Date(item?.created || 0))}
+                  </p>
                 </div>
-                <p className='text-[#7AA822]'>3/5</p>
-                <button
-                  className={classNames(
-                    ' text-black flex px-5 py-3 text-sm ml-auto rounded-full',
-                    !project.completed ? 'bg-light-grey' : 'bg-primary'
-                  )}
-                >
-                  {project.complete ? 'completed' : 'In progress'}
-                </button>
+                <div className='my-7'>
+                  <p className='text-sm line-clamp-2 md:line-clamp-3 lg:line-clamp-4'>
+                    {item.description}
+                  </p>
+                </div>
+                <div className='flex pb-9 justify-between'>
+                  <div className='flex space-x-5 text-sm text-imbue-purple-dark'>
+                    <p>${item.required_funds}</p>
+                    <p>Fixed price</p>
+                  </div>
+                </div>
               </div>
-              <p className='text-imbue-purple-dark text-sm sm:text-lg'>
-                {project.name}
-              </p>
-              <p className='text-xs sm:text-sm'>
-                {timeAgo?.format(new Date(project?.created || 0))}
-              </p>
-            </div>
-            <div className='my-7'>
-              <p className='text-sm line-clamp-2 md:line-clamp-3 lg:line-clamp-4'>
-                {project.description}
-              </p>
-            </div>
-            <div className='flex pb-9 justify-between'>
-              <div className='flex space-x-5 text-sm text-imbue-purple-dark'>
-                <p>${project.required_funds}</p>
-                <p>Fixed price</p>
-              </div>
-            </div>
+              {index !== projects.length - 1 && <Divider />}
+            </>
+          )
+      )}
+      {value < projects.length && (
+        <div className='flex justify-center my-7 items-center '>
+          <div className='w-full flex justify-center py-6'>
+            <button
+              onClick={() => {
+                setValue((value) => value + 10);
+              }}
+              className='primary-btn in-dark w-button lg:w-1/3'
+              style={{ textAlign: 'center' }}
+            >
+              load more
+            </button>
           </div>
-          {index !== projects.length - 1 && <Divider />}
-        </>
-      ))}
+        </div>
+      )}
+      {value > projects.length && projects.length > 10 && (
+        <div className='flex justify-center my-7 items-center '>
+          <div className='w-full flex justify-center py-6'>
+            <button
+              onClick={() => {
+                setValue((value) => value - 10);
+              }}
+              className='primary-btn in-dark w-button lg:w-1/3'
+              style={{ textAlign: 'center' }}
+            >
+              show less
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

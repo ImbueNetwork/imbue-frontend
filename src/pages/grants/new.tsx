@@ -2,6 +2,8 @@ import { Alert, Dialog, IconButton } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import WalletIcon from '@svgs/wallet.svg';
 import { WalletAccount } from '@talismn/connect-wallets';
+// import ChainService from '@/redux/services/chainService';
+import Filter from 'bad-words';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -28,7 +30,6 @@ import { timeData } from '@/config/briefs-data';
 import { Currency, OffchainProjectState } from '@/model';
 import ChainService from '@/redux/services/chainService';
 import { RootState } from '@/redux/store/store';
-// import ChainService from '@/redux/services/chainService';
 
 interface MilestoneItem {
   name: string;
@@ -45,6 +46,7 @@ interface InputErrorType {
 
 const GrantApplication = (): JSX.Element => {
   const router = useRouter();
+  const filter = new Filter();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<any>();
@@ -191,9 +193,13 @@ const GrantApplication = (): JSX.Element => {
 
     try {
       // const user = await getCurrentUser();
+      if (filter.isProfane(title)) {
+        setError({ message: 'please remove bad words from the title' });
+        return;
+      }
       const grant = {
-        title,
-        description,
+        title: filter.clean(title),
+        description: filter.clean(description),
         duration_id: durationId, // TODO:
         required_funds: totalCost,
         currency_id: currencyId,
@@ -204,12 +210,16 @@ const GrantApplication = (): JSX.Element => {
         chain_project_id: projectId,
         milestones: milestones.map((milestone) => ({
           ...milestone,
+          name: filter.clean(milestone.name),
+          description: filter.clean(milestone.description),
           percentage_to_unlock: Math.floor(
             100 * ((milestone.amount ?? 0) / totalCostWithoutFee)
           ),
         })),
         approvers,
       };
+
+    
 
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);

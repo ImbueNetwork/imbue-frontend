@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import Filter from 'bad-words';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import passport from 'passport';
@@ -30,6 +31,8 @@ export const authenticate = (
 export default nextConnect()
   .use(passport.initialize())
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
+    const filter = new Filter({ placeHolder: ' ' });
+
     const user: Partial<models.User> | any = req.body as Partial<models.User>;
 
     const userAuth: Partial<models.User> | any = await authenticate(
@@ -84,6 +87,20 @@ export default nextConnect()
               }
             }
 
+            if (filter.isProfane(user?.display_name)) {
+              return res.status(400).json({
+                status: 'Failed',
+                message: 'Bad words are not allowed in display name',
+              });
+            }
+
+            if (filter.isProfane(user?.username)) {
+              return res.status(400).json({
+                status: 'Failed',
+                message: 'Bad words are not allowed in username name',
+              });
+            }
+
             const userData = {
               id: user?.id,
               display_name: user?.display_name,
@@ -93,8 +110,14 @@ export default nextConnect()
               profile_photo: user?.profile_photo,
               country: user?.country,
               region: user?.region,
-              about: user?.about,
-              website: user?.website,
+              about:
+                user?.about && user.about.trim().length
+                  ? filter.clean(user.about).trim()
+                  : '',
+              website:
+                user?.website && user.website.trim().length
+                  ? filter.clean(user.website).trim()
+                  : '',
               industry: user?.industry,
             };
 
