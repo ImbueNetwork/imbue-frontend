@@ -3,6 +3,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Divider, OutlinedInput, TextField, Tooltip } from '@mui/material';
 import { SignerResult } from '@polkadot/api/types';
 import { WalletAccount } from '@talismn/connect-wallets';
+import Filter from 'bad-words';
 import moment from 'moment';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -32,6 +33,7 @@ import styles from '@/styles/modules/freelancers.module.css';
 import { checkEnvironment, updateUser } from '../../utils';
 
 const Profile = ({ initUser, browsingUser }: any) => {
+  const filter = new Filter({ placeHolder: ' ' });
   const router = useRouter();
   // const slug = router.query.slug as string;
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
@@ -60,9 +62,34 @@ const Profile = ({ initUser, browsingUser }: any) => {
 
   const onSave = async (user: any) => {
     try {
-      if (user) {
+      if (filter.isProfane(user.display_name)) {
+        setError({ message: 'remove bad word from display name' });
+        return;
+      } else if (filter.isProfane(user.username)) {
+        setError({ message: 'remove bad word from username' });
+        return;
+      } else if (user) {
         setLoading(true);
-        const userResponse: any = await updateUser(user);
+
+        const filterdUser = {
+          ...user,
+          description:
+            user.description && user.description.trim().length
+              ? filter.clean(user.description).trim()
+              : '',
+          website:
+            user.website && user.website.trim().length
+              ? filter.clean(user.website).trim()
+              : '',
+          about:
+            user.about && user.about.trim().length
+              ? filter.clean(user.about).trim()
+              : '',
+        };
+
+        setUser(filterdUser);
+
+        const userResponse: any = await updateUser(filterdUser);
 
         if (userResponse.status === 'Successful') {
           setSuccess(true);
@@ -71,7 +98,8 @@ const Profile = ({ initUser, browsingUser }: any) => {
         }
       }
     } catch (error) {
-      setError({ message: error });
+      // setError({ message: error });
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -125,7 +153,10 @@ const Profile = ({ initUser, browsingUser }: any) => {
   };
 
   const handleChange = (e: any) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
+    setUser({
+      ...user,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const navigateToLink = (link: string) => {
