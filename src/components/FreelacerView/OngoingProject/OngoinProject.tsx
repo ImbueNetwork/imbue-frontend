@@ -43,7 +43,7 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
     <>
       {projects?.map(
         (item: any, index: number) =>
-          index < Math.min(value, projects.length) && (
+          index < Math.min(Math.max(value, 10), projects.length) && (
             <>
               <div
                 key={item.id}
@@ -112,7 +112,7 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
           <div className='w-full flex justify-center py-6'>
             <button
               onClick={() => {
-                setValue(10);
+                setValue((value) => value - 10);
               }}
               className='primary-btn in-dark w-button lg:w-1/3'
               style={{ textAlign: 'center' }}

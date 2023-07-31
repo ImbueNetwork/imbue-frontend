@@ -46,7 +46,7 @@ const BreifApplication: React.FC<BreifApplicationProps> = ({
     <div>
       {applications?.map(
         (item: any, index: number) =>
-          index < Math.min(applications.length, loadValue) && (
+          index < Math.min(applications.length, Math.max(loadValue, 10)) && (
             <>
               <div
                 key={item.id}
@@ -110,7 +110,7 @@ const BreifApplication: React.FC<BreifApplicationProps> = ({
           <div className='w-full flex justify-center py-6'>
             <button
               onClick={() => {
-                setValue(10);
+                setValue((value) => value - 10);
               }}
               className='primary-btn in-dark w-button lg:w-1/3'
               style={{ textAlign: 'center' }}

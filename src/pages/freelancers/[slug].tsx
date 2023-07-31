@@ -77,6 +77,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const [hideLinkedAccounts, setHideLinkedAccounts] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [projects, setProjects] = useState<Project[]>();
+  const [loadValue, setLoadValue] = useState(10);
 
   const memberSince = moment(freelancer?.created).format('MMMM YYYY');
 
@@ -971,41 +972,78 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
             </div>
             <hr className='separator' />
             <div>
-              {projects?.map((v, i) => (
-                <div
-                  key={i}
-                  className='px-8 lg:px-10 py-8 flex flex-col gap-3 border-b last:border-b-0 border-b-imbue-light-purple'
-                >
-                  <p className='text-xl text-imbue-purple-dark'>{v?.name}</p>
-                  <div className='flex gap-3 lg:gap-8 flex-wrap items-center justify-between'>
-                    <div className='flex'>
-                      {[...Array(4)].map((r, ri) => (
-                        <FaStar
-                          className='lg:h-[24px] lg:w-[24px]'
-                          key={ri}
-                          color={
-                            ri + 1 > work.ratings
-                              ? 'var(--theme-light-purple)'
-                              : 'var(--theme-primary)'
-                          }
-                        />
-                      ))}
+              {projects?.map(
+                (v, i) =>
+                  i < Math.min(Math.max(loadValue, 5), projects.length) && (
+                    <div
+                      key={i}
+                      className='px-8 lg:px-10 py-8 flex flex-col gap-3 border-b last:border-b-0 border-b-imbue-light-purple'
+                    >
+                      <p className='text-xl text-imbue-purple-dark'>
+                        {v?.name}
+                      </p>
+                      <div className='flex gap-3 lg:gap-8 flex-wrap items-center justify-between'>
+                        <div className='flex'>
+                          {[...Array(4)].map((r, ri) => (
+                            <FaStar
+                              className='lg:h-[24px] lg:w-[24px]'
+                              key={ri}
+                              color={
+                                ri + 1 > work.ratings
+                                  ? 'var(--theme-light-purple)'
+                                  : 'var(--theme-primary)'
+                              }
+                            />
+                          ))}
+                        </div>
+                        <p className='text-imbue-purple text-sm'>
+                          {moment(v?.created).format('Do MMM YYYY')}
+                        </p>
+                      </div>
+                      <p className='text-imbue-purple-dark'>
+                        {v?.description?.length > 500
+                          ? v?.description.substring(0, 500)
+                          : v?.description}
+                      </p>
+                      <div className='flex gap-1  text-imbue-purple'>
+                        <p className=''>{v?.required_funds}</p>
+                        <p className=''>{Currency[v?.currency_id]}</p>
+                      </div>
                     </div>
-                    <p className='text-imbue-purple text-sm'>
-                      {moment(v?.created).format('Do MMM YYYY')}
-                    </p>
-                  </div>
-                  <p className='text-imbue-purple-dark'>
-                    {v?.description?.length > 500
-                      ? v?.description.substring(0, 500)
-                      : v?.description}
-                  </p>
-                  <div className='flex gap-1  text-imbue-purple'>
-                    <p className=''>{v?.required_funds}</p>
-                    <p className=''>{Currency[v?.currency_id]}</p>
+                  )
+              )}
+              {projects && loadValue < projects?.length && (
+                <div className='flex justify-center my-7 items-center '>
+                  <div className='w-full flex justify-center py-6'>
+                    <button
+                      onClick={() => {
+                        setLoadValue((value) => value + 10);
+                      }}
+                      className='primary-btn in-dark w-button lg:w-1/3'
+                      style={{ textAlign: 'center' }}
+                    >
+                      show more
+                    </button>
                   </div>
                 </div>
-              ))}
+              )}
+              {projects &&
+                loadValue > projects?.length &&
+                projects.length > 10 && (
+                  <div className='flex justify-center my-7 items-center '>
+                    <div className='w-full flex justify-center py-6'>
+                      <button
+                        onClick={() => {
+                          setLoadValue((value) => value - 10);
+                        }}
+                        className='primary-btn in-dark w-button lg:w-1/3'
+                        style={{ textAlign: 'center' }}
+                      >
+                        show less
+                      </button>
+                    </div>
+                  </div>
+                )}
             </div>
           </div>
           <p className='text-primary mt-2 cursor-pointer underline w-fit ml-auto'>
