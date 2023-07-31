@@ -555,6 +555,7 @@ const Briefs = (): JSX.Element => {
               <div>
                 <div className='flex items-center'>
                   <input
+                    autoComplete='off'
                     id='search-input'
                     className='search-input px-[12px] !w-full  lg:!w-[20rem] !h-[2.875rem] !rounded-tr-[0px] !rounded-br-[0px]'
                     placeholder='Search'
@@ -667,7 +668,7 @@ const Briefs = (): JSX.Element => {
                           : item.description}
                       </div>
 
-                      <div className='brief-tags'>
+                      <div className='brief-tags !flex-wrap'>
                         {item.skills.map((skill: any, skillIndex: any) => (
                           <div className='tag-item' key={skillIndex}>
                             {skill.name}

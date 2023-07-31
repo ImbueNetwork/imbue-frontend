@@ -92,7 +92,7 @@ export const fetchProject = async (
   }
 };
 
-export const fetchUser = async (id: number) => {
+export const fetchUser = async (id: number | string) => {
   const resp = await fetch(`${config.apiBase}users/byid/${id}`, {
     headers: config.getAPIHeaders,
   });

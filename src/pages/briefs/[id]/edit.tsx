@@ -60,6 +60,8 @@ export const EditProposal = (): JSX.Element => {
   const [success, setSuccess] = useState<boolean>(false);
   const [suggestedSkills, setSuggestedSkills] = useState<string[]>([]);
 
+  const [inputError, setInputError] = useState<any>();
+
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
   const [skills, setSkills] = useState<string[]>([]);
@@ -148,6 +150,57 @@ export const EditProposal = (): JSX.Element => {
     return arr1.filter((str) => !arr2.includes(str.toLocaleLowerCase()));
   }
 
+  const validateInputLength = (
+    text: string,
+    min: number,
+    max: number
+  ): boolean => {
+    return text.length >= min && text.length <= max;
+  };
+
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = event.target;
+    switch (name) {
+      case 'headline':
+        if (validateInputLength(value, 10, 50)) {
+          setHeadline(value);
+          setInputError({ headline: '' });
+        } else {
+          setHeadline(value);
+          setInputError({
+            headline: 'Headline must be between 10 and 50 characters',
+          });
+        }
+        break;
+      case 'description':
+        if (validateInputLength(value, 50, 500)) {
+          setDescription(value);
+          setInputError('');
+        } else {
+          setInputError({
+            description: 'Description must be between 50 and 500 characters',
+          });
+          setDescription(value);
+        }
+        break;
+      case 'budget':
+        if (Number(value) < 10 || Number(value) > 1000000000) {
+          setInputError({
+            budget: 'Budget must be between $10 and $1,000,000,000',
+          });
+          setBudget(value);
+        } else {
+          setInputError('');
+          setBudget(value);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <div className='flex flex-row max-width-868px:block max-md:px-7'>
       <header
@@ -158,6 +211,12 @@ export const EditProposal = (): JSX.Element => {
       max-width-868px:max-w-[unset]
       md:w-[70%]
       md:mr-20 
+
+      bg-white 
+      lg:p-[2rem] 
+      rounded-[1.25rem]
+      flex
+      self-start
       '
       >
         <h1 className='lg:text-4xl text-[1.5rem] leading-[50px] !text-imbue-purple m-0 font-normal mx-0'>
@@ -177,8 +236,12 @@ export const EditProposal = (): JSX.Element => {
               style={{ paddingLeft: '24px', height: 'auto' }}
               type='text'
               value={headline || ''}
-              onChange={(e) => setHeadline(e.target.value)}
+              onChange={handleChange}
+              name='headline'
             />
+            <span className={!inputError?.headline ? 'hide' : 'error'}>
+              {inputError?.headline}
+            </span>
           </div>
 
           <h1 className='!text-[1.3rem] lg:!text-3xl m-0 font-normal !my-0 mx-0 !mb-3'>
@@ -230,25 +293,24 @@ export const EditProposal = (): JSX.Element => {
                 min='0'
                 max={1000000000}
                 value={budget || ''}
-                onChange={(e) => {
-                  if (
-                    Number(e.target.value) < 0 ||
-                    Number(e.target.value) > 1000000000
-                  ) {
-                    e.preventDefault();
-                  } else {
-                    setBudget(Number(e.target.value));
-                  }
-                }}
+                onChange={handleChange}
+                name='budget'
               />
               <div className={styles.budgetCurrencyContainer}>$</div>
             </div>
-            <div
-              className={`${styles.budgetDescription} !text-imbue-purple !mb-0 !mt-0`}
-            >
-              You will be able to set milestones which divide your project into
-              manageable phases.
-            </div>
+
+            {inputError?.budget ? (
+              <span className={!inputError?.budget ? 'hide' : 'error'}>
+                {inputError?.budget}
+              </span>
+            ) : (
+              <div
+                className={`${styles.budgetDescription} !text-imbue-purple !mb-0 !mt-0`}
+              >
+                You will be able to set milestones which divide your project
+                into manageable phases.
+              </div>
+            )}
           </div>
         </fieldset>
 
@@ -263,10 +325,11 @@ export const EditProposal = (): JSX.Element => {
               maxLength={5000}
               className='text-black bg-transparent'
               rows={10}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                setDescription(e.target.value)
-              }
+              onChange={handleChange}
             />
+            <span className={!inputError?.description ? 'hide' : 'error'}>
+              {inputError?.description}
+            </span>
           </div>
 
           <SpacedRow>
@@ -324,7 +387,7 @@ export const EditProposal = (): JSX.Element => {
         <fieldset>
           <div className='buttons-container mb-[2rem]'>
             <button
-              disabled={false}
+              disabled={loading || inputError}
               className='primary-btn in-dark w-button w-full !mr-0 hover:!bg-imbue-purple !text-[1rem] hover:!text-white h-[2.6rem]'
               onClick={() => handleSubmit()}
             >

@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
@@ -112,10 +113,12 @@ function Project() {
   const [error, setError] = useState<any>();
   const [balance, setBalance] = useState<any>(0);
   const [approversPreview, setApproverPreview] = useState<any>([]);
-  const [isApprover, setIsApprover] = useState<boolean>(false)
+  const [isApprover, setIsApprover] = useState<boolean>(false);
 
   const [projectType, setProjectType] = useState<"grant" | "brief" | null>(null)
   const canVote = isApprover || (projectType === "brief" && isProjectOwner)
+  const [expandPorjectDesc, setExpandProjectDesc] = useState<number>(500)
+
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -169,41 +172,40 @@ function Project() {
 
   const getProject = async () => {
     try {
-      const projectRes = await getProjectById(projectId);
+      const projectRes: Project = await getProjectById(projectId);
       // showing owner profile if the current user if the applicant freelancer
 
       let owner;
       let freelancerRes;
 
-      if (projectRes?.brief_id) {
-        setProjectType('brief')
+      if (projectRes?.brief_id && projectRes?.user_id) {
+        setProjectType('brief');
 
         const brief = await getBrief(projectRes.brief_id);
-        owner = brief?.user_id ? await utils.fetchUser(brief?.user_id) : null
+        owner = brief?.user_id ? await utils.fetchUser(brief?.user_id) : null;
         freelancerRes = await getFreelancerProfile(projectRes?.user_id);
 
         if (owner?.id == user?.id) {
-          setTargetUser(freelancerRes)
+          setTargetUser(freelancerRes);
+        } else {
+          setTargetUser(owner);
         }
-        else {
-          setTargetUser(owner)
-        }
-      }
-      else {
+      } else {
         setProjectType('grant')
+        if (!projectRes?.user_id) return
 
-        owner = await utils.fetchUser(projectRes?.user_id)
-        setTargetUser(owner)
+        owner = await utils.fetchUser(projectRes?.user_id);
+        setTargetUser(owner);
       }
 
-      setIsProjectOwner(owner?.id === user.id)
+      setIsProjectOwner(owner?.id === user.id);
       setProject(projectRes);
       // setting approver list
       const approversPreviewList = [...approversPreview];
 
       if (projectRes?.approvers?.length && approversPreviewList.length === 0) {
         projectRes?.approvers.map(async (approverAddress: any) => {
-          if (approverAddress === user?.web3_address) setIsApprover(true)
+          if (approverAddress === user?.web3_address) setIsApprover(true);
 
           const approver = await utils.fetchUserByUsernameOrAddress(
             approverAddress
@@ -256,14 +258,19 @@ function Project() {
       const imbueApi = await initImbueAPIInfo();
       // const userRes: User | any = await utils.getCurrentUser();
       const chainService = new ChainService(imbueApi, user);
-      await chainService.voteOnMilestone(
+      const result = await chainService.voteOnMilestone(
         account,
         onChainProject,
         milestoneKeyInView,
         vote
       );
-      setSuccess(true);
-      setSuccessTitle('Your vote was successfull');
+      if (!result.txError) {
+        setSuccess(true);
+        setSuccessTitle('Your vote was successfull');
+      }
+      else {
+        setError({ message: result.errorMessage })
+      }
     } catch (error) {
       setError({ message: 'Could not vote. Please try again later' });
     } finally {
@@ -372,7 +379,7 @@ function Project() {
   const renderVotingModal = (
     <Dialogue
       title='Want to appove milestone?'
-      closeDialouge={() => setShowVotingModal(false)}
+      // closeDialouge={() => setShowVotingModal(false)}
       actionList={
         <>
           <li className='button-container !bg-transparent !hover:bg-gray-950  !border !border-solid !border-white'>
@@ -481,20 +488,25 @@ function Project() {
             {milestone?.description}
           </p>
 
-          {(!isApplicant) && milestone.milestone_key == milestoneBeingVotedOn && (
-            <Tooltip followCursor title={!canVote && "Only approvers are allowed to vote on a milestone"}>
+          {!isApplicant && milestone.milestone_key == milestoneBeingVotedOn && (
+            <Tooltip
+              followCursor
+              title={
+                !canVote && 'Only approvers are allowed to vote on a milestone'
+              }
+            >
               <button
-                className={`primary-btn in-dark w-button ${!canVote && "!bg-gray-300 !text-gray-400"} font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
+                className={`primary-btn in-dark w-button ${!canVote && '!bg-gray-300 !text-gray-400'
+                  } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
                 data-testid='next-button'
                 onClick={() => canVote && vote()}
               >
                 Vote
               </button>
             </Tooltip>
-
           )}
 
-          {isApplicant &&
+          {(isApplicant || (projectType === 'grant' && isProjectOwner)) &&
             onChainProject?.projectState !==
             OnchainProjectState.OpenForVoting &&
             !milestone?.is_approved && (
@@ -509,7 +521,8 @@ function Project() {
 
           {isApplicant && milestone.is_approved && (
             <button
-              className={`primary-btn in-dark w-button ${!balance && "!bg-gray-300 !text-gray-400"} font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
+              className={`primary-btn in-dark w-button ${!balance && '!bg-gray-300 !text-gray-400'
+                } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
               data-testid='next-button'
               onClick={() => withdraw()}
               disabled={!balance}
@@ -547,6 +560,20 @@ function Project() {
        '
       >
         <div className='flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] max-lg:basis-[60%] mr-[5%]  max-lg:mr-0 relative'>
+          <Tooltip
+            title='Go back to previous page'
+            followCursor
+            leaveTouchDelay={10}
+            enterDelay={500}
+            className='cursor-pointer'
+          >
+            <div
+              onClick={() => router.back()}
+              className='border border-content rounded-full p-1 flex items-center justify-center self-start'
+            >
+              <ArrowBackIcon className='h-5 w-5' color='secondary' />
+            </div>
+          </Tooltip>
           <div className='flex flex-wrap gap-3 lg:gap-4 items-center'>
             <h3 className='text-[2rem] max-lg:text-[24px] leading-[1.5] font-normal m-0 p-0 text-imbue-purple'>
               {project?.name}
@@ -561,12 +588,29 @@ function Project() {
               </span>
             )}
           </div>
+
           <p className='text-sm lg:text-base text-content font-normal leading-[178.15%] lg:w-[80%]'>
-            Project Type : <span className='ml-1 capitalize'>{projectType}</span>
+            Project Type :{' '}
+            <span className='ml-1 capitalize'>{projectType}</span>
           </p>
 
-          <p className='text-base text-content font-normal leading-[178.15%] lg:w-[80%]'>
-            {project?.description}
+          <p className='text-base text-content font-normal leading-[178.15%] lg:w-[80%] whitespace-pre-wrap'>
+            {
+              project?.description?.length > expandPorjectDesc
+                ? project?.description?.substring(0, expandPorjectDesc) + " ..."
+                : project?.description
+            }
+            {
+              project?.description?.length > 500 && (
+                <span>
+                  {
+                    (project?.description?.length > expandPorjectDesc)
+                      ? <button onClick={() => setExpandProjectDesc((prev) => prev + 500)} className='mt-3 ml-2 w-fit text-sm hover:underline text-imbue-lemon'>Show more</button>
+                      : <button onClick={() => setExpandProjectDesc(500)} className='mt-3 ml-2 w-fit text-sm hover:underline text-imbue-lemon'>Show Less</button>
+                  }
+                </span>
+              )
+            }
           </p>
 
           <p className='text-sm text-content-primary leading-[1.5] m-0 p-0'>
@@ -574,17 +618,20 @@ function Project() {
           </p>
 
           <p className='text-imbue-purple text-[1.25rem] font-normal leading-[1.5] mt-[16px] p-0'>
-            {isProjectOwner
+            {isProjectOwner && projectType === 'brief'
               ? 'Freelancer hired'
               : 'Project Owner'}
           </p>
 
           <div className='flex flex-row items-center max-lg:flex-wrap'>
             <div
-              onClick={() => router.push(
-                isProjectOwner
-                  ? `/freelancers/${targetUser?.username}`
-                  : `/profile/${targetUser?.username}`)}
+              onClick={() =>
+                router.push(
+                  isProjectOwner
+                    ? `/freelancers/${targetUser?.username}`
+                    : `/profile/${targetUser?.username}`
+                )
+              }
               className='flex items-center'
             >
               <Image
@@ -685,6 +732,7 @@ function Project() {
             </>
           )}
         </div>
+
         <div className='flex flex-col gap-[30px] max-lg:mt-10 lg:w-56'>
           <div className='flex flex-col'>
             <div className='flex flex-row items-start gap-3'>
@@ -860,8 +908,8 @@ function Project() {
         <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => {
-              setSuccess(false)
-              window.location.reload()
+              setSuccess(false);
+              window.location.reload();
             }}
             className='primary-btn in-dark w-button w-full !m-0'
           >

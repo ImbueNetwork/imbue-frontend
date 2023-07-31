@@ -45,7 +45,7 @@ export const getAllFreelancers = async (
 };
 
 export async function getFreelancerProfile(
-  username: string
+  username: string | number
 ): Promise<Freelancer | undefined> {
   const resp = await fetch(
     checkEnvironment().concat(`${config.apiBase}freelancers/${username}`),

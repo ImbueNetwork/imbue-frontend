@@ -97,12 +97,10 @@ const BioInsights = ({
   return (
     <div
       className='brief-insights 
-      xl:py-[3rem]
-      xl:px-[3.88rem]
-      py-[1.5rem]
-      px-[1.5rem]
-      lg:py-[2rem]
-      lg:px-[1.88rem]
+      py-6
+      px-6
+      lg:py-10
+      lg:px-10
       mt-[2rem]
       lg:mt-0
       w-full
@@ -110,8 +108,8 @@ const BioInsights = ({
       relative
     '
     >
-      <div className='subsection max-width-750px:!my-0'>
-        <div className='header'>
+      <div className=''>
+        <div className=''>
           <h3 className='text-imbue-purple-dark !font-normal'>
             Activities on this job
           </h3>
@@ -133,7 +131,8 @@ const BioInsights = ({
                 title={hint}
                 arrow
                 placement='bottom'
-                leaveTouchDelay={10}
+                leaveTouchDelay={5}
+                followCursor
               >
                 <button
                   className='primary-btn 
@@ -149,7 +148,6 @@ const BioInsights = ({
                   onClick={() =>
                     canSubmitProposal && !isOwnerOfBrief && redirectToApply()
                   }
-                  disabled={!canSubmitProposal}
                 >
                   Submit a Proposal <FaRegShareSquare />
                 </button>

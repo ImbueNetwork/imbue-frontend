@@ -2,7 +2,7 @@
 import { Autocomplete, TextField } from '@mui/material';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import * as utils from '@/utils';
 
@@ -17,9 +17,10 @@ import {
   suggestedLanguages,
   suggestedServices,
 } from '@/config/freelancer-data';
+import { fetchUserRedux } from '@/redux/reducers/userReducers';
 import { searchSkills } from '@/redux/services/briefService';
 import { createFreelancingProfile } from '@/redux/services/freelancerService';
-import { RootState } from '@/redux/store/store';
+import { AppDispatch, RootState } from '@/redux/store/store';
 
 import { TagsInput } from '../../components/TagsInput';
 import styles from '../../styles/modules/Freelancers/new-Freelancer.module.css';
@@ -34,7 +35,7 @@ const Freelancer = (): JSX.Element => {
   const [freelancingBefore, setFreelancingBefore] = useState<any>();
   const [goal, setGoal] = useState<any>();
   // const [resume, setResume] = useState<any>();
-  const [title, setTitle] = useState<any>();
+  const [title, setTitle] = useState<string>("");
   const [education, setEducation] = useState<string>('');
   const [languages, setLanguages] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
@@ -45,6 +46,7 @@ const Freelancer = (): JSX.Element => {
   const [suggestedFreelancingSkills, setSuggestedSkills] = useState<string[]>(
     []
   );
+  const dispatch = useDispatch<AppDispatch>()
 
   useEffect(() => {
     fetchSuggestedSkills();
@@ -89,9 +91,8 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-xp-${index}`}
-            className={`${styles.freelanceXpItem} ${
-              freelancingBefore === value ? styles.active : ''
-            }`}
+            className={`${styles.freelanceXpItem} ${freelancingBefore === value ? styles.active : ''
+              }`}
             onClick={() => setFreelancingBefore(value)}
           >
             {label}
@@ -113,9 +114,8 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-goal-${index}`}
-            className={`${styles.freelanceXpItem} ${
-              goal === value ? styles.active : ''
-            }`}
+            className={`${styles.freelanceXpItem} ${goal === value ? styles.active : ''
+              }`}
             onClick={() => setGoal(value)}
           >
             {label}
@@ -158,6 +158,7 @@ const Freelancer = (): JSX.Element => {
       </div>
       <div className={styles.namePanelInputWrapper}>
         <input
+          maxLength={50}
           className={`${styles.fieldInput} placeholder:text-imbue-light-purple`}
           placeholder='Enter your title'
           data-testid='title'
@@ -165,6 +166,7 @@ const Freelancer = (): JSX.Element => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
+        <p className='mt-2 text-content-primary text-sm text-right'>{title?.length}/50</p>
       </div>
     </div>
   );
@@ -188,6 +190,7 @@ const Freelancer = (): JSX.Element => {
       </div>
       <div className={styles.namePanelInputWrapper}>
         <input
+          maxLength={100}
           className={`${styles.fieldInput} placeholder:text-imbue-light-purple`}
           placeholder='Enter your education'
           name='education'
@@ -195,6 +198,7 @@ const Freelancer = (): JSX.Element => {
           value={education}
           onChange={(e) => setEducation(e.target.value)}
         />
+        <p className='mt-2 text-content-primary text-sm text-right'>{education?.length}/100</p>
       </div>
     </div>
   );
@@ -271,6 +275,7 @@ const Freelancer = (): JSX.Element => {
           value={bio}
           onChange={(e) => setBio(e.target.value)}
         />
+        <p className='mt-2 text-content-primary text-sm text-right'>{bio?.length}/5000</p>
       </div>
     </div>
   );
@@ -375,6 +380,7 @@ const Freelancer = (): JSX.Element => {
       });
 
       if (response.status === 201) {
+        dispatch(fetchUserRedux())
         setStep(step + 1);
       } else {
         setError({

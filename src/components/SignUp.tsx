@@ -71,15 +71,54 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
     return /\S+@\S+\.\S+/.test(val);
   };
 
-  const handleChange = (event: any) => {
-    if (!isValidEmail(event.target.value)) {
-      setError('Email is invalid');
-    } else {
-      setError(null);
-    }
-
-    setEmail(event.target.value);
+  const validateInputLength = (
+    text: string,
+    min: number,
+    max: number
+  ): boolean => {
+    return text.length >= min && text.length <= max;
   };
+
+  const validatePassword = (passwordString: string): boolean => {
+    const passwordRegex = /^(?=.*[A-Za-z0-9])(?=.*[@#£&?]).{6,15}$/;
+    return passwordRegex.test(passwordString);
+  };
+
+  const handleChange = (event: any) => {
+    const { name, value } = event.target;
+    switch (name) {
+      case 'email':
+        if (!isValidEmail(value)) {
+          setError('Email is invalid');
+        } else {
+          setEmail(value);
+          setError(null);
+        }
+        break;
+      case 'user':
+        if (!validateInputLength(value, 5, 30)) {
+          setError('Username must be between 5 and 30 characters');
+        } else {
+          setUser(value);
+          setError(null);
+        }
+        break;
+      case 'password':
+        setPassword(value);
+        break;
+      case 'matchPassword':
+        if (value !== password) {
+          setError('Passwords do not match');
+        } else {
+          setMatchPassword(value);
+          setError(null);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
   useEffect(() => {
     if (password !== matchPassword) {
       setError('Passwords do not match');
@@ -116,6 +155,13 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
       return;
     }
 
+    if (!validatePassword(password)) {
+      setError(
+        'Password must be between 6 and 15 characters and contain at least one number and one special character'
+      );
+      return;
+    }
+
     setError(null);
   }, [matchPassword, password, user, email]);
 
@@ -134,9 +180,10 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
 
         <input
           placeholder='Enter your Username'
-          onChange={(e: any) => setUser(e.target.value)}
+          onChange={handleChange}
           required
           className='outlinedInput'
+          name='user'
         />
       </div>
 
@@ -147,11 +194,12 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
 
         <input
           placeholder='Enter your Email'
-          onChange={(e: any) => handleChange(e)}
+          onChange={handleChange}
           className='outlinedInput'
           required
           onError={(err) => console.log(err)}
           type='email'
+          name='email'
         />
       </div>
 
@@ -162,10 +210,11 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
 
         <input
           placeholder='Enter your Password'
-          onChange={(e: any) => setPassword(e.target.value)}
+          onChange={handleChange}
           className='outlinedInput'
           required
           type='password'
+          name='password'
         />
         <PasswordStrengthBar password={password} />
       </div>
@@ -184,8 +233,8 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
         />
       </div>
 
-      <div className='flex flex-wrap flex-row justify-center'>
-        <span className={!error ? 'hide' : 'error'}>{error}</span>
+      <div className='flex flex-wrap flex-row justify-center break-words w-fit px-4'>
+        <span className={`${!error ? 'hide' : 'error'} w-fit`}>{error}</span>
       </div>
       <div className='flex justify-center mt-2 w-full cursor-pointer'>
         <button

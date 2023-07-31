@@ -7,6 +7,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 
+import {
+  handleApplicationInput,
+  validateApplicationInput,
+} from '@/utils/helper';
+
 import AccountChoice from '@/components/AccountChoice';
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
 import ErrorScreen from '@/components/ErrorScreen';
@@ -20,17 +25,20 @@ import { getBrief } from '@/redux/services/briefService';
 import { getFreelancerBrief } from '@/redux/services/briefService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { selectAccount } from '@/redux/services/polkadotService';
+import { createProject } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 interface MilestoneItem {
   name: string;
   amount: number | undefined;
   description: string;
-  error?: {
-    name?: string;
-    description?: string;
-    amount?: string;
-  };
+}
+
+interface InputErrorType {
+  title?: string;
+  description?: string;
+  approvers?: string;
+  milestones: Array<{ name?: string; amount?: string; description?: string }>;
 }
 
 export const SubmitProposal = (): JSX.Element => {
@@ -48,6 +56,12 @@ export const SubmitProposal = (): JSX.Element => {
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [inputErrors, setInputErrors] = useState<InputErrorType>({
+    title: '',
+    description: '',
+    approvers: '',
+    milestones: [],
+  });
 
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
@@ -55,6 +69,9 @@ export const SubmitProposal = (): JSX.Element => {
   const [applicationId, setapplicationId] = useState();
   const [error, setError] = useState<any>();
   const [open, setOpen] = useState(false);
+  const [enteredInvalid, setEnteredInvalid] = useState<boolean>(false);
+  // eslint-disable-next-line no-unused-vars, unused-imports/no-unused-vars
+  const [inputError, setInputError] = useState<any>([]);
 
   useEffect(() => {
     setOpen(applicationId ? true : false);
@@ -105,7 +122,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   const milestonesRef = useRef<any>([]);
   const [milestones, setMilestones] = useState<MilestoneItem[]>([
-    { name: '', amount: undefined, description: '', error: {} },
+    { name: '', amount: undefined, description: '' },
   ]);
 
   const durationOptions = timeData.sort((a, b) =>
@@ -122,7 +139,7 @@ export const SubmitProposal = (): JSX.Element => {
   const onAddMilestone = () => {
     setMilestones([
       ...milestones,
-      { name: '', amount: undefined, description: '', error: {} },
+      { name: '', amount: undefined, description: '' },
     ]);
   };
 
@@ -157,15 +174,14 @@ export const SubmitProposal = (): JSX.Element => {
     }
   }
 
-  const allInputsValid = () => {
+  const allInputsValid = (): { hasValue: boolean; firstErrorIndex: number } => {
     let hasValue = true;
     let firstErrorIndex = -1;
-    const newMilestones = [...milestones];
+    const newMilestones: any = [];
     const blockUnicodeRegex = /^[\x20-\x7E]*$/;
 
     for (let i = 0; i < milestones.length; i++) {
       const { amount, name, description } = milestones[i];
-      newMilestones[i].error = {};
 
       if (
         name === undefined ||
@@ -173,17 +189,24 @@ export const SubmitProposal = (): JSX.Element => {
         name.length === 0 ||
         !blockUnicodeRegex.test(name)
       ) {
-        newMilestones[i].error = {
-          ...newMilestones[i].error,
+        newMilestones[i] = {
+          ...newMilestones[i],
           name: 'A valid name is required',
+        };
+        hasValue = false;
+        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
+      } else if (name.length < 10) {
+        newMilestones[i] = {
+          ...newMilestones[i],
+          name: 'Milestone title should be between 10 - 50 characters',
         };
         hasValue = false;
         firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
       }
 
       if (amount === undefined || amount === null || amount === 0) {
-        newMilestones[i].error = {
-          ...newMilestones[i].error,
+        newMilestones[i] = {
+          ...newMilestones[i],
           amount: 'A valid amount is required',
         };
         hasValue = false;
@@ -195,37 +218,59 @@ export const SubmitProposal = (): JSX.Element => {
         description === null ||
         description.length === 0
       ) {
-        newMilestones[i].error = {
-          ...newMilestones[i].error,
+        newMilestones[i] = {
+          ...newMilestones[i],
           description: 'A valid description is required.',
+        };
+        hasValue = false;
+        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
+      } else if (description.length < 50) {
+        newMilestones[i] = {
+          ...newMilestones[i],
+          description:
+            'Milestone description should be between 100 - 500 characters.',
         };
         hasValue = false;
         firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
       }
     }
 
-    // if(totalCost > )
+    setInputError(newMilestones);
 
-    setMilestones(newMilestones);
+    return { hasValue, firstErrorIndex };
+  };
 
-    if (firstErrorIndex !== -1)
+  useEffect(() => {
+    enteredInvalid && allInputsValid();
+  }, [milestones]);
+
+  async function insertProject() {
+    const { isValid, firstErrorIndex } = validateApplicationInput(
+      'brief',
+      inputErrors,
+      setInputErrors,
+      milestones,
+      brief?.headline,
+      brief?.description,
+      []
+    );
+
+    if (!isValid) {
       milestonesRef.current[firstErrorIndex]?.scrollIntoView({
         behavior: 'auto',
         block: 'center',
         inline: 'center',
       });
-
-    return hasValue;
-  };
-
-  async function insertProject() {
-    if (!allInputsValid()) {
+      setEnteredInvalid(true);
       return setError({
         message: 'Please fill all the required fields first',
       });
     }
     if (totalPercent !== 100)
       return setError({ message: 'Total percentage must be 100%' });
+
+    if (totalCostWithoutFee > 100000000)
+      return setError({ message: 'Total cost must be less than 100,000,000' });
 
     setLoading(true);
 
@@ -262,7 +307,7 @@ export const SubmitProposal = (): JSX.Element => {
         const applicationId = (await resp.json()).id;
         applicationId && setapplicationId(applicationId);
       } else {
-        setError({ message: 'Failed to submit the proposal' });
+        setError({ message: resp.message });
       }
     } catch (error) {
       setError({ message: error });
@@ -277,6 +322,22 @@ export const SubmitProposal = (): JSX.Element => {
     );
     return sum + percent;
   }, 0);
+
+  const handleMilestoneChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    milestoneIndex: number | undefined = undefined
+  ) => {
+    const { milestonesRes, errors } = handleApplicationInput(
+      event,
+      milestoneIndex,
+      inputErrors,
+      milestones,
+      brief?.headline,
+      brief?.description
+    );
+    setMilestones(milestonesRes);
+    setInputErrors(errors);
+  };
 
   // const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
 
@@ -307,7 +368,7 @@ export const SubmitProposal = (): JSX.Element => {
         <hr className='h-[1px] bg-[rgba(3, 17, 106, 0.12)] w-full mt-4' />
 
         <div className='milestone-list !gap-0'>
-          {milestones.map(({ name, amount, description, error }, index) => {
+          {milestones.map(({ name, amount, description }, index) => {
             const percent = Number(
               ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
             );
@@ -337,26 +398,38 @@ export const SubmitProposal = (): JSX.Element => {
 
                     <input
                       type='text'
+                      maxLength={50}
                       data-testid={`milestone-title-${index}`}
                       className='input-budget text-base rounded-md py-3 px-5 text-imbue-purple text-left placeholder:text-imbue-light-purple mb-1'
                       placeholder='Add milestone name here'
                       value={name || ''}
-                      onChange={(e) =>
-                        setMilestones([
-                          ...milestones.slice(0, index),
-                          {
-                            ...milestones[index],
-                            name: e.target.value,
-                          },
-                          ...milestones.slice(index + 1),
-                        ])
+                      name='milestoneTitle'
+                      onChange={
+                        (e) => handleMilestoneChange(e, index)
+                        // setMilestones([
+                        //   ...milestones.slice(0, index),
+                        //   {
+                        //     ...milestones[index],
+                        //     name: e.target.value,
+                        //   },
+                        //   ...milestones.slice(index + 1),
+                        // ])
                       }
                     />
                     <div className='flex items-center justify-between mb-4'>
+                      {/* <p className='text-sm text-imbue-coral'>{enteredInvalid && inputError[index]?.name}</p> */}
+                      <p
+                        className={`text-xs ${
+                          enteredInvalid
+                            ? 'text-imbue-coral'
+                            : 'text-imbue-light-purple-two'
+                        }`}
+                      >
+                        {inputErrors?.milestones[index]?.name || ''}
+                      </p>
                       <p className='text-sm text-content my-2'>
                         {name?.length}/50
                       </p>
-                      <p className='text-sm text-imbue-coral'>{error?.name}</p>
                     </div>
 
                     <h3 className='mb-2 lg:mb-5 text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
@@ -368,23 +441,21 @@ export const SubmitProposal = (): JSX.Element => {
                       className='input-description text-base placeholder:text-imbue-light-purple'
                       data-testid={`milestone-description-${index}`}
                       value={description}
-                      onChange={(e) =>
-                        setMilestones([
-                          ...milestones.slice(0, index),
-                          {
-                            ...milestones[index],
-                            description: e.target.value,
-                          },
-                          ...milestones.slice(index + 1),
-                        ])
-                      }
+                      name='milestoneDescription'
+                      onChange={(e) => handleMilestoneChange(e, index)}
                     />
                     <div className='flex items-center justify-between'>
+                      <p
+                        className={`text-xs ${
+                          enteredInvalid
+                            ? 'text-imbue-coral'
+                            : 'text-imbue-light-purple-two'
+                        }`}
+                      >
+                        {inputErrors?.milestones[index]?.description || ''}
+                      </p>
                       <p className='text-sm text-content my-2'>
                         {description?.length}/500
-                      </p>
-                      <p className='text-sm text-imbue-coral'>
-                        {error?.description}
                       </p>
                     </div>
                   </div>
@@ -406,22 +477,20 @@ export const SubmitProposal = (): JSX.Element => {
                         placeholder='Add an amount'
                         className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
                         value={amount || ''}
-                        onChange={(e) => {
-                          if (Number(e.target.value) >= 0)
-                            setMilestones([
-                              ...milestones.slice(0, index),
-                              {
-                                ...milestones[index],
-                                amount: Number(e.target.value),
-                              },
-                              ...milestones.slice(index + 1),
-                            ]);
-                        }}
+                        onChange={(e) => handleMilestoneChange(e, index)}
+                        name='milestoneAmount'
                       />
                     </div>
-                    <p className='text-sm text-imbue-coral my-2 text-right w-full'>
-                      {error?.amount}
+                    <p
+                      className={`text-xs ${
+                        enteredInvalid
+                          ? 'text-imbue-coral'
+                          : 'text-imbue-light-purple-two'
+                      } mt-2`}
+                    >
+                      {inputErrors?.milestones[index]?.amount || ''}
                     </p>
+
                     {totalCostWithoutFee !== 0 && (
                       <div className='flex flex-col items-end mt-3 gap-2 w-full'>
                         <div className='progress-value text-base !text-imbue-purple-dark'>

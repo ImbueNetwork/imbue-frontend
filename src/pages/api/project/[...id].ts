@@ -36,18 +36,18 @@ export default nextConnect()
   .use(passport.initialize())
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
     const { id } = req.query;
-    const projectId = id ? id[0] : "";
-    const briefId = id ? id[1] : "";
-    
-    if(!projectId) return res.status(404).end();
+    const projectId = id ? id[0] : '';
+    const briefId = id ? id[1] : '';
+
+    if (!projectId) return res.status(404).end();
 
     db.transaction(async (tx) => {
       try {
-
         let project;
 
-        if(briefId) project = await models.fetchBriefProject(projectId, briefId)(tx);
-        else project = await models.fetchProjectById(projectId)(tx)
+        if (briefId)
+          project = await models.fetchBriefProject(projectId, briefId)(tx);
+        else project = await models.fetchProjectById(projectId)(tx);
 
         if (!project) {
           return res.status(404).end();
@@ -76,7 +76,7 @@ export default nextConnect()
     const projectId = query?.id ? query.id[0] : null;
     // const brief_id: any = query.brief_id as string[];
 
-    if(projectId === null ) return res.status(404).end();
+    if (projectId === null) return res.status(404).end();
 
     const userAuth: Partial<models.User> | any = await authenticate(
       'jwt',
@@ -102,7 +102,7 @@ export default nextConnect()
       escrow_address,
       duration_id,
     } = body;
-    
+
     db.transaction(async (tx) => {
       try {
         // ensure the project exists first
@@ -147,7 +147,7 @@ export default nextConnect()
 
         return res.status(200).send(pkg);
       } catch (cause) {
-        new Error(`Failed to update project.`, { cause: cause as Error });
+        return res.status(401).json({error : cause});
       }
     });
   });

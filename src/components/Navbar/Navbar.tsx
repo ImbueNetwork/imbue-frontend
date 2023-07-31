@@ -40,7 +40,7 @@ function Navbar() {
   const open = Boolean(anchorEl);
   const [openMenu, setOpenMenu] = useState(false);
 
-  const user = useSelector((state: RootState) => state.userState.user);
+  const { user, loading: loadingUser } = useSelector((state: RootState) => state.userState);
   const dispatch = useDispatch<AppDispatch>();
 
   const [expanded, setExpanded] = useState(false);
@@ -120,8 +120,8 @@ function Navbar() {
             <div className='relative items-center z-0 hidden lg:flex'>
               <div
                 className={`${expanded
-                    ? 'translate-x-0 opacity-100 duration-700'
-                    : '-translate-x-full opacity-0 duration-1000'
+                  ? 'translate-x-0 opacity-100 duration-700'
+                  : '-translate-x-full opacity-0 duration-1000'
                   } flex items-center ml-1 transition-all`}
               >
                 <Link
@@ -245,7 +245,7 @@ function Navbar() {
               )}
             </Tooltip>
 
-            {!user.username && (
+            {!loadingUser && !user.username && (
               <button
                 className='mx-1 text-xs lg:text-sm bg-theme-grey-dark hover:bg-primary hover:text-black transition-all px-6 py-2 rounded-full hidden lg:inline-block'
                 onClick={() => setLoginModal(true)}

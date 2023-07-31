@@ -93,25 +93,45 @@ const Join = (): JSX.Element => {
     }
   };
 
-  // const validateInputLength = (
-  //   text: string,
-  //   min: number,
-  //   max: number
-  // ): boolean => {
-  //   return text.length >= 10 && text.length <= 30;
-  // };
+  const validateInputLength = (
+    text: string,
+    min: number,
+    max: number
+  ): boolean => {
+    return text.length >= min && text.length <= max;
+  };
+
+  const validatePassword = (password: string): boolean => {
+    const passwordRegex = /^(?=.*[A-Za-z0-9])(?=.*[@#£&?]).{6,15}$/;
+    return passwordRegex.test(password);
+  };
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     switch (name) {
       case 'user':
-        setUser(value);
+        if (validateInputLength(value, 5, 30)) {
+          setUser(value);
+          setError('');
+        } else {
+          setError('Username must be between 5 and 30 characters');
+          setUser(value);
+        }
         break;
       case 'email':
         setEmail(value);
+        setError('');
         break;
       case 'password':
-        setPassword(value);
+        if (validatePassword(value)) {
+          setPassword(value);
+          setError('');
+        } else {
+          setError(
+            'Password must be between 6 and 15 characters and contain at least one special character'
+          );
+          setPassword(value);
+        }
         break;
       case 'matchPassword':
         setMatchPassword(value);
@@ -207,7 +227,7 @@ const Join = (): JSX.Element => {
               <div className='flex justify-center mt-2 w-full'>
                 <input
                   type='submit'
-                  disabled={password != matchPassword}
+                  disabled={password != matchPassword || error}
                   className='primary-btn in-dark confirm w-full !text-center'
                   id='create-account'
                   value={'Sign Up'}
