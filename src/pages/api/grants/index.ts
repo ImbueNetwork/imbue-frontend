@@ -1,3 +1,4 @@
+import Filter from 'bad-words';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import passport from 'passport';
@@ -58,12 +59,23 @@ export default nextConnect()
   })
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
     const grant: Grant = req.body as Grant;
-
+    const filter = new Filter();
     const userAuth: Partial<User> | any = await authenticate('jwt', req, res);
     verifyUserIdFromJwt(req, res, userAuth.id);
     await db.transaction(async (tx: any) => {
       try {
-        const grant_id = await insertGrant(grant)(tx);
+        const filterdGrants = {
+          ...grant,
+          title: filter.clean(grant.title),
+          description: filter.clean(grant.description),
+          milestones: grant.milestones.map((milestone) => ({
+            ...milestone,
+            name: filter.clean(milestone.name),
+            description: filter.clean(milestone.description),
+          })),
+        };
+
+        const grant_id = await insertGrant(filterdGrants)(tx);
         res.status(200).json({ status: 'Success', grant_id });
       } catch (e) {
         throw new Error('Failed to insert a new grant.', { cause: e as Error });
