@@ -25,7 +25,7 @@ import { getBrief } from '@/redux/services/briefService';
 import { getFreelancerBrief } from '@/redux/services/briefService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { selectAccount } from '@/redux/services/polkadotService';
-import { createProject } from '@/redux/services/projectServices';
+//import { createProject } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 interface MilestoneItem {

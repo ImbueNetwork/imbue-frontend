@@ -76,7 +76,7 @@ const Dashboard = (): JSX.Element => {
         setClient(await getStreamChat());
         _setMyApplications(await getFreelancerApplications(user?.id));
       } catch (error) {
-        setError({message: error});
+        setError({ message: error });
       } finally {
         setLoadingStreamChat(false);
       }
@@ -140,7 +140,10 @@ const Dashboard = (): JSX.Element => {
         <DashboardChatBox client={client} filters={filters} />
       )}
       {selectedOption === 3 && (
-        <MyFreelancerApplications myApplications={myApplications} />
+        <MyFreelancerApplications
+          user_id={user.id}
+          myApplications={myApplications}
+        />
       )}
 
       {user && showMessageBox && (

@@ -8,6 +8,7 @@ TimeAgo.addLocale(en);
 
 type FreelancerApplicationsType = {
   myApplications: any;
+  user_id: number;
 };
 
 const MyFreelancerApplications = ({

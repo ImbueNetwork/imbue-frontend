@@ -133,3 +133,28 @@ export const getFreelancerApplications = async (userId: number) => {
     );
   }
 };
+
+export const getOnGoingProjects = async (
+  userId: number,
+  skip: number,
+  limit: number
+) => {
+  const resp = await fetch(
+    checkEnvironment().concat(
+      `${config.apiBase}freelancers/${userId}/ongoingprojects`
+    ),
+    {
+      headers: config.postAPIHeaders,
+      method: 'post',
+      body: JSON.stringify({ skip, limit }),
+    }
+  );
+
+  if (resp.ok) {
+    return (await resp.json()) as Array<Project>;
+  } else {
+    throw new Error(
+      'Failed to get all freelancer applications. status:' + resp.status
+    );
+  }
+};
