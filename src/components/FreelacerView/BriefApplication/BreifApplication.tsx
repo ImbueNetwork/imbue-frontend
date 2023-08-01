@@ -14,7 +14,9 @@ const timeAgo = new TimeAgo('en-US');
 const BreifApplication: React.FC<BreifApplicationProps> = ({
   applications,
 }) => {
-  const [loadValue, setValue] = useState(10);
+  //// limit of loading application
+  const loadBrefApplicationValue = 10;
+  const [loadValue, setValue] = useState(loadBrefApplicationValue);
   const redirectToApplication = (application: Project) => {
     router.push(
       `/briefs/${application.brief_id}/applications/${application.id}/`
@@ -44,7 +46,11 @@ const BreifApplication: React.FC<BreifApplicationProps> = ({
     <div>
       {applications?.map(
         (item: any, index: number) =>
-          index < Math.min(applications.length, Math.max(loadValue, 10)) && (
+          index <
+            Math.min(
+              applications.length,
+              Math.max(loadValue, loadBrefApplicationValue)
+            ) && (
             <>
               <div
                 key={item.id}
@@ -84,7 +90,7 @@ const BreifApplication: React.FC<BreifApplicationProps> = ({
             <div className='w-full flex justify-center py-6'>
               <button
                 onClick={() => {
-                  setValue((value) => value + 10);
+                  setValue((value) => value + loadBrefApplicationValue);
                 }}
                 className='primary-btn in-dark w-button lg:w-1/3'
                 style={{ textAlign: 'center' }}
@@ -94,21 +100,22 @@ const BreifApplication: React.FC<BreifApplicationProps> = ({
             </div>
           </div>
         )}
-        {loadValue > 10 && applications.length > 10 && (
-          <div className='flex w-full justify-center my-7 items-center '>
-            <div className='w-full flex justify-center py-6'>
-              <button
-                onClick={() => {
-                  setValue((value) => value - 10);
-                }}
-                className='primary-btn in-dark w-button lg:w-1/3'
-                style={{ textAlign: 'center' }}
-              >
-                show less
-              </button>
+        {loadValue > loadBrefApplicationValue &&
+          applications.length > loadBrefApplicationValue && (
+            <div className='flex w-full justify-center my-7 items-center '>
+              <div className='w-full flex justify-center py-6'>
+                <button
+                  onClick={() => {
+                    setValue((value) => value - loadBrefApplicationValue);
+                  }}
+                  className='primary-btn in-dark w-button lg:w-1/3'
+                  style={{ textAlign: 'center' }}
+                >
+                  show less
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
     </div>
   );
