@@ -1,3 +1,4 @@
+import Filter from 'bad-words';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import passport from 'passport';
@@ -72,6 +73,7 @@ export default nextConnect()
     });
   })
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
+    const filter = new Filter();
     const { query, body } = req;
     const projectId = query?.id ? query.id[0] : null;
     // const brief_id: any = query.brief_id as string[];
@@ -140,14 +142,27 @@ export default nextConnect()
         // drop then recreate
         await models.deleteMilestones(projectId)(tx);
 
+        //filtering milestones in back-end
+
+        const filterdMileStone = milestones.map((item: any) => {
+          return {
+            ...item,
+            name: filter.clean(item.name),
+            description: filter.clean(item.description),
+          };
+        });
+
         const pkg: ProjectPkg = {
           ...project,
-          milestones: await models.insertMilestones(milestones, project.id)(tx),
+          milestones: await models.insertMilestones(
+            filterdMileStone,
+            project.id
+          )(tx),
         };
 
         return res.status(200).send(pkg);
       } catch (cause) {
-        return res.status(401).json({error : cause});
+        return res.status(401).json({ error: cause });
       }
     });
   });

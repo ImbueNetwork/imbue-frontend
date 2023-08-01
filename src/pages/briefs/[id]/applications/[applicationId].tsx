@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { Backdrop, CircularProgress } from '@mui/material';
+import Filter from 'bad-words';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import { FiEdit, FiPlusCircle } from 'react-icons/fi';
@@ -63,6 +64,7 @@ export type ApplicationPreviewProps = {
 };
 
 const ApplicationPreview = (): JSX.Element => {
+  const filter = new Filter();
   const [brief, setBrief] = useState<Brief | any>();
   const { user } = useSelector((state: RootState) => state.userState);
   const [application, setApplication] = useState<Project | any>();
@@ -351,9 +353,9 @@ const ApplicationPreview = (): JSX.Element => {
           .filter((m) => m.amount !== undefined)
           .map((m) => {
             return {
-              name: m.name,
+              name: filter.clean(m.name),
               amount: m.amount,
-              description: m.description,
+              description: filter.clean(m.description),
               percentage_to_unlock: (
                 ((m.amount ?? 0) / totalCostWithoutFee) *
                 100
@@ -368,6 +370,20 @@ const ApplicationPreview = (): JSX.Element => {
       });
 
       if (resp.id) {
+        const milStone = milestones
+          .filter((m) => m.amount !== undefined)
+          .map((m) => {
+            return {
+              name: filter.clean(m.name),
+              amount: m.amount,
+              description: filter.clean(m.description),
+              percentage_to_unlock: (
+                ((m.amount ?? 0) / totalCostWithoutFee) *
+                100
+              ).toFixed(0),
+            };
+          });
+        setMilestones(milStone);
         setSuccess(true);
         setIsEditingBio(false);
       } else {
