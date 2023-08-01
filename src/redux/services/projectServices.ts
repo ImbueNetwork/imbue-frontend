@@ -12,7 +12,7 @@ export const createProject = async (project: any) => {
       return await resp.json();
     } else {
       const data = await resp.json();
-      console.error(data);
+      console.log(data);
 
       return {
         status: resp.status,

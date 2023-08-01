@@ -145,8 +145,8 @@ export default nextConnect()
         )(tx);
 
         const brief_id = await models.updateBrief(
-          brief.headline,
-          brief.description,
+          filter.clean(brief.headline),
+          filter.clean(brief.description),
           brief.scope_id,
           brief.experience_id,
           brief.duration_id,

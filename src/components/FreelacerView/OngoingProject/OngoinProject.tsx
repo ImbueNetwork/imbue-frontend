@@ -107,7 +107,7 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
           </div>
         </div>
       )}
-      {value > projects.length && projects.length > 10 && (
+      {value > 10 && projects.length > 10 && (
         <div className='flex justify-center my-7 items-center '>
           <div className='w-full flex justify-center py-6'>
             <button

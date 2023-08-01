@@ -1,5 +1,3 @@
-import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
-import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import { Divider } from '@mui/material';
 import TimeAgo from 'javascript-time-ago';
 import router from 'next/router';
@@ -66,17 +64,7 @@ const BreifApplication: React.FC<BreifApplicationProps> = ({
                     {item.description}
                   </p>
                 </div>
-                <div className='flex pb-9 justify-between'>
-                  <div className='flex space-x-5'>
-                    <p className='text-sm flex cursor-pointer items-center text-imbue-purple-dark'>
-                      <ThumbUpOffAltIcon fontSize='small' />
-                      <span className='ml-1'>Yes</span>
-                    </p>
-                    <p className='text-sm flex cursor-pointer items-center text-imbue-purple-dark'>
-                      <ThumbDownOffAltIcon fontSize='small' />
-                      <span className='ml-1'>No</span>
-                    </p>
-                  </div>
+                <div className='flex pb-9 flex-row-reverse justify-between'>
                   <div
                     className={`px-4 py-1 lg:py-2 w-fit rounded-full text-xs lg:text-base text-center ${
                       OffchainProjectState[item?.status_id || 0]
@@ -90,36 +78,38 @@ const BreifApplication: React.FC<BreifApplicationProps> = ({
             </>
           )
       )}
-      {loadValue < applications.length && (
-        <div className='flex justify-center my-7 items-center '>
-          <div className='w-full flex justify-center py-6'>
-            <button
-              onClick={() => {
-                setValue((value) => value + 10);
-              }}
-              className='primary-btn in-dark w-button lg:w-1/3'
-              style={{ textAlign: 'center' }}
-            >
-              load more
-            </button>
+      <div className='flex'>
+        {loadValue < applications.length && (
+          <div className='flex w-full justify-center my-7 items-center '>
+            <div className='w-full flex justify-center py-6'>
+              <button
+                onClick={() => {
+                  setValue((value) => value + 10);
+                }}
+                className='primary-btn in-dark w-button lg:w-1/3'
+                style={{ textAlign: 'center' }}
+              >
+                load more
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-      {loadValue > applications.length && applications.length > 10 && (
-        <div className='flex justify-center my-7 items-center '>
-          <div className='w-full flex justify-center py-6'>
-            <button
-              onClick={() => {
-                setValue((value) => value - 10);
-              }}
-              className='primary-btn in-dark w-button lg:w-1/3'
-              style={{ textAlign: 'center' }}
-            >
-              show less
-            </button>
+        )}
+        {loadValue > 10 && applications.length > 10 && (
+          <div className='flex w-full justify-center my-7 items-center '>
+            <div className='w-full flex justify-center py-6'>
+              <button
+                onClick={() => {
+                  setValue((value) => value - 10);
+                }}
+                className='primary-btn in-dark w-button lg:w-1/3'
+                style={{ textAlign: 'center' }}
+              >
+                show less
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

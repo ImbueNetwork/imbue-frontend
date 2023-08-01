@@ -77,7 +77,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const [hideLinkedAccounts, setHideLinkedAccounts] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [projects, setProjects] = useState<Project[]>();
-  const [loadValue, setLoadValue] = useState(10);
+  const [loadValue, setLoadValue] = useState(5);
 
   const memberSince = moment(freelancer?.created).format('MMMM YYYY');
 
@@ -1017,7 +1017,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   <div className='w-full flex justify-center py-6'>
                     <button
                       onClick={() => {
-                        setLoadValue((value) => value + 10);
+                        setLoadValue((value) => value + 5);
                       }}
                       className='primary-btn in-dark w-button lg:w-1/3'
                       style={{ textAlign: 'center' }}
@@ -1034,7 +1034,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                     <div className='w-full flex justify-center py-6'>
                       <button
                         onClick={() => {
-                          setLoadValue((value) => value - 10);
+                          setLoadValue(5);
                         }}
                         className='primary-btn in-dark w-button lg:w-1/3'
                         style={{ textAlign: 'center' }}

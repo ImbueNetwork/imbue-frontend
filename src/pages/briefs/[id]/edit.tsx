@@ -4,6 +4,7 @@
 import styled from '@emotion/styled';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Tooltip } from '@mui/material';
+import Filter from 'bad-words';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -29,7 +30,6 @@ import {
 } from '@/redux/services/briefService';
 import { RootState } from '@/redux/store/store';
 import styles from '@/styles/modules/newBrief.module.css';
-
 const SpacedRow = styled.div`
   display: flex;
   flex-direction: row;
@@ -45,6 +45,7 @@ const SpacedRow = styled.div`
 `;
 
 export const EditProposal = (): JSX.Element => {
+  const filter = new Filter();
   // FIXME: brief
   const [_brief, setBrief] = useState<Brief | any>();
   // FIXME: user
@@ -126,11 +127,15 @@ export const EditProposal = (): JSX.Element => {
     try {
       setLoading(true);
       const updateBriefResponse = await updateBriefById({
-        description,
-        headline: headline,
-        industries,
+        description: filter.clean(description),
+        headline: filter.clean(headline),
+        industries: industries.map((item) =>
+          item.trim().length ? filter.clean(item) : ''
+        ),
         scope_id: scopeId,
-        skills,
+        skills: skills.map((item) =>
+          item.trim().length ? filter.clean(item) : ''
+        ),
         duration_id: durationId,
         experience_id: expId,
         budget,
