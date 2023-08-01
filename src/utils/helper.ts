@@ -229,6 +229,14 @@ export const validateApplicationInput = (
   return { isValid, firstErrorIndex };
 };
 
+export const validateInputLength = (
+  text: string,
+  min: number,
+  max: number
+): boolean => {
+  return text.length >= min && text.length <= max;
+};
+
 export const handleApplicationInput = (
   event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   milestoneIndex: number | undefined = undefined,
@@ -238,14 +246,6 @@ export const handleApplicationInput = (
   description: string
 ) => {
   const { name, value } = event.target;
-
-  const validateInputLength = (
-    text: string,
-    min: number,
-    max: number
-  ): boolean => {
-    return text.length >= min && text.length <= max;
-  };
 
   const milestoneErrors: any = [...inputErrors.milestones];
   let newInputErrors = { ...inputErrors };
