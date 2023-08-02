@@ -88,7 +88,7 @@ export const TagsInput = ({
           />
         )}
       </div>
-      <div className='tags-suggestion-container'>
+      <div className='tags-suggestion-container mt-4'>
         {suggestData
           .filter((item: string) => vtags?.indexOf(item) === -1)
           .map((item, index) => (

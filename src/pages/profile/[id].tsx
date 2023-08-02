@@ -30,7 +30,7 @@ import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 import { AppDispatch } from '@/redux/store/store';
 import styles from '@/styles/modules/freelancers.module.css';
 
-import { checkEnvironment, updateUser } from '../../utils';
+import { checkEnvironment, matchedByUserName, updateUser } from '../../utils';
 
 const Profile = ({ initUser, browsingUser }: any) => {
   const filter = new Filter({ placeHolder: ' ' });
@@ -48,8 +48,12 @@ const Profile = ({ initUser, browsingUser }: any) => {
   const [error, setError] = useState<any>();
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [displayNameError, setDisplayNameError] = useState(false);
+  const [userNameError, setUserNameError] = useState(false);
+  const [userNameExist, setUserNameExist] = useState(false);
 
   const dispatch = useDispatch<AppDispatch>();
+  const [prevUserName, setPrevUserName] = useState(user.username);
 
   useEffect(() => {
     const getBriefs = async () => {
@@ -73,11 +77,18 @@ const Profile = ({ initUser, browsingUser }: any) => {
       } else if (filter.isProfane(user.username)) {
         setError({ message: 'remove bad word from username' });
         return;
+      } else if (userNameError || displayNameError) {
+        setError({ message: 'fill the required fields' });
+        return;
+      } else if (userNameExist && user.username !== prevUserName) {
+        setError({ message: 'username is already exist' });
+        return;
       } else if (user) {
         setLoading(true);
 
         const filterdUser = {
           ...user,
+
           description:
             user.description && user.description.trim().length
               ? filter.clean(user.description).trim()
@@ -91,13 +102,12 @@ const Profile = ({ initUser, browsingUser }: any) => {
               ? filter.clean(user.about).trim()
               : '',
         };
-
         setUser(filterdUser);
-
         const userResponse: any = await updateUser(filterdUser);
 
         if (userResponse.status === 'Successful') {
           setSuccess(true);
+          setPrevUserName(user.username);
         } else {
           setError(userResponse);
         }
@@ -164,8 +174,20 @@ const Profile = ({ initUser, browsingUser }: any) => {
   // ): boolean => {
   //   return text.length >= min && text.length <= max;
   // };
+  const handleChange = async (e: any) => {
+    if (e.target.name === 'display_name') {
+      if (e.target.value.length < 1) setDisplayNameError(true);
+      else setDisplayNameError(false);
+    }
+    if (e.target.name === 'username') {
+      if (e.target.value.length < 1) setUserNameError(true);
+      else setUserNameError(false);
+      const data = await matchedByUserName(e.target.value);
+      if (data && e.target.value !== prevUserName) {
+        setUserNameExist(true);
+      } else setUserNameExist(false);
+    }
 
-  const handleChange = (e: any) => {
     setUser({
       ...user,
       [e.target.name]: e.target.value,
@@ -217,7 +239,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                 saveChanges={updateUser}
               />
             </div>
-            <div className='w-full flex flex-col gap-4'>
+            <div className='w-full flex flex-col gap-6'>
               {isEditMode ? (
                 <>
                   <TextField
@@ -229,6 +251,15 @@ const Profile = ({ initUser, browsingUser }: any) => {
                     variant='outlined'
                     defaultValue={user?.display_name}
                   />
+                  {displayNameError && (
+                    <p
+                      className={`text-xs text-imbue-light-purple-two mt-[-34px]
+                    `}
+                    >
+                      Name must contain atleast 1 character
+                    </p>
+                  )}
+
                   <p
                     className={`text-xs text-imbue-light-purple-two mt-[-32px]
                     `}
@@ -254,6 +285,22 @@ const Profile = ({ initUser, browsingUser }: any) => {
                     variant='outlined'
                     defaultValue={user?.username}
                   />
+                  {userNameError && (
+                    <p
+                      className={`text-xs text-imbue-light-purple-two mt-[-34px]
+                    `}
+                    >
+                      username must contain atleast 1 character
+                    </p>
+                  )}
+                  {userNameExist && (
+                    <p
+                      className={`text-xs text-imbue-light-purple-two mt-[-34px]
+                    `}
+                    >
+                      username is already exist try another one
+                    </p>
+                  )}
                   <p
                     className={`text-xs text-imbue-light-purple-two mt-[-32px]
                     `}
@@ -472,58 +519,56 @@ const Profile = ({ initUser, browsingUser }: any) => {
             </div>
           </div>
 
-          {
-            !isEditMode && (
-              <div className='w-full bg-white rounded-xl'>
-                <p className='px-10 lg:px-16 py-6 text-xl text-imbue-purple-dark'>
-                  Open Briefs
-                </p>
-                <div className='briefs-list w-full'>
-                  {openBriefs?.map(
-                    (item, itemIndex) =>
-                      !item?.project_id && (
-                        <div
-                          className='brief-item !px-10 lg:!px-16 rounded-b-xl'
-                          key={itemIndex}
-                          onClick={() => router.push(`/briefs/${item?.id}/`)}
-                        >
-                          <div className='brief-title !text-xl lg:!text-2xl'>
-                            {item.headline.length > 50
-                              ? `${item.headline.substring(0, 50)}...`
-                              : item.headline}
-                          </div>
-                          <div className='brief-time-info !text-sm lg:!text-base'>
-                            {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
-                          </div>
-                          <div className='brief-description !text-sm lg:!text-base'>
-                            {item.description.length > 400
-                              ? `${item.description.substring(0, 400)}...`
-                              : item.description}
-                          </div>
-
-                          <div className='brief-tags'>
-                            {item.skills?.map((skill: any, skillIndex: any) => (
-                              <div className='tag-item' key={skillIndex}>
-                                {skill}
-                              </div>
-                            ))}
-                          </div>
-
-                          <div className='brief-proposals !text-xs lg:!text-sm'>
-                            <span className='proposals-heading'>
-                              Proposals Submitted:{' '}
-                            </span>
-                            <span className='proposals-count'>
-                              {item.number_of_briefs_submitted}
-                            </span>
-                          </div>
+          {!isEditMode && (
+            <div className='w-full bg-white rounded-xl'>
+              <p className='px-10 lg:px-16 py-6 text-xl text-imbue-purple-dark'>
+                Open Briefs
+              </p>
+              <div className='briefs-list w-full'>
+                {openBriefs?.map(
+                  (item, itemIndex) =>
+                    !item?.project_id && (
+                      <div
+                        className='brief-item !px-10 lg:!px-16 rounded-b-xl'
+                        key={itemIndex}
+                        onClick={() => router.push(`/briefs/${item?.id}/`)}
+                      >
+                        <div className='brief-title !text-xl lg:!text-2xl'>
+                          {item.headline.length > 50
+                            ? `${item.headline.substring(0, 50)}...`
+                            : item.headline}
                         </div>
-                      )
-                  )}
-                </div>
+                        <div className='brief-time-info !text-sm lg:!text-base'>
+                          {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
+                        </div>
+                        <div className='brief-description !text-sm lg:!text-base'>
+                          {item.description.length > 400
+                            ? `${item.description.substring(0, 400)}...`
+                            : item.description}
+                        </div>
+
+                        <div className='brief-tags'>
+                          {item.skills?.map((skill: any, skillIndex: any) => (
+                            <div className='tag-item' key={skillIndex}>
+                              {skill}
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className='brief-proposals !text-xs lg:!text-sm'>
+                          <span className='proposals-heading'>
+                            Proposals Submitted:{' '}
+                          </span>
+                          <span className='proposals-count'>
+                            {item.number_of_briefs_submitted}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                )}
               </div>
-            )
-          }
+            </div>
+          )}
         </div>
       </div>
       {user && showMessageBox && (
