@@ -104,7 +104,7 @@ function Project() {
   const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
   const [isApplicant, setIsApplicant] = useState<boolean>(false);
   const [isProjectOwner, setIsProjectOwner] = useState<boolean>(false);
-  const [showRefundButton] = useState<boolean>();
+  const [showRefundButton, setShowRefundButton] = useState<boolean>();
 
   const [wait, setWait] = useState<boolean>(false);
   const [waitMessage, setWaitMessage] = useState<string>('');
@@ -133,11 +133,19 @@ function Project() {
     const chainService = new ChainService(imbueApi, user);
     const onChainProjectRes = await chainService.getProject(projectId);
 
+
+
     if (onChainProjectRes) {
+      console.log(OnchainProjectState[onChainProjectRes.projectState]);
       const isApplicant = onChainProjectRes.initiator == user.web3_address;
       setIsApplicant(isApplicant);
       // TODO Enable refunds first
-      //setShowRefundButton(onChainProjectRes.fundingType.Grant)
+      const userIsApprover = onChainProjectRes.contributions.map(c => c.accountId).includes(user.web3_address!);
+
+      if (userIsApprover) {
+        setShowRefundButton(onChainProjectRes.fundingType.Grant)
+      }
+
       if (onChainProjectRes.projectState == OnchainProjectState.OpenForVoting) {
         const firstPendingMilestone =
           await chainService.findFirstPendingMilestone(
@@ -155,6 +163,10 @@ function Project() {
         case OffchainProjectState.ChangesRequested:
           setWaitMessage('Changes have been requested');
           break;
+        case OffchainProjectState.Refunded:
+          setSuccess(true);
+          setSuccessTitle('This project has been refunded!');
+          break;
         case OffchainProjectState.Accepted:
           if (!project.chain_project_id) {
             setWaitMessage(
@@ -167,7 +179,9 @@ function Project() {
           }
           break;
       }
-      setWait(true);
+      if(project.status_id !== OffchainProjectState.Refunded) {
+        setWait(true);
+      }
     }
   };
 
@@ -267,9 +281,10 @@ function Project() {
       );
       if (!result.txError) {
         setSuccess(true);
-        setSuccessTitle('Your vote was successfull');
-      } else {
-        setError({ message: result.errorMessage });
+        setSuccessTitle('Your vote was successful');
+      }
+      else {
+        setError({ message: result.errorMessage })
       }
     } catch (error) {
       setError({ message: 'Could not vote. Please try again later' });
@@ -330,25 +345,46 @@ function Project() {
   };
 
   const refund = async (account: WalletAccount) => {
+    // TODO make this a popup value like vote on milestone
+    const vote = false;
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
-    // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
-    const result = await chainService.raiseVoteOfNoConfidence(
-      account,
-      onChainProject
-    );
-    while (true) {
-      if (result.status || result.txError) {
-        if (result.status) {
-          setSuccess(true);
-          setSuccessTitle('Vote of no confidence raised.');
-        } else if (result.txError) {
-          setError({ message: result.errorMessage });
+    if (onChainProject.projectState == OnchainProjectState.OpenForVotingOfNoConfidence) {
+      const result = await chainService.voteOnNoConfidence(
+        account,
+        onChainProject,
+        vote
+      );
+      while (true) {
+        if (result.status || result.txError) {
+          if (result.status) {
+            setSuccess(true);
+            setSuccessTitle('Your vote was successful');
+          } else if (result.txError) {
+            setError({ message: result.errorMessage });
+          }
+          break;
         }
-        break;
+        await new Promise((f) => setTimeout(f, 1000));
       }
-      await new Promise((f) => setTimeout(f, 1000));
+    } else {
+      const result = await chainService.raiseVoteOfNoConfidence(
+        account,
+        onChainProject
+      );
+      while (true) {
+        if (result.status || result.txError) {
+          if (result.status) {
+            setSuccess(true);
+            setSuccessTitle('Vote of no confidence raised.');
+          } else if (result.txError) {
+            setError({ message: result.errorMessage });
+          }
+          break;
+        }
+        await new Promise((f) => setTimeout(f, 1000));
+      }
     }
     setLoading(false);
   };

@@ -30,6 +30,7 @@ const eventMapping: Record<string, EventDetails> = {
   voteOnMilestone: { eventName: 'VoteComplete' },
   approveMilestone: { eventName: 'MilestoneApproved' },
   refund: { eventName: 'NoConfidenceRoundCreated' },
+  voteOnNoConfidence: { eventName: 'NoConfidenceRoundVotedUpon' },
   withraw: { eventName: 'ProjectFundsWithdrawn' },
   createBrief: { eventName: 'BriefSubmitted' },
   commenceWork: { eventName: 'ProjectCreated' },
@@ -193,6 +194,22 @@ class ChainService {
       eventMapping['withraw'].eventName
     );
   }
+
+  public async voteOnNoConfidence(
+    account: WalletAccount,
+    projectOnChain: any,
+    userVote: boolean
+    ): Promise<BasicTxResponse> {
+    const projectId = projectOnChain.milestones[0].project_chain_id;
+    const extrinsic =
+      this.imbueApi.imbue.api.tx.imbueProposals.voteOnNoConfidenceRound(projectId, userVote);
+    return await this.submitImbueExtrinsic(
+      account,
+      extrinsic,
+      eventMapping['voteOnNoConfidence'].eventName
+    );
+  }
+
 
   public async raiseVoteOfNoConfidence(
     account: WalletAccount,
