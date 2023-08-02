@@ -132,7 +132,7 @@ export default nextConnect()
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
     const userAuth: Partial<User> | any = await authenticate('jwt', req, res);
 
-    verifyUserIdFromJwt(req, res, userAuth.id);
+    verifyUserIdFromJwt(req, res, [userAuth.id]);
 
     const freelancer: models.Freelancer | any = req.body.freelancer;
     const loggedInUser = req.body.freelancer.logged_in_user;

@@ -39,20 +39,7 @@ export enum ImbueChainEvent {
   SubmitInitialGrant = "ProjectCreated",
 }
 
-
-// export const eventMapping: Record<string, EventDetails> = {
-//   contribute: { eventName: 'ContributeSucceeded' },
-//   submitMilestone: { eventName: 'MilestoneSubmitted' },
-//   voteOnMilestone: { eventName: 'VoteComplete' },
-//   approveMilestone: { eventName: 'MilestoneApproved' },
-//   refund: { eventName: 'NoConfidenceRoundCreated' },
-//   voteOnNoConfidence: { eventName: 'NoConfidenceRoundVotedUpon' },
-//   withraw: { eventName: 'ProjectFundsWithdrawn' },
-//   createBrief: { eventName: 'BriefSubmitted' },
-//   commenceWork: { eventName: 'ProjectCreated' },
-//   submitInitialGrant: { eventName: 'ProjectCreated' },
-// };
-
+const WAIT_FOR_EVENT_IN_MS = 60_000; // WAIT FOR 1 MIN
 class ChainService {
   imbueApi: ImbueApiInfo;
   user: User;
@@ -227,41 +214,50 @@ class ChainService {
   }
 
   public async pollChainMessage(eventName: string, account: WalletAccount) {
-    const imbueApi = this.imbueApi;
-    return (function poll(imbueApi) {
-      let myTimeout = setTimeout(() => {
-        //call the service layer to do an ajax call
-        //depending on the result I would like to exit the infinite poll
-          imbueApi.imbue.api.query.system.events(
-            (events: EventRecord[]) => {
-              events
-                .filter(
-                  ({ event: { section } }: EventRecord) =>
-                    section === 'imbueProposals' ||
-                    section === 'imbueBriefs' ||
-                    section === 'system'
-                )
-                .forEach(
-                  ({
-                    event: { data, method },
-                  }: EventRecord) => {
-                    if (
-                      eventName 
-                      && method === eventName 
-                      && data[0].toHuman() === account.address
-                    ) {
-                      clearTimeout(myTimeout);
-                      return data.toHuman();
-                    }
-                  }
-                );
-            });
-      }, 1000);
-
-      console.log("**** testing is");
-      console.log(myTimeout);
-    })(imbueApi);
-
+    const asyncTimeout = (imbueApi: any, account: WalletAccount) => {
+      return new Promise((resolve, reject) => {
+        const timeoutID = setTimeout(
+          () => reject("Event not found"),
+          WAIT_FOR_EVENT_IN_MS
+        );
+        imbueApi.imbue.api.query.system.events((events: EventRecord[]) => {
+          events
+            .filter(
+              ({ event: { section } }: EventRecord) =>
+                section === 'imbueProposals' ||
+                section === 'imbueBriefs' ||
+                section === 'system'
+            )
+            .forEach(
+              ({
+                event: { data, method },
+              }: EventRecord) => {
+                console.log("**** event name is ");
+                console.log(eventName);
+                console.log(data.toHuman());
+                console.log("***** account is ");
+                console.log(account.address);
+                if (
+                  eventName
+                  && method === eventName
+                  && data[0].toHuman() === account.address
+                ) {
+                  clearTimeout(timeoutID);
+                  return resolve(data.toHuman());
+                }
+              }
+            );
+        });
+      });
+    }
+    return (async (imbueApi) => {
+      try {
+        const result = await asyncTimeout(imbueApi, account);
+        return result
+      } catch (ex) {
+        return false;
+      }
+    })(this.imbueApi)
   }
 
 

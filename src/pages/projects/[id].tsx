@@ -41,6 +41,7 @@ import ChainService from '@/redux/services/chainService';
 import { ImbueChainEvent } from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { RootState } from '@/redux/store/store';
+import { updateProject } from '@/redux/services/projectServices';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -133,9 +134,7 @@ function Project() {
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
     const onChainProjectRes = await chainService.getProject(projectId);
-
     if (onChainProjectRes) {
-      console.log(OnchainProjectState[onChainProjectRes.projectState]);
       const isApplicant = onChainProjectRes.initiator == user.web3_address;
       setIsApplicant(isApplicant);
       // TODO Enable refunds first
@@ -178,7 +177,7 @@ function Project() {
           }
           break;
       }
-      if(project.status_id !== OffchainProjectState.Refunded) {
+      if (project.status_id !== OffchainProjectState.Refunded) {
         setWait(true);
       }
     }
@@ -355,14 +354,14 @@ function Project() {
         onChainProject,
         vote
       );
-
-      const refundCompleted = await chainService.pollChainMessage(ImbueChainEvent.NoConfidenceRoundFinalised,account);
-      console.log("**** refundCompleted is ");
-      console.log(refundCompleted);
-
+      const shouldRefund = await chainService.pollChainMessage(ImbueChainEvent.NoConfidenceRoundFinalised, account);
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
+            if (shouldRefund) {
+              project.status_id = OffchainProjectState.Refunded;
+              await updateProject(project?.id, project);
+            }
             setSuccess(true);
             setSuccessTitle('Your vote was successful');
           } else if (result.txError) {

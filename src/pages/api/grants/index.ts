@@ -61,7 +61,7 @@ export default nextConnect()
     const grant: Grant = req.body as Grant;
     const filter = new Filter();
     const userAuth: Partial<User> | any = await authenticate('jwt', req, res);
-    verifyUserIdFromJwt(req, res, userAuth.id);
+    verifyUserIdFromJwt(req, res, [userAuth.id]);
     await db.transaction(async (tx: any) => {
       try {
         const filterdGrants = {

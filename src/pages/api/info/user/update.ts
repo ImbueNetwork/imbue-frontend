@@ -42,7 +42,7 @@ export default nextConnect()
       res
     );
 
-    verifyUserIdFromJwt(req, res, userAuth.id);
+    verifyUserIdFromJwt(req, res, [userAuth.id]);
 
     const isAuthenticatedUer = userAuth?.id === user?.id;
 

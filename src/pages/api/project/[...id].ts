@@ -56,7 +56,6 @@ export default nextConnect()
 
         const milestones = await models.fetchProjectMilestones(projectId)(tx);
         const approvers = await models.fetchProjectApprovers(projectId)(tx);
-
         const pkg: ProjectPkg = {
           ...project,
           milestones,
@@ -79,34 +78,36 @@ export default nextConnect()
     // const brief_id: any = query.brief_id as string[];
 
     if (projectId === null) return res.status(404).end();
-
     const userAuth: Partial<models.User> | any = await authenticate(
       'jwt',
       req,
       res
     );
-    verifyUserIdFromJwt(req, res, userAuth.id);
-
-    const {
-      name,
-      logo,
-      description,
-      website,
-      category,
-      required_funds,
-      currency_id,
-      chain_project_id,
-      owner,
-      milestones,
-      total_cost_without_fee,
-      imbue_fee,
-      user_id,
-      escrow_address,
-      duration_id,
-    } = body;
 
     db.transaction(async (tx) => {
       try {
+        const projectApproverIds = await models.fetchProjectApproverUserIds(projectId)(tx);
+        verifyUserIdFromJwt(req, res, [userAuth.id, ...projectApproverIds]);
+        const {
+          name,
+          logo,
+          description,
+          website,
+          category,
+          required_funds,
+          currency_id,
+          chain_project_id,
+          owner,
+          milestones,
+          total_cost_without_fee,
+          imbue_fee,
+          user_id,
+          escrow_address,
+          duration_id,
+          status_id,
+        } = body;
+
+
         // ensure the project exists first
         const exists = await models.fetchProjectById(projectId)(tx);
 
@@ -133,6 +134,7 @@ export default nextConnect()
           escrow_address,
           // project_type: exists.project_type,
           duration_id,
+          status_id,
         })(tx);
 
         if (!project.id) {
