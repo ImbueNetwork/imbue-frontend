@@ -59,6 +59,8 @@ const NewBrief = (): JSX.Element => {
     if (skillsRes) {
       setSuggestedSkills(skillsRes?.skills.map((skill) => skill.name));
     }
+    
+    
   };
 
   const searchSkill = async (name: string) => {
