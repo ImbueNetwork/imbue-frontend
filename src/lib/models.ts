@@ -446,6 +446,13 @@ export const updateFederatedLoginUser =
         .returning('*')
     )[0];
 
+export const getApproverProjects =
+  (wallet: string | string[]) => async (tx: Knex.Transaction) =>
+    await tx<Project>('project_approvers')
+      .join('projects', 'project_approvers.project_id', '=', 'projects.id')
+      .select()
+      .where({ approver: wallet });
+
 export const insertProject =
   (project: Project) => async (tx: Knex.Transaction) =>
     (await tx<Project>('projects').insert(project).returning('*'))[0];

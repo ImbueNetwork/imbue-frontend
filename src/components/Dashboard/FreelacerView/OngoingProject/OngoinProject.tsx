@@ -1,6 +1,7 @@
 import { Divider } from '@mui/material';
 import classNames from 'classnames';
 import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
 import router from 'next/router';
 import { useState } from 'react';
 
@@ -12,7 +13,10 @@ interface OnGoinProjectProps {
   projects: Project[];
 }
 
+TimeAgo.addLocale(en);
+
 const timeAgo = new TimeAgo('en-US');
+
 const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
   /// limit ongoing project
   const ongoinProjectLimit = 10;
@@ -46,7 +50,7 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
       {projects?.map(
         (item: any, index: number) =>
           index <
-            Math.min(Math.max(value, ongoinProjectLimit), projects.length) && (
+          Math.min(Math.max(value, ongoinProjectLimit), projects.length) && (
             <>
               <div
                 key={item.id}

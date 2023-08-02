@@ -141,6 +141,15 @@ export const validateApplicationInput = (
     };
   }
 
+  if (!validateInputLength(title, 10, 50) && application === 'grant') {
+    isValid = false;
+    firstErrorIndex = 0;
+    newInputs = {
+      ...newInputs,
+      title: 'Grant title should be between 10 - 50 characters',
+    };
+  }
+
   if (
     (description === undefined ||
       description === null ||
@@ -152,6 +161,15 @@ export const validateApplicationInput = (
     newInputs = {
       ...newInputs,
       description: 'Please enter a valid grant description',
+    };
+  }
+
+  if (!validateInputLength(description, 50, 5000) && application === 'grant') {
+    isValid = false;
+    firstErrorIndex = firstErrorIndex === -1 ? 1 : firstErrorIndex;
+    newInputs = {
+      ...newInputs,
+      description: 'Grant description should be between 50 - 5000 characters',
     };
   }
 
@@ -213,11 +231,11 @@ export const validateApplicationInput = (
       };
       isValid = false;
       firstErrorIndex = firstErrorIndex === -1 ? i + 3 : firstErrorIndex;
-    } else if (description.length < 100) {
+    } else if (description.length < 50) {
       newMilestones[i] = {
         ...newMilestones[i],
         description:
-          'Milestone description should be between 100 - 500 characters.',
+          'Milestone description should be between 50 - 5000 characters.',
       };
       isValid = false;
       firstErrorIndex = firstErrorIndex === -1 ? i + 3 : firstErrorIndex;
@@ -264,13 +282,13 @@ export const handleApplicationInput = (
       break;
     case 'mainDescription':
       description = value;
-      if (validateInputLength(value, 100, 500)) {
+      if (validateInputLength(value, 50, 5000)) {
         newInputErrors = { ...inputErrors, description: '' };
       } else {
         newInputErrors = {
           ...inputErrors,
           description:
-            'Grant description should be between 100 - 500 characters',
+            'Grant description should be between 50 - 5000 characters',
         };
       }
       break;
@@ -306,7 +324,7 @@ export const handleApplicationInput = (
         },
         ...milestones.slice(milestoneIndex + 1),
       ];
-      if (validateInputLength(value, 100, 500)) {
+      if (validateInputLength(value, 50, 5000)) {
         milestoneErrors[milestoneIndex] = {
           ...milestoneErrors[milestoneIndex],
           description: '',
@@ -315,7 +333,7 @@ export const handleApplicationInput = (
         milestoneErrors[milestoneIndex] = {
           ...milestoneErrors[milestoneIndex],
           description:
-            'A valid milestone description is required between 100 - 500 characters',
+            'A valid milestone description is required between 50 - 5000 characters',
         };
       }
       break;

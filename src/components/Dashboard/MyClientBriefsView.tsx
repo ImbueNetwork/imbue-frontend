@@ -1,13 +1,15 @@
 /* eslint-disable no-console */
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Skeleton } from '@mui/material';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 import { Freelancer, Project } from '@/model';
 import { getBriefApplications, getUserBriefs } from '@/redux/services/briefService';
+import { getUsersOngoingGrants } from '@/redux/services/projectServices';
 
+import OngoingProject from './FreelacerView/OngoingProject/OngoinProject';
 import { ApplicationContainer } from '../Briefs/ApplicationContainer';
+import ApplicationSkeleton from '../Briefs/ApplicationSkeleton';
 import { BriefLists } from '../Briefs/BriefsList';
 
 type ClientViewProps = {
@@ -24,18 +26,20 @@ const MyClientBriefsView = (props: ClientViewProps) => {
     handleMessageBoxClick,
     redirectToBriefApplications,
   } = props;
-  
+
   const [briefs, _setBriefs] = useState<any>();
   const [briefApplications, setBriefApplications] = useState<Project[]>([]);
+  const [ongoingGrants, setOngoingGrants] = useState<Project[]>([]);
   const [loadingApplications, setLoadingApplications] = useState<boolean>(true);
   const router = useRouter();
 
   useEffect(() => {
     const setUserBriefs = async () => {
       if (user?.id) _setBriefs(await getUserBriefs(user?.id));
+      setOngoingGrants(await getUsersOngoingGrants(user?.web3_address));
     }
     setUserBriefs();
-  }, [user?.id])
+  }, [user?.id, user?.web3_address])
 
   useEffect(() => {
     const getApplications = async (id: string | number) => {
@@ -105,65 +109,25 @@ const MyClientBriefsView = (props: ClientViewProps) => {
             )
           }
 
+          {
+            ongoingGrants?.length && (
+              <>
+                <p className='text-imbue-purple-dark text-base lg:text-xl mb-3 mt-4 lg:mt-10'>
+                  Ongoing Grants
+                </p>
+                <div className='bg-background rounded-xl overflow-hidden'>
+                  <OngoingProject
+                    projects={ongoingGrants}
+                  />
+                </div>
+              </>
+            )
+          }
+
         </div>
       )}
     </div>
   );
 };
-
-export function ApplicationSkeleton() {
-  return (
-    <div className='bg-white overflow-hidden rounded-xl'>
-      {[1, 2].map((v, i) => (
-        <div
-          key={i}
-          className='w-full px-5 py-3 lg:px-10 lg:py-8 border-b last:border-b-0 border-b-imbue-light-purple'
-        >
-          <div className='flex justify-between items-center'>
-            <div className='flex w-full items-center gap-4'>
-              <Skeleton
-                className='w-16 h-16'
-                variant='circular'
-                sx={{ fontSize: '1rem' }}
-              />
-              <Skeleton
-                className='w-1/6 h-7'
-                variant='text'
-                sx={{ fontSize: '1rem' }}
-              />
-            </div>
-            <Skeleton
-              className='w-1/6 h-7'
-              variant='text'
-              sx={{ fontSize: '1rem' }}
-            />
-          </div>
-          <div className='flex justify-between'>
-            <Skeleton
-              className='w-5/6'
-              variant='text'
-              sx={{ fontSize: '1rem' }}
-            />
-            <Skeleton
-              className='w-1/12'
-              variant='text'
-              sx={{ fontSize: '1rem' }}
-            />
-          </div>
-          <Skeleton
-            className='w-3/5'
-            variant='text'
-            sx={{ fontSize: '1rem' }}
-          />
-          <Skeleton
-            className='w-1/12'
-            variant='text'
-            sx={{ fontSize: '1rem' }}
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export default MyClientBriefsView;
