@@ -38,6 +38,7 @@ import {
 } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
+import { ImbueChainEvent } from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { RootState } from '@/redux/store/store';
 
@@ -132,8 +133,6 @@ function Project() {
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
     const onChainProjectRes = await chainService.getProject(projectId);
-
-
 
     if (onChainProjectRes) {
       console.log(OnchainProjectState[onChainProjectRes.projectState]);
@@ -356,6 +355,11 @@ function Project() {
         onChainProject,
         vote
       );
+
+      const refundCompleted = await chainService.pollChainMessage(ImbueChainEvent.NoConfidenceRoundFinalised,account);
+      console.log("**** refundCompleted is ");
+      console.log(refundCompleted);
+
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {

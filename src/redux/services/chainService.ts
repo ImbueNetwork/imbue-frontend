@@ -24,18 +24,34 @@ type EventDetails = {
   eventName: string;
 };
 
-const eventMapping: Record<string, EventDetails> = {
-  contribute: { eventName: 'ContributeSucceeded' },
-  submitMilestone: { eventName: 'MilestoneSubmitted' },
-  voteOnMilestone: { eventName: 'VoteComplete' },
-  approveMilestone: { eventName: 'MilestoneApproved' },
-  refund: { eventName: 'NoConfidenceRoundCreated' },
-  voteOnNoConfidence: { eventName: 'NoConfidenceRoundVotedUpon' },
-  withraw: { eventName: 'ProjectFundsWithdrawn' },
-  createBrief: { eventName: 'BriefSubmitted' },
-  commenceWork: { eventName: 'ProjectCreated' },
-  submitInitialGrant: { eventName: 'ProjectCreated' },
-};
+
+export enum ImbueChainEvent {
+  Contribute = "ContributeSucceeded",
+  SubmitMilestone = "MilestoneSubmitted",
+  VoteOnMilestone = "VoteComplete",
+  ApproveMilestone = "MilestoneApproved",
+  RaiseNoConfidenceRound = "NoConfidenceRoundCreated",
+  VoteOnNoConfidenceRound = "NoConfidenceRoundVotedUpon",
+  NoConfidenceRoundFinalised = "NoConfidenceRoundFinalised",
+  Withraw = "ProjectFundsWithdrawn",
+  CreateBrief = "BriefSubmitted",
+  CommenceWork = "ProjectCreated",
+  SubmitInitialGrant = "ProjectCreated",
+}
+
+
+// export const eventMapping: Record<string, EventDetails> = {
+//   contribute: { eventName: 'ContributeSucceeded' },
+//   submitMilestone: { eventName: 'MilestoneSubmitted' },
+//   voteOnMilestone: { eventName: 'VoteComplete' },
+//   approveMilestone: { eventName: 'MilestoneApproved' },
+//   refund: { eventName: 'NoConfidenceRoundCreated' },
+//   voteOnNoConfidence: { eventName: 'NoConfidenceRoundVotedUpon' },
+//   withraw: { eventName: 'ProjectFundsWithdrawn' },
+//   createBrief: { eventName: 'BriefSubmitted' },
+//   commenceWork: { eventName: 'ProjectCreated' },
+//   submitInitialGrant: { eventName: 'ProjectCreated' },
+// };
 
 class ChainService {
   imbueApi: ImbueApiInfo;
@@ -54,7 +70,7 @@ class ChainService {
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
-      eventMapping['commenceWork'].eventName
+      ImbueChainEvent.CommenceWork
     );
   }
 
@@ -78,7 +94,7 @@ class ChainService {
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
-      eventMapping['submitInitialGrant'].eventName
+      ImbueChainEvent.SubmitInitialGrant
     );
   }
 
@@ -104,7 +120,7 @@ class ChainService {
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
-      eventMapping['createBrief'].eventName
+      ImbueChainEvent.CreateBrief
     );
   }
 
@@ -122,7 +138,7 @@ class ChainService {
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
-      eventMapping['contribute'].eventName
+      ImbueChainEvent.Contribute
     );
   }
 
@@ -139,7 +155,7 @@ class ChainService {
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
-      eventMapping['submitMilestone'].eventName
+      ImbueChainEvent.SubmitMilestone
     );
   }
 
@@ -158,7 +174,7 @@ class ChainService {
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
-      eventMapping['voteOnMilestone'].eventName
+      ImbueChainEvent.VoteOnMilestone
     );
   }
 
@@ -177,7 +193,7 @@ class ChainService {
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
-      eventMapping['approveMilestone'].eventName
+      ImbueChainEvent.ApproveMilestone
     );
   }
 
@@ -191,7 +207,7 @@ class ChainService {
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
-      eventMapping['withraw'].eventName
+      ImbueChainEvent.Withraw
     );
   }
 
@@ -199,15 +215,53 @@ class ChainService {
     account: WalletAccount,
     projectOnChain: any,
     userVote: boolean
-    ): Promise<BasicTxResponse> {
+  ): Promise<BasicTxResponse> {
     const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic =
       this.imbueApi.imbue.api.tx.imbueProposals.voteOnNoConfidenceRound(projectId, userVote);
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
-      eventMapping['voteOnNoConfidence'].eventName
+      ImbueChainEvent.VoteOnNoConfidenceRound
     );
+  }
+
+  public async pollChainMessage(eventName: string, account: WalletAccount) {
+    const imbueApi = this.imbueApi;
+    return (function poll(imbueApi) {
+      let myTimeout = setTimeout(() => {
+        //call the service layer to do an ajax call
+        //depending on the result I would like to exit the infinite poll
+          imbueApi.imbue.api.query.system.events(
+            (events: EventRecord[]) => {
+              events
+                .filter(
+                  ({ event: { section } }: EventRecord) =>
+                    section === 'imbueProposals' ||
+                    section === 'imbueBriefs' ||
+                    section === 'system'
+                )
+                .forEach(
+                  ({
+                    event: { data, method },
+                  }: EventRecord) => {
+                    if (
+                      eventName 
+                      && method === eventName 
+                      && data[0].toHuman() === account.address
+                    ) {
+                      clearTimeout(myTimeout);
+                      return data.toHuman();
+                    }
+                  }
+                );
+            });
+      }, 1000);
+
+      console.log("**** testing is");
+      console.log(myTimeout);
+    })(imbueApi);
+
   }
 
 
@@ -221,7 +275,7 @@ class ChainService {
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
-      eventMapping['refund'].eventName
+      ImbueChainEvent.RaiseNoConfidenceRound
     );
   }
 
@@ -477,21 +531,21 @@ class ChainService {
       milestones: milestones,
       contributions: Object.keys(projectOnChain.contributions).map(
         (accountId: string) =>
-          ({
-            value: BigInt(
-              projectOnChain.contributions[accountId].value?.replaceAll(
-                ',',
-                ''
-              ) || 0
-            ),
-            accountId: accountId,
-            timestamp: BigInt(
-              projectOnChain.contributions[accountId].timestamp?.replaceAll(
-                ',',
-                ''
-              ) || 0
-            ),
-          } as Contribution)
+        ({
+          value: BigInt(
+            projectOnChain.contributions[accountId].value?.replaceAll(
+              ',',
+              ''
+            ) || 0
+          ),
+          accountId: accountId,
+          timestamp: BigInt(
+            projectOnChain.contributions[accountId].timestamp?.replaceAll(
+              ',',
+              ''
+            ) || 0
+          ),
+        } as Contribution)
       ),
       initiator: projectOnChain.initiator,
       createBlockNumber: BigInt(
@@ -516,24 +570,24 @@ class ChainService {
       .map((milestoneItem: any) => projectOnChain.milestones[milestoneItem])
       .map(
         (milestone: any) =>
-          ({
-            project_id: projectOffChain.id,
-            project_chain_id: Number(milestone.projectKey),
-            milestone_key: Number(milestone.milestoneKey),
-            name: projectOffChain.milestones[milestone.milestoneKey].name,
-            description:
-              projectOffChain.milestones[milestone.milestoneKey].description,
-            modified:
-              projectOffChain.milestones[milestone.milestoneKey].modified,
-            percentage_to_unlock: Number(
-              projectOffChain.milestones[milestone.milestoneKey]
-                .percentage_to_unlock
-            ),
-            amount: Number(
-              projectOffChain.milestones[milestone.milestoneKey].amount
-            ),
-            is_approved: milestone.isApproved,
-          } as Milestone)
+        ({
+          project_id: projectOffChain.id,
+          project_chain_id: Number(milestone.projectKey),
+          milestone_key: Number(milestone.milestoneKey),
+          name: projectOffChain.milestones[milestone.milestoneKey].name,
+          description:
+            projectOffChain.milestones[milestone.milestoneKey].description,
+          modified:
+            projectOffChain.milestones[milestone.milestoneKey].modified,
+          percentage_to_unlock: Number(
+            projectOffChain.milestones[milestone.milestoneKey]
+              .percentage_to_unlock
+          ),
+          amount: Number(
+            projectOffChain.milestones[milestone.milestoneKey].amount
+          ),
+          is_approved: milestone.isApproved,
+        } as Milestone)
       );
 
     return milestones;
