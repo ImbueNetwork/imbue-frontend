@@ -21,9 +21,9 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
   /// limit ongoing project
   const ongoinProjectLimit = 10;
   const [value, setValue] = useState(ongoinProjectLimit);
-  const redirectToApplication = (application: Project) => {
+  const redirectToApplication = (project: Project) => {
     router.push(
-      `/briefs/${application.brief_id}/applications/${application.id}/`
+      `/projects/${project.id}`
     );
   };
 

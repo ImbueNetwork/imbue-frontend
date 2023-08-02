@@ -3,13 +3,12 @@ import {
   CircularProgress,
   Dialog,
   DialogContent,
-  DialogTitle,
 } from '@mui/material';
 import { SignerResult } from '@polkadot/api/types';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import customStyled from 'styled-components';
 
 import * as utils from '@/utils';
@@ -57,8 +56,6 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const [formContent, setFormContent] = useState<string>('login');
-
-  const googleParentRef = useRef<any>();
 
   const imbueLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     setErrorMessage(undefined);
@@ -132,17 +129,65 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
         className='loginModal'
       >
         {
-          <div className='lg:min-w-[450px] m-auto py-2'>
-            <DialogTitle
+          <div className='lg:min-w-[500px] m-auto'>
+            <p
               className='text-center text-imbue-purple-dark text-[1.5rem] lg:text-[2rem] font-normal font-Aeonik'
-              id='responsive-dialog-title'
             >
               {'You must be signed in to continue'}
-            </DialogTitle>
-            <DialogContent className='mx-auto w-4/5'>
+            </p>
+            <DialogContent className='mx-auto py-0'>
               <p className='text-base lg:text-xl text-imbue-purple-dark mb-7 relative text-center'>
                 Please use the link below to sign in.
               </p>
+
+              <div className='login justify-center items-center w-full flex flex-col'>
+                <li
+                  // ref={googleParentRef}
+                  className='mt-1 mb-2 w-full flex justify-center'
+                >
+                  <GoogleOAuthProvider clientId={config?.googleClientId}>
+                    <GoogleLogin
+                      width='400px'
+                      logo_alignment='center'
+                      shape='circle'
+                      size='large'
+                      useOneTap={true}
+                      onSuccess={(creds: any) => googleLogin(creds)}
+                      onError={() => {
+                        // FIXME: error handling
+                        console.log('Login Failed');
+                      }}
+                    />
+                  </GoogleOAuthProvider>
+                </li>
+              </div>
+
+              <div className='login justify-center items-center w-full flex flex-col'>
+                <li
+                  className='mt-4 flex flex-row items-center cursor-pointer w-full'
+                  tabIndex={0}
+                  data-mdc-dialog-action='web3'
+                  onClick={() => closeModal()}
+                >
+                  <button className='h-[2.6rem] rounded-[1.56rem] border border-imbue-purple-dark w-full justify-center bg-[#E1DDFF]'>
+                    <div className='flex text-imbue-purple-dark text-base justify-center items-center'>
+                      <Image
+                        src={walletIcon}
+                        alt='Wallet-icon'
+                        className='relative right-2'
+                      />
+                      Sign in with a wallet
+                    </div>
+                  </button>
+                </li>
+              </div>
+
+              <div className='w-full mt-8 mb-5 flex justify-between items-center'>
+                <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
+                <p className='text-base text-imbue-purple-dark'>or</p>
+                <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
+              </div>
+
               <div>
                 {formContent === 'login' ? (
                   <form
@@ -220,59 +265,12 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                           Sign up
                         </span>
                       </div>
-
-                      <div className='w-full mt-8 mb-5 flex justify-between items-center'>
-                        <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
-                        <p className='text-base text-imbue-purple-dark'>or</p>
-                        <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
-                      </div>
                     </div>
                   </form>
                 ) : (
                   <SignUp {...{ setFormContent, redirectUrl }} />
                 )}
 
-                <div className='login justify-center items-center w-full flex flex-col'>
-                  <li
-                    // ref={googleParentRef}
-                    className='mt-1 mb-2 w-full flex justify-center'
-                  >
-                    <GoogleOAuthProvider clientId={config?.googleClientId}>
-                      <GoogleLogin
-                        width={`${googleParentRef?.current?.clientWidth}`}
-                        logo_alignment='center'
-                        shape='circle'
-                        size='large'
-                        useOneTap={true}
-                        onSuccess={(creds: any) => googleLogin(creds)}
-                        onError={() => {
-                          // FIXME: error handling
-                          console.log('Login Failed');
-                        }}
-                      />
-                    </GoogleOAuthProvider>
-                  </li>
-                </div>
-
-                <div className='login justify-center items-center w-full flex flex-col'>
-                  <li
-                    className='mt-4 flex flex-row items-center cursor-pointer w-full'
-                    tabIndex={0}
-                    data-mdc-dialog-action='web3'
-                    onClick={() => closeModal()}
-                  >
-                    <button className='h-[2.6rem] rounded-[1.56rem] border border-imbue-purple-dark w-full justify-center bg-[#E1DDFF]'>
-                      <div className='flex text-imbue-purple-dark text-base justify-center items-center'>
-                        <Image
-                          src={walletIcon}
-                          alt='Wallet-icon'
-                          className='relative right-2'
-                        />
-                        Sign in with a wallet
-                      </div>
-                    </button>
-                  </li>
-                </div>
               </div>
             </DialogContent>
           </div>

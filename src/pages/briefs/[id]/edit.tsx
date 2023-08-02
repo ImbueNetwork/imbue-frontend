@@ -433,7 +433,7 @@ export const EditProposal = (): JSX.Element => {
       >
         <div className='flex flex-col gap-4 w-1/2'>
           <button
-            onClick={() => router.push(`/briefs/${briefId}/`)}
+            onClick={() => router.replace(`/briefs/${briefId}/`)}
             className='primary-btn in-dark w-button w-full !m-0'
           >
             See Updated Brief

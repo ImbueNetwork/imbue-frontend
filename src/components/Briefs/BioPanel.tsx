@@ -46,7 +46,7 @@ const BioPanel = ({
               !self-start
               '
               onClick={() => {
-                router.push(`/briefs/${brief?.id}/edit`);
+                router.replace(`/briefs/${brief?.id}/edit`);
               }}
             >
               Edit Brief

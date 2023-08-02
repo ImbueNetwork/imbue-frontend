@@ -1,7 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
-import { CircularProgress } from '@mui/material';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { Checkbox, CircularProgress, IconButton, InputAdornment, OutlinedInput } from '@mui/material';
 import bcrypt from 'bcryptjs';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
@@ -19,8 +21,10 @@ type SignUpFormProps = {
 const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
   const [user, setUser] = useState<any>();
   const [email, setEmail] = useState<any>();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [password, setPassword] = useState<any>();
   const [matchPassword, setMatchPassword] = useState<any>();
+  const [agreedToTerms, setAgreedToTerms] = useState<boolean>(false);
   const [error, setError] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -34,6 +38,8 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
     'password',
     'admin',
   ];
+
+  const disableSubmit = password != matchPassword || loading || error || !agreedToTerms
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -175,7 +181,7 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
       name='contribution-submission-form'
       method='get'
       onSubmit={handleSubmit}
-      className='w-full'
+      className='w-full max-w-[450px]'
     >
       <div className='flex flex-col justify-center pb-[10px] w-full mt-2'>
         <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
@@ -212,13 +218,33 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
           Password
         </label>
 
-        <input
+        {/* <input
           placeholder='Enter your Password'
           onChange={handleChange}
           className='outlinedInput'
           required
           type='password'
           name='password'
+        /> */}
+        <OutlinedInput
+          id="outlined-adornment-password"
+          color='secondary'
+          className='h-10 pl-[6px]'
+          placeholder='Enter your password'
+          type={showPassword ? 'text' : 'password'}
+          name='password'
+          onChange={handleChange}
+          endAdornment={
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={() => setShowPassword(!showPassword)}
+                edge="end"
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          }
         />
         <PasswordStrengthBar password={password} />
       </div>
@@ -237,14 +263,25 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
         />
       </div>
 
-      <div className='flex flex-wrap flex-row justify-center break-words w-fit px-4'>
-        <span className={`${!error ? 'hide' : 'error'} w-fit`}>{error}</span>
+      <p className={`${!error ? 'hide' : 'error'} w-full text-sm text-center`}>{error}</p>
+
+      <div className='flex items-center mb-2 justify-center'>
+        <Checkbox
+          required
+          checked={agreedToTerms}
+          onChange={(e) => setAgreedToTerms(e.target.checked)}
+          color='secondary'
+        />
+        <p className='text-content'>I agree to the
+          <span className='hover:underline cursor-pointer'>terms of services of Imbue</span>
+        </p>
       </div>
+
       <div className='flex justify-center mt-2 w-full cursor-pointer'>
         <button
           type='submit'
-          disabled={password != matchPassword || loading || error}
-          className='primary-btn in-dark w-full !text-center relative group !mx-0'
+          disabled={disableSubmit}
+          className={`primary-btn in-dark w-full !text-center relative group !mx-0 ${disableSubmit && '!bg-gray-400 !text-white'}`}
           id='create-account'
         >
           {loading && (
@@ -255,7 +292,7 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
               color='info'
             />
           )}
-          <span className='font-normal text-white group-hover:text-black'>
+          <span className='font-normal'>
             {loading ? 'Signing up' : 'Sign Up'}
           </span>
         </button>
@@ -273,12 +310,6 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
         >
           Sign In
         </span>
-      </div>
-
-      <div className='w-full my-4 flex justify-between items-center'>
-        <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
-        <p className='text-base text-imbue-purple-dark'>or</p>
-        <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
       </div>
     </form>
   );

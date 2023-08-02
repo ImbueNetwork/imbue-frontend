@@ -651,7 +651,7 @@ const Briefs = (): JSX.Element => {
                     <div
                       className='brief-item relative z-20'
                       onClick={() =>
-                        router.push(`/briefs/${item?.id}?page=${currentPage}`)
+                        router.push(`/briefs/${item?.id}`)
                       }
                     >
                       <div className='brief-title'>
