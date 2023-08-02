@@ -102,11 +102,11 @@ const NewBrief = (): JSX.Element => {
         }
         break;
       case 'description':
-        if (validateInputLength(value, 50, 500)) {
+        if (validateInputLength(value, 50, 5000)) {
           setDescription(value);
           setInputError('');
         } else {
-          setInputError('Description must be between 50 and 500 characters');
+          setInputError('Description must be between 50 and 5000 characters');
           setDescription(value);
         }
         break;
@@ -171,7 +171,7 @@ const NewBrief = (): JSX.Element => {
           data-testid='description-input'
           value={description}
           name='description'
-          maxLength={500}
+          maxLength={5000}
           className='text-black bg-white outline-none'
           onChange={handleChange}
         />

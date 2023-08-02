@@ -377,7 +377,7 @@ const GrantApplication = (): JSX.Element => {
               >
                 <div>Description</div>
                 <textarea
-                  maxLength={500}
+                  maxLength={5000}
                   value={description}
                   placeholder='Input description'
                   onChange={handleChange}
@@ -395,7 +395,7 @@ const GrantApplication = (): JSX.Element => {
                     {inputErrors?.description}
                   </p>
                   <div className='text-imbue-purple text-sm text-right'>
-                    {`${description?.length || 0}/500`}
+                    {`${description?.length || 0}/5000`}
                   </div>
                 </div>
               </div>
@@ -625,7 +625,7 @@ const GrantApplication = (): JSX.Element => {
                           </p>
                           <div>
                             <textarea
-                              maxLength={500}
+                              maxLength={5000}
                               placeholder='Add milestone description'
                               className='input-description text-base outline-content-primary placeholder:text-imbue-light-purple'
                               value={milestoneDescription}
@@ -646,7 +646,7 @@ const GrantApplication = (): JSX.Element => {
                               <div className='text-imbue-purple text-sm ml-auto text-right'>
                                 {`${
                                   milestones[index].description?.length || 0
-                                }/500`}
+                                }/5000`}
                               </div>
                             </div>
                           </div>

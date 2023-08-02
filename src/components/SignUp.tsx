@@ -223,7 +223,7 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
         <PasswordStrengthBar password={password} />
       </div>
 
-      <div className='flex flex-col justify-center pb-[10px] w-full mt-0'>
+      <div className='flex flex-col justify-center pb-[10px] w-full mt-0 mb-10'>
         <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
           Confirm Password
         </label>
@@ -237,8 +237,14 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
         />
       </div>
 
-      <div className='flex flex-wrap flex-row justify-center break-words w-fit px-4'>
-        <span className={`${!error ? 'hide' : 'error'} w-fit`}>{error}</span>
+      <div className='flex flex-wrap flex-row justify-center break-words w-full px-4 relative z-30'>
+        <span
+          className={`${
+            !error ? 'hide' : 'error'
+          } w-[150%] text-center absolute bottom-[-5px]`}
+        >
+          {error}
+        </span>
       </div>
       <div className='flex justify-center mt-2 w-full cursor-pointer'>
         <button

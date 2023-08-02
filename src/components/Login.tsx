@@ -130,6 +130,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
         onClose={() => setVisible(false)}
         aria-labelledby='responsive-dialog-title'
         className='loginModal'
+        maxWidth='xs'
       >
         {
           <div className='lg:min-w-[450px] m-auto py-2'>
