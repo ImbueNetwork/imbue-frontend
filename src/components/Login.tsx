@@ -1,15 +1,19 @@
 /* eslint-disable no-console */
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import {
   CircularProgress,
   Dialog,
   DialogContent,
+  IconButton,
+  InputAdornment,
+  OutlinedInput,
 } from '@mui/material';
 import { SignerResult } from '@polkadot/api/types';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
 import React, { useState } from 'react';
-import customStyled from 'styled-components';
 
 import * as utils from '@/utils';
 
@@ -28,32 +32,13 @@ type LoginProps = {
   setVisible: (_visible: boolean) => void;
 };
 
-const CustomInput = customStyled.input`
-  height: 2.6rem;
-  width: 100%;
-  border-width: 1px;
-  border-color: #03116a;
-  border-radius: 0.25rem !important;
-  padding: 0.62rem 1.25rem !important;
-  outline: none;
-  background-color: #fff;
-  color: #03116A !important;
-  
-  ::placeholder,
-  ::-webkit-input-placeholder {
-    color: rgba(3, 17, 106, 0.30);
-  }
-  :-ms-input-placeholder {
-     color: rgba(3, 17, 106, 0.30);
-  }
-`;
-
 const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   const [userOrEmail, setUserOrEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const [formContent, setFormContent] = useState<string>('login');
 
@@ -202,10 +187,14 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                         <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
                           Username/Email
                         </label>
-                        <CustomInput
+                        <OutlinedInput
+                          id='outlined-adornment-password'
+                          color='secondary'
+                          className='h-[2.6rem] pl-[6px]'
+                          type='text'
+                          name='emailorUsername'
                           placeholder='Enter your Username/Email'
                           onChange={(e: any) => setUserOrEmail(e.target.value)}
-                          className='mdc-text-field'
                           required
                         />
                       </div>
@@ -213,12 +202,26 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                         <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
                           Password
                         </label>
-                        <CustomInput
+                        <OutlinedInput
+                          id='outlined-adornment-password'
+                          color='secondary'
+                          className='h-[2.6rem] pl-[6px]'
                           placeholder='Enter your password'
-                          onChange={(e: any) => setPassword(e.target.value)}
-                          type='password'
-                          className='mdc-text-field'
+                          type={showPassword ? 'text' : 'password'}
+                          name='password'
                           required
+                          onChange={(e: any) => setPassword(e.target.value)}
+                          endAdornment={
+                            <InputAdornment position='end'>
+                              <IconButton
+                                aria-label='toggle password visibility'
+                                onClick={() => setShowPassword(!showPassword)}
+                                edge='end'
+                              >
+                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                              </IconButton>
+                            </InputAdornment>
+                          }
                         />
                       </div>
 
