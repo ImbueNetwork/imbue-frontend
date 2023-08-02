@@ -139,7 +139,6 @@ function Project() {
       setIsApplicant(isApplicant);
       // TODO Enable refunds first
       const userIsApprover = onChainProjectRes.contributions.map(c => c.accountId).includes(user.web3_address!);
-
       if (userIsApprover) {
         setShowRefundButton(onChainProjectRes.fundingType.Grant)
       }
@@ -164,6 +163,10 @@ function Project() {
         case OffchainProjectState.Refunded:
           setSuccess(true);
           setSuccessTitle('This project has been refunded!');
+          break;
+        case OffchainProjectState.Completed:
+          setSuccess(true);
+          setSuccessTitle('This project has been successfully delivered!');
           break;
         case OffchainProjectState.Accepted:
           if (!project.chain_project_id) {
@@ -330,6 +333,12 @@ function Project() {
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
+          const haveAllMilestonesBeenApproved = onChainProject.milestones.map((m:any) => m.is_approved).every(Boolean);
+          if(haveAllMilestonesBeenApproved) {
+            project.status_id = OffchainProjectState.Completed;
+            await updateProject(project?.id, project);
+          }
+
           setSuccess(true);
           setSuccessTitle('Withdraw successfull');
         } else if (result.txError) {
@@ -495,8 +504,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, 'Completed')
               : milestone?.milestone_key == milestoneBeingVotedOn
-              ? openForVotingTag()
-              : projectStateTag(modified, 'Not Started')}
+                ? openForVotingTag()
+                : projectStateTag(modified, 'Not Started')}
 
             <Image
               src={require(expanded
@@ -535,9 +544,8 @@ function Project() {
               }
             >
               <button
-                className={`primary-btn in-dark w-button ${
-                  !canVote && '!bg-gray-300 !text-gray-400'
-                } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
+                className={`primary-btn in-dark w-button ${!canVote && '!bg-gray-300 !text-gray-400'
+                  } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
                 data-testid='next-button'
                 onClick={() => canVote && vote()}
               >
@@ -548,7 +556,7 @@ function Project() {
 
           {(isApplicant || (projectType === 'grant' && isProjectOwner)) &&
             onChainProject?.projectState !==
-              OnchainProjectState.OpenForVoting &&
+            OnchainProjectState.OpenForVoting &&
             !milestone?.is_approved && (
               <button
                 className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
@@ -561,9 +569,8 @@ function Project() {
 
           {isApplicant && milestone.is_approved && (
             <button
-              className={`primary-btn in-dark w-button ${
-                !balance && '!bg-gray-300 !text-gray-400'
-              } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
+              className={`primary-btn in-dark w-button ${!balance && '!bg-gray-300 !text-gray-400'
+                } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
               data-testid='next-button'
               onClick={() => withdraw()}
               disabled={!balance}
@@ -747,9 +754,8 @@ function Project() {
                   {approversPreview?.map((approver: any, index: number) => (
                     <div
                       key={index}
-                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${
-                        approver?.display_name && 'cursor-pointer'
-                      }`}
+                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${approver?.display_name && 'cursor-pointer'
+                        }`}
                       onClick={() =>
                         approver.display_name &&
                         router.push(`/profile/${approver.username}`)
@@ -803,13 +809,12 @@ function Project() {
                 <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
                   <div
                     style={{
-                      width: `${
-                        (onChainProject?.milestones?.filter?.(
-                          (m: any) => m?.is_approved
-                        )?.length /
+                      width: `${(onChainProject?.milestones?.filter?.(
+                        (m: any) => m?.is_approved
+                      )?.length /
                           onChainProject?.milestones?.length) *
                         100
-                      }%`,
+                        }%`,
                     }}
                     className='h-full rounded-xl Accepted-button absolute'
                   ></div>
@@ -817,9 +822,8 @@ function Project() {
                     {onChainProject?.milestones?.map((m: any, i: number) => (
                       <div
                         key={i}
-                        className={`h-4 w-4 ${
-                          m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
-                        } rounded-full -mt-1.5`}
+                        className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
+                          } rounded-full -mt-1.5`}
                       ></div>
                     ))}
                   </div>

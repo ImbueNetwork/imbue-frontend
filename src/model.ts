@@ -14,6 +14,7 @@ export enum OffchainProjectState {
   Rejected = 3,
   Accepted = 4,
   Refunded = 5,
+  Completed = 6,
 }
 
 

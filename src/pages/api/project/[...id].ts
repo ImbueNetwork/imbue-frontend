@@ -8,6 +8,7 @@ import * as models from '@/lib/models';
 import db from '@/db';
 
 import { verifyUserIdFromJwt } from '../auth/common';
+import { OffchainProjectState } from '@/model';
 
 type ProjectPkg = models.Project & {
   milestones: models.Milestone[];
@@ -135,6 +136,7 @@ export default nextConnect()
           // project_type: exists.project_type,
           duration_id,
           status_id,
+          completed: status_id == OffchainProjectState.Completed
         })(tx);
 
         if (!project.id) {

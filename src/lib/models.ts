@@ -124,6 +124,7 @@ export type Project = {
   // project_type: number;
   escrow_address?: string;
   duration_id: number;
+  completed?: boolean;
 };
 
 export type ProjectProperties = {
