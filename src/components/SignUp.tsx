@@ -3,7 +3,13 @@
 /* eslint-disable no-unused-vars */
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { Checkbox, CircularProgress, IconButton, InputAdornment, OutlinedInput } from '@mui/material';
+import {
+  Checkbox,
+  CircularProgress,
+  IconButton,
+  InputAdornment,
+  OutlinedInput,
+} from '@mui/material';
 import bcrypt from 'bcryptjs';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
@@ -39,7 +45,8 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
     'admin',
   ];
 
-  const disableSubmit = password != matchPassword || loading || error || !agreedToTerms
+  const disableSubmit =
+    password != matchPassword || loading || error || !agreedToTerms;
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -85,10 +92,18 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
     return text.length >= min && text.length <= max;
   };
 
-  const validatePassword = (passwordString: string): boolean => {
-    const passwordRegex =
-      /^(?=.*[A-Za-z0-9])(?=.*[@#£&?. !"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~]).{6,15}$/;
-    return passwordRegex.test(passwordString);
+  const validatePassword = (password: string): boolean => {
+    // Define a regular expression to check for at least one number and one special character
+    const numberAndSpecialCharRegex =
+      // eslint-disable-next-line no-useless-escape
+      /^(?=.*\d)(?=.*[!\"#$%&'()*+,-.\/:;<=>?@[\\\]^_`{|}~]).*$/;
+
+    // Check if the password length is between 6 and 15 characters and contains a number and a special character
+    return (
+      password?.length >= 6 &&
+      password?.length <= 15 &&
+      numberAndSpecialCharRegex.test(password)
+    );
   };
 
   const handleChange = (event: any) => {
@@ -219,7 +234,7 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
           Password
         </label>
         <OutlinedInput
-          id="outlined-adornment-password"
+          id='outlined-adornment-password'
           color='secondary'
           className='h-[2.6rem] pl-[6px]'
           placeholder='Enter your password'
@@ -227,11 +242,11 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
           name='password'
           onChange={handleChange}
           endAdornment={
-            <InputAdornment position="end">
+            <InputAdornment position='end'>
               <IconButton
-                aria-label="toggle password visibility"
+                aria-label='toggle password visibility'
                 onClick={() => setShowPassword(!showPassword)}
-                edge="end"
+                edge='end'
               >
                 {showPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
@@ -255,7 +270,9 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
         />
       </div>
 
-      <p className={`${!error ? 'hide' : 'error'} w-full text-sm text-center`}>{error}</p>
+      <p className={`${!error ? 'hide' : 'error'} w-full text-sm text-center`}>
+        {error}
+      </p>
 
       <div className='flex items-center mb-2 justify-center'>
         <Checkbox
@@ -264,8 +281,11 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
           onChange={(e) => setAgreedToTerms(e.target.checked)}
           color='secondary'
         />
-        <p className='text-content'>I agree to the
-          <span className='hover:underline cursor-pointer'>terms of services of Imbue</span>
+        <p className='text-content'>
+          I agree to the
+          <span className='hover:underline cursor-pointer'>
+            terms of services of Imbue
+          </span>
         </p>
       </div>
 
@@ -273,7 +293,9 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
         <button
           type='submit'
           disabled={disableSubmit}
-          className={`primary-btn in-dark w-full !text-center relative group !mx-0 ${disableSubmit && '!bg-gray-400 !text-white'}`}
+          className={`primary-btn in-dark w-full !text-center relative group !mx-0 ${
+            disableSubmit && '!bg-gray-400 !text-white'
+          }`}
           id='create-account'
         >
           {loading && (
