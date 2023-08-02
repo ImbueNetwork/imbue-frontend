@@ -20,11 +20,6 @@ import {
   User,
 } from '@/model';
 
-type EventDetails = {
-  eventName: string;
-};
-
-
 export enum ImbueChainEvent {
   Contribute = "ContributeSucceeded",
   SubmitMilestone = "MilestoneSubmitted",
