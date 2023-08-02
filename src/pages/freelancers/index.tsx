@@ -234,7 +234,7 @@ const Freelancers = (): JSX.Element => {
 
         const { currentData, totalFreelancers } = await callSearchFreelancers(
           filter
-          );
+        );
         setFreelancers(currentData);
         setFreelancersTotal(totalFreelancers);
       }
@@ -528,7 +528,7 @@ const Freelancers = (): JSX.Element => {
                             </h5>
                           </div>
                           <div
-                            className={`${styles.skills} ml-4 overflow-scroll mb-4`}
+                            className={`${styles.skills} ml-4 overflow-scroll mb-4 flex-wrap`}
                           >
                             {skills
                               ?.slice(0, 3)
@@ -594,6 +594,7 @@ const Freelancers = (): JSX.Element => {
                   onChange={(e) => {
                     setItemsPerPage(Number(e.target.value));
                   }}
+                  value={itemsPerPage}
                   placeholder='Select a currency'
                   className='bg-white outline-none round border border-imbue-purple rounded-[0.5rem] text-base px-5 h-[2.75rem] text-imbue-purple-dark'
                   required
