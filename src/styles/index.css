@@ -770,6 +770,10 @@ input[type='radio'] {
   color: #000;
 }
 
+.capitalize-first::first-letter {
+  text-transform: uppercase;
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,

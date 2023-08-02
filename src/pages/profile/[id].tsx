@@ -472,54 +472,58 @@ const Profile = ({ initUser, browsingUser }: any) => {
             </div>
           </div>
 
-          <div className='w-full bg-white rounded-xl'>
-            <p className='px-10 lg:px-16 py-6 text-xl text-imbue-purple-dark'>
-              Open Briefs
-            </p>
-            <div className='briefs-list w-full'>
-              {openBriefs?.map(
-                (item, itemIndex) =>
-                  !item?.project_id && (
-                    <div
-                      className='brief-item !px-10 lg:!px-16 rounded-b-xl'
-                      key={itemIndex}
-                      onClick={() => router.push(`/briefs/${item?.id}/`)}
-                    >
-                      <div className='brief-title !text-xl lg:!text-2xl'>
-                        {item.headline.length > 50
-                          ? `${item.headline.substring(0, 50)}...`
-                          : item.headline}
-                      </div>
-                      <div className='brief-time-info !text-sm lg:!text-base'>
-                        {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
-                      </div>
-                      <div className='brief-description !text-sm lg:!text-base'>
-                        {item.description.length > 400
-                          ? `${item.description.substring(0, 400)}...`
-                          : item.description}
-                      </div>
-
-                      <div className='brief-tags'>
-                        {item.skills?.map((skill: any, skillIndex: any) => (
-                          <div className='tag-item' key={skillIndex}>
-                            {skill}
+          {
+            !isEditMode && (
+              <div className='w-full bg-white rounded-xl'>
+                <p className='px-10 lg:px-16 py-6 text-xl text-imbue-purple-dark'>
+                  Open Briefs
+                </p>
+                <div className='briefs-list w-full'>
+                  {openBriefs?.map(
+                    (item, itemIndex) =>
+                      !item?.project_id && (
+                        <div
+                          className='brief-item !px-10 lg:!px-16 rounded-b-xl'
+                          key={itemIndex}
+                          onClick={() => router.push(`/briefs/${item?.id}/`)}
+                        >
+                          <div className='brief-title !text-xl lg:!text-2xl'>
+                            {item.headline.length > 50
+                              ? `${item.headline.substring(0, 50)}...`
+                              : item.headline}
                           </div>
-                        ))}
-                      </div>
+                          <div className='brief-time-info !text-sm lg:!text-base'>
+                            {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
+                          </div>
+                          <div className='brief-description !text-sm lg:!text-base'>
+                            {item.description.length > 400
+                              ? `${item.description.substring(0, 400)}...`
+                              : item.description}
+                          </div>
 
-                      <div className='brief-proposals !text-xs lg:!text-sm'>
-                        <span className='proposals-heading'>
-                          Proposals Submitted:{' '}
-                        </span>
-                        <span className='proposals-count'>
-                          {item.number_of_briefs_submitted}
-                        </span>
-                      </div>
-                    </div>
-                  )
-              )}
-            </div>
-          </div>
+                          <div className='brief-tags'>
+                            {item.skills?.map((skill: any, skillIndex: any) => (
+                              <div className='tag-item' key={skillIndex}>
+                                {skill}
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className='brief-proposals !text-xs lg:!text-sm'>
+                            <span className='proposals-heading'>
+                              Proposals Submitted:{' '}
+                            </span>
+                            <span className='proposals-count'>
+                              {item.number_of_briefs_submitted}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                  )}
+                </div>
+              </div>
+            )
+          }
         </div>
       </div>
       {user && showMessageBox && (

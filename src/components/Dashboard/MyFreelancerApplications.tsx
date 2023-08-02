@@ -2,7 +2,7 @@ import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import React, { useState } from 'react';
 
-import FreelancerView from '@/components/FreelacerView/FreelancerView';
+import FreelancerView from '@/components/Dashboard/FreelacerView/FreelancerView';
 
 TimeAgo.addLocale(en);
 

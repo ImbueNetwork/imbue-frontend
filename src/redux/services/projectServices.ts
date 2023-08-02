@@ -11,9 +11,6 @@ export const createProject = async (project: any) => {
     if (resp.status === 201 || resp.status === 200) {
       return await resp.json();
     } else {
-      const data = await resp.json();
-      console.log(data);
-
       return {
         status: resp.status,
         message: 'Could not complete the application. Please try again',
@@ -40,5 +37,25 @@ export const updateProject = async (application_id: number, project: any) => {
     }
   } catch (error: any) {
     return { message: `${error?.message}` };
+  }
+};
+
+export const getUsersOngoingGrants = async (walletAddress: string) => {
+  const resp = await fetch(
+    `${config.apiBase}/project/getApproverProjects/${walletAddress}`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'get',
+    }
+  );
+
+  return await resp.json();
+
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    throw new Error(
+      'Failed to get all brief applications. status:' + resp.status
+    );
   }
 };

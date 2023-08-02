@@ -1,6 +1,7 @@
 import { Divider } from '@mui/material';
 import classNames from 'classnames';
 import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
 import router from 'next/router';
 import { useState } from 'react';
 
@@ -12,9 +13,14 @@ interface OnGoinProjectProps {
   projects: Project[];
 }
 
+TimeAgo.addLocale(en);
+
 const timeAgo = new TimeAgo('en-US');
+
 const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
-  const [value, setValue] = useState(10);
+  /// limit ongoing project
+  const ongoinProjectLimit = 10;
+  const [value, setValue] = useState(ongoinProjectLimit);
   const redirectToApplication = (application: Project) => {
     router.push(
       `/briefs/${application.brief_id}/applications/${application.id}/`
@@ -43,7 +49,8 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
     <>
       {projects?.map(
         (item: any, index: number) =>
-          index < Math.min(Math.max(value, 10), projects.length) && (
+          index <
+          Math.min(Math.max(value, ongoinProjectLimit), projects.length) && (
             <>
               <div
                 key={item.id}
@@ -92,36 +99,38 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
             </>
           )
       )}
-      {value < projects.length && (
-        <div className='flex justify-center my-7 items-center '>
-          <div className='w-full flex justify-center py-6'>
-            <button
-              onClick={() => {
-                setValue((value) => value + 10);
-              }}
-              className='primary-btn in-dark w-button lg:w-1/3'
-              style={{ textAlign: 'center' }}
-            >
-              load more
-            </button>
+      <div className='flex'>
+        {value < projects.length && (
+          <div className='flex w-full justify-center my-7 items-center '>
+            <div className='w-full flex justify-center py-6'>
+              <button
+                onClick={() => {
+                  setValue((value) => value + ongoinProjectLimit);
+                }}
+                className='primary-btn in-dark w-button lg:w-1/3'
+                style={{ textAlign: 'center' }}
+              >
+                load more
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-      {value > 10 && projects.length > 10 && (
-        <div className='flex justify-center my-7 items-center '>
-          <div className='w-full flex justify-center py-6'>
-            <button
-              onClick={() => {
-                setValue((value) => value - 10);
-              }}
-              className='primary-btn in-dark w-button lg:w-1/3'
-              style={{ textAlign: 'center' }}
-            >
-              show less
-            </button>
+        )}
+        {value > ongoinProjectLimit && projects.length > ongoinProjectLimit && (
+          <div className='flex w-full justify-center my-7 items-center '>
+            <div className='w-full flex justify-center py-6'>
+              <button
+                onClick={() => {
+                  setValue((value) => value - ongoinProjectLimit);
+                }}
+                className='primary-btn in-dark w-button lg:w-1/3'
+                style={{ textAlign: 'center' }}
+              >
+                show less
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 };
