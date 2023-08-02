@@ -532,7 +532,7 @@ export const fetchUserProject =
 
 export const fetchUserProjects =
   (id: string | number) => (tx: Knex.Transaction) =>
-    fetchAllProjects()(tx).where({ user_id: id });
+    fetchAllProjects()(tx).where({ user_id: id }).orderBy('created', 'desc');
 
 export const fetchUserOnGoingProjects =
   (id: string | number, skip: number, limit: number) =>

@@ -86,7 +86,8 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
   };
 
   const validatePassword = (passwordString: string): boolean => {
-    const passwordRegex = /^(?=.*[A-Za-z0-9])(?=.*[@#£&?.]).{6,15}$/;
+    const passwordRegex =
+      /^(?=.*[A-Za-z0-9])(?=.*[@#£&?. !"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~]).{6,15}$/;
     return passwordRegex.test(passwordString);
   };
 
@@ -217,19 +218,10 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
         <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
           Password
         </label>
-
-        {/* <input
-          placeholder='Enter your Password'
-          onChange={handleChange}
-          className='outlinedInput'
-          required
-          type='password'
-          name='password'
-        /> */}
         <OutlinedInput
           id="outlined-adornment-password"
           color='secondary'
-          className='h-10 pl-[6px]'
+          className='h-[2.6rem] pl-[6px]'
           placeholder='Enter your password'
           type={showPassword ? 'text' : 'password'}
           name='password'

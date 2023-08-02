@@ -95,8 +95,9 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-xp-${index}`}
-            className={`${styles.freelanceXpItem} ${freelancingBefore === value ? styles.active : ''
-              }`}
+            className={`${styles.freelanceXpItem} ${
+              freelancingBefore === value ? styles.active : ''
+            }`}
             onClick={() => setFreelancingBefore(value)}
           >
             {label}
@@ -118,8 +119,9 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-goal-${index}`}
-            className={`${styles.freelanceXpItem} ${goal === value ? styles.active : ''
-              }`}
+            className={`${styles.freelanceXpItem} ${
+              goal === value ? styles.active : ''
+            }`}
             onClick={() => setGoal(value)}
           >
             {label}
@@ -162,7 +164,9 @@ const Freelancer = (): JSX.Element => {
       </div>
       <div className={styles.namePanelInputWrapper}>
         <ValidatableInput
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setTitle(e.target.value)
+          }
           name='title'
           data-testid='title'
           placeholder='Enter your title'
@@ -191,7 +195,9 @@ const Freelancer = (): JSX.Element => {
       </div>
       <div className={styles.namePanelInputWrapper}>
         <ValidatableInput
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setEducation(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setEducation(e.target.value)
+          }
           maxLength={100}
           className={`${styles.fieldInput} placeholder:text-imbue-light-purple`}
           placeholder='Enter your education'
@@ -278,7 +284,9 @@ const Freelancer = (): JSX.Element => {
           onChange={(e) => setBio(e.target.value)}
         /> */}
         <ValidatableInput
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setBio(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setBio(e.target.value)
+          }
           className={`${styles.fieldInput} ${styles.large}`}
           placeholder='Enter your bio'
           data-testid='bio'
@@ -333,8 +341,16 @@ const Freelancer = (): JSX.Element => {
   ];
 
   useEffect(() => {
-    validate()
-  }, [freelancedBefore, goal, title, education, skills?.length, bio, services?.length])
+    validate();
+  }, [
+    freelancedBefore,
+    goal,
+    title,
+    education,
+    skills?.length,
+    bio,
+    services?.length,
+  ]);
 
   const validate = (): boolean => {
     // TODO: show notification
@@ -348,7 +364,10 @@ const Freelancer = (): JSX.Element => {
       // TODO: minimum required length for description
       return false;
     }
-    if (step === 4 && (!education || !validateInputLength(education, 10, 100))) {
+    if (
+      step === 4 &&
+      (!education || !validateInputLength(education, 10, 100))
+    ) {
       return false;
     }
     // Freelancers might only speak 1 language

@@ -86,6 +86,7 @@ const Dashboard = (): JSX.Element => {
   }, [user]);
 
   useEffect(() => {
+    
     if (client && user?.username && !loadingStreamChat) {
       client?.connectUser(
         {

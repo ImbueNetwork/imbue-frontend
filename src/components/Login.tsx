@@ -127,6 +127,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
         onClose={() => setVisible(false)}
         aria-labelledby='responsive-dialog-title'
         className='loginModal'
+        maxWidth='xs'
       >
         {
           <div className='lg:min-w-[500px] m-auto'>
@@ -139,6 +140,26 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
               <p className='text-base lg:text-xl text-imbue-purple-dark mb-7 relative text-center'>
                 Please use the link below to sign in.
               </p>
+
+              <div className='login justify-center items-center w-full flex flex-col'>
+                <li
+                  className='mb-4 flex flex-row items-center cursor-pointer w-full'
+                  tabIndex={0}
+                  data-mdc-dialog-action='web3'
+                  onClick={() => closeModal()}
+                >
+                  <button className='h-[2.6rem] rounded-[1.56rem] border border-imbue-purple-dark w-full justify-center bg-[#E1DDFF]'>
+                    <div className='flex text-imbue-purple-dark text-base justify-center items-center'>
+                      <Image
+                        src={walletIcon}
+                        alt='Wallet-icon'
+                        className='relative right-2'
+                      />
+                      Sign in with a wallet
+                    </div>
+                  </button>
+                </li>
+              </div>
 
               <div className='login justify-center items-center w-full flex flex-col'>
                 <li
@@ -159,26 +180,6 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                       }}
                     />
                   </GoogleOAuthProvider>
-                </li>
-              </div>
-
-              <div className='login justify-center items-center w-full flex flex-col'>
-                <li
-                  className='mt-4 flex flex-row items-center cursor-pointer w-full'
-                  tabIndex={0}
-                  data-mdc-dialog-action='web3'
-                  onClick={() => closeModal()}
-                >
-                  <button className='h-[2.6rem] rounded-[1.56rem] border border-imbue-purple-dark w-full justify-center bg-[#E1DDFF]'>
-                    <div className='flex text-imbue-purple-dark text-base justify-center items-center'>
-                      <Image
-                        src={walletIcon}
-                        alt='Wallet-icon'
-                        className='relative right-2'
-                      />
-                      Sign in with a wallet
-                    </div>
-                  </button>
                 </li>
               </div>
 

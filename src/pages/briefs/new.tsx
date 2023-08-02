@@ -44,6 +44,8 @@ const NewBrief = (): JSX.Element => {
   const [error, setError] = useState<any>();
   const [inputError, setInputError] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [industriesError, setIndustriesError] = useState(false);
+  const [skillError, setSkillError] = useState(false);
   const router = useRouter();
 
   const { user } = useSelector((state: RootState) => state.userState);
@@ -63,6 +65,18 @@ const NewBrief = (): JSX.Element => {
     const skillRes = await searchSkills(name);
     if (!skillRes || !skillRes?.skills.length) return;
     setSuggestedSkills(skillRes?.skills.map((skill) => skill.name));
+  };
+
+  const handleIndustriesChange = (val: string[]) => {
+    if (val.length < 3 || val.length > 5) setIndustriesError(true);
+    else setIndustriesError(false);
+    setIndustries(val);
+  };
+
+  const handleSkillsChange = (val: string[]) => {
+    if (val.length < 5 || val.length > 10) setSkillError(true);
+    else setSkillError(false);
+    setSkills(val);
   };
 
   const validateInputLength = (
@@ -135,9 +149,14 @@ const NewBrief = (): JSX.Element => {
           suggestData={suggestedIndustries}
           data-testid='industries-input'
           tags={industries}
-          onChange={(tags: string[]) => setIndustries(tags)}
+          onChange={(tags: string[]) => handleIndustriesChange(tags)}
           limit={10}
         />
+      </div>
+      <div className='flex flex-wrap flex-row  justify-center relative -top-4'>
+        <span className={!industriesError ? 'hide' : 'error'}>
+          number of industries must be btween 3 to 5
+        </span>
       </div>
     </>
   );
@@ -182,7 +201,7 @@ const NewBrief = (): JSX.Element => {
           getOptionLabel={(option) => option}
           options={suggestedSkills}
           sx={{ width: '100%' }}
-          onChange={(e, value) => setSkills(value)}
+          onChange={(e, value) => handleSkillsChange(value)}
           defaultValue={skills}
           renderInput={(params) => (
             <TextField
@@ -192,6 +211,11 @@ const NewBrief = (): JSX.Element => {
             />
           )}
         />
+      </div>
+      <div className='flex flex-wrap flex-row  justify-center relative -top-8'>
+        <span className={!skillError ? 'hide' : 'error'}>
+          number of skills must be btween 5 to 10
+        </span>
       </div>
     </>
   );
@@ -307,14 +331,20 @@ const NewBrief = (): JSX.Element => {
     if (step === 0 && !headline) {
       return false;
     }
-    if (step === 1 && !industries.length) {
+    if (
+      step === 1 &&
+      (!industries.length || industries.length < 3 || industries.length > 5)
+    ) {
       return false;
     }
     if (step === 2 && !description && inputError) {
       // TODO: minimum required length for description
       return false;
     }
-    if (step === 3 && !skills.length) {
+    if (
+      step === 3 &&
+      (!skills.length || skills.length < 5 || skills.length > 10)
+    ) {
       return false;
     }
     if (step === 4 && expId === undefined) {

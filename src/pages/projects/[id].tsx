@@ -115,10 +115,11 @@ function Project() {
   const [approversPreview, setApproverPreview] = useState<any>([]);
   const [isApprover, setIsApprover] = useState<boolean>(false);
 
-  const [projectType, setProjectType] = useState<"grant" | "brief" | null>(null)
-  const canVote = isApprover || (projectType === "brief" && isProjectOwner)
-  const [expandPorjectDesc, setExpandProjectDesc] = useState<number>(500)
-
+  const [projectType, setProjectType] = useState<'grant' | 'brief' | null>(
+    null
+  );
+  const canVote = isApprover || (projectType === 'brief' && isProjectOwner);
+  const [expandPorjectDesc, setExpandProjectDesc] = useState<number>(500);
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -191,8 +192,8 @@ function Project() {
           setTargetUser(owner);
         }
       } else {
-        setProjectType('grant')
-        if (!projectRes?.user_id) return
+        setProjectType('grant');
+        if (!projectRes?.user_id) return;
 
         owner = await utils.fetchUser(projectRes?.user_id);
         setTargetUser(owner);
@@ -267,9 +268,8 @@ function Project() {
       if (!result.txError) {
         setSuccess(true);
         setSuccessTitle('Your vote was successfull');
-      }
-      else {
-        setError({ message: result.errorMessage })
+      } else {
+        setError({ message: result.errorMessage });
       }
     } catch (error) {
       setError({ message: 'Could not vote. Please try again later' });
@@ -456,8 +456,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, 'Completed')
               : milestone?.milestone_key == milestoneBeingVotedOn
-                ? openForVotingTag()
-                : projectStateTag(modified, 'Not Started')}
+              ? openForVotingTag()
+              : projectStateTag(modified, 'Not Started')}
 
             <Image
               src={require(expanded
@@ -496,8 +496,9 @@ function Project() {
               }
             >
               <button
-                className={`primary-btn in-dark w-button ${!canVote && '!bg-gray-300 !text-gray-400'
-                  } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
+                className={`primary-btn in-dark w-button ${
+                  !canVote && '!bg-gray-300 !text-gray-400'
+                } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
                 data-testid='next-button'
                 onClick={() => canVote && vote()}
               >
@@ -508,7 +509,7 @@ function Project() {
 
           {(isApplicant || (projectType === 'grant' && isProjectOwner)) &&
             onChainProject?.projectState !==
-            OnchainProjectState.OpenForVoting &&
+              OnchainProjectState.OpenForVoting &&
             !milestone?.is_approved && (
               <button
                 className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
@@ -521,8 +522,9 @@ function Project() {
 
           {isApplicant && milestone.is_approved && (
             <button
-              className={`primary-btn in-dark w-button ${!balance && '!bg-gray-300 !text-gray-400'
-                } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
+              className={`primary-btn in-dark w-button ${
+                !balance && '!bg-gray-300 !text-gray-400'
+              } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
               data-testid='next-button'
               onClick={() => withdraw()}
               disabled={!balance}
@@ -595,22 +597,28 @@ function Project() {
           </p>
 
           <p className='text-base text-content font-normal leading-[178.15%] lg:w-[80%] whitespace-pre-wrap'>
-            {
-              project?.description?.length > expandPorjectDesc
-                ? project?.description?.substring(0, expandPorjectDesc) + " ..."
-                : project?.description
-            }
-            {
-              project?.description?.length > 500 && (
-                <span>
-                  {
-                    (project?.description?.length > expandPorjectDesc)
-                      ? <button onClick={() => setExpandProjectDesc((prev) => prev + 500)} className='mt-3 ml-2 w-fit text-sm hover:underline text-imbue-lemon'>Show more</button>
-                      : <button onClick={() => setExpandProjectDesc(500)} className='mt-3 ml-2 w-fit text-sm hover:underline text-imbue-lemon'>Show Less</button>
-                  }
-                </span>
-              )
-            }
+            {project?.description?.length > expandPorjectDesc
+              ? project?.description?.substring(0, expandPorjectDesc) + ' ...'
+              : project?.description}
+            {project?.description?.length > 500 && (
+              <span>
+                {project?.description?.length > expandPorjectDesc ? (
+                  <button
+                    onClick={() => setExpandProjectDesc((prev) => prev + 500)}
+                    className='mt-3 ml-2 w-fit text-sm hover:underline text-imbue-lemon'
+                  >
+                    Show more
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setExpandProjectDesc(500)}
+                    className='mt-3 ml-2 w-fit text-sm hover:underline text-imbue-lemon'
+                  >
+                    Show Less
+                  </button>
+                )}
+              </span>
+            )}
           </p>
 
           <p className='text-sm text-content-primary leading-[1.5] m-0 p-0'>
@@ -700,8 +708,9 @@ function Project() {
                   {approversPreview?.map((approver: any, index: number) => (
                     <div
                       key={index}
-                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${approver?.display_name && 'cursor-pointer'
-                        }`}
+                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${
+                        approver?.display_name && 'cursor-pointer'
+                      }`}
                       onClick={() =>
                         approver.display_name &&
                         router.push(`/profile/${approver.username}`)
@@ -755,12 +764,13 @@ function Project() {
                 <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
                   <div
                     style={{
-                      width: `${(onChainProject?.milestones?.filter?.(
-                        (m: any) => m?.is_approved
-                      )?.length /
-                        onChainProject?.milestones?.length) *
+                      width: `${
+                        (onChainProject?.milestones?.filter?.(
+                          (m: any) => m?.is_approved
+                        )?.length /
+                          onChainProject?.milestones?.length) *
                         100
-                        }%`,
+                      }%`,
                     }}
                     className='h-full rounded-xl Accepted-button absolute'
                   ></div>
@@ -768,8 +778,9 @@ function Project() {
                     {onChainProject?.milestones?.map((m: any, i: number) => (
                       <div
                         key={i}
-                        className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
-                          } rounded-full -mt-1.5`}
+                        className={`h-4 w-4 ${
+                          m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
+                        } rounded-full -mt-1.5`}
                       ></div>
                     ))}
                   </div>
