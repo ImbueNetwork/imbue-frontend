@@ -124,6 +124,7 @@ export type Project = {
   // project_type: number;
   escrow_address?: string;
   duration_id: number;
+  completed?: boolean;
 };
 
 export type ProjectProperties = {
@@ -287,87 +288,87 @@ export const fetchUserOrEmail =
 
 export const upsertWeb3Challenge =
   (user: User, address: string, type: string, challenge: string) =>
-  async (
-    tx: Knex.Transaction
-  ): Promise<[web3Account: Web3Account, isInsert: boolean]> => {
-    await resetUserWeb3Addresses(address)(tx);
-    await tx<User>('users')
-      .update({ web3_address: address })
-      .where({ id: user.id })
-      .returning('*');
+    async (
+      tx: Knex.Transaction
+    ): Promise<[web3Account: Web3Account, isInsert: boolean]> => {
+      await resetUserWeb3Addresses(address)(tx);
+      await tx<User>('users')
+        .update({ web3_address: address })
+        .where({ id: user.id })
+        .returning('*');
 
-    const web3Account = await tx<Web3Account>('web3_accounts')
-      .select()
-      .where({
-        user_id: user?.id,
-      })
-      .first();
+      const web3Account = await tx<Web3Account>('web3_accounts')
+        .select()
+        .where({
+          user_id: user?.id,
+        })
+        .first();
 
-    if (!web3Account) {
+      if (!web3Account) {
+        return [
+          (
+            await tx<Web3Account>('web3_accounts')
+              .insert({
+                address,
+                user_id: user.id,
+                type,
+                challenge,
+              })
+              .returning('*')
+          )[0],
+          true,
+        ];
+      }
+
       return [
         (
           await tx<Web3Account>('web3_accounts')
-            .insert({
-              address,
-              user_id: user.id,
-              type,
-              challenge,
-            })
+            .update({ challenge })
+            .where({ user_id: user.id })
             .returning('*')
         )[0],
-        true,
+        false,
       ];
-    }
-
-    return [
-      (
-        await tx<Web3Account>('web3_accounts')
-          .update({ challenge })
-          .where({ user_id: user.id })
-          .returning('*')
-      )[0],
-      false,
-    ];
-  };
+    };
 
 export const updateOrInsertUserWeb3Address =
   (user: User, address: string, type: string, challenge: string) =>
-  async (
-    tx: Knex.Transaction
-  ): Promise<[web3Account: Web3Account, isInsert: boolean]> => {
-    const web3Account = await tx<Web3Account>('web3_accounts')
-      .select()
-      .where({
-        user_id: user?.id,
-      })
-      .orWhere({ address })
-      .first();
-    if (!web3Account) {
+    async (
+      tx: Knex.Transaction
+    ): Promise<[web3Account: Web3Account, isInsert: boolean]> => {
+      const web3Account = await tx<Web3Account>('web3_accounts')
+        .select()
+        .where({
+          user_id: user?.id,
+        })
+        .orWhere({ address })
+        .first();
+      if (!web3Account) {
+        return [
+          (
+            await tx<Web3Account>('web3_accounts')
+              .insert({
+                address,
+                user_id: user.id,
+                type,
+                challenge,
+              })
+              .returning('*')
+          )[0],
+          true,
+        ];
+      }
       return [
         (
           await tx<Web3Account>('web3_accounts')
-            .insert({
-              address,
-              user_id: user.id,
-              type,
-              challenge,
-            })
+            .update({ user_id: user.id, address })
+            .where({ user_id: user.id })
+            .orWhere({ address })
             .returning('*')
         )[0],
-        true,
+        false,
       ];
-    }
-    return [
-      (
-        await tx<Web3Account>('web3_accounts')
-          .update({ user_id: user.id, address })
-          .where({ user_id: user.id })
-          .orWhere({ address })
-          .returning('*')
-      )[0],
-      false,
-    ];
-  };
+    };
 
 export const insertUserByDisplayName =
   (displayName: string, username: string) => async (tx: Knex.Transaction) =>
@@ -419,32 +420,32 @@ export const insertToFreelancerClientsTable =
     item: { name: string; website?: string; logo?: string },
     table_name: string
   ) =>
-  async (tx: Knex.Transaction) =>
-    (
-      await tx(table_name)
-        .insert({
-          name: item.name.toLowerCase(),
-          website: item?.website || '',
-          logo: item?.logo || '',
-        })
-        .returning('*')
-    )[0];
+    async (tx: Knex.Transaction) =>
+      (
+        await tx(table_name)
+          .insert({
+            name: item.name.toLowerCase(),
+            website: item?.website || '',
+            logo: item?.logo || '',
+          })
+          .returning('*')
+      )[0];
 
 export const updateFederatedLoginUser =
   (user: User, username: string, email: string, password?: string) =>
-  async (tx: Knex.Transaction) =>
-    (
-      await tx<User>('users')
-        .update({
-          username: username.toLowerCase(),
-          email: email.toLowerCase(),
-          password: password,
-        })
-        .where({
-          id: user.id,
-        })
-        .returning('*')
-    )[0];
+    async (tx: Knex.Transaction) =>
+      (
+        await tx<User>('users')
+          .update({
+            username: username.toLowerCase(),
+            email: email.toLowerCase(),
+            password: password,
+          })
+          .where({
+            id: user.id,
+          })
+          .returning('*')
+      )[0];
 
 export const getApproverProjects =
   (wallet: string | string[]) => async (tx: Knex.Transaction) =>
@@ -466,26 +467,26 @@ export const updateProject =
 
 export const updateProjectProperties =
   (id: string | number, properties: ProjectProperties) =>
-  async (tx: Knex.Transaction) =>
-    (
-      await tx<ProjectProperties>('project_properties')
-        .update(properties)
-        .where({ project_id: id })
-        .returning('*')
-    )[0];
+    async (tx: Knex.Transaction) =>
+      (
+        await tx<ProjectProperties>('project_properties')
+          .update(properties)
+          .where({ project_id: id })
+          .returning('*')
+      )[0];
 
 export const fetchUserBriefApplications =
   (user_id: string | number, brief_id: string | number) =>
-  (tx: Knex.Transaction) =>
-    tx<Project>('projects').select().where({ user_id, brief_id }).first();
+    (tx: Knex.Transaction) =>
+      tx<Project>('projects').select().where({ user_id, brief_id }).first();
 
 export const fetchBriefProject =
   (id: string | number, brief_id: string | undefined) =>
-  (tx: Knex.Transaction) =>
-    tx<Project>('projects')
-      .select()
-      .where({ id: id, brief_id: brief_id })
-      .first();
+    (tx: Knex.Transaction) =>
+      tx<Project>('projects')
+        .select()
+        .where({ id: id, brief_id: brief_id })
+        .first();
 
 export const fetchProjectById =
   (id: string | number) => (tx: Knex.Transaction) =>
@@ -537,12 +538,12 @@ export const fetchUserProjects =
 
 export const fetchUserOnGoingProjects =
   (id: string | number, skip: number, limit: number) =>
-  (tx: Knex.Transaction) =>
-    fetchAllProjects()(tx)
-      .where({ user_id: id })
-      .whereNot({ chain_project_id: null })
-      .offset(skip)
-      .limit(limit);
+    (tx: Knex.Transaction) =>
+      fetchAllProjects()(tx)
+        .where({ user_id: id })
+        .whereNot({ chain_project_id: null })
+        .offset(skip)
+        .limit(limit);
 
 export const insertMilestones = (
   milestones: ProposedMilestone[],
@@ -572,14 +573,22 @@ export const fetchProjectApprovers =
       .select('approver')
       .where({ project_id: id });
 
+export const fetchProjectApproverUserIds =
+  (id: string | number) => 
+  async (tx: Knex.Transaction) =>
+   (await tx<User>('project_approvers').select('users.id')
+      .join('web3_accounts', 'project_approvers.approver', 'web3_accounts.address')
+      .join('users', 'web3_accounts.user_id', 'users.id')
+      .where('project_approvers.project_id', '=', id).returning('users.id')).map( (row) => row.id);
+
 export const updateMilestoneDetails =
   (id: string | number, milestoneId: string | number, details: string) =>
-  (tx: Knex.Transaction) =>
-    tx<MilestoneDetails>('milestone_details')
-      .where({ project_id: id })
-      .where('index', '=', milestoneId)
-      .update('details', details)
-      .returning('*');
+    (tx: Knex.Transaction) =>
+      tx<MilestoneDetails>('milestone_details')
+        .where({ project_id: id })
+        .where('index', '=', milestoneId)
+        .update('details', details)
+        .returning('*');
 
 export const insertMilestoneDetails =
   (value: MilestoneDetails) => async (tx: Knex.Transaction) =>
@@ -595,11 +604,11 @@ export const fetchAllMilestone =
 
 export const fetchMilestoneByIndex =
   (projectId: string | number, milestoneId: string | number) =>
-  (tx: Knex.Transaction) =>
-    tx<MilestoneDetails>('milestone_details')
-      .select()
-      .where({ project_id: projectId })
-      .where('index', '=', milestoneId);
+    (tx: Knex.Transaction) =>
+      tx<MilestoneDetails>('milestone_details')
+        .select()
+        .where({ project_id: projectId })
+        .where('index', '=', milestoneId);
 
 export const fetchBriefApplications =
   (id: string | string[]) => (tx: Knex.Transaction) =>
@@ -707,68 +716,68 @@ export const insertBrief =
     scope_id: number,
     duration_id: number
   ) =>
-  async (tx: Knex.Transaction) =>
-    await tx('briefs')
-      .insert({
-        headline: brief.headline,
-        description: brief.description,
-        duration_id: duration_id,
-        scope_id: scope_id,
-        user_id: brief.user_id,
-        budget: brief.budget,
-        experience_id: brief.experience_id,
-      })
-      .returning('briefs.id')
-      .then(async (ids) => {
-        if (skill_ids) {
-          skill_ids.forEach(async (skillId) => {
-            if (skillId) {
-              await tx('brief_skills').insert({
-                brief_id: ids[0],
-                skill_id: skillId,
-              });
-            }
-          });
-        }
+    async (tx: Knex.Transaction) =>
+      await tx('briefs')
+        .insert({
+          headline: brief.headline,
+          description: brief.description,
+          duration_id: duration_id,
+          scope_id: scope_id,
+          user_id: brief.user_id,
+          budget: brief.budget,
+          experience_id: brief.experience_id,
+        })
+        .returning('briefs.id')
+        .then(async (ids) => {
+          if (skill_ids) {
+            skill_ids.forEach(async (skillId) => {
+              if (skillId) {
+                await tx('brief_skills').insert({
+                  brief_id: ids[0],
+                  skill_id: skillId,
+                });
+              }
+            });
+          }
 
-        if (industry_ids) {
-          industry_ids.forEach(async (industry_id) => {
-            if (industry_id) {
-              await tx('brief_industries').insert({
-                brief_id: ids[0],
-                industry_id: industry_id,
-              });
-            }
-          });
-        }
-        return ids[0];
-      });
+          if (industry_ids) {
+            industry_ids.forEach(async (industry_id) => {
+              if (industry_id) {
+                await tx('brief_industries').insert({
+                  brief_id: ids[0],
+                  industry_id: industry_id,
+                });
+              }
+            });
+          }
+          return ids[0];
+        });
 
 // save a brief
 export const insertSavedBrief =
   (brief: any, scope_id: number, duration_id: number, user_id: number) =>
-  async (tx: Knex.Transaction) => {
-    return await tx('saved_briefs')
-      .select('*')
-      .where({ user_id: user_id, brief_id: brief.id })
-      .then(async (ids) => {
-        if (ids.length === 0) {
-          return await tx('saved_briefs')
-            .insert({
-              user_id: user_id,
-              brief_id: brief.id,
-            })
-            .returning('saved_briefs.id')
-            .then(async (ids) => {
-              return ids[0];
-            });
-        } else {
-          return {
-            status: 'Brief already saved',
-          };
-        }
-      });
-  };
+    async (tx: Knex.Transaction) => {
+      return await tx('saved_briefs')
+        .select('*')
+        .where({ user_id: user_id, brief_id: brief.id })
+        .then(async (ids) => {
+          if (ids.length === 0) {
+            return await tx('saved_briefs')
+              .insert({
+                user_id: user_id,
+                brief_id: brief.id,
+              })
+              .returning('saved_briefs.id')
+              .then(async (ids) => {
+                return ids[0];
+              });
+          } else {
+            return {
+              status: 'Brief already saved',
+            };
+          }
+        });
+    };
 
 export const getSavedBriefs =
   (user_id: string) => async (tx: Knex.Transaction) => {
@@ -815,46 +824,46 @@ export const updateBrief =
     skill_ids: number[],
     industry_ids: number[]
   ) =>
-  async (tx: Knex.Transaction) =>
-    await tx<Brief>('briefs')
-      .update({
-        headline: headline,
-        description: description,
-        scope_id: scope_id,
-        duration_id: duration_id,
-        budget: budget,
-        experience_id: experience_id,
-      })
-      .where({ id: brief_id })
-      .returning('briefs.id')
-      .then(async (ids) => {
-        if (skill_ids) {
-          await tx('brief_skills').where({ brief_id: ids[0] }).delete();
+    async (tx: Knex.Transaction) =>
+      await tx<Brief>('briefs')
+        .update({
+          headline: headline,
+          description: description,
+          scope_id: scope_id,
+          duration_id: duration_id,
+          budget: budget,
+          experience_id: experience_id,
+        })
+        .where({ id: brief_id })
+        .returning('briefs.id')
+        .then(async (ids) => {
+          if (skill_ids) {
+            await tx('brief_skills').where({ brief_id: ids[0] }).delete();
 
-          skill_ids.forEach(async (skillId) => {
-            if (skillId) {
-              await tx('brief_skills').insert({
-                brief_id: ids[0],
-                skill_id: skillId,
-              });
-            }
-          });
-        }
+            skill_ids.forEach(async (skillId) => {
+              if (skillId) {
+                await tx('brief_skills').insert({
+                  brief_id: ids[0],
+                  skill_id: skillId,
+                });
+              }
+            });
+          }
 
-        if (industry_ids) {
-          await tx('brief_industries').where({ brief_id: ids[0] }).delete();
+          if (industry_ids) {
+            await tx('brief_industries').where({ brief_id: ids[0] }).delete();
 
-          industry_ids.forEach(async (industry_id) => {
-            if (industry_id) {
-              await tx('brief_industries').insert({
-                brief_id: ids[0],
-                industry_id: industry_id,
-              });
-            }
-          });
-        }
-        return ids[0];
-      });
+            industry_ids.forEach(async (industry_id) => {
+              if (industry_id) {
+                await tx('brief_industries').insert({
+                  brief_id: ids[0],
+                  industry_id: industry_id,
+                });
+              }
+            });
+          }
+          return ids[0];
+        });
 
 export const incrementUserBriefSubmissions =
   (id: number) => async (tx: Knex.Transaction) =>
@@ -862,16 +871,16 @@ export const incrementUserBriefSubmissions =
 
 export const insertFederatedCredential =
   (id: number, issuer: string, subject: string) =>
-  async (tx: Knex.Transaction) =>
-    (
-      await tx<FederatedCredential>('federated_credentials')
-        .insert({
-          id,
-          issuer,
-          subject,
-        })
-        .returning('*')
-    )[0];
+    async (tx: Knex.Transaction) =>
+      (
+        await tx<FederatedCredential>('federated_credentials')
+          .insert({
+            id,
+            issuer,
+            subject,
+          })
+          .returning('*')
+      )[0];
 
 export const upsertItems =
   (items: any, tableName: string) => async (tx: Knex.Transaction) => {
@@ -1125,71 +1134,71 @@ export const insertFreelancerDetails =
     client_ids: number[],
     service_ids: number[]
   ) =>
-  async (tx: Knex.Transaction) =>
-    await tx<Freelancer>('freelancers')
-      .insert({
-        freelanced_before: f.freelanced_before.toString(),
-        freelancing_goal: f.freelancing_goal,
-        work_type: f.work_type,
-        education: f.education,
-        experience: f.experience,
-        title: f.title,
-        bio: f.bio,
-        facebook_link: f.facebook_link,
-        twitter_link: f.twitter_link,
-        telegram_link: f.telegram_link,
-        discord_link: f.discord_link,
-        user_id: f.user_id,
-      })
+    async (tx: Knex.Transaction) =>
+      await tx<Freelancer>('freelancers')
+        .insert({
+          freelanced_before: f.freelanced_before.toString(),
+          freelancing_goal: f.freelancing_goal,
+          work_type: f.work_type,
+          education: f.education,
+          experience: f.experience,
+          title: f.title,
+          bio: f.bio,
+          facebook_link: f.facebook_link,
+          twitter_link: f.twitter_link,
+          telegram_link: f.telegram_link,
+          discord_link: f.discord_link,
+          user_id: f.user_id,
+        })
 
-      .returning('id')
-      .then((ids) => {
-        if (skill_ids) {
-          skill_ids.forEach(async (skillId) => {
-            if (skillId) {
-              await tx('freelancer_skills').insert({
-                freelancer_id: ids[0],
-                skill_id: skillId,
-              });
-            }
-          });
-        }
+        .returning('id')
+        .then((ids) => {
+          if (skill_ids) {
+            skill_ids.forEach(async (skillId) => {
+              if (skillId) {
+                await tx('freelancer_skills').insert({
+                  freelancer_id: ids[0],
+                  skill_id: skillId,
+                });
+              }
+            });
+          }
 
-        if (language_ids) {
-          language_ids.forEach(async (langId) => {
-            if (langId) {
-              await tx('freelancer_languages').insert({
-                freelancer_id: ids[0],
-                language_id: langId,
-              });
-            }
-          });
-        }
+          if (language_ids) {
+            language_ids.forEach(async (langId) => {
+              if (langId) {
+                await tx('freelancer_languages').insert({
+                  freelancer_id: ids[0],
+                  language_id: langId,
+                });
+              }
+            });
+          }
 
-        if (client_ids) {
-          client_ids.forEach(async (clientId) => {
-            if (clientId) {
-              await tx('freelancer_clients').insert({
-                freelancer_id: ids[0],
-                client_id: clientId,
-              });
-            }
-          });
-        }
+          if (client_ids) {
+            client_ids.forEach(async (clientId) => {
+              if (clientId) {
+                await tx('freelancer_clients').insert({
+                  freelancer_id: ids[0],
+                  client_id: clientId,
+                });
+              }
+            });
+          }
 
-        if (service_ids) {
-          service_ids.forEach(async (serviceId) => {
-            if (serviceId) {
-              await tx('freelancer_services').insert({
-                freelancer_id: ids[0],
-                service_id: serviceId,
-              });
-            }
-          });
-        }
+          if (service_ids) {
+            service_ids.forEach(async (serviceId) => {
+              if (serviceId) {
+                await tx('freelancer_services').insert({
+                  freelancer_id: ids[0],
+                  service_id: serviceId,
+                });
+              }
+            });
+          }
 
-        return ids[0];
-      });
+          return ids[0];
+        });
 
 export const updateFreelancerDetails =
   (
@@ -1208,133 +1217,133 @@ export const updateFreelancerDetails =
     // eslint-disable-next-line unused-imports/no-unused-vars
     freelancer_clients: Array<{ id: number; name: string; img: string }>
   ) =>
-  async (tx: Knex.Transaction) =>
-    await tx<Freelancer>('freelancers')
-      .update({
-        freelanced_before: f.freelanced_before,
-        freelancing_goal: f.freelancing_goal,
-        work_type: f.work_type,
-        education: f.education,
-        experience: f.experience,
-        title: f.title,
-        bio: f.bio,
-        facebook_link: f.facebook_link,
-        twitter_link: f.twitter_link,
-        telegram_link: f.telegram_link,
-        discord_link: f.discord_link,
-        user_id: f.user_id,
-      })
-      .where({ user_id: userId })
-      .returning('id')
-      .then(async (ids) => {
-        if (userId) {
-          await tx('users').where({ id: userId }).update({
-            display_name: f.display_name,
-          });
-        }
+    async (tx: Knex.Transaction) =>
+      await tx<Freelancer>('freelancers')
+        .update({
+          freelanced_before: f.freelanced_before,
+          freelancing_goal: f.freelancing_goal,
+          work_type: f.work_type,
+          education: f.education,
+          experience: f.experience,
+          title: f.title,
+          bio: f.bio,
+          facebook_link: f.facebook_link,
+          twitter_link: f.twitter_link,
+          telegram_link: f.telegram_link,
+          discord_link: f.discord_link,
+          user_id: f.user_id,
+        })
+        .where({ user_id: userId })
+        .returning('id')
+        .then(async (ids) => {
+          if (userId) {
+            await tx('users').where({ id: userId }).update({
+              display_name: f.display_name,
+            });
+          }
 
-        if (userId && country && region) {
-          await tx('freelancer_country').where({ user_id: userId }).delete();
+          if (userId && country && region) {
+            await tx('freelancer_country').where({ user_id: userId }).delete();
 
-          await tx('freelancer_country').where({ user_id: userId }).insert({
-            country: country,
-            region: region,
-            freelancer_id: ids[0],
-            user_id: userId,
-          });
-        }
-        if (userId && web3_address && web3_type && web3_challenge) {
-          await tx('web3_accounts').where({ user_id: userId }).delete();
-
-          await tx('web3_accounts').where({ user_id: userId }).insert({
-            address: web3_address,
-            type: web3_type,
-            challenge: web3_challenge,
-            user_id: userId,
-          });
-        }
-        if (userId && profile_image) {
-          await tx('freelancer_profile_image')
-            .where({ user_id: userId })
-            .delete();
-
-          await tx('freelancer_profile_image')
-            .where({ user_id: userId })
-            .insert({
-              profile_image: profile_image,
+            await tx('freelancer_country').where({ user_id: userId }).insert({
+              country: country,
+              region: region,
               freelancer_id: ids[0],
               user_id: userId,
             });
+          }
+          if (userId && web3_address && web3_type && web3_challenge) {
+            await tx('web3_accounts').where({ user_id: userId }).delete();
 
-          await tx<User>('users')
-            .update({
-              profile_photo: profile_image,
-            })
-            .where({ id: userId });
-        }
+            await tx('web3_accounts').where({ user_id: userId }).insert({
+              address: web3_address,
+              type: web3_type,
+              challenge: web3_challenge,
+              user_id: userId,
+            });
+          }
+          if (userId && profile_image) {
+            await tx('freelancer_profile_image')
+              .where({ user_id: userId })
+              .delete();
 
-        if (skill_ids) {
-          await tx('freelancer_skills')
-            .where({ freelancer_id: ids[0] })
-            .delete();
-
-          skill_ids.forEach(async (skillId) => {
-            if (skillId) {
-              await tx('freelancer_skills').insert({
+            await tx('freelancer_profile_image')
+              .where({ user_id: userId })
+              .insert({
+                profile_image: profile_image,
                 freelancer_id: ids[0],
-                skill_id: skillId,
+                user_id: userId,
               });
-            }
-          });
-        }
 
-        if (language_ids) {
-          await tx('freelancer_languages')
-            .where({ freelancer_id: ids[0] })
-            .delete();
+            await tx<User>('users')
+              .update({
+                profile_photo: profile_image,
+              })
+              .where({ id: userId });
+          }
 
-          language_ids.forEach(async (langId) => {
-            if (langId) {
-              await tx('freelancer_languages').insert({
-                freelancer_id: ids[0],
-                language_id: langId,
-              });
-            }
-          });
-        }
+          if (skill_ids) {
+            await tx('freelancer_skills')
+              .where({ freelancer_id: ids[0] })
+              .delete();
 
-        if (client_ids) {
-          await tx('freelancer_clients')
-            .where({ freelancer_id: ids[0] })
-            .delete();
+            skill_ids.forEach(async (skillId) => {
+              if (skillId) {
+                await tx('freelancer_skills').insert({
+                  freelancer_id: ids[0],
+                  skill_id: skillId,
+                });
+              }
+            });
+          }
 
-          client_ids.forEach(async (clientId) => {
-            if (clientId) {
-              await tx('freelancer_clients').insert({
-                freelancer_id: ids[0],
-                client_id: clientId,
-              });
-            }
-          });
-        }
+          if (language_ids) {
+            await tx('freelancer_languages')
+              .where({ freelancer_id: ids[0] })
+              .delete();
 
-        if (service_ids) {
-          await tx('freelancer_services')
-            .where({ freelancer_id: ids[0] })
-            .delete();
+            language_ids.forEach(async (langId) => {
+              if (langId) {
+                await tx('freelancer_languages').insert({
+                  freelancer_id: ids[0],
+                  language_id: langId,
+                });
+              }
+            });
+          }
 
-          service_ids.forEach(async (serviceId) => {
-            if (serviceId) {
-              await tx('freelancer_services').insert({
-                freelancer_id: ids[0],
-                service_id: serviceId,
-              });
-            }
-          });
-        }
+          if (client_ids) {
+            await tx('freelancer_clients')
+              .where({ freelancer_id: ids[0] })
+              .delete();
 
-        return ids[0];
-      });
+            client_ids.forEach(async (clientId) => {
+              if (clientId) {
+                await tx('freelancer_clients').insert({
+                  freelancer_id: ids[0],
+                  client_id: clientId,
+                });
+              }
+            });
+          }
+
+          if (service_ids) {
+            await tx('freelancer_services')
+              .where({ freelancer_id: ids[0] })
+              .delete();
+
+            service_ids.forEach(async (serviceId) => {
+              if (serviceId) {
+                await tx('freelancer_services').insert({
+                  freelancer_id: ids[0],
+                  service_id: serviceId,
+                });
+              }
+            });
+          }
+
+          return ids[0];
+        });
 
 // The search briefs and all these lovely parameters.
 // Since we are using checkboxes only i unfortunatly ended up using all these parameters.

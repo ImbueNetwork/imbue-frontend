@@ -86,7 +86,7 @@ export default nextConnect()
       req,
       res
     );
-    verifyUserIdFromJwt(req, res, userAuth.id);
+    verifyUserIdFromJwt(req, res, [userAuth.id]);
 
     await db.transaction(async (tx: any) => {
       try {
@@ -134,7 +134,7 @@ export default nextConnect()
       res
     );
 
-    verifyUserIdFromJwt(req, res, userAuth.id);
+    verifyUserIdFromJwt(req, res, [userAuth.id]);
 
     await db.transaction(async (tx: any) => {
       try {

@@ -47,7 +47,7 @@ export default nextConnect()
 
     const userAuth: Partial<User> | any = await authenticate('jwt', req, res);
 
-    verifyUserIdFromJwt(req, res, userAuth.id);
+    verifyUserIdFromJwt(req, res, [userAuth.id]);
 
     db.transaction(async (tx) => {
       try {
@@ -56,7 +56,7 @@ export default nextConnect()
           return new Error('Brief does not exist.');
         }
         const briefOwner = (await fetchUser(brief.user_id)(tx))[0] as User;
-        verifyUserIdFromJwt(req, res, briefOwner?.id);
+        verifyUserIdFromJwt(req, res, [briefOwner?.id]);
         const project = await fetchProjectById(projectId)(tx);
         if (!project) {
           return new Error('Project does not exist.');

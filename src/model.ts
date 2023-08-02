@@ -13,6 +13,8 @@ export enum OffchainProjectState {
   ChangesRequested = 2,
   Rejected = 3,
   Accepted = 4,
+  Refunded = 5,
+  Completed = 6,
 }
 
 
@@ -22,6 +24,7 @@ export const applicationStatusId = [
   'Changes Requested',
   'Rejected',
   'Accepted',
+  'Refunded',
 ];
 
 export function displayState(state: OffchainProjectState) {

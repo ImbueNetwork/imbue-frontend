@@ -41,7 +41,7 @@ export default nextConnect()
       res
     );
 
-    verifyUserIdFromJwt(req, res, userAuth.id);
+    verifyUserIdFromJwt(req, res, [userAuth.id]);
 
     db.transaction(async (tx) => {
       try {

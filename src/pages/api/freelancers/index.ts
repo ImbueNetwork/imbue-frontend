@@ -58,7 +58,7 @@ export default nextConnect()
     const { body } = req;
     const freelancer = body.freelancer;
 
-    verifyUserIdFromJwt(req, res, freelancer.user_id);
+    verifyUserIdFromJwt(req, res, [freelancer.user_id]);
     db.transaction(async (tx) => {
       try {
         const skill_ids = await upsertItems(freelancer.skills, 'skills')(tx);

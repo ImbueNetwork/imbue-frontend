@@ -16,7 +16,7 @@ export const ensureParams = (record: Record<string, any>, params: string[]) => {
   }
 };
 
-export function verifyUserIdFromJwt(req: any, res: any, user_id: number) {
+export function verifyUserIdFromJwt(req: any, res: any, user_ids: number[]) {
   const token = getTokenCookie(req);
   if (!token) {
     return res
@@ -26,7 +26,7 @@ export function verifyUserIdFromJwt(req: any, res: any, user_id: number) {
 
   try {
     const decoded: any = jwt.verify(token, jwtOptions.secretOrKey);
-    if (user_id == decoded.id) {
+    if (user_ids.includes(decoded.id)) {
       return res;
     } else {
       return res

@@ -3,6 +3,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import { Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
@@ -38,7 +39,9 @@ import {
 } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
+import { ImbueChainEvent } from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
+import { updateProject } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 TimeAgo.addDefaultLocale(en);
@@ -104,7 +107,7 @@ function Project() {
   const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
   const [isApplicant, setIsApplicant] = useState<boolean>(false);
   const [isProjectOwner, setIsProjectOwner] = useState<boolean>(false);
-  const [showRefundButton] = useState<boolean>();
+  const [showRefundButton, setShowRefundButton] = useState<boolean>();
 
   const [wait, setWait] = useState<boolean>(false);
   const [waitMessage, setWaitMessage] = useState<string>('');
@@ -132,12 +135,15 @@ function Project() {
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
     const onChainProjectRes = await chainService.getProject(projectId);
-
     if (onChainProjectRes) {
       const isApplicant = onChainProjectRes.initiator == user.web3_address;
       setIsApplicant(isApplicant);
       // TODO Enable refunds first
-      //setShowRefundButton(onChainProjectRes.fundingType.Grant)
+      const userIsApprover = onChainProjectRes.contributions.map(c => c.accountId).includes(user.web3_address!);
+      if (userIsApprover) {
+        setShowRefundButton(onChainProjectRes.fundingType.Grant)
+      }
+
       if (onChainProjectRes.projectState == OnchainProjectState.OpenForVoting) {
         const firstPendingMilestone =
           await chainService.findFirstPendingMilestone(
@@ -155,6 +161,14 @@ function Project() {
         case OffchainProjectState.ChangesRequested:
           setWaitMessage('Changes have been requested');
           break;
+        case OffchainProjectState.Refunded:
+          setSuccess(true);
+          setSuccessTitle('This project has been refunded!');
+          break;
+        case OffchainProjectState.Completed:
+          setSuccess(true);
+          setSuccessTitle('This project has been successfully delivered!');
+          break;
         case OffchainProjectState.Accepted:
           if (!project.chain_project_id) {
             setWaitMessage(
@@ -167,7 +181,9 @@ function Project() {
           }
           break;
       }
-      setWait(true);
+      if (project.status_id !== OffchainProjectState.Refunded) {
+        setWait(true);
+      }
     }
   };
 
@@ -267,9 +283,10 @@ function Project() {
       );
       if (!result.txError) {
         setSuccess(true);
-        setSuccessTitle('Your vote was successfull');
-      } else {
-        setError({ message: result.errorMessage });
+        setSuccessTitle('Your vote was successful');
+      }
+      else {
+        setError({ message: result.errorMessage })
       }
     } catch (error) {
       setError({ message: 'Could not vote. Please try again later' });
@@ -317,6 +334,12 @@ function Project() {
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
+          const haveAllMilestonesBeenApproved = onChainProject.milestones.map((m: any) => m.is_approved).every(Boolean);
+          if (haveAllMilestonesBeenApproved) {
+            project.status_id = OffchainProjectState.Completed;
+            await updateProject(project?.id, project);
+          }
+
           setSuccess(true);
           setSuccessTitle('Withdraw successfull');
         } else if (result.txError) {
@@ -330,25 +353,51 @@ function Project() {
   };
 
   const refund = async (account: WalletAccount) => {
+    // TODO make this a popup value like vote on milestone
+    const vote = false;
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
-    // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
-    const result = await chainService.raiseVoteOfNoConfidence(
-      account,
-      onChainProject
-    );
-    while (true) {
-      if (result.status || result.txError) {
-        if (result.status) {
-          setSuccess(true);
-          setSuccessTitle('Vote of no confidence raised.');
-        } else if (result.txError) {
-          setError({ message: result.errorMessage });
+    if (onChainProject.projectState == OnchainProjectState.OpenForVotingOfNoConfidence) {
+      const result = await chainService.voteOnNoConfidence(
+        account,
+        onChainProject,
+        vote
+      );
+      const shouldRefund = await chainService.pollChainMessage(ImbueChainEvent.NoConfidenceRoundFinalised, account);
+      while (true) {
+        if (result.status || result.txError) {
+          if (result.status) {
+            if (shouldRefund) {
+              project.status_id = OffchainProjectState.Refunded;
+              await updateProject(project?.id, project);
+            }
+            setSuccess(true);
+            setSuccessTitle('Your vote was successful');
+          } else if (result.txError) {
+            setError({ message: result.errorMessage });
+          }
+          break;
         }
-        break;
+        await new Promise((f) => setTimeout(f, 1000));
       }
-      await new Promise((f) => setTimeout(f, 1000));
+    } else {
+      const result = await chainService.raiseVoteOfNoConfidence(
+        account,
+        onChainProject
+      );
+      while (true) {
+        if (result.status || result.txError) {
+          if (result.status) {
+            setSuccess(true);
+            setSuccessTitle('Vote of no confidence raised.');
+          } else if (result.txError) {
+            setError({ message: result.errorMessage });
+          }
+          break;
+        }
+        await new Promise((f) => setTimeout(f, 1000));
+      }
     }
     setLoading(false);
   };
@@ -456,8 +505,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, 'Completed')
               : milestone?.milestone_key == milestoneBeingVotedOn
-              ? openForVotingTag()
-              : projectStateTag(modified, 'Not Started')}
+                ? openForVotingTag()
+                : projectStateTag(modified, 'Not Started')}
 
             <Image
               src={require(expanded
@@ -496,9 +545,8 @@ function Project() {
               }
             >
               <button
-                className={`primary-btn in-dark w-button ${
-                  !canVote && '!bg-gray-300 !text-gray-400'
-                } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
+                className={`primary-btn in-dark w-button ${!canVote && '!bg-gray-300 !text-gray-400'
+                  } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
                 data-testid='next-button'
                 onClick={() => canVote && vote()}
               >
@@ -509,7 +557,7 @@ function Project() {
 
           {(isApplicant || (projectType === 'grant' && isProjectOwner)) &&
             onChainProject?.projectState !==
-              OnchainProjectState.OpenForVoting &&
+            OnchainProjectState.OpenForVoting &&
             !milestone?.is_approved && (
               <button
                 className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
@@ -522,9 +570,8 @@ function Project() {
 
           {isApplicant && milestone.is_approved && (
             <button
-              className={`primary-btn in-dark w-button ${
-                !balance && '!bg-gray-300 !text-gray-400'
-              } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
+              className={`primary-btn in-dark w-button ${!balance && '!bg-gray-300 !text-gray-400'
+                } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
               data-testid='next-button'
               onClick={() => withdraw()}
               disabled={!balance}
@@ -708,9 +755,8 @@ function Project() {
                   {approversPreview?.map((approver: any, index: number) => (
                     <div
                       key={index}
-                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${
-                        approver?.display_name && 'cursor-pointer'
-                      }`}
+                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${approver?.display_name && 'cursor-pointer'
+                        }`}
                       onClick={() =>
                         approver.display_name &&
                         router.push(`/profile/${approver.username}`)
@@ -764,13 +810,12 @@ function Project() {
                 <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
                   <div
                     style={{
-                      width: `${
-                        (onChainProject?.milestones?.filter?.(
-                          (m: any) => m?.is_approved
-                        )?.length /
-                          onChainProject?.milestones?.length) *
+                      width: `${(onChainProject?.milestones?.filter?.(
+                        (m: any) => m?.is_approved
+                      )?.length /
+                        onChainProject?.milestones?.length) *
                         100
-                      }%`,
+                        }%`,
                     }}
                     className='h-full rounded-xl Accepted-button absolute'
                   ></div>
@@ -778,9 +823,8 @@ function Project() {
                     {onChainProject?.milestones?.map((m: any, i: number) => (
                       <div
                         key={i}
-                        className={`h-4 w-4 ${
-                          m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
-                        } rounded-full -mt-1.5`}
+                        className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
+                          } rounded-full -mt-1.5`}
                       ></div>
                     ))}
                   </div>
@@ -810,25 +854,6 @@ function Project() {
             </div>
           </div>
 
-          {project?.escrow_address && (
-            <div className='flex flex-col'>
-              <div className='flex flex-row items-start gap-3'>
-                <AccountBalanceWalletOutlinedIcon className='mt-1 text-imbue-purple-dark' />
-                <div className='flex flex-col'>
-                  <h3 className='text-lg lg:text-[1.25rem] text-imbue-purple-dark leading-[1.5] font-normal m-0 p-0'>
-                    Wallet Address
-                  </h3>
-                  <div className='text-[1rem] text-imbue-light-purple-two mt-2 text-xs break-all'>
-                    {project?.escrow_address}
-                  </div>
-                  <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
-                    balance : {balance} ${Currency[project?.currency_id]}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
           <div className='flex flex-col'>
             <div className='flex flex-row items-start gap-3'>
               <Image
@@ -848,6 +873,43 @@ function Project() {
               </div>
             </div>
           </div>
+
+          {project?.escrow_address && (
+            <div className='flex flex-col'>
+              <div className='flex flex-row items-start gap-3'>
+                <AccountBalanceWalletOutlinedIcon className='mt-1 text-imbue-purple-dark' />
+                <div className='flex flex-col'>
+                  <h3 className='text-lg lg:text-[1.25rem] text-imbue-purple-dark leading-[1.5] font-normal m-0 p-0'>
+                    Wallet Address
+                  </h3>
+                  <div className='text-[1rem] text-imbue-light-purple-two mt-2 text-xs break-all'>
+                    {project?.escrow_address}
+                  </div>
+                  <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
+                    balance : {balance} ${Currency[project?.currency_id]}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {project?.chain_project_id && (
+            <div className='flex flex-col'>
+              <div className='flex flex-row items-start gap-3'>
+                <FingerprintIcon className='mt-1 text-imbue-purple-dark' />
+                <div className='flex flex-col'>
+                  <h3 className='text-lg lg:text-[1.25rem] text-imbue-purple-dark leading-[1.5] font-normal m-0 p-0'>
+                    On-Chain Project ID
+                  </h3>
+                  <div className='text-[1rem] text-imbue-light-purple-two mt-2 text-xs break-all'>
+                    {project?.chain_project_id}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+
         </div>
       </div>
 
