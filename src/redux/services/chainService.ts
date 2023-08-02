@@ -19,7 +19,7 @@ import {
   RoundType,
   User,
 } from '@/model';
-
+/* eslint-disable no-unused-vars */
 export enum ImbueChainEvent {
   Contribute = "ContributeSucceeded",
   SubmitMilestone = "MilestoneSubmitted",
@@ -227,11 +227,6 @@ class ChainService {
               ({
                 event: { data, method },
               }: EventRecord) => {
-                console.log("**** event name is ");
-                console.log(eventName);
-                console.log(data.toHuman());
-                console.log("***** account is ");
-                console.log(account.address);
                 if (
                   eventName
                   && method === eventName

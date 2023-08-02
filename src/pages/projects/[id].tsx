@@ -40,8 +40,8 @@ import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
 import { ImbueChainEvent } from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
-import { RootState } from '@/redux/store/store';
 import { updateProject } from '@/redux/services/projectServices';
+import { RootState } from '@/redux/store/store';
 
 TimeAgo.addDefaultLocale(en);
 
