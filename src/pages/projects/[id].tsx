@@ -3,6 +3,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import { Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
@@ -333,8 +334,8 @@ function Project() {
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
-          const haveAllMilestonesBeenApproved = onChainProject.milestones.map((m:any) => m.is_approved).every(Boolean);
-          if(haveAllMilestonesBeenApproved) {
+          const haveAllMilestonesBeenApproved = onChainProject.milestones.map((m: any) => m.is_approved).every(Boolean);
+          if (haveAllMilestonesBeenApproved) {
             project.status_id = OffchainProjectState.Completed;
             await updateProject(project?.id, project);
           }
@@ -812,7 +813,7 @@ function Project() {
                       width: `${(onChainProject?.milestones?.filter?.(
                         (m: any) => m?.is_approved
                       )?.length /
-                          onChainProject?.milestones?.length) *
+                        onChainProject?.milestones?.length) *
                         100
                         }%`,
                     }}
@@ -853,25 +854,6 @@ function Project() {
             </div>
           </div>
 
-          {project?.escrow_address && (
-            <div className='flex flex-col'>
-              <div className='flex flex-row items-start gap-3'>
-                <AccountBalanceWalletOutlinedIcon className='mt-1 text-imbue-purple-dark' />
-                <div className='flex flex-col'>
-                  <h3 className='text-lg lg:text-[1.25rem] text-imbue-purple-dark leading-[1.5] font-normal m-0 p-0'>
-                    Wallet Address
-                  </h3>
-                  <div className='text-[1rem] text-imbue-light-purple-two mt-2 text-xs break-all'>
-                    {project?.escrow_address}
-                  </div>
-                  <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
-                    balance : {balance} ${Currency[project?.currency_id]}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
           <div className='flex flex-col'>
             <div className='flex flex-row items-start gap-3'>
               <Image
@@ -891,6 +873,43 @@ function Project() {
               </div>
             </div>
           </div>
+
+          {project?.escrow_address && (
+            <div className='flex flex-col'>
+              <div className='flex flex-row items-start gap-3'>
+                <AccountBalanceWalletOutlinedIcon className='mt-1 text-imbue-purple-dark' />
+                <div className='flex flex-col'>
+                  <h3 className='text-lg lg:text-[1.25rem] text-imbue-purple-dark leading-[1.5] font-normal m-0 p-0'>
+                    Wallet Address
+                  </h3>
+                  <div className='text-[1rem] text-imbue-light-purple-two mt-2 text-xs break-all'>
+                    {project?.escrow_address}
+                  </div>
+                  <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
+                    balance : {balance} ${Currency[project?.currency_id]}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {project?.chain_project_id && (
+            <div className='flex flex-col'>
+              <div className='flex flex-row items-start gap-3'>
+                <FingerprintIcon className='mt-1 text-imbue-purple-dark' />
+                <div className='flex flex-col'>
+                  <h3 className='text-lg lg:text-[1.25rem] text-imbue-purple-dark leading-[1.5] font-normal m-0 p-0'>
+                    On-Chain Project ID
+                  </h3>
+                  <div className='text-[1rem] text-imbue-light-purple-two mt-2 text-xs break-all'>
+                    {project?.chain_project_id}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+
         </div>
       </div>
 
