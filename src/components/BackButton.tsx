@@ -1,4 +1,5 @@
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
+import ArrowBackIcon from '@mui/icons-material/ChevronLeft'; 
 import { Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -16,9 +17,9 @@ const BackButton = () => {
         >
             <div
                 onClick={() => router.back()}
-                className='border border-content rounded-full p-1 flex items-center justify-center relative cursor-pointer right-10'
+                className='border border-transparent hover:border-content rounded-full flex items-center justify-center relative cursor-pointer right-10'
             >
-                <ArrowBackIcon className='h-5 w-5 group-hover:text-white' color='secondary' />
+                <ArrowBackIcon className='h-7 w-7 group-hover:text-white' color='secondary' />
             </div>
         </Tooltip>
     );

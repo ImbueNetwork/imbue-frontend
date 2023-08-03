@@ -45,7 +45,7 @@ export default nextConnect()
         let freelancer;
         freelancer = await fetchFreelancerDetailsByUsername(username)(tx);
 
-        if (!freelancer)
+        if (!freelancer.id)
           freelancer = await models.fetchFreelancerDetailsByUserID(
             Number(username)
           )(tx);
@@ -98,25 +98,25 @@ export default nextConnect()
         //   )(tx)),
         // ]);
 
-        const country = await tx
-          .select('country')
-          .from('freelancer_country')
-          .where({ freelancer_id: freelancer.id })
-          .first();
+        // const country = await tx
+        //   .select('country')
+        //   .from('freelancer_country')
+        //   .where({ freelancer_id: freelancer.id })
+        //   .first();
 
-        if (country) {
-          freelancer.country = country;
-        }
+        // if (country) {
+        //   freelancer.country = country;
+        // }
 
-        const region = await tx
-          .select('region')
-          .from('freelancer_country')
-          .where({ freelancer_id: freelancer.id })
-          .first();
+        // const region = await tx
+        //   .select('region')
+        //   .from('freelancer_country')
+        //   .where({ freelancer_id: freelancer.id })
+        //   .first();
 
-        if (region) {
-          freelancer.region = region;
-        }
+        // if (region) {
+        //   freelancer.region = region;
+        // }
 
         return res.status(200).json(freelancer);
       } catch (e) {

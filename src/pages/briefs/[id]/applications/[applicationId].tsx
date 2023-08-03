@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { Backdrop, CircularProgress } from '@mui/material';
+import { Backdrop, CircularProgress, Tooltip } from '@mui/material';
 import Filter from 'bad-words';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -43,11 +43,6 @@ interface MilestoneItem {
   name: string;
   description: string;
   amount: number | undefined;
-  error?: {
-    name?: string;
-    description?: string;
-    amount?: string;
-  };
 }
 
 interface InputErrorType {
@@ -86,7 +81,7 @@ const ApplicationPreview = (): JSX.Element => {
     approvers: '',
     milestones: [],
   });
-  const [enteredInvalid, setEnteredInvalid] = useState<boolean>(false);
+  const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
 
   const isApplicationOwner =
     user && application && user?.id == application?.user_id;
@@ -262,92 +257,75 @@ const ApplicationPreview = (): JSX.Element => {
 
   const milestonesRef = useRef<any>([]);
 
-  const allAmountAndNamesHaveValue = () => {
-    let hasValue = true;
-    let firstErrorIndex = -1;
-    const newMilestones = [...milestones];
-    const blockUnicodeRegex = /^[\x20-\x7E]*$/;
+  // const allAmountAndNamesHaveValue = () => {
+  //   let hasValue = true;
+  //   let firstErrorIndex = -1;
+  //   const newMilestones = [...milestones];
+  //   const blockUnicodeRegex = /^[\x20-\x7E]*$/;
 
-    for (let i = 0; i < milestones.length; i++) {
-      const { amount, name, description } = milestones[i];
-      newMilestones[i].error = {};
+  //   for (let i = 0; i < milestones.length; i++) {
+  //     const { amount, name, description } = milestones[i];
+  //     newMilestones[i].error = {};
 
-      if (
-        name === undefined ||
-        name === null ||
-        name.length === 0 ||
-        !blockUnicodeRegex.test(name)
-      ) {
-        newMilestones[i].error = {
-          ...newMilestones[i].error,
-          name: 'A valid name is required',
-        };
-        hasValue = false;
-        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
-      }
+  //     if (
+  //       name === undefined ||
+  //       name === null ||
+  //       name.length === 0 ||
+  //       !blockUnicodeRegex.test(name)
+  //     ) {
+  //       newMilestones[i].error = {
+  //         ...newMilestones[i].error,
+  //         name: 'A valid name is required',
+  //       };
+  //       hasValue = false;
+  //       firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
+  //     }
 
-      if (amount === undefined || amount === null || amount === 0) {
-        newMilestones[i].error = {
-          ...newMilestones[i].error,
-          amount: 'A valid amount is required',
-        };
-        hasValue = false;
-        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
-      }
+  //     if (amount === undefined || amount === null || amount === 0) {
+  //       newMilestones[i].error = {
+  //         ...newMilestones[i].error,
+  //         amount: 'A valid amount is required',
+  //       };
+  //       hasValue = false;
+  //       firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
+  //     }
 
-      if (
-        description === undefined ||
-        description === null ||
-        description.length === 0
-      ) {
-        newMilestones[i].error = {
-          ...newMilestones[i].error,
-          description: 'A valid description is required.',
-        };
-        hasValue = false;
-        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
-      }
-    }
+  //     if (
+  //       description === undefined ||
+  //       description === null ||
+  //       description.length === 0
+  //     ) {
+  //       newMilestones[i].error = {
+  //         ...newMilestones[i].error,
+  //         description: 'A valid description is required.',
+  //       };
+  //       hasValue = false;
+  //       firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
+  //     }
+  //   }
 
-    setMilestones(newMilestones);
+  //   setMilestones(newMilestones);
 
-    if (firstErrorIndex !== -1)
-      milestonesRef.current[firstErrorIndex]?.scrollIntoView({
-        behavior: 'auto',
-        block: 'center',
-        inline: 'center',
-      });
+  //   if (firstErrorIndex !== -1)
+  //     milestonesRef.current[firstErrorIndex]?.scrollIntoView({
+  //       behavior: 'auto',
+  //       block: 'center',
+  //       inline: 'center',
+  //     });
 
-    return hasValue;
-  };
+  //   return hasValue;
+  // };
+
+  useEffect(() => {
+    const { isValid, errors } = validateApplicationInput("brief", inputErrors, milestones)
+    setDisableSubmit(!isValid)
+    setInputErrors(errors)
+  }, [milestones])
 
   const handleUpdateProject = async (
     chainProjectId?: number,
     escrow_address?: string
   ) => {
-    const { isValid, firstErrorIndex } = validateApplicationInput(
-      'brief',
-      inputErrors,
-      milestones,
-      brief?.headline,
-      brief?.description,
-      []
-    );
-
-    if (!isValid) {
-      milestonesRef.current[firstErrorIndex]?.scrollIntoView({
-        behavior: 'auto',
-        block: 'center',
-        inline: 'center',
-      });
-      setEnteredInvalid(true);
-      return setError({
-        message: 'Please fill all the required fields first',
-      });
-    }
-
-    if (!allAmountAndNamesHaveValue())
-      return setError({ message: 'Please fill all the required fields' });
     if (totalPercent !== 100)
       return setError({ message: 'TotalPercent must be 100%' });
     if (totalCostWithoutFee > 100000000)
@@ -458,7 +436,6 @@ const ApplicationPreview = (): JSX.Element => {
                 briefOwner,
                 brief,
                 handleMessageBoxClick,
-                freelancer,
                 application,
                 setLoading,
                 updateProject: handleUpdateProject,
@@ -501,7 +478,7 @@ const ApplicationPreview = (): JSX.Element => {
 
             <div className='milestone-list lg:mb-5'>
               {milestones?.map?.(
-                ({ name, description, amount, error }, index) => {
+                ({ name, description, amount }, index) => {
                   const percent = Number(
                     ((100 * (amount ?? 0)) / totalCostWithoutFee)?.toFixed?.(0)
                   );
@@ -523,9 +500,8 @@ const ApplicationPreview = (): JSX.Element => {
                         {index + 1}.
                       </div>
                       <div
-                        className={`flex ${
-                          isEditingBio ? 'flex-col lg:flex-row' : 'flex-row'
-                        } justify-between w-full`}
+                        className={`flex ${isEditingBio ? 'flex-col lg:flex-row' : 'flex-row'
+                          } justify-between w-full`}
                       >
                         <div className='w-full lg:w-1/2 h-fit'>
                           {isEditingBio ? (
@@ -548,11 +524,7 @@ const ApplicationPreview = (): JSX.Element => {
                                   {name?.length}/50
                                 </p>
                                 <p
-                                  className={`text-xs ${
-                                    enteredInvalid
-                                      ? 'text-imbue-coral'
-                                      : 'text-imbue-light-purple-two'
-                                  }`}
+                                  className={`text-xs text-imbue-light-purple-two`}
                                 >
                                   {inputErrors?.milestones[index]?.name ||
                                     error?.name ||
@@ -571,7 +543,7 @@ const ApplicationPreview = (): JSX.Element => {
                                 Description
                               </h3>
                               <textarea
-                                maxLength={500}
+                                maxLength={5000}
                                 className='text-content !p-3 placeholder:text-imbue-light-purple'
                                 placeholder='Add Milestone Description'
                                 rows={7}
@@ -584,14 +556,10 @@ const ApplicationPreview = (): JSX.Element => {
                               />
                               <div className='flex items-center justify-between mb-4'>
                                 <p className='text-sm text-content my-2'>
-                                  {description?.length}/500
+                                  {description?.length}/5000
                                 </p>
                                 <p
-                                  className={`text-xs ${
-                                    enteredInvalid
-                                      ? 'text-imbue-coral'
-                                      : 'text-imbue-light-purple-two'
-                                  }`}
+                                  className={`text-xs text-imbue-light-purple-two`}
                                 >
                                   {inputErrors?.milestones[index]
                                     ?.description ||
@@ -612,22 +580,6 @@ const ApplicationPreview = (): JSX.Element => {
                           </h3>
                           {isEditingBio ? (
                             <>
-                              {/* <input
-                              type='number'
-                              className='input-budget text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-right  pl-5'
-                              disabled={!isEditingBio}
-                              value={amount || ''}
-                              onChange={(e) =>
-                                setMilestones([
-                                  ...milestones.slice(0, index),
-                                  {
-                                    ...milestones[index],
-                                    amount: Number(e.target.value),
-                                  },
-                                  ...milestones.slice(index + 1),
-                                ])
-                              }
-                            /> */}
                               <div className='w-full relative p-0 m-0'>
                                 <span className='h-fit absolute left-5 bottom-3 text-base text-content'>
                                   {Currency[currencyId]}
@@ -649,11 +601,7 @@ const ApplicationPreview = (): JSX.Element => {
                                 />
                               </div>
                               <p
-                                className={`text-xs ${
-                                  enteredInvalid
-                                    ? 'text-imbue-coral'
-                                    : 'text-imbue-light-purple-two'
-                                } mt-2`}
+                                className={`text-xs text-imbue-light-purple-two mt-2`}
                               >
                                 {inputErrors?.milestones[index]?.amount ||
                                   error?.amount ||
@@ -839,15 +787,18 @@ const ApplicationPreview = (): JSX.Element => {
                 </button>
               )}
             {isEditingBio && (
-              <button
-                className='primary-btn in-dark w-button'
-                // disabled={
-                //   totalPercent !== 100 || !milestoneAmountsAndNamesHaveValue
-                // }
-                onClick={() => handleUpdateProject()}
+              <Tooltip 
+              followCursor
+              title={disableSubmit && "Please fill all the input fields"}
               >
-                Update
-              </button>
+                <button
+                  className={`primary-btn in-dark w-button ${disableSubmit && "!bg-gray-400 !text-white !cursor-not-allowed"}`}
+                  onClick={() => !disableSubmit && handleUpdateProject()}
+                >
+                  Update
+                </button>
+              </Tooltip>
+
             )}
 
             {/* TODO: Add Drafts Functionality */}
