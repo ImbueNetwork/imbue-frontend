@@ -71,7 +71,7 @@ export const SubmitProposal = (): JSX.Element => {
   const [applicationId, setapplicationId] = useState();
   const [error, setError] = useState<any>();
   const [open, setOpen] = useState(false);
-  const [enteredInvalid, setEnteredInvalid] = useState<boolean>(false);
+  const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
   // eslint-disable-next-line no-unused-vars, unused-imports/no-unused-vars
   const [inputError, setInputError] = useState<any>([]);
 
@@ -124,7 +124,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   const milestonesRef = useRef<any>([]);
   const [milestones, setMilestones] = useState<MilestoneItem[]>([
-    { name: '', amount: undefined, description: '' },
+    { name: '', amount: 0, description: '' },
   ]);
 
   const durationOptions = timeData.sort((a, b) =>
@@ -141,7 +141,7 @@ export const SubmitProposal = (): JSX.Element => {
   const onAddMilestone = () => {
     setMilestones([
       ...milestones,
-      { name: '', amount: undefined, description: '' },
+      { name: '', amount: 0, description: '' },
     ]);
   };
 
@@ -176,98 +176,13 @@ export const SubmitProposal = (): JSX.Element => {
     }
   }
 
-  const allInputsValid = (): { hasValue: boolean; firstErrorIndex: number } => {
-    let hasValue = true;
-    let firstErrorIndex = -1;
-    const newMilestones: any = [];
-    const blockUnicodeRegex = /^[\x20-\x7E]*$/;
-
-    for (let i = 0; i < milestones.length; i++) {
-      const { amount, name, description } = milestones[i];
-
-      if (
-        name === undefined ||
-        name === null ||
-        name.length === 0 ||
-        !blockUnicodeRegex.test(name)
-      ) {
-        newMilestones[i] = {
-          ...newMilestones[i],
-          name: 'A valid name is required',
-        };
-        hasValue = false;
-        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
-      } else if (name.length < 10) {
-        newMilestones[i] = {
-          ...newMilestones[i],
-          name: 'Milestone title should be between 10 - 50 characters',
-        };
-        hasValue = false;
-        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
-      }
-
-      if (amount === undefined || amount === null || amount === 0) {
-        newMilestones[i] = {
-          ...newMilestones[i],
-          amount: 'A valid amount is required',
-        };
-        hasValue = false;
-        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
-      }
-
-      if (
-        description === undefined ||
-        description === null ||
-        description.length === 0
-      ) {
-        newMilestones[i] = {
-          ...newMilestones[i],
-          description: 'A valid description is required.',
-        };
-        hasValue = false;
-        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
-      } else if (description.length < 50) {
-        newMilestones[i] = {
-          ...newMilestones[i],
-          description:
-            'Milestone description should be between 100 - 500 characters.',
-        };
-        hasValue = false;
-        firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
-      }
-    }
-
-    setInputError(newMilestones);
-
-    return { hasValue, firstErrorIndex };
-  };
-
   useEffect(() => {
-    enteredInvalid && allInputsValid();
+    const { isValid, errors } = validateApplicationInput("brief", inputErrors, milestones);
+    setInputErrors(errors)
+    setDisableSubmit(!isValid)
   }, [milestones]);
 
   async function insertProject() {
-    const { isValid, firstErrorIndex } = validateApplicationInput(
-      'brief',
-      inputErrors,
-      setInputErrors,
-      milestones,
-      brief?.headline,
-      brief?.description,
-      []
-    );
-
-    if (!isValid) {
-      milestonesRef.current[firstErrorIndex]?.scrollIntoView({
-        behavior: 'auto',
-        block: 'center',
-        inline: 'center',
-      });
-      setEnteredInvalid(true);
-      return setError({
-        message: 'Please fill all the required fields first',
-      });
-    }
     if (totalPercent !== 100)
       return setError({ message: 'Total percentage must be 100%' });
 
@@ -428,11 +343,7 @@ export const SubmitProposal = (): JSX.Element => {
                     <div className='flex items-center justify-between mb-4'>
                       {/* <p className='text-sm text-imbue-coral'>{enteredInvalid && inputError[index]?.name}</p> */}
                       <p
-                        className={`text-xs ${
-                          enteredInvalid
-                            ? 'text-imbue-coral'
-                            : 'text-imbue-light-purple-two'
-                        }`}
+                        className={`text-xs text-imbue-light-purple-two`}
                       >
                         {inputErrors?.milestones[index]?.name || ''}
                       </p>
@@ -445,7 +356,7 @@ export const SubmitProposal = (): JSX.Element => {
                       Description
                     </h3>
                     <textarea
-                      maxLength={500}
+                      maxLength={5000}
                       placeholder='Add milestone description here'
                       className='input-description text-base placeholder:text-imbue-light-purple'
                       data-testid={`milestone-description-${index}`}
@@ -455,16 +366,12 @@ export const SubmitProposal = (): JSX.Element => {
                     />
                     <div className='flex items-center justify-between'>
                       <p
-                        className={`text-xs ${
-                          enteredInvalid
-                            ? 'text-imbue-coral'
-                            : 'text-imbue-light-purple-two'
-                        }`}
+                        className={`text-xs text-imbue-light-purple-two`}
                       >
                         {inputErrors?.milestones[index]?.description || ''}
                       </p>
                       <p className='text-sm text-content my-2'>
-                        {description?.length}/500
+                        {description?.length}/5000
                       </p>
                     </div>
                   </div>
@@ -491,11 +398,7 @@ export const SubmitProposal = (): JSX.Element => {
                       />
                     </div>
                     <p
-                      className={`text-xs ${
-                        enteredInvalid
-                          ? 'text-imbue-coral'
-                          : 'text-imbue-light-purple-two'
-                      } mt-2`}
+                      className={`text-xs text-imbue-light-purple-two mt-2`}
                     >
                       {inputErrors?.milestones[index]?.amount || ''}
                     </p>
@@ -634,15 +537,19 @@ export const SubmitProposal = (): JSX.Element => {
 
       <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-2xl w-full p-[1rem] flex items-center justify-between   self-center'>
         <div className='buttons-container'>
-          <button
-            // disabled={
-            //   totalPercent !== 100 || !milestoneAmountsAndNamesHaveValue
-            // }
-            className='primary-btn in-dark w-button hover:!bg-imbue-purple hover:!text-white'
-            onClick={() => handleSubmit()}
+          <Tooltip
+            followCursor
+            leaveTouchDelay={10}
+            title={disableSubmit && "Please fill all the required input fields"}
           >
-            Submit
-          </button>
+            <button
+              className={`primary-btn in-dark w-button ${disableSubmit && "!bg-gray-400 !text-white !cursor-not-allowed"}`}
+              onClick={() => !disableSubmit && handleSubmit()}
+            >
+              Submit
+            </button>
+          </Tooltip>
+
           {/* TODO: Add Drafts Functionality */}
           {/* <button className="secondary-btn">Save draft</button> */}
         </div>

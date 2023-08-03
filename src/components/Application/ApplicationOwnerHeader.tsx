@@ -1,6 +1,5 @@
 /* eslint-disable no-constant-condition */
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Tooltip, useMediaQuery } from '@mui/material';
+import { useMediaQuery } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
@@ -21,6 +20,7 @@ import {
 import ChainService from '@/redux/services/chainService';
 
 import AccountChoice from '../AccountChoice';
+import BackButton from '../BackButton';
 import ErrorScreen from '../ErrorScreen';
 import SuccessScreen from '../SuccessScreen';
 
@@ -95,20 +95,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
   return (
     <div className='flex items-center w-full lg:justify-between lg:px-10 flex-wrap'>
       <div className='flex gap-5 items-center'>
-        <Tooltip
-          title='Go back to previous page'
-          followCursor
-          leaveTouchDelay={10}
-          enterDelay={500}
-          className='cursor-pointer'
-        >
-          <div
-            onClick={() => router.back()}
-            className='border border-content rounded-full p-1 flex items-center justify-center relative cursor-pointer right-10'
-          >
-            <ArrowBackIcon className='h-5 w-5' color='secondary' />
-          </div>
-        </Tooltip>
+        <BackButton />
 
         <Image
           onClick={() => router.push(`/profile/${briefOwner?.username}`)}
@@ -153,9 +140,8 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           </button>
         ) : (
           <button
-            className={`${
-              applicationStatusId[application?.status_id]
-            }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
+            className={`${applicationStatusId[application?.status_id]
+              }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
           >
             {applicationStatusId[application?.status_id]}
           </button>

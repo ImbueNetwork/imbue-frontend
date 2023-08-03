@@ -283,7 +283,7 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
         />
         <p className='text-content'>
           I agree to the
-          <span className='hover:underline cursor-pointer'>
+          <span className='hover:underline cursor-pointer ml-1'>
             terms of services of Imbue
           </span>
         </p>

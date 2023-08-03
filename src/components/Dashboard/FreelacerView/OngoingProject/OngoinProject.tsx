@@ -18,6 +18,7 @@ TimeAgo.addLocale(en);
 const timeAgo = new TimeAgo('en-US');
 
 const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
+  console.log("🚀 ~ file: OngoinProject.tsx:21 ~ projects:", projects)
   /// limit ongoing project
   const ongoinProjectLimit = 10;
   const [value, setValue] = useState(ongoinProjectLimit);

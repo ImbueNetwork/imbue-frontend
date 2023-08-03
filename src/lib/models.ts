@@ -452,7 +452,8 @@ export const getApproverProjects =
     await tx<Project>('project_approvers')
       .join('projects', 'project_approvers.project_id', '=', 'projects.id')
       .select()
-      .where({ approver: wallet });
+      .where({ approver: wallet })
+      .orderBy('projects.created', 'desc')
 
 export const insertProject =
   (project: Project) => async (tx: Knex.Transaction) =>

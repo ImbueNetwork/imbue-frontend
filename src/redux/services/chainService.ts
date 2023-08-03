@@ -19,12 +19,7 @@ import {
   RoundType,
   User,
 } from '@/model';
-
-type EventDetails = {
-  eventName: string;
-};
-
-
+/* eslint-disable no-unused-vars */
 export enum ImbueChainEvent {
   Contribute = "ContributeSucceeded",
   SubmitMilestone = "MilestoneSubmitted",
@@ -232,11 +227,6 @@ class ChainService {
               ({
                 event: { data, method },
               }: EventRecord) => {
-                console.log("**** event name is ");
-                console.log(eventName);
-                console.log(data.toHuman());
-                console.log("***** account is ");
-                console.log(account.address);
                 if (
                   eventName
                   && method === eventName
@@ -469,11 +459,12 @@ class ChainService {
 
     for (let i = Object.keys(rounds).length - 1; i >= 0; i--) {
       const [roundType, expiringBlock] = rounds[i];
+      const roundProjectId = roundType.toHuman()[0];
       const roundTypeHuman = roundType.toHuman()[1];
       const expiringBlockHuman = BigInt(
         expiringBlock.toHuman().replaceAll(',', '')
       );
-      if (expiringBlockHuman > currentBlockNumber) {
+      if (roundProjectId == project.chain_project_id && expiringBlockHuman > currentBlockNumber) {
         if (
           projectOnChain.approvedForFunding &&
           roundTypeHuman == RoundType[RoundType.ContributionRound]

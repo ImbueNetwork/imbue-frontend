@@ -6,9 +6,9 @@ import passport from 'passport';
 import * as models from '@/lib/models';
 
 import db from '@/db';
+import { OffchainProjectState } from '@/model';
 
 import { verifyUserIdFromJwt } from '../auth/common';
-import { OffchainProjectState } from '@/model';
 
 type ProjectPkg = models.Project & {
   milestones: models.Milestone[];

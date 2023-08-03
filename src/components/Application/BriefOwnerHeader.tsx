@@ -23,6 +23,7 @@ import {
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 
 import AccountChoice from '../AccountChoice';
+import BackButton from '../BackButton';
 import ErrorScreen from '../ErrorScreen';
 import { HirePopup } from '../HirePopup';
 
@@ -139,29 +140,31 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
 
   return (
     <div className='flex items-center w-full md:justify-between lg:px-10 flex-wrap gap-4'>
-      <div className='flex gap-6 items-start'>
-        <Image
-          onClick={() => router.push(`/freelancers/${freelancer?.username}`)}
-          className='w-16 h-16 rounded-full object-cover cursor-pointer'
-          src={freelancer?.profile_image ?? require('@/assets/images/profile-image.png')}
-          height={200}
-          width={200}
-          priority
-          alt='profileImage'
-        />
-        <div>
-          <Badge
-            badgeContent={'Hired'}
-            color='primary'
-            invisible={
-              !(application?.status_id === OffchainProjectState.Accepted)
-            }
-          >
-            <p className='text-[1.25rem] font-normal capitalize text-imbue-purple'>
-              {freelancer?.display_name}
-            </p>
-          </Badge>
-          {/* 
+      <div className='flex items-center'>
+        <BackButton />
+        <div className='flex gap-6 items-start'>
+          <Image
+            onClick={() => router.push(`/freelancers/${freelancer?.username}`)}
+            className='w-16 h-16 rounded-full object-cover cursor-pointer'
+            src={freelancer?.profile_image ?? require('@/assets/images/profile-image.png')}
+            height={200}
+            width={200}
+            priority
+            alt='profileImage'
+          />
+          <div>
+            <Badge
+              badgeContent={'Hired'}
+              color='primary'
+              invisible={
+                !(application?.status_id === OffchainProjectState.Accepted)
+              }
+            >
+              <p className='text-[1.25rem] font-normal capitalize text-imbue-purple'>
+                {freelancer?.display_name}
+              </p>
+            </Badge>
+            {/* 
           <div className='flex items-center mt-[1rem]'>
             <Image
               className='h-4 w-6 object-cover'
@@ -176,16 +179,18 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
             </h3>
           </div> */}
 
-          <p className='text-sm text-content-primary lg:text-center break-words'>
-            @
-            {mobileView && freelancer?.username?.length > 16
-              ? `${freelancer?.username?.substring(0, 16)}...`
-              : freelancer?.username}
-          </p>
+            <p className='text-sm text-content-primary lg:text-center break-words'>
+              @
+              {mobileView && freelancer?.username?.length > 16
+                ? `${freelancer?.username?.substring(0, 16)}...`
+                : freelancer?.username}
+            </p>
 
 
+          </div>
         </div>
       </div>
+
 
       <div className='flex flex-col justify-center lg:items-center'>
         {application?.currency_id !== Currency.IMBU
