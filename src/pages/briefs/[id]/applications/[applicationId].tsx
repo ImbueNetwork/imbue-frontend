@@ -220,6 +220,8 @@ const ApplicationPreview = (): JSX.Element => {
       } else {
         router.push('/');
       }
+    } else if (!userLoading && (!user || !user.id)) {
+      router.push('/');
     }
   }, [briefOwner, freelancer]);
 
