@@ -45,13 +45,19 @@ const Freelancer = (): JSX.Element => {
   const [skills, setSkills] = useState<string[]>([]);
   const [bio, setBio] = useState<any>();
   const [services, setServices] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
   const [error, setError] = useState<any>();
   const [suggestedFreelancingSkills, setSuggestedSkills] = useState<string[]>(
     []
   );
   const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    if (!userLoading && (!user || !user?.id)) {
+      router.push('/');
+    } else if (!userLoading) setLoading(false);
+  }, [userLoading, user]);
 
   useEffect(() => {
     fetchSuggestedSkills();
@@ -81,7 +87,7 @@ const Freelancer = (): JSX.Element => {
       </div>
     </div>
   );
-console.log(freelancingBefore);
+
   const FreelanceExperience = (
     <div className={styles.freelanceXpContainer}>
       <div className={styles.contentTextSmallFlex}>
@@ -96,8 +102,9 @@ console.log(freelancingBefore);
           <div
             key={index}
             data-testid={`freelance-xp-${index}`}
-            className={`${styles.freelanceXpItem} ${freelancingBefore === value ? styles.active : ''
-              }`}
+            className={`${styles.freelanceXpItem} ${
+              freelancingBefore === value ? styles.active : ''
+            }`}
             onClick={() => setFreelancingBefore(value)}
           >
             {label}
@@ -119,8 +126,9 @@ console.log(freelancingBefore);
           <div
             key={index}
             data-testid={`freelance-goal-${index}`}
-            className={`${styles.freelanceXpItem} ${goal === value ? styles.active : ''
-              }`}
+            className={`${styles.freelanceXpItem} ${
+              goal === value ? styles.active : ''
+            }`}
             onClick={() => setGoal(value)}
           >
             {label}
@@ -253,11 +261,11 @@ console.log(freelancingBefore);
             />
           )}
         />
-        {
-          !skills.length && (
-            <p className='mt-2 text-imbue-coral text-sm capitalize-first'>Please add at least 1 skill</p>
-          )
-        }
+        {!skills.length && (
+          <p className='mt-2 text-imbue-coral text-sm capitalize-first'>
+            Please add at least 1 skill
+          </p>
+        )}
       </div>
     </div>
   );
@@ -301,11 +309,11 @@ console.log(freelancingBefore);
           tags={services}
           onChange={(tags: string[]) => setServices(tags)}
         />
-        {
-          !services.length && (
-            <p className='mt-4 text-imbue-coral text-sm capitalize-first'>Please add at least 1 service</p>
-          )
-        }
+        {!services.length && (
+          <p className='mt-4 text-imbue-coral text-sm capitalize-first'>
+            Please add at least 1 service
+          </p>
+        )}
       </div>
     </div>
   );
@@ -334,7 +342,7 @@ console.log(freelancingBefore);
   ];
 
   useEffect(() => {
-    setDisableSubmit(!validate())
+    setDisableSubmit(!validate());
   }, [
     freelancingBefore,
     goal,
@@ -343,22 +351,19 @@ console.log(freelancingBefore);
     skills?.length,
     bio,
     services?.length,
-    step
+    step,
   ]);
 
   const validate = (): boolean => {
     // TODO: show notification
     if (step === 1 && !freelancingBefore) {
       return false;
-    }
-    else if (step === 2 && !goal) {
+    } else if (step === 2 && !goal) {
       return false;
-    }
-    else if (step === 3 && (!title || !validateInputLength(title, 10, 50))) {
+    } else if (step === 3 && (!title || !validateInputLength(title, 10, 50))) {
       // TODO: minimum required length for description
       return false;
-    }
-    else if (
+    } else if (
       step === 4 &&
       (!education || !validateInputLength(education, 10, 100))
     ) {
@@ -370,11 +375,9 @@ console.log(freelancingBefore);
     // }
     else if (step === 6 && !skills.length) {
       return false;
-    }
-    else if (step === 7 && (!bio || !validateInputLength(bio, 50, 5000))) {
+    } else if (step === 7 && (!bio || !validateInputLength(bio, 50, 5000))) {
       return false;
-    }
-    else if (step === 8 && !services.length) {
+    } else if (step === 8 && !services.length) {
       return false;
     }
     return true;
@@ -473,25 +476,34 @@ console.log(freelancingBefore);
               <Tooltip
                 followCursor
                 leaveTouchDelay={10}
-                title={disableSubmit && "Please fill all the required input fields"}
+                title={
+                  disableSubmit && 'Please fill all the required input fields'
+                }
               >
                 <button
-                  className={`primary-btn in-dark w-button !mt-0 ${disableSubmit && "!bg-gray-400 !text-white !cursor-not-allowed"}`}
+                  className={`primary-btn in-dark w-button !mt-0 ${
+                    disableSubmit &&
+                    '!bg-gray-400 !text-white !cursor-not-allowed'
+                  }`}
                   data-testid='submit-button'
                   onClick={() => !disableSubmit && createProfile()}
                 >
                   Submit
                 </button>
               </Tooltip>
-
             ) : (
               <Tooltip
                 followCursor
                 leaveTouchDelay={10}
-                title={disableSubmit && "Please fill all the required input fields"}
+                title={
+                  disableSubmit && 'Please fill all the required input fields'
+                }
               >
                 <button
-                  className={`primary-btn in-dark w-button !mt-0 ${disableSubmit && "!bg-gray-400 !text-white !cursor-not-allowed"}`}
+                  className={`primary-btn in-dark w-button !mt-0 ${
+                    disableSubmit &&
+                    '!bg-gray-400 !text-white !cursor-not-allowed'
+                  }`}
                   data-testid='next-button'
                   onClick={() => !disableSubmit && setStep(step + 1)}
                 >

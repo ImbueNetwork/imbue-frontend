@@ -17,6 +17,7 @@ import {
 import { StyledEngineProvider } from '@mui/system';
 import { SignerResult } from '@polkadot/api/types';
 import { WalletAccount } from '@talismn/connect-wallets';
+import Filter from 'bad-words';
 import moment from 'moment';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -69,7 +70,17 @@ export type ProfileProps = {
   initFreelancer: Freelancer;
 };
 
+const invalidUsernames = [
+  'username',
+  'imbue',
+  'imbuenetwork',
+  'polkadot',
+  'password',
+  'admin',
+];
+
 const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
+  const filter = new Filter({ placeHolder: ' ' });
   const router = useRouter();
   const [freelancer, setFreelancer] = useState<any>(initFreelancer);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
@@ -78,7 +89,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [projects, setProjects] = useState<Project[]>();
   const [loadValue, setLoadValue] = useState(5);
-
+  const [displayError, setDisplayNameError] = useState(false);
+  const [userNameError, setUserNameError] = useState(false);
   const memberSince = moment(freelancer?.created).format('MMMM YYYY');
 
   const [skills, setSkills] = useState<string[]>(
@@ -136,10 +148,29 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const onSave = async () => {
     try {
       if (freelancer) {
+        if (userNameError || displayError) {
+          setError({ message: 'Invalid input' });
+          return;
+        }
         setLoading(true);
+
+        if (invalidUsernames.includes(freelancer.username)) {
+          setError({ message: 'Invalid username' });
+          return;
+        }
+
         let data = freelancer;
         data = {
           ...data,
+          bio: freelancer.bio.trim().length
+            ? filter.clean(freelancer.bio).trim()
+            : '',
+          education: freelancer.education.trim().length
+            ? filter.clean(freelancer.education).trim()
+            : '',
+          title: freelancer.title.trim().length
+            ? filter.clean(freelancer.title).trim()
+            : '',
           skills: skills,
           clients: clients,
           logged_in_user: browsingUser.id === initFreelancer.user_id,
@@ -172,8 +203,25 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const handleUpdateState = (e: any) => {
     const newFreelancer = {
       ...freelancer,
-      [e?.target?.name]: e?.target?.value,
+      [e?.target?.name]: e?.target?.value.trim().length
+        ? filter.clean(e.target.value).trim()
+        : '',
     };
+    if (
+      e.target.name === 'display_name' &&
+      newFreelancer.display_name.trim().length < 1
+    ) {
+      setDisplayNameError(true);
+    } else if (e.target.name === 'display_name') {
+      setDisplayNameError(false);
+    }
+    if (
+      (e.target.name === 'username' &&
+        newFreelancer.username.trim().length < 5) ||
+      newFreelancer.username.trim().length > 30
+    ) {
+      setUserNameError(true);
+    } else if (e.target.name === 'username') setUserNameError(false);
     setFreelancer(newFreelancer);
   };
 
@@ -417,15 +465,25 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
               />
               <div className='w-full flex flex-col gap-[16px] mt-5'>
                 {isEditMode ? (
-                  <TextField
-                    color='secondary'
-                    onChange={(e) => handleUpdateState(e)}
-                    id='outlined-basic'
-                    name='display_name'
-                    label='Name'
-                    variant='outlined'
-                    defaultValue={freelancer?.display_name}
-                  />
+                  <>
+                    <TextField
+                      onChange={(e) => handleUpdateState(e)}
+                      id='outlined-basic'
+                      name='display_name'
+                      label='Name'
+                      variant='outlined'
+                      color='secondary'
+                      defaultValue={freelancer?.display_name}
+                    />
+                    {displayError && (
+                      <p
+                        className={`text-xs text-imbue-light-purple-two mt-[-34px]
+                    `}
+                      >
+                        Name must contain atleast 1 character
+                      </p>
+                    )}
+                  </>
                 ) : (
                   <div className='flex gap-2'>
                     <h3 className='!text-2xl z-[1] text-imbue-purple'>
@@ -444,16 +502,26 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
 
                 <div className='flex gap-4 flex-col'>
                   {isEditMode ? (
-                    <TextField
-                      color='secondary'
-                      onChange={(e) => handleUpdateState(e)}
-                      className='w-full'
-                      id='outlined-basic'
-                      name='username'
-                      label='Username'
-                      variant='outlined'
-                      defaultValue={freelancer?.username}
-                    />
+                    <>
+                      <TextField
+                        onChange={(e) => handleUpdateState(e)}
+                        className='w-full'
+                        id='outlined-basic'
+                        name='username'
+                        label='Username'
+                        variant='outlined'
+                        color='secondary'
+                        defaultValue={freelancer?.username}
+                      />
+                      {userNameError && (
+                        <p
+                          className={`text-xs text-imbue-light-purple-two mt-[-34px]
+                    `}
+                        >
+                          username must contain min 5 max 30 character
+                        </p>
+                      )}
+                    </>
                   ) : (
                     <p className='text-[16px] leading-[1.2] text-imbue-purple max-w-full break-words'>
                       @{freelancer?.username}
@@ -475,7 +543,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                     ) : (
                       <>
                         <IoPeople color='var(--theme-secondary)' size='24px' />
-                        <p className='text-[16px] leading-[1.2] text-imbue-purple'>
+                        <p className='text-[16px] break-all leading-[1.2] text-imbue-purple'>
                           {freelancer?.title}
                         </p>
                       </>

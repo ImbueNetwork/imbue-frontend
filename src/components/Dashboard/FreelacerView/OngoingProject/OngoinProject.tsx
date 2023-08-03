@@ -72,7 +72,7 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
                         !item.completed ? 'bg-light-grey' : 'bg-primary'
                       )}
                     >
-                      {item.complete ? 'completed' : 'In progress'}
+                      {item.completed ? 'completed' : 'In progress'}
                     </button>
                   </div>
                   <p className='text-imbue-purple-dark text-sm sm:text-lg'>

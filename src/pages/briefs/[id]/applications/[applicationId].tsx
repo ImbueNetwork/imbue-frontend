@@ -18,6 +18,7 @@ import BriefOwnerHeader from '@/components/Application/BriefOwnerHeader';
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
+import FullScreenLoader from '@/components/FullScreenLoader';
 import Login from '@/components/Login';
 import SuccessScreen from '@/components/SuccessScreen';
 
@@ -61,7 +62,9 @@ export type ApplicationPreviewProps = {
 const ApplicationPreview = (): JSX.Element => {
   const filter = new Filter();
   const [brief, setBrief] = useState<Brief | any>();
-  const { user } = useSelector((state: RootState) => state.userState);
+  const { user, loading: userLoading } = useSelector(
+    (state: RootState) => state.userState
+  );
   const [application, setApplication] = useState<Project | any>();
   const [freelancer, setFreelancer] = useState<Freelancer | any>();
   const [loginModal, setLoginModal] = useState<boolean>(false);
@@ -118,7 +121,7 @@ const ApplicationPreview = (): JSX.Element => {
       } catch (error) {
         setError({ message: 'Could not find application' });
       } finally {
-        setLoading(false);
+        //setLoading(false);
       }
     };
 
@@ -130,9 +133,9 @@ const ApplicationPreview = (): JSX.Element => {
   useEffect(() => {
     async function setup() {
       if (brief) {
-        setLoading(true);
+        // setLoading(true);
         const briefOwner: User = await fetchUser(brief?.user_id);
-        setLoading(false);
+        // setLoading(false);
         setBriefOwner(briefOwner);
       }
     }
@@ -204,6 +207,18 @@ const ApplicationPreview = (): JSX.Element => {
       setLoginModal(true);
     }
   };
+
+  useEffect(() => {
+    if (freelancer && briefOwner && user.id && !userLoading) {
+      if (freelancer.user_id === user.id || briefOwner.id === user.id) {
+        setLoading(false);
+      } else {
+        router.push('/');
+      }
+    } else if (!userLoading && (!user || !user.id)) {
+      router.push('/');
+    }
+  }, [briefOwner, freelancer]);
 
   const updateApplicationState = async (
     application: any,
@@ -374,6 +389,8 @@ const ApplicationPreview = (): JSX.Element => {
   };
 
   // const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
+
+  if (loading) return <FullScreenLoader />;
 
   return (
     <div>

@@ -32,6 +32,15 @@ import styles from '@/styles/modules/freelancers.module.css';
 
 import { checkEnvironment, matchedByUserName, updateUser } from '../../utils';
 
+const invalidUsernames = [
+  'username',
+  'imbue',
+  'imbuenetwork',
+  'polkadot',
+  'password',
+  'admin',
+];
+
 const Profile = ({ initUser, browsingUser }: any) => {
   const filter = new Filter({ placeHolder: ' ' });
   const router = useRouter();
@@ -82,6 +91,9 @@ const Profile = ({ initUser, browsingUser }: any) => {
         return;
       } else if (userNameExist && user.username !== prevUserName) {
         setError({ message: 'username is already exist' });
+        return;
+      } else if (invalidUsernames.includes(user.username)) {
+        setError({ message: 'Invalid user name' });
         return;
       } else if (user) {
         setLoading(true);
@@ -180,7 +192,8 @@ const Profile = ({ initUser, browsingUser }: any) => {
       else setDisplayNameError(false);
     }
     if (e.target.name === 'username') {
-      if (e.target.value.length < 1) setUserNameError(true);
+      if (e.target.value.length < 5 || e.target.value.length > 30)
+        setUserNameError(true);
       else setUserNameError(false);
       const data = await matchedByUserName(e.target.value);
       if (data && e.target.value !== prevUserName) {
@@ -290,7 +303,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                       className={`text-xs text-imbue-light-purple-two mt-[-34px]
                     `}
                     >
-                      username must contain atleast 1 character
+                      username must contain min 5 character max 30 character
                     </p>
                   )}
                   {userNameExist && (
