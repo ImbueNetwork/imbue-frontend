@@ -110,7 +110,6 @@ export const isValidAddressPolkadotAddress = (address: string) => {
 export const validateApplicationInput = (
   application: 'brief' | 'grant',
   inputErrors: InputErrorType,
-  setInputErrors: (value: InputErrorType) => void,
   milestones: MilestoneItem[],
   title: string,
   description: string,
@@ -242,9 +241,9 @@ export const validateApplicationInput = (
     }
   }
 
-  setInputErrors({ ...newInputs, milestones: newMilestones });
+  const errors = { ...newInputs, milestones: newMilestones }
 
-  return { isValid, firstErrorIndex };
+  return { isValid, firstErrorIndex, errors };
 };
 
 export const validateInputLength = (

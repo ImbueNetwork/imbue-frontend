@@ -1,4 +1,4 @@
-import { Alert, Dialog, IconButton } from '@mui/material';
+import { Alert, Dialog, IconButton, Tooltip } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import WalletIcon from '@svgs/wallet.svg';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -69,7 +69,7 @@ const GrantApplication = (): JSX.Element => {
   const [success, setSuccess] = useState(false);
   const [projectId, setProjectId] = useState<number>();
   const [copied, setCopied] = useState<boolean>(false);
-  const [enteredInvalid, setEnteredInvalid] = useState<boolean>(false);
+  const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
 
   const copyAddress = () => {
     setCopied(true);
@@ -162,24 +162,7 @@ const GrantApplication = (): JSX.Element => {
 
   const submitGrant = async (account: WalletAccount) => {
     if (!account) return;
-    const { isValid, firstErrorIndex } = validateApplicationInput(
-      'grant',
-      inputErrors,
-      setInputErrors,
-      milestones,
-      title,
-      description,
-      approvers
-    );
-    if (!isValid) {
-      setEnteredInvalid(true);
-      milestonesRef.current[firstErrorIndex]?.scrollIntoView({
-        behavior: 'auto',
-        block: 'center',
-        inline: 'center',
-      });
-      return setError({ message: 'Please fill the required fields first' });
-    }
+    if (approvers.includes(account.address)) return setError({ message: "You can't use approver address for grantor payment address" })
     if (totalPercent < 100)
       return setError({
         message: 'Total Percentage of milelstones must be equal to 100%',
@@ -219,7 +202,7 @@ const GrantApplication = (): JSX.Element => {
         approvers,
       };
 
-    
+
 
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);
@@ -332,6 +315,13 @@ const GrantApplication = (): JSX.Element => {
     }));
   }, [approvers.length]);
 
+  useEffect(() => {
+    const { isValid, errors } = validateApplicationInput("grant", inputErrors, milestones, title, description, approvers)
+    setDisableSubmit(!isValid)
+    setInputErrors(errors)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [title, description, milestones, approvers])
+
   if (userLoading) return <FullScreenLoader />;
 
   return (
@@ -347,7 +337,7 @@ const GrantApplication = (): JSX.Element => {
                 ref={(el) => (milestonesRef.current[0] = el)}
                 className='flex flex-col text-imbue-purple-dark'
               >
-                <div>Title</div>
+                <div>Title*</div>
                 <input
                   value={title}
                   maxLength={50}
@@ -358,11 +348,7 @@ const GrantApplication = (): JSX.Element => {
                 />
                 <div className='flex items-center justify-between mt-2'>
                   <p
-                    className={`text-xs ${
-                      enteredInvalid
-                        ? 'text-imbue-coral'
-                        : 'text-imbue-light-purple-two'
-                    }`}
+                    className={`text-xs text-imbue-light-purple-two`}
                   >
                     {inputErrors?.title}
                   </p>
@@ -375,7 +361,7 @@ const GrantApplication = (): JSX.Element => {
                 ref={(el) => (milestonesRef.current[1] = el)}
                 className='flex flex-col text-imbue-purple-dark'
               >
-                <div>Description</div>
+                <div>Description*</div>
                 <textarea
                   maxLength={5000}
                   value={description}
@@ -386,11 +372,7 @@ const GrantApplication = (): JSX.Element => {
                 />
                 <div className='flex items-center justify-between mt-2'>
                   <p
-                    className={`text-xs ${
-                      enteredInvalid
-                        ? 'text-imbue-coral'
-                        : 'text-imbue-light-purple-two'
-                    }`}
+                    className={`text-xs text-imbue-light-purple-two`}
                   >
                     {inputErrors?.description}
                   </p>
@@ -497,11 +479,7 @@ const GrantApplication = (): JSX.Element => {
                   user={user}
                 />
                 <p
-                  className={`text-xs ${
-                    enteredInvalid
-                      ? 'text-imbue-coral'
-                      : 'text-imbue-light-purple-two'
-                  }`}
+                  className={`text-xs text-imbue-light-purple-two`}
                 >
                   {inputErrors?.approvers}
                 </p>
@@ -590,7 +568,7 @@ const GrantApplication = (): JSX.Element => {
                       <div className='flex flex-col lg:flex-row justify-between w-full text-content'>
                         <div className='lg:w-3/5'>
                           <h3 className='text-base lg:text-xl mb-1 p-0 text-imbue-purple-dark font-normal'>
-                            Title
+                            Title*
                           </h3>
 
                           <div className='mb-8'>
@@ -606,11 +584,7 @@ const GrantApplication = (): JSX.Element => {
                             />
                             <div className='flex items-center justify-between'>
                               <p
-                                className={`text-xs ${
-                                  enteredInvalid
-                                    ? 'text-imbue-coral'
-                                    : 'text-imbue-light-purple-two'
-                                }`}
+                                className={`text-xs text-imbue-light-purple-two`}
                               >
                                 {inputErrors?.milestones[index]?.name || ''}
                               </p>
@@ -621,7 +595,7 @@ const GrantApplication = (): JSX.Element => {
                           </div>
 
                           <p className='mb-2 lg:mb-5 text-base lg:text-lg'>
-                            Description
+                            Description*
                           </p>
                           <div>
                             <textarea
@@ -634,19 +608,14 @@ const GrantApplication = (): JSX.Element => {
                             />
                             <div className='flex items-center justify-between'>
                               <p
-                                className={`text-xs ${
-                                  enteredInvalid
-                                    ? 'text-imbue-coral'
-                                    : 'text-imbue-light-purple-two'
-                                }`}
+                                className={`text-xs text-imbue-light-purple-two`}
                               >
                                 {inputErrors?.milestones[index]?.description ||
                                   ''}
                               </p>
                               <div className='text-imbue-purple text-sm ml-auto text-right'>
-                                {`${
-                                  milestones[index].description?.length || 0
-                                }/5000`}
+                                {`${milestones[index].description?.length || 0
+                                  }/5000`}
                               </div>
                             </div>
                           </div>
@@ -654,7 +623,7 @@ const GrantApplication = (): JSX.Element => {
 
                         <div className='flex flex-col lg:w-4/12 mt-5 lg:mt-[-0.2rem]'>
                           <h3 className=' text-base lg:text-xl mb-2 p-0 text-imbue-purple-dark font-normal'>
-                            Amount
+                            Amount*
                           </h3>
                           <div className='w-full relative p-0 m-0'>
                             <span className='h-fit absolute left-5 bottom-3 text-base text-content'>
@@ -673,11 +642,7 @@ const GrantApplication = (): JSX.Element => {
                             />
                           </div>
                           <p
-                            className={`text-xs ${
-                              enteredInvalid
-                                ? 'text-imbue-coral'
-                                : 'text-imbue-light-purple-two'
-                            } mt-2`}
+                            className={`text-xs text-imbue-light-purple-two mt-2`}
                           >
                             {inputErrors?.milestones[index]?.amount || ''}
                           </p>
@@ -724,9 +689,8 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${
-                  currencies[currencyId]
-                }`}
+                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
+                  }`}
               </div>
             </div>
 
@@ -746,9 +710,8 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${
-                  currencies[currencyId]
-                }`}
+                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
+                  }`}
               </div>
             </div>
 
@@ -767,13 +730,19 @@ const GrantApplication = (): JSX.Element => {
       </div>
 
       <div className='buttons-container'>
-        <button
-          // disabled={!formDataValid}
-          className='primary-btn in-dark w-button'
-          onClick={() => handleSubmit()}
+        <Tooltip
+          followCursor
+          leaveTouchDelay={10}
+          title={disableSubmit && "Please fill all the required input fields"}
         >
-          Submit
-        </button>
+          <button
+            // disabled={!formDataValid}
+            className={`primary-btn in-dark w-button ${disableSubmit && "!bg-gray-400 !text-white !cursor-not-allowed"}`}
+            onClick={() => !disableSubmit && handleSubmit()}
+          >
+            Submit
+          </button>
+        </Tooltip>
       </div>
       {loading && <FullScreenLoader />}
       <Dialog
@@ -785,8 +754,8 @@ const GrantApplication = (): JSX.Element => {
       >
         <div className='my-auto flex flex-col gap-3 items-center p-8'>
           <div className='f-modal-alert'>
-            <div className='p-10 border-[5px] border-solid border-primary rounded-full  relative'>
-              <Image src={WalletIcon} alt='wallet icon' className='w-24 h-24' />
+            <div className='p-6 lg:p-10 border-[2px] lg:border-[5px] border-primary rounded-full relative'>
+              <Image src={WalletIcon} alt='wallet icon' className='w-10 h-10 lg:w-24 lg:h-24' />
             </div>
           </div>
           <div className='my-2 lg:my-4'>
@@ -796,14 +765,14 @@ const GrantApplication = (): JSX.Element => {
           </div>
 
           <CopyToClipboard text={escrowAddress}>
-            <div className='flex flex-row gap-4 items-center rounded-[10px] border border-solid border-light-grey p-6 text-xl text-content'>
+            <div className='flex flex-row gap-4 items-center rounded-[10px] border border-solid border-light-grey p-4 lg:p-6 text-xl text-content'>
               <IconButton onClick={() => copyAddress()}>
                 <FaRegCopy className='text-content' />
               </IconButton>
-              <span>{escrowAddress}</span>
+              <span className='text-sm lg:text-base break-all'>{escrowAddress}</span>
             </div>
           </CopyToClipboard>
-          <div className='my-6 text-content text-lg text-center'>
+          <div className='my-6 text-content text-sm lg:text-lg text-center'>
             Please use this given address to create a proposal in your Kusama
             treasury. After the voting is passed your project will be created
           </div>
@@ -815,9 +784,8 @@ const GrantApplication = (): JSX.Element => {
           </button>
         </div>
         <Alert
-          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${
-            copied ? 'flex' : 'hidden'
-          }`}
+          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${copied ? 'flex' : 'hidden'
+            }`}
           severity='success'
         >
           Grant Wallet Address Copied to clipboard
