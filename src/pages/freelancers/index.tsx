@@ -71,7 +71,7 @@ const Freelancers = (): JSX.Element => {
     if (input[0]) {
       return input
         .filter((thing: any, i: any, arr: any) => {
-          return arr.indexOf(arr.find((t: any) => t.id === thing.id)) === i;
+          return arr.indexOf(arr.find((t: any) => t?.id === thing?.id)) === i;
         })
         .sort(function (a: any, b: any) {
           return a.name.localeCompare(b.name);

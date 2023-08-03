@@ -418,6 +418,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
               <div className='w-full flex flex-col gap-[16px] mt-5'>
                 {isEditMode ? (
                   <TextField
+                    color='secondary'
                     onChange={(e) => handleUpdateState(e)}
                     id='outlined-basic'
                     name='display_name'
@@ -444,6 +445,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                 <div className='flex gap-4 flex-col'>
                   {isEditMode ? (
                     <TextField
+                      color='secondary'
                       onChange={(e) => handleUpdateState(e)}
                       className='w-full'
                       id='outlined-basic'
@@ -461,6 +463,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   <div className='flex items-center gap-2 w-full'>
                     {isEditMode ? (
                       <TextField
+                        color='secondary'
                         onChange={(e) => handleUpdateState(e)}
                         className='w-full'
                         id='outlined-basic'
@@ -1208,9 +1211,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         </div>
       </ErrorScreen>
       <div
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${
-          copied ? 'right-5' : '-right-full'
-        }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
+          }`}
       >
         <Alert severity='success'>{`${copied} Copied to clipboard`}</Alert>
       </div>

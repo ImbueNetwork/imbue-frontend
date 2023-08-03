@@ -51,6 +51,7 @@ export default nextConnect()
           tx,
           filter
         );
+        console.log("🚀 ~ file: search.ts:54 ~ db.transaction ~ freelancers:", freelancers)
 
         const { currentData } = await models.paginatedData(
           filter?.page || 1,

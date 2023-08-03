@@ -45,7 +45,7 @@ export default nextConnect()
         let freelancer;
         freelancer = await fetchFreelancerDetailsByUsername(username)(tx);
 
-        if (!freelancer.id)
+        if (!freelancer?.id)
           freelancer = await models.fetchFreelancerDetailsByUserID(
             Number(username)
           )(tx);
@@ -126,6 +126,8 @@ export default nextConnect()
             cause: e as Error,
           }
         );
+        return res.status(401).json(e);
+
       }
     });
   })

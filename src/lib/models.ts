@@ -596,6 +596,15 @@ export const updateMilestoneDetails =
       .update('details', details)
       .returning('*');
 
+export const updateMilestone =
+  (id: string | number, milestoneId: string | number, details: any) =>
+  (tx: Knex.Transaction) =>
+    tx<Milestone>('milestones')
+      .where({ project_id: id })
+      .where('milestone_index', '=', milestoneId)
+      .update(details)
+      .returning('*');
+
 export const insertMilestoneDetails =
   (value: MilestoneDetails) => async (tx: Knex.Transaction) =>
     (

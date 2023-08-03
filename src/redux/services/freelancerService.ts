@@ -110,6 +110,7 @@ export const callSearchFreelancers = async (
     const data: FreelancerResponse = await resp.json();
     return data;
   } else {
+    console.log(await resp.json());
     throw new Error('Failed to search freelancers. status:' + resp.status);
   }
 };

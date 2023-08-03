@@ -49,13 +49,29 @@ export const getUsersOngoingGrants = async (walletAddress: string) => {
     }
   );
 
-  return await resp.json();
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    return {
+      message: 'Failed to get all brief applications. status:' + resp.status,
+    };
+  }
+};
+
+export const updateMilestone = async (projectId: number, milestoneIndex:number, approve:boolean) => {
+  const resp = await fetch(
+    `${config.apiBase}/project/updateMilestone?projectId=${projectId}&milestoneIndex=${milestoneIndex}&approve=${approve}`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'get',
+    }
+  );
 
   if (resp.ok) {
     return await resp.json();
   } else {
-    throw new Error(
-      'Failed to get all brief applications. status:' + resp.status
-    );
+    return {
+      message: 'Failed to get all brief applications. status:' + resp.status,
+    };
   }
-};
+}
