@@ -1,4 +1,4 @@
-import { Autocomplete, TextField } from '@mui/material';
+import { Autocomplete, TextField, Tooltip } from '@mui/material';
 import Filter from 'bad-words';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -13,6 +13,7 @@ import FullScreenLoader from '@/components/FullScreenLoader';
 import { Option } from '@/components/Option';
 import { ProgressBar } from '@/components/ProgressBar';
 import { TagsInput } from '@/components/TagsInput';
+import ValidatableInput from '@/components/ValidatableInput';
 
 import * as config from '@/config';
 import {
@@ -38,7 +39,7 @@ const NewBrief = (): JSX.Element => {
   const [expId, setExpId] = useState<number>();
   const [scopeId, setScopeId] = useState<number>();
   const [durationId, setDurationId] = useState<number>();
-  const [budget, setBudget] = useState<number>();
+  const [budget, setBudget] = useState<number>(0);
   const [suggestedSkills, setSuggestedSkills] = useState<string[]>([]);
 
   const [error, setError] = useState<any>();
@@ -46,6 +47,7 @@ const NewBrief = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
   const [industriesError, setIndustriesError] = useState(false);
   const [skillError, setSkillError] = useState(false);
+  const [disableSubmit, setDisableSubmit] = useState(false);
   const router = useRouter();
 
   const { user } = useSelector((state: RootState) => state.userState);
@@ -59,8 +61,6 @@ const NewBrief = (): JSX.Element => {
     if (skillsRes) {
       setSuggestedSkills(skillsRes?.skills.map((skill) => skill.name));
     }
-    
-    
   };
 
   const searchSkill = async (name: string) => {
@@ -86,13 +86,15 @@ const NewBrief = (): JSX.Element => {
     min: number,
     max: number
   ): boolean => {
-    return text.length >= min && text.length <= max;
+    return text?.length >= min && text.length <= max;
   };
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = event.target;
+    setInputError('');
+
     switch (name) {
       case 'headline':
         if (validateInputLength(value, 10, 50)) {
@@ -121,16 +123,12 @@ const NewBrief = (): JSX.Element => {
     <>
       <p className={styles.fieldName}>Write a headline for your brief</p>
       <div className={styles.namePanelInputWrapper}>
-        <input
-          className={styles.briefDetailFieldInput}
+        <ValidatableInput
           data-testid='headline-input'
           name='headline'
           value={headline}
-          onChange={handleChange}
+          onChange={(e: any) => setHeadline(e.target.value)}
         />
-        <div className='flex flex-wrap flex-row justify-center relative top-4'>
-          <span className={!inputError ? 'hide' : 'error'}>{inputError}</span>
-        </div>
       </div>
       <p className={styles.fieldName}>Examples</p>
       <div className={styles.namePanelNameExamples}>
@@ -188,14 +186,6 @@ const NewBrief = (): JSX.Element => {
     <>
       <p className={styles.fieldName}>Search the skills</p>
       <div className={styles.skillsContainer}>
-        {/* <TagsInput
-          suggestData={suggestedSkills}
-          tags={skills}
-          data-testid='skills-input'
-          onChange={(tags: string[]) => setSkills(tags)}
-          limit={10}
-          hideInput
-        /> */}
         <Autocomplete
           id='tags-standard'
           data-testid='skills-input'
@@ -330,7 +320,7 @@ const NewBrief = (): JSX.Element => {
   ];
   const validate = (): boolean => {
     // TODO: show notification
-    if (step === 0 && !headline) {
+    if (step === 0 && !validateInputLength(headline, 10, 50)) {
       return false;
     }
     if (
@@ -339,7 +329,7 @@ const NewBrief = (): JSX.Element => {
     ) {
       return false;
     }
-    if (step === 2 && !description && inputError) {
+    if ((step === 2 && !validateInputLength(description, 50, 5000)) || inputError) {
       // TODO: minimum required length for description
       return false;
     }
@@ -358,11 +348,16 @@ const NewBrief = (): JSX.Element => {
     if (step === 6 && durationId === undefined) {
       return false;
     }
-    if ((step === 7 && !budget) || Number(budget) < 10) {
+    if (step === 7 && (!budget || Number(budget) < 10)) {
       return false;
     }
     return true;
   };
+
+  useEffect(() => {
+    setDisableSubmit(!validate())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [headline, industries.length, description, skills.length, expId, scopeId, durationId, budget, step])
 
   const onReviewPost = async () => {
     //TODO: implement api call
@@ -437,23 +432,36 @@ const NewBrief = (): JSX.Element => {
                 Discover Briefs
               </button>
             ) : step === stepData.length - 2 ? (
-              <button
-                className='primary-btn in-dark w-button !mt-0'
-                disabled={!validate()}
-                data-testid='submit-button'
-                onClick={() => onReviewPost()}
+              <Tooltip
+                followCursor
+                leaveTouchDelay={10}
+                title={disableSubmit && "Please fill all the required input fields"}
               >
-                Submit
-              </button>
+                <button
+                  className={`primary-btn in-dark w-button !mt-0 ${disableSubmit && "!bg-gray-400 !text-white !cursor-not-allowed"}`}
+                  data-testid='submit-button'
+                  onClick={() => !disableSubmit && onReviewPost()}
+                >
+                  Submit
+                </button>
+              </Tooltip>
+
             ) : (
-              <button
-                className='primary-btn in-dark w-button !mt-0 hover:!bg-imbue-purple hover:!text-white'
-                data-testid='next-button'
-                onClick={() => setStep(step + 1)}
-                disabled={!validate() || inputError}
+              <Tooltip
+                followCursor
+                leaveTouchDelay={10}
+                title={disableSubmit && "Please fill all the required input fields"}
               >
-                {stepData[step].next ? `Next: ${stepData[step].next}` : 'Next'}
-              </button>
+                <button
+                  className={`primary-btn in-dark w-button !mt-0 ${disableSubmit && "!bg-gray-400 !text-white !cursor-not-allowed"}`}
+                  data-testid='next-button'
+                  onClick={() => !disableSubmit && setStep(step + 1)}
+                // onClick={() => console.log("hit")}
+                >
+                  {stepData[step].next ? `Next: ${stepData[step].next}` : 'Next'}
+                </button>
+              </Tooltip>
+
             )}
           </div>
         </div>

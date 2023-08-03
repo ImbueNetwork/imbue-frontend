@@ -111,9 +111,9 @@ export const validateApplicationInput = (
   application: 'brief' | 'grant',
   inputErrors: InputErrorType,
   milestones: MilestoneItem[],
-  title: string,
-  description: string,
-  approvers: any
+  title?: string,
+  description?: string,
+  approvers?: any
 ) => {
   let isValid = true;
   let firstErrorIndex = -1;
@@ -172,7 +172,7 @@ export const validateApplicationInput = (
     };
   }
 
-  if (approvers.length === 0 && application === 'grant') {
+  if (approvers?.length === 0 && application === 'grant') {
     isValid = false;
     firstErrorIndex = firstErrorIndex === -1 ? 2 : firstErrorIndex;
     newInputs = {
@@ -182,7 +182,7 @@ export const validateApplicationInput = (
   }
 
   for (let i = 0; i < milestones.length; i++) {
-    const { amount, name, description } = milestones[i];
+    const { amount = 0, name, description } = milestones[i];
 
     if (
       name === undefined ||
@@ -241,17 +241,17 @@ export const validateApplicationInput = (
     }
   }
 
-  const errors = { ...newInputs, milestones: newMilestones }
+  const errors = { ...newInputs, milestones: newMilestones };
 
   return { isValid, firstErrorIndex, errors };
 };
 
 export const validateInputLength = (
-  text: string,
+  text: string | undefined,
   min: number,
   max: number
 ): boolean => {
-  return text.length >= min && text.length <= max;
+  return text !== undefined && text?.length >= min && text?.length <= max;
 };
 
 export const handleApplicationInput = (

@@ -32,23 +32,25 @@ const ValidatableInput = (props: any) => {
 
         handleOnChange(event)
     }
-    
+
     return (
         <div className='w-full'>
             <TextField
                 id="outlined-multiline-static"
                 {...props}
+                inputProps={{
+                    maxLength
+                }}
                 onChange={(e) => handleInput(e)}
                 className='w-full !mb-0'
                 multiline
-                rows={1}
                 color='secondary'
             />
             <div className='flex justify-between items-center'>
                 <p className='mt-2 text-imbue-coral text-sm text-right capitalize-first'>{error}</p>
                 {
                     !hideLimit && (
-                        <p className='mt-2 text-content-primary text-sm text-right'>{value?.length}/{maxLength}</p>
+                        <p className='mt-2 text-content-primary text-sm text-right'>{value?.length || 0}/{maxLength}</p>
                     )
                 }
             </div>

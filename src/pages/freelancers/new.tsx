@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Autocomplete, TextField } from '@mui/material';
+import { Autocomplete, TextField, Tooltip } from '@mui/material';
 import Filter from 'bad-words';
 import { useRouter } from 'next/router';
 import React, { ChangeEvent, useEffect, useState } from 'react';
@@ -36,7 +36,7 @@ const Freelancer = (): JSX.Element => {
     (state: RootState) => state.userState
   );
   const displayName = user?.display_name;
-  const [freelancingBefore, setFreelancingBefore] = useState<any>();
+  const [freelancingBefore, setFreelancingBefore] = useState<string>();
   const [goal, setGoal] = useState<any>();
   // const [resume, setResume] = useState<any>();
   const [title, setTitle] = useState<string>('');
@@ -46,6 +46,7 @@ const Freelancer = (): JSX.Element => {
   const [bio, setBio] = useState<any>();
   const [services, setServices] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
   const [error, setError] = useState<any>();
   const [suggestedFreelancingSkills, setSuggestedSkills] = useState<string[]>(
     []
@@ -80,7 +81,7 @@ const Freelancer = (): JSX.Element => {
       </div>
     </div>
   );
-
+console.log(freelancingBefore);
   const FreelanceExperience = (
     <div className={styles.freelanceXpContainer}>
       <div className={styles.contentTextSmallFlex}>
@@ -95,9 +96,8 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-xp-${index}`}
-            className={`${styles.freelanceXpItem} ${
-              freelancingBefore === value ? styles.active : ''
-            }`}
+            className={`${styles.freelanceXpItem} ${freelancingBefore === value ? styles.active : ''
+              }`}
             onClick={() => setFreelancingBefore(value)}
           >
             {label}
@@ -119,9 +119,8 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-goal-${index}`}
-            className={`${styles.freelanceXpItem} ${
-              goal === value ? styles.active : ''
-            }`}
+            className={`${styles.freelanceXpItem} ${goal === value ? styles.active : ''
+              }`}
             onClick={() => setGoal(value)}
           >
             {label}
@@ -238,12 +237,6 @@ const Freelancer = (): JSX.Element => {
       </div>
       <h3 className='text-lg text-black mt-5'>Your Skills</h3>
       <div className='mt-5 mb-20'>
-        {/* <TagsInput
-          suggestData={suggestedFreelancingSkills}
-          tags={skills}
-          onChange={(tags: string[]) => setSkills(tags)}
-          hideInput
-        /> */}
         <Autocomplete
           id='tags-standard'
           multiple
@@ -260,6 +253,11 @@ const Freelancer = (): JSX.Element => {
             />
           )}
         />
+        {
+          !skills.length && (
+            <p className='mt-2 text-imbue-coral text-sm capitalize-first'>Please add at least 1 skill</p>
+          )
+        }
       </div>
     </div>
   );
@@ -273,16 +271,6 @@ const Freelancer = (): JSX.Element => {
       </div>
 
       <div className={styles.namePanelInputWrapper}>
-        {/* <textarea
-          className={`${styles.fieldInput} ${styles.large}`}
-          placeholder='Enter your bio'
-          data-testid='bio'
-          name='bio'
-          maxLength={5000}
-          rows={6}
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-        /> */}
         <ValidatableInput
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setBio(e.target.value)
@@ -313,6 +301,11 @@ const Freelancer = (): JSX.Element => {
           tags={services}
           onChange={(tags: string[]) => setServices(tags)}
         />
+        {
+          !services.length && (
+            <p className='mt-4 text-imbue-coral text-sm capitalize-first'>Please add at least 1 service</p>
+          )
+        }
       </div>
     </div>
   );
@@ -341,15 +334,16 @@ const Freelancer = (): JSX.Element => {
   ];
 
   useEffect(() => {
-    validate();
+    setDisableSubmit(!validate())
   }, [
-    freelancedBefore,
+    freelancingBefore,
     goal,
     title,
     education,
     skills?.length,
     bio,
     services?.length,
+    step
   ]);
 
   const validate = (): boolean => {
@@ -357,14 +351,14 @@ const Freelancer = (): JSX.Element => {
     if (step === 1 && !freelancingBefore) {
       return false;
     }
-    if (step === 2 && !goal) {
+    else if (step === 2 && !goal) {
       return false;
     }
-    if (step === 3 && (!title || !validateInputLength(title, 10, 50))) {
+    else if (step === 3 && (!title || !validateInputLength(title, 10, 50))) {
       // TODO: minimum required length for description
       return false;
     }
-    if (
+    else if (
       step === 4 &&
       (!education || !validateInputLength(education, 10, 100))
     ) {
@@ -374,13 +368,13 @@ const Freelancer = (): JSX.Element => {
     // if (step === 5 && !languages.length) {
     //   return false;
     // }
-    if (step === 6 && !skills.length) {
+    else if (step === 6 && !skills.length) {
       return false;
     }
-    if (step === 7 && (!bio || !validateInputLength(bio, 50, 5000))) {
+    else if (step === 7 && (!bio || !validateInputLength(bio, 50, 5000))) {
       return false;
     }
-    if (step === 8 && !services.length) {
+    else if (step === 8 && !services.length) {
       return false;
     }
     return true;
@@ -476,23 +470,34 @@ const Freelancer = (): JSX.Element => {
                 Discover Briefs
               </button>
             ) : step === stepData.length - 2 ? (
-              <button
-                className='primary-btn in-dark w-button'
-                data-testid='submit-button'
-                disabled={!validate()}
-                onClick={() => createProfile()}
+              <Tooltip
+                followCursor
+                leaveTouchDelay={10}
+                title={disableSubmit && "Please fill all the required input fields"}
               >
-                Submit
-              </button>
+                <button
+                  className={`primary-btn in-dark w-button !mt-0 ${disableSubmit && "!bg-gray-400 !text-white !cursor-not-allowed"}`}
+                  data-testid='submit-button'
+                  onClick={() => !disableSubmit && createProfile()}
+                >
+                  Submit
+                </button>
+              </Tooltip>
+
             ) : (
-              <button
-                className='primary-btn in-dark w-button !mt-0'
-                data-testid='next-button'
-                disabled={!validate()}
-                onClick={() => setStep(step + 1)}
+              <Tooltip
+                followCursor
+                leaveTouchDelay={10}
+                title={disableSubmit && "Please fill all the required input fields"}
               >
-                Next
-              </button>
+                <button
+                  className={`primary-btn in-dark w-button !mt-0 ${disableSubmit && "!bg-gray-400 !text-white !cursor-not-allowed"}`}
+                  data-testid='next-button'
+                  onClick={() => !disableSubmit && setStep(step + 1)}
+                >
+                  Next
+                </button>
+              </Tooltip>
             )}
           </div>
         </div>
