@@ -329,7 +329,7 @@ const NewBrief = (): JSX.Element => {
     ) {
       return false;
     }
-    if ((step === 2 && !validateInputLength(description, 50, 5000)) || inputError) {
+    if ((step === 2 && !validateInputLength(description, 50, 5000))) {
       // TODO: minimum required length for description
       return false;
     }

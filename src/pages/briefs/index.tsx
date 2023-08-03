@@ -257,6 +257,12 @@ const Briefs = (): JSX.Element => {
           page: currentPage,
         };
 
+        if (router.query.page) {
+          const pageQuery = Number(router.query.page)
+          filter.page = pageQuery;
+          setCurrentPage(pageQuery)
+        }
+
         if (expRange) {
           const range = strToIntRange(expRange);
           range?.forEach?.((v: any) => {
@@ -379,7 +385,7 @@ const Briefs = (): JSX.Element => {
               // eslint-disable-next-line no-console
               console.log(
                 'Invalid filter option selected or unimplemented. type:' +
-                  filterType
+                filterType
               );
           }
         }
@@ -481,6 +487,22 @@ const Briefs = (): JSX.Element => {
     setFilterVisible(false);
   };
 
+  const nextPage = () => {
+    if (briefs_total > currentPage * itemsPerPage) {
+      setCurrentPage(currentPage + 1);
+      router.query.page = (currentPage + 1).toString()
+      router.push(router, undefined, { shallow: true });
+    }
+  }
+
+  const previousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      router.query.page = (currentPage - 1).toString()
+      router.push(router, undefined, { shallow: true });
+    }
+  }
+
   const FilterModal = ({ open, handleClose }: FilterModalProps) => {
     return (
       <CustomModal
@@ -538,8 +560,8 @@ const Briefs = (): JSX.Element => {
 
   const briefsData = savedBriefsActive
     ? briefs?.filter((brief) =>
-        brief?.headline.toLocaleLowerCase().includes(searchInput)
-      )
+      brief?.headline.toLocaleLowerCase().includes(searchInput)
+    )
     : briefs;
 
   if (loading) return <FullScreenLoader />;
@@ -717,9 +739,7 @@ const Briefs = (): JSX.Element => {
       <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex  justify-between  max-width-868px:w-[90%] self-center'>
         <div className='flex items-center'>
           <button
-            onClick={() => {
-              if (currentPage > 1) setCurrentPage(currentPage - 1);
-            }}
+            onClick={() => previousPage()}
             className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'
           >
             <Image src={chevLeftIcon} alt='chev left' />
@@ -731,11 +751,7 @@ const Briefs = (): JSX.Element => {
           </div>
 
           <button
-            onClick={() => {
-              if (briefs_total > currentPage * itemsPerPage) {
-                setCurrentPage(currentPage + 1);
-              }
-            }}
+            onClick={() => nextPage()}
             className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'
           >
             Next

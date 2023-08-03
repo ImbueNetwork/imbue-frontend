@@ -12,7 +12,6 @@ import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import {
   applicationStatusId,
-  Freelancer,
   OffchainProjectState,
   Project,
   User,
@@ -27,8 +26,7 @@ import SuccessScreen from '../SuccessScreen';
 type ApplicationOwnerProps = {
   briefOwner: any;
   brief: Brief;
-  handleMessageBoxClick: (_user_id: number, _freelancer: any) => Promise<void>;
-  freelancer: Freelancer;
+  handleMessageBoxClick: (_user_id: number) => Promise<void>;
   application: Project | any;
   setLoading: (_loading: boolean) => void;
   updateProject: (
@@ -43,7 +41,6 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
     briefOwner,
     brief,
     handleMessageBoxClick,
-    freelancer,
     application,
     setLoading,
     updateProject,
@@ -126,7 +123,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         <button
           className='primary-btn in-dark w-button !text-xs lg:!text-base'
           onClick={() =>
-            brief && handleMessageBoxClick(brief?.user_id, freelancer?.username)
+            brief && handleMessageBoxClick(briefOwner.id)
           }
         >
           Message

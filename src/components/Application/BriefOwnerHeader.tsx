@@ -36,7 +36,7 @@ type BriefOwnerHeaderProps = {
   brief: Brief;
   freelancer: Freelancer;
   application: Project | any;
-  handleMessageBoxClick: (_userId: number, _freelancer: any) => void;
+  handleMessageBoxClick: (_userId: number ) => void;
   updateApplicationState: (
     _application: any,
     _projectStatus: OffchainProjectState
@@ -238,7 +238,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
           className='primary-btn in-dark w-button !px-5 !mr-0 !bg-[#BAFF36] !text-imbue-purple in-dark'
           onClick={() =>
             application.user_id &&
-            handleMessageBoxClick(application?.user_id, freelancer?.username)
+            handleMessageBoxClick(freelancer?.user_id)
           }
         >
           Message
