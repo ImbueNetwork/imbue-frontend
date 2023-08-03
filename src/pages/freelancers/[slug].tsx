@@ -917,7 +917,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                 />
               </>
             ) : (
-              <div className='bio text-content-primary text-base lg:mx-10 whitespace-pre-wrap'>
+              <div className='bio text-content-primary text-base lg:mx-10 break-all whitespace-pre-wrap'>
                 {freelancer?.bio}
               </div>
             )}
@@ -946,7 +946,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
               </>
             ) : (
               <>
-                <div className='bio text-imbue-purple lg:mx-10'>
+                <div className='bio text-imbue-purple break-all lg:mx-10'>
                   {/* TODO: Implementation */}
                   {/* {freelancer?.education
                   ?.split?.("\n")
@@ -1000,7 +1000,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                           {moment(v?.created).format('Do MMM YYYY')}
                         </p>
                       </div>
-                      <p className='text-imbue-purple-dark'>
+                      <p className='text-imbue-purple-dark break-all'>
                         {v?.description?.length > 500
                           ? v?.description.substring(0, 500)
                           : v?.description}
@@ -1135,7 +1135,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                     | {review.time}
                   </span>
                 </div>
-                <p className='mt-2'>
+                <p className='mt-2 break-all'>
                   {review.description.length > 500
                     ? `${review.description.substring(0, 500)}...`
                     : review.description}

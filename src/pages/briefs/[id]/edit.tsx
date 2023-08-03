@@ -44,9 +44,29 @@ const SpacedRow = styled.div`
   }
 `;
 
+type ErrorObjectType = {
+  headline: string;
+  description: string;
+  budget: string;
+  skills: string;
+  industries: string;
+  message: string;
+};
+
 export const EditProposal = (): JSX.Element => {
   const filter = new Filter();
   // FIXME: brief
+
+  /// error handling objects
+  const initErrorObject: ErrorObjectType = {
+    headline: '',
+    description: '',
+    budget: '',
+    skills: '',
+    industries: '',
+    message: '',
+  };
+
   const [_brief, setBrief] = useState<Brief | any>();
   // FIXME: user
   const { user } = useSelector((state: RootState) => state.userState);
@@ -63,7 +83,8 @@ export const EditProposal = (): JSX.Element => {
   const [success, setSuccess] = useState<boolean>(false);
   const [suggestedSkills, setSuggestedSkills] = useState<string[]>([]);
 
-  const [inputError, setInputError] = useState<any>();
+  const [inputError, setInputError] =
+    useState<ErrorObjectType>(initErrorObject);
 
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
@@ -81,6 +102,18 @@ export const EditProposal = (): JSX.Element => {
     if (skillsRes) {
       setSuggestedSkills(skillsRes?.skills.map((skill) => skill.name));
     }
+  };
+
+  const isinputError = () => {
+    if (
+      inputError.headline.length ||
+      inputError.description.length ||
+      inputError.industries.length ||
+      inputError.skills.length ||
+      inputError.budget.length
+    )
+      return true;
+    return false;
   };
 
   const getCurrentUserBrief = async () => {
@@ -165,6 +198,50 @@ export const EditProposal = (): JSX.Element => {
     return text.length >= min && text.length <= max;
   };
 
+  const validateSkillsAndIndustry = (
+    text: string,
+    value: string[],
+    min: number,
+    max: number
+  ): boolean => {
+    if (text === 'skills') {
+      return value.length >= min && value.length <= max;
+    }
+    if (text === 'industries') {
+      return value.length >= min && value.length <= max;
+    }
+    return false;
+  };
+
+  const handleSkillChange = (val: string[]) => {
+    setSkills(val);
+    if (validateSkillsAndIndustry('skills', val, 5, 10)) {
+      setInputError((val) => {
+        return { ...val, skills: '' };
+      });
+    } else {
+      setInputError((val) => {
+        return { ...val, skills: 'Nunber of skills must be between 5 to 10' };
+      });
+    }
+  };
+
+  const handleIndustriesChange = (val: string[]) => {
+    setIndustries(val);
+    if (validateSkillsAndIndustry('industries', val, 5, 10)) {
+      setInputError((val) => {
+        return { ...val, industries: '' };
+      });
+    } else {
+      setInputError((val) => {
+        return {
+          ...val,
+          industries: 'Number of industries must be between 3 to 5',
+        };
+      });
+    }
+  };
+
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -173,33 +250,56 @@ export const EditProposal = (): JSX.Element => {
       case 'headline':
         if (validateInputLength(value, 10, 50)) {
           setHeadline(value);
-          setInputError({ headline: '' });
+          setInputError((val) => {
+            return { ...val, headline: '' };
+          });
         } else {
           setHeadline(value);
-          setInputError({
-            headline: 'Headline must be between 10 and 50 characters',
+          setInputError((val) => {
+            return {
+              ...val,
+              headline: 'Headline must be between 10 and 50 characters',
+            };
           });
         }
         break;
       case 'description':
         if (validateInputLength(value, 50, 500)) {
           setDescription(value);
-          setInputError('');
-        } else {
-          setInputError({
-            description: 'Description must be between 50 and 500 characters',
+          setInputError((val) => {
+            return {
+              ...val,
+              description: '',
+            };
           });
+        } else {
+          setInputError((val) => {
+            return {
+              ...val,
+              description: 'Description must be between 50 and 500 characters',
+            };
+          });
+
           setDescription(value);
         }
         break;
       case 'budget':
         if (Number(value) < 10 || Number(value) > 1000000000) {
-          setInputError({
-            budget: 'Budget must be between $10 and $1,000,000,000',
+          setInputError((val) => {
+            return {
+              ...val,
+              budget: 'Budget must be between $10 and $1,000,000,000',
+            };
           });
+
           setBudget(value);
         } else {
-          setInputError('');
+          setInputError((val) => {
+            return {
+              ...val,
+              budget: '',
+            };
+          });
           setBudget(value);
         }
         break;
@@ -277,11 +377,16 @@ export const EditProposal = (): JSX.Element => {
             <TagsInput
               suggestData={filterStrings(suggestedSkills, skills)}
               tags={skills}
-              onChange={(tags: string[]) => setSkills([...tags])}
+              onChange={(tags: string[]) => handleSkillChange(tags)}
               limit={10}
               hideInput
               showSearch
             />
+            <div className='mt-4'>
+              <span className={`text-xs ${'text-imbue-light-purple-two'} `}>
+                {inputError?.skills}
+              </span>
+            </div>
           </div>
 
           <h1 className='!text-[1.3rem] lg:!text-3xl m-0 font-normal my-0 mx-0'>
@@ -293,10 +398,15 @@ export const EditProposal = (): JSX.Element => {
               data-testid='industries-input'
               tags={industries}
               onChange={(tags: string[]) => {
-                setIndustries([...tags]);
+                handleIndustriesChange(tags);
               }}
               limit={10}
             />
+            <div className='mt-4'>
+              <span className={`text-xs ${'text-imbue-light-purple-two'} `}>
+                {inputError?.industries}
+              </span>
+            </div>
           </div>
 
           <div>
@@ -414,7 +524,7 @@ export const EditProposal = (): JSX.Element => {
         <fieldset>
           <div className='buttons-container mb-[2rem]'>
             <button
-              disabled={loading || inputError}
+              disabled={loading || isinputError()}
               className='primary-btn in-dark w-button w-full !mr-0 hover:!bg-imbue-purple !text-[1rem] hover:!text-white h-[2.6rem]'
               onClick={() => handleSubmit()}
             >

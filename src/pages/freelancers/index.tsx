@@ -521,7 +521,7 @@ const Freelancers = (): JSX.Element => {
                             <h3 className='text-xl font-medium text-content text-center'>
                               {display_name}
                             </h3>
-                            <h5 className='text-xs lg:text-sm mt-2 text-imbue-purple-dark font-normal whitespace-pre-wrap'>
+                            <h5 className='text-xs lg:text-sm mt-2 text-imbue-purple-dark font-normal whitespace-pre-wrap break-all'>
                               {bio?.length > 299
                                 ? bio.substring(0, 300) + '...'
                                 : bio}

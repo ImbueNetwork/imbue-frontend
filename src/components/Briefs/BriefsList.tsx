@@ -58,7 +58,7 @@ export const BriefLists = ({
         {briefs?.map(
           (brief, index) =>
             index <
-            Math.min(Math.max(loadValue, openBriefLimit), briefs.length) && (
+              Math.min(Math.max(loadValue, openBriefLimit), briefs.length) && (
               <div
                 key={index}
                 onClick={() => handleItemClick(brief)}
@@ -73,7 +73,7 @@ export const BriefLists = ({
                   <p className='text-xs lg:text-[16px] text-imbue-purple'>
                     Budget ${Number(brief.budget).toLocaleString()}
                   </p>
-                  <p className='text-xs lg:text-sm w-4/5 text-content whitespace-pre-wrap'>
+                  <p className='text-xs lg:text-sm w-4/5 text-content break-all whitespace-pre-wrap'>
                     {brief?.description?.length > 500
                       ? brief?.description?.substring(0, 500) + '...'
                       : brief?.description}
@@ -97,11 +97,13 @@ export const BriefLists = ({
                     <div className='w-full group-hover:bg-white bg-light-grey h-1 relative my-auto'>
                       <div
                         style={{
-                          width: `${(brief.milestones?.filter((m: any) => m?.is_approved)
-                            ?.length /
-                            brief.milestones?.length) *
+                          width: `${
+                            (brief.milestones?.filter(
+                              (m: any) => m?.is_approved
+                            )?.length /
+                              brief.milestones?.length) *
                             100
-                            }%`,
+                          }%`,
                         }}
                         className='h-full rounded-xl Accepted-button absolute'
                       ></div>
@@ -109,10 +111,11 @@ export const BriefLists = ({
                         {brief.milestones?.map((m: any, i: number) => (
                           <div
                             key={i}
-                            className={`h-3 w-3 lg:h-4 lg:w-4 rounded-full -mt-1 lg:-mt-1.5 ${m.is_approved
-                              ? 'bg-primary'
-                              : 'bg-light-grey group-hover:bg-white'
-                              }`}
+                            className={`h-3 w-3 lg:h-4 lg:w-4 rounded-full -mt-1 lg:-mt-1.5 ${
+                              m.is_approved
+                                ? 'bg-primary'
+                                : 'bg-light-grey group-hover:bg-white'
+                            }`}
                           ></div>
                         ))}
                       </div>

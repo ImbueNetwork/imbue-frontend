@@ -157,7 +157,7 @@ const NewBrief = (): JSX.Element => {
       </div>
       <div className='flex flex-wrap flex-row  justify-center relative -top-4'>
         <span className={!industriesError ? 'hide' : 'error'}>
-          number of industries must be btween 3 to 5
+          number of industries must be between 3 to 5
         </span>
       </div>
     </>

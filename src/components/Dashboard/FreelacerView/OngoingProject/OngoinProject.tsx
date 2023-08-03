@@ -22,9 +22,7 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
   const ongoinProjectLimit = 10;
   const [value, setValue] = useState(ongoinProjectLimit);
   const redirectToApplication = (project: Project) => {
-    router.push(
-      `/projects/${project.id}`
-    );
+    router.push(`/projects/${project.id}`);
   };
 
   const redirectToDiscoverBriefs = () => {
@@ -50,7 +48,7 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
       {projects?.map(
         (item: any, index: number) =>
           index <
-          Math.min(Math.max(value, ongoinProjectLimit), projects.length) && (
+            Math.min(Math.max(value, ongoinProjectLimit), projects.length) && (
             <>
               <div
                 key={item.id}
@@ -83,7 +81,7 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
                     {timeAgo?.format(new Date(item?.created || 0))}
                   </p>
                 </div>
-                <div className='my-7'>
+                <div className='my-7 break-all'>
                   <p className='text-sm line-clamp-2 md:line-clamp-3 lg:line-clamp-4'>
                     {item.description}
                   </p>

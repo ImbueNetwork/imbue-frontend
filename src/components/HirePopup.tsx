@@ -166,7 +166,7 @@ export const HirePopup = ({
             <div className={styles.budgetDescription}>
               <p className='mb-2 text-lg'>Total price of the project</p>
               <div className='text-imbue-purple text-sm'>
-                (This includes all milestonees, and is the amount client will
+                (This includes all milestones, and is the amount client will
                 see)
               </div>
             </div>

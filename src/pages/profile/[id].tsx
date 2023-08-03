@@ -432,7 +432,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                 ) : (
                   <>
                     {user?.about && (
-                      <div className='bio text-imbue-purple'>
+                      <div className='bio text-imbue-purple break-all'>
                         {user?.about}
                         {/* {user?.bio
                                         ?.split?.("\n")
@@ -464,7 +464,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
             {(user?.website || isEditMode) && (
               <div className='flex gap-14 items-center'>
                 <p className='w-24 lg:text-xl text-imbue-purple-dark'>
-                  Website :
+                  Website:
                 </p>
                 {isEditMode ? (
                   <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>
@@ -481,7 +481,9 @@ const Profile = ({ initUser, browsingUser }: any) => {
                     className=' no-underline'
                     target='_blank'
                   >
-                    <span className='text-imbue-purple'>{user?.website}</span>
+                    <span className='text-imbue-purple break-all'>
+                      {user?.website}
+                    </span>
                   </a>
                 )}
               </div>
@@ -490,7 +492,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
             {user?.industry && (
               <div className='flex gap-14 items-center'>
                 <p className='w-24 text-imbue-purple-dark lg:text-xl'>
-                  Industry :
+                  Industry:
                 </p>
                 {isEditMode ? (
                   <div className='h-auto w-full lg:w-2/3 flex justify-between items-center'>

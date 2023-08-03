@@ -182,7 +182,7 @@ const GrantApplication = (): JSX.Element => {
     }
     if (totalPercent < 100)
       return setError({
-        message: 'Total Percentage of milelstones must be equal to 100%',
+        message: 'Total Percentage of milestones must be equal to 100%',
       });
     if (totalCostWithoutFee > 1e8)
       return setError({
@@ -218,8 +218,6 @@ const GrantApplication = (): JSX.Element => {
         })),
         approvers,
       };
-
-    
 
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);
