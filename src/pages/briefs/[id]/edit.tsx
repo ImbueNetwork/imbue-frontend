@@ -228,7 +228,7 @@ export const EditProposal = (): JSX.Element => {
 
   const handleIndustriesChange = (val: string[]) => {
     setIndustries(val);
-    if (validateSkillsAndIndustry('industries', val, 5, 10)) {
+    if (validateSkillsAndIndustry('industries', val, 3, 5)) {
       setInputError((val) => {
         return { ...val, industries: '' };
       });
