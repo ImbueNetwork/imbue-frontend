@@ -313,7 +313,6 @@ const ApplicationPreview = (): JSX.Element => {
     const { isValid, firstErrorIndex } = validateApplicationInput(
       'brief',
       inputErrors,
-      setInputErrors,
       milestones,
       brief?.headline,
       brief?.description,
