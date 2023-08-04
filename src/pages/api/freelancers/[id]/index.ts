@@ -8,6 +8,7 @@ import {
   fetchFreelancerClients,
   fetchFreelancerDetailsByUsername,
   fetchFreelancerMetadata,
+  generateGetStreamToken,
   User,
 } from '@/lib/models';
 
@@ -127,7 +128,6 @@ export default nextConnect()
           }
         );
         return res.status(401).json(e);
-
       }
     });
   })
@@ -138,6 +138,9 @@ export default nextConnect()
 
     const freelancer: models.Freelancer | any = req.body.freelancer;
     const loggedInUser = req.body.freelancer.logged_in_user;
+
+    console.log(freelancer);
+
     if (!loggedInUser) {
       return res.status(401).send({
         status: 'Failed',
@@ -181,6 +184,8 @@ export default nextConnect()
           const web3_challenge = freelancer.web3_challenge;
           const freelancer_clients = freelancer?.clients;
 
+          const token = await generateGetStreamToken(freelancer);
+
           const freelancer_id = await models.updateFreelancerDetails(
             freelancer.user_id,
             freelancer,
@@ -194,7 +199,8 @@ export default nextConnect()
             web3_address,
             web3_type,
             web3_challenge,
-            freelancer_clients
+            freelancer_clients,
+            token
           )(tx);
 
           if (!freelancer_id) {

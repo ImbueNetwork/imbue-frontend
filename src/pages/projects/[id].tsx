@@ -41,7 +41,10 @@ import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
 import { ImbueChainEvent } from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
-import { updateMilestone, updateProject } from '@/redux/services/projectServices';
+import {
+  updateMilestone,
+  updateProject,
+} from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 TimeAgo.addDefaultLocale(en);
@@ -203,7 +206,10 @@ function Project() {
         const brief = await getBrief(projectRes.brief_id);
         owner = brief?.user_id ? await utils.fetchUser(brief?.user_id) : null;
         freelancerRes = await getFreelancerProfile(projectRes?.user_id);
-        console.log("🚀 ~ file: [id].tsx:208 ~ getProject ~ freelancerRes:", freelancerRes)
+        console.log(
+          '🚀 ~ file: [id].tsx:208 ~ getProject ~ freelancerRes:',
+          freelancerRes
+        );
 
         if (owner?.id == user?.id) {
           setTargetUser(freelancerRes);
@@ -289,7 +295,7 @@ function Project() {
         if (result.status || result.txError) {
           if (result.status) {
             if (onChainProject.milestones[milestoneKeyInView].is_approved) {
-              await updateMilestone(projectId, milestoneKeyInView, true)
+              await updateMilestone(projectId, milestoneKeyInView, true);
             }
 
             setSuccess(true);
@@ -301,7 +307,6 @@ function Project() {
         }
         await new Promise((f) => setTimeout(f, 1000));
       }
-
     } catch (error) {
       setError({ message: 'Could not vote. Please try again later' });
     } finally {
@@ -367,6 +372,7 @@ function Project() {
     }
     setLoading(false);
   };
+
 
   const refund = async (account: WalletAccount) => {
     // TODO make this a popup value like vote on milestone
@@ -527,8 +533,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, 'Completed')
               : milestone?.milestone_key == milestoneBeingVotedOn
-                ? openForVotingTag()
-                : projectStateTag(modified, 'Not Started')}
+              ? openForVotingTag()
+              : projectStateTag(modified, 'Not Started')}
 
             <Image
               src={require(expanded
@@ -567,8 +573,9 @@ function Project() {
               }
             >
               <button
-                className={`primary-btn in-dark w-button ${!canVote && '!bg-gray-300 !text-gray-400'
-                  } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
+                className={`primary-btn in-dark w-button ${
+                  !canVote && '!bg-gray-300 !text-gray-400'
+                } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
                 data-testid='next-button'
                 onClick={() => canVote && vote()}
               >
@@ -579,7 +586,7 @@ function Project() {
 
           {(isApplicant || (projectType === 'grant' && isProjectOwner)) &&
             onChainProject?.projectState !==
-            OnchainProjectState.OpenForVoting &&
+              OnchainProjectState.OpenForVoting &&
             !milestone?.is_approved && (
               <button
                 className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
@@ -592,8 +599,9 @@ function Project() {
 
           {isApplicant && milestone.is_approved && (
             <button
-              className={`primary-btn in-dark w-button ${!balance && '!bg-gray-300 !text-gray-400'
-                } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
+              className={`primary-btn in-dark w-button ${
+                !balance && '!bg-gray-300 !text-gray-400'
+              } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
               data-testid='next-button'
               onClick={() => withdraw()}
               disabled={!balance}
@@ -777,8 +785,9 @@ function Project() {
                   {approversPreview?.map((approver: any, index: number) => (
                     <div
                       key={index}
-                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${approver?.display_name && 'cursor-pointer'
-                        }`}
+                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${
+                        approver?.display_name && 'cursor-pointer'
+                      }`}
                       onClick={() =>
                         approver.display_name &&
                         router.push(`/profile/${approver.username}`)
@@ -832,12 +841,13 @@ function Project() {
                 <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
                   <div
                     style={{
-                      width: `${(onChainProject?.milestones?.filter?.(
-                        (m: any) => m?.is_approved
-                      )?.length /
-                        onChainProject?.milestones?.length) *
+                      width: `${
+                        (onChainProject?.milestones?.filter?.(
+                          (m: any) => m?.is_approved
+                        )?.length /
+                          onChainProject?.milestones?.length) *
                         100
-                        }%`,
+                      }%`,
                     }}
                     className='h-full rounded-xl Accepted-button absolute'
                   ></div>
@@ -845,8 +855,9 @@ function Project() {
                     {onChainProject?.milestones?.map((m: any, i: number) => (
                       <div
                         key={i}
-                        className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
-                          } rounded-full -mt-1.5`}
+                        className={`h-4 w-4 ${
+                          m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
+                        } rounded-full -mt-1.5`}
                       ></div>
                     ))}
                   </div>
@@ -930,8 +941,6 @@ function Project() {
               </div>
             </div>
           )}
-
-
         </div>
       </div>
 
