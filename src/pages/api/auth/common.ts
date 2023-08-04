@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
 import jwt from 'jsonwebtoken';
+import { NextApiRequest, NextApiResponse } from 'next';
+import passport from 'passport';
 
 import { getTokenCookie } from '@/lib/auth-cookies';
 
@@ -15,6 +17,26 @@ export const ensureParams = (record: Record<string, any>, params: string[]) => {
     console.error(e);
   }
 };
+
+export const authenticate = (
+  method: string,
+  req: NextApiRequest,
+  res: NextApiResponse
+) =>
+  new Promise((resolve, reject) => {
+    passport.authenticate(
+      method,
+      { session: false },
+      (error: Error, token: any) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(token);
+        }
+      }
+    )(req, res);
+  });
+
 
 export function verifyUserIdFromJwt(req: any, res: any, user_ids: number[]) {
   const token = getTokenCookie(req);

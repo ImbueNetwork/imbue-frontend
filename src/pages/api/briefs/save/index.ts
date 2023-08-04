@@ -8,26 +8,7 @@ import * as models from '@/lib/models';
 import db from '@/db';
 import { Brief } from '@/model';
 
-import { verifyUserIdFromJwt } from '../../auth/common';
-
-export const authenticate = (
-  method: string,
-  req: NextApiRequest,
-  res: NextApiResponse
-) =>
-  new Promise((resolve, reject) => {
-    passport.authenticate(
-      method,
-      { session: false },
-      (error: Error, token: any) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(token);
-        }
-      }
-    )(req, res);
-  });
+import { authenticate, verifyUserIdFromJwt } from '../../auth/common';
 
 export default nextConnect()
   .use(passport.initialize())

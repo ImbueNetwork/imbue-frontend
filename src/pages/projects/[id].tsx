@@ -164,10 +164,12 @@ function Project() {
           setWaitMessage('Changes have been requested');
           break;
         case OffchainProjectState.Refunded:
+          setWait(false);
           setSuccess(true);
           setSuccessTitle('This project has been refunded!');
           break;
         case OffchainProjectState.Completed:
+          setWait(false);
           setSuccess(true);
           setSuccessTitle('This project has been successfully delivered!');
           break;
@@ -183,7 +185,7 @@ function Project() {
           }
           break;
       }
-      if (project.status_id !== OffchainProjectState.Refunded) {
+      if (project.status_id !== OffchainProjectState.Refunded && project.status_id !== OffchainProjectState.Completed ) {
         setWait(true);
       }
     }
@@ -278,11 +280,16 @@ function Project() {
       const imbueApi = await initImbueAPIInfo();
       // const userRes: User | any = await utils.getCurrentUser();
       const chainService = new ChainService(imbueApi, user);
+      
       const result = await chainService.voteOnMilestone(
         account,
         onChainProject,
         milestoneKeyInView,
         vote
+      );
+      const milestoneApproved = await chainService.pollChainMessage(
+        ImbueChainEvent.ApproveMilestone,
+        account
       );
 
       while (true) {
@@ -292,8 +299,9 @@ function Project() {
         
         if (result.status || result.txError) {
           if (result.status) {
-            
-            await updateMilestone(projectId, milestoneKeyInView, milestonApproved)
+            if (milestoneApproved) {
+              await updateMilestone(projectId, milestoneKeyInView, true)
+            }
 
             setSuccess(true);
             setSuccessTitle('Your vote was successful');

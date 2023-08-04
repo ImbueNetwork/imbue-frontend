@@ -23,7 +23,7 @@ import {
 export enum ImbueChainEvent {
   Contribute = "ContributeSucceeded",
   SubmitMilestone = "MilestoneSubmitted",
-  VoteOnMilestone = "VoteComplete",
+  VoteOnMilestone = "VoteSubmitted",
   ApproveMilestone = "MilestoneApproved",
   RaiseNoConfidenceRound = "NoConfidenceRoundCreated",
   VoteOnNoConfidenceRound = "NoConfidenceRoundVotedUpon",
