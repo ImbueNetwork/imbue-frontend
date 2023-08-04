@@ -120,12 +120,13 @@ function Project() {
   const [balance, setBalance] = useState<any>(0);
   const [approversPreview, setApproverPreview] = useState<any>([]);
   const [isApprover, setIsApprover] = useState<boolean>(false);
+  const [approverVotedOnRefund, setApproverVotedOnRefund] = useState<boolean>(false);
 
   const [projectType, setProjectType] = useState<'grant' | 'brief' | null>(
     null
   );
   const canVote = isApprover || (projectType === 'brief' && isProjectOwner);
-  const [expandPorjectDesc, setExpandProjectDesc] = useState<number>(500);
+  const [expandProjectDesc, setExpandProjectDesc] = useState<number>(500);
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -155,6 +156,14 @@ function Project() {
             onChainProjectRes.milestones
           );
         setMilestoneBeingVotedOn(firstPendingMilestone);
+      }
+
+
+      if (user.web3_address && onChainProjectRes.projectState == OnchainProjectState.OpenForVotingOfNoConfidence) {
+        const voters = await chainService.getNoConfidenceVoters(onChainProjectRes.id!);
+        if (voters.includes(user.web3_address)) {
+          setApproverVotedOnRefund(true);
+        }
       }
 
       setOnChainProject(onChainProjectRes);
@@ -205,7 +214,6 @@ function Project() {
     try {
       const projectRes: Project = await getProjectById(projectId);
       // showing owner profile if the current user if the applicant freelancer
-
       let owner;
       let freelancerRes;
 
@@ -215,11 +223,6 @@ function Project() {
         const brief = await getBrief(projectRes.brief_id);
         owner = brief?.user_id ? await utils.fetchUser(brief?.user_id) : null;
         freelancerRes = await getFreelancerProfile(projectRes?.user_id);
-        console.log(
-          '🚀 ~ file: [id].tsx:208 ~ getProject ~ freelancerRes:',
-          freelancerRes
-        );
-
         if (owner?.id == user?.id) {
           setTargetUser(freelancerRes);
         } else {
@@ -684,12 +687,12 @@ function Project() {
           </p>
 
           <p className='text-base text-content font-normal leading-[178.15%] break-all lg:w-[80%] whitespace-pre-wrap'>
-            {project?.description?.length > expandPorjectDesc
-              ? project?.description?.substring(0, expandPorjectDesc) + ' ...'
+            {project?.description?.length > expandProjectDesc
+              ? project?.description?.substring(0, expandProjectDesc) + ' ...'
               : project?.description}
             {project?.description?.length > 500 && (
               <span>
-                {project?.description?.length > expandPorjectDesc ? (
+                {project?.description?.length > expandProjectDesc ? (
                   <button
                     onClick={() => setExpandProjectDesc((prev) => prev + 500)}
                     className='mt-3 ml-2 w-fit text-sm hover:underline text-imbue-lemon'
@@ -771,17 +774,29 @@ function Project() {
             )}
 
             {showRefundButton && (
-              <button
-                className='border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors'
-                onClick={async () => {
-                  // set submitting mile stone to true
-                  await setRaiseVoteOfNoConfidence(true);
-                  // show polkadot account modal
-                  await setShowPolkadotAccounts(true);
-                }}
+
+
+              <Tooltip
+                title={approverVotedOnRefund ? 'Your vote has already been registered' : 'Vote on refunds'}
+                followCursor
+                leaveTouchDelay={10}
+                enterDelay={500}
+                className='cursor-pointer'
               >
-                Refund
-              </button>
+                <button
+                  className={`border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors ${approverVotedOnRefund && '!bg-gray-300 !text-gray-400 !cursor-not-allowed'}`}
+                  onClick={async () => {
+                    if (!approverVotedOnRefund) {
+                      // set submitting mile stone to true
+                      await setRaiseVoteOfNoConfidence(true);
+                      // show polkadot account modal
+                      await setShowPolkadotAccounts(true);
+                    }
+                  }}
+                >
+                  Refund
+                </button>
+              </Tooltip>
             )}
           </div>
 
@@ -853,7 +868,7 @@ function Project() {
                       width: `${(onChainProject?.milestones?.filter?.(
                         (m: any) => m?.is_approved
                       )?.length /
-                          onChainProject?.milestones?.length) *
+                        onChainProject?.milestones?.length) *
                         100
                         }%`,
                     }}

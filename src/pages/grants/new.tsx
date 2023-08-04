@@ -307,9 +307,9 @@ const GrantApplication = (): JSX.Element => {
   useEffect(() => {
     setInputErrors((prev) => ({
       ...prev,
-      approvers: approvers?.length
+      approvers: approvers?.length < 4
         ? ''
-        : 'Please select atleast one valid grant approver',
+        : 'Please select atleast 4 valid grant approvers',
     }));
   }, [approvers.length]);
 
