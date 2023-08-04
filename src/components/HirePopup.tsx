@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { useMediaQuery } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
@@ -137,7 +138,7 @@ export const HirePopup = ({
   const FirstContent = () => {
     return (
       <div className='relative modal-container'>
-        <div className='flex w-full justify-start lg:items-center px-5 gap-5 pt-8 md:px-10 lg:gap-11 lg:px-16 lg:pb-2'>
+        <div className='flex w-full justify-start lg:items-center px-5 gap-5 pt-8 md:px-10 lg:px-16 lg:pb-2'>
           <Image
             className='w-12 h-12 md:w-16 md:h-16 rounded-full object-cover'
             src={
@@ -152,15 +153,27 @@ export const HirePopup = ({
             <span className='text-xl text-secondary-dark-hover'>
               {freelancer?.display_name}
             </span>
-            <p className='text-sm teconpr'>${Currency[application.currency_id]}: {freelancerBalance}</p>
-            {
-              Number(freelancerBalance) < 500 && (
-                <div className='lg:flex lg:items-center rounded-2xl bg-imbue-coral px-2 py-1 text-sm text-white'>
-                  <ErrorOutlineOutlinedIcon className='h-4 inline' />
-                  <p className='inline'>Freelance does not currently have the necessary deposit balance (500 $IMBU) to start the work</p>
-                </div>
-              )
+            {freelancerBalance !== "Chekcing Balance"
+              ? <>
+                {
+                  Number(freelancerBalance) < 500
+                    ? (
+                      <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-imbue-coral px-3 py-1 text-sm text-white'>
+                        <ErrorOutlineOutlinedIcon className='h-4 w-4 inline' />
+                        <p className='inline'>Freelance does not currently have the necessary deposit balance (500 $IMBU) to start the work</p>
+                      </div>
+                    )
+                    : (
+                      <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-primary px-3 py-1 text-sm text-black'>
+                        <CheckCircleOutlineIcon className='h-4 w-4 inline' />
+                        <p className='inline'>Freelance currently has the necessary deposit balance (500 $IMBU) to start the work</p>
+                      </div>
+                    )
+                }
+              </>
+              : <p className='text-sm text-content-primary'>Checking Freelancer Wallet Balance</p>
             }
+
           </div>
         </div>
         <p className='absolute top-0 text-center w-full text-lg lg:text-xl text-imbue-purple-dark'>
@@ -285,7 +298,7 @@ export const HirePopup = ({
         }}
         closeAfterTransition
         slots={{ backdrop: Backdrop }}
-        sx={{ zIndex: 4, marginTop:"30px" }}
+        sx={{ zIndex: 4, marginTop: "30px" }}
         slotProps={{
           backdrop: {
             timeout: 500,

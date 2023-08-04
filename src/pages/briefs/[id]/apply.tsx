@@ -233,12 +233,12 @@ export const SubmitProposal = (): JSX.Element => {
     }
   }
 
-  const totalPercent = milestones.reduce((sum, { amount }) => {
+  const totalPercent = Math.round(milestones.reduce((sum, { amount }) => {
     const percent = Number(
-      ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
+      ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(2)
     );
     return sum + percent;
-  }, 0);
+  }, 0))
 
   const handleMilestoneChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -304,7 +304,7 @@ export const SubmitProposal = (): JSX.Element => {
         <div className='milestone-list !gap-0'>
           {milestones.map(({ name, amount, description }, index) => {
             const percent = Number(
-              ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
+              ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(2)
             );
             return (
               <div
