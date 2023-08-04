@@ -596,9 +596,9 @@ function Project() {
               OnchainProjectState.OpenForVoting &&
             !milestone?.is_approved && (
               <button
-                className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
+                className={`primary-btn in-dark w-button mt-3 ${!balance && '!bg-gray-300 !text-gray-400 !cursor-not-allowed'}`}
                 data-testid='next-button'
-                onClick={() => submitMilestone()}
+                onClick={() => balance && submitMilestone()}
               >
                 Submit
               </button>
