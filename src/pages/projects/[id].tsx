@@ -2,7 +2,6 @@
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import { Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -19,10 +18,11 @@ import { getBalance } from '@/utils/helper';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import AccountChoice from '@/components/AccountChoice';
+import BackButton from '@/components/BackButton';
 import ChatPopup from '@/components/ChatPopup';
 import { Dialogue } from '@/components/Dialogue';
 import ErrorScreen from '@/components/ErrorScreen';
-import FullScreenLoader from '@/components/FullScreenLoader';
+import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 import Login from '@/components/Login';
 import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
@@ -167,10 +167,12 @@ function Project() {
           setWaitMessage('Changes have been requested');
           break;
         case OffchainProjectState.Refunded:
+          setWait(false);
           setSuccess(true);
           setSuccessTitle('This project has been refunded!');
           break;
         case OffchainProjectState.Completed:
+          setWait(false);
           setSuccess(true);
           setSuccessTitle('This project has been successfully delivered!');
           break;
@@ -186,7 +188,7 @@ function Project() {
           }
           break;
       }
-      if (project.status_id !== OffchainProjectState.Refunded) {
+      if (project.status_id !== OffchainProjectState.Refunded && project.status_id !== OffchainProjectState.Completed ) {
         setWait(true);
       }
     }
@@ -284,14 +286,19 @@ function Project() {
       const imbueApi = await initImbueAPIInfo();
       // const userRes: User | any = await utils.getCurrentUser();
       const chainService = new ChainService(imbueApi, user);
+      
       const result = await chainService.voteOnMilestone(
         account,
         onChainProject,
         milestoneKeyInView,
         vote
       );
+      const milestoneApproved = await chainService.pollChainMessage(
+        ImbueChainEvent.ApproveMilestone,
+        account
+      );
 
-      while (true) {
+      while (true) {        
         if (result.status || result.txError) {
           if (result.status) {
             if (onChainProject.milestones[milestoneKeyInView].is_approved) {
@@ -615,8 +622,7 @@ function Project() {
   };
 
   return (
-    <div className='max-lg:p-[var(--hq-layout-padding)]'>
-      {loading && <FullScreenLoader />}
+    <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
       {user && showMessageBox && (
         <ChatPopup
           {...{
@@ -639,24 +645,13 @@ function Project() {
        '
       >
         <div className='flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] max-lg:basis-[60%] mr-[5%]  max-lg:mr-0 relative'>
-          <Tooltip
-            title='Go back to previous page'
-            followCursor
-            leaveTouchDelay={10}
-            enterDelay={500}
-            className='cursor-pointer'
-          >
-            <div
-              onClick={() => router.back()}
-              className='border border-content rounded-full p-1 flex items-center justify-center self-start'
-            >
-              <ArrowBackIcon className='h-5 w-5' color='secondary' />
-            </div>
-          </Tooltip>
           <div className='flex flex-wrap gap-3 lg:gap-4 items-center'>
-            <h3 className='text-[2rem] max-lg:text-[24px] break-all leading-[1.5] font-normal m-0 p-0 text-imbue-purple'>
-              {project?.name}
-            </h3>
+            <div className='flex items-center'>
+              <BackButton className='-ml-2 mr-1' />
+              <h3 className='text-[2rem] max-lg:text-[24px] break-all leading-[1.5] font-normal m-0 p-0 text-imbue-purple'>
+                {project?.name}
+              </h3>
+            </div>
 
             {project?.brief_id && (
               <span
@@ -1044,6 +1039,7 @@ function Project() {
           </button>
         </div>
       </WaitingScreen>
+      <BackDropLoader open={loading} />
     </div>
   );
 }

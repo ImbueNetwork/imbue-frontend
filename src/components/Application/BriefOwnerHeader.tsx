@@ -140,31 +140,32 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
   const mobileView = useMediaQuery('(max-width:480px)');
 
   return (
-    <div className='flex items-center w-full md:justify-between lg:px-10 flex-wrap gap-4'>
+    <div className='flex items-center w-full md:justify-between lg:px-10 flex-wrap gap-4 relative'>
+      <BackButton className='absolute left-0 top-5' />
       <div className='flex items-start'>
-        <BackButton />
         <div className='flex flex-col items-start'>
-          <Image
-            onClick={() => router.push(`/freelancers/${freelancer?.username}`)}
-            className='w-16 h-16 rounded-full object-cover cursor-pointer'
-            src={freelancer?.profile_image ?? require('@/assets/images/profile-image.png')}
-            height={200}
-            width={200}
-            priority
-            alt='profileImage'
-          />
+          <Badge
+            badgeContent={'Hired'}
+            color='secondary'
+            invisible={
+              !(application?.status_id === OffchainProjectState.Accepted)
+            }
+          >
+            <Image
+              onClick={() => router.push(`/freelancers/${freelancer?.username}`)}
+              className='w-16 h-16 rounded-full object-cover cursor-pointer'
+              src={freelancer?.profile_image ?? require('@/assets/images/profile-image.png')}
+              height={200}
+              width={200}
+              priority
+              alt='profileImage'
+            />
+          </Badge>
+
           <div className='flex flex-col gap-1 mt-2'>
-            <Badge
-              badgeContent={'Hired'}
-              color='primary'
-              invisible={
-                !(application?.status_id === OffchainProjectState.Accepted)
-              }
-            >
-              <p className='text-[1.25rem] font-normal capitalize text-imbue-purple'>
-                {freelancer?.display_name}
-              </p>
-            </Badge>
+            <p className='text-[1.25rem] font-normal capitalize text-imbue-purple'>
+              {freelancer?.display_name}
+            </p>
             {/* 
           <div className='flex items-center mt-[1rem]'>
             <Image

@@ -78,40 +78,48 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
 
   const startWork = async (account: WalletAccount) => {
     setLoading(true);
-    const imbueApi = await initImbueAPIInfo();
-    const chainService = new ChainService(imbueApi, user);
-    delete application.modified;
-    const briefHash = blake2AsHex(JSON.stringify(application));
-    const result = await chainService?.commenceWork(account, briefHash);
 
-    while (true) {
-      if (result.status || result.txError) {
-        if (result.status) {
-          const projectId = parseInt(result.eventData[2]);
-          const escrow_address = result.eventData[5];
-          // setProjectId(applicationId);
-          await updateProject(projectId, escrow_address);
-          setSuccess(true);
-        } else if (result.txError) {
-          let errorMessage = showErrorMessage(result.errorMessage);
+    try {
+      const imbueApi = await initImbueAPIInfo();
+      const chainService = new ChainService(imbueApi, user);
+      delete application.modified;
+      const briefHash = blake2AsHex(JSON.stringify(application));
+      const result = await chainService?.commenceWork(account, briefHash);
 
-          if (result?.errorMessage?.includes('1010:')) {
-            errorMessage = showErrorMessage(1010);
+      while (true) {
+        if (result.status || result.txError) {
+          if (result.status) {
+            const projectId = parseInt(result.eventData[2]);
+            const escrow_address = result.eventData[5];
+            // setProjectId(applicationId);
+            await updateProject(projectId, escrow_address);
+            setSuccess(true);
+          } else if (result.txError) {
+            let errorMessage = showErrorMessage(result.errorMessage);
+
+            if (result?.errorMessage?.includes('1010:')) {
+              errorMessage = showErrorMessage(1010);
+            }
+
+            setError({ message: errorMessage });
           }
-
-          setError({ message: errorMessage });
+          break;
         }
-        break;
+        await new Promise((f) => setTimeout(f, 1000));
       }
-      await new Promise((f) => setTimeout(f, 1000));
+    } catch (error) {
+      setError({ message: "Something went wrong" });
     }
-    setLoading(false);
+    finally {
+      setLoading(false);
+    }
+
   };
 
   return (
-    <div className='flex items-center w-full lg:justify-between lg:px-10 flex-wrap'>
+    <div className='flex items-center w-full lg:justify-between lg:px-10 flex-wrap relative'>
+      <BackButton className='absolute left-0 top-5' />
       <div className='flex items-start'>
-        <BackButton />
         <div className='flex flex-col gap-2'>
           <Image
             onClick={() => router.push(`/profile/${briefOwner?.username}`)}
