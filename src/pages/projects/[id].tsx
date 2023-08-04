@@ -294,13 +294,13 @@ function Project() {
         vote
       );
 
-      let milestoneApproved;
-      if(!result.txError) {
-        milestoneApproved = await chainService.pollChainMessage(
-          ImbueChainEvent.ApproveMilestone,
-          account
-        );
-      }
+      // let milestoneApproved;
+      // if(!result.txError) {
+      //   milestoneApproved = await chainService.pollChainMessage(
+      //     ImbueChainEvent.ApproveMilestone,
+      //     account
+      //   );
+      // }
 
       while (true) {
         if (result.status || result.txError) {
