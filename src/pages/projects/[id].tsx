@@ -292,11 +292,7 @@ function Project() {
         account
       );
 
-      while (true) {
-        console.log(result);
-        const milestonApproved = onChainProject.milestones[milestoneKeyInView].is_approved ?? false
-        console.log("🚀 ~ file: [id].tsx:291 ~ voteOnMilestone ~ milestonApproved:", milestonApproved)
-        
+      while (true) {        
         if (result.status || result.txError) {
           if (result.status) {
             if (milestoneApproved) {

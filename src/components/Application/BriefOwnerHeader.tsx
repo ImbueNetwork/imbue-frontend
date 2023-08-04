@@ -140,9 +140,9 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
   const mobileView = useMediaQuery('(max-width:480px)');
 
   return (
-    <div className='flex items-center w-full md:justify-between lg:px-10 flex-wrap gap-4'>
+    <div className='flex items-center w-full md:justify-between lg:px-10 flex-wrap gap-4 relative'>
+      <BackButton className='absolute left-0 top-5' />
       <div className='flex items-start'>
-        <BackButton />
         <div className='flex flex-col items-start'>
           <Badge
             badgeContent={'Hired'}

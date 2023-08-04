@@ -85,7 +85,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
       delete application.modified;
       const briefHash = blake2AsHex(JSON.stringify(application));
       const result = await chainService?.commenceWork(account, briefHash);
-      
+
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
@@ -117,9 +117,9 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
   };
 
   return (
-    <div className='flex items-center w-full lg:justify-between lg:px-10 flex-wrap'>
+    <div className='flex items-center w-full lg:justify-between lg:px-10 flex-wrap relative'>
+      <BackButton className='absolute left-0 top-5' />
       <div className='flex items-start'>
-        <BackButton />
         <div className='flex flex-col gap-2'>
           <Image
             onClick={() => router.push(`/profile/${briefOwner?.username}`)}
