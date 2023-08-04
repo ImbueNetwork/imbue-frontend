@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-
-import { Backdrop, CircularProgress, Tooltip } from '@mui/material';
+import { Tooltip } from '@mui/material';
 import Filter from 'bad-words';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -18,7 +17,7 @@ import BriefOwnerHeader from '@/components/Application/BriefOwnerHeader';
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
-import FullScreenLoader from '@/components/FullScreenLoader';
+import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 import Login from '@/components/Login';
 import SuccessScreen from '@/components/SuccessScreen';
 
@@ -257,65 +256,6 @@ const ApplicationPreview = (): JSX.Element => {
 
   const milestonesRef = useRef<any>([]);
 
-  // const allAmountAndNamesHaveValue = () => {
-  //   let hasValue = true;
-  //   let firstErrorIndex = -1;
-  //   const newMilestones = [...milestones];
-  //   const blockUnicodeRegex = /^[\x20-\x7E]*$/;
-
-  //   for (let i = 0; i < milestones.length; i++) {
-  //     const { amount, name, description } = milestones[i];
-  //     newMilestones[i].error = {};
-
-  //     if (
-  //       name === undefined ||
-  //       name === null ||
-  //       name.length === 0 ||
-  //       !blockUnicodeRegex.test(name)
-  //     ) {
-  //       newMilestones[i].error = {
-  //         ...newMilestones[i].error,
-  //         name: 'A valid name is required',
-  //       };
-  //       hasValue = false;
-  //       firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
-  //     }
-
-  //     if (amount === undefined || amount === null || amount === 0) {
-  //       newMilestones[i].error = {
-  //         ...newMilestones[i].error,
-  //         amount: 'A valid amount is required',
-  //       };
-  //       hasValue = false;
-  //       firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
-  //     }
-
-  //     if (
-  //       description === undefined ||
-  //       description === null ||
-  //       description.length === 0
-  //     ) {
-  //       newMilestones[i].error = {
-  //         ...newMilestones[i].error,
-  //         description: 'A valid description is required.',
-  //       };
-  //       hasValue = false;
-  //       firstErrorIndex = firstErrorIndex === -1 ? i : firstErrorIndex;
-  //     }
-  //   }
-
-  //   setMilestones(newMilestones);
-
-  //   if (firstErrorIndex !== -1)
-  //     milestonesRef.current[firstErrorIndex]?.scrollIntoView({
-  //       behavior: 'auto',
-  //       block: 'center',
-  //       inline: 'center',
-  //     });
-
-  //   return hasValue;
-  // };
-
   useEffect(() => {
     const { isValid, errors } = validateApplicationInput("brief", inputErrors, milestones)
     setDisableSubmit(!isValid)
@@ -390,7 +330,7 @@ const ApplicationPreview = (): JSX.Element => {
 
   // const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
 
-  if (loading) return <FullScreenLoader />;
+  // if (loading) return <FullScreenLoader />;
 
   return (
     <div>
@@ -444,11 +384,6 @@ const ApplicationPreview = (): JSX.Element => {
             />
           </div>
         )}
-
-        {/* loading screen while connecting to wallet*/}
-        <Backdrop sx={{ color: '#fff', zIndex: 1000 }} open={loading}>
-          <CircularProgress color='inherit' />
-        </Backdrop>
 
         {
           <div className='bg-white rounded-[20px]'>
@@ -511,6 +446,7 @@ const ApplicationPreview = (): JSX.Element => {
                               </h3>
                               <input
                                 type='text'
+                                maxLength={50}
                                 placeholder='Add Milestone Name'
                                 className='input-budget !pl-3 text-base rounded-[5px] py-3 text-imbue-purple mb-2 placeholder:text-imbue-light-purple'
                                 value={name || ''}
@@ -787,9 +723,9 @@ const ApplicationPreview = (): JSX.Element => {
                 </button>
               )}
             {isEditingBio && (
-              <Tooltip 
-              followCursor
-              title={disableSubmit && "Please fill all the input fields"}
+              <Tooltip
+                followCursor
+                title={disableSubmit && "Please fill all the input fields"}
               >
                 <button
                   className={`primary-btn in-dark w-button ${disableSubmit && "!bg-gray-400 !text-white !cursor-not-allowed"}`}
@@ -853,6 +789,8 @@ const ApplicationPreview = (): JSX.Element => {
           </button>
         </div>
       </ErrorScreen>
+
+      <BackDropLoader open={loading} />
     </div>
   );
 };

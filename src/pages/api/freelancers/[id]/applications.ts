@@ -11,10 +11,23 @@ export default nextConnect().get(
     const id: any = query.id as string[];
     db.transaction(async (tx) => {
       try {
-        const projects = await models.fetchUserProjects(id)(tx);
+        let projects = await models.fetchUserProjects(id)(tx);
         if (!projects) {
           return res.status(404).end();
         }
+
+        projects = await Promise.all(
+          projects.map(async (project) => {
+            return {
+              ... project,
+              milestones: await models.fetchProjectMilestones(
+                project.id
+              )(tx)
+            }
+           
+          })
+        );
+
         return res.status(200).json(projects);
       } catch (e) {
         new Error(`Failed to fetch freelancer applications by userid: ${id}`, {

@@ -264,7 +264,7 @@ export const EditProposal = (): JSX.Element => {
         }
         break;
       case 'description':
-        if (validateInputLength(value, 50, 500)) {
+        if (validateInputLength(value, 50, 5000)) {
           setDescription(value);
           setInputError((val) => {
             return {
@@ -276,7 +276,7 @@ export const EditProposal = (): JSX.Element => {
           setInputError((val) => {
             return {
               ...val,
-              description: 'Description must be between 50 and 500 characters',
+              description: 'Description must be between 50 and 5000 characters',
             };
           });
 

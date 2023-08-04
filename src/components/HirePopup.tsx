@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { useMediaQuery } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
@@ -8,8 +9,10 @@ import { blake2AsHex } from '@polkadot/util-crypto';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+
+import { getBalance } from '@/utils/helper';
 
 import { Currency, OffchainProjectState } from '@/model';
 import { changeBriefApplicationStatus } from '@/redux/services/briefService';
@@ -39,8 +42,8 @@ export const HirePopup = ({
 
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<any>();
-  // const [projectId, setProjectId] = useState<string>();
   const router = useRouter();
+  const [freelancerBalance, setFreelancerBalance] = useState<number | string>(0)
 
   const { user } = useSelector((state: RootState) => state.userState);
 
@@ -58,6 +61,21 @@ export const HirePopup = ({
     borderRadius: '20px',
     zIndex: 1,
   };
+
+  useEffect(() => {
+    const checkBalance = async () => {
+      setFreelancerBalance("Chekcing Balance")
+      const balance = await getBalance(
+        freelancer.web3_address,
+        application?.currency_id || 0,
+        user
+      );
+
+      setFreelancerBalance(balance);
+    }
+
+    openHirePopup && checkBalance()
+  }, [freelancer.web3_address, application?.currency_id, user, openHirePopup])
 
   const selectedAccount = async (account: WalletAccount) => {
     setLoading(true);
@@ -119,7 +137,7 @@ export const HirePopup = ({
   const FirstContent = () => {
     return (
       <div className='relative modal-container'>
-        <div className='flex w-full justify-start items-center px-5 gap-5 pt-8 md:px-10 lg:gap-11 lg:px-16 lg:pb-2'>
+        <div className='flex w-full justify-start lg:items-center px-5 gap-5 pt-8 md:px-10 lg:gap-11 lg:px-16 lg:pb-2'>
           <Image
             className='w-12 h-12 md:w-16 md:h-16 rounded-full object-cover'
             src={
@@ -130,9 +148,20 @@ export const HirePopup = ({
             width={70}
             height={70}
           />
-          <span className='text-xl text-secondary-dark-hover'>
-            {freelancer?.display_name}
-          </span>
+          <div className='flex flex-col gap-1'>
+            <span className='text-xl text-secondary-dark-hover'>
+              {freelancer?.display_name}
+            </span>
+            <p className='text-sm teconpr'>${Currency[application.currency_id]}: {freelancerBalance}</p>
+            {
+              Number(freelancerBalance) < 500 && (
+                <div className='lg:flex lg:items-center rounded-2xl bg-imbue-coral px-2 py-1 text-sm text-white'>
+                  <ErrorOutlineOutlinedIcon className='h-4 inline' />
+                  <p className='inline'>Freelance does not currently have the necessary deposit balance (500 $IMBU) to start the work</p>
+                </div>
+              )
+            }
+          </div>
         </div>
         <p className='absolute top-0 text-center w-full text-lg lg:text-xl text-imbue-purple-dark'>
           Hire This Freelancer
@@ -147,8 +176,8 @@ export const HirePopup = ({
                 <p className='mr-3 lg:mr-9 text-lg'>{index + 1}.</p>
                 <div className='flex justify-between w-full'>
                   <div>
-                    <p className='text-lg mb-1 text-content'>Description</p>
-                    <p className='text-base'>{m.name}</p>
+                    <p className='text-lg mb-1 text-content'>{m.name}</p>
+                    <p className='text-base'>{m.description.substring(0, 100) + "..."}</p>
                   </div>
                   <div className='budget-wrapper text-end'>
                     <p className='text-lg mb-1 text-content'>Amount</p>
@@ -256,7 +285,7 @@ export const HirePopup = ({
         }}
         closeAfterTransition
         slots={{ backdrop: Backdrop }}
-        sx={{ zIndex: 4 }}
+        sx={{ zIndex: 4, marginTop:"30px" }}
         slotProps={{
           backdrop: {
             timeout: 500,
