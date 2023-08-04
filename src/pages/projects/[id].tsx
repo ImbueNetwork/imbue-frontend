@@ -185,7 +185,7 @@ function Project() {
           }
           break;
       }
-      if (project.status_id !== OffchainProjectState.Refunded) {
+      if (project.status_id !== OffchainProjectState.Refunded && project.status_id !== OffchainProjectState.Completed ) {
         setWait(true);
       }
     }
