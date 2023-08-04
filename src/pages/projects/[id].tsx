@@ -288,7 +288,7 @@ function Project() {
         vote
       );
 
-      var milestoneApproved;
+      let milestoneApproved;
       if(!result.txError) {
         milestoneApproved = await chainService.pollChainMessage(
           ImbueChainEvent.ApproveMilestone,
@@ -396,7 +396,7 @@ function Project() {
         vote
       );
 
-      var shouldRefund;
+      let shouldRefund;
       if(!result.txError) {
         shouldRefund = await chainService.pollChainMessage(
           ImbueChainEvent.NoConfidenceRoundFinalised,
