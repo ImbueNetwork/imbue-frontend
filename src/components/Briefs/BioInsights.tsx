@@ -135,7 +135,7 @@ const BioInsights = ({
                 followCursor
               >
                 <button
-                  className='primary-btn 
+                  className={`primary-btn 
               in-dark
               !text-[1rem]
               !font-normal
@@ -144,7 +144,8 @@ const BioInsights = ({
               gap-2
               !m-0
               !px-4
-              '
+              ${!canSubmitProposal && '!bg-gray-300 !text-gray-400 !cursor-not-allowed'}
+              ` }
                   onClick={() =>
                     canSubmitProposal && !isOwnerOfBrief && redirectToApply()
                   }

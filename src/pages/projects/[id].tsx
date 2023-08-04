@@ -287,13 +287,18 @@ function Project() {
         milestoneKeyInView,
         vote
       );
-      const milestoneApproved = await chainService.pollChainMessage(
-        ImbueChainEvent.ApproveMilestone,
-        account
-      );
+
+      let milestoneApproved;
+      if(!result.txError) {
+        milestoneApproved = await chainService.pollChainMessage(
+          ImbueChainEvent.ApproveMilestone,
+          account
+        );
+      }
 
       while (true) {
         if (result.status || result.txError) {
+
           if (result.status) {
             if (milestoneApproved) {
               await updateMilestone(projectId, milestoneKeyInView, true)
@@ -390,10 +395,15 @@ function Project() {
         onChainProject,
         vote
       );
-      const shouldRefund = await chainService.pollChainMessage(
-        ImbueChainEvent.NoConfidenceRoundFinalised,
-        account
-      );
+
+      let shouldRefund;
+      if(!result.txError) {
+        shouldRefund = await chainService.pollChainMessage(
+          ImbueChainEvent.NoConfidenceRoundFinalised,
+          account
+        );
+      }
+
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
