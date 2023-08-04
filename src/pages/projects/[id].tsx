@@ -188,7 +188,7 @@ function Project() {
           }
           break;
       }
-      if (project.status_id !== OffchainProjectState.Refunded && project.status_id !== OffchainProjectState.Completed ) {
+      if (project.status_id !== OffchainProjectState.Refunded && project.status_id !== OffchainProjectState.Completed) {
         setWait(true);
       }
     }
@@ -286,20 +286,25 @@ function Project() {
       const imbueApi = await initImbueAPIInfo();
       // const userRes: User | any = await utils.getCurrentUser();
       const chainService = new ChainService(imbueApi, user);
-      
+
       const result = await chainService.voteOnMilestone(
         account,
         onChainProject,
         milestoneKeyInView,
         vote
       );
-      const milestoneApproved = await chainService.pollChainMessage(
-        ImbueChainEvent.ApproveMilestone,
-        account
-      );
 
-      while (true) {        
+      let milestoneApproved;
+      if(!result.txError) {
+        milestoneApproved = await chainService.pollChainMessage(
+          ImbueChainEvent.ApproveMilestone,
+          account
+        );
+      }
+
+      while (true) {
         if (result.status || result.txError) {
+
           if (result.status) {
             if (onChainProject.milestones[milestoneKeyInView].is_approved) {
               await updateMilestone(projectId, milestoneKeyInView, true);
@@ -396,10 +401,15 @@ function Project() {
         onChainProject,
         vote
       );
-      const shouldRefund = await chainService.pollChainMessage(
-        ImbueChainEvent.NoConfidenceRoundFinalised,
-        account
-      );
+
+      let shouldRefund;
+      if(!result.txError) {
+        shouldRefund = await chainService.pollChainMessage(
+          ImbueChainEvent.NoConfidenceRoundFinalised,
+          account
+        );
+      }
+
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
@@ -595,13 +605,20 @@ function Project() {
             onChainProject?.projectState !==
               OnchainProjectState.OpenForVoting &&
             !milestone?.is_approved && (
-              <button
-                className={`primary-btn in-dark w-button mt-3 ${!balance && '!bg-gray-300 !text-gray-400 !cursor-not-allowed'}`}
-                data-testid='next-button'
-                onClick={() => balance && submitMilestone()}
+              <Tooltip
+                followCursor
+                title={!balance && "The escrow wallet balance cannot be 0 while submiting a milestone"}
               >
-                Submit
-              </button>
+                <button
+                  className={`primary-btn in-dark w-button mt-3 ${!balance && '!bg-gray-300 !text-gray-400 !cursor-not-allowed'}`}
+                  data-testid='next-button'
+                  onClick={() => balance && submitMilestone()}
+                >
+                  Submit
+                </button>
+
+              </Tooltip>
+
             )}
 
           {isApplicant && milestone.is_approved && (
@@ -914,7 +931,7 @@ function Project() {
                     {project?.escrow_address}
                   </div>
                   <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
-                    balance : {balance} ${Currency[project?.currency_id]}
+                    Balance : {balance} ${Currency[project?.currency_id]}
                   </div>
                 </div>
               </div>
