@@ -775,28 +775,42 @@ function Project() {
 
             {showRefundButton && (
 
+              <>
 
-              <Tooltip
-                title={approverVotedOnRefund ? 'Your vote has already been registered' : 'Vote on refunds'}
-                followCursor
-                leaveTouchDelay={10}
-                enterDelay={500}
-                className='cursor-pointer'
-              >
-                <button
-                  className={`border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors ${approverVotedOnRefund && '!bg-gray-300 !text-gray-400 !cursor-not-allowed'}`}
-                  onClick={async () => {
-                    if (!approverVotedOnRefund) {
-                      // set submitting mile stone to true
-                      await setRaiseVoteOfNoConfidence(true);
-                      // show polkadot account modal
-                      await setShowPolkadotAccounts(true);
-                    }
-                  }}
+                <Tooltip
+                  title={approverVotedOnRefund ? 'Your vote has already been registered' : 'Vote on refunds'}
+                  followCursor
+                  leaveTouchDelay={10}
+                  enterDelay={500}
+                  className='cursor-pointer'
                 >
-                  Refund
-                </button>
-              </Tooltip>
+                  <button
+                    className={`border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors ${approverVotedOnRefund && '!bg-gray-300 !text-gray-400 !cursor-not-allowed'}`}
+                    onClick={async () => {
+                      if (!approverVotedOnRefund) {
+                        // set submitting mile stone to true
+                        await setRaiseVoteOfNoConfidence(true);
+                        // show polkadot account modal
+                        await setShowPolkadotAccounts(true);
+                      }
+                    }}
+                  >
+                    Refund
+                  </button>
+                </Tooltip>
+
+
+                {onChainProject && onChainProject.projectState == OnchainProjectState.OpenForVotingOfNoConfidence && (
+
+                  <button
+                    disabled={true}
+                    className={' text-black flex px-5 py-3 text-sm ml-auto rounded-full Rejected-btn'}
+                  >
+                    Project undergoing vote of no confidence
+                  </button>
+                )}
+
+              </>
             )}
           </div>
 
