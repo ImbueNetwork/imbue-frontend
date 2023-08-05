@@ -257,10 +257,14 @@ const ApplicationPreview = (): JSX.Element => {
   const milestonesRef = useRef<any>([]);
 
   useEffect(() => {
-    const { isValid, errors } = validateApplicationInput("brief", inputErrors, milestones)
-    setDisableSubmit(!isValid)
-    setInputErrors(errors)
-  }, [milestones])
+    const { isValid, errors } = validateApplicationInput(
+      'brief',
+      inputErrors,
+      milestones
+    );
+    setDisableSubmit(!isValid);
+    setInputErrors(errors);
+  }, [milestones]);
 
   const handleUpdateProject = async (
     chainProjectId?: number,
@@ -412,168 +416,164 @@ const ApplicationPreview = (): JSX.Element => {
             <hr className='h-[1px] bg-[#E1DDFF] w-full' />
 
             <div className='milestone-list lg:mb-5'>
-              {milestones?.map?.(
-                ({ name, description, amount }, index) => {
-                  const percent = Number(
-                    ((100 * (amount ?? 0)) / totalCostWithoutFee)?.toFixed?.(0)
-                  );
-                  return (
-                    <div
-                      className={`flex items-start w-full px-5 py-9 lg:px-14 relative border-b border-b-imbue-light-purple last:border-b-0`}
-                      key={index}
-                      ref={(el) => (milestonesRef.current[index] = el)}
-                    >
-                      {isEditingBio && index !== 0 && (
-                        <span
-                          onClick={() => onRemoveMilestone(index)}
-                          className='absolute top-1 right-2 lg:right-4 text-sm lg:text-xl font-bold hover:border-red-500 text-red-500 cursor-pointer'
-                        >
-                          x
-                        </span>
-                      )}
-                      <div className='mr-4 lg:mr-9 text-base lg:text-[1.25rem] text-imbue-purple font-normal'>
-                        {index + 1}.
-                      </div>
-                      <div
-                        className={`flex ${isEditingBio ? 'flex-col lg:flex-row' : 'flex-row'
-                          } justify-between w-full`}
+              {milestones?.map?.(({ name, description, amount }, index) => {
+                const percent = Number(
+                  ((100 * (amount ?? 0)) / totalCostWithoutFee)?.toFixed?.(0)
+                );
+                return (
+                  <div
+                    className={`flex items-start w-full px-5 py-9 lg:px-14 relative border-b border-b-imbue-light-purple last:border-b-0`}
+                    key={index}
+                    ref={(el) => (milestonesRef.current[index] = el)}
+                  >
+                    {isEditingBio && index !== 0 && (
+                      <span
+                        onClick={() => onRemoveMilestone(index)}
+                        className='absolute top-1 right-2 lg:right-4 text-sm lg:text-xl font-bold hover:border-red-500 text-red-500 cursor-pointer'
                       >
-                        <div className='w-full lg:w-1/2 h-fit'>
-                          {isEditingBio ? (
-                            <>
-                              <h3 className='text-base lg:text-xl mb-2 lg:mb-5 p-0 text-imbue-purple-dark font-normal'>
-                                Title
-                              </h3>
-                              <input
-                                type='text'
-                                maxLength={50}
-                                placeholder='Add Milestone Name'
-                                className='input-budget !pl-3 text-base rounded-[5px] py-3 text-imbue-purple mb-2 placeholder:text-imbue-light-purple'
-                                value={name || ''}
-                                name='milestoneTitle'
-                                onChange={(e) =>
-                                  handleMilestoneChange(e, index)
-                                }
-                              />
-                              <div className='flex items-center justify-between mb-4'>
-                                <p className='text-sm text-content my-2'>
-                                  {name?.length}/50
-                                </p>
-                                <p
-                                  className={`text-xs text-imbue-light-purple-two`}
-                                >
-                                  {inputErrors?.milestones[index]?.name ||
-                                    error?.name ||
-                                    ''}
-                                </p>
-                              </div>
-                            </>
-                          ) : (
-                            <h3 className='mb-2 lg:mb-5 text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
-                              {name}
+                        x
+                      </span>
+                    )}
+                    <div className='mr-4 lg:mr-9 text-base lg:text-[1.25rem] text-imbue-purple font-normal'>
+                      {index + 1}.
+                    </div>
+                    <div
+                      className={`flex ${
+                        isEditingBio ? 'flex-col lg:flex-row' : 'flex-row'
+                      } justify-between w-full`}
+                    >
+                      <div className='w-full lg:w-1/2 h-fit'>
+                        {isEditingBio ? (
+                          <>
+                            <h3 className='text-base lg:text-xl mb-2 lg:mb-5 p-0 text-imbue-purple-dark font-normal'>
+                              Title
                             </h3>
-                          )}
-                          {isEditingBio ? (
-                            <>
-                              <h3 className='text-base lg:text-xl mb-2 lg:mb-5 p-0 text-imbue-purple-dark font-normal'>
-                                Description
-                              </h3>
-                              <textarea
-                                maxLength={5000}
-                                className='text-content !p-3 placeholder:text-imbue-light-purple'
-                                placeholder='Add Milestone Description'
-                                rows={7}
-                                value={description}
-                                disabled={!isEditingBio}
-                                name='milestoneDescription'
-                                onChange={(e) =>
-                                  handleMilestoneChange(e, index)
-                                }
-                              />
-                              <div className='flex items-center justify-between mb-4'>
-                                <p className='text-sm text-content my-2'>
-                                  {description?.length}/5000
-                                </p>
-                                <p
-                                  className={`text-xs text-imbue-light-purple-two`}
-                                >
-                                  {inputErrors?.milestones[index]
-                                    ?.description ||
-                                    error?.description ||
-                                    ''}
-                                </p>
-                              </div>
-                            </>
-                          ) : (
-                            <p className='text-[1rem] text-[#3B27C180] m-0'>
-                              {description}
-                            </p>
-                          )}
-                        </div>
-                        <div className='flex flex-col w-full lg:w-1/5 items-end'>
-                          <h3 className='mb-2 lg:mb-5 text-right text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
-                            Amount
-                          </h3>
-                          {isEditingBio ? (
-                            <>
-                              <div className='w-full relative p-0 m-0'>
-                                <span className='h-fit absolute left-5 bottom-3 text-base text-content'>
-                                  {Currency[currencyId]}
-                                </span>
-
-                                <input
-                                  type='number'
-                                  onWheel={(e) =>
-                                    (e.target as HTMLElement).blur()
-                                  }
-                                  disabled={!isEditingBio}
-                                  placeholder='Add an amount'
-                                  className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
-                                  value={amount || ''}
-                                  onChange={(e) =>
-                                    handleMilestoneChange(e, index)
-                                  }
-                                  name='milestoneAmount'
-                                />
-                              </div>
+                            <input
+                              type='text'
+                              autoComplete='off'
+                              maxLength={50}
+                              placeholder='Add Milestone Name'
+                              className='input-budget !pl-3 text-base rounded-[5px] py-3 text-imbue-purple mb-2 placeholder:text-imbue-light-purple'
+                              value={name || ''}
+                              name='milestoneTitle'
+                              onChange={(e) => handleMilestoneChange(e, index)}
+                            />
+                            <div className='flex items-center justify-between mb-4'>
+                              <p className='text-sm text-content my-2'>
+                                {name?.length}/50
+                              </p>
                               <p
-                                className={`text-xs text-imbue-light-purple-two mt-2`}
+                                className={`text-xs text-imbue-light-purple-two`}
                               >
-                                {inputErrors?.milestones[index]?.amount ||
-                                  error?.amount ||
+                                {inputErrors?.milestones[index]?.name ||
+                                  error?.name ||
                                   ''}
                               </p>
-                            </>
-                          ) : (
-                            <p className='text-[1rem] text-[#3B27C180] m-0'>
-                              $
-                              {Number(
-                                milestones[index]?.amount?.toFixed(2)
-                              )?.toLocaleString?.()}
-                            </p>
-                          )}
-
-                          {totalCostWithoutFee !== 0 && isEditingBio && (
-                            <div className='flex flex-col items-end mt-[auto] gap-[8px] w-full'>
-                              <div className='progress-value text-base !text-imbue-purple-dark'>
-                                {percent}%
-                              </div>
-                              <div className='progress-bar'>
-                                <div
-                                  className='progress'
-                                  style={{
-                                    width: `${percent}%`,
-                                  }}
-                                ></div>
-                              </div>
                             </div>
-                          )}
-                        </div>
+                          </>
+                        ) : (
+                          <h3 className='mb-2 lg:mb-5 text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
+                            {name}
+                          </h3>
+                        )}
+                        {isEditingBio ? (
+                          <>
+                            <h3 className='text-base lg:text-xl mb-2 lg:mb-5 p-0 text-imbue-purple-dark font-normal'>
+                              Description
+                            </h3>
+                            <textarea
+                              maxLength={5000}
+                              className='text-content !p-3 placeholder:text-imbue-light-purple'
+                              placeholder='Add Milestone Description'
+                              rows={7}
+                              value={description}
+                              disabled={!isEditingBio}
+                              name='milestoneDescription'
+                              onChange={(e) => handleMilestoneChange(e, index)}
+                            />
+                            <div className='flex items-center justify-between mb-4'>
+                              <p className='text-sm text-content my-2'>
+                                {description?.length}/5000
+                              </p>
+                              <p
+                                className={`text-xs text-imbue-light-purple-two`}
+                              >
+                                {inputErrors?.milestones[index]?.description ||
+                                  error?.description ||
+                                  ''}
+                              </p>
+                            </div>
+                          </>
+                        ) : (
+                          <p className='text-[1rem] text-[#3B27C180] m-0'>
+                            {description}
+                          </p>
+                        )}
+                      </div>
+                      <div className='flex flex-col w-full lg:w-1/5 items-end'>
+                        <h3 className='mb-2 lg:mb-5 text-right text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
+                          Amount
+                        </h3>
+                        {isEditingBio ? (
+                          <>
+                            <div className='w-full relative p-0 m-0'>
+                              <span className='h-fit absolute left-5 bottom-3 text-base text-content'>
+                                {Currency[currencyId]}
+                              </span>
+
+                              <input
+                                type='number'
+                                onWheel={(e) =>
+                                  (e.target as HTMLElement).blur()
+                                }
+                                autoComplete='off'
+                                disabled={!isEditingBio}
+                                placeholder='Add an amount'
+                                className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
+                                value={amount || ''}
+                                onChange={(e) =>
+                                  handleMilestoneChange(e, index)
+                                }
+                                name='milestoneAmount'
+                              />
+                            </div>
+                            <p
+                              className={`text-xs text-imbue-light-purple-two mt-2`}
+                            >
+                              {inputErrors?.milestones[index]?.amount ||
+                                error?.amount ||
+                                ''}
+                            </p>
+                          </>
+                        ) : (
+                          <p className='text-[1rem] text-[#3B27C180] m-0'>
+                            $
+                            {Number(
+                              milestones[index]?.amount?.toFixed(2)
+                            )?.toLocaleString?.()}
+                          </p>
+                        )}
+
+                        {totalCostWithoutFee !== 0 && isEditingBio && (
+                          <div className='flex flex-col items-end mt-[auto] gap-[8px] w-full'>
+                            <div className='progress-value text-base !text-imbue-purple-dark'>
+                              {percent}%
+                            </div>
+                            <div className='progress-bar'>
+                              <div
+                                className='progress'
+                                style={{
+                                  width: `${percent}%`,
+                                }}
+                              ></div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  );
-                }
-              )}
+                  </div>
+                );
+              })}
             </div>
             {isEditingBio && (
               <p
@@ -725,16 +725,18 @@ const ApplicationPreview = (): JSX.Element => {
             {isEditingBio && (
               <Tooltip
                 followCursor
-                title={disableSubmit && "Please fill all the input fields"}
+                title={disableSubmit && 'Please fill all the input fields'}
               >
                 <button
-                  className={`primary-btn in-dark w-button ${disableSubmit && "!bg-gray-400 !text-white !cursor-not-allowed"}`}
+                  className={`primary-btn in-dark w-button ${
+                    disableSubmit &&
+                    '!bg-gray-400 !text-white !cursor-not-allowed'
+                  }`}
                   onClick={() => !disableSubmit && handleUpdateProject()}
                 >
                   Update
                 </button>
               </Tooltip>
-
             )}
 
             {/* TODO: Add Drafts Functionality */}

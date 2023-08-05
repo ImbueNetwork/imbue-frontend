@@ -67,6 +67,7 @@ const TextArea = ({
         <Input
           id='component-filled'
           name={name}
+          autoComplete='off'
           multiline
           rows={12}
           error={error}

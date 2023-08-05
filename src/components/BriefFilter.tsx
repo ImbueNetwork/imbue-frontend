@@ -42,6 +42,7 @@ export const BriefFilter = React.memo(
                 {value}
                 <input
                   type='checkbox'
+                  autoComplete='off'
                   className='filtercheckbox'
                   id={`${filter_type.toString()}-${interiorIndex}`}
                   data-testid={`${filter_type.toString()}-${interiorIndex}`}

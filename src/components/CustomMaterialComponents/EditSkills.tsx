@@ -40,6 +40,7 @@ const EditSkills = ({ skills, setSkills }: EditSkillsProps) => {
               color='secondary'
               onChange={(e) => searchSkill(e.target.value)}
               {...params}
+              autoComplete='off'
             />
           )}
         />

@@ -103,6 +103,9 @@ const BriefDetails = (): JSX.Element => {
     fetchData();
   }, [id, browsingUser.username]);
 
+  console.log('breif', brief);
+  console.log('target', targetUser);
+
   const redirectToApply = () => {
     router.push(`/briefs/${brief.id}/apply`);
   };
@@ -217,6 +220,7 @@ const BriefDetails = (): JSX.Element => {
         {/* TODO: Implement */}
         <BioPanel
           brief={brief}
+          targetUser={targetUser}
           isOwnerOfBrief={isOwnerOfBrief}
           projectCategories={projectCategories}
         />

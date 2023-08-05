@@ -139,10 +139,7 @@ export const SubmitProposal = (): JSX.Element => {
   const totalCost = imbueFee + totalCostWithoutFee;
 
   const onAddMilestone = () => {
-    setMilestones([
-      ...milestones,
-      { name: '', amount: 0, description: '' },
-    ]);
+    setMilestones([...milestones, { name: '', amount: 0, description: '' }]);
   };
 
   const onRemoveMilestone = (index: number) => {
@@ -177,9 +174,13 @@ export const SubmitProposal = (): JSX.Element => {
   }
 
   useEffect(() => {
-    const { isValid, errors } = validateApplicationInput("brief", inputErrors, milestones);
-    setInputErrors(errors)
-    setDisableSubmit(!isValid)
+    const { isValid, errors } = validateApplicationInput(
+      'brief',
+      inputErrors,
+      milestones
+    );
+    setInputErrors(errors);
+    setDisableSubmit(!isValid);
   }, [milestones]);
 
   async function insertProject() {
@@ -233,12 +234,14 @@ export const SubmitProposal = (): JSX.Element => {
     }
   }
 
-  const totalPercent = Math.round(milestones.reduce((sum, { amount }) => {
-    const percent = Number(
-      ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(2)
-    );
-    return sum + percent;
-  }, 0))
+  const totalPercent = Math.round(
+    milestones.reduce((sum, { amount }) => {
+      const percent = Number(
+        ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(2)
+      );
+      return sum + percent;
+    }, 0)
+  );
 
   const handleMilestoneChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -331,6 +334,7 @@ export const SubmitProposal = (): JSX.Element => {
                     </h3>
 
                     <input
+                      autoComplete='off'
                       type='text'
                       maxLength={50}
                       data-testid={`milestone-title-${index}`}
@@ -342,9 +346,7 @@ export const SubmitProposal = (): JSX.Element => {
                     />
                     <div className='flex items-center justify-between mb-4'>
                       {/* <p className='text-sm text-imbue-coral'>{enteredInvalid && inputError[index]?.name}</p> */}
-                      <p
-                        className={`text-xs text-imbue-light-purple-two`}
-                      >
+                      <p className={`text-xs text-imbue-light-purple-two`}>
                         {inputErrors?.milestones[index]?.name || ''}
                       </p>
                       <p className='text-sm text-content my-2'>
@@ -365,9 +367,7 @@ export const SubmitProposal = (): JSX.Element => {
                       onChange={(e) => handleMilestoneChange(e, index)}
                     />
                     <div className='flex items-center justify-between'>
-                      <p
-                        className={`text-xs text-imbue-light-purple-two`}
-                      >
+                      <p className={`text-xs text-imbue-light-purple-two`}>
                         {inputErrors?.milestones[index]?.description || ''}
                       </p>
                       <p className='text-sm text-content my-2'>
@@ -397,9 +397,7 @@ export const SubmitProposal = (): JSX.Element => {
                         name='milestoneAmount'
                       />
                     </div>
-                    <p
-                      className={`text-xs text-imbue-light-purple-two mt-2`}
-                    >
+                    <p className={`text-xs text-imbue-light-purple-two mt-2`}>
                       {inputErrors?.milestones[index]?.amount || ''}
                     </p>
 
@@ -540,10 +538,12 @@ export const SubmitProposal = (): JSX.Element => {
           <Tooltip
             followCursor
             leaveTouchDelay={10}
-            title={disableSubmit && "Please fill all the required input fields"}
+            title={disableSubmit && 'Please fill all the required input fields'}
           >
             <button
-              className={`primary-btn in-dark w-button ${disableSubmit && "!bg-gray-400 !text-white !cursor-not-allowed"}`}
+              className={`primary-btn in-dark w-button ${
+                disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
+              }`}
               onClick={() => !disableSubmit && handleSubmit()}
             >
               Submit

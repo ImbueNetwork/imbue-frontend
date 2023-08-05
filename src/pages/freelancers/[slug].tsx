@@ -6,6 +6,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import {
   Alert,
+  Button,
   FormControl,
   InputAdornment,
   InputLabel,
@@ -479,6 +480,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                       variant='outlined'
                       color='secondary'
                       defaultValue={freelancer?.display_name}
+                      autoComplete='off'
                     />
                     {displayError && (
                       <p
@@ -517,6 +519,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                         variant='outlined'
                         color='secondary'
                         defaultValue={freelancer?.username}
+                        autoComplete='off'
                       />
                       {userNameError && (
                         <p
@@ -552,6 +555,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                         label='Tittle'
                         variant='outlined'
                         defaultValue={freelancer?.title}
+                        autoComplete='off'
                       />
                     ) : (
                       <>
@@ -599,19 +603,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
 
                   {isCurrentFreelancer ? (
                     <>
-                      {isEditMode ? (
-                        <div className='flex gap-6 mb-5'>
-                          <button onClick={() => onSave()} className='message'>
-                            Save Changes <FiEdit />
-                          </button>
-                          <button
-                            onClick={() => cancelEdit()}
-                            className='message !bg-red-600 !border-0'
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      ) : (
+                      {!isEditMode && (
                         <div className='flex gap-6 mb-5'>
                           <button
                             onClick={() => flipEdit()}
@@ -822,6 +814,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                                   >
                                     <TextField
                                       color='secondary'
+                                      autoComplete='off'
                                       value={freelancer && freelancer[key]}
                                       onChange={(e) => {
                                         if (freelancer) {
@@ -1044,6 +1037,25 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
               </>
             )}
           </div>
+          <div className='connect-buttons w-full'>
+            {isCurrentFreelancer && (
+              <>
+                {isEditMode && (
+                  <div className='flex gap-6 mb-5'>
+                    <button onClick={() => onSave()} className='message'>
+                      Save Changes <FiEdit />
+                    </button>
+                    <button
+                      onClick={() => cancelEdit()}
+                      className='message !bg-red-600 !border-0'
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
 
         <div className='lg:w-[50%] mt-[20px] lg:mt-0'>
@@ -1137,6 +1149,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           <StyledEngineProvider injectFirst>
             <div className='flex flex-col'>
               <TextField
+                autoComplete='off'
                 color='secondary'
                 id='outlined-controlled'
                 label='Search'

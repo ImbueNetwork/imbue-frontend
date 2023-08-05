@@ -198,6 +198,7 @@ const NewBrief = (): JSX.Element => {
           renderInput={(params) => (
             <TextField
               color='secondary'
+              autoComplete='off'
               onChange={(e) => searchSkill(e.target.value)}
               {...params}
             />
@@ -329,7 +330,7 @@ const NewBrief = (): JSX.Element => {
     ) {
       return false;
     }
-    if ((step === 2 && !validateInputLength(description, 50, 5000))) {
+    if (step === 2 && !validateInputLength(description, 50, 5000)) {
       // TODO: minimum required length for description
       return false;
     }
@@ -355,9 +356,19 @@ const NewBrief = (): JSX.Element => {
   };
 
   useEffect(() => {
-    setDisableSubmit(!validate())
+    setDisableSubmit(!validate());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [headline, industries.length, description, skills.length, expId, scopeId, durationId, budget, step])
+  }, [
+    headline,
+    industries.length,
+    description,
+    skills.length,
+    expId,
+    scopeId,
+    durationId,
+    budget,
+    step,
+  ]);
 
   const onReviewPost = async () => {
     //TODO: implement api call
@@ -435,33 +446,43 @@ const NewBrief = (): JSX.Element => {
               <Tooltip
                 followCursor
                 leaveTouchDelay={10}
-                title={disableSubmit && "Please fill all the required input fields"}
+                title={
+                  disableSubmit && 'Please fill all the required input fields'
+                }
               >
                 <button
-                  className={`primary-btn in-dark w-button !mt-0 ${disableSubmit && "!bg-gray-400 !text-white !cursor-not-allowed"}`}
+                  className={`primary-btn in-dark w-button !mt-0 ${
+                    disableSubmit &&
+                    '!bg-gray-400 !text-white !cursor-not-allowed'
+                  }`}
                   data-testid='submit-button'
                   onClick={() => !disableSubmit && onReviewPost()}
                 >
                   Submit
                 </button>
               </Tooltip>
-
             ) : (
               <Tooltip
                 followCursor
                 leaveTouchDelay={10}
-                title={disableSubmit && "Please fill all the required input fields"}
+                title={
+                  disableSubmit && 'Please fill all the required input fields'
+                }
               >
                 <button
-                  className={`primary-btn in-dark w-button !mt-0 ${disableSubmit && "!bg-gray-400 !text-white !cursor-not-allowed"}`}
+                  className={`primary-btn in-dark w-button !mt-0 ${
+                    disableSubmit &&
+                    '!bg-gray-400 !text-white !cursor-not-allowed'
+                  }`}
                   data-testid='next-button'
                   onClick={() => !disableSubmit && setStep(step + 1)}
-                // onClick={() => console.log("hit")}
+                  // onClick={() => console.log("hit")}
                 >
-                  {stepData[step].next ? `Next: ${stepData[step].next}` : 'Next'}
+                  {stepData[step].next
+                    ? `Next: ${stepData[step].next}`
+                    : 'Next'}
                 </button>
               </Tooltip>
-
             )}
           </div>
         </div>

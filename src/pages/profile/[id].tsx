@@ -263,6 +263,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                     label='Name'
                     variant='outlined'
                     defaultValue={user?.display_name}
+                    autoComplete='off'
                   />
                   {displayNameError && (
                     <p
@@ -289,6 +290,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
               {isEditMode ? (
                 <>
                   <TextField
+                    autoComplete='off'
                     color='secondary'
                     onChange={handleChange}
                     className='w-full'

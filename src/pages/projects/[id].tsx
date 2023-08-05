@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import ArrowBackIcon from '@mui/icons-material/ChevronLeft';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import { Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -188,7 +189,10 @@ function Project() {
           }
           break;
       }
-      if (project.status_id !== OffchainProjectState.Refunded && project.status_id !== OffchainProjectState.Completed) {
+      if (
+        project.status_id !== OffchainProjectState.Refunded &&
+        project.status_id !== OffchainProjectState.Completed
+      ) {
         setWait(true);
       }
     }
@@ -294,17 +298,16 @@ function Project() {
         vote
       );
 
-      // let milestoneApproved;
-      // if(!result.txError) {
-      //   milestoneApproved = await chainService.pollChainMessage(
-      //     ImbueChainEvent.ApproveMilestone,
-      //     account
-      //   );
-      // }
+      let milestoneApproved;
+      if (!result.txError) {
+        milestoneApproved = await chainService.pollChainMessage(
+          ImbueChainEvent.ApproveMilestone,
+          account
+        );
+      }
 
       while (true) {
         if (result.status || result.txError) {
-
           if (result.status) {
             if (onChainProject.milestones[milestoneKeyInView].is_approved) {
               await updateMilestone(projectId, milestoneKeyInView, true);
@@ -385,7 +388,6 @@ function Project() {
     setLoading(false);
   };
 
-
   const refund = async (account: WalletAccount) => {
     // TODO make this a popup value like vote on milestone
     const vote = false;
@@ -403,7 +405,7 @@ function Project() {
       );
 
       let shouldRefund;
-      if(!result.txError) {
+      if (!result.txError) {
         shouldRefund = await chainService.pollChainMessage(
           ImbueChainEvent.NoConfidenceRoundFinalised,
           account
@@ -607,18 +609,22 @@ function Project() {
             !milestone?.is_approved && (
               <Tooltip
                 followCursor
-                title={!balance && "The escrow wallet balance cannot be 0 while submiting a milestone"}
+                title={
+                  !balance &&
+                  'The escrow wallet balance cannot be 0 while submiting a milestone'
+                }
               >
                 <button
-                  className={`primary-btn in-dark w-button mt-3 ${!balance && '!bg-gray-300 !text-gray-400 !cursor-not-allowed'}`}
+                  className={`primary-btn in-dark w-button mt-3 ${
+                    !balance &&
+                    '!bg-gray-300 !text-gray-400 !cursor-not-allowed'
+                  }`}
                   data-testid='next-button'
                   onClick={() => balance && submitMilestone()}
                 >
                   Submit
                 </button>
-
               </Tooltip>
-
             )}
 
           {isApplicant && milestone.is_approved && (
@@ -664,7 +670,23 @@ function Project() {
         <div className='flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] max-lg:basis-[60%] mr-[5%]  max-lg:mr-0 relative'>
           <div className='flex flex-wrap gap-3 lg:gap-4 items-center'>
             <div className='flex items-center'>
-              <BackButton className='-ml-2 mr-1' />
+              <Tooltip
+                title='Go back to previous page'
+                followCursor
+                leaveTouchDelay={10}
+                enterDelay={500}
+                className='cursor-pointer hover:bg-content-primary group'
+              >
+                <div
+                  onClick={() => window.history.back()}
+                  className='border border-transparent hover:border-content rounded-full flex items-center justify-center cursor-pointer'
+                >
+                  <ArrowBackIcon
+                    className='h-7 w-7 group-hover:text-white'
+                    color='secondary'
+                  />
+                </div>
+              </Tooltip>
               <h3 className='text-[2rem] max-lg:text-[24px] break-all leading-[1.5] font-normal m-0 p-0 text-imbue-purple'>
                 {project?.name}
               </h3>

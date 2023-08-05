@@ -440,6 +440,7 @@ const Freelancers = (): JSX.Element => {
                     id='search-input'
                     className='search-input px-[12px] !w-full lg:!w-[20rem] !h-[2.875rem] !rounded-tr-[0px] !rounded-br-[0px] !text-black'
                     placeholder='Search'
+                    autoComplete='off'
                   />
                   <div
                     role='button'

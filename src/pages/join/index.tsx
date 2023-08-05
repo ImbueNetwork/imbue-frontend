@@ -172,6 +172,7 @@ const Join = (): JSX.Element => {
                   required
                   className='outlinedInput'
                   name='user'
+                  autoComplete='off'
                 />
               </div>
 
@@ -188,6 +189,7 @@ const Join = (): JSX.Element => {
                   onError={(err) => console.log(err)}
                   type='email'
                   name='email'
+                  autoComplete='off'
                 />
               </div>
 
@@ -203,6 +205,7 @@ const Join = (): JSX.Element => {
                   required
                   type='password'
                   name='password'
+                  autoComplete='off'
                 />
               </div>
 
@@ -218,6 +221,7 @@ const Join = (): JSX.Element => {
                   required
                   type='password'
                   name='matchPassword'
+                  autoComplete='off'
                 />
               </div>
 
@@ -231,6 +235,7 @@ const Join = (): JSX.Element => {
                   className='primary-btn in-dark confirm w-full !text-center'
                   id='create-account'
                   value={'Sign Up'}
+                  autoComplete='off'
                 />
               </div>
 
