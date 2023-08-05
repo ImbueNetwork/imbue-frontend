@@ -19,7 +19,6 @@ import { getBalance } from '@/utils/helper';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import AccountChoice from '@/components/AccountChoice';
-import BackButton from '@/components/BackButton';
 import ChatPopup from '@/components/ChatPopup';
 import { Dialogue } from '@/components/Dialogue';
 import ErrorScreen from '@/components/ErrorScreen';

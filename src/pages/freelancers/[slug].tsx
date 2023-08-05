@@ -6,7 +6,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import {
   Alert,
-  Button,
   FormControl,
   InputAdornment,
   InputLabel,
