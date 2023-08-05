@@ -121,12 +121,13 @@ function Project() {
   const [balance, setBalance] = useState<any>(0);
   const [approversPreview, setApproverPreview] = useState<any>([]);
   const [isApprover, setIsApprover] = useState<boolean>(false);
+  const [approverVotedOnRefund, setApproverVotedOnRefund] = useState<boolean>(false);
 
   const [projectType, setProjectType] = useState<'grant' | 'brief' | null>(
     null
   );
   const canVote = isApprover || (projectType === 'brief' && isProjectOwner);
-  const [expandPorjectDesc, setExpandProjectDesc] = useState<number>(500);
+  const [expandProjectDesc, setExpandProjectDesc] = useState<number>(500);
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -158,8 +159,23 @@ function Project() {
         setMilestoneBeingVotedOn(firstPendingMilestone);
       }
 
+
+      if (user.web3_address && onChainProjectRes.projectState == OnchainProjectState.OpenForVotingOfNoConfidence) {
+        const voters = await chainService.getNoConfidenceVoters(onChainProjectRes.id!);
+        if (voters.includes(user.web3_address)) {
+          setApproverVotedOnRefund(true);
+        }
+      }
+
       setOnChainProject(onChainProjectRes);
-    } else {
+    } else if (project.chain_project_id && project.owner) {
+      const projectHasBeenCompleted = await chainService.hasProjectCompleted(project.owner, project.chain_project_id);
+
+      if (projectHasBeenCompleted) {
+        project.status_id = OffchainProjectState.Completed;
+        await updateProject(projectId, project);
+      }
+
       switch (project.status_id) {
         case OffchainProjectState.PendingReview:
           setWaitMessage('This project is pending review');
@@ -202,7 +218,6 @@ function Project() {
     try {
       const projectRes: Project = await getProjectById(projectId);
       // showing owner profile if the current user if the applicant freelancer
-
       let owner;
       let freelancerRes;
 
@@ -212,11 +227,6 @@ function Project() {
         const brief = await getBrief(projectRes.brief_id);
         owner = brief?.user_id ? await utils.fetchUser(brief?.user_id) : null;
         freelancerRes = await getFreelancerProfile(projectRes?.user_id);
-        console.log(
-          '🚀 ~ file: [id].tsx:208 ~ getProject ~ freelancerRes:',
-          freelancerRes
-        );
-
         if (owner?.id == user?.id) {
           setTargetUser(freelancerRes);
         } else {
@@ -309,7 +319,7 @@ function Project() {
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
-            if (onChainProject.milestones[milestoneKeyInView].is_approved) {
+            if (milestoneApproved) {
               await updateMilestone(projectId, milestoneKeyInView, true);
             }
 
@@ -552,8 +562,8 @@ function Project() {
             {milestone?.is_approved
               ? projectStateTag(modified, 'Completed')
               : milestone?.milestone_key == milestoneBeingVotedOn
-              ? openForVotingTag()
-              : projectStateTag(modified, 'Not Started')}
+                ? openForVotingTag()
+                : projectStateTag(modified, 'Not Started')}
 
             <Image
               src={require(expanded
@@ -592,9 +602,8 @@ function Project() {
               }
             >
               <button
-                className={`primary-btn in-dark w-button ${
-                  !canVote && '!bg-gray-300 !text-gray-400'
-                } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
+                className={`primary-btn in-dark w-button ${!canVote && '!bg-gray-300 !text-gray-400'
+                  } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
                 data-testid='next-button'
                 onClick={() => canVote && vote()}
               >
@@ -605,7 +614,7 @@ function Project() {
 
           {(isApplicant || (projectType === 'grant' && isProjectOwner)) &&
             onChainProject?.projectState !==
-              OnchainProjectState.OpenForVoting &&
+            OnchainProjectState.OpenForVoting &&
             !milestone?.is_approved && (
               <Tooltip
                 followCursor
@@ -629,9 +638,8 @@ function Project() {
 
           {isApplicant && milestone.is_approved && (
             <button
-              className={`primary-btn in-dark w-button ${
-                !balance && '!bg-gray-300 !text-gray-400'
-              } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
+              className={`primary-btn in-dark w-button ${!balance && '!bg-gray-300 !text-gray-400'
+                } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
               data-testid='next-button'
               onClick={() => withdraw()}
               disabled={!balance}
@@ -708,12 +716,12 @@ function Project() {
           </p>
 
           <p className='text-base text-content font-normal leading-[178.15%] break-all lg:w-[80%] whitespace-pre-wrap'>
-            {project?.description?.length > expandPorjectDesc
-              ? project?.description?.substring(0, expandPorjectDesc) + ' ...'
+            {project?.description?.length > expandProjectDesc
+              ? project?.description?.substring(0, expandProjectDesc) + ' ...'
               : project?.description}
             {project?.description?.length > 500 && (
               <span>
-                {project?.description?.length > expandPorjectDesc ? (
+                {project?.description?.length > expandProjectDesc ? (
                   <button
                     onClick={() => setExpandProjectDesc((prev) => prev + 500)}
                     className='mt-3 ml-2 w-fit text-sm hover:underline text-imbue-lemon'
@@ -795,17 +803,43 @@ function Project() {
             )}
 
             {showRefundButton && (
-              <button
-                className='border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors'
-                onClick={async () => {
-                  // set submitting mile stone to true
-                  await setRaiseVoteOfNoConfidence(true);
-                  // show polkadot account modal
-                  await setShowPolkadotAccounts(true);
-                }}
-              >
-                Refund
-              </button>
+
+              <>
+
+                <Tooltip
+                  title={approverVotedOnRefund ? 'Your vote has already been registered' : 'Vote on refunds'}
+                  followCursor
+                  leaveTouchDelay={10}
+                  enterDelay={500}
+                  className='cursor-pointer'
+                >
+                  <button
+                    className={`border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors ${approverVotedOnRefund && '!bg-gray-300 !text-gray-400 !cursor-not-allowed'}`}
+                    onClick={async () => {
+                      if (!approverVotedOnRefund) {
+                        // set submitting mile stone to true
+                        await setRaiseVoteOfNoConfidence(true);
+                        // show polkadot account modal
+                        await setShowPolkadotAccounts(true);
+                      }
+                    }}
+                  >
+                    Refund
+                  </button>
+                </Tooltip>
+
+
+                {onChainProject && onChainProject.projectState == OnchainProjectState.OpenForVotingOfNoConfidence && (
+
+                  <button
+                    disabled={true}
+                    className={' text-black flex px-5 py-3 text-sm ml-auto rounded-full Rejected-btn'}
+                  >
+                    Project undergoing vote of no confidence
+                  </button>
+                )}
+
+              </>
             )}
           </div>
 
@@ -819,9 +853,8 @@ function Project() {
                   {approversPreview?.map((approver: any, index: number) => (
                     <div
                       key={index}
-                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${
-                        approver?.display_name && 'cursor-pointer'
-                      }`}
+                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${approver?.display_name && 'cursor-pointer'
+                        }`}
                       onClick={() =>
                         approver.display_name &&
                         router.push(`/profile/${approver.username}`)
@@ -875,13 +908,12 @@ function Project() {
                 <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
                   <div
                     style={{
-                      width: `${
-                        (onChainProject?.milestones?.filter?.(
-                          (m: any) => m?.is_approved
-                        )?.length /
-                          onChainProject?.milestones?.length) *
+                      width: `${(onChainProject?.milestones?.filter?.(
+                        (m: any) => m?.is_approved
+                      )?.length /
+                        onChainProject?.milestones?.length) *
                         100
-                      }%`,
+                        }%`,
                     }}
                     className='h-full rounded-xl Accepted-button absolute'
                   ></div>
@@ -889,9 +921,8 @@ function Project() {
                     {onChainProject?.milestones?.map((m: any, i: number) => (
                       <div
                         key={i}
-                        className={`h-4 w-4 ${
-                          m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
-                        } rounded-full -mt-1.5`}
+                        className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
+                          } rounded-full -mt-1.5`}
                       ></div>
                     ))}
                   </div>
