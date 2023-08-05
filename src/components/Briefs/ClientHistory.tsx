@@ -26,7 +26,7 @@ const ClientsHistory = ({ client, briefId }: ClientsHistoryType) => {
             // if(briefs?.briefsUnderReview?.length) allBriefs = [...allBriefs, ...briefs.briefsUnderReview]
             // if(briefs?.acceptedBriefs?.length) allBriefs = [...allBriefs, ...briefs.acceptedBriefs]
             const briefs = res.briefsUnderReview?.filter((brief: Brief) => brief.id != briefId)
-            setTotalBriefs(briefs.length)
+            setTotalBriefs(briefs?.length)
             briefs.splice(briefsToShow)
             setClientAllBriefs(briefs)
         }

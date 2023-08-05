@@ -82,41 +82,46 @@ const Freelancers = (): JSX.Element => {
   useEffect(() => {
     const setFilters = async () => {
       setLoading(true);
-      const data: FreelancerResponse = await getAllFreelancers(
-        itemsPerPage,
-        currentPage
-      );
-      setLoading(false);
-      const combinedSkills = Array.prototype.concat.apply(
-        [],
-        data?.currentData?.map((x: any) => x.skills)
-      ) as Item[];
+      try {
+        const data: FreelancerResponse = await getAllFreelancers(
+          itemsPerPage,
+          currentPage
+        );
+        const combinedSkills = Array.prototype.concat.apply(
+          [],
+          data?.currentData?.map((x: any) => x.skills)
+        ) as Item[];
 
-      const dedupedSkills =
-        combinedSkills.length > 0 ? await dedupeArray(combinedSkills) : [];
-      const combinedServices = Array.prototype.concat.apply(
-        [],
-        data?.currentData?.map((x: any) => x.services)
-      ) as Item[];
-      const dedupedServices = combinedServices
-        ? await dedupeArray(combinedServices)
-        : [];
-      const combinedLanguages = Array.prototype.concat.apply(
-        [],
-        data?.currentData?.map((x: any) => x.languages)
-      ) as Item[];
-      const dedupedLanguages = combinedLanguages
-        ? await dedupeArray(combinedLanguages)
-        : [];
-      setSkills(dedupedSkills);
-      setServices(dedupedServices);
-      setLanguages(dedupedLanguages);
-      setFreelancers(data?.currentData);
-      setFreelancersTotal(data?.totalFreelancers);
-      setLoading(false);
+        const dedupedSkills =
+          combinedSkills.length > 0 ? await dedupeArray(combinedSkills) : [];
+        const combinedServices = Array.prototype.concat.apply(
+          [],
+          data?.currentData?.map((x: any) => x.services)
+        ) as Item[];
+        const dedupedServices = combinedServices
+          ? await dedupeArray(combinedServices)
+          : [];
+        const combinedLanguages = Array.prototype.concat.apply(
+          [],
+          data?.currentData?.map((x: any) => x.languages)
+        ) as Item[];
+        const dedupedLanguages = combinedLanguages
+          ? await dedupeArray(combinedLanguages)
+          : [];
+        setSkills(dedupedSkills);
+        setServices(dedupedServices);
+        setLanguages(dedupedLanguages);
+        setFreelancers(data?.currentData);
+        setFreelancersTotal(data?.totalFreelancers);
+      } catch (error) {
+        console.log(error);
+      }
+      finally {
+        setLoading(false)
+      }
     };
 
-    setFilters();
+    !Object.keys(router?.query).length && setFilters();
   }, [currentPage, itemsPerPage]);
 
   const skillsFilter = {
@@ -181,11 +186,13 @@ const Freelancers = (): JSX.Element => {
           skills_range: [],
           services_range: [],
           languages_range: [],
-          search_input: '',
+          name: '',
+          page: currentPage,
+          items_per_page: itemsPerPage
         };
 
         if (name) {
-          filter = { ...filter, search_input: name };
+          filter = { ...filter, name: name };
           const input = document.getElementById(
             'search-input'
           ) as HTMLInputElement;
@@ -251,6 +258,8 @@ const Freelancers = (): JSX.Element => {
     languagesRangeProps,
     servicesRangeProps,
     freelancerInfoProps,
+    currentPage,
+    itemsPerPage
   ]);
 
   const onSearch = async () => {
@@ -296,7 +305,7 @@ const Freelancers = (): JSX.Element => {
             default:
               console.log(
                 'Invalid filter option selected or unimplemented. type:' +
-                  filterType
+                filterType
               );
           }
         }
@@ -325,10 +334,11 @@ const Freelancers = (): JSX.Element => {
         skills_range: skillsRange,
         services_range: servicesRange,
         languages_range: languagesRange,
-        search_input: search_value,
+        name: search_value,
         items_per_page: itemsPerPage,
         page: currentPage,
         verified: freelancerInfo.verified,
+
       };
       if (search_value.length === 0) {
         setFilterVisible(!filterVisble);
@@ -484,7 +494,6 @@ const Freelancers = (): JSX.Element => {
           <Grid container spacing={4} sx={{ marginTop: '0.75rem' }}>
             {freelancers?.length &&
               freelancers
-                ?.slice?.(0, 10)
                 ?.map?.(
                   (
                     {

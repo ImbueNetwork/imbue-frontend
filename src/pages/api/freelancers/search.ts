@@ -41,8 +41,7 @@ export default nextConnect()
       req,
       res
     );
-
-    verifyUserIdFromJwt(req, res, userAuth.id);
+    await verifyUserIdFromJwt(req, res, [userAuth.id]);
 
     db.transaction(async (tx) => {
       try {
@@ -51,15 +50,15 @@ export default nextConnect()
           tx,
           filter
         );
-        console.log("🚀 ~ file: search.ts:54 ~ db.transaction ~ freelancers:", freelancers)
+        // const { currentData } = await models.paginatedData(
+        //   filter?.page || 1,
+        //   filter?.items_per_page || 5,
+        //   freelancers
+        // );
+        const freelancerCount = await models.searchFreelancersCount(tx, filter);
 
-        const { currentData } = await models.paginatedData(
-          filter?.page || 1,
-          filter?.items_per_page || 5,
-          freelancers
-        );
         await Promise.all([
-          ...currentData.map(async (freelancer: any) => {
+          ...freelancers.map(async (freelancer: any) => {
             freelancer.skills = await fetchFreelancerMetadata(
               'skill',
               freelancer.id
@@ -78,10 +77,12 @@ export default nextConnect()
           }),
         ]);
 
-        res
-          .status(200)
-          .json({ currentData, totalFreelancers: freelancers.length });
+        res.status(200).send({
+          currentData: freelancers,
+          totalFreelancers: freelancerCount,
+        });
       } catch (e) {
+        res.status(401).send({ currentData: null, totalFreelancers: null });
         new Error(`Failed to search all freelancers`, { cause: e as Error });
       }
     });

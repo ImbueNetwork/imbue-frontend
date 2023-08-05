@@ -106,12 +106,16 @@ export const callSearchFreelancers = async (
     method: 'post',
     body: JSON.stringify(filter),
   });
+
   if (resp.ok) {
     const data: FreelancerResponse = await resp.json();
     return data;
   } else {
-    console.log(await resp.json());
-    throw new Error('Failed to search freelancers. status:' + resp.status);
+    return {
+      currentData: [],
+      totalFreelancers: 0,
+      message: 'Failed to search freelancers. status:' + resp.status,
+    };
   }
 };
 
