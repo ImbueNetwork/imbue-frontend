@@ -255,6 +255,7 @@ const Freelancer = (): JSX.Element => {
           defaultValue={skills}
           renderInput={(params) => (
             <TextField
+              autoComplete='off'
               color='secondary'
               onChange={(e) => searchSkill(e.target.value)}
               {...params}

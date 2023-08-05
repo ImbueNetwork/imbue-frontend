@@ -162,7 +162,10 @@ const GrantApplication = (): JSX.Element => {
 
   const submitGrant = async (account: WalletAccount) => {
     if (!account) return;
-    if (approvers.includes(account.address)) return setError({ message: "You can't use approver address for grantor payment address" })
+    if (approvers.includes(account.address))
+      return setError({
+        message: "You can't use approver address for grantor payment address",
+      });
     if (totalPercent < 100)
       return setError({
         message: 'Total Percentage of milestones must be equal to 100%',
@@ -307,18 +310,25 @@ const GrantApplication = (): JSX.Element => {
   useEffect(() => {
     setInputErrors((prev) => ({
       ...prev,
-      approvers: approvers?.length
+      approvers: approvers?.length < 4
         ? ''
-        : 'Please select atleast one valid grant approver',
+        : 'Please select atleast 4 valid grant approvers',
     }));
   }, [approvers.length]);
 
   useEffect(() => {
-    const { isValid, errors } = validateApplicationInput("grant", inputErrors, milestones, title, description, approvers)
-    setDisableSubmit(!isValid)
-    setInputErrors(errors)
+    const { isValid, errors } = validateApplicationInput(
+      'grant',
+      inputErrors,
+      milestones,
+      title,
+      description,
+      approvers
+    );
+    setDisableSubmit(!isValid);
+    setInputErrors(errors);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [title, description, milestones, approvers])
+  }, [title, description, milestones, approvers]);
 
   if (userLoading) return <FullScreenLoader />;
 
@@ -337,6 +347,7 @@ const GrantApplication = (): JSX.Element => {
               >
                 <div>Title*</div>
                 <input
+                  autoComplete='off'
                   value={title}
                   maxLength={50}
                   placeholder='Input title'
@@ -345,9 +356,7 @@ const GrantApplication = (): JSX.Element => {
                   className='bg-transparent border border-imbue-purple rounded-md p-3 placeholder:text-imbue-light-purple text-imbue-purple outline-content-primary mt-4'
                 />
                 <div className='flex items-center justify-between mt-2'>
-                  <p
-                    className={`text-xs text-imbue-light-purple-two`}
-                  >
+                  <p className={`text-xs text-imbue-light-purple-two`}>
                     {inputErrors?.title}
                   </p>
                   <div className='text-imbue-purple text-sm ml-auto'>
@@ -361,6 +370,7 @@ const GrantApplication = (): JSX.Element => {
               >
                 <div>Description*</div>
                 <textarea
+                  autoComplete='off'
                   maxLength={5000}
                   value={description}
                   placeholder='Input description'
@@ -369,9 +379,7 @@ const GrantApplication = (): JSX.Element => {
                   className='bg-transparent border border-imbue-purple rounded-md placeholder:text-imbue-light-purple text-imbue-purple outline-content-primary min-h-[160px] p-3 mt-4'
                 />
                 <div className='flex items-center justify-between mt-2'>
-                  <p
-                    className={`text-xs text-imbue-light-purple-two`}
-                  >
+                  <p className={`text-xs text-imbue-light-purple-two`}>
                     {inputErrors?.description}
                   </p>
                   <div className='text-imbue-purple text-sm text-right'>
@@ -476,9 +484,7 @@ const GrantApplication = (): JSX.Element => {
                   setApprovers={setApprovers}
                   user={user}
                 />
-                <p
-                  className={`text-xs text-imbue-light-purple-two`}
-                >
+                <p className={`text-xs text-imbue-light-purple-two`}>
                   {inputErrors?.approvers}
                 </p>
               </div>
@@ -571,6 +577,7 @@ const GrantApplication = (): JSX.Element => {
 
                           <div className='mb-8'>
                             <input
+                              autoComplete='off'
                               type='text'
                               maxLength={50}
                               data-testid={`milestone-title-${index}`}
@@ -597,6 +604,7 @@ const GrantApplication = (): JSX.Element => {
                           </p>
                           <div>
                             <textarea
+                              autoComplete='off'
                               maxLength={5000}
                               placeholder='Add milestone description'
                               className='input-description text-base outline-content-primary placeholder:text-imbue-light-purple'
@@ -612,8 +620,9 @@ const GrantApplication = (): JSX.Element => {
                                   ''}
                               </p>
                               <div className='text-imbue-purple text-sm ml-auto text-right'>
-                                {`${milestones[index].description?.length || 0
-                                  }/5000`}
+                                {`${
+                                  milestones[index].description?.length || 0
+                                }/5000`}
                               </div>
                             </div>
                           </div>
@@ -687,8 +696,9 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
-                  }`}
+                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${
+                  currencies[currencyId]
+                }`}
               </div>
             </div>
 
@@ -708,8 +718,9 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
-                  }`}
+                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${
+                  currencies[currencyId]
+                }`}
               </div>
             </div>
 
@@ -731,11 +742,13 @@ const GrantApplication = (): JSX.Element => {
         <Tooltip
           followCursor
           leaveTouchDelay={10}
-          title={disableSubmit && "Please fill all the required input fields"}
+          title={disableSubmit && 'Please fill all the required input fields'}
         >
           <button
             // disabled={!formDataValid}
-            className={`primary-btn in-dark w-button ${disableSubmit && "!bg-gray-400 !text-white !cursor-not-allowed"}`}
+            className={`primary-btn in-dark w-button ${
+              disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
+            }`}
             onClick={() => !disableSubmit && handleSubmit()}
           >
             Submit
@@ -753,7 +766,11 @@ const GrantApplication = (): JSX.Element => {
         <div className='my-auto flex flex-col gap-3 items-center p-8'>
           <div className='f-modal-alert'>
             <div className='p-6 lg:p-10 border-[2px] lg:border-[5px] border-primary rounded-full relative'>
-              <Image src={WalletIcon} alt='wallet icon' className='w-10 h-10 lg:w-24 lg:h-24' />
+              <Image
+                src={WalletIcon}
+                alt='wallet icon'
+                className='w-10 h-10 lg:w-24 lg:h-24'
+              />
             </div>
           </div>
           <div className='my-2 lg:my-4'>
@@ -767,7 +784,9 @@ const GrantApplication = (): JSX.Element => {
               <IconButton onClick={() => copyAddress()}>
                 <FaRegCopy className='text-content' />
               </IconButton>
-              <span className='text-sm lg:text-base break-all'>{escrowAddress}</span>
+              <span className='text-sm lg:text-base break-all'>
+                {escrowAddress}
+              </span>
             </div>
           </CopyToClipboard>
           <div className='my-6 text-content text-sm lg:text-lg text-center'>
@@ -782,8 +801,9 @@ const GrantApplication = (): JSX.Element => {
           </button>
         </div>
         <Alert
-          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${copied ? 'flex' : 'hidden'
-            }`}
+          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${
+            copied ? 'flex' : 'hidden'
+          }`}
           severity='success'
         >
           Grant Wallet Address Copied to clipboard

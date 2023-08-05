@@ -85,6 +85,7 @@ export const TagsInput = ({
             maxLength={25}
             onChange={(e) => handleChange(e.target.value)}
             onKeyDown={handleKeyDown}
+            autoComplete='off'
           />
         )}
       </div>

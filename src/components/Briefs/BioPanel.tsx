@@ -14,14 +14,16 @@ type BioPanelData = {
   brief: Brief;
   projectCategories: string[];
   isOwnerOfBrief?: boolean | null;
+  targetUser: any;
 };
 
 const BioPanel = ({
   brief,
   projectCategories,
   isOwnerOfBrief,
+  targetUser,
 }: BioPanelData) => {
-  const [expandBreifDesc, setExpandBreifDesc] = useState<number>(500)
+  const [expandBreifDesc, setExpandBreifDesc] = useState<number>(500);
   const timePosted = timeAgo.format(new Date(brief.created));
   const router = useRouter();
   return (
@@ -57,7 +59,7 @@ const BioPanel = ({
         <span className='text-sm primary-text !text-imbue-lemon'>
           Posted {timePosted} by{' '}
           <span
-            onClick={() => router.push(`/profile/${brief.user_id}`)}
+            onClick={() => router.push(`/profile/${targetUser.username}`)}
             className='hover:underline cursor-pointer'
           >
             {brief.created_by}
@@ -70,22 +72,28 @@ const BioPanel = ({
           Project Description
         </h3>
         <p className='mt-4 text-imbue-purple-dark whitespace-pre-wrap !leading-normal'>
-          {
-            brief.description.length > expandBreifDesc
-              ? brief.description.substring(0, expandBreifDesc) + " ..."
-              : brief.description
-          }
-          {
-            brief.description.length > 500 && (
-              <span>
-                {
-                  brief.description.length > expandBreifDesc
-                    ? <button onClick={() => setExpandBreifDesc((prev) => prev + 500)} className='ml-3 w-fit text-sm hover:underline text-imbue-lemon'>Show more</button>
-                    : <button onClick={() => setExpandBreifDesc(500)} className='ml-3 w-fit text-sm hover:underline text-imbue-lemon'>Show Less</button>
-                }
-              </span>
-            )
-          }
+          {brief.description.length > expandBreifDesc
+            ? brief.description.substring(0, expandBreifDesc) + ' ...'
+            : brief.description}
+          {brief.description.length > 500 && (
+            <span>
+              {brief.description.length > expandBreifDesc ? (
+                <button
+                  onClick={() => setExpandBreifDesc((prev) => prev + 500)}
+                  className='ml-3 w-fit text-sm hover:underline text-imbue-lemon'
+                >
+                  Show more
+                </button>
+              ) : (
+                <button
+                  onClick={() => setExpandBreifDesc(500)}
+                  className='ml-3 w-fit text-sm hover:underline text-imbue-lemon'
+                >
+                  Show Less
+                </button>
+              )}
+            </span>
+          )}
         </p>
       </div>
 

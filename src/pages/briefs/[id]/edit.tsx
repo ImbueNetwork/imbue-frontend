@@ -355,6 +355,7 @@ export const EditProposal = (): JSX.Element => {
           </p>
           <div className={`${styles.budgetInputContainer} !mt-[0.5rem]`}>
             <input
+              autoComplete='off'
               className={styles.briefDetailFieldInput}
               style={{ paddingLeft: '24px', height: 'auto' }}
               type='text'
@@ -419,6 +420,7 @@ export const EditProposal = (): JSX.Element => {
               className={`${styles.budgetInputContainer} !mt-[0.5rem] !py-0 !mb-3`}
             >
               <input
+                autoComplete='off'
                 className={`${styles.briefDetailFieldInput}`}
                 style={{
                   paddingLeft: '24px',

@@ -51,9 +51,9 @@ export enum OnchainProjectState {
 }
 
 export enum RoundType {
-  ContributionRound,
   VotingRound,
   VoteOfNoConfidence,
+  ContributionRound,
 }
 
 export enum ButtonState {

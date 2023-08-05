@@ -42,7 +42,7 @@ import { IoPeople } from 'react-icons/io5';
 import { MdOutlineWatchLater } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { checkEnvironment, fetchUser } from '@/utils';
+import { checkEnvironment, fetchUser, matchedByUserName } from '@/utils';
 
 import AccountChoice from '@/components/AccountChoice';
 import { TextArea } from '@/components/Briefs/TextArea';
@@ -92,6 +92,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const [displayError, setDisplayNameError] = useState(false);
   const [userNameError, setUserNameError] = useState(false);
   const memberSince = moment(freelancer?.created).format('MMMM YYYY');
+  const [prevUserName, setprevUserName] = useState(freelancer.username);
 
   const [skills, setSkills] = useState<string[]>(
     freelancer?.skills?.map(
@@ -113,6 +114,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [copied, setCopied] = useState<string>('');
+  const [userNameExist, setUserNameExist] = useState(false);
 
   const [clients, setClients] = useState<any>(
     initFreelancer?.clients ? initFreelancer.clients : []
@@ -148,7 +150,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const onSave = async () => {
     try {
       if (freelancer) {
-        if (userNameError || displayError) {
+        if (userNameError || displayError || userNameExist) {
           setError({ message: 'Invalid input' });
           return;
         }
@@ -179,6 +181,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         const resp: any = await updateFreelancer(data);
         if (resp.status) {
           setSuccess(true);
+          setprevUserName(data.username);
         } else {
           setError({ message: resp.message });
         }
@@ -200,7 +203,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     setIsEditMode(!isEditMode);
   };
 
-  const handleUpdateState = (e: any) => {
+  const handleUpdateState = async (e: any) => {
     const newFreelancer = {
       ...freelancer,
       [e?.target?.name]: e?.target?.value.trim().length
@@ -215,13 +218,15 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     } else if (e.target.name === 'display_name') {
       setDisplayNameError(false);
     }
-    if (
-      (e.target.name === 'username' &&
-        newFreelancer.username.trim().length < 5) ||
-      newFreelancer.username.trim().length > 30
-    ) {
-      setUserNameError(true);
-    } else if (e.target.name === 'username') setUserNameError(false);
+    if (e.target.name === 'username') {
+      if (e.target.value.length < 5 || e.target.value.length > 30)
+        setUserNameError(true);
+      else setUserNameError(false);
+      const data = await matchedByUserName(e.target.value);
+      if (data && e.target.value !== prevUserName) {
+        setUserNameExist(true);
+      } else setUserNameExist(false);
+    }
     setFreelancer(newFreelancer);
   };
 
@@ -474,6 +479,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                       variant='outlined'
                       color='secondary'
                       defaultValue={freelancer?.display_name}
+                      autoComplete='off'
                     />
                     {displayError && (
                       <p
@@ -512,6 +518,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                         variant='outlined'
                         color='secondary'
                         defaultValue={freelancer?.username}
+                        autoComplete='off'
                       />
                       {userNameError && (
                         <p
@@ -519,6 +526,14 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                     `}
                         >
                           username must contain min 5 max 30 character
+                        </p>
+                      )}
+                      {userNameExist && (
+                        <p
+                          className={`text-xs text-imbue-light-purple-two mt-[-34px]
+                    `}
+                        >
+                          username is already exist try another one
                         </p>
                       )}
                     </>
@@ -539,6 +554,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                         label='Tittle'
                         variant='outlined'
                         defaultValue={freelancer?.title}
+                        autoComplete='off'
                       />
                     ) : (
                       <>
@@ -586,19 +602,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
 
                   {isCurrentFreelancer ? (
                     <>
-                      {isEditMode ? (
-                        <div className='flex gap-6 mb-5'>
-                          <button onClick={() => onSave()} className='message'>
-                            Save Changes <FiEdit />
-                          </button>
-                          <button
-                            onClick={() => cancelEdit()}
-                            className='message !bg-red-600 !border-0'
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      ) : (
+                      {!isEditMode && (
                         <div className='flex gap-6 mb-5'>
                           <button
                             onClick={() => flipEdit()}
@@ -809,6 +813,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                                   >
                                     <TextField
                                       color='secondary'
+                                      autoComplete='off'
                                       value={freelancer && freelancer[key]}
                                       onChange={(e) => {
                                         if (freelancer) {
@@ -1031,6 +1036,25 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
               </>
             )}
           </div>
+          <div className='connect-buttons w-full'>
+            {isCurrentFreelancer && (
+              <>
+                {isEditMode && (
+                  <div className='flex gap-6 mb-5'>
+                    <button onClick={() => onSave()} className='message'>
+                      Save Changes <FiEdit />
+                    </button>
+                    <button
+                      onClick={() => cancelEdit()}
+                      className='message !bg-red-600 !border-0'
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
 
         <div className='lg:w-[50%] mt-[20px] lg:mt-0'>
@@ -1124,6 +1148,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           <StyledEngineProvider injectFirst>
             <div className='flex flex-col'>
               <TextField
+                autoComplete='off'
                 color='secondary'
                 id='outlined-controlled'
                 label='Search'
@@ -1247,7 +1272,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           <button
             onClick={() => {
               flipEdit(), setSuccess(false);
-              window.location.reload();
+              window.location.href = `/freelancers/${freelancer.username}`;
             }}
             className='primary-btn in-dark w-button w-full !m-0'
           >
@@ -1279,8 +1304,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         </div>
       </ErrorScreen>
       <div
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
-          }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${
+          copied ? 'right-5' : '-right-full'
+        }`}
       >
         <Alert severity='success'>{`${copied} Copied to clipboard`}</Alert>
       </div>

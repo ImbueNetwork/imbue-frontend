@@ -205,6 +205,7 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
         </label>
 
         <input
+          autoComplete='off'
           placeholder='Enter your Username'
           onChange={handleChange}
           required
@@ -226,6 +227,7 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
           onError={(err) => console.log(err)}
           type='email'
           name='email'
+          autoComplete='off'
         />
       </div>
 
@@ -267,6 +269,7 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
           className='outlinedInput'
           required
           type='password'
+          autoComplete='off'
         />
       </div>
 

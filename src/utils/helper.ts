@@ -172,12 +172,12 @@ export const validateApplicationInput = (
     };
   }
 
-  if (approvers?.length === 0 && application === 'grant') {
+  if (approvers?.length < 4 && application === 'grant') {
     isValid = false;
     firstErrorIndex = firstErrorIndex === -1 ? 2 : firstErrorIndex;
     newInputs = {
       ...newInputs,
-      approvers: 'Please select atleast one valid grant approver',
+      approvers: 'Please select atleast 4 valid grant approvers',
     };
   }
 

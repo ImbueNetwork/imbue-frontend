@@ -250,6 +250,22 @@ class ChainService {
     })(this.imbueApi)
   }
 
+  public async getCompletedUserProjects(userAddress: string) {
+    const completedProjects = await this.imbueApi.imbue.api.query.imbueProposals.completedProjects(userAddress);
+    return (completedProjects.toHuman() as string[]);
+  }
+
+  public async hasProjectCompleted(userAddress: string, chain_project_id: number) {
+    const completedUserProjects: string[] = await this.getCompletedUserProjects(userAddress);
+    return completedUserProjects.includes(chain_project_id.toString());
+  }
+
+  public async getNoConfidenceVoters(chain_project_id: string | number) {
+    const lookupKey =  [chain_project_id,RoundType.VoteOfNoConfidence,0];
+    const noConfidenceVotes = await this.imbueApi.imbue.api.query.imbueProposals.userHasVoted(lookupKey);
+    const voters = Object.keys(JSON.parse(JSON.stringify(noConfidenceVotes.toJSON())));
+    return voters;
+  }
 
   public async raiseVoteOfNoConfidence(
     account: WalletAccount,

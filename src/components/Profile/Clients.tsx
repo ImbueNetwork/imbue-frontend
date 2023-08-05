@@ -50,8 +50,8 @@ const Clients = ({
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const handleClose = () => setOpen(false);
-  const [error, setError] = useState<any>({})
-  const [inputFile, setInputFile] = useState<any>([])
+  const [error, setError] = useState<any>({});
+  const [inputFile, setInputFile] = useState<any>([]);
   // const [openAddClient] = useState<boolean>(false)
 
   const removeClient = (e: any, logo: string) => {
@@ -66,7 +66,7 @@ const Clients = ({
     // setInputFile(files)
     if (files?.length && files[0]?.type?.includes('image')) {
       setLoading(true);
-      removeImgError()
+      removeImgError();
       try {
         const data = await uploadPhoto(files[0]);
         if (data.url) {
@@ -74,33 +74,39 @@ const Clients = ({
             return { ...prev, logo: data.url };
           });
         } else {
-          setErrorMessage('imgUp')
+          setErrorMessage('imgUp');
         }
       } catch (error) {
-        setErrorMessage('imgUp')
+        setErrorMessage('imgUp');
       } finally {
         setLoading(false);
-        setInputFile([])
+        setInputFile([]);
       }
-    }
-    else {
-      setErrorMessage('imgType')
-      setInputFile([])
+    } else {
+      setErrorMessage('imgType');
+      setInputFile([]);
     }
   };
 
   const allClientsDataIsFilled = (): boolean => {
-    setError({})
-    const urlRegex = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/gi;
+    setError({});
+    const urlRegex =
+      /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/gi;
     const regex = new RegExp(urlRegex);
 
     const usersClients = [newClient];
     const isFilled = usersClients.every((client) => {
-      if (!client.name) setErrorMessage("name")
-      if (!client.logo) setErrorMessage("img")
-      if (!client.website || !client.website.match(regex)) setErrorMessage("website")
+      if (!client.name) setErrorMessage('name');
+      if (!client.logo) setErrorMessage('img');
+      if (!client.website || !client.website.match(regex))
+        setErrorMessage('website');
 
-      return client.name && client.logo && client.website && client.website.match(regex);
+      return (
+        client.name &&
+        client.logo &&
+        client.website &&
+        client.website.match(regex)
+      );
     });
     return isFilled;
   };
@@ -113,36 +119,37 @@ const Clients = ({
   };
 
   const handleSubmit = () => {
-    if (!allClientsDataIsFilled()) return
+    if (!allClientsDataIsFilled()) return;
     const newClients = [...clients, newClient];
     setClients(newClients);
     setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients }));
     setOpen(false);
     setNewClient({});
-    setError({})
+    setError({});
   };
 
   const setErrorMessage = (field: string) => {
-    setError((prev: any) => ({ ...prev, [field]: true }))
-  }
+    setError((prev: any) => ({ ...prev, [field]: true }));
+  };
 
   const removeImgError = () => {
-    setError((prev: any) => ({ ...prev, imgUp: false, imgType: false }))
-  }
+    setError((prev: any) => ({ ...prev, imgUp: false, imgType: false }));
+  };
 
   const navigateToLink = (link: string) => {
-    if (!link) return
+    if (!link) return;
 
     const regEx = /^http/;
-    if (!regEx.test(link)) link = `https://${link}`
-    window.open(link, '_blank')
-  }
+    if (!regEx.test(link)) link = `https://${link}`;
+    window.open(link, '_blank');
+  };
 
   return (
     <>
       <div className='grid grid-cols-2 justify-center md:grid-cols-3 w-full mt-2'>
         {clients?.map((client: any, index: string) => (
-          <div key={index}
+          <div
+            key={index}
             onClick={() => !isEditMode && navigateToLink(client?.website)}
           >
             <Tooltip title={client?.website} placement='top' arrow>
@@ -178,7 +185,7 @@ const Clients = ({
           aria-describedby='modal-modal-description'
         >
           <Box sx={style}>
-            {(newClient?.logo && !loading) ? (
+            {newClient?.logo && !loading ? (
               <label
                 htmlFor='client-logo'
                 className='w-32 h-32 mx-auto overflow-hidden rounded-xl cursor-pointer relative group'
@@ -207,12 +214,14 @@ const Clients = ({
                 )}
               </label>
             )}
-            <p className={`text-center mt-2 mb-3 text-sm text-red-500 ${(error.img || error.imgType) || "invisible"}`}>
-              {
-                error.imgType
-                  ? "A valid logo is required. Please try with a PNG/JPG file"
-                  : "Image failed to upload."
-              }
+            <p
+              className={`text-center mt-2 mb-3 text-sm text-red-500 ${
+                error.img || error.imgType || 'invisible'
+              }`}
+            >
+              {error.imgType
+                ? 'A valid logo is required. Please try with a PNG/JPG file'
+                : 'Image failed to upload.'}
             </p>
 
             <input
@@ -230,8 +239,15 @@ const Clients = ({
               color='secondary'
               name='name'
               className='!mb-0'
+              autoComplete='off'
             />
-            <p className={`text-center mt-2 mb-3 text-sm text-red-500 ${!error.name && "invisible"}`}>Please fill the Client Name field</p>
+            <p
+              className={`text-center mt-2 mb-3 text-sm text-red-500 ${
+                !error.name && 'invisible'
+              }`}
+            >
+              Please fill the Client Name field
+            </p>
 
             <TextField
               onChange={(e) => handleNewClientData(e)}
@@ -241,8 +257,15 @@ const Clients = ({
               color='secondary'
               name='website'
               className='!mb-0'
+              autoComplete='off'
             />
-            <p className={`text-center mt-2 mb-3 text-sm text-red-500 ${!error.website && "invisible"}`}>A valid client website link is required</p>
+            <p
+              className={`text-center mt-2 mb-3 text-sm text-red-500 ${
+                !error.website && 'invisible'
+              }`}
+            >
+              A valid client website link is required
+            </p>
 
             <button
               // disabled={!allClientsDataIsFilled()}

@@ -100,6 +100,7 @@ const TextInput = ({
             <span className='preffix'>{preffixText}</span>
           )}
           <Input
+            autoComplete='off'
             id='component-filled'
             name={name}
             error={error}
