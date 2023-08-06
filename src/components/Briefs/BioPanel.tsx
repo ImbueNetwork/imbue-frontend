@@ -67,7 +67,7 @@ const BioPanel = ({
         </span>
       </div>
 
-      <div className='subsection'>
+      <div className='subsection break-all'>
         <h3 className='text-imbue-purple-dark !font-normal'>
           Project Description
         </h3>

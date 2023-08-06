@@ -8,13 +8,12 @@ import * as models from '@/lib/models';
 import db from '@/db';
 import { OffchainProjectState } from '@/model';
 
-import { authenticate, verifyUserIdFromJwt, } from '../auth/common';
+import { authenticate, verifyUserIdFromJwt } from '../auth/common';
 
 type ProjectPkg = models.Project & {
   milestones: models.Milestone[];
   approvers?: string[];
 };
-
 
 export default nextConnect()
   .use(passport.initialize())
@@ -69,8 +68,11 @@ export default nextConnect()
 
     db.transaction(async (tx) => {
       try {
-        const projectApproverIds = await models.fetchProjectApproverUserIds(projectId)(tx);
+        const projectApproverIds = await models.fetchProjectApproverUserIds(
+          projectId
+        )(tx);
         verifyUserIdFromJwt(req, res, [userAuth.id, ...projectApproverIds]);
+
         const {
           name,
           logo,
@@ -89,7 +91,6 @@ export default nextConnect()
           duration_id,
           status_id,
         } = body;
-
 
         // ensure the project exists first
         const exists = await models.fetchProjectById(projectId)(tx);
@@ -118,7 +119,7 @@ export default nextConnect()
           // project_type: exists.project_type,
           duration_id,
           status_id,
-          completed: status_id == OffchainProjectState.Completed
+          completed: status_id === OffchainProjectState.Completed,
         })(tx);
 
         if (!project.id) {
@@ -148,7 +149,7 @@ export default nextConnect()
 
         return res.status(200).send(pkg);
       } catch (cause) {
-        return res.status(401).json({ error: cause });
+        return res.status(501).json({ error: cause });
       }
     });
   });

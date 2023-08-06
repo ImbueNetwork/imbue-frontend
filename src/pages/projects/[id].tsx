@@ -379,20 +379,21 @@ function Project() {
   const withdraw = async (account: WalletAccount) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
+    const mileStone = onChainProject.milestones;
     // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
     const result = await chainService.withdraw(account, onChainProject);
 
-    console.log(onChainProject);
-
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
-          const haveAllMilestonesBeenApproved = onChainProject.milestones
+          const haveAllMilestonesBeenApproved = mileStone
             .map((m: any) => m.is_approved)
             .every(Boolean);
+
           if (haveAllMilestonesBeenApproved) {
             project.status_id = OffchainProjectState.Completed;
+
             await updateProject(project?.id, project);
           }
 
