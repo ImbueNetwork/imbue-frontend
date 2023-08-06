@@ -22,10 +22,10 @@ export const BriefFilter = React.memo(
   }: BriefFilterProps): JSX.Element => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const { checked, id } = e.target;
-      const newIds = checked
-        ? [...ids, id]
-        : ids.filter((existingId) => existingId !== id);
-
+      const newIds = (checked && !ids.includes(id))
+      ? [...ids, id]
+      : ids.filter((existingId) => existingId !== id);
+      
       setId && setId(newIds);
     };
 
