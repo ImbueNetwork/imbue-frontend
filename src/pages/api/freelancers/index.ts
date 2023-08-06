@@ -3,11 +3,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
 import {
+  countAllFreelancers,
   fetchAllFreelancers,
   fetchFreelancerClients,
   fetchFreelancerMetadata,
   insertFreelancerDetails,
-  paginatedData,
   upsertItems,
 } from '@/lib/models';
 
@@ -19,35 +19,40 @@ export default nextConnect()
     const { query: data } = req;
     db.transaction(async (tx) => {
       try {
-        await fetchAllFreelancers()(tx).then(async (freelancers: any) => {
-          const { currentData } = await paginatedData(
-            Number(data?.page || 1),
-            Number(data?.items_per_page || 5),
-            freelancers
-          );
-          await Promise.all([
-            ...currentData.map(async (freelancer: any) => {
-              freelancer.skills = await fetchFreelancerMetadata(
-                'skill',
-                freelancer.id
-              )(tx);
-              freelancer.services = await fetchFreelancerMetadata(
-                'service',
-                freelancer.id
-              )(tx);
-              freelancer.languages = await fetchFreelancerMetadata(
-                'language',
-                freelancer.id
-              )(tx);
-              freelancer.clients = await fetchFreelancerClients(freelancer.id)(
-                tx
-              );
-            }),
-          ]);
-          res
-            .status(200)
-            .json({ currentData, totalFreelancers: freelancers.length });
-        });
+        const offset =
+          (Number(data?.page) - 1) * Number(data?.items_per_page) || 0;
+
+        await fetchAllFreelancers()(tx)
+          .offset(offset)
+          .limit(Number(data?.items_per_page) || 100)
+          .then(async (freelancers: any) => {
+            
+            const freelancerCount: any = await countAllFreelancers()(tx);
+
+            await Promise.all([
+              ...freelancers.map(async (freelancer: any) => {
+                freelancer.skills = await fetchFreelancerMetadata(
+                  'skill',
+                  freelancer.id
+                )(tx);
+                freelancer.services = await fetchFreelancerMetadata(
+                  'service',
+                  freelancer.id
+                )(tx);
+                freelancer.languages = await fetchFreelancerMetadata(
+                  'language',
+                  freelancer.id
+                )(tx);
+                freelancer.clients = await fetchFreelancerClients(
+                  freelancer.id
+                )(tx);
+              }),
+            ]);
+            res.status(200).json({
+              currentData: freelancers,
+              totalFreelancers: freelancerCount[0].count,
+            });
+          });
       } catch (e) {
         new Error(`Failed to fetch all freelancers`, { cause: e as Error });
       }

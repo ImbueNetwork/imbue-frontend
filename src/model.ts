@@ -190,6 +190,7 @@ export type Freelancer = {
 export type FreelancerResponse = {
   currentData: Array<Freelancer>;
   totalFreelancers: number;
+  message?: string;
 };
 
 export function getDefaultFreelancer(): Freelancer {
@@ -263,7 +264,7 @@ export type FreelancerSqlFilter = {
   skills_range: Array<number>;
   services_range: Array<number>;
   languages_range: Array<number>;
-  search_input: string | string[];
+  name: string | string[];
   items_per_page?: number;
   page?: number;
   verified?: boolean;
