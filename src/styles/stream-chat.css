@@ -13,6 +13,10 @@
   height: 75vh;
 }
 
+.str-chat__edit-message-form-options{
+  gap: 12px;
+}
+
 /* left side */
 .chat-list-container {
   width: 30%;

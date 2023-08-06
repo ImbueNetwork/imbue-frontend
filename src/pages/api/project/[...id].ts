@@ -149,7 +149,7 @@ export default nextConnect()
 
         return res.status(200).send(pkg);
       } catch (cause) {
-        return res.status(501).json({ error: cause });
+        return res.status(500).json({ error: cause });
       }
     });
   });
