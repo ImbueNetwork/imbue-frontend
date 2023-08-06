@@ -6,6 +6,7 @@ import {
   Freelancer,
   FreelancerResponse,
   FreelancerSqlFilter,
+  Item,
   Project,
 } from '@/model';
 
@@ -132,6 +133,24 @@ export const getFreelancerApplications = async (userId: number) => {
 
   if (resp.ok) {
     return (await resp.json()) as Array<Project>;
+  } else {
+    throw new Error(
+      'Failed to get all freelancer applications. status:' + resp.status
+    );
+  }
+};
+
+export const getFreelancerFilters = async () => {
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}freelancers/filters`),
+    {
+      headers: config.postAPIHeaders,
+      method: 'get',
+    }
+  );
+
+  if (resp.ok) {
+    return (await resp.json()) as { skills: Item[]; services: Item[] };
   } else {
     throw new Error(
       'Failed to get all freelancer applications. status:' + resp.status

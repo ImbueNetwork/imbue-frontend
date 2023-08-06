@@ -1087,6 +1087,8 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
     // 'freelancer_languages.language_id': 'languages.id',
     // })
     .innerJoin('users', { 'freelancers.user_id': 'users.id' })
+    .leftJoin("freelancer_skills", { 'freelancers.id': 'freelancer_skills.freelancer_id' })
+    .leftJoin("freelancer_services", { 'freelancers.id': 'freelancer_services.freelancer_id' })
     // .leftJoin('freelancer_ratings', {
     // 'freelancers.id': 'freelancer_ratings.freelancer_id',
     // })
@@ -1428,16 +1430,16 @@ export const searchFreelancers = async (
   filter: FreelancerSqlFilter
 ) =>
   fetchAllFreelancers()(tx)
-    // .where(function () {
-    //   if (filter.skills_range.length > 0) {
-    //     this.whereIn('freelancer_skills.skill_id', filter.skills_range);
-    //   }
-    // })
-    // .where(function () {
-    //   if (filter.services_range.length > 0) {
-    //     this.whereIn('freelancer_services.service_id', filter.services_range);
-    //   }
-    // })
+    .where(function () {
+      if (filter?.skills_range.length > 0) {
+        this.whereIn('freelancer_skills.skill_id', filter.skills_range);
+      }
+    })
+    .where(function () {
+      if (filter.services_range.length > 0) {
+        this.whereIn('freelancer_services.service_id', filter.services_range);
+      }
+    })
     // .where(function () {
     //   if (filter.languages_range.length > 0) {
     //     this.whereIn(
@@ -1484,7 +1486,14 @@ export const searchFreelancersCount = async (
     //   }
     // })
     .where('display_name', 'ilike', `${filter.name}%`)
-    .then((freelancers) => freelancers.length)
+    .then((freelancers) => freelancers?.length || 0);
+
+export const getFreelancerFilterItems =
+  (item: string) => async (tx: Knex.Transaction) =>
+    tx(`freelancer_${item}s`)
+      .distinct(`${item}_id as id`)
+      .join(`${item}s`, `freelancer_${item}s.${item}_id`, '=', `${item}s.id`)
+      .select(`${item}s.name`);
 
 export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
   const {

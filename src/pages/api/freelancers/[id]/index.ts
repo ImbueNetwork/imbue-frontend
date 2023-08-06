@@ -139,8 +139,6 @@ export default nextConnect()
     const freelancer: models.Freelancer | any = req.body.freelancer;
     const loggedInUser = req.body.freelancer.logged_in_user;
 
-    console.log(freelancer);
-
     if (!loggedInUser) {
       return res.status(401).send({
         status: 'Failed',

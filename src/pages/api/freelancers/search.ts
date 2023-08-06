@@ -12,37 +12,9 @@ import {
 
 import db from '@/db';
 
-import { verifyUserIdFromJwt } from '../auth/common';
-
-const authenticate = (
-  method: string,
-  req: NextApiRequest,
-  res: NextApiResponse
-) =>
-  new Promise((resolve, reject) => {
-    passport.authenticate(
-      method,
-      { session: false },
-      (error: Error, token: any) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(token);
-        }
-      }
-    )(req, res);
-  });
-
 export default nextConnect()
   .use(passport.initialize())
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
-    const userAuth: Partial<models.User> | any = await authenticate(
-      'jwt',
-      req,
-      res
-    );
-    await verifyUserIdFromJwt(req, res, [userAuth.id]);
-
     db.transaction(async (tx) => {
       try {
         const filter: models.FreelancerSqlFilter = req.body;
@@ -83,7 +55,7 @@ export default nextConnect()
         });
       } catch (e) {
         res.status(401).send({ currentData: null, totalFreelancers: null });
-        new Error(`Failed to search all freelancers`, { cause: e as Error });
+        throw new Error(`Failed to search all freelancers`, { cause: e as Error });
       }
     });
   });

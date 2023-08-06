@@ -28,7 +28,7 @@ export default nextConnect()
           .then(async (freelancers: any) => {
             
             const freelancerCount: any = await countAllFreelancers()(tx);
-
+            //TODO Get all freelancers skills, and properties
             await Promise.all([
               ...freelancers.map(async (freelancer: any) => {
                 freelancer.skills = await fetchFreelancerMetadata(

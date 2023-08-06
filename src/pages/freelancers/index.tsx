@@ -28,6 +28,7 @@ import {
 import {
   callSearchFreelancers,
   getAllFreelancers,
+  getFreelancerFilters,
 } from '../../redux/services/freelancerService';
 import { FreelancerFilterOption } from '../../types/freelancerTypes';
 
@@ -43,8 +44,8 @@ const Freelancers = (): JSX.Element => {
   const [freelancers_total, setFreelancersTotal] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [skills, setSkills] = useState<Item[]>();
-  const [services, setServices] = useState<Item[]>();
-  const [languages, setLanguages] = useState<Item[]>();
+  const [services, setServices] = useState<Item[]>([{ id: 0, name: "" }]);
+  const [languages] = useState<Item[]>();
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [itemsPerPage, setItemsPerPage] = useState<number>(12);
@@ -67,17 +68,17 @@ const Freelancers = (): JSX.Element => {
     router.push(`/freelancers/${username}/`);
   };
 
-  const dedupeArray = async (input: any[]) => {
-    if (input[0]) {
-      return input
-        .filter((thing: any, i: any, arr: any) => {
-          return arr.indexOf(arr.find((t: any) => t?.id === thing?.id)) === i;
-        })
-        .sort(function (a: any, b: any) {
-          return a.name.localeCompare(b.name);
-        });
-    }
-  };
+  // const dedupeArray = async (input: any[]) => {
+  //   if (input[0]) {
+  //     return input
+  //       .filter((thing: any, i: any, arr: any) => {
+  //         return arr.indexOf(arr.find((t: any) => t?.id === thing?.id)) === i;
+  //       })
+  //       .sort(function (a: any, b: any) {
+  //         return a.name.localeCompare(b.name);
+  //       });
+  //   }
+  // };
 
   useEffect(() => {
     const setFilters = async () => {
@@ -87,30 +88,30 @@ const Freelancers = (): JSX.Element => {
           itemsPerPage,
           currentPage
         );
-        const combinedSkills = Array.prototype.concat.apply(
-          [],
-          data?.currentData?.map((x: any) => x.skills)
-        ) as Item[];
+        // const combinedSkills = Array.prototype.concat.apply(
+        //   [],
+        //   data?.currentData?.map((x: any) => x.skills)
+        // ) as Item[];
 
-        const dedupedSkills =
-          combinedSkills.length > 0 ? await dedupeArray(combinedSkills) : [];
-        const combinedServices = Array.prototype.concat.apply(
-          [],
-          data?.currentData?.map((x: any) => x.services)
-        ) as Item[];
-        const dedupedServices = combinedServices
-          ? await dedupeArray(combinedServices)
-          : [];
-        const combinedLanguages = Array.prototype.concat.apply(
-          [],
-          data?.currentData?.map((x: any) => x.languages)
-        ) as Item[];
-        const dedupedLanguages = combinedLanguages
-          ? await dedupeArray(combinedLanguages)
-          : [];
-        setSkills(dedupedSkills);
-        setServices(dedupedServices);
-        setLanguages(dedupedLanguages);
+        // const dedupedSkills =
+        //   combinedSkills.length > 0 ? await dedupeArray(combinedSkills) : [];
+        // const combinedServices = Array.prototype.concat.apply(
+        //   [],
+        //   data?.currentData?.map((x: any) => x.services)
+        // ) as Item[];
+        // const dedupedServices = combinedServices
+        //   ? await dedupeArray(combinedServices)
+        //   : [];
+        // const combinedLanguages = Array.prototype.concat.apply(
+        //   [],
+        //   data?.currentData?.map((x: any) => x.languages)
+        // ) as Item[];
+        // const dedupedLanguages = combinedLanguages
+        //   ? await dedupeArray(combinedLanguages)
+        //   : [];
+        // setSkills(dedupedSkills);
+        // setServices(dedupedServices);
+        // setLanguages(dedupedLanguages);
         setFreelancers(data?.currentData);
         setFreelancersTotal(data?.totalFreelancers);
       } catch (error) {
@@ -121,8 +122,19 @@ const Freelancers = (): JSX.Element => {
       }
     };
 
-    !Object.keys(router?.query).length && setFilters();
-  }, [currentPage, itemsPerPage]);
+    !Object.keys(router?.query).length && router.isReady && setFilters();
+  }, [currentPage, itemsPerPage, router.isReady]);
+
+  useEffect(() => {
+    const getAllFilters = async () => {
+      const filteredItems = await getFreelancerFilters()
+      console.log("🚀 ~ file: index.tsx:131 ~ getAllFilters ~ filteredItems:", filteredItems)
+      setSkills(filteredItems.skills);
+      setServices(filteredItems.services);
+    }
+
+    getAllFilters()
+  }, [])
 
   const skillsFilter = {
     filterType: FreelancerFilterOption.Skills,
@@ -202,20 +214,22 @@ const Freelancers = (): JSX.Element => {
         if (skillsRangeProps) {
           const range = strToIntRange(skillsRangeProps);
           range?.forEach?.((v: any) => {
-            setSlectedFilterIds([...selectedFilterIds, `0-${v}`]);
+            if (!selectedFilterIds.includes(`0-${v}`))
+              setSlectedFilterIds([...selectedFilterIds, `0-${v}`]);
           });
-          filter = { ...filter, skills_range: strToIntRange(skillsRangeProps) };
+          filter = { ...filter, skills_range: range };
         }
 
         if (servicesRangeProps) {
           const range = strToIntRange(servicesRangeProps);
 
           range?.forEach?.((v: any) => {
-            setSlectedFilterIds([...selectedFilterIds, `1-${v}`]);
+            if (!selectedFilterIds.includes(`1-${v}`))
+              setSlectedFilterIds([...selectedFilterIds, `1-${v}`]);
           });
           filter = {
             ...filter,
-            services_range: strToIntRange(servicesRangeProps),
+            services_range: range,
           };
         }
 
@@ -238,18 +252,18 @@ const Freelancers = (): JSX.Element => {
             setSlectedFilterIds([...selectedFilterIds, '3-0']); // FIXME:
           }
         }
-
         const { currentData, totalFreelancers } = await callSearchFreelancers(
           filter
-        );
+          );
         setFreelancers(currentData);
         setFreelancersTotal(totalFreelancers);
+        setLoading(false)
       }
     };
 
     router.isReady && fetchAndSetFreelancers();
   }, [
-    router,
+    router.isReady,
     skills,
     services,
     languages,
@@ -261,6 +275,7 @@ const Freelancers = (): JSX.Element => {
     currentPage,
     itemsPerPage
   ]);
+
 
   const onSearch = async () => {
     // The filter initially should return all values
