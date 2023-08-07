@@ -28,6 +28,7 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
   const redirectToDiscoverBriefs = () => {
     router.push(`/briefs`);
   };
+
   if (projects?.length === 0)
     return (
       <div className='w-full flex justify-center py-6'>
