@@ -1087,8 +1087,8 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
     // 'freelancer_languages.language_id': 'languages.id',
     // })
     .innerJoin('users', { 'freelancers.user_id': 'users.id' })
-    .leftJoin("freelancer_skills", { 'freelancers.id': 'freelancer_skills.freelancer_id' })
-    .leftJoin("freelancer_services", { 'freelancers.id': 'freelancer_services.freelancer_id' })
+    // .leftJoin("freelancer_skills", { 'freelancers.id': 'freelancer_skills.freelancer_id' })s
+    // .leftJoin("freelancer_services", { 'freelancers.id': 'freelancer_services.freelancer_id' })
     // .leftJoin('freelancer_ratings', {
     // 'freelancers.id': 'freelancer_ratings.freelancer_id',
     // })
@@ -1425,75 +1425,107 @@ export const paginatedData = (
   };
 };
 
-export const searchFreelancers = async (
-  tx: Knex.Transaction,
-  filter: FreelancerSqlFilter
-) =>
-  fetchAllFreelancers()(tx)
-    .where(function () {
-      if (filter?.skills_range.length > 0) {
-        this.whereIn('freelancer_skills.skill_id', filter.skills_range);
-      }
-    })
-    .where(function () {
-      if (filter.services_range.length > 0) {
-        this.whereIn('freelancer_services.service_id', filter.services_range);
-      }
-    })
-    // .where(function () {
-    //   if (filter.languages_range.length > 0) {
-    //     this.whereIn(
-    //       'freelancer_languages.language_id',
-    //       filter.languages_range
-    //     );
-    //   }
-    // })
-    // .where(function () {
-    //   if (filter.verified) {
-    //     this.where('verified', true);
-    //   }
-    // })
-    .where('display_name', 'ilike', `${filter.name}%`)
-    .offset(Number(filter.page - 1) * Number(filter.items_per_page) || 0)
-    .limit(Number(filter.items_per_page) || 5);
+export const searchFreelancers =
+  (filter: FreelancerSqlFilter) => (tx: Knex.Transaction) =>
+    tx
+      .select(
+        'freelancers.id',
+        'freelanced_before',
+        'freelancing_goal',
+        'work_type',
+        'education',
+        'experience',
+        'facebook_link',
+        'twitter_link',
+        'telegram_link',
+        'discord_link',
+        'title',
+        'bio',
+        'freelancers.user_id',
+        'username',
+        'users.profile_photo as profile_image',
+        'display_name',
+        'web3_accounts.address as web3_address',
+        'freelancers.created',
+        'verified',
+        'users.country',
+        'users.region'
+      )
+      .from<Freelancer>('freelancers')
+      .innerJoin('users', { 'freelancers.user_id': 'users.id' })
+      .leftJoin('freelancer_skills', {
+        'freelancers.id': 'freelancer_skills.freelancer_id',
+      })
+      .leftJoin('freelancer_services', {
+        'freelancers.id': 'freelancer_services.freelancer_id',
+      })
+      .leftJoin('freelancer_languages', {
+        'freelancers.id': 'freelancer_languages.freelancer_id',
+      })
+      .leftJoin('web3_accounts', {
+        'freelancers.user_id': 'web3_accounts.user_id',
+      })
+      .where(function () {
+        if (filter?.skills_range?.length > 0) {
+          this.whereIn('freelancer_skills.skill_id', filter.skills_range);
+        }
+      })
+      .where(function () {
+        if (filter.services_range?.length > 0) {
+          this.whereIn('freelancer_services.service_id', filter.services_range);
+        }
+      })
+      .where(function () {
+        if (filter.languages_range?.length > 0) {
+          this.whereIn(
+            'freelancer_languages.language_id',
+            filter.languages_range
+          );
+        }
+      })
+      .where(function () {
+        if (filter?.verified) {
+          this.where('verified', true);
+        }
+      })
+      .where(function () {
+        if (filter?.name) {
+          this.where('display_name', 'ilike', `${filter.name}%`);
+        }
+      })
+      .distinct('freelancers.id')
+      // .groupBy(
+      //   'freelancers.id',
+      //   'users.username',
+      //   'users.profile_photo',
+      //   'users.display_name',
+      //   'web3_accounts.address',
+      //   'users.country',
+      //   'users.region'
+      // )
+      .offset(Number(filter.page - 1) * Number(filter.items_per_page) || 0)
+      .limit(Number(filter.items_per_page) || 5);
 
 export const searchFreelancersCount = async (
   tx: Knex.Transaction,
   filter: FreelancerSqlFilter
 ) =>
-  fetchAllFreelancers()(tx)
-    // .where(function () {
-    //   if (filter.skills_range.length > 0) {
-    //     this.whereIn('freelancer_skills.skill_id', filter.skills_range);
-    //   }
-    // })
-    // .where(function () {
-    //   if (filter.services_range.length > 0) {
-    //     this.whereIn('freelancer_services.service_id', filter.services_range);
-    //   }
-    // })
-    // .where(function () {
-    //   if (filter.languages_range.length > 0) {
-    //     this.whereIn(
-    //       'freelancer_languages.language_id',
-    //       filter.languages_range
-    //     );
-    //   }
-    // })
-    // .where(function () {
-    //   if (filter.verified) {
-    //     this.where('verified', true);
-    //   }
-    // })
-    .where('display_name', 'ilike', `${filter.name}%`)
-    .then((freelancers) => freelancers?.length || 0);
+  searchFreelancers(filter)(tx)
+  .then((freelancers) => freelancers?.length || 0);
+
+export const getFreelancerBySkills =
+  (skills: Array<number>) => async (tx: Knex.Transaction) =>
+    tx(`freelancer_skills`)
+      .select(`freelancer_id as id`)
+      .whereIn('skill_id', skills);
 
 export const getFreelancerFilterItems =
   (item: string) => async (tx: Knex.Transaction) =>
     tx(`freelancer_${item}s`)
       .distinct(`${item}_id as id`)
       .join(`${item}s`, `freelancer_${item}s.${item}_id`, '=', `${item}s.id`)
-      .select(`${item}s.name`);
+      .select(`${item}s.name`)
+      .orderBy('name');
 
 export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
   const {

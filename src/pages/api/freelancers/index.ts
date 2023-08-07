@@ -26,8 +26,8 @@ export default nextConnect()
           .offset(offset)
           .limit(Number(data?.items_per_page) || 100)
           .then(async (freelancers: any) => {
-            
             const freelancerCount: any = await countAllFreelancers()(tx);
+
             //TODO Get all freelancers skills, and properties
             await Promise.all([
               ...freelancers.map(async (freelancer: any) => {
@@ -48,13 +48,16 @@ export default nextConnect()
                 )(tx);
               }),
             ]);
+
             res.status(200).json({
               currentData: freelancers,
               totalFreelancers: freelancerCount[0].count,
             });
           });
       } catch (e) {
-        new Error(`Failed to fetch all freelancers`, { cause: e as Error });
+        throw new Error(`Failed to fetch all freelancers`, {
+          cause: e as Error,
+        });
       }
     });
   })

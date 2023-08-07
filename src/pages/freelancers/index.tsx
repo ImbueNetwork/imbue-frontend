@@ -45,7 +45,7 @@ const Freelancers = (): JSX.Element => {
   const [currentPage, setCurrentPage] = useState(1);
   const [skills, setSkills] = useState<Item[]>();
   const [services, setServices] = useState<Item[]>([{ id: 0, name: "" }]);
-  const [languages] = useState<Item[]>();
+  const [languages, setLanguages] = useState<Item[]>();
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [itemsPerPage, setItemsPerPage] = useState<number>(12);
@@ -128,9 +128,9 @@ const Freelancers = (): JSX.Element => {
   useEffect(() => {
     const getAllFilters = async () => {
       const filteredItems = await getFreelancerFilters()
-      console.log("🚀 ~ file: index.tsx:131 ~ getAllFilters ~ filteredItems:", filteredItems)
       setSkills(filteredItems.skills);
       setServices(filteredItems.services);
+      setLanguages(filteredItems.languages);
     }
 
     getAllFilters()
@@ -240,7 +240,7 @@ const Freelancers = (): JSX.Element => {
           });
           filter = {
             ...filter,
-            services_range: strToIntRange(languagesRangeProps),
+            languages_range: strToIntRange(languagesRangeProps),
           };
         }
 

@@ -13,10 +13,12 @@ export default nextConnect()
       try {
         const skills = await models.getFreelancerFilterItems('skill')(tx);
         const services = await models.getFreelancerFilterItems('service')(tx);
-        
+        const languages = await models.getFreelancerFilterItems('language')(tx);
+
         res.status(200).json({
           skills,
           services,
+          languages,
         });
       } catch (e) {
         res.status(401).send({ currentData: null, totalFreelancers: null });
