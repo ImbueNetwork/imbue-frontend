@@ -1503,15 +1503,19 @@ export const searchFreelancers =
       //   'users.country',
       //   'users.region'
       // )
-      .offset(Number(filter.page - 1) * Number(filter.items_per_page) || 0)
-      .limit(Number(filter.items_per_page) || 5);
+      .where(function () {
+        if (filter.items_per_page > 0) {
+          this.offset(
+            Number(filter.page - 1) * Number(filter.items_per_page) || 0
+          ).limit(Number(filter.items_per_page) || 5);
+        }
+      });
 
 export const searchFreelancersCount = async (
   tx: Knex.Transaction,
   filter: FreelancerSqlFilter
 ) =>
-  searchFreelancers(filter)(tx)
-  .then((freelancers) => freelancers?.length || 0);
+  searchFreelancers(filter)(tx).then((freelancers) => freelancers?.length || 0);
 
 export const getFreelancerBySkills =
   (skills: Array<number>) => async (tx: Knex.Transaction) =>

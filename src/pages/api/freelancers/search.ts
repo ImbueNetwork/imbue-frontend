@@ -19,11 +19,14 @@ export default nextConnect()
         const filter: models.FreelancerSqlFilter = req.body;
         const freelancers = await searchFreelancers(filter)(tx);
         // const { currentData } = await models.paginatedData(
-          //   filter?.page || 1,
-          //   filter?.items_per_page || 5,
-          //   freelancers
-          // );
-          const freelancerCount = await models.searchFreelancersCount(tx, filter);
+        //   filter?.page || 1,
+        //   filter?.items_per_page || 5,
+        //   freelancers
+        // );
+        const freelancerCount = await models.searchFreelancersCount(tx, {
+          ...filter,
+          items_per_page: 0,
+        });
 
         await Promise.all([
           ...freelancers.map(async (freelancer: any) => {
