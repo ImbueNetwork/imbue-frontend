@@ -34,7 +34,7 @@ export enum ImbueChainEvent {
   SubmitInitialGrant = "ProjectCreated",
 }
 
-const WAIT_FOR_EVENT_IN_MS = 60_000; // WAIT FOR 1 MIN
+const WAIT_FOR_EVENT_IN_MS = 12_000; // WAIT FOR 1 MIN
 class ChainService {
   imbueApi: ImbueApiInfo;
   user: User;

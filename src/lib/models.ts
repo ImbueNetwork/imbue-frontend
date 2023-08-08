@@ -1494,15 +1494,6 @@ export const searchFreelancers =
         }
       })
       .distinct('freelancers.id')
-      // .groupBy(
-      //   'freelancers.id',
-      //   'users.username',
-      //   'users.profile_photo',
-      //   'users.display_name',
-      //   'web3_accounts.address',
-      //   'users.country',
-      //   'users.region'
-      // )
       .where(function () {
         if (filter.items_per_page > 0) {
           this.offset(

@@ -107,10 +107,12 @@ function Project() {
   const [loading, setLoading] = useState<boolean>(true);
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const projectId: any = router?.query?.id || 0;
-  const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
+  const [firstPendingMilestone, setFirstPendingMilestone] = useState<number>();
   const [isApplicant, setIsApplicant] = useState<boolean>(false);
   const [isProjectOwner, setIsProjectOwner] = useState<boolean>(false);
   const [showRefundButton, setShowRefundButton] = useState<boolean>();
+  const [projectInMilestoneVoting, setProjectInMilestoneVoting] = useState<boolean>();
+  const [projectInVotingOfNoConfidence, setProjectInVotingOfNoConfidence] = useState<boolean>();
 
   const [wait, setWait] = useState<boolean>(false);
   const [waitMessage, setWaitMessage] = useState<string>('');
@@ -151,18 +153,18 @@ function Project() {
         setShowRefundButton(onChainProjectRes.fundingType.Grant);
       }
 
-      if (onChainProjectRes.projectState == OnchainProjectState.OpenForVoting) {
-        const firstPendingMilestone =
-          await chainService.findFirstPendingMilestone(
-            onChainProjectRes.milestones
-          );
-        setMilestoneBeingVotedOn(firstPendingMilestone);
-      }
+      const firstPendingMilestone =
+        await chainService.findFirstPendingMilestone(
+          onChainProjectRes.milestones
+        );
+      setFirstPendingMilestone(firstPendingMilestone);
+      setProjectInMilestoneVoting(onChainProjectRes.projectState == OnchainProjectState.OpenForVoting);
+      setProjectInVotingOfNoConfidence(onChainProjectRes.projectState == OnchainProjectState.OpenForVotingOfNoConfidence);
 
       if (
         user.web3_address &&
         onChainProjectRes.projectState ==
-          OnchainProjectState.OpenForVotingOfNoConfidence
+        OnchainProjectState.OpenForVotingOfNoConfidence
       ) {
         const voters = await chainService.getNoConfidenceVoters(
           onChainProjectRes.id!
@@ -415,10 +417,7 @@ function Project() {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
-    if (
-      onChainProject.projectState ==
-      OnchainProjectState.OpenForVotingOfNoConfidence
-    ) {
+    if (projectInVotingOfNoConfidence) {
       const result = await chainService.voteOnNoConfidence(
         account,
         onChainProject,
@@ -572,9 +571,9 @@ function Project() {
           <div className='flex flex-row items-center max-width-750px:w-full max-width-750px:justify-between'>
             {milestone?.is_approved
               ? projectStateTag(modified, 'Completed')
-              : milestone?.milestone_key == milestoneBeingVotedOn
-              ? openForVotingTag()
-              : projectStateTag(modified, 'Not Started')}
+              : milestone?.milestone_key == firstPendingMilestone && projectInMilestoneVoting
+                ? openForVotingTag()
+                : projectStateTag(modified, 'Not Started')}
 
             <Image
               src={require(expanded
@@ -605,7 +604,7 @@ function Project() {
             {milestone?.description}
           </p>
 
-          {!isApplicant && milestone.milestone_key == milestoneBeingVotedOn && (
+          {!isApplicant && milestone.milestone_key == firstPendingMilestone && projectInMilestoneVoting && (
             <Tooltip
               followCursor
               title={
@@ -613,9 +612,8 @@ function Project() {
               }
             >
               <button
-                className={`primary-btn in-dark w-button ${
-                  !canVote && '!bg-gray-300 !text-gray-400'
-                } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
+                className={`primary-btn in-dark w-button ${!canVote && '!bg-gray-300 !text-gray-400'
+                  } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
                 data-testid='next-button'
                 onClick={() => canVote && vote()}
               >
@@ -624,10 +622,10 @@ function Project() {
             </Tooltip>
           )}
 
-          {(isApplicant || (projectType === 'grant' && isProjectOwner)) &&
-            onChainProject?.projectState !==
-              OnchainProjectState.OpenForVoting &&
-            !milestone?.is_approved && (
+          {(isApplicant || (projectType === 'grant' && isProjectOwner))
+            && milestone.milestone_key == firstPendingMilestone
+            && !projectInMilestoneVoting
+            && !milestone?.is_approved && (
               <Tooltip
                 followCursor
                 title={
@@ -636,10 +634,9 @@ function Project() {
                 }
               >
                 <button
-                  className={`primary-btn in-dark w-button mt-3 ${
-                    !balance &&
+                  className={`primary-btn in-dark w-button mt-3 ${!balance &&
                     '!bg-gray-300 !text-gray-400 !cursor-not-allowed'
-                  }`}
+                    }`}
                   data-testid='next-button'
                   onClick={() => balance && submitMilestone()}
                 >
@@ -650,9 +647,8 @@ function Project() {
 
           {isApplicant && milestone.is_approved && (
             <button
-              className={`primary-btn in-dark w-button ${
-                !balance && '!bg-gray-300 !text-gray-400'
-              } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
+              className={`primary-btn in-dark w-button ${!balance && '!bg-gray-300 !text-gray-400'
+                } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
               data-testid='next-button'
               onClick={() => withdraw()}
               disabled={!balance}
@@ -829,10 +825,9 @@ function Project() {
                   className='cursor-pointer'
                 >
                   <button
-                    className={`border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors ${
-                      approverVotedOnRefund &&
+                    className={`border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors ${approverVotedOnRefund &&
                       '!bg-gray-300 !text-gray-400 !cursor-not-allowed'
-                    }`}
+                      }`}
                     onClick={async () => {
                       if (!approverVotedOnRefund) {
                         // set submitting mile stone to true
@@ -846,9 +841,8 @@ function Project() {
                   </button>
                 </Tooltip>
 
-                {onChainProject &&
-                  onChainProject.projectState ==
-                    OnchainProjectState.OpenForVotingOfNoConfidence && (
+                {onChainProject
+                && projectInVotingOfNoConfidence && (
                     <button
                       disabled={true}
                       className={
@@ -872,9 +866,8 @@ function Project() {
                   {approversPreview?.map((approver: any, index: number) => (
                     <div
                       key={index}
-                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${
-                        approver?.display_name && 'cursor-pointer'
-                      }`}
+                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${approver?.display_name && 'cursor-pointer'
+                        }`}
                       onClick={() =>
                         approver.display_name &&
                         router.push(`/profile/${approver.username}`)
@@ -928,13 +921,12 @@ function Project() {
                 <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
                   <div
                     style={{
-                      width: `${
-                        (onChainProject?.milestones?.filter?.(
-                          (m: any) => m?.is_approved
-                        )?.length /
-                          onChainProject?.milestones?.length) *
+                      width: `${(onChainProject?.milestones?.filter?.(
+                        (m: any) => m?.is_approved
+                      )?.length /
+                        onChainProject?.milestones?.length) *
                         100
-                      }%`,
+                        }%`,
                     }}
                     className='h-full rounded-xl Accepted-button absolute'
                   ></div>
@@ -942,9 +934,8 @@ function Project() {
                     {onChainProject?.milestones?.map((m: any, i: number) => (
                       <div
                         key={i}
-                        className={`h-4 w-4 ${
-                          m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
-                        } rounded-full -mt-1.5`}
+                        className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
+                          } rounded-full -mt-1.5`}
                       ></div>
                     ))}
                   </div>
