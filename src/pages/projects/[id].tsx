@@ -33,7 +33,6 @@ import {
   Currency,
   Milestone,
   OffchainProjectState,
-  OnchainProjectState,
   Project,
   ProjectOnChain,
 } from '@/model';
@@ -158,13 +157,12 @@ function Project() {
           onChainProjectRes.milestones
         );
       setFirstPendingMilestone(firstPendingMilestone);
-      setProjectInMilestoneVoting(onChainProjectRes.projectState == OnchainProjectState.OpenForVoting);
-      setProjectInVotingOfNoConfidence(onChainProjectRes.projectState == OnchainProjectState.OpenForVotingOfNoConfidence);
+      setProjectInMilestoneVoting(onChainProjectRes.projectInMilestoneVoting);
+      setProjectInVotingOfNoConfidence(onChainProjectRes.projectInVotingOfNoConfidence);
 
       if (
         user.web3_address &&
-        onChainProjectRes.projectState ==
-        OnchainProjectState.OpenForVotingOfNoConfidence
+        onChainProjectRes.projectInVotingOfNoConfidence
       ) {
         const voters = await chainService.getNoConfidenceVoters(
           onChainProjectRes.id!

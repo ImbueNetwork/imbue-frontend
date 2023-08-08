@@ -108,6 +108,8 @@ export type ProjectOnChain = {
   cancelled: boolean;
   projectState: OnchainProjectState;
   fundingType: any;
+  projectInMilestoneVoting: boolean;
+  projectInVotingOfNoConfidence: boolean;
 };
 
 export type Milestone = {

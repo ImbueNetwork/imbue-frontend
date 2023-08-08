@@ -448,8 +448,8 @@ class ChainService {
       projectOnChain
     );
     let projectInContributionRound = false;
-    let projectInVotingRound = false;
-    let projectInVoteOfNoConfidenceRound = false;
+    let projectInMilestoneVoting = false;
+    let projectInVotingOfNoConfidence = false;
 
     const lastApprovedMilestoneKey = await this.findLastApprovedMilestone(
       milestones
@@ -474,19 +474,16 @@ class ChainService {
           roundTypeHuman == RoundType[RoundType.ContributionRound]
         ) {
           projectInContributionRound = true;
-          break;
         } else if (roundTypeHuman == RoundType[RoundType.VotingRound]) {
-          projectInVotingRound = true;
-          break;
+          projectInMilestoneVoting = true;
         } else if (roundTypeHuman == RoundType[RoundType.VoteOfNoConfidence]) {
-          projectInVoteOfNoConfidenceRound = true;
-          break;
+          projectInVotingOfNoConfidence = true;
         }
       }
     }
     // Initators cannot contribute to their own project
     if (userIsInitiator) {
-      if (projectInVotingRound) {
+      if (projectInMilestoneVoting) {
         projectState = OnchainProjectState.OpenForVoting;
       } else if (projectInContributionRound) {
         projectState = OnchainProjectState.OpenForContribution;
@@ -495,9 +492,10 @@ class ChainService {
       } else {
         projectState = OnchainProjectState.PendingMilestoneSubmission;
       }
-    } else if (projectInVotingRound) {
+    } else if (projectInMilestoneVoting) {
       projectState = OnchainProjectState.OpenForVoting;
-    } else if (projectInVoteOfNoConfidenceRound) {
+
+    } else if (projectInVotingOfNoConfidence) {
       projectState = OnchainProjectState.OpenForVotingOfNoConfidence;
     } else {
       projectState = OnchainProjectState.PendingMilestoneSubmission;
@@ -547,6 +545,8 @@ class ChainService {
       cancelled: projectOnChain.cancelled,
       projectState,
       fundingType: projectOnChain.fundingType,
+      projectInMilestoneVoting,
+      projectInVotingOfNoConfidence
       // roundKey,
     };
 
