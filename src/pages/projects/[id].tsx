@@ -153,10 +153,7 @@ function Project() {
       if (userIsApprover) {
         setShowRefundButton(onChainProjectRes.fundingType.Grant);
       }
-
-      console.log(onChainProjectRes);
-      console.log(onChainProjectRes.id);
-
+      await chainService.syncOffChainDb(project,onChainProjectRes);
 
       const firstPendingMilestone =
         await chainService.findFirstPendingMilestone(
@@ -175,10 +172,6 @@ function Project() {
         const voters = await chainService.getNoConfidenceVoters(
           onChainProjectRes.id
         );
-        console.log("**** current voters are ");
-        console.log(voters);
-        console.log("***** has current user voted? ");
-        console.log(voters.includes(user.web3_address));
         if (voters.includes(user.web3_address)) {
           setApproverVotedOnRefund(true);
         }
@@ -240,7 +233,6 @@ function Project() {
       // showing owner profile if the current user if the applicant freelancer
       let owner;
       let freelancerRes;
-      console.log(projectRes);
       if (!projectRes) {
         setLoading(false);
         router.push('/error');

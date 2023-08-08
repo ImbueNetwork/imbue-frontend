@@ -10,7 +10,7 @@ import { authenticate, verifyUserIdFromJwt, } from '../../auth/common';
 
 export default nextConnect()
   .use(passport.initialize())
-  .get(async (req: NextApiRequest, res: NextApiResponse) => {
+  .put(async (req: NextApiRequest, res: NextApiResponse) => {
     db.transaction(async (tx) => {
       try {
         const { projectId, milestoneIndex, approve } = req.query;
