@@ -71,7 +71,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
 
   const [balance, setBalance] = useState<string>();
   const [imbueBalance, setImbueBalance] = useState<string>();
-  const [loadingWallet, setLoadingWallet] = useState<string>("");
+  const [loadingWallet, setLoadingWallet] = useState<string>('');
   const [error, setError] = useState<any>();
 
   const [openPopup, setOpenPopup] = useState<boolean>(false);
@@ -152,16 +152,26 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
             }
           >
             <Image
-              onClick={() => router.push(`/freelancers/${freelancer?.username}`)}
+              onClick={() =>
+                router.push(`/freelancers/${freelancer?.username}`)
+              }
               className='w-16 h-16 rounded-full object-cover cursor-pointer'
-              src={freelancer?.profile_image ?? require('@/assets/images/profile-image.png')}
+              src={
+                freelancer?.profile_image ??
+                require('@/assets/images/profile-image.png')
+              }
               height={200}
               width={200}
               priority
               alt='profileImage'
             />
           </Badge>
-
+          <p className='text-sm mt-4 text-content-primary lg:text-center break-words'>
+            @
+            {mobileView && freelancer?.username?.length > 16
+              ? `${freelancer?.username?.substring(0, 16)}...`
+              : freelancer?.username}
+          </p>
           <div className='flex flex-col gap-1 mt-2'>
             <p className='text-[1.25rem] font-normal capitalize text-imbue-purple'>
               {freelancer?.display_name}
@@ -186,13 +196,6 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         </div>
       </div>
 
-
-      <p className='text-sm text-content-primary lg:text-center break-words'>
-        @
-        {mobileView && freelancer?.username?.length > 16
-          ? `${freelancer?.username?.substring(0, 16)}...`
-          : freelancer?.username}
-      </p>
       {/* <div className='rating flex justify-center gap-4 mt-2 lg:mt-6'>
           <p className=''>
             <FaStar color='#BAFF36' />
@@ -213,8 +216,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
           <button
             className='primary-btn in-dark w-button !px-5 !mr-0 !bg-[#BAFF36] !text-imbue-purple in-dark'
             onClick={() =>
-              application.user_id &&
-              handleMessageBoxClick(freelancer?.user_id)
+              application.user_id && handleMessageBoxClick(freelancer?.user_id)
             }
           >
             Message
@@ -241,13 +243,13 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                 )}
               </button>
               <button
-                className={`${applicationStatusId[application?.status_id]
-                  }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[10px]`}
+                className={`${
+                  applicationStatusId[application?.status_id]
+                }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[10px]`}
               >
                 {applicationStatusId[application?.status_id]}
               </button>
             </>
-
           ) : (
             <button
               onClick={() => setOpenAccountChoice(true)}
@@ -276,7 +278,6 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
             </MenuItem>
             <div>
               {application?.status_id !== OffchainProjectState.Accepted && (
-
                 <MenuItem
                   onClick={() => {
                     handleOptionsClose();
@@ -302,7 +303,6 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
               </MenuItem>
 
               {application?.status_id !== OffchainProjectState.Rejected && (
-
                 <MenuItem
                   onClick={() => {
                     handleOptionsClose();
@@ -316,38 +316,33 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                   Reject
                 </MenuItem>
               )}
-
             </div>
           </Menu>
         </div>
 
         <div className='flex flex-col gap-1 mt-5 justify-center lg:items-end'>
           <p className='text-content'>Balance</p>
-          {application?.currency_id !== Currency.IMBU
-            ? (
-              <p className='text-sm text-imbue-purple'>
-                {loadingWallet === 'loading' && 'Loading Wallet...'}
-                {loadingWallet === 'connecting' && 'Connecting Wallet...'}
-                {!loadingWallet &&
-                  (balance === undefined
-                    ? 'No wallet found'
-                    : `$${Currency[application?.currency_id ?? 0]}: ${balance}`)}
-              </p>
-            )
-            : (
-              <p className='text-sm lg:text-base text-imbue-purple'>
-                {loadingWallet === 'loading' && 'Loading Wallet...'}
-                {loadingWallet === 'connecting' && 'Connecting Wallet...'}
-                {!loadingWallet &&
-                  (balance === undefined
-                    ? 'No wallet found'
-                    : `$${Currency[Currency.IMBU]}: ${imbueBalance}`)}
-              </p>
-            )
-          }
+          {application?.currency_id !== Currency.IMBU ? (
+            <p className='text-sm text-imbue-purple'>
+              {loadingWallet === 'loading' && 'Loading Wallet...'}
+              {loadingWallet === 'connecting' && 'Connecting Wallet...'}
+              {!loadingWallet &&
+                (balance === undefined
+                  ? 'No wallet found'
+                  : `$${Currency[application?.currency_id ?? 0]}: ${balance}`)}
+            </p>
+          ) : (
+            <p className='text-sm lg:text-base text-imbue-purple'>
+              {loadingWallet === 'loading' && 'Loading Wallet...'}
+              {loadingWallet === 'connecting' && 'Connecting Wallet...'}
+              {!loadingWallet &&
+                (balance === undefined
+                  ? 'No wallet found'
+                  : `$${Currency[Currency.IMBU]}: ${imbueBalance}`)}
+            </p>
+          )}
         </div>
       </div>
-
 
       <HirePopup
         {...{

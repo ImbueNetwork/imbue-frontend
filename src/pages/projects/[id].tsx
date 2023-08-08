@@ -110,8 +110,10 @@ function Project() {
   const [isApplicant, setIsApplicant] = useState<boolean>(false);
   const [isProjectOwner, setIsProjectOwner] = useState<boolean>(false);
   const [showRefundButton, setShowRefundButton] = useState<boolean>();
-  const [projectInMilestoneVoting, setProjectInMilestoneVoting] = useState<boolean>();
-  const [projectInVotingOfNoConfidence, setProjectInVotingOfNoConfidence] = useState<boolean>();
+  const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
+    useState<boolean>();
+  const [projectInVotingOfNoConfidence, setProjectInVotingOfNoConfidence] =
+    useState<boolean>();
 
   const [wait, setWait] = useState<boolean>(false);
   const [waitMessage, setWaitMessage] = useState<string>('');
@@ -158,7 +160,9 @@ function Project() {
         );
       setFirstPendingMilestone(firstPendingMilestone);
       setProjectInMilestoneVoting(onChainProjectRes.projectInMilestoneVoting);
-      setProjectInVotingOfNoConfidence(onChainProjectRes.projectInVotingOfNoConfidence);
+      setProjectInVotingOfNoConfidence(
+        onChainProjectRes.projectInVotingOfNoConfidence
+      );
 
       if (
         user.web3_address &&
@@ -303,7 +307,6 @@ function Project() {
       setLoading(false);
     }
   };
-
 
   // submitting a milestone
   const submitMilestone = async (account: WalletAccount) => {
@@ -573,9 +576,10 @@ function Project() {
           <div className='flex flex-row items-center max-width-750px:w-full max-width-750px:justify-between'>
             {milestone?.is_approved
               ? projectStateTag(modified, 'Completed')
-              : milestone?.milestone_key == firstPendingMilestone && projectInMilestoneVoting
-                ? openForVotingTag()
-                : projectStateTag(modified, 'Not Started')}
+              : milestone?.milestone_key == firstPendingMilestone &&
+                projectInMilestoneVoting
+              ? openForVotingTag()
+              : projectStateTag(modified, 'Not Started')}
 
             <Image
               src={require(expanded
@@ -606,28 +610,32 @@ function Project() {
             {milestone?.description}
           </p>
 
-          {!isApplicant && milestone.milestone_key == firstPendingMilestone && projectInMilestoneVoting && (
-            <Tooltip
-              followCursor
-              title={
-                !canVote && 'Only approvers are allowed to vote on a milestone'
-              }
-            >
-              <button
-                className={`primary-btn in-dark w-button ${!canVote && '!bg-gray-300 !text-gray-400'
-                  } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
-                data-testid='next-button'
-                onClick={() => canVote && vote()}
+          {!isApplicant &&
+            milestone.milestone_key == firstPendingMilestone &&
+            projectInMilestoneVoting && (
+              <Tooltip
+                followCursor
+                title={
+                  !canVote &&
+                  'Only approvers are allowed to vote on a milestone'
+                }
               >
-                Vote
-              </button>
-            </Tooltip>
-          )}
+                <button
+                  className={`primary-btn in-dark w-button ${
+                    !canVote && '!bg-gray-300 !text-gray-400'
+                  } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
+                  data-testid='next-button'
+                  onClick={() => canVote && vote()}
+                >
+                  Vote
+                </button>
+              </Tooltip>
+            )}
 
-          {(isApplicant || (projectType === 'grant' && isProjectOwner))
-            && milestone.milestone_key == firstPendingMilestone
-            && !projectInMilestoneVoting
-            && !milestone?.is_approved && (
+          {(isApplicant || (projectType === 'grant' && isProjectOwner)) &&
+            milestone.milestone_key == firstPendingMilestone &&
+            !projectInMilestoneVoting &&
+            !milestone?.is_approved && (
               <Tooltip
                 followCursor
                 title={
@@ -636,9 +644,10 @@ function Project() {
                 }
               >
                 <button
-                  className={`primary-btn in-dark w-button mt-3 ${!balance &&
+                  className={`primary-btn in-dark w-button mt-3 ${
+                    !balance &&
                     '!bg-gray-300 !text-gray-400 !cursor-not-allowed'
-                    }`}
+                  }`}
                   data-testid='next-button'
                   onClick={() => balance && submitMilestone()}
                 >
@@ -649,8 +658,9 @@ function Project() {
 
           {isApplicant && milestone.is_approved && (
             <button
-              className={`primary-btn in-dark w-button ${!balance && '!bg-gray-300 !text-gray-400'
-                } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
+              className={`primary-btn in-dark w-button ${
+                !balance && '!bg-gray-300 !text-gray-400'
+              } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
               data-testid='next-button'
               onClick={() => withdraw()}
               disabled={!balance}
@@ -827,9 +837,10 @@ function Project() {
                   className='cursor-pointer'
                 >
                   <button
-                    className={`border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors ${approverVotedOnRefund &&
+                    className={`border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors ${
+                      approverVotedOnRefund &&
                       '!bg-gray-300 !text-gray-400 !cursor-not-allowed'
-                      }`}
+                    }`}
                     onClick={async () => {
                       if (!approverVotedOnRefund) {
                         // set submitting mile stone to true
@@ -842,21 +853,18 @@ function Project() {
                     Refund
                   </button>
                 </Tooltip>
-
-
               </>
             )}
-            {onChainProject
-              && projectInVotingOfNoConfidence && (
-                <button
-                  disabled={true}
-                  className={
-                    ' text-black flex px-5 py-3 text-sm ml-auto rounded-full Rejected-btn'
-                  }
-                >
-                  Project undergoing vote of no confidence
-                </button>
-              )}
+            {onChainProject && projectInVotingOfNoConfidence && (
+              <button
+                disabled={true}
+                className={
+                  ' text-black flex px-5 py-3 text-sm ml-auto rounded-full Rejected-btn'
+                }
+              >
+                Project undergoing vote of no confidence
+              </button>
+            )}
           </div>
 
           {project?.approvers && (
@@ -869,8 +877,9 @@ function Project() {
                   {approversPreview?.map((approver: any, index: number) => (
                     <div
                       key={index}
-                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${approver?.display_name && 'cursor-pointer'
-                        }`}
+                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${
+                        approver?.display_name && 'cursor-pointer'
+                      }`}
                       onClick={() =>
                         approver.display_name &&
                         router.push(`/profile/${approver.username}`)
@@ -924,12 +933,13 @@ function Project() {
                 <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
                   <div
                     style={{
-                      width: `${(onChainProject?.milestones?.filter?.(
-                        (m: any) => m?.is_approved
-                      )?.length /
-                        onChainProject?.milestones?.length) *
+                      width: `${
+                        (onChainProject?.milestones?.filter?.(
+                          (m: any) => m?.is_approved
+                        )?.length /
+                          onChainProject?.milestones?.length) *
                         100
-                        }%`,
+                      }%`,
                     }}
                     className='h-full rounded-xl Accepted-button absolute'
                   ></div>
@@ -937,8 +947,9 @@ function Project() {
                     {onChainProject?.milestones?.map((m: any, i: number) => (
                       <div
                         key={i}
-                        className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
-                          } rounded-full -mt-1.5`}
+                        className={`h-4 w-4 ${
+                          m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
+                        } rounded-full -mt-1.5`}
                       ></div>
                     ))}
                   </div>
@@ -958,8 +969,11 @@ function Project() {
               />
               <div className='flex flex-col'>
                 <h3 className='text-xl leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0'>
-                  {Number(Number(project?.total_cost_without_fee) + Number(project?.imbue_fee))?.toLocaleString()} $
-                  {Currency[project?.currency_id || 0]}
+                  {Number(
+                    Number(project?.total_cost_without_fee) +
+                      Number(project?.imbue_fee)
+                  )?.toLocaleString()}{' '}
+                  ${Currency[project?.currency_id || 0]}
                 </h3>
                 <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
                   Budget - Fixed
