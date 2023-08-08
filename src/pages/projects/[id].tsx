@@ -955,7 +955,7 @@ function Project() {
               />
               <div className='flex flex-col'>
                 <h3 className='text-xl leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0'>
-                  {Number(project?.total_cost_without_fee)?.toLocaleString()} $
+                  {Number(Number(project?.total_cost_without_fee) + Number(project?.imbue_fee))?.toLocaleString()} $
                   {Currency[project?.currency_id || 0]}
                 </h3>
                 <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
