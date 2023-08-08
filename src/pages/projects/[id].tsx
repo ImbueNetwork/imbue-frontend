@@ -154,6 +154,10 @@ function Project() {
         setShowRefundButton(onChainProjectRes.fundingType.Grant);
       }
 
+      console.log(onChainProjectRes);
+      console.log(onChainProjectRes.id);
+
+
       const firstPendingMilestone =
         await chainService.findFirstPendingMilestone(
           onChainProjectRes.milestones
@@ -169,8 +173,12 @@ function Project() {
         onChainProjectRes.projectInVotingOfNoConfidence
       ) {
         const voters = await chainService.getNoConfidenceVoters(
-          onChainProjectRes.id!
+          onChainProjectRes.id
         );
+        console.log("**** current voters are ");
+        console.log(voters);
+        console.log("***** has current user voted? ");
+        console.log(voters.includes(user.web3_address));
         if (voters.includes(user.web3_address)) {
           setApproverVotedOnRefund(true);
         }
@@ -386,7 +394,7 @@ function Project() {
   const withdraw = async (account: WalletAccount) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
-    const mileStone = onChainProject.milestones;
+    const projectMilestones = onChainProject.milestones;
     // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
     const result = await chainService.withdraw(account, onChainProject);
@@ -394,7 +402,7 @@ function Project() {
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
-          const haveAllMilestonesBeenApproved = mileStone
+          const haveAllMilestonesBeenApproved = projectMilestones
             .map((m: any) => m.is_approved)
             .every(Boolean);
 
