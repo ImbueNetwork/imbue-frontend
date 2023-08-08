@@ -406,9 +406,9 @@ const ApplicationPreview = (): JSX.Element => {
               </h3>
 
               <h3 className='text-lg lg:text-[1.25rem] text-imbue-light-purple-two leading-[1.5] font-normal m-0 p-0'>
-                Client&apos;s budget:{' '}
+                Projects&apos;s budget:{' '}
                 <span className=' text-imbue-purple-dark text-lg lg:text-[1.25rem]'>
-                  ${Number(brief?.budget)?.toLocaleString()}
+                  ${Number(Number(application.total_cost_without_fee) + Number(application.imbue_fee))?.toLocaleString()}
                 </span>
               </h3>
             </div>
