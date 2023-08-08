@@ -91,7 +91,7 @@ export type Project = {
 };
 
 export type ProjectOnChain = {
-  id?: string | number;
+  id: string | number;
   requiredFunds: bigint;
   requiredFundsFormatted: number;
   raisedFunds: bigint;
