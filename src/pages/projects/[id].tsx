@@ -143,6 +143,7 @@ function Project() {
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
     const onChainProjectRes = await chainService.getProject(projectId);
+    project = await chainService.syncOffChainDb(project,onChainProjectRes);
     if (onChainProjectRes) {
       const isApplicant = onChainProjectRes.initiator == user.web3_address;
       setIsApplicant(isApplicant);
@@ -153,7 +154,6 @@ function Project() {
       if (userIsApprover) {
         setShowRefundButton(onChainProjectRes.fundingType.Grant);
       }
-      await chainService.syncOffChainDb(project,onChainProjectRes);
 
       const firstPendingMilestone =
         await chainService.findFirstPendingMilestone(
@@ -179,16 +179,6 @@ function Project() {
 
       setOnChainProject(onChainProjectRes);
     } else if (project.chain_project_id && project.owner) {
-      const projectHasBeenCompleted = await chainService.hasProjectCompleted(
-        project.owner,
-        project.chain_project_id
-      );
-
-      if (projectHasBeenCompleted) {
-        project.status_id = OffchainProjectState.Completed;
-        await updateProject(projectId, project);
-      }
-
       switch (project.status_id) {
         case OffchainProjectState.PendingReview:
           setWaitMessage('This project is pending review');

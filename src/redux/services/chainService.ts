@@ -13,13 +13,15 @@ import {
   Contribution,
   Currency,
   Milestone,
+  OffchainProjectState,
   OnchainProjectState,
   Project,
   ProjectOnChain,
   RoundType,
   User,
 } from '@/model';
-import { updateMilestone } from './projectServices';
+
+import { updateMilestone, updateProject } from './projectServices';
 /* eslint-disable no-unused-vars */
 export enum ImbueChainEvent {
   Contribute = "ContributeSucceeded",
@@ -427,15 +429,29 @@ class ChainService {
     return await this.convertToOnChainProject(project);
   }
 
-  public async syncOffChainDb(offChainProject: any, onChainProject: ProjectOnChain) {
-    const offChainMilestones = offChainProject.milestones.map((milestone: any) => milestone.is_approved);
-    const onChainProjectMilestones = onChainProject.milestones.map((milestone) => milestone.is_approved);;
-    const milestonesSynced = JSON.stringify(offChainMilestones) === JSON.stringify(onChainProjectMilestones);
-    if(!milestonesSynced) {
-      offChainProject.milestones.map(async (milestone: any) => {
-        await updateMilestone(milestone.project_id, milestone.milestone_index, onChainProject.milestones[milestone.milestone_index].is_approved);
-      });
+  public async syncOffChainDb(offChainProject: any, onChainProject?: ProjectOnChain) {
+    if(!onChainProject) {
+      const projectHasBeenCompleted = await this.hasProjectCompleted(
+        offChainProject.owner,
+        offChainProject.chain_project_id
+      );
+
+      if (projectHasBeenCompleted) {
+        offChainProject.status_id = OffchainProjectState.Completed;
+        await updateProject(offChainProject.id, offChainProject);
+      }
+    } else {
+      const offChainMilestones = offChainProject.milestones.map((milestone: any) => milestone.is_approved);
+      const onChainProjectMilestones = onChainProject.milestones.map((milestone) => milestone.is_approved);;
+      const milestonesSynced = JSON.stringify(offChainMilestones) === JSON.stringify(onChainProjectMilestones);
+      if(!milestonesSynced) {
+        offChainProject.milestones.map(async (milestone: any) => {
+          await updateMilestone(milestone.project_id, milestone.milestone_index, onChainProject.milestones[milestone.milestone_index].is_approved);
+        });
+      }
     }
+    return offChainProject;
+
   }
 
   async convertToOnChainProject(project: Project) {
