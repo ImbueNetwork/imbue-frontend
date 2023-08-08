@@ -92,6 +92,7 @@ const BriefDetails = (): JSX.Element => {
           setFreelancer(_freelancer);
         } else {
           setError({ message: 'No Brief Found' });
+          router.push('/error');
         }
       } catch (error) {
         setError({ message: error });
@@ -102,8 +103,6 @@ const BriefDetails = (): JSX.Element => {
   useEffect(() => {
     fetchData();
   }, [id, browsingUser.username]);
-
-
 
   const redirectToApply = () => {
     router.push(`/briefs/${brief.id}/apply`);
