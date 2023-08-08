@@ -302,6 +302,35 @@ function Project() {
     }
   };
 
+
+  // submitting a milestone
+  const submitMilestone = async (account: WalletAccount) => {
+    setLoading(true);
+
+    const imbueApi = await initImbueAPIInfo();
+    // const user: User | any = await utils.getCurrentUser();
+    const chainService = new ChainService(imbueApi, user);
+    const result = await chainService.submitMilestone(
+      account,
+      onChainProject,
+      milestoneKeyInView
+    );
+    while (true) {
+      if (result.status || result.txError) {
+        if (result.status) {
+          setSuccess(true);
+          setSuccessTitle('Milestone Submitted Successfully');
+        } else if (result.txError) {
+          // TODO: show error screen
+          setError({ message: result.errorMessage });
+        }
+        break;
+      }
+      await new Promise((f) => setTimeout(f, 1000));
+    }
+    setLoading(false);
+  };
+
   // voting on a mile stone
   const voteOnMilestone = async (account: WalletAccount, vote: boolean) => {
     setLoading(true);
@@ -332,7 +361,6 @@ function Project() {
             if (milestoneApproved) {
               await updateMilestone(projectId, milestoneKeyInView, true);
             }
-
             setSuccess(true);
             setSuccessTitle('Your vote was successful');
           } else if (result.txError) {
@@ -349,35 +377,7 @@ function Project() {
     }
   };
 
-  // submitting a milestone
-  const submitMilestone = async (account: WalletAccount) => {
-    setLoading(true);
-
-    const imbueApi = await initImbueAPIInfo();
-    // const user: User | any = await utils.getCurrentUser();
-    const chainService = new ChainService(imbueApi, user);
-    const result = await chainService.submitMilestone(
-      account,
-      onChainProject,
-      milestoneKeyInView
-    );
-    while (true) {
-      if (result.status || result.txError) {
-        if (result.status) {
-          setSuccess(true);
-          setSuccessTitle('Milestone Submitted Successfully');
-        } else if (result.txError) {
-          // TODO: show error screen
-          setError({ message: result.errorMessage });
-        }
-        break;
-      }
-      await new Promise((f) => setTimeout(f, 1000));
-    }
-    setLoading(false);
-  };
-
-  // submitting a milestone
+  // withdrawing funds
   const withdraw = async (account: WalletAccount) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
@@ -842,7 +842,7 @@ function Project() {
                 </Tooltip>
 
                 {onChainProject
-                && projectInVotingOfNoConfidence && (
+                  && projectInVotingOfNoConfidence && (
                     <button
                       disabled={true}
                       className={

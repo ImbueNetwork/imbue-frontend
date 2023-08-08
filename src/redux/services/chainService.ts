@@ -34,7 +34,6 @@ export enum ImbueChainEvent {
   SubmitInitialGrant = "ProjectCreated",
 }
 
-const WAIT_FOR_EVENT_IN_MS = 12_000; // WAIT FOR 1 MIN
 class ChainService {
   imbueApi: ImbueApiInfo;
   user: User;
@@ -209,12 +208,8 @@ class ChainService {
   }
 
   public async pollChainMessage(eventName: string, account: WalletAccount) {
-    const asyncTimeout = (imbueApi: any, account: WalletAccount) => {
-      return new Promise((resolve, reject) => {
-        const timeoutID = setTimeout(
-          () => reject("Event not found"),
-          WAIT_FOR_EVENT_IN_MS
-        );
+    return (async (imbueApi) => {
+      try {
         imbueApi.imbue.api.query.system.events((events: EventRecord[]) => {
           events
             .filter(
@@ -232,18 +227,11 @@ class ChainService {
                   && method === eventName
                   && data[0].toHuman() === account.address
                 ) {
-                  clearTimeout(timeoutID);
-                  return resolve(data.toHuman());
+                  return data.toHuman();
                 }
               }
             );
         });
-      });
-    }
-    return (async (imbueApi) => {
-      try {
-        const result = await asyncTimeout(imbueApi, account);
-        return result
       } catch (ex) {
         return false;
       }
