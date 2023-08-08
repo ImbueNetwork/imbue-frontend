@@ -9,7 +9,6 @@ import {
   Chat,
   MessageInput,
   MessageList,
-  PinIndicator,
   Thread,
   useChatContext,
   Window,
@@ -164,10 +163,9 @@ function DashboardChatBox({
                 showChannelSearch={true}
               />
             </div>
-            <Channel PinIndicator={CustomPinIndicator}>
+            <Channel>
               <Window>
                 <CustomChannelHeader showFreelancerProfile={false} />
-                <PinIndicator />
                 <MessageList />
                 <MessageInput />
               </Window>
@@ -179,13 +177,5 @@ function DashboardChatBox({
     </div>
   );
 }
-
-export const CustomPinIndicator = () => {
-  return (
-    <div>
-      <div className='pin-text'>pinned</div>
-    </div>
-  );
-};
 
 export default DashboardChatBox;

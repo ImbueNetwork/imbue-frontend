@@ -18,7 +18,7 @@
 }
 
 .str-chat__list {
-  overflow: visible !important;
+  padding-top: 60px;
 }
 
 .pin-text {
@@ -41,9 +41,9 @@
   padding: 25px 20px !important;
 }
 
-.str-chat__message-actions-list {
+/* .str-chat__message-actions-list {
   z-index: 100 !important;
-}
+} */
 
 .str-chat__channel-search .str-chat__channel-search-bar {
   padding: 0;
