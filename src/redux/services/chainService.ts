@@ -34,7 +34,6 @@ export enum ImbueChainEvent {
   SubmitInitialGrant = "ProjectCreated",
 }
 
-const WAIT_FOR_EVENT_IN_MS = 60_000; // WAIT FOR 1 MIN
 class ChainService {
   imbueApi: ImbueApiInfo;
   user: User;
@@ -209,12 +208,8 @@ class ChainService {
   }
 
   public async pollChainMessage(eventName: string, account: WalletAccount) {
-    const asyncTimeout = (imbueApi: any, account: WalletAccount) => {
-      return new Promise((resolve, reject) => {
-        const timeoutID = setTimeout(
-          () => reject("Event not found"),
-          WAIT_FOR_EVENT_IN_MS
-        );
+    return (async (imbueApi) => {
+      try {
         imbueApi.imbue.api.query.system.events((events: EventRecord[]) => {
           events
             .filter(
@@ -232,18 +227,11 @@ class ChainService {
                   && method === eventName
                   && data[0].toHuman() === account.address
                 ) {
-                  clearTimeout(timeoutID);
-                  return resolve(data.toHuman());
+                  return data.toHuman();
                 }
               }
             );
         });
-      });
-    }
-    return (async (imbueApi) => {
-      try {
-        const result = await asyncTimeout(imbueApi, account);
-        return result
       } catch (ex) {
         return false;
       }
@@ -460,8 +448,8 @@ class ChainService {
       projectOnChain
     );
     let projectInContributionRound = false;
-    let projectInVotingRound = false;
-    let projectInVoteOfNoConfidenceRound = false;
+    let projectInMilestoneVoting = false;
+    let projectInVotingOfNoConfidence = false;
 
     const lastApprovedMilestoneKey = await this.findLastApprovedMilestone(
       milestones
@@ -486,19 +474,16 @@ class ChainService {
           roundTypeHuman == RoundType[RoundType.ContributionRound]
         ) {
           projectInContributionRound = true;
-          break;
         } else if (roundTypeHuman == RoundType[RoundType.VotingRound]) {
-          projectInVotingRound = true;
-          break;
+          projectInMilestoneVoting = true;
         } else if (roundTypeHuman == RoundType[RoundType.VoteOfNoConfidence]) {
-          projectInVoteOfNoConfidenceRound = true;
-          break;
+          projectInVotingOfNoConfidence = true;
         }
       }
     }
     // Initators cannot contribute to their own project
     if (userIsInitiator) {
-      if (projectInVotingRound) {
+      if (projectInMilestoneVoting) {
         projectState = OnchainProjectState.OpenForVoting;
       } else if (projectInContributionRound) {
         projectState = OnchainProjectState.OpenForContribution;
@@ -507,9 +492,10 @@ class ChainService {
       } else {
         projectState = OnchainProjectState.PendingMilestoneSubmission;
       }
-    } else if (projectInVotingRound) {
+    } else if (projectInMilestoneVoting) {
       projectState = OnchainProjectState.OpenForVoting;
-    } else if (projectInVoteOfNoConfidenceRound) {
+
+    } else if (projectInVotingOfNoConfidence) {
       projectState = OnchainProjectState.OpenForVotingOfNoConfidence;
     } else {
       projectState = OnchainProjectState.PendingMilestoneSubmission;
@@ -559,6 +545,8 @@ class ChainService {
       cancelled: projectOnChain.cancelled,
       projectState,
       fundingType: projectOnChain.fundingType,
+      projectInMilestoneVoting,
+      projectInVotingOfNoConfidence
       // roundKey,
     };
 

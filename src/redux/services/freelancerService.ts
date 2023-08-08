@@ -10,6 +10,12 @@ import {
   Project,
 } from '@/model';
 
+type Filters = {
+  skills: Item[];
+  services: Item[];
+  languages: Item[];
+};
+
 export async function createFreelancingProfile(freelancer: any) {
   // Check that this user doesnt already have a freelancer profile.
   try {
@@ -150,7 +156,7 @@ export const getFreelancerFilters = async () => {
   );
 
   if (resp.ok) {
-    return (await resp.json()) as { skills: Item[]; services: Item[] };
+    return (await resp.json()) as Filters;
   } else {
     throw new Error(
       'Failed to get all freelancer applications. status:' + resp.status

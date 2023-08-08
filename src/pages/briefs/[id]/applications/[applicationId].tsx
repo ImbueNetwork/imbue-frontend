@@ -405,12 +405,15 @@ const ApplicationPreview = (): JSX.Element => {
                 Milestones
               </h3>
 
-              <h3 className='text-lg lg:text-[1.25rem] text-imbue-light-purple-two leading-[1.5] font-normal m-0 p-0'>
-                Client&apos;s budget:{' '}
-                <span className=' text-imbue-purple-dark text-lg lg:text-[1.25rem]'>
-                  ${Number(brief?.budget)?.toLocaleString()}
-                </span>
-              </h3>
+              {application?.total_cost_without_fee && application?.imbue_fee && (
+                <h3 className='text-lg lg:text-[1.25rem] text-imbue-light-purple-two leading-[1.5] font-normal m-0 p-0'>
+                  Projects&apos;s budget:{' '}
+                  <span className=' text-imbue-purple-dark text-lg lg:text-[1.25rem]'>
+                    ${Number(Number(application.total_cost_without_fee) + Number(application.imbue_fee))?.toLocaleString()}
+                  </span>
+                </h3>
+              )}
+
             </div>
 
             <hr className='h-[1px] bg-[#E1DDFF] w-full' />
@@ -438,9 +441,8 @@ const ApplicationPreview = (): JSX.Element => {
                       {index + 1}.
                     </div>
                     <div
-                      className={`flex ${
-                        isEditingBio ? 'flex-col lg:flex-row' : 'flex-row'
-                      } justify-between w-full`}
+                      className={`flex ${isEditingBio ? 'flex-col lg:flex-row' : 'flex-row'
+                        } justify-between w-full`}
                     >
                       <div className='w-full lg:w-1/2 h-fit'>
                         {isEditingBio ? (
@@ -728,10 +730,9 @@ const ApplicationPreview = (): JSX.Element => {
                 title={disableSubmit && 'Please fill all the input fields'}
               >
                 <button
-                  className={`primary-btn in-dark w-button ${
-                    disableSubmit &&
+                  className={`primary-btn in-dark w-button ${disableSubmit &&
                     '!bg-gray-400 !text-white !cursor-not-allowed'
-                  }`}
+                    }`}
                   onClick={() => !disableSubmit && handleUpdateProject()}
                 >
                   Update

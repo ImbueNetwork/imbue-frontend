@@ -6,7 +6,6 @@ import * as models from '@/lib/models';
 import {
   fetchFreelancerClients,
   fetchFreelancerMetadata,
-  Freelancer,
   searchFreelancers,
 } from '@/lib/models';
 
@@ -18,16 +17,16 @@ export default nextConnect()
     db.transaction(async (tx) => {
       try {
         const filter: models.FreelancerSqlFilter = req.body;
-        const freelancers: Array<Freelancer> = await searchFreelancers(
-          tx,
-          filter
-        );
+        const freelancers = await searchFreelancers(filter)(tx);
         // const { currentData } = await models.paginatedData(
         //   filter?.page || 1,
         //   filter?.items_per_page || 5,
         //   freelancers
         // );
-        const freelancerCount = await models.searchFreelancersCount(tx, filter);
+        const freelancerCount = await models.searchFreelancersCount(tx, {
+          ...filter,
+          items_per_page: 0,
+        });
 
         await Promise.all([
           ...freelancers.map(async (freelancer: any) => {
@@ -55,7 +54,9 @@ export default nextConnect()
         });
       } catch (e) {
         res.status(401).send({ currentData: null, totalFreelancers: null });
-        throw new Error(`Failed to search all freelancers`, { cause: e as Error });
+        throw new Error(`Failed to search all freelancers`, {
+          cause: e as Error,
+        });
       }
     });
   });
