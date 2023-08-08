@@ -839,19 +839,20 @@ function Project() {
                   </button>
                 </Tooltip>
 
-                {onChainProject
-                  && projectInVotingOfNoConfidence && (
-                    <button
-                      disabled={true}
-                      className={
-                        ' text-black flex px-5 py-3 text-sm ml-auto rounded-full Rejected-btn'
-                      }
-                    >
-                      Project undergoing vote of no confidence
-                    </button>
-                  )}
+
               </>
             )}
+            {onChainProject
+              && projectInVotingOfNoConfidence && (
+                <button
+                  disabled={true}
+                  className={
+                    ' text-black flex px-5 py-3 text-sm ml-auto rounded-full Rejected-btn'
+                  }
+                >
+                  Project undergoing vote of no confidence
+                </button>
+              )}
           </div>
 
           {project?.approvers && (
