@@ -52,7 +52,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
   const [openPopup, setOpenPopup] = useState(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<any>();
-  const [loadingWallet, setLoadingWallet] = useState<string>("");
+  const [loadingWallet, setLoadingWallet] = useState<string>('');
   const [balance, setBalance] = useState<string>();
 
   const router = useRouter();
@@ -108,12 +108,10 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         await new Promise((f) => setTimeout(f, 1000));
       }
     } catch (error) {
-      setError({ message: "Something went wrong" });
-    }
-    finally {
+      setError({ message: 'Something went wrong' });
+    } finally {
       setLoading(false);
     }
-
   };
 
   return (
@@ -133,6 +131,12 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
             priority
             alt='profileImage'
           />
+          <p className='text-sm text-content-primary break-all mt-5 lg:mt-2'>
+            @
+            {briefOwner?.username?.length > 16
+              ? `${briefOwner?.username.substr(0, 16)}...`
+              : briefOwner?.username}
+          </p>
           <div className='flex flex-col gap-2'>
             <p className='text-[1.25rem] font-normal capitalize text-imbue-purple'>
               {briefOwner?.display_name}
@@ -141,22 +145,11 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           </div>
         </div>
       </div>
-
-      <div>
-        <p className='text-sm text-content-primary break-all mt-3 lg:mt-0'>
-          @
-          {briefOwner?.username?.length > 16
-            ? `${briefOwner?.username.substr(0, 16)}...`
-            : briefOwner?.username}
-        </p>
-      </div>
       <div>
         <div className='ml-auto lg:ml-0 flex items-center justify-end gap-2 mt-3 lg:mt-0'>
           <button
             className='primary-btn in-dark w-button !text-xs lg:!text-base'
-            onClick={() =>
-              brief && handleMessageBoxClick(briefOwner.id)
-            }
+            onClick={() => brief && handleMessageBoxClick(briefOwner.id)}
           >
             Message
           </button>
@@ -169,8 +162,9 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
             </button>
           ) : (
             <button
-              className={`${applicationStatusId[application?.status_id]
-                }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
+              className={`${
+                applicationStatusId[application?.status_id]
+              }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
             >
               {applicationStatusId[application?.status_id]}
             </button>
@@ -185,14 +179,12 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
                 ? 'No wallet found'
                 : `Your Balance: ${balance} $${Currency[Currency.IMBU]}`)}
           </p>
-          {
-            Number(balance) < 500 && (
-              <div className='flex rounded-2xl gap-2 bg-imbue-coral px-2 py-1'>
-                <ErrorOutlineOutlinedIcon />
-                <p>the imbu balance is less than 500 $IMBU</p>
-              </div>
-            )
-          }
+          {Number(balance) < 500 && (
+            <div className='flex rounded-2xl gap-2 bg-imbue-coral px-2 py-1'>
+              <ErrorOutlineOutlinedIcon />
+              <p>the imbu balance is less than 500 $IMBU</p>
+            </div>
+          )}
         </div>
       </div>
       <AccountChoice

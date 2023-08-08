@@ -236,7 +236,11 @@ function Project() {
       // showing owner profile if the current user if the applicant freelancer
       let owner;
       let freelancerRes;
-
+      console.log(projectRes);
+      if (!projectRes) {
+        setLoading(false);
+        router.push('/error');
+      }
       if (projectRes?.brief_id && projectRes?.user_id) {
         setProjectType('brief');
 

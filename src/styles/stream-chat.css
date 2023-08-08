@@ -13,8 +13,17 @@
   height: 75vh;
 }
 
-.str-chat__edit-message-form-options{
+.str-chat__edit-message-form-options {
   gap: 12px;
+}
+
+.str-chat__list {
+  padding-top: 60px;
+}
+
+.pin-text {
+  font-style: italic;
+  color: grey;
 }
 
 /* left side */
@@ -31,6 +40,10 @@
 .str-chat__channel-preview {
   padding: 25px 20px !important;
 }
+
+/* .str-chat__message-actions-list {
+  z-index: 100 !important;
+} */
 
 .str-chat__channel-search .str-chat__channel-search-bar {
   padding: 0;

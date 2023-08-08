@@ -141,7 +141,11 @@ function DashboardChatBox({
             ) : (
               <Channel channel={channel}>
                 <Window>
-                  <CustomChannelHeader showFreelancerProfile={false} closeChat={closeChat} />
+                  <CustomChannelHeader
+                    showFreelancerProfile={false}
+                    closeChat={closeChat}
+                  />
+
                   <MessageList />
                   <MessageInput />
                 </Window>
@@ -161,7 +165,7 @@ function DashboardChatBox({
             </div>
             <Channel>
               <Window>
-                <CustomChannelHeader showFreelancerProfile={false}  />
+                <CustomChannelHeader showFreelancerProfile={false} />
                 <MessageList />
                 <MessageInput />
               </Window>
