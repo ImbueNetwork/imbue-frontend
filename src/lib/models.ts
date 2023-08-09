@@ -722,6 +722,12 @@ export const searchImbueSkillsByName =
       .where('name', 'ilike', `${name}%`)
       .limit(10);
 
+export const searchIndustryByName = (name: string) => (tx: Knex.Transaction) =>
+  tx<Skill>('industries').select().where('name', 'ilike', `${name}%`).limit(10);
+
+export const searchLanguageByName = (name: string) => (tx: Knex.Transaction) =>
+  tx<Skill>('languages').select().where('name', 'ilike', `${name}%`).limit(10);
+
 // Insert a brief and their respective skill and industry_ids.
 export const insertBrief =
   (

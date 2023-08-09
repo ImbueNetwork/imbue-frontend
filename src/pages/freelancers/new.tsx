@@ -17,11 +17,13 @@ import {
   freelancingGoal,
   // importInformation,
   stepData,
-  suggestedLanguages,
   suggestedServices,
 } from '@/config/freelancer-data';
 import { fetchUserRedux } from '@/redux/reducers/userReducers';
-import { searchSkills } from '@/redux/services/briefService';
+import {
+  searchLanguageByName,
+  searchSkills,
+} from '@/redux/services/briefService';
 import { createFreelancingProfile } from '@/redux/services/freelancerService';
 import { AppDispatch, RootState } from '@/redux/store/store';
 
@@ -51,6 +53,7 @@ const Freelancer = (): JSX.Element => {
   const [suggestedFreelancingSkills, setSuggestedSkills] = useState<string[]>(
     []
   );
+  const [suggestedLanguages, setSuggestedLanguages] = useState<string[]>([]);
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -61,12 +64,33 @@ const Freelancer = (): JSX.Element => {
 
   useEffect(() => {
     fetchSuggestedSkills();
+    fetchSuggestedLanguage();
   }, []);
 
   const fetchSuggestedSkills = async () => {
     const skillsRes = await searchSkills('');
     if (skillsRes) {
       setSuggestedSkills(skillsRes?.skills.map((skill) => skill.name));
+    }
+  };
+
+  const fetchSuggestedLanguage = async () => {
+    const languageRes = await searchLanguageByName('e');
+    if (languageRes) {
+      setSuggestedLanguages(
+        languageRes?.languages.map((language) => language.name)
+      );
+    }
+  };
+
+  const searchLanguage = async (name: string) => {
+    const languageRes = await searchLanguageByName(
+      name.length > 0 ? name : 'e'
+    );
+    if (languageRes) {
+      setSuggestedLanguages(
+        languageRes?.languages.map((language) => language.name)
+      );
     }
   };
 
@@ -226,11 +250,22 @@ const Freelancer = (): JSX.Element => {
         ))}
       </div>
       <div className='mt-6 pb-20'>
-        <TagsInput
-          suggestData={suggestedLanguages}
-          data-testid='languages'
-          tags={languages}
-          onChange={(tags: string[]) => setLanguages(tags)}
+        <Autocomplete
+          id='tags-standard'
+          multiple
+          getOptionLabel={(option) => option}
+          options={suggestedLanguages}
+          sx={{ width: '100%' }}
+          onChange={(e, value) => setLanguages(value)}
+          defaultValue={languages}
+          renderInput={(params) => (
+            <TextField
+              autoComplete='off'
+              color='secondary'
+              onChange={(e) => searchLanguage(e.target.value)}
+              {...params}
+            />
+          )}
         />
       </div>
     </div>
