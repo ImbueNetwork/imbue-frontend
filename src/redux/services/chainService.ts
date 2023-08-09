@@ -12,6 +12,7 @@ import {
   BasicTxResponse,
   Contribution,
   Currency,
+  ImbueChainPollResult,
   Milestone,
   OffchainProjectState,
   OnchainProjectState,
@@ -22,6 +23,8 @@ import {
 } from '@/model';
 
 import { updateMilestone, updateProject } from './projectServices';
+const WAIT_FOR_EVENT_IN_MS = 12_000; // WAIT FOR 1 MIN
+
 /* eslint-disable no-unused-vars */
 export enum ImbueChainEvent {
   Contribute = "ContributeSucceeded",
@@ -211,30 +214,49 @@ class ChainService {
   }
 
   public async pollChainMessage(eventName: string, account: WalletAccount) {
+    const asyncTimeout = (imbueApi: any, account: WalletAccount)  => {
+      const timeoutPromise =  new Promise((resolve,_) => {
+        setTimeout(
+          () => resolve(ImbueChainPollResult.EventNotFound),
+          WAIT_FOR_EVENT_IN_MS
+        );
+      });
+
+      const imbuePoll =  new Promise((resolve,_) => {
+        try {
+          imbueApi.imbue.api.query.system.events((events: EventRecord[]) => {
+            events
+              .filter(
+                ({ event: { section } }: EventRecord) =>
+                  section === 'imbueProposals' ||
+                  section === 'imbueBriefs' ||
+                  section === 'system'
+              )
+              .forEach(
+                ({
+                  event: { data, method },
+                }: EventRecord) => {
+                  if (
+                    eventName
+                    && method === eventName
+                    && data[0].toHuman() === account.address
+                  ) {
+                     resolve(ImbueChainPollResult.EventFound);
+                  }
+                }
+              );
+          });
+        } catch (ex) {
+          return false;
+        }
+      });
+
+      return Promise.race([imbuePoll,timeoutPromise]);
+    }
     return (async (imbueApi) => {
       try {
-        imbueApi.imbue.api.query.system.events((events: EventRecord[]) => {
-          events
-            .filter(
-              ({ event: { section } }: EventRecord) =>
-                section === 'imbueProposals' ||
-                section === 'imbueBriefs' ||
-                section === 'system'
-            )
-            .forEach(
-              ({
-                event: { data, method },
-              }: EventRecord) => {
-                if (
-                  eventName
-                  && method === eventName
-                  && data[0].toHuman() === account.address
-                ) {
-                  return data.toHuman();
-                }
-              }
-            );
-        });
+        const result = await asyncTimeout(imbueApi, account);
+        return result
       } catch (ex) {
         return false;
       }
@@ -252,7 +274,7 @@ class ChainService {
   }
 
   public async getNoConfidenceVoters(chain_project_id: string | number) {
-    const lookupKey =  [chain_project_id,RoundType.VoteOfNoConfidence,0];
+    const lookupKey = [chain_project_id, RoundType.VoteOfNoConfidence, 0];
     const noConfidenceVotes = await this.imbueApi.imbue.api.query.imbueProposals.userHasVoted(lookupKey);
     const voters = Object.keys(JSON.parse(JSON.stringify(noConfidenceVotes.toJSON())));
     return voters;
@@ -430,21 +452,23 @@ class ChainService {
   }
 
   public async syncOffChainDb(offChainProject: any, onChainProject?: ProjectOnChain) {
-    if(!onChainProject) {
+    if (!onChainProject) {
       const projectHasBeenCompleted = await this.hasProjectCompleted(
         offChainProject.owner,
         offChainProject.chain_project_id
       );
-
       if (projectHasBeenCompleted) {
         offChainProject.status_id = OffchainProjectState.Completed;
         await updateProject(offChainProject.id, offChainProject);
+        offChainProject.milestones.map(async (milestone: any) => {
+          await updateMilestone(milestone.project_id, milestone.milestone_index, true);
+        });
       }
     } else {
       const offChainMilestones = offChainProject.milestones.map((milestone: any) => milestone.is_approved);
       const onChainProjectMilestones = onChainProject.milestones.map((milestone) => milestone.is_approved);;
       const milestonesSynced = JSON.stringify(offChainMilestones) === JSON.stringify(onChainProjectMilestones);
-      if(!milestonesSynced) {
+      if (!milestonesSynced) {
         offChainProject.milestones.map(async (milestone: any) => {
           await updateMilestone(milestone.project_id, milestone.milestone_index, onChainProject.milestones[milestone.milestone_index].is_approved);
         });

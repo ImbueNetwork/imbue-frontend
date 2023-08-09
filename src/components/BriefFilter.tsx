@@ -20,6 +20,7 @@ export const BriefFilter = React.memo(
     setId,
     ids = [],
   }: BriefFilterProps): JSX.Element => {
+    console.log("🚀 ~ file: BriefFilter.tsx:23 ~ ids:", ids)
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const { checked, id } = e.target;
       const newIds = (checked && !ids.includes(id))

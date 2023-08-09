@@ -67,6 +67,12 @@ export enum ProjectType {
   Grant = 1,
 }
 
+export enum ImbueChainPollResult {
+  Pending,
+  EventFound,
+  EventNotFound,
+}
+
 export type Project = {
   id?: string | number;
   name: string;
@@ -259,7 +265,7 @@ export type BriefSqlFilter = {
   length_is_max: boolean;
   search_input: string | string[];
   items_per_page?: number;
-  page?: number;
+  page: number;
 };
 
 export type FreelancerSqlFilter = {
@@ -268,7 +274,7 @@ export type FreelancerSqlFilter = {
   languages_range: Array<number>;
   name: string | string[];
   items_per_page?: number;
-  page?: number;
+  page: number;
   verified?: boolean;
 };
 export type ApplicationData = {

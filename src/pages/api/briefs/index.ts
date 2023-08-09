@@ -20,42 +20,54 @@ import { authenticate, verifyUserIdFromJwt } from '../auth/common';
 
 const filter = new Filter();
 
-
 export default nextConnect()
   .use(passport.initialize())
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
-    const data = req.query;
+    const { page, items_per_page } = req.query;
     await db.transaction(async (tx: any) => {
       try {
-        await fetchAllBriefs()(tx).then(async (briefs: any) => {
-          const filteredOutProjects = briefs.filter(
-            (brief: any) => !brief.project_id
-          );
+        // await fetchAllBriefs()(tx).then(async (briefs: any) => {
+        //   const filteredOutProjects = briefs.filter(
+        //     (brief: any) => !brief.project_id
+        //   );
 
-          const { currentData } = models.paginatedData(
-            Number(data?.page || 1),
-            Number(data?.items_per_page || 5),
-            filteredOutProjects
-          );
+        //   // const { currentData } = models.paginatedData(
+        //   //   Number(page || 1),
+        //   //   Number(items_per_page || 5),
+        //   //   filteredOutProjects
+        //   // );
 
-          await Promise.all([
-            currentData,
-            ...currentData.map(async (brief: any) => {
-              brief.skills = await fetchItems(brief.skill_ids, 'skills')(tx);
-              brief.industries = await fetchItems(
-                brief.industry_ids,
-                'industries'
-              )(tx);
-            }),
-          ]);
+        // });
 
-          res.status(200).json({
-            currentData: currentData,
-            totalBriefs: filteredOutProjects?.length,
-          });
+        const currentData = await fetchAllBriefs()(tx)
+          .offset((Number(page || 1) - 1) * Number(items_per_page || 6))
+          .limit(Number(items_per_page || 5));
+
+        const briefsCount = await fetchAllBriefs()(tx).then(
+          (res) => res?.length
+        );
+
+        await Promise.all([
+          currentData,
+          ...currentData.map(async (brief: any) => {
+            brief.skills = await fetchItems(brief.skill_ids, 'skills')(tx);
+            brief.industries = await fetchItems(
+              brief.industry_ids,
+              'industries'
+            )(tx);
+          }),
+        ]);
+
+        res.status(200).json({
+          currentData: currentData,
+          totalBriefs: briefsCount || 0,
         });
       } catch (e) {
-        new Error(`Failed to fetch all briefs`, { cause: e as Error });
+        res.status(401).json({
+          currentData: [],
+          totalBriefs: 0,
+        });
+        throw new Error(`Failed to fetch all briefs`, { cause: e as Error });
       }
     });
   })

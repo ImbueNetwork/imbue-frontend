@@ -31,6 +31,7 @@ import { calenderIcon, shieldIcon, tagIcon } from '@/assets/svgs';
 import { timeData } from '@/config/briefs-data';
 import {
   Currency,
+  ImbueChainPollResult,
   Milestone,
   OffchainProjectState,
   Project,
@@ -342,18 +343,19 @@ function Project() {
         vote
       );
 
-      let milestoneApproved;
+      let pollResult = ImbueChainPollResult.Pending;
+
       if (!result.txError) {
-        milestoneApproved = await chainService.pollChainMessage(
+        pollResult = await chainService.pollChainMessage(
           ImbueChainEvent.ApproveMilestone,
           account
-        );
+        ) as ImbueChainPollResult;
       }
 
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
-            if (milestoneApproved) {
+            if (pollResult == ImbueChainPollResult.EventFound) {
               await updateMilestone(projectId, milestoneKeyInView, true);
             }
             setSuccess(true);
@@ -361,7 +363,9 @@ function Project() {
           } else if (result.txError) {
             setError({ message: result.errorMessage });
           }
-          break;
+          if (pollResult != ImbueChainPollResult.Pending) {
+            break;
+          }
         }
         await new Promise((f) => setTimeout(f, 1000));
       }
@@ -419,18 +423,18 @@ function Project() {
         vote
       );
 
-      let shouldRefund;
+      let pollResult = ImbueChainPollResult.Pending;
       if (!result.txError) {
-        shouldRefund = await chainService.pollChainMessage(
+        pollResult = await chainService.pollChainMessage(
           ImbueChainEvent.NoConfidenceRoundFinalised,
           account
-        );
+        ) as ImbueChainPollResult;
       }
 
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
-            if (shouldRefund) {
+            if (pollResult == ImbueChainPollResult.EventFound) {
               project.status_id = OffchainProjectState.Refunded;
               await updateProject(project?.id, project);
             }
@@ -439,7 +443,9 @@ function Project() {
           } else if (result.txError) {
             setError({ message: result.errorMessage });
           }
-          break;
+          if (pollResult != ImbueChainPollResult.Pending) {
+            break;
+          }
         }
         await new Promise((f) => setTimeout(f, 1000));
       }
@@ -905,7 +911,7 @@ function Project() {
                       width: `${(onChainProject?.milestones?.filter?.(
                         (m: any) => m?.is_approved
                       )?.length /
-                        onChainProject?.milestones?.length) *
+                          onChainProject?.milestones?.length) *
                         100
                         }%`,
                     }}
