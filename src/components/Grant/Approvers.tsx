@@ -32,11 +32,19 @@ const Approvers = ({ setApprovers, approvers, user }: ApproverProps) => {
   const getAllUsers = async (e: any) => {
     setOpen(true);
     if (e.target.value === '') {
-      const allUsers = await searchUserByUsernameOrAddress('')
-      const excludeUser = allUsers.filter((u: any) => u.web3_address !== user?.web3_address)
+      try {
+        let allUsers = await searchUserByUsernameOrAddress('')
+        if (user?.web3_address) {
+          allUsers = allUsers.filter((u: any) => u.web3_address !== user?.web3_address)
+        }
 
-      setRegUsers(excludeUser);
-      setLoading(false);
+        setRegUsers(allUsers);
+      } catch (error) {
+        console.log(error);
+      }
+      finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -47,12 +55,15 @@ const Approvers = ({ setApprovers, approvers, user }: ApproverProps) => {
   const handleInputChange = async (e: any) => {
     const input = e.target.value;
     setInput(input);
-    const allUsers = await searchUserByUsernameOrAddress(input);
-    const excludeUser = allUsers.filter((u: any) => u.web3_address !== user?.web3_address)
+
+    let allUsers = await searchUserByUsernameOrAddress(input);
+    if (user?.web3_address) {
+      allUsers = allUsers.filter((u: any) => u.web3_address !== user?.web3_address)
+    }
 
     const isValid = isValidAddressPolkadotAddress(input);
     setValidAddress(isValid);
-    setRegUsers(excludeUser);
+    setRegUsers(allUsers);
   };
 
   const addApprover = (newApprover: any) => {
@@ -118,7 +129,7 @@ const Approvers = ({ setApprovers, approvers, user }: ApproverProps) => {
           />
 
           {open && (
-            <div className='flex flex-col bg-overlay border border-imbue-purple rounded-lg absolute top-full w-full z-[5] overflow-hidden'>
+            <div className='flex flex-col bg-overlay border border-imbue-purple rounded-lg absolute top-full w-full z-[5] overflow-y-auto max-h-[350px]'>
               {loading ? (
                 <p className='flex items-center gap-10 p-4'>
                   Loading users <CircularProgress />
@@ -189,7 +200,7 @@ const Approvers = ({ setApprovers, approvers, user }: ApproverProps) => {
                                   user?.web3_address &&
                                   addApprover(user)
                                 }
-                                className='flex flex-col gap-4 '
+                                className='flex flex-col gap-4'
                               >
                                 <div className='flex justify-between items-center w-full hover:bg-imbue-light-purple px-4 py-2'>
                                   <div className='flex text-white gap-3 items-center cursor-pointer'>
