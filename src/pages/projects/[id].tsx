@@ -154,10 +154,6 @@ function Project() {
         setShowRefundButton(onChainProjectRes.fundingType.Grant);
       }
 
-      console.log(onChainProjectRes);
-      console.log(onChainProjectRes.id);
-
-
       const firstPendingMilestone =
         await chainService.findFirstPendingMilestone(
           onChainProjectRes.milestones
@@ -175,9 +171,9 @@ function Project() {
         const voters = await chainService.getNoConfidenceVoters(
           onChainProjectRes.id
         );
-        console.log("**** current voters are ");
+        console.log('**** current voters are ');
         console.log(voters);
-        console.log("***** has current user voted? ");
+        console.log('***** has current user voted? ');
         console.log(voters.includes(user.web3_address));
         if (voters.includes(user.web3_address)) {
           setApproverVotedOnRefund(true);
