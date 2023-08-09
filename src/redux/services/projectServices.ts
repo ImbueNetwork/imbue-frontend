@@ -63,7 +63,7 @@ export const updateMilestone = async (projectId: number, milestoneIndex:number, 
     `${config.apiBase}/project/updateMilestone?projectId=${projectId}&milestoneIndex=${milestoneIndex}&approve=${approve}`,
     {
       headers: config.postAPIHeaders,
-      method: 'get',
+      method: 'put',
     }
   );
 
