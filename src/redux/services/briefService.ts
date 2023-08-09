@@ -289,3 +289,27 @@ export const searchSkills = async (name: string) => {
     throw new Error('Failed to get skills ..... status:' + resp.status);
   }
 };
+
+export const searchIndustries = async (name: string) => {
+  const resp = await fetch(`${config.apiBase}industry/${name}`, {
+    headers: getAPIHeaders,
+    method: 'get',
+  });
+  if (resp.ok) {
+    return (await resp.json()) as { industry: Array<{ name: string }> };
+  } else {
+    throw new Error('Failed to get industry ..... status:' + resp.status);
+  }
+};
+
+export const searchLanguageByName = async (name: string) => {
+  const resp = await fetch(`${config.apiBase}language/${name}`, {
+    headers: getAPIHeaders,
+    method: 'get',
+  });
+  if (resp.ok) {
+    return (await resp.json()) as { languages: Array<{ name: string }> };
+  } else {
+    throw new Error('Failed to get language ..... status:' + resp.status);
+  }
+};

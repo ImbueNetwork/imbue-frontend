@@ -43,7 +43,6 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
         </button>
       </div>
     );
-
   return (
     <>
       {projects?.map(
@@ -61,11 +60,22 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
                     <div className='w-48'>
                       <ProgressBar
                         isPrimary={true}
-                        titleArray={['', '', '', '']}
-                        currentValue={2}
+                        titleArray={Array(item.milestones.length).fill('')}
+                        currentValue={
+                          item.milestones.filter(
+                            (it: any) => it.is_approved === true
+                          ).length - 1
+                        }
                       />
                     </div>
-                    <p className='text-[#7AA822]'>3/4</p>
+                    <p className='text-[#7AA822]'>
+                      {
+                        item.milestones.filter(
+                          (it: any) => it.is_approved === true
+                        ).length
+                      }
+                      /{item.milestones.length}
+                    </p>
                     <button
                       className={classNames(
                         ' text-black flex px-5 py-3 text-sm ml-auto rounded-full',

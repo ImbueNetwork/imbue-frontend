@@ -12,7 +12,6 @@ import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 import { Option } from '@/components/Option';
 import { ProgressBar } from '@/components/ProgressBar';
-import { TagsInput } from '@/components/TagsInput';
 import ValidatableInput from '@/components/ValidatableInput';
 
 import * as config from '@/config';
@@ -21,10 +20,9 @@ import {
   nameExamples,
   scopeData,
   stepData,
-  suggestedIndustries,
   timeData,
 } from '@/config/briefs-data';
-import { searchSkills } from '@/redux/services/briefService';
+import { searchIndustries, searchSkills } from '@/redux/services/briefService';
 import { RootState } from '@/redux/store/store';
 
 import styles from '../../styles/modules/newBrief.module.css';
@@ -41,6 +39,7 @@ const NewBrief = (): JSX.Element => {
   const [durationId, setDurationId] = useState<number>();
   const [budget, setBudget] = useState<number>(0);
   const [suggestedSkills, setSuggestedSkills] = useState<string[]>([]);
+  const [suggestedIndustries, setSuggestedIndustries] = useState<string[]>([]);
 
   const [error, setError] = useState<any>();
   const [inputError, setInputError] = useState<any>();
@@ -54,6 +53,7 @@ const NewBrief = (): JSX.Element => {
 
   useEffect(() => {
     fetchSuggestedSkills();
+    fetchSuggestedIndustries();
   }, []);
 
   const fetchSuggestedSkills = async () => {
@@ -63,10 +63,27 @@ const NewBrief = (): JSX.Element => {
     }
   };
 
+  const fetchSuggestedIndustries = async () => {
+    const industriesRes = await searchIndustries('a');
+    if (industriesRes) {
+      setSuggestedIndustries(
+        industriesRes?.industry.map((industries) => industries.name)
+      );
+    }
+  };
+
   const searchSkill = async (name: string) => {
     const skillRes = await searchSkills(name);
     if (!skillRes || !skillRes?.skills.length) return;
     setSuggestedSkills(skillRes?.skills.map((skill) => skill.name));
+  };
+
+  const searchIndustry = async (name: string) => {
+    const industriesRes = await searchIndustries(name.length > 0 ? name : 'a');
+    if (!industriesRes || !industriesRes?.industry.length) return;
+    setSuggestedIndustries(
+      industriesRes?.industry.map((industry) => industry.name)
+    );
   };
 
   const handleIndustriesChange = (val: string[]) => {
@@ -145,12 +162,31 @@ const NewBrief = (): JSX.Element => {
     <>
       <p className={styles.fieldName}>Search industries or add your own</p>
       <div className={styles.industryContainer}>
-        <TagsInput
+        {/* <TagsInput
           suggestData={suggestedIndustries}
           data-testid='industries-input'
           tags={industries}
           onChange={(tags: string[]) => handleIndustriesChange(tags)}
           limit={10}
+        /> */}
+        <Autocomplete
+          id='tags-standard'
+          data-testid='skills-input'
+          multiple
+          getOptionLabel={(option) => option}
+          options={suggestedIndustries}
+          sx={{ width: '100%' }}
+          onChange={(e, value) => handleIndustriesChange(value)}
+          defaultValue={industries}
+          limitTags={10}
+          renderInput={(params) => (
+            <TextField
+              color='secondary'
+              autoComplete='off'
+              onChange={(e) => searchIndustry(e.target.value)}
+              {...params}
+            />
+          )}
         />
       </div>
       <div className='flex flex-wrap flex-row  justify-center relative -top-4'>
