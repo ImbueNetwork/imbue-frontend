@@ -67,6 +67,12 @@ export enum ProjectType {
   Grant = 1,
 }
 
+export enum ImbueChainPollResult {
+  Pending,
+  EventFound,
+  EventNotFound,
+}
+
 export type Project = {
   id?: string | number;
   name: string;
