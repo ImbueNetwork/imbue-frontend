@@ -72,60 +72,6 @@ const MyClientBriefsView = (props: ClientViewProps) => {
         ongoingGrants={ongoingGrants}
         loadingApplications={loadingApplications}
       />
-
-      {/* {briefId ? (
-        <div className='bg-white relative rounded-[0.75rem] '>
-          <div
-            className='absolute top-2 left-2 cursor-pointer'
-            onClick={goBack}
-          >
-            <ArrowBackIcon htmlColor='#3B27C1' />
-          </div>
-          {loadingApplications ? (
-            <ApplicationSkeleton />
-          ) : (
-            <>
-              {briefApplications?.map((application: any, index: any) => {
-                return (
-                  <ApplicationContainer
-                    application={application}
-                    handleMessageBoxClick={handleMessageBoxClick}
-                    redirectToApplication={redirectToBriefApplications}
-                    key={index}
-                  />
-                );
-              })}
-            </>
-          )}
-        </div>
-      ) : (
-        <div>
-          <h2 className='text-imbue-purple-dark text-base lg:text-xl mb-3'>Open Briefs</h2>
-          <BriefLists
-            briefs={briefs?.briefsUnderReview}
-            showNewBriefButton={true}
-          />
-
-
-
-          {
-            ongoingGrants?.length && (
-              <>
-                <p className='text-imbue-purple-dark text-base lg:text-xl mb-3 mt-4 lg:mt-10'>
-                  Ongoing Grants
-                </p>
-                <div className='bg-background rounded-xl overflow-hidden'>
-                  <OngoingProject
-                    projects={ongoingGrants}
-                  />
-                </div>
-              </>
-            )
-          }
-
-        </div>
-      )}
-      */}
     </div>
   );
 };

@@ -1,3 +1,5 @@
+import { useRouter } from 'next/router';
+
 import OngoingProject from '@/components/Dashboard/FreelacerView/OngoingProject/OngoinProject';
 
 import { Project } from '@/model';
@@ -7,13 +9,29 @@ export default function Grants({
 }: {
   ongoingGrants: Project[];
 }) {
+  const router = useRouter();
+  const redirectToNewBrief = () => {
+    router.push('/grants/new');
+  };
+  if (ongoingGrants?.length === 0) {
+    return (
+      <div className='flex justify-center w-full'>
+        <button
+          onClick={() => {
+            redirectToNewBrief();
+          }}
+          className='primary-btn in-dark w-button lg:w-1/3'
+          style={{ textAlign: 'center' }}
+        >
+          submit a grant
+        </button>
+      </div>
+    );
+  }
   return (
     <div>
       {ongoingGrants?.length && (
         <>
-          <p className='text-imbue-purple-dark text-base lg:text-xl mb-3 mt-4 lg:mt-10'>
-            Ongoing Grants
-          </p>
           <div className='bg-background rounded-xl overflow-hidden'>
             <OngoingProject projects={ongoingGrants} />
           </div>
