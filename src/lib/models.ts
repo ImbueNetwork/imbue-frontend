@@ -449,7 +449,7 @@ export const updateFederatedLoginUser =
 export const getApproverProjects =
   (wallet: string | string[]) => async (tx: Knex.Transaction) =>
     await tx<Project>('project_approvers')
-      .join('projects', 'project_approvers.project_id', '=', 'projects.id')
+      .leftJoin('projects', 'project_approvers.project_id', '=', 'projects.id')
       .select()
       .where({ approver: wallet })
       .orderBy('projects.created', 'desc');

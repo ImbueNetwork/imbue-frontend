@@ -46,13 +46,13 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
   return (
     <>
       {projects?.map(
-        (item: any, index: number) =>
+        (project, index: number) =>
           index <
             Math.min(Math.max(value, ongoinProjectLimit), projects.length) && (
             <>
               <div
-                key={item.id}
-                onClick={() => redirectToApplication(item)}
+                key={project.id}
+                onClick={() => redirectToApplication(project)}
                 className=' hover:bg-imbue-light-purple cursor-pointer px-9 text-imbue-purple'
               >
                 <div className='flex flex-col pt-7 gap-y-5 '>
@@ -60,9 +60,9 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
                     <div className='w-48'>
                       <ProgressBar
                         isPrimary={true}
-                        titleArray={Array(item.milestones.length).fill('')}
+                        titleArray={Array(project.milestones?.length).fill('')}
                         currentValue={
-                          item.milestones.filter(
+                          project?.milestones?.filter(
                             (it: any) => it.is_approved === true
                           ).length - 1
                         }
@@ -70,36 +70,36 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
                     </div>
                     <p className='text-[#7AA822]'>
                       {
-                        item.milestones.filter(
+                        project.milestones?.filter(
                           (it: any) => it.is_approved === true
                         ).length
                       }
-                      /{item.milestones.length}
+                      /{project.milestones?.length}
                     </p>
                     <button
                       className={classNames(
                         ' text-black flex px-5 py-3 text-sm ml-auto rounded-full',
-                        !item.completed ? 'bg-light-grey' : 'bg-primary'
+                        !project.completed ? 'bg-light-grey' : 'bg-primary'
                       )}
                     >
-                      {item.completed ? 'completed' : 'In progress'}
+                      {project.completed ? 'completed' : 'In progress'}
                     </button>
                   </div>
                   <p className='text-imbue-purple-dark text-sm sm:text-lg'>
-                    {item.name}
+                    {project.name}
                   </p>
                   <p className='text-xs sm:text-sm'>
-                    {timeAgo?.format(new Date(item?.created || 0))}
+                    {timeAgo?.format(new Date(project?.created || 0))}
                   </p>
                 </div>
                 <div className='my-7 break-all'>
                   <p className='text-sm line-clamp-2 md:line-clamp-3 lg:line-clamp-4'>
-                    {item.description}
+                    {project.description}
                   </p>
                 </div>
                 <div className='flex pb-9 justify-between'>
                   <div className='flex space-x-5 text-sm text-imbue-purple-dark'>
-                    <p>${item.required_funds}</p>
+                    <p>${project.required_funds}</p>
                     <p>Fixed price</p>
                   </div>
                 </div>

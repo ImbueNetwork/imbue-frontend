@@ -17,7 +17,6 @@ export enum OffchainProjectState {
   Completed = 6,
 }
 
-
 export const applicationStatusId = [
   'Draft',
   'Pending Review',
@@ -94,6 +93,8 @@ export type Project = {
   created?: string;
   duration_id: number;
   escrow_address: string;
+  completed: boolean;
+  milestones: Milestone[];
 };
 
 export type ProjectOnChain = {

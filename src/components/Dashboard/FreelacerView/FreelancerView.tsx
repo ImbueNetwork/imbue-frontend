@@ -2,14 +2,14 @@ import { Divider } from '@mui/material';
 import cn from 'classnames';
 import { useMemo, useState } from 'react';
 
-import { displayState } from '@/model';
+import { displayState,Project } from '@/model';
 
 import BreifApplication from './BriefApplication/BreifApplication';
 import OngoingProject from './OngoingProject/OngoinProject';
 
 interface FreelacerViewProps {
   myApplications: any;
-  currentProject: any;
+  currentProject: Project[];
 }
 
 const FreelancerView: React.FC<FreelacerViewProps> = ({
@@ -51,8 +51,8 @@ const FreelancerView: React.FC<FreelacerViewProps> = ({
           )}
           onClick={() => setSwitcher('ongoingproject')}
         >
-          Ongoing project
-          <span className='text-sm ml-2'>({currentProject.length})</span>
+          Ongoing Projects
+          <span className='text-sm ml-2'>({currentProject?.length})</span>
         </p>
       </div>
       <Divider />
