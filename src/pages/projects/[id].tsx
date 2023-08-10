@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
-import { Tooltip } from '@mui/material';
+import { Modal, Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -130,6 +130,7 @@ function Project() {
   const [projectType, setProjectType] = useState<'grant' | 'brief' | null>(
     null
   );
+  const [isModalOpen, setModalOpen] = useState(false);
   const canVote = isApprover || (projectType === 'brief' && isProjectOwner);
   const [expandProjectDesc, setExpandProjectDesc] = useState<number>(500);
 
@@ -297,7 +298,9 @@ function Project() {
         projectRes?.currency_id || 0,
         user
       );
-
+      if (!balance) {
+        setModalOpen(true);
+      }
       setBalance(balance || 0);
     } catch (error) {
       setError({ message: 'can not find the project ' + error });
@@ -678,6 +681,98 @@ function Project() {
 
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
+      <Modal
+        sx={{
+          color: '#fff',
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          outline: 0,
+        }}
+        open={isModalOpen}
+        onClose={() => setModalOpen(false)}
+      >
+        <div className='bg-white rounded-2xl absolute top-28 right-14 min-w-[32.5625rem] py-7 px-6 text-imbue-purple-dark'>
+          <div
+            onClick={() => setModalOpen(false)}
+            className='pb-7 flex-row-reverse cursor-pointer  items-center flex'
+          >
+            <Image
+              className='ml-2'
+              src={'/cross.svg'}
+              width={30}
+              height={30}
+              alt='close'
+            />
+            <p>close</p>
+          </div>
+          <div className='flex flex-col items-center'>
+            <Image
+              src={'/round-dimond.svg'}
+              height={50}
+              width={50}
+              alt='rounded dimond'
+            />
+            <p className='text-3xl pt-3'>Pending</p>
+            <p className='py-2'>
+              steps required to submit/withdraw a milestone
+            </p>
+          </div>
+          <div className='flex  mt-7 items-center w-full'>
+            <Image
+              className='bg-transparent drop-shadow-sm mr-3'
+              src={'/checked.svg'}
+              width={35}
+              height={30}
+              alt='checked'
+            />
+            <div className='flex bg-imbue-light-purple-three rounded-xl px-3 py-2 w-full justify-between items-center '>
+              <p className='flex text-xl flex-col'>
+                {projectType}
+                <span className='text-xs text-imbue-light-purple-two'>
+                  create {projectType}
+                </span>
+              </p>
+              <p className='ml-auto text-imbue-purple text-sm'>Done</p>
+            </div>
+          </div>
+          <div className='flex  mt-2 items-center w-full'>
+            <Image
+              className='bg-transparent  drop-shadow-sm mr-2'
+              src={'/checked.svg'}
+              width={40}
+              height={30}
+              alt='checked'
+            />
+            <div className='flex bg-imbue-light-purple-three rounded-xl px-3 py-2 w-full justify-between items-center '>
+              <p className='flex text-xl flex-col'>
+                Address
+                <span className='text-xs text-imbue-light-purple-two'>
+                  copy escrow address and submit this proposal to kusama
+                </span>
+              </p>
+              <p className='ml-auto text-sm text-imbue-purple'>Done</p>
+            </div>
+          </div>
+          <div className='flex  mt-2 items-center w-full'>
+            <Image
+              className='bg-transparent  drop-shadow-sm mr-2'
+              src={'/unchecked.svg'}
+              width={40}
+              height={30}
+              alt='checked'
+            />
+            <div className='flex bg-imbue-light-purple-three rounded-xl px-3 py-2 w-full justify-between items-center '>
+              <p className='flex text-xl flex-col'>
+                Funds deposited
+                <span className='text-xs text-imbue-light-purple-two'>
+                  Raised through governance
+                </span>
+              </p>
+              <p className='ml-auto text-sm text-imbue-coral'>Not Done</p>
+            </div>
+          </div>
+        </div>
+      </Modal>
+
       {user && showMessageBox && (
         <ChatPopup
           {...{
@@ -701,11 +796,13 @@ function Project() {
       >
         <div className='flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] max-lg:basis-[60%] mr-[5%]  max-lg:mr-0 relative'>
           <div className='flex flex-wrap gap-3 lg:gap-4 items-center'>
-            <div className='flex items-center'>
-              <BackButton  className='mr-1 -ml-3'/>
-              <h3 className='text-[2rem] max-lg:text-[24px] break-all leading-[1.5] font-normal m-0 p-0 text-imbue-purple'>
-                {project?.name}
-              </h3>
+            <div className='flex items-center  w-full justify-between'>
+              <div className='flex items-center'>
+                <BackButton className='mr-1 -ml-3' />
+                <h3 className='text-[2rem] max-lg:text-[24px] break-all leading-[1.5] font-normal m-0 p-0 text-imbue-purple'>
+                  {project?.name}
+                </h3>
+              </div>
             </div>
 
             {project?.brief_id && (
@@ -994,8 +1091,14 @@ function Project() {
               <div className='flex flex-row items-start gap-3'>
                 <AccountBalanceWalletOutlinedIcon className='mt-1 text-imbue-purple-dark' />
                 <div className='flex flex-col'>
-                  <h3 className='text-lg lg:text-[1.25rem] text-imbue-purple-dark leading-[1.5] font-normal m-0 p-0'>
+                  <h3 className='text-lg flex items-center lg:text-[1.25rem] text-imbue-purple-dark leading-[1.5] font-normal m-0 p-0'>
                     Wallet Address
+                    <span
+                      onClick={() => setModalOpen(true)}
+                      className='bg-indigo-700 ml-2 h-5 w-5 py-1 px-1.5 cursor-pointer text-xs !text-white rounded-full flex justify-center items-center'
+                    >
+                      ?
+                    </span>
                   </h3>
                   <div className='text-[1rem] text-imbue-light-purple-two mt-2 text-xs break-all'>
                     {project?.escrow_address}
@@ -1025,7 +1128,6 @@ function Project() {
           )}
         </div>
       </div>
-
       {onChainProject?.milestones?.map?.(
         (milestone: Milestone, index: number) => {
           return (
@@ -1062,7 +1164,6 @@ function Project() {
           );
         }
       )}
-
       {showPolkadotAccounts && renderPolkadotJSModal}
       {showVotingModal && renderVotingModal}
       <Login
@@ -1072,7 +1173,6 @@ function Project() {
         }}
         redirectUrl={`/project/${projectId}/`}
       />
-
       <ErrorScreen {...{ error, setError }}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button
@@ -1089,7 +1189,6 @@ function Project() {
           </button>
         </div>
       </ErrorScreen>
-
       <SuccessScreen title={successTitle} open={success} setOpen={setSuccess}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button
@@ -1109,7 +1208,6 @@ function Project() {
           </button>
         </div>
       </SuccessScreen>
-
       <WaitingScreen title={waitMessage} open={wait} setOpen={setWait}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button
