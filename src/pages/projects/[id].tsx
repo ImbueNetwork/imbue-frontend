@@ -141,6 +141,13 @@ function Project() {
     }
   }, [projectId, userLoading]);
 
+  const handlePopUpForUser = () => {
+    if (!localStorage.getItem('isShown')) {
+      localStorage.setItem('isShown', 'true');
+      setModalOpen(true);
+    }
+  };
+
   const getChainProject = async (project: Project, freelancer: any) => {
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
@@ -299,7 +306,7 @@ function Project() {
         user
       );
       if (!balance) {
-        setModalOpen(true);
+        handlePopUpForUser();
       }
       setBalance(balance || 0);
     } catch (error) {
@@ -686,6 +693,7 @@ function Project() {
           color: '#fff',
           zIndex: (theme) => theme.zIndex.drawer + 1,
           outline: 0,
+          border: 'none',
         }}
         open={isModalOpen}
         onClose={() => setModalOpen(false)}
