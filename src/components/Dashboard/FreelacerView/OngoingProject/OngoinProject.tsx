@@ -63,14 +63,12 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
                           <ProgressBar
                             isPrimary={true}
                             titleArray={Array(
-                              project.milestones?.length > 1
-                                ? project.milestones.length
-                                : 2
+                              project.milestones?.length + 1
                             ).fill('')}
                             currentValue={
                               project.milestones?.filter(
                                 (it: any) => it.is_approved === true
-                              ).length - 1
+                              ).length
                             }
                           />
                         </div>

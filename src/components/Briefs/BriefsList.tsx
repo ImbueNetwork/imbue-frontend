@@ -60,7 +60,7 @@ export const BriefLists = ({
         {briefs?.map(
           (brief, index) =>
             index <
-            Math.min(Math.max(loadValue, openBriefLimit), briefs.length) && (
+              Math.min(Math.max(loadValue, openBriefLimit), briefs.length) && (
               <div
                 key={index}
                 onClick={() => handleItemClick(brief)}
@@ -124,12 +124,14 @@ export const BriefLists = ({
                     </div> */}
                     <div className='w-full my-auto'>
                       <ProgressBar
-                        titleArray={Array(brief.milestones?.length).fill('')}
+                        titleArray={Array(brief.milestones?.length + 1).fill(
+                          ''
+                        )}
                         isPrimary={true}
                         currentValue={
                           brief.milestones?.filter(
                             (it: any) => it.is_approved === true
-                          ).length - 1
+                          ).length
                         }
                       />
                     </div>
