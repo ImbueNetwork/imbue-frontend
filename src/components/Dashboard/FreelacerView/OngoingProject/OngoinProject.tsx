@@ -57,25 +57,33 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
               >
                 <div className='flex flex-col pt-7 gap-y-5 '>
                   <div className='flex gap-x-3 items-center'>
-                    <div className='w-48'>
-                      <ProgressBar
-                        isPrimary={true}
-                        titleArray={Array(item.milestones.length).fill('')}
-                        currentValue={
-                          item.milestones.filter(
-                            (it: any) => it.is_approved === true
-                          ).length - 1
-                        }
-                      />
-                    </div>
-                    <p className='text-[#7AA822]'>
-                      {
-                        item.milestones.filter(
-                          (it: any) => it.is_approved === true
-                        ).length
-                      }
-                      /{item.milestones.length}
-                    </p>
+                    {item.milestones && (
+                      <>
+                        <div className='w-48'>
+                          <ProgressBar
+                            isPrimary={true}
+                            titleArray={Array(
+                              item.milestones?.length > 1
+                                ? item.milestones.length
+                                : 2
+                            ).fill('')}
+                            currentValue={
+                              item.milestones?.filter(
+                                (it: any) => it.is_approved === true
+                              ).length - 1
+                            }
+                          />
+                        </div>
+                        <p className='text-[#7AA822]'>
+                          {
+                            item.milestones?.filter(
+                              (it: any) => it.is_approved === true
+                            ).length
+                          }
+                          /{item.milestones?.length}
+                        </p>
+                      </>
+                    )}
                     <button
                       className={classNames(
                         ' text-black flex px-5 py-3 text-sm ml-auto rounded-full',

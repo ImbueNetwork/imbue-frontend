@@ -37,7 +37,7 @@ const FreelancerView: React.FC<FreelacerViewProps> = ({
           )}
           onClick={() => setSwitcher('application')}
         >
-          Brief Application{' '}
+          Brief Applications{' '}
           <span className='text-sm'>
             ({acceptedApplication + '/' + myApplications.length})
           </span>
@@ -51,7 +51,7 @@ const FreelancerView: React.FC<FreelacerViewProps> = ({
           )}
           onClick={() => setSwitcher('ongoingproject')}
         >
-          Ongoing project
+          Ongoing projects
           <span className='text-sm ml-2'>({currentProject.length})</span>
         </p>
       </div>

@@ -230,6 +230,7 @@ function Project() {
       let owner;
       let freelancerRes;
       if (!projectRes) {
+        setError({ message: 'No project is found!' });
         setLoading(false);
         router.push('/error');
       }
