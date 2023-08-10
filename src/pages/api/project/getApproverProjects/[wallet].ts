@@ -16,8 +16,18 @@ export default nextConnect()
         if (!wallet)
           return res.status(401).json({ message: 'No wallet found' });
 
-        const result = await models.getApproverProjects(wallet)(tx);
-        return res.status(201).json(result);
+        let projects = await models.getApproverProjects(wallet)(tx);
+
+        projects = await Promise.all(
+          projects.map(async (project) => {
+            return {
+              ...project,
+              milestones: await models.fetchProjectMilestones(project.id)(tx),
+            };
+          })
+        );
+
+        return res.status(201).json(projects);
       } catch (cause) {
         return res.status(401).json(cause);
       }

@@ -2,14 +2,14 @@ import { Divider } from '@mui/material';
 import cn from 'classnames';
 import { useMemo, useState } from 'react';
 
-import { displayState } from '@/model';
+import { displayState,Project } from '@/model';
 
 import BreifApplication from './BriefApplication/BreifApplication';
 import OngoingProject from './OngoingProject/OngoinProject';
 
 interface FreelacerViewProps {
   myApplications: any;
-  currentProject: any;
+  currentProject: Project[];
 }
 
 const FreelancerView: React.FC<FreelacerViewProps> = ({

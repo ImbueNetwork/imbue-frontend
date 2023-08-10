@@ -65,6 +65,7 @@ const ApplicationPreview = (): JSX.Element => {
     (state: RootState) => state.userState
   );
   const [application, setApplication] = useState<Project | any>();
+  console.log("🚀 ~ file: [applicationId].tsx:68 ~ ApplicationPreview ~ application:", application)
   const [freelancer, setFreelancer] = useState<Freelancer | any>();
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [currencyId, setCurrencyId] = useState(application?.currency_id);

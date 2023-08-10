@@ -449,7 +449,7 @@ export const updateFederatedLoginUser =
 export const getApproverProjects =
   (wallet: string | string[]) => async (tx: Knex.Transaction) =>
     await tx<Project>('project_approvers')
-      .join('projects', 'project_approvers.project_id', '=', 'projects.id')
+      .leftJoin('projects', 'project_approvers.project_id', '=', 'projects.id')
       .select()
       .where({ approver: wallet })
       .orderBy('projects.created', 'desc');
@@ -1381,41 +1381,48 @@ export const updateFreelancerDetails =
 // The search briefs and all these lovely parameters.
 // Since we are using checkboxes only i unfortunatly ended up using all these parameters.
 // Because we could have multiple ranges of values and open ended ors.
-export const searchBriefs = async (
-  tx: Knex.Transaction,
-  filter: BriefSqlFilter
-) =>
-  // select everything that is associated with brief.
-  fetchAllBriefs()(tx)
-    .where(function () {
-      if (filter.submitted_range.length > 0) {
-        this.whereBetween('users.briefs_submitted', [
-          filter.submitted_range[0].toString(),
-          Math.max(...filter.submitted_range).toString(),
-        ]);
-      }
-      if (filter.submitted_is_max) {
-        this.orWhere(
-          'users.briefs_submitted',
-          '>=',
-          Math.max(...filter.submitted_range)
-        );
-      }
-    })
-    .where(function () {
-      if (filter.experience_range.length > 0) {
-        this.whereIn('experience_id', filter.experience_range);
-      }
-    })
-    .where(function () {
-      if (filter.length_range.length > 0) {
-        this.whereIn('duration_id', filter.length_range);
-      }
-      if (filter.length_is_max) {
-        this.orWhere('duration_id', '>=', Math.max(...filter.length_range));
-      }
-    })
-    .where('headline', 'ilike', '%' + filter.search_input + '%');
+export const searchBriefs =
+  (filter: BriefSqlFilter) => async (tx: Knex.Transaction) =>
+    // select everything that is associated with brief.
+    fetchAllBriefs()(tx)
+    .whereNull('briefs.project_id')
+      .where(function () {
+        if (filter.submitted_range.length > 0) {
+          this.whereBetween('users.briefs_submitted', [
+            filter.submitted_range[0].toString(),
+            Math.max(...filter.submitted_range).toString(),
+          ]);
+        }
+        if (filter.submitted_is_max) {
+          this.orWhere(
+            'users.briefs_submitted',
+            '>=',
+            Math.max(...filter.submitted_range)
+          );
+        }
+      })
+      .where(function () {
+        if (filter.experience_range.length > 0) {
+          this.whereIn('experience_id', filter.experience_range);
+        }
+      })
+      .where(function () {
+        if (filter.length_range.length > 0) {
+          this.whereIn('duration_id', filter.length_range);
+        }
+        if (filter.length_is_max) {
+          this.orWhere('duration_id', '>=', Math.max(...filter.length_range));
+        }
+      })
+      .where('headline', 'ilike', '%' + filter.search_input + '%')
+      .modify(function (builder) {
+        if (filter?.items_per_page > 0)
+          builder
+            .offset(
+              (Number(filter.page) - 1) * Number(filter.items_per_page) || 0
+            )
+            .limit(Number(filter.items_per_page) || 5);
+      });
 
 export const paginatedData = (
   currentPage: number,
@@ -1500,11 +1507,13 @@ export const searchFreelancers =
         }
       })
       .distinct('freelancers.id')
-      .where(function () {
-        if (filter.items_per_page > 0) {
-          this.offset(
-            Number(filter.page - 1) * Number(filter.items_per_page) || 0
-          ).limit(Number(filter.items_per_page) || 5);
+      .modify(function (builder) {
+        if (Number(filter?.items_per_page) > 0) {
+          builder
+            .offset(
+              (Number(filter.page) - 1) * Number(filter.items_per_page) || 0
+            )
+            .limit(Number(filter.items_per_page) || 5);
         }
       });
 

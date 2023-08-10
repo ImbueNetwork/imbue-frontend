@@ -2,6 +2,8 @@ import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+
+import { ProgressBar } from '../ProgressBar';
 TimeAgo.addLocale(en);
 
 const timeAgo = new TimeAgo('en-US');
@@ -58,7 +60,7 @@ export const BriefLists = ({
         {briefs?.map(
           (brief, index) =>
             index <
-              Math.min(Math.max(loadValue, openBriefLimit), briefs.length) && (
+            Math.min(Math.max(loadValue, openBriefLimit), briefs.length) && (
               <div
                 key={index}
                 onClick={() => handleItemClick(brief)}
@@ -86,7 +88,7 @@ export const BriefLists = ({
                   <div className='flex flex-col items-center w-1/4'>
                     <p className='text-sm lg:text-xl text-imbue-purple-dark flex flex-col items-center lg:flex-row gap-2'>
                       Milestones{' '}
-                      <span className='primary-text'>
+                      <span className='text-imbue-lemon font-semibold'>
                         {
                           brief.milestones?.filter((m: any) => m?.is_approved)
                             ?.length
@@ -94,7 +96,7 @@ export const BriefLists = ({
                         /{brief.milestones?.length}
                       </span>
                     </p>
-                    <div className='w-full group-hover:bg-white bg-light-grey h-1 relative my-auto'>
+                    {/* <div className='w-full group-hover:bg-white bg-light-grey h-1 relative my-auto'>
                       <div
                         style={{
                           width: `${
@@ -119,6 +121,17 @@ export const BriefLists = ({
                           ></div>
                         ))}
                       </div>
+                    </div> */}
+                    <div className='w-full my-auto'>
+                      <ProgressBar
+                        titleArray={Array(brief.milestones?.length).fill('')}
+                        isPrimary={true}
+                        currentValue={
+                          brief.milestones?.filter(
+                            (it: any) => it.is_approved === true
+                          ).length - 1
+                        }
+                      />
                     </div>
                   </div>
                 ) : (
@@ -126,7 +139,7 @@ export const BriefLists = ({
                     <h2 className='text-sm lg:text-lg text-imbue-purple-dark'>
                       Proposals
                     </h2>
-                    <h2 className='text-sm lg:text-xl font-bold text-primary'>
+                    <h2 className='text-sm lg:text-xl text-imbue-lemon font-semibold'>
                       {brief.number_of_applications}
                     </h2>
                   </div>

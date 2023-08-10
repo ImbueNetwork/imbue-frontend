@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
+import { strToIntRange } from '@/utils/helper';
+
 import CustomDropDown from '@/components/CustomDropDown';
 import CustomModal from '@/components/CustomModal';
 
@@ -17,7 +19,6 @@ import {
 } from '@/assets/svgs';
 import styles from '@/styles/modules/freelancers.module.css';
 
-import { strToIntRange } from '../briefs';
 import LoadingFreelancers from '../../components/Freelancers/FreelancersLoading';
 import {
   Freelancer,
@@ -60,6 +61,8 @@ const Freelancers = (): JSX.Element => {
     languagesRangeProps,
     freelancerInfoProps,
     name,
+    page: pageProp,
+    size: sizeProp
   } = router.query;
 
   const { pathname } = router;
@@ -203,6 +206,16 @@ const Freelancers = (): JSX.Element => {
           items_per_page: itemsPerPage
         };
 
+
+        if (sizeProp) {
+          filter = { ...filter, items_per_page: Number(sizeProp) || 12 };
+          setItemsPerPage(Number(sizeProp))
+        }
+
+        if (pageProp) {
+          filter = { ...filter, page: Number(pageProp) || 1 };
+        }
+
         if (name) {
           filter = { ...filter, name: name };
           const input = document.getElementById(
@@ -254,7 +267,17 @@ const Freelancers = (): JSX.Element => {
         }
         const { currentData, totalFreelancers } = await callSearchFreelancers(
           filter
-          );
+        );
+
+        const totalPages = Math.ceil(totalFreelancers / (filter?.items_per_page || 12))
+
+        if (totalPages < filter.page) {
+          router.query.page = totalPages.toString()
+          router.push(router, undefined, { shallow: true })
+          filter.page = totalPages
+        }
+
+        setCurrentPage(filter.page)
         setFreelancers(currentData);
         setFreelancersTotal(totalFreelancers);
         setLoading(false)
@@ -273,7 +296,8 @@ const Freelancers = (): JSX.Element => {
     servicesRangeProps,
     freelancerInfoProps,
     currentPage,
-    itemsPerPage
+    itemsPerPage,
+    pageProp
   ]);
 
 
@@ -586,7 +610,11 @@ const Freelancers = (): JSX.Element => {
             <div className='flex items-center'>
               <button
                 onClick={() => {
-                  if (currentPage > 1) setCurrentPage(currentPage - 1);
+                  if (currentPage > 1) {
+                    router.query.page = String(currentPage - 1)
+                    router.push(router, undefined, { shallow: true })
+                    setCurrentPage(currentPage - 1)
+                  }
                 }}
                 className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'
               >
@@ -602,6 +630,8 @@ const Freelancers = (): JSX.Element => {
                 onClick={() => {
                   if (freelancers_total > currentPage * itemsPerPage) {
                     setCurrentPage(currentPage + 1);
+                    router.query.page = String(currentPage + 1)
+                    router.push(router, undefined, { shallow: true })
                   }
                 }}
                 className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'
@@ -617,6 +647,8 @@ const Freelancers = (): JSX.Element => {
                 <select
                   name='currencyId'
                   onChange={(e) => {
+                    router.query.size = String(e.target.value)
+                    router.push(router, undefined, { shallow: true })
                     setItemsPerPage(Number(e.target.value));
                   }}
                   value={itemsPerPage}

@@ -46,13 +46,20 @@ export default nextConnect()
 
     await db.transaction(async (tx: any) => {
       try {
-        const briefs: Array<Brief> = await models.searchBriefs(tx, data);
+        const currentData: Array<Brief> = await models.searchBriefs(data)(tx);
 
-        const { currentData, totalItems } = await models.paginatedData(
-          Number(data?.page || 1),
-          Number(data?.items_per_page || 5),
-          briefs
-        );
+        const totalBriefs = await models
+          .searchBriefs({
+            ...data,
+            items_per_page: 0,
+          })(tx)
+          .then((resp) => resp.length);
+
+        // const { currentData, totalItems } = await models.paginatedData(
+        //   Number(data?.page || 1),
+        //   Number(data?.items_per_page || 5),
+        //   briefs
+        // );
 
         await Promise.all([
           currentData,
@@ -65,7 +72,7 @@ export default nextConnect()
           }),
         ]);
 
-        res.status(200).json({ currentData, totalBriefs: totalItems });
+        res.status(200).json({ currentData, totalBriefs });
       } catch (e) {
         new Error(`Failed to search for briefs ${data}`, { cause: e as Error });
       }

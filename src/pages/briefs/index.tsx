@@ -8,6 +8,8 @@ import React, { useEffect, useState } from 'react';
 import { IoTrashBin } from 'react-icons/io5';
 import { useSelector } from 'react-redux';
 
+import { strToIntRange } from '@/utils/helper';
+
 import CustomDropDown from '@/components/CustomDropDown';
 import CustomModal from '@/components/CustomModal';
 import ErrorScreen from '@/components/ErrorScreen';
@@ -40,14 +42,10 @@ interface FilterModalProps {
   handleClose: () => void;
 }
 
-export const strToIntRange = (strList: any) => {
-  return Array.isArray(strList)
-    ? strList?.[0]?.split?.(',')?.map?.((v: any) => Number(v))
-    : strList?.split?.(',')?.map((v: any) => Number(v));
-};
 
 const Briefs = (): JSX.Element => {
   const [briefs, setBriefs] = useState<Brief[]>([]);
+  console.log("🚀 ~ file: index.tsx:48 ~ Briefs ~ briefs:", briefs?.length)
   const [briefs_total, setBriefsTotal] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   // FIXME: setLoading
@@ -65,7 +63,7 @@ const Briefs = (): JSX.Element => {
   const [searchInput, setSearchInput] = useState<string>('');
 
   const [error, setError] = useState<any>();
-  const { expRange, submitRange, lengthRange, heading } = router.query;
+  const { expRange, submitRange, lengthRange, heading, size: sizeProps } = router.query;
 
   const { pathname } = router;
 
@@ -263,10 +261,16 @@ const Briefs = (): JSX.Element => {
           setCurrentPage(pageQuery)
         }
 
+        if (sizeProps) {
+          filter.items_per_page = Number(sizeProps)
+          setItemsPerPage(Number(sizeProps))
+        }
+
         if (expRange) {
           const range = strToIntRange(expRange);
           range?.forEach?.((v: any) => {
-            selectedFilterIds.push(`0-${v - 1}`);
+            if (!selectedFilterIds.includes(`0-${v - 1}`))
+              selectedFilterIds.push(`0-${v - 1}`);
           });
 
           filter = { ...filter, experience_range: strToIntRange(expRange) };
@@ -294,11 +298,21 @@ const Briefs = (): JSX.Element => {
         if (lengthRange) {
           const range = strToIntRange(lengthRange);
           range?.forEach?.((v: any) => {
-            selectedFilterIds.push(`2-${v - 1}`);
+            if (!selectedFilterIds.includes(`2-${v - 1}`))
+              selectedFilterIds.push(`2-${v - 1}`);
           });
           filter = { ...filter, length_range: strToIntRange(lengthRange) };
         }
         const result: any = await callSearchBriefs(filter);
+
+        const totalPages = Math.ceil(result?.totalBriefs / (filter?.items_per_page || 6))
+
+        if (totalPages < filter.page) {
+          router.query.page = totalPages.toString()
+          router.push(router, undefined, { shallow: true })
+          filter.page = totalPages
+        }
+
         setBriefs(result?.currentData);
         setBriefsTotal(result?.totalBriefs);
       }
@@ -656,65 +670,64 @@ const Briefs = (): JSX.Element => {
 
           <div className='briefs-list !overflow-hidden z-10'>
             {briefsData?.map(
-              (item, itemIndex) =>
-                !item?.project_id && (
-                  <div key={itemIndex} className='relative z-0'>
-                    {savedBriefsActive && (
-                      <button
-                        className='absolute top-5 z-[1000] right-5 h-[30px] w-[30px] border border-red-500 rounded-full flex justify-center items-center bg-red-500'
-                        onClick={() => {
-                          deleteBrief(item?.id);
-                        }}
-                      >
-                        <IoTrashBin color='#fff' />
-                      </button>
-                    )}
-
-                    <div
-                      className='brief-item relative z-20'
-                      onClick={() =>
-                        router.push(`/briefs/${item?.id}`)
-                      }
+              (item, itemIndex) => (
+                <div key={itemIndex} className='relative z-0'>
+                  {savedBriefsActive && (
+                    <button
+                      className='absolute top-5 z-[1000] right-5 h-[30px] w-[30px] border border-red-500 rounded-full flex justify-center items-center bg-red-500'
+                      onClick={() => {
+                        deleteBrief(item?.id);
+                      }}
                     >
-                      <div className='brief-title'>
-                        {item.headline.length > 50
-                          ? `${item.headline.substring(0, 50)}...`
-                          : item.headline}
-                      </div>
-                      <div className='brief-time-info'>
-                        {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
-                      </div>
-                      <div className='brief-description lg:w-10/12'>
-                        {item.description.length > 500
-                          ? `${item.description.substring(0, 500)}...`
-                          : item.description}
-                      </div>
+                      <IoTrashBin color='#fff' />
+                    </button>
+                  )}
 
-                      <div className='brief-tags !flex-wrap'>
-                        {item.skills.map((skill: any, skillIndex: any) => (
-                          <div className='tag-item' key={skillIndex}>
-                            {skill.name}
-                          </div>
-                        ))}
-                      </div>
+                  <div
+                    className='brief-item relative z-20'
+                    onClick={() =>
+                      router.push(`/briefs/${item?.id}`)
+                    }
+                  >
+                    <div className='brief-title'>
+                      {item.headline.length > 50
+                        ? `${item.headline.substring(0, 50)}...`
+                        : item.headline}
+                    </div>
+                    <div className='brief-time-info'>
+                      {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
+                    </div>
+                    <div className='brief-description lg:w-10/12'>
+                      {item.description.length > 500
+                        ? `${item.description.substring(0, 500)}...`
+                        : item.description}
+                    </div>
 
-                      <div className='flex justify-between lg:flex-row flex-col lg:w-[400px] lg:items-center'>
-                        <div className='brief-proposals'>
-                          <span className='proposals-heading'>
-                            Proposals Submitted:{' '}
-                          </span>
-                          <span className='proposals-count'>
-                            Less than {item.number_of_briefs_submitted}
-                          </span>
+                    <div className='brief-tags !flex-wrap'>
+                      {item.skills.map((skill: any, skillIndex: any) => (
+                        <div className='tag-item' key={skillIndex}>
+                          {skill.name}
                         </div>
+                      ))}
+                    </div>
 
-                        <div className='leading-none text-black mt-3 lg:mt-0'>
-                          {timeAgo.format(new Date(item?.created))}
-                        </div>
+                    <div className='flex justify-between lg:flex-row flex-col lg:w-[400px] lg:items-center'>
+                      <div className='brief-proposals'>
+                        <span className='proposals-heading'>
+                          Proposals Submitted:{' '}
+                        </span>
+                        <span className='proposals-count'>
+                          Less than {item.number_of_briefs_submitted}
+                        </span>
+                      </div>
+
+                      <div className='leading-none text-black mt-3 lg:mt-0'>
+                        {timeAgo.format(new Date(item?.created))}
                       </div>
                     </div>
                   </div>
-                )
+                </div>
+              )
             )}
           </div>
         </div>
@@ -765,8 +778,11 @@ const Briefs = (): JSX.Element => {
             <select
               name='currencyId'
               onChange={(e) => {
+                router.query.size = (e.target.value).toString()
+                router.push(router, undefined, { shallow: true });
                 setItemsPerPage(Number(e.target.value));
               }}
+              value={itemsPerPage}
               placeholder='Select a currency'
               className='bg-white outline-none round border border-imbue-purple rounded-[0.5rem] text-base px-5 h-[2.75rem] text-imbue-purple-dark'
               required

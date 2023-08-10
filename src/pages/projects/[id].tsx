@@ -2,7 +2,6 @@
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
-import ArrowBackIcon from '@mui/icons-material/ChevronLeft';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import { Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -19,6 +18,7 @@ import { getBalance } from '@/utils/helper';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import AccountChoice from '@/components/AccountChoice';
+import BackButton from '@/components/BackButton';
 import ChatPopup from '@/components/ChatPopup';
 import { Dialogue } from '@/components/Dialogue';
 import ErrorScreen from '@/components/ErrorScreen';
@@ -702,23 +702,7 @@ function Project() {
         <div className='flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] max-lg:basis-[60%] mr-[5%]  max-lg:mr-0 relative'>
           <div className='flex flex-wrap gap-3 lg:gap-4 items-center'>
             <div className='flex items-center'>
-              <Tooltip
-                title='Go back to previous page'
-                followCursor
-                leaveTouchDelay={10}
-                enterDelay={500}
-                className='cursor-pointer hover:bg-content-primary group'
-              >
-                <div
-                  onClick={() => window.history.back()}
-                  className='border border-transparent hover:border-content rounded-full flex items-center justify-center cursor-pointer'
-                >
-                  <ArrowBackIcon
-                    className='h-7 w-7 group-hover:text-white'
-                    color='secondary'
-                  />
-                </div>
-              </Tooltip>
+              <BackButton  className='mr-1 -ml-3'/>
               <h3 className='text-[2rem] max-lg:text-[24px] break-all leading-[1.5] font-normal m-0 p-0 text-imbue-purple'>
                 {project?.name}
               </h3>

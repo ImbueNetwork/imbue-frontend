@@ -17,7 +17,6 @@ export enum OffchainProjectState {
   Completed = 6,
 }
 
-
 export const applicationStatusId = [
   'Draft',
   'Pending Review',
@@ -94,6 +93,8 @@ export type Project = {
   created?: string;
   duration_id: number;
   escrow_address: string;
+  completed: boolean;
+  milestones: Milestone[];
 };
 
 export type ProjectOnChain = {
@@ -265,7 +266,7 @@ export type BriefSqlFilter = {
   length_is_max: boolean;
   search_input: string | string[];
   items_per_page?: number;
-  page?: number;
+  page: number;
 };
 
 export type FreelancerSqlFilter = {
@@ -274,7 +275,7 @@ export type FreelancerSqlFilter = {
   languages_range: Array<number>;
   name: string | string[];
   items_per_page?: number;
-  page?: number;
+  page: number;
   verified?: boolean;
 };
 export type ApplicationData = {

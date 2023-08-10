@@ -371,3 +371,9 @@ export const handleApplicationInput = (
     errors,
   };
 };
+
+export const strToIntRange = (strList: any) => {
+  return Array.isArray(strList)
+    ? strList?.[0]?.split?.(',')?.map?.((v: any) => Number(v))
+    : strList?.split?.(',')?.map((v: any) => Number(v));
+};
