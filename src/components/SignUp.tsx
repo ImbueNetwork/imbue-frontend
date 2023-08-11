@@ -171,7 +171,10 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
       setError('Username is not allowed');
       return;
     }
-
+    if (user && user.includes(' ')) {
+      setError('space is not allowed in username');
+      return;
+    }
     if (user && password && user.toLowerCase() === password.toLowerCase()) {
       setError('Username and password cannot be the same');
       return;

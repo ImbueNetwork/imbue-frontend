@@ -761,13 +761,28 @@ function Project() {
             </div>
           </div>
           <div className='flex  mt-2 items-center w-full'>
-            <Image
-              className='bg-transparent  drop-shadow-sm mr-2'
-              src={'/unchecked.svg'}
-              width={40}
-              height={30}
-              alt='checked'
-            />
+            {balance >=
+            Number(
+              Number(project?.total_cost_without_fee) +
+                Number(project?.imbue_fee)
+            ) ? (
+              <Image
+                className='bg-transparent  drop-shadow-sm mr-2'
+                src={'/checked.svg'}
+                width={40}
+                height={30}
+                alt='checked'
+              />
+            ) : (
+              <Image
+                className='bg-transparent  drop-shadow-sm mr-2'
+                src={'/unchecked.svg'}
+                width={40}
+                height={30}
+                alt='checked'
+              />
+            )}
+
             <div className='flex bg-imbue-light-purple-three rounded-xl px-3 py-2 w-full justify-between items-center '>
               <p className='flex text-xl flex-col'>
                 Funds deposited
@@ -775,7 +790,15 @@ function Project() {
                   Raised through governance
                 </span>
               </p>
-              <p className='ml-auto text-sm text-imbue-coral'>Not Done</p>
+              {balance >=
+              Number(
+                Number(project?.total_cost_without_fee) +
+                  Number(project?.imbue_fee)
+              ) ? (
+                <p className='ml-auto text-sm text-imbue-purple'>Done</p>
+              ) : (
+                <p className='ml-auto text-sm text-imbue-coral'>Not Done</p>
+              )}
             </div>
           </div>
         </div>
