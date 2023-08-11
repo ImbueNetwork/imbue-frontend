@@ -272,7 +272,7 @@ export const getAllSkills = async () => {
     method: 'get',
   });
   if (resp.ok) {
-    return (await resp.json()) as { skills: Array<{ name: string }> };
+    return (await resp.json()) as { skills: Array<{ name: string, id: number }> };
   } else {
     throw new Error('Failed to get skills ..... status:' + resp.status);
   }
@@ -313,3 +313,4 @@ export const searchLanguageByName = async (name: string) => {
     throw new Error('Failed to get language ..... status:' + resp.status);
   }
 };
+

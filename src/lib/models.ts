@@ -704,6 +704,9 @@ export const fetchAllGrants = () => (tx: Knex.Transaction) =>
     .innerJoin('users', { 'grants.user_id': 'users.id' })
     .orderBy('grants.created', 'desc');
 
+export const countAllBriefs = () => async (tx: Knex.Transaction) =>
+  tx('briefs').count('id').whereNull('briefs.project_id').first();
+
 export const fetchProfileImages =
   (id: number, tableName: string) => async (tx: Knex.Transaction) =>
     tx(tableName).select('profile_image').where({ user_id: id }).first();
@@ -1100,7 +1103,8 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
     // })
     .leftJoin('web3_accounts', {
       'freelancers.user_id': 'web3_accounts.user_id',
-    });
+    })
+    .orderBy('freelancers.id');
 
 // order and group by many-many selects
 // .orderBy('profile_image', 'asc')
@@ -1385,7 +1389,15 @@ export const searchBriefs =
   (filter: BriefSqlFilter) => async (tx: Knex.Transaction) =>
     // select everything that is associated with brief.
     fetchAllBriefs()(tx)
-    .whereNull('briefs.project_id')
+      .whereNull('briefs.project_id')
+      .modify(function (builder) {
+        if (filter?.items_per_page > 0)
+          builder
+            .offset(
+              (Number(filter.page) - 1) * Number(filter.items_per_page) || 0
+            )
+            .limit(Number(filter.items_per_page) || 5);
+      })
       .where(function () {
         if (filter.submitted_range.length > 0) {
           this.whereBetween('users.briefs_submitted', [
@@ -1414,15 +1426,44 @@ export const searchBriefs =
           this.orWhere('duration_id', '>=', Math.max(...filter.length_range));
         }
       })
-      .where('headline', 'ilike', '%' + filter.search_input + '%')
-      .modify(function (builder) {
-        if (filter?.items_per_page > 0)
-          builder
-            .offset(
-              (Number(filter.page) - 1) * Number(filter.items_per_page) || 0
-            )
-            .limit(Number(filter.items_per_page) || 5);
-      });
+      .where('headline', 'ilike', filter.search_input + '%')
+      .distinct('briefs.id');
+
+export const searchBriefsCount =
+  (filter: BriefSqlFilter) => async (tx: Knex.Transaction) =>
+    // select everything that is associated with brief.
+    fetchAllBriefs()(tx)
+      .whereNull('briefs.project_id')
+      .where(function () {
+        if (filter.submitted_range.length > 0) {
+          this.whereBetween('users.briefs_submitted', [
+            filter.submitted_range[0].toString(),
+            Math.max(...filter.submitted_range).toString(),
+          ]);
+        }
+        if (filter.submitted_is_max) {
+          this.orWhere(
+            'users.briefs_submitted',
+            '>=',
+            Math.max(...filter.submitted_range)
+          );
+        }
+      })
+      .where(function () {
+        if (filter.experience_range.length > 0) {
+          this.whereIn('experience_id', filter.experience_range);
+        }
+      })
+      .where(function () {
+        if (filter.length_range.length > 0) {
+          this.whereIn('duration_id', filter.length_range);
+        }
+        if (filter.length_is_max) {
+          this.orWhere('duration_id', '>=', Math.max(...filter.length_range));
+        }
+      })
+      .where('headline', 'ilike', filter.search_input + '%')
+      .then((res) => res.length);
 
 export const paginatedData = (
   currentPage: number,
@@ -1478,6 +1519,7 @@ export const searchFreelancers =
       .leftJoin('web3_accounts', {
         'freelancers.user_id': 'web3_accounts.user_id',
       })
+      .orderBy('freelancers.id')
       .where(function () {
         if (filter?.skills_range?.length > 0) {
           this.whereIn('freelancer_skills.skill_id', filter.skills_range);
@@ -1534,6 +1576,14 @@ export const getFreelancerFilterItems =
     tx(`freelancer_${item}s`)
       .distinct(`${item}_id as id`)
       .join(`${item}s`, `freelancer_${item}s.${item}_id`, '=', `${item}s.id`)
+      .select(`${item}s.name`)
+      .orderBy('name');
+
+export const getBriefFilterItems =
+  (item: string) => async (tx: Knex.Transaction) =>
+    tx(`brief_${item}s`)
+      .distinct(`${item}_id as id`)
+      .join(`${item}s`, `brief_${item}s.${item}_id`, '=', `${item}s.id`)
       .select(`${item}s.name`)
       .orderBy('name');
 

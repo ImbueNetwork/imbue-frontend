@@ -12,9 +12,8 @@ export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
     await db.transaction(async (tx: any) => {
       try {
-        const { limit = 10 } = req.query;
         await models
-          .fetchAllImbueSkills(Number(limit))(tx)
+          .getBriefFilterItems('skill')(tx)
           .then(async (skills: any) => {
             res.status(200).json({ skills });
           });

@@ -8,8 +8,7 @@ import React, { useEffect, useState } from 'react';
 
 import { strToIntRange } from '@/utils/helper';
 
-import CustomDropDown from '@/components/CustomDropDown';
-import CustomModal from '@/components/CustomModal';
+import FilterModal from '@/components/Filter/FilterModal';
 
 import {
   chevLeftIcon,
@@ -33,10 +32,7 @@ import {
 } from '../../redux/services/freelancerService';
 import { FreelancerFilterOption } from '../../types/freelancerTypes';
 
-interface FilterModalProps {
-  open: boolean;
-  handleClose: () => void;
-}
+
 
 const Freelancers = (): JSX.Element => {
   const [freelancers, setFreelancers] = useState<
@@ -50,6 +46,7 @@ const Freelancers = (): JSX.Element => {
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [itemsPerPage, setItemsPerPage] = useState<number>(12);
+  const [searhInput, setSearchInput] = useState<string>("")
 
   const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
 
@@ -197,6 +194,7 @@ const Freelancers = (): JSX.Element => {
   useEffect(() => {
     const fetchAndSetFreelancers = async () => {
       if (Object.keys(router?.query).length) {
+        setLoading(true)
         let filter: FreelancerSqlFilter = {
           skills_range: [],
           services_range: [],
@@ -212,16 +210,17 @@ const Freelancers = (): JSX.Element => {
           setItemsPerPage(Number(sizeProp))
         }
 
-        if (pageProp) {
+        if (Number(pageProp)) {
           filter = { ...filter, page: Number(pageProp) || 1 };
         }
 
         if (name) {
           filter = { ...filter, name: name };
-          const input = document.getElementById(
-            'search-input'
-          ) as HTMLInputElement;
-          if (input) input.value = name.toString();
+          // const input = document.getElementById(
+          //   'search-input'
+          // ) as HTMLInputElement;
+          // if (input) input.value = name.toString();
+          setSearchInput(name.toString())
         }
 
         if (skillsRangeProps) {
@@ -271,7 +270,7 @@ const Freelancers = (): JSX.Element => {
 
         const totalPages = Math.ceil(totalFreelancers / (filter?.items_per_page || 12))
 
-        if (totalPages < filter.page) {
+        if (totalPages < filter.page && totalPages > 0) {
           router.query.page = totalPages.toString()
           router.push(router, undefined, { shallow: true })
           filter.page = totalPages
@@ -303,6 +302,7 @@ const Freelancers = (): JSX.Element => {
 
   const onSearch = async () => {
     // The filter initially should return all values
+    setLoading(true);
     let is_search = false;
 
     let skillsRange: number[] = [];
@@ -351,6 +351,7 @@ const Freelancers = (): JSX.Element => {
       }
     }
 
+    router.query.page = '1';
     router.query.name = search_value !== '' ? search_value : [];
     router.query.skillsRangeProps = skillsRange.length
       ? skillsRange.toString()
@@ -368,30 +369,36 @@ const Freelancers = (): JSX.Element => {
     }
     router.push(router, undefined, { shallow: true });
 
-    if (is_search) {
-      const filter: FreelancerSqlFilter = {
-        skills_range: skillsRange,
-        services_range: servicesRange,
-        languages_range: languagesRange,
-        name: search_value,
-        items_per_page: itemsPerPage,
-        page: currentPage,
-        verified: freelancerInfo.verified,
-
-      };
-      if (search_value.length === 0) {
-        setFilterVisible(!filterVisble);
+    try {
+      if (is_search) {
+        const filter: FreelancerSqlFilter = {
+          skills_range: skillsRange,
+          services_range: servicesRange,
+          languages_range: languagesRange,
+          name: search_value,
+          items_per_page: itemsPerPage,
+          page: 1,
+          verified: freelancerInfo.verified,
+        };
+        if (search_value.length === 0) {
+          setFilterVisible(!filterVisble);
+        }
+        const filteredFreelancers: any = await callSearchFreelancers(filter);
+        setFreelancers(filteredFreelancers?.currentData);
+        setFreelancersTotal(filteredFreelancers?.totalFreelancers);
+      } else {
+        const allFreelancers: any = await getAllFreelancers(
+          itemsPerPage,
+          currentPage
+        );
+        setFreelancers(allFreelancers?.currentData);
+        setFreelancersTotal(allFreelancers?.totalFreelancers);
       }
-      const filteredFreelancers: any = await callSearchFreelancers(filter);
-      setFreelancers(filteredFreelancers?.currentData);
-      setFreelancersTotal(filteredFreelancers?.totalFreelancers);
-    } else {
-      const allFreelancers: any = await getAllFreelancers(
-        itemsPerPage,
-        currentPage
-      );
-      setFreelancers(allFreelancers?.currentData);
-      setFreelancersTotal(allFreelancers?.totalFreelancers);
+    } catch (error) {
+      console.error(error);
+    }
+    finally {
+      setLoading(true);
     }
   };
 
@@ -399,59 +406,7 @@ const Freelancers = (): JSX.Element => {
     setFilterVisible(!filterVisble);
   };
 
-  const FilterModal = ({ open, handleClose }: FilterModalProps) => {
-    return (
-      <CustomModal
-        open={open}
-        onClose={handleClose}
-        className='flex justify-center items-center flex-wrap bg-black bg-opacity-50 top-0 left-0 w-full h-full z-[100] fixed'
-      >
-        <div
-          onClick={(e: any) => {
-            e?.stopPropagation();
-          }}
-          className='bg-white rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative'
-        >
-          <p className='font-normal text-base !text-imbue-purple-dark !mb-9'>
-            Filter
-          </p>
-
-          <div className='grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5'>
-            {customDropdownConfigs
-              ?.filter(({ options }) => options && options.length > 0)
-              ?.map(({ label, filterType, options }) => (
-                <CustomDropDown
-                  key={label}
-                  name={label}
-                  filterType={filterType}
-                  filterOptions={options}
-                  setId={handleSetId}
-                  ids={selectedFilterIds}
-                />
-              ))}
-          </div>
-
-          <div className='h-[39px] text-center gap-5 flex items-center absolute md:bottom-10 bottom-5 right-10'>
-            <button
-              onClick={cancelFilters}
-              data-testid='Apply'
-              className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-coral flex items-center cursor-pointer hover:scale-105 hover:bg-primary hover:text-content'
-            >
-              Cancel
-            </button>
-
-            <button
-              onClick={onSearch}
-              data-testid='Apply'
-              className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 hover:bg-primary hover:text-content'
-            >
-              Apply
-            </button>
-          </div>
-        </div>
-      </CustomModal>
-    );
-  };
+  
 
   const reset = async () => {
     await router.push({
@@ -477,7 +432,11 @@ const Freelancers = (): JSX.Element => {
   return (
     <div>
       <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
-        <FilterModal open={filterVisble} handleClose={() => toggleFilter()} />
+        <FilterModal open={filterVisble} handleClose={() => toggleFilter()}
+        {
+          ...{selectedFilterIds,handleSetId, cancelFilters, customDropdownConfigs, onSearch}
+        }
+        />
         <div
           className={`${styles.freelancersView} max-width-750px:!w-full max-width-750px:px-5`}
         >
@@ -486,6 +445,8 @@ const Freelancers = (): JSX.Element => {
               <div>
                 <div className='flex items-center'>
                   <input
+                    value={searhInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
                     id='search-input'
                     className='search-input px-[12px] !w-full lg:!w-[20rem] !h-[2.875rem] !rounded-tr-[0px] !rounded-br-[0px] !text-black'
                     placeholder='Search'
