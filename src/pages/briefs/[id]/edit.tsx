@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import styled from '@emotion/styled';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Tooltip } from '@mui/material';
+import { Autocomplete, TextField, Tooltip } from '@mui/material';
 import Filter from 'bad-words';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -14,17 +14,13 @@ import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 import { Option } from '@/components/Option';
 import SuccessScreen from '@/components/SuccessScreen';
-import { TagsInput } from '@/components/TagsInput';
 
 import { timeData } from '@/config/briefs-data';
-import {
-  experiencedLevel,
-  scopeData,
-  suggestedIndustries,
-} from '@/config/briefs-data';
+import { experiencedLevel, scopeData } from '@/config/briefs-data';
 import { Brief } from '@/model';
 import {
   getBrief,
+  searchIndustries,
   searchSkills,
   updateBriefById,
 } from '@/redux/services/briefService';
@@ -82,6 +78,7 @@ export const EditProposal = (): JSX.Element => {
   const [error, setError] = useState<any>();
   const [success, setSuccess] = useState<boolean>(false);
   const [suggestedSkills, setSuggestedSkills] = useState<string[]>([]);
+  const [suggestedIndustries, setSuggestedIndustries] = useState<string[]>([]);
 
   const [inputError, setInputError] =
     useState<ErrorObjectType>(initErrorObject);
@@ -95,7 +92,17 @@ export const EditProposal = (): JSX.Element => {
 
   useEffect(() => {
     fetchSuggestedSkills();
+    fetchSuggestedIndustries();
   }, []);
+
+  const fetchSuggestedIndustries = async () => {
+    const industriesRes = await searchIndustries('a');
+    if (industriesRes) {
+      setSuggestedIndustries(
+        industriesRes?.industry.map((industries) => industries.name)
+      );
+    }
+  };
 
   const fetchSuggestedSkills = async () => {
     const skillsRes = await searchSkills('');
@@ -186,9 +193,12 @@ export const EditProposal = (): JSX.Element => {
     }
   }
 
-  function filterStrings(arr1: string[], arr2: string[]): string[] {
-    return arr1.filter((str) => !arr2.includes(str.toLocaleLowerCase()));
-  }
+  // function filterStrings(arr1: string[], arr2: string[]): string[] {
+  //   return arr1.filter((str) => !arr2.includes(str.toLocaleLowerCase()));
+  // }
+
+  console.log(skills);
+  console.log(industries);
 
   const validateInputLength = (
     text: string,
@@ -224,6 +234,20 @@ export const EditProposal = (): JSX.Element => {
         return { ...val, skills: 'Number of skills must be between 3 to 10' };
       });
     }
+  };
+
+  const searchSkill = async (name: string) => {
+    const skillRes = await searchSkills(name);
+    if (!skillRes || !skillRes?.skills.length) return;
+    setSuggestedSkills(skillRes?.skills.map((skill) => skill.name));
+  };
+
+  const searchIndustry = async (name: string) => {
+    const industriesRes = await searchIndustries(name.length > 0 ? name : 'a');
+    if (!industriesRes || !industriesRes?.industry.length) return;
+    setSuggestedIndustries(
+      industriesRes?.industry.map((industry) => industry.name)
+    );
   };
 
   const handleIndustriesChange = (val: string[]) => {
@@ -308,6 +332,53 @@ export const EditProposal = (): JSX.Element => {
     }
   };
 
+  const SkillPanel = () => {
+    return (
+      <Autocomplete
+        id='tags-standard'
+        data-testid='skills-input'
+        multiple
+        getOptionLabel={(option) => option}
+        options={suggestedSkills}
+        sx={{ width: '100%' }}
+        onChange={(e, value) => handleSkillChange(value)}
+        defaultValue={skills}
+        renderInput={(params) => (
+          <TextField
+            color='secondary'
+            autoComplete='off'
+            onChange={(e) => searchSkill(e.target.value)}
+            {...params}
+          />
+        )}
+      />
+    );
+  };
+
+  const IndustryPannel = () => {
+    return (
+      <Autocomplete
+        id='tags-standard'
+        data-testid='skills-input'
+        multiple
+        getOptionLabel={(option) => option}
+        options={suggestedIndustries}
+        sx={{ width: '100%' }}
+        onChange={(e, value) => handleIndustriesChange(value)}
+        defaultValue={industries}
+        limitTags={10}
+        renderInput={(params) => (
+          <TextField
+            color='secondary'
+            autoComplete='off'
+            onChange={(e) => searchIndustry(e.target.value)}
+            {...params}
+          />
+        )}
+      />
+    );
+  };
+
   return (
     <div className='flex flex-row max-width-868px:block max-md:px-7'>
       <header
@@ -375,14 +446,7 @@ export const EditProposal = (): JSX.Element => {
           </h1>
 
           <div className={`${styles.skillsContainer} !mt-0 !py-0 mb-6 `}>
-            <TagsInput
-              suggestData={filterStrings(suggestedSkills, skills)}
-              tags={skills}
-              onChange={(tags: string[]) => handleSkillChange(tags)}
-              limit={10}
-              hideInput
-              showSearch
-            />
+            <SkillPanel />
             <div className='mt-4'>
               <span className={`text-xs ${'text-imbue-light-purple-two'} `}>
                 {inputError?.skills}
@@ -394,15 +458,7 @@ export const EditProposal = (): JSX.Element => {
             Industries
           </h1>
           <div className={`${styles.industryContainer} !mt-[0.5rem] !py-0 `}>
-            <TagsInput
-              suggestData={filterStrings(suggestedIndustries, industries)}
-              data-testid='industries-input'
-              tags={industries}
-              onChange={(tags: string[]) => {
-                handleIndustriesChange(tags);
-              }}
-              limit={10}
-            />
+            <IndustryPannel />
             <div className='mt-4'>
               <span className={`text-xs ${'text-imbue-light-purple-two'} `}>
                 {inputError?.industries}
