@@ -267,6 +267,7 @@ export type BriefSqlFilter = {
   search_input: string | string[];
   items_per_page?: number;
   page: number;
+  skills_range: Array<number>;
 };
 
 export type FreelancerSqlFilter = {

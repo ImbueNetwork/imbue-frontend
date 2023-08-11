@@ -248,7 +248,8 @@ const Freelancers = (): JSX.Element => {
         if (languagesRangeProps) {
           const range = strToIntRange(languagesRangeProps);
           range?.forEach?.((v: any) => {
-            setSlectedFilterIds([...selectedFilterIds, `2-${v}`]);
+            if (!selectedFilterIds.includes(`2-${v}`))
+              setSlectedFilterIds([...selectedFilterIds, `2-${v}`]);
           });
           filter = {
             ...filter,
@@ -406,7 +407,7 @@ const Freelancers = (): JSX.Element => {
     setFilterVisible(!filterVisble);
   };
 
-  
+
 
   const reset = async () => {
     await router.push({
@@ -433,9 +434,9 @@ const Freelancers = (): JSX.Element => {
     <div>
       <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
         <FilterModal open={filterVisble} handleClose={() => toggleFilter()}
-        {
-          ...{selectedFilterIds,handleSetId, cancelFilters, customDropdownConfigs, onSearch}
-        }
+          {
+          ...{ selectedFilterIds, handleSetId, cancelFilters, customDropdownConfigs, onSearch }
+          }
         />
         <div
           className={`${styles.freelancersView} max-width-750px:!w-full max-width-750px:px-5`}

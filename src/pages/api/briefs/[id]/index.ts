@@ -7,8 +7,6 @@ import { Brief, BriefSqlFilter, fetchItems } from '@/lib/models';
 
 import db from '@/db';
 
-import { authenticate, verifyUserIdFromJwt } from '../../auth/common';
-
 export default nextConnect()
   .use(passport.initialize())
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
@@ -36,13 +34,12 @@ export default nextConnect()
   })
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
     const data = req.body as BriefSqlFilter;
-
-    const userAuth: Partial<models.User> | any = await authenticate(
-      'jwt',
-      req,
-      res
-    );
-    verifyUserIdFromJwt(req, res, [userAuth.id]);
+    // const userAuth: Partial<models.User> | any = await authenticate(
+    //   'jwt',
+    //   req,
+    //   res
+    // );
+    // verifyUserIdFromJwt(req, res, [userAuth.id]);
 
     await db.transaction(async (tx: any) => {
       try {
@@ -58,7 +55,7 @@ export default nextConnect()
             )(tx);
           }),
         ]);
-        
+
         // const totalBriefs = await models
         //   .searchBriefs({
         //     ...data,
@@ -66,7 +63,10 @@ export default nextConnect()
         //   })(tx)
         //   .then((resp) => resp.length);
 
-        const briefCount = await models.searchBriefsCount(data)(tx);
+        const briefCount = await models.searchBriefsCount({
+          ...data,
+          items_per_page: 0,
+        })(tx);
 
         // const { currentData, totalItems } = await models.paginatedData(
         //   Number(data?.page || 1),
@@ -76,7 +76,8 @@ export default nextConnect()
 
         res.status(200).json({ currentData, totalBriefs: briefCount });
       } catch (e) {
-        new Error(`Failed to search for briefs ${data}`, { cause: e as Error });
+        res.status(401).json({ currentData: [], totalBriefs: 0 });
+        throw new Error(`Failed to search for briefs`, { cause: e as Error });
       }
     });
   });

@@ -24,9 +24,10 @@ export const callSearchBriefs = async (filter: BriefSqlFilter) => {
     body: JSON.stringify(filter),
   });
   if (resp.ok) {
-    return (await resp.json()) as PaginatedResponse;
+    const data = await resp.json();
+    return { status: resp.status, ...data } as PaginatedResponse;
   } else {
-    throw new Error('Failed to search briefs. status:' + resp.status);
+    return { status: resp.status, currentData: [], totalBriefs: 0 };
   }
 };
 
@@ -45,9 +46,10 @@ export const getAllBriefs = async (
   );
 
   if (resp.ok) {
-    return (await resp.json()) as PaginatedResponse;
+    const data = await resp.json();
+    return { status: resp.status, ...data } as PaginatedResponse;
   } else {
-    throw new Error('Failed to get all briefs. status:' + resp.status);
+    return { status: resp.status, currentData: [], totalBriefs: 0 };
   }
 };
 
@@ -272,7 +274,9 @@ export const getAllSkills = async () => {
     method: 'get',
   });
   if (resp.ok) {
-    return (await resp.json()) as { skills: Array<{ name: string, id: number }> };
+    return (await resp.json()) as {
+      skills: Array<{ name: string; id: number }>;
+    };
   } else {
     throw new Error('Failed to get skills ..... status:' + resp.status);
   }
@@ -313,4 +317,3 @@ export const searchLanguageByName = async (name: string) => {
     throw new Error('Failed to get language ..... status:' + resp.status);
   }
 };
-
