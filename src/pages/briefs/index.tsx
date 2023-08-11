@@ -10,9 +10,8 @@ import { useSelector } from 'react-redux';
 
 import { strToIntRange } from '@/utils/helper';
 
-import CustomDropDown from '@/components/CustomDropDown';
-import CustomModal from '@/components/CustomModal';
 import ErrorScreen from '@/components/ErrorScreen';
+import FilterModal from '@/components/Filter/FilterModal';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 
 import {
@@ -38,10 +37,10 @@ TimeAgo.addLocale(en);
 
 const timeAgo = new TimeAgo('en-US');
 
-interface FilterModalProps {
-  open: boolean;
-  handleClose: () => void;
-}
+// interface FilterModalProps {
+//   open: boolean;
+//   handleClose: () => void;
+// }
 
 
 const Briefs = (): JSX.Element => {
@@ -56,7 +55,7 @@ const Briefs = (): JSX.Element => {
 
   const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
   // FIXME: openDropdown
-  const [_openDropDown, setOpenDropDown] = useState<string>('');
+  // const [_openDropDown, setOpenDropDown] = useState<string>('');
   const [savedBriefsActive, setSavedBriefsActive] = useState<boolean>(false);
 
   // search input value
@@ -64,7 +63,7 @@ const Briefs = (): JSX.Element => {
   const [skills, setSkills] = useState<Item[]>([{ name: "", id: 0 }]);
 
   const [error, setError] = useState<any>();
-  const { expRange, submitRange, lengthRange, heading, size: sizeProps } = router.query;
+  const { expRange, submitRange, lengthRange, heading, size: sizeProps, skillsProps } = router.query;
 
   const { pathname } = router;
 
@@ -208,10 +207,11 @@ const Briefs = (): JSX.Element => {
   // };
 
   const skillsFilter = {
-    filterType: BriefFilterOption.HoursPerWeek,
+    filterType: BriefFilterOption.Skills,
     label: 'Skills required',
     options: skills?.map((s) => ({
-      interiorIndex: 0,
+      interiorIndex: s.id,
+      search_for: [s.id],
       value: s.name,
     }))
   };
@@ -234,7 +234,7 @@ const Briefs = (): JSX.Element => {
     },
     {
       label: 'Skills Required',
-      filterType: BriefFilterOption.HoursPerWeek,
+      filterType: BriefFilterOption.Skills,
       options: skillsFilter.options,
     },
     // {
@@ -255,87 +255,114 @@ const Briefs = (): JSX.Element => {
   useEffect(() => {
     const fetchAndSetBriefs = async () => {
       setLoading(true)
-      if (!Object.keys(router?.query).length) {
-        const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
-        setBriefs(briefs_all?.currentData);
-        setBriefsTotal(briefs_all?.totalBriefs);
-      } else {
-        let filter: BriefSqlFilter = {
-          experience_range: [],
-          submitted_range: [],
-          submitted_is_max: false,
-          length_range: [],
-          length_is_max: false,
-          search_input: '',
-          items_per_page: itemsPerPage,
-          page: currentPage,
-        };
-
-        if (router.query.page) {
-          const pageQuery = Number(router.query.page)
-          filter.page = pageQuery;
-          setCurrentPage(pageQuery)
-        }
-
-        if (sizeProps) {
-          filter.items_per_page = Number(sizeProps)
-          setItemsPerPage(Number(sizeProps))
-        }
-
-        if (expRange) {
-          const range = strToIntRange(expRange);
-          range?.forEach?.((v: any) => {
-            if (!selectedFilterIds.includes(`0-${v - 1}`))
-              selectedFilterIds.push(`0-${v - 1}`);
-          });
-
-          filter = { ...filter, experience_range: strToIntRange(expRange) };
-        }
-        if (submitRange) {
-          const range = strToIntRange(submitRange);
-          range?.forEach?.((v: any) => {
-            if (v > 0 && v < 5) selectedFilterIds.push(`1-${0}`);
-
-            if (v >= 5 && v < 10) selectedFilterIds.push(`1-${1}`);
-
-            if (v >= 10 && v < 15) selectedFilterIds.push(`1-${2}`);
-
-            if (v > 15) selectedFilterIds.push(`1-${3}`);
-          });
-          filter = { ...filter, submitted_range: strToIntRange(submitRange) };
-        }
-        if (heading) {
-          filter = { ...filter, search_input: heading };
-          // const input = document.getElementById(
-          //   'search-input'
-          // ) as HTMLInputElement;
-          // if (input) input.value = heading.toString();
-          setSearchInput(heading.toString())
-        }
-        if (lengthRange) {
-          const range = strToIntRange(lengthRange);
-          range?.forEach?.((v: any) => {
-            if (!selectedFilterIds.includes(`2-${v - 1}`))
-              selectedFilterIds.push(`2-${v - 1}`);
-          });
-          filter = { ...filter, length_range: strToIntRange(lengthRange) };
-        }
-        try {
-          const result: any = await callSearchBriefs(filter);
-
-          const totalPages = Math.ceil(result?.totalBriefs / (filter?.items_per_page || 6))
-
-          if (totalPages < filter.page && totalPages > 0) {
-            router.query.page = totalPages.toString()
-            router.push(router, undefined, { shallow: true })
-            filter.page = totalPages
+      try {
+        if (!Object.keys(router?.query).length) {
+          const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
+          if (briefs_all.status === 200) {
+            setBriefs(briefs_all?.currentData);
+            setBriefsTotal(briefs_all?.totalBriefs);
+          }
+          else {
+            setError({ message: "Something went wrong. Please try again" })
           }
 
-          setBriefs(result?.currentData);
-          setBriefsTotal(result?.totalBriefs);
-        } catch (error) {
-          setError({ message: "Something went wrong. Please try again" })
+        } else {
+          
+          let filter: BriefSqlFilter = {
+            experience_range: [],
+            submitted_range: [],
+            submitted_is_max: false,
+            length_range: [],
+            skills_range: [],
+            length_is_max: false,
+            search_input: '',
+            items_per_page: itemsPerPage,
+            page: currentPage,
+          };
+
+          if (router.query.page) {
+            const pageQuery = Number(router.query.page)
+            filter.page = pageQuery;
+            setCurrentPage(pageQuery)
+          }
+
+          if (sizeProps) {
+            filter.items_per_page = Number(sizeProps)
+            setItemsPerPage(Number(sizeProps))
+          }
+
+          if (expRange) {
+            const range = strToIntRange(expRange);
+            range?.forEach?.((v: any) => {
+              if (!selectedFilterIds.includes(`0-${v - 1}`))
+                selectedFilterIds.push(`0-${v - 1}`);
+            });
+
+            filter = { ...filter, experience_range: strToIntRange(expRange) };
+          }
+
+          if (skillsProps) {
+            const range = strToIntRange(skillsProps);
+            range?.forEach?.((v: any) => {
+              if (!selectedFilterIds.includes(`3-${v}`))
+                selectedFilterIds.push(`3-${v}`);
+            });
+
+            filter = { ...filter, skills_range: range };
+          }
+
+          if (submitRange) {
+            const range = strToIntRange(submitRange);
+            range?.forEach?.((v: any) => {
+              if (v > 0 && v < 5) selectedFilterIds.push(`1-${0}`);
+
+              if (v >= 5 && v < 10) selectedFilterIds.push(`1-${1}`);
+
+              if (v >= 10 && v < 15) selectedFilterIds.push(`1-${2}`);
+
+              if (v > 15) selectedFilterIds.push(`1-${3}`);
+            });
+            filter = { ...filter, submitted_range: strToIntRange(submitRange) };
+          }
+          if (heading) {
+            filter = { ...filter, search_input: heading };
+            // const input = document.getElementById(
+            //   'search-input'
+            // ) as HTMLInputElement;
+            // if (input) input.value = heading.toString();
+            setSearchInput(heading.toString())
+          }
+          if (lengthRange) {
+            const range = strToIntRange(lengthRange);
+            range?.forEach?.((v: any) => {
+              if (!selectedFilterIds.includes(`2-${v - 1}`))
+                selectedFilterIds.push(`2-${v - 1}`);
+            });
+            filter = { ...filter, length_range: strToIntRange(lengthRange) };
+          }
+
+
+          const result: any = await callSearchBriefs(filter);
+
+          if (result.status === 200) {
+            const totalPages = Math.ceil(result?.totalBriefs / (filter?.items_per_page || 6))
+
+            if (totalPages < filter.page && totalPages > 0) {
+              router.query.page = totalPages.toString()
+              router.push(router, undefined, { shallow: true })
+              filter.page = totalPages
+            }
+
+            setBriefs(result?.currentData);
+            setBriefsTotal(result?.totalBriefs);
+          }
+
+          else {
+            setError({ message: "Something went wrong. Please try again" })
+          }
         }
+      } catch (error) {
+        setError({ message: "Something went wrong. Please try again" })
       }
       setLoading(false)
     };
@@ -363,6 +390,7 @@ const Briefs = (): JSX.Element => {
     let length_range: number[] = [];
     let length_is_max = false;
     let length_range_prop: number[] = [];
+    let skills_prop: number[] = [];
 
     // default is max
     // const hpw_max = 50;
@@ -417,6 +445,12 @@ const Briefs = (): JSX.Element => {
               }
               break;
 
+            case BriefFilterOption.Skills:
+              {
+                skills_prop = [...skills_prop, parseInt(interiorIndex)];
+              }
+              break;
+
             default:
               // eslint-disable-next-line no-console
               console.log(
@@ -440,6 +474,9 @@ const Briefs = (): JSX.Element => {
     router.query.lengthRange = length_range_prop.length
       ? length_range_prop.toString()
       : [];
+    router.query.skillsProps = skills_prop.length
+      ? skills_prop.toString()
+      : [];
     router.push(router, undefined, { shallow: true });
 
     try {
@@ -450,6 +487,7 @@ const Briefs = (): JSX.Element => {
           submitted_is_max,
           length_range,
           length_is_max,
+          skills_range: skills_prop,
           search_input: search_value,
           items_per_page: itemsPerPage,
           page: 1,
@@ -552,61 +590,6 @@ const Briefs = (): JSX.Element => {
     }
   }
 
-  const FilterModal = ({ open, handleClose }: FilterModalProps) => {
-    return (
-      <CustomModal
-        open={open}
-        onClose={handleClose}
-        className='flex justify-center items-center flex-wrap bg-black bg-opacity-50 top-0 left-0 w-full h-full z-[100] fixed'
-      >
-        <div
-          onClick={(e: any) => {
-            e?.stopPropagation();
-          }}
-          className='bg-white rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] lg:w-[60%] w-[95vw] self-center relative'
-        >
-          <p className='font-normal text-base text-black mb-9'>Filter by:</p>
-
-          <div className='grid md:grid-cols-4 grid-cols-1 md:gap-10 gap-5'>
-            {customDropdownConfigs
-              ?.filter(
-                (item) => item?.options && item?.options?.length > 0
-              )
-              ?.map?.(({ label, filterType, options }) => (
-                <CustomDropDown
-                  key={label}
-                  name={label}
-                  filterType={filterType}
-                  filterOptions={options}
-                  setId={handleSetId}
-                  ids={selectedFilterIds}
-                  setOpenDropDown={setOpenDropDown}
-                />
-              ))}
-          </div>
-
-          <div className='h-[39px] text-center gap-5 flex items-center absolute md:bottom-10 bottom-5 right-10'>
-            <button
-              onClick={cancelFilters}
-              data-testid='cancel'
-              className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-coral flex items-center cursor-pointer hover:scale-105 hover:bg-primary hover:text-content'
-            >
-              Cancel
-            </button>
-
-            <button
-              onClick={onSearch}
-              data-testid='Apply'
-              className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 hover:bg-primary hover:text-content'
-            >
-              Apply
-            </button>
-          </div>
-        </div>
-      </CustomModal>
-    );
-  };
-
   const briefsData = savedBriefsActive
     ? briefs?.filter((brief) =>
       brief?.headline.toLocaleLowerCase().includes(searchInput)
@@ -617,7 +600,7 @@ const Briefs = (): JSX.Element => {
     <div className='flex flex-col'>
       <div className='search-briefs-container !overflow-hidden max-width-868px:px-5'>
         <FilterModal open={filterVisble} handleClose={() => toggleFilter()}
-          {...{ cancelFilters, handleSetId, onSearch, customDropdownConfigs }}
+          {...{ cancelFilters, handleSetId, onSearch, customDropdownConfigs, selectedFilterIds }}
         />
 
         <div className='briefs-section !overflow-hidden'>

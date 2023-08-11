@@ -12,7 +12,7 @@ type BriefFilterProps = {
   ids?: Array<string>;
 };
 
-export const BriefFilter = React.memo(
+export const BriefFilter = (
   ({
     label,
     filter_options,
@@ -26,7 +26,7 @@ export const BriefFilter = React.memo(
       ? [...ids, id]
       : ids.filter((existingId) => existingId !== id);
       
-      setId && setId(newIds);
+      setId?.(newIds);
     };
 
     return (
