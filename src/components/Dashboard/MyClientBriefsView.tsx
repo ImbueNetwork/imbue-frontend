@@ -1,16 +1,20 @@
 /* eslint-disable no-console */
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+//import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 import { Freelancer, Project } from '@/model';
-import { getBriefApplications, getUserBriefs } from '@/redux/services/briefService';
+import {
+  getBriefApplications,
+  getUserBriefs,
+} from '@/redux/services/briefService';
 import { getUsersOngoingGrants } from '@/redux/services/projectServices';
 
-import OngoingProject from './FreelacerView/OngoingProject/OngoinProject';
-import { ApplicationContainer } from '../Briefs/ApplicationContainer';
-import ApplicationSkeleton from '../Briefs/ApplicationSkeleton';
-import { BriefLists } from '../Briefs/BriefsList';
+// import OngoingProject from './FreelacerView/OngoingProject/OngoinProject';
+// import { ApplicationContainer } from '../Briefs/ApplicationContainer';
+// import ApplicationSkeleton from '../Briefs/ApplicationSkeleton';
+// import { BriefLists } from '../Briefs/BriefsList';
+import ClientView from '../ClientView/ClientView';
 
 type ClientViewProps = {
   briefId: string | string[] | undefined;
@@ -20,12 +24,8 @@ type ClientViewProps = {
 };
 
 const MyClientBriefsView = (props: ClientViewProps) => {
-  const {
-    user,
-    briefId,
-    handleMessageBoxClick,
-    redirectToBriefApplications,
-  } = props;
+  const { user, briefId, handleMessageBoxClick, redirectToBriefApplications } =
+    props;
 
   const [briefs, _setBriefs] = useState<any>();
   const [briefApplications, setBriefApplications] = useState<Project[]>([]);
@@ -37,9 +37,9 @@ const MyClientBriefsView = (props: ClientViewProps) => {
     const setUserBriefs = async () => {
       if (user?.id) _setBriefs(await getUserBriefs(user?.id));
       setOngoingGrants(await getUsersOngoingGrants(user?.web3_address));
-    }
+    };
     setUserBriefs();
-  }, [user?.id, user?.web3_address])
+  }, [user?.id, user?.web3_address]);
 
   useEffect(() => {
     const getApplications = async (id: string | number) => {
@@ -62,70 +62,16 @@ const MyClientBriefsView = (props: ClientViewProps) => {
 
   return (
     <div>
-      {briefId ? (
-        <div className='bg-white relative rounded-[0.75rem] '>
-          <div
-            className='absolute top-2 left-2 cursor-pointer'
-            onClick={goBack}
-          >
-            <ArrowBackIcon htmlColor='#3B27C1' />
-          </div>
-          {loadingApplications ? (
-            <ApplicationSkeleton />
-          ) : (
-            <>
-              {briefApplications?.map((application: any, index: any) => {
-                return (
-                  <ApplicationContainer
-                    application={application}
-                    handleMessageBoxClick={handleMessageBoxClick}
-                    redirectToApplication={redirectToBriefApplications}
-                    key={index}
-                  />
-                );
-              })}
-            </>
-          )}
-        </div>
-      ) : (
-        <div>
-          <h2 className='text-imbue-purple-dark text-base lg:text-xl mb-3'>Open Briefs</h2>
-          <BriefLists
-            briefs={briefs?.briefsUnderReview}
-            showNewBriefButton={true}
-          />
-
-          {
-            briefs?.acceptedBriefs?.length && (
-              <>
-                <p className='text-imbue-purple-dark text-base lg:text-xl mb-3 mt-4 lg:mt-10'>
-                  Projects
-                </p>
-                <BriefLists
-                  briefs={briefs?.acceptedBriefs}
-                  areAcceptedBriefs={true}
-                />
-              </>
-            )
-          }
-
-          {
-            ongoingGrants?.length && (
-              <>
-                <p className='text-imbue-purple-dark text-base lg:text-xl mb-3 mt-4 lg:mt-10'>
-                  Ongoing Grants
-                </p>
-                <div className='bg-background rounded-xl overflow-hidden'>
-                  <OngoingProject
-                    projects={ongoingGrants}
-                  />
-                </div>
-              </>
-            )
-          }
-
-        </div>
-      )}
+      <ClientView
+        GoBack={goBack}
+        briefId={briefId}
+        briefs={briefs}
+        handleMessageBoxClick={handleMessageBoxClick}
+        redirectToBriefApplications={redirectToBriefApplications}
+        briefApplications={briefApplications}
+        ongoingGrants={ongoingGrants}
+        loadingApplications={loadingApplications}
+      />
     </div>
   );
 };

@@ -57,25 +57,31 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
               >
                 <div className='flex flex-col pt-7 gap-y-5 '>
                   <div className='flex gap-x-3 items-center'>
-                    <div className='w-48'>
-                      <ProgressBar
-                        isPrimary={true}
-                        titleArray={Array(project.milestones?.length).fill('')}
-                        currentValue={
-                          project?.milestones?.filter(
-                            (it: any) => it.is_approved === true
-                          ).length - 1
-                        }
-                      />
-                    </div>
-                    <p className='text-[#7AA822]'>
-                      {
-                        project.milestones?.filter(
-                          (it: any) => it.is_approved === true
-                        ).length
-                      }
-                      /{project.milestones?.length}
-                    </p>
+                    {project.milestones && (
+                      <>
+                        <div className='w-48'>
+                          <ProgressBar
+                            isPrimary={true}
+                            titleArray={Array(
+                              project.milestones?.length + 1
+                            ).fill('')}
+                            currentValue={
+                              project.milestones?.filter(
+                                (it: any) => it.is_approved === true
+                              ).length
+                            }
+                          />
+                        </div>
+                        <p className='text-[#7AA822]'>
+                          {
+                            project.milestones?.filter(
+                              (it: any) => it.is_approved === true
+                            ).length
+                          }
+                          /{project.milestones?.length}
+                        </p>
+                      </>
+                    )}
                     <button
                       className={classNames(
                         ' text-black flex px-5 py-3 text-sm ml-auto rounded-full',

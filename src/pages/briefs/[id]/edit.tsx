@@ -215,13 +215,13 @@ export const EditProposal = (): JSX.Element => {
 
   const handleSkillChange = (val: string[]) => {
     setSkills(val);
-    if (validateSkillsAndIndustry('skills', val, 5, 10)) {
+    if (validateSkillsAndIndustry('skills', val, 3, 10)) {
       setInputError((val) => {
         return { ...val, skills: '' };
       });
     } else {
       setInputError((val) => {
-        return { ...val, skills: 'Nunber of skills must be between 5 to 10' };
+        return { ...val, skills: 'Number of skills must be between 3 to 10' };
       });
     }
   };
