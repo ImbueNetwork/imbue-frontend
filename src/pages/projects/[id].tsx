@@ -122,6 +122,7 @@ function Project() {
   const [successTitle, setSuccessTitle] = useState<string>('');
   const [error, setError] = useState<any>();
   const [balance, setBalance] = useState<any>(0);
+  const [requiredBalance, setRequiredBalance] = useState<any>(0);
   const [approversPreview, setApproverPreview] = useState<any>([]);
   const [isApprover, setIsApprover] = useState<boolean>(false);
   const [approverVotedOnRefund, setApproverVotedOnRefund] =
@@ -305,6 +306,8 @@ function Project() {
         projectRes?.currency_id || 0,
         user
       );
+      const totalCost = Number(Number(projectRes?.total_cost_without_fee) + Number(projectRes?.imbue_fee) );
+      setRequiredBalance(totalCost * 0.95);
       if (!balance) {
         handlePopUpForUser();
       }
@@ -761,11 +764,7 @@ function Project() {
             </div>
           </div>
           <div className='flex  mt-2 items-center w-full'>
-            {balance >=
-            Number(
-              Number(project?.total_cost_without_fee) +
-                Number(project?.imbue_fee)
-            ) ? (
+            {balance >= requiredBalance ? (
               <Image
                 className='bg-transparent  drop-shadow-sm mr-2'
                 src={'/checked.svg'}
