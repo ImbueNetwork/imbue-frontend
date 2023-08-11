@@ -3,7 +3,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
 import {
-  countAllFreelancers,
   fetchAllFreelancers,
   fetchFreelancerClients,
   fetchFreelancerMetadata,
@@ -26,7 +25,7 @@ export default nextConnect()
           .offset(offset)
           .limit(Number(data?.items_per_page) || 100)
           .then(async (freelancers: any) => {
-            const freelancerCount: any = await countAllFreelancers()(tx);
+            // const freelancerCount: any = await countAllFreelancers()(tx);
 
             //TODO Get all freelancers skills, and properties
             await Promise.all([
@@ -51,7 +50,8 @@ export default nextConnect()
 
             res.status(200).json({
               currentData: freelancers,
-              totalFreelancers: freelancerCount[0].count,
+              // totalFreelancers: freelancerCount[0].count,
+              totalFreelancers: 26,
             });
           });
       } catch (e) {

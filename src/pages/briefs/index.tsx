@@ -13,7 +13,7 @@ import { strToIntRange } from '@/utils/helper';
 import CustomDropDown from '@/components/CustomDropDown';
 import CustomModal from '@/components/CustomModal';
 import ErrorScreen from '@/components/ErrorScreen';
-import FullScreenLoader from '@/components/FullScreenLoader';
+import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 
 import {
   chevLeftIcon,
@@ -22,12 +22,13 @@ import {
   savedIcon,
   searchSvg,
 } from '@/assets/svgs';
-import { Brief, BriefSqlFilter } from '@/model';
+import { Brief, BriefSqlFilter, Item } from '@/model';
 import {
   callSearchBriefs,
   deleteSavedBrief,
   getAllBriefs,
   getAllSavedBriefs,
+  getAllSkills,
 } from '@/redux/services/briefService';
 import { RootState } from '@/redux/store/store';
 
@@ -45,11 +46,10 @@ interface FilterModalProps {
 
 const Briefs = (): JSX.Element => {
   const [briefs, setBriefs] = useState<Brief[]>([]);
-  console.log("🚀 ~ file: index.tsx:48 ~ Briefs ~ briefs:", briefs?.length)
   const [briefs_total, setBriefsTotal] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   // FIXME: setLoading
-  const [loading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const router = useRouter();
   const [itemsPerPage, setItemsPerPage] = useState<number>(6);
@@ -61,6 +61,7 @@ const Briefs = (): JSX.Element => {
 
   // search input value
   const [searchInput, setSearchInput] = useState<string>('');
+  const [skills, setSkills] = useState<Item[]>([{ name: "", id: 0 }]);
 
   const [error, setError] = useState<any>();
   const { expRange, submitRange, lengthRange, heading, size: sizeProps } = router.query;
@@ -185,48 +186,62 @@ const Briefs = (): JSX.Element => {
     ],
   };
 
-  const hoursPwFilter = {
+  // const hoursPwFilter = {
+  //   filterType: BriefFilterOption.HoursPerWeek,
+  //   label: 'Hours Per Week',
+  //   options: [
+  //     {
+  //       interiorIndex: 0,
+  //       // This will be 0-30 as we actually use this as max value
+  //       search_for: [30],
+  //       or_max: false,
+  //       value: '30hrs/week',
+  //     },
+  //     {
+  //       interiorIndex: 1,
+  //       // Same goes for this
+  //       search_for: [50],
+  //       value: '50hrs/week',
+  //       or_max: true,
+  //     },
+  //   ],
+  // };
+
+  const skillsFilter = {
     filterType: BriefFilterOption.HoursPerWeek,
-    label: 'Hours Per Week',
-    options: [
-      {
-        interiorIndex: 0,
-        // This will be 0-30 as we actually use this as max value
-        search_for: [30],
-        or_max: false,
-        value: '30hrs/week',
-      },
-      {
-        interiorIndex: 1,
-        // Same goes for this
-        search_for: [50],
-        value: '50hrs/week',
-        or_max: true,
-      },
-    ],
+    label: 'Skills required',
+    options: skills?.map((s) => ({
+      interiorIndex: 0,
+      value: s.name,
+    }))
   };
 
   const customDropdownConfigs = [
     {
-      name: 'Project Length',
+      label: 'Project Length',
       filterType: BriefFilterOption.Length,
-      filterOptions: lengthFilters.options,
+      options: lengthFilters.options,
     },
     {
-      name: 'Proposal Submitted',
+      label: 'Proposal Submitted',
       filterType: BriefFilterOption.AmountSubmitted,
-      filterOptions: submittedFilters.options,
+      options: submittedFilters.options,
     },
     {
-      name: 'Experience Level',
+      label: 'Experience Level',
       filterType: BriefFilterOption.ExpLevel,
-      filterOptions: expfilter.options,
+      options: expfilter.options,
     },
     {
-      name: 'Hours Per Week',
+      label: 'Skills Required',
       filterType: BriefFilterOption.HoursPerWeek,
-      filterOptions: hoursPwFilter.options,
+      options: skillsFilter.options,
     },
+    // {
+    //   name: 'Hours Per Week',
+    //   filterType: BriefFilterOption.HoursPerWeek,
+    //   filterOptions: hoursPwFilter.options,
+    // },
   ];
 
   const handleSetId = (id: string | string[]) => {
@@ -239,6 +254,7 @@ const Briefs = (): JSX.Element => {
 
   useEffect(() => {
     const fetchAndSetBriefs = async () => {
+      setLoading(true)
       if (!Object.keys(router?.query).length) {
         const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
         setBriefs(briefs_all?.currentData);
@@ -290,10 +306,11 @@ const Briefs = (): JSX.Element => {
         }
         if (heading) {
           filter = { ...filter, search_input: heading };
-          const input = document.getElementById(
-            'search-input'
-          ) as HTMLInputElement;
-          if (input) input.value = heading.toString();
+          // const input = document.getElementById(
+          //   'search-input'
+          // ) as HTMLInputElement;
+          // if (input) input.value = heading.toString();
+          setSearchInput(heading.toString())
         }
         if (lengthRange) {
           const range = strToIntRange(lengthRange);
@@ -303,19 +320,24 @@ const Briefs = (): JSX.Element => {
           });
           filter = { ...filter, length_range: strToIntRange(lengthRange) };
         }
-        const result: any = await callSearchBriefs(filter);
+        try {
+          const result: any = await callSearchBriefs(filter);
 
-        const totalPages = Math.ceil(result?.totalBriefs / (filter?.items_per_page || 6))
+          const totalPages = Math.ceil(result?.totalBriefs / (filter?.items_per_page || 6))
 
-        if (totalPages < filter.page) {
-          router.query.page = totalPages.toString()
-          router.push(router, undefined, { shallow: true })
-          filter.page = totalPages
+          if (totalPages < filter.page && totalPages > 0) {
+            router.query.page = totalPages.toString()
+            router.push(router, undefined, { shallow: true })
+            filter.page = totalPages
+          }
+
+          setBriefs(result?.currentData);
+          setBriefsTotal(result?.totalBriefs);
+        } catch (error) {
+          setError({ message: "Something went wrong. Please try again" })
         }
-
-        setBriefs(result?.currentData);
-        setBriefsTotal(result?.totalBriefs);
       }
+      setLoading(false)
     };
 
     router.isReady && fetchAndSetBriefs();
@@ -332,7 +354,7 @@ const Briefs = (): JSX.Element => {
   // Here we have to get all the checked boxes and try and construct a query out of it...
   const onSearch = async () => {
     // The filter initially should return all values
-
+    setLoading(true);
     let is_search = false;
 
     let exp_range: number[] = [];
@@ -406,6 +428,7 @@ const Briefs = (): JSX.Element => {
       }
     }
 
+    router.query.page = '1';
     router.query.heading = search_value !== '' ? search_value : [];
     router.query.expRange = exp_range.length ? exp_range.toString() : [];
     router.query.submitRange = submitted_range.length
@@ -429,7 +452,7 @@ const Briefs = (): JSX.Element => {
           length_is_max,
           search_input: search_value,
           items_per_page: itemsPerPage,
-          page: currentPage,
+          page: 1,
         };
 
         if (search_value.length === 0) {
@@ -449,7 +472,19 @@ const Briefs = (): JSX.Element => {
     } catch (error) {
       setError({ message: error });
     }
+    finally {
+      setLoading(false)
+    }
   };
+
+  useEffect(() => {
+    const getAllFilters = async () => {
+      const filteredItems = await getAllSkills()
+      setSkills(filteredItems?.skills);
+    }
+
+    getAllFilters()
+  }, [])
 
   const onSavedBriefs = async () => {
     setSavedBriefsActive(true);
@@ -532,17 +567,17 @@ const Briefs = (): JSX.Element => {
         >
           <p className='font-normal text-base text-black mb-9'>Filter by:</p>
 
-          <div className='grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5'>
+          <div className='grid md:grid-cols-4 grid-cols-1 md:gap-10 gap-5'>
             {customDropdownConfigs
               ?.filter(
-                (item) => item?.filterOptions && item?.filterOptions?.length > 0
+                (item) => item?.options && item?.options?.length > 0
               )
-              ?.map?.(({ name, filterType, filterOptions }) => (
+              ?.map?.(({ label, filterType, options }) => (
                 <CustomDropDown
-                  key={name}
-                  name={name}
+                  key={label}
+                  name={label}
                   filterType={filterType}
-                  filterOptions={filterOptions}
+                  filterOptions={options}
                   setId={handleSetId}
                   ids={selectedFilterIds}
                   setOpenDropDown={setOpenDropDown}
@@ -578,12 +613,12 @@ const Briefs = (): JSX.Element => {
     )
     : briefs;
 
-  if (loading) return <FullScreenLoader />;
-
   return (
     <div className='flex flex-col'>
       <div className='search-briefs-container !overflow-hidden max-width-868px:px-5'>
-        <FilterModal open={filterVisble} handleClose={() => toggleFilter()} />
+        <FilterModal open={filterVisble} handleClose={() => toggleFilter()}
+          {...{ cancelFilters, handleSetId, onSearch, customDropdownConfigs }}
+        />
 
         <div className='briefs-section !overflow-hidden'>
           <div className='briefs-heading'>
@@ -748,6 +783,7 @@ const Briefs = (): JSX.Element => {
             </button>
           </div>
         </ErrorScreen>
+        <BackDropLoader open={loading} />
       </div>
       <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex  justify-between  max-width-868px:w-[90%] self-center'>
         <div className='flex items-center'>

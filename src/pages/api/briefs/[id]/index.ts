@@ -48,19 +48,6 @@ export default nextConnect()
       try {
         const currentData: Array<Brief> = await models.searchBriefs(data)(tx);
 
-        const totalBriefs = await models
-          .searchBriefs({
-            ...data,
-            items_per_page: 0,
-          })(tx)
-          .then((resp) => resp.length);
-
-        // const { currentData, totalItems } = await models.paginatedData(
-        //   Number(data?.page || 1),
-        //   Number(data?.items_per_page || 5),
-        //   briefs
-        // );
-
         await Promise.all([
           currentData,
           ...currentData.map(async (brief: any) => {
@@ -71,8 +58,23 @@ export default nextConnect()
             )(tx);
           }),
         ]);
+        
+        // const totalBriefs = await models
+        //   .searchBriefs({
+        //     ...data,
+        //     items_per_page: 0,
+        //   })(tx)
+        //   .then((resp) => resp.length);
 
-        res.status(200).json({ currentData, totalBriefs });
+        const briefCount = await models.searchBriefsCount(data)(tx);
+
+        // const { currentData, totalItems } = await models.paginatedData(
+        //   Number(data?.page || 1),
+        //   Number(data?.items_per_page || 5),
+        //   briefs
+        // );
+
+        res.status(200).json({ currentData, totalBriefs: briefCount });
       } catch (e) {
         new Error(`Failed to search for briefs ${data}`, { cause: e as Error });
       }

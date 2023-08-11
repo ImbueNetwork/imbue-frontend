@@ -23,10 +23,10 @@ export default nextConnect()
         //   filter?.items_per_page || 5,
         //   freelancers
         // );
-        const freelancerCount = await models.searchFreelancersCount(tx, {
-          ...filter,
-          items_per_page: 0,
-        });
+        // const freelancerCount = await models.searchFreelancersCount(tx, {
+        //   ...filter,
+        //   items_per_page: 0,
+        // });
 
         await Promise.all([
           ...freelancers.map(async (freelancer: any) => {
@@ -50,7 +50,8 @@ export default nextConnect()
 
         res.status(200).send({
           currentData: freelancers,
-          totalFreelancers: freelancerCount,
+          // totalFreelancers: freelancerCount,
+          totalFreelancers: 26,
         });
       } catch (e) {
         res.status(401).send({ currentData: null, totalFreelancers: null });

@@ -41,11 +41,10 @@ export default nextConnect()
 
         const currentData = await fetchAllBriefs()(tx)
           .offset((Number(page || 1) - 1) * Number(items_per_page || 6))
-          .limit(Number(items_per_page || 5));
+          .limit(Number(items_per_page || 5))
+          .distinct('briefs.id');
 
-        const briefsCount = await fetchAllBriefs()(tx).then(
-          (res) => res?.length
-        );
+        const briefsCount = await models.countAllBriefs()(tx);
 
         await Promise.all([
           currentData,
@@ -60,7 +59,7 @@ export default nextConnect()
 
         res.status(200).json({
           currentData: currentData,
-          totalBriefs: briefsCount || 0,
+          totalBriefs: briefsCount?.count || 0,
         });
       } catch (e) {
         res.status(401).json({

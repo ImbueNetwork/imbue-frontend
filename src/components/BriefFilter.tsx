@@ -20,7 +20,6 @@ export const BriefFilter = React.memo(
     setId,
     ids = [],
   }: BriefFilterProps): JSX.Element => {
-    console.log("🚀 ~ file: BriefFilter.tsx:23 ~ ids:", ids)
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const { checked, id } = e.target;
       const newIds = (checked && !ids.includes(id))
@@ -34,9 +33,9 @@ export const BriefFilter = React.memo(
       <div className='filter-section'>
         <div className='filter-label'>{label}</div>
         <div className='filter-option-list !mb-0 !gap-0'>
-          {filter_options.map(({ value, interiorIndex }) => (
+          {filter_options?.map(({ value, interiorIndex }) => (
             <div
-              className='filter-option flex items-center justify-between w-full hover:bg-imbue-light-purple px-4 py-2'
+              className='filter-option flex items-center justify-between w-full hover:bg-imbue-light-purple px-4 py-2 cursor-pointer'
               key={value}
             >
               <label className='font-normal text-base text-imbue-purple-dark flex justify-between w-full cursor-pointer'>
@@ -44,7 +43,7 @@ export const BriefFilter = React.memo(
                 <input
                   type='checkbox'
                   autoComplete='off'
-                  className='filtercheckbox'
+                  className='filtercheckbox cursor-pointer'
                   id={`${filter_type.toString()}-${interiorIndex}`}
                   data-testid={`${filter_type.toString()}-${interiorIndex}`}
                   checked={ids.includes(
