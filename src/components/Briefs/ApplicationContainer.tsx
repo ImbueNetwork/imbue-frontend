@@ -11,7 +11,7 @@ export const ApplicationContainer = ({
   handleMessageBoxClick,
 }: ApplicationContainerProps) => {
   return (
-    <div className='flex flex-col px-5 py-5 lg:px-[60px] lg:py-[35px] border-b border-b-light-white last:border-b-0'>
+    <div className='flex flex-col px-5 py-5 lg:px-[60px] lg:py-[35px] border-b border-b-imbue-light-purple last:border-b-0 hover:bg-imbue-light-purple-hover cursor-pointer'>
       <div className='flex flex-col gap-5 lg:flex-row lg:items-center justify-between mb-4'>
         <div className='flex items-start gap-5 ml-4 lg:ml-0'>
           <Image

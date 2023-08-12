@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
+import { TextField } from '@mui/material';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import Image from 'next/image';
@@ -46,7 +47,7 @@ const timeAgo = new TimeAgo('en-US');
 const Briefs = (): JSX.Element => {
   const [briefs, setBriefs] = useState<Brief[]>([]);
   const [briefs_total, setBriefsTotal] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   // FIXME: setLoading
   const [loading, setLoading] = useState<boolean>(true);
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
@@ -60,6 +61,8 @@ const Briefs = (): JSX.Element => {
 
   // search input value
   const [searchInput, setSearchInput] = useState<string>('');
+  const [pageInput, setPageInput] = useState<number>(1);
+
   const [skills, setSkills] = useState<Item[]>([{ name: "", id: 0 }]);
 
   const [error, setError] = useState<any>();
@@ -267,7 +270,7 @@ const Briefs = (): JSX.Element => {
           }
 
         } else {
-          
+
           let filter: BriefSqlFilter = {
             experience_range: [],
             submitted_range: [],
@@ -364,7 +367,9 @@ const Briefs = (): JSX.Element => {
       } catch (error) {
         setError({ message: "Something went wrong. Please try again" })
       }
-      setLoading(false)
+      finally {
+        setLoading(false)
+      }
     };
 
     router.isReady && fetchAndSetBriefs();
@@ -590,6 +595,17 @@ const Briefs = (): JSX.Element => {
     }
   }
 
+  const setPageNumber = (e: any) => {
+    const pageNumber = Number(e.target.value) || 1;
+    const totalPages = Math.ceil(briefs_total / itemsPerPage)
+
+    if ((e.key === 'Enter' || e.key === 'Enter') && (pageNumber <= totalPages)) {
+      setCurrentPage(pageNumber);
+      router.query.page = pageNumber.toString()
+      router.push(router, undefined, { shallow: true });
+    }
+  }
+
   const briefsData = savedBriefsActive
     ? briefs?.filter((brief) =>
       brief?.headline.toLocaleLowerCase().includes(searchInput)
@@ -766,9 +782,10 @@ const Briefs = (): JSX.Element => {
             </button>
           </div>
         </ErrorScreen>
+
         <BackDropLoader open={loading} />
       </div>
-      <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex  justify-between  max-width-868px:w-[90%] self-center'>
+      <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center justify-between max-width-868px:w-[90%] self-center'>
         <div className='flex items-center'>
           <button
             onClick={() => previousPage()}
@@ -778,8 +795,27 @@ const Briefs = (): JSX.Element => {
             Previous
           </button>
 
-          <div className='mx-[1.62rem] text-[#5E5E5E] text-[0.7rem] lg:text-[1rem] font-normal'>
-            {currentPage} of {Math.ceil(briefs_total / itemsPerPage)}
+          <div className='mx-[1.62rem] text-[#5E5E5E] text-[0.7rem] lg:text-[1rem] font-normal flex items-center gap-3'>
+            <TextField
+              id="standard-size-small"
+              className='!mb-0'
+              inputProps={{
+                className: "w-6 text-right px-1",
+                type: "number",
+                min: 1,
+                max: Math.ceil(briefs_total / itemsPerPage)
+              }}
+              onChange={(e) => setPageInput(Number(e.target.value))}
+              onKeyDown={(e) => setPageNumber(e)}
+              value={pageInput}
+              variant="standard" />
+            <span>
+              of
+            </span>
+            <span>
+              {Math.ceil(briefs_total / itemsPerPage)}
+            </span>
+            {/* {currentPage} of {Math.ceil(briefs_total / itemsPerPage)} */}
           </div>
 
           <button

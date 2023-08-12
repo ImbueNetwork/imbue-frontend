@@ -26,7 +26,7 @@ const FreelancerView: React.FC<FreelacerViewProps> = ({
   }, [myApplications]);
 
   return (
-    <div className='bg-white rounded-2xl  '>
+    <div className='bg-white rounded-2xl overflow-hidden'>
       <div className='text-imbue-purple py-7  px-9 flex   text-sm space-x-9'>
         <p
           className={cn(

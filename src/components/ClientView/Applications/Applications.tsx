@@ -1,5 +1,5 @@
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
+import BackButton from '@/components/BackButton';
 import { ApplicationContainer } from '@/components/Briefs/ApplicationContainer';
 import ApplicationSkeleton from '@/components/Briefs/ApplicationSkeleton';
 import { BriefLists } from '@/components/Briefs/BriefsList';
@@ -30,27 +30,27 @@ export default function Applications({
       {briefId ? (
         <div className='bg-white relative rounded-[0.75rem] '>
           <div
-            className='absolute top-2 left-2 cursor-pointer'
+            className='absolute top-5 left-3 cursor-pointer'
             onClick={goBack}
           >
-            <ArrowBackIcon htmlColor='#3B27C1' />
+            <BackButton />
           </div>
-          {loadingApplications ? (
-            <ApplicationSkeleton />
-          ) : (
-            <>
-              {briefApplications?.map((application: any, index: any) => {
-                return (
-                  <ApplicationContainer
-                    application={application}
-                    handleMessageBoxClick={handleMessageBoxClick}
-                    redirectToApplication={redirectToBriefApplications}
-                    key={index}
-                  />
-                );
-              })}
-            </>
-          )}
+          {loadingApplications
+            ? <ApplicationSkeleton />
+            : (
+              <>
+                {briefApplications?.map((application: any, index: any) => {
+                  return (
+                    <ApplicationContainer
+                      application={application}
+                      handleMessageBoxClick={handleMessageBoxClick}
+                      redirectToApplication={redirectToBriefApplications}
+                      key={index}
+                    />
+                  );
+                })}
+              </>
+            )}
         </div>
       ) : (
         <div>

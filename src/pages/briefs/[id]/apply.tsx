@@ -188,7 +188,10 @@ export const SubmitProposal = (): JSX.Element => {
       return setError({ message: 'Total percentage must be 100%' });
 
     if (totalCostWithoutFee > 100000000)
-      return setError({ message: 'Total cost must be less than 100,000,000' });
+      return setError({ message: 'Total cost must be less than $100,000,000' });
+
+    if (totalCostWithoutFee < 10)
+      return setError({ message: 'Total cost must be greater than $10' });
 
     setLoading(true);
 
@@ -234,13 +237,13 @@ export const SubmitProposal = (): JSX.Element => {
     }
   }
 
-  const totalPercent = 
-  milestones.reduce((sum, { amount }) => {
-    const percent = Number(
-      ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
-    );
-    return sum + percent;
-  }, 0)
+  const totalPercent =
+    milestones.reduce((sum, { amount }) => {
+      const percent = Number(
+        ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
+      );
+      return sum + percent;
+    }, 0)
 
   const handleMilestoneChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -540,9 +543,8 @@ export const SubmitProposal = (): JSX.Element => {
             title={disableSubmit && 'Please fill all the required input fields'}
           >
             <button
-              className={`primary-btn in-dark w-button ${
-                disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
-              }`}
+              className={`primary-btn in-dark w-button ${disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
+                }`}
               onClick={() => !disableSubmit && handleSubmit()}
             >
               Submit

@@ -1,4 +1,3 @@
-import { Divider } from '@mui/material';
 import classNames from 'classnames';
 import { useState } from 'react';
 
@@ -31,8 +30,8 @@ export default function ClientView({
 }: ClientViewProps) {
   const [switcher, setSwitcher] = useState('application');
   return (
-    <div className='bg-white rounded-2xl pb-5'>
-      <div className='text-imbue-purple py-7  px-9 flex   text-sm space-x-9'>
+    <div className='bg-white rounded-2xl overflow-hidden'>
+      <div className='text-imbue-purple py-7 px-9 flex text-sm space-x-9 border-b border-b-imbue-light-purple'>
         <p
           onClick={() => setSwitcher('application')}
           className={classNames(
@@ -67,7 +66,7 @@ export default function ClientView({
           Grants({ongoingGrants.length})
         </p>
       </div>
-      <Divider className='mb-5' />
+      {/* <Divider className='mb-5' /> */}
 
       {switcher === 'application' && (
         <Applications

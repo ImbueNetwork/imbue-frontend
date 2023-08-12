@@ -179,6 +179,7 @@ const NewBrief = (): JSX.Element => {
           onChange={(e, value) => handleIndustriesChange(value)}
           defaultValue={industries}
           limitTags={10}
+          ListboxProps={{className: "max-h-[250px]"}}
           renderInput={(params) => (
             <TextField
               color='secondary'
@@ -231,6 +232,7 @@ const NewBrief = (): JSX.Element => {
           sx={{ width: '100%' }}
           onChange={(e, value) => handleSkillsChange(value)}
           defaultValue={skills}
+          ListboxProps={{className: "max-h-[250px]"}}
           renderInput={(params) => (
             <TextField
               color='secondary'

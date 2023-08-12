@@ -465,6 +465,17 @@ export const updateProject =
       await tx<Project>('projects').update(project).where({ id }).returning('*')
     )[0];
 
+export const rejectOtherApplications =
+  (briefID: string | number, projectID: string | number) =>
+  async (tx: Knex.Transaction) =>
+    (
+      await tx<Project>('projects')
+        .where({ brief_id: briefID })
+        .whereNot({ id: projectID })
+        .update({ status_id: ProjectStatus.Rejected })
+        .returning('*')
+    )[0];
+
 export const updateProjectProperties =
   (id: string | number, properties: ProjectProperties) =>
   async (tx: Knex.Transaction) =>

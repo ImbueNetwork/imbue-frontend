@@ -9,6 +9,7 @@ import {
   fetchProjectById,
   fetchUser,
   ProjectStatus,
+  rejectOtherApplications,
   updateProject,
   User,
 } from '@/lib/models';
@@ -66,6 +67,8 @@ export default nextConnect()
         await updateProject(project.id ?? '', project)(tx);
 
         if (status_id == ProjectStatus.Accepted) {
+          await rejectOtherApplications(id, projectId)(tx);
+
           const updatedBrief = await acceptBriefApplication(id, projectId)(tx);
           return res.send(updatedBrief);
         } else {
