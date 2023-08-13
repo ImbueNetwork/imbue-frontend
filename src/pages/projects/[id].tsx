@@ -39,6 +39,7 @@ import {
   Project,
   ProjectOnChain,
   User,
+  Vote,
 } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
@@ -77,7 +78,6 @@ function Project() {
   const [project, setProject] = useState<Project | any>({});
   const [targetUser, setTargetUser] = useState<any>({});
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
-  console.log("🚀 ~ file: [id].tsx:91 ~ Project ~ onChainProject:", onChainProject)
   // const [user, setUser] = useState<User | any>();
   const { user, loading: userLoading } = useSelector(
     (state: RootState) => state.userState
@@ -102,6 +102,7 @@ function Project() {
   const [isApplicant, setIsApplicant] = useState<boolean>(false);
   const [isProjectOwner, setIsProjectOwner] = useState<boolean>(false);
   const [showRefundButton, setShowRefundButton] = useState<boolean>();
+  const [milestoneVotes, setMilestoneVotes] = useState<Vote[]>([]);
   const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
     useState<boolean>();
   const [projectInVotingOfNoConfidence, setProjectInVotingOfNoConfidence] =
@@ -168,6 +169,8 @@ function Project() {
         onChainProjectRes.projectInVotingOfNoConfidence
       );
 
+
+
       if (
         user.web3_address &&
         onChainProjectRes.projectInVotingOfNoConfidence
@@ -175,13 +178,14 @@ function Project() {
         const voters = await chainService.getNoConfidenceVoters(
           onChainProjectRes.id
         );
-        console.log('**** current voters are ');
-        console.log(voters);
-        console.log('***** has current user voted? ');
-        console.log(voters.includes(user.web3_address));
         if (voters.includes(user.web3_address)) {
           setApproverVotedOnRefund(true);
         }
+      }
+
+      if(user.web3_address && onChainProjectRes.projectInMilestoneVoting) {
+        const milestoneVotes: Vote[] = await chainService.getMilestoneVotes(onChainProjectRes.id,firstPendingMilestone);
+        setMilestoneVotes(milestoneVotes)
       }
 
       setOnChainProject(onChainProjectRes);

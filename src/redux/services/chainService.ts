@@ -20,6 +20,7 @@ import {
   ProjectOnChain,
   RoundType,
   User,
+  Vote,
 } from '@/model';
 
 import { updateMilestone, updateProject } from './projectServices';
@@ -278,6 +279,12 @@ class ChainService {
     const noConfidenceVotes = await this.imbueApi.imbue.api.query.imbueProposals.userHasVoted(lookupKey);
     const voters = Object.keys(JSON.parse(JSON.stringify(noConfidenceVotes.toJSON())));
     return voters;
+  }
+
+  public async getMilestoneVotes(chain_project_id: string | number, milestone: number) {
+    const lookupKey = [chain_project_id, RoundType.VotingRound, milestone];
+    const milestoneVotes = (await this.imbueApi.imbue.api.query.imbueProposals.userHasVoted(lookupKey)).toHuman() as Vote[];
+    return milestoneVotes;
   }
 
   public async raiseVoteOfNoConfidence(

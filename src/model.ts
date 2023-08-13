@@ -161,6 +161,12 @@ export type User = {
   industry?: string;
   created?: string;
 };
+
+export type Vote = {
+  voterAddress: string;
+  vote: boolean;
+}
+
 export interface BasicTxResponse {
   errorMessage: string | null;
   callHash?: string;
