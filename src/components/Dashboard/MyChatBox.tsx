@@ -2,17 +2,21 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { StreamChat } from 'stream-chat';
+import { StreamChat, UserResponse } from 'stream-chat';
 import {
   Channel,
   ChannelList,
   Chat,
   MessageInput,
   MessageList,
+  MessageSimple,
+  RenderTextOptions,
   Thread,
   useChatContext,
+  useMessageContext,
   Window,
 } from 'stream-chat-react';
+import { DefaultStreamChatGenerics } from 'stream-chat-react/dist/types/types';
 
 import { CustomChannelHeader } from '../StreamChatComponents/CustomChannelHeader';
 
@@ -124,8 +128,43 @@ function DashboardChatBox({
     return <></>;
   }
 
+  function customRenderText(
+    text: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _mentions_user: UserResponse<DefaultStreamChatGenerics>[] | undefined,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _options: RenderTextOptions | undefined
+  ) {
+    return <p className='text-base'>{text}</p>;
+  }
+
+  function customPinnedRenderText(
+    text: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _mentions_user: UserResponse<DefaultStreamChatGenerics>[] | undefined,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _options: RenderTextOptions | undefined
+  ) {
+    return (
+      <div className='flex flex-col !space-x-2'>
+        <p className='italic w-full flex text-xs  text-gray-500 flex-row-reverse'>
+          Pinned
+        </p>
+        <p className='text-base'>{text} </p>
+      </div>
+    );
+  }
+
+  const CustomMessage = (props: any) => {
+    const { message } = useMessageContext();
+    if (message.pinned)
+      return <MessageSimple {...props} renderText={customPinnedRenderText} />;
+
+    return <MessageSimple {...props} renderText={customRenderText} />;
+  };
+
   return (
-    <div className='custom-chat-container w-full rounded-2xl h-[75vh] bg---theme-grey-dark border border-white border-opacity-25 overflow-hidden -mt-4'>
+    <div className='custom-chat-container relative w-full rounded-2xl h-[75vh] bg---theme-grey-dark border border-white border-opacity-25 overflow-hidden -mt-4'>
       <Chat client={client} theme='str-chat__theme-light'>
         {mobileView ? (
           <>
@@ -163,7 +202,7 @@ function DashboardChatBox({
                 showChannelSearch={true}
               />
             </div>
-            <Channel>
+            <Channel Message={CustomMessage}>
               <Window>
                 <CustomChannelHeader showFreelancerProfile={false} />
                 <MessageList />
