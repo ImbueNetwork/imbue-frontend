@@ -197,9 +197,6 @@ export const EditProposal = (): JSX.Element => {
   //   return arr1.filter((str) => !arr2.includes(str.toLocaleLowerCase()));
   // }
 
-  console.log(skills);
-  console.log(industries);
-
   const validateInputLength = (
     text: string,
     min: number,

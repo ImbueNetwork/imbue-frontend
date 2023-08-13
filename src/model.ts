@@ -120,6 +120,7 @@ export type ProjectOnChain = {
 };
 
 export type Milestone = {
+  approvedForFunding?: boolean;
   project_id: number;
   project_chain_id: number;
   milestone_key: number;

@@ -281,6 +281,7 @@ const Freelancers = (): JSX.Element => {
           }
 
           setCurrentPage(filter.page)
+          setPageInput(filter.page)
           setFreelancers(currentData);
           setFreelancersTotal(totalFreelancers);
         } catch (error) {
@@ -423,7 +424,7 @@ const Freelancers = (): JSX.Element => {
       itemsPerPage,
       currentPage
     );
-    await setSlectedFilterIds([]);
+    setSlectedFilterIds([]);
     setFreelancers(allFreelancers?.currentData);
     setFreelancersTotal(allFreelancers?.totalFreelancers);
   };
@@ -437,8 +438,9 @@ const Freelancers = (): JSX.Element => {
     const pageNumber = Number(e.target.value) || 1;
     const totalPages = Math.ceil(freelancers_total / itemsPerPage)
 
-    if ((e.key === 'Enter' || e.key === 'Enter') && (pageNumber <= totalPages)) {
+    if ((e.key === 'Enter' || e.key === 'Enter') && (pageNumber <= totalPages) && (pageNumber > 0)) {
       setCurrentPage(pageNumber);
+      setPageInput(pageNumber);
       router.query.page = pageNumber.toString()
       router.push(router, undefined, { shallow: true });
     }
@@ -592,6 +594,7 @@ const Freelancers = (): JSX.Element => {
                     router.query.page = String(currentPage - 1)
                     router.push(router, undefined, { shallow: true })
                     setCurrentPage(currentPage - 1)
+                    setPageInput(currentPage - 1)
                   }
                 }}
                 className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'
@@ -627,6 +630,7 @@ const Freelancers = (): JSX.Element => {
                 onClick={() => {
                   if (freelancers_total > currentPage * itemsPerPage) {
                     setCurrentPage(currentPage + 1);
+                    setPageInput(currentPage + 1);
                     router.query.page = String(currentPage + 1)
                     router.push(router, undefined, { shallow: true })
                   }

@@ -274,7 +274,11 @@ const ApplicationPreview = (): JSX.Element => {
       return setError({ message: 'TotalPercent must be 100%' });
     if (totalCostWithoutFee > 100000000)
       return setError({
-        message: 'Total price of the project must be less than 100,000,000',
+        message: 'Total price of the project must be less than $100,000,000',
+      });
+    if (totalCostWithoutFee < 10)
+      return setError({
+        message: 'Total price of the project must be greater than $10',
       });
 
     setLoading(true);

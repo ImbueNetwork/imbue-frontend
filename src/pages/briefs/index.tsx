@@ -287,6 +287,7 @@ const Briefs = (): JSX.Element => {
             const pageQuery = Number(router.query.page)
             filter.page = pageQuery;
             setCurrentPage(pageQuery)
+            setPageInput(pageQuery)
           }
 
           if (sizeProps) {
@@ -561,7 +562,7 @@ const Briefs = (): JSX.Element => {
       query: {},
     });
     const allBriefs: any = await getAllBriefs(itemsPerPage, currentPage);
-    await setSlectedFilterIds([]);
+    setSlectedFilterIds([]);
     setBriefs(allBriefs?.currentData);
     setBriefsTotal(allBriefs?.totalBriefs);
     setSearchInput('');
@@ -569,7 +570,7 @@ const Briefs = (): JSX.Element => {
 
   const deleteBrief = async (briefId: string | number) => {
     const allBriefs: any = await deleteSavedBrief(briefId, currentUser?.id);
-    await setSlectedFilterIds([]);
+    setSlectedFilterIds([]);
     setBriefs(allBriefs?.currentData);
     setBriefsTotal(allBriefs?.totalBriefs);
   };
@@ -582,6 +583,7 @@ const Briefs = (): JSX.Element => {
   const nextPage = () => {
     if (briefs_total > currentPage * itemsPerPage) {
       setCurrentPage(currentPage + 1);
+      setPageInput(currentPage + 1);
       router.query.page = (currentPage + 1).toString()
       router.push(router, undefined, { shallow: true });
     }
@@ -590,6 +592,7 @@ const Briefs = (): JSX.Element => {
   const previousPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
+      setPageInput(currentPage - 1);
       router.query.page = (currentPage - 1).toString()
       router.push(router, undefined, { shallow: true });
     }
@@ -599,8 +602,9 @@ const Briefs = (): JSX.Element => {
     const pageNumber = Number(e.target.value) || 1;
     const totalPages = Math.ceil(briefs_total / itemsPerPage)
 
-    if ((e.key === 'Enter' || e.key === 'Enter') && (pageNumber <= totalPages)) {
+    if ((e.key === 'Enter' || e.key === 'Enter') && (pageNumber <= totalPages) && (pageNumber > 0)) {
       setCurrentPage(pageNumber);
+      setPageInput(pageNumber);
       router.query.page = pageNumber.toString()
       router.push(router, undefined, { shallow: true });
     }

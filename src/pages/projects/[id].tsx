@@ -3,11 +3,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
-import { Modal, Tooltip } from '@mui/material';
+import { AvatarGroup, Modal, Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
-import moment from 'moment';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -22,11 +21,14 @@ import BackButton from '@/components/BackButton';
 import ChatPopup from '@/components/ChatPopup';
 import { Dialogue } from '@/components/Dialogue';
 import ErrorScreen from '@/components/ErrorScreen';
+import RefundScreen from '@/components/Grant/Refund';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 import Login from '@/components/Login';
+import ProjectStateTag from '@/components/Project/ProjectStateTag';
 import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
 
+import freelalncerPic from '@/assets/images/profile-image.png'
 import { calenderIcon, shieldIcon, tagIcon } from '@/assets/svgs';
 import { timeData } from '@/config/briefs-data';
 import {
@@ -36,6 +38,7 @@ import {
   OffchainProjectState,
   Project,
   ProjectOnChain,
+  User,
 } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
@@ -58,35 +61,23 @@ type ExpandableDropDownsProps = {
   withdraw: () => void;
 };
 
-const openForVotingTag = (): JSX.Element => {
-  return (
-    <div className='flex flex-row items-center'>
-      <div className='h-[15px] w-[15px] rounded-[7.5px] bg-[#BAFF36]' />
-      <p className='text-xl font-normal leading-[23px] text-[#BAFF36] mr-[27px] ml-[14px]'>
-        Open for Voting
-      </p>
-    </div>
-  );
-};
-
-const projectStateTag = (dateCreated: Date, text: string): JSX.Element => {
-  return (
-    <div className='flex flex-row items-center'>
-      <p className='text-sm font-normal leading-[16px] text-content'>
-        {moment(dateCreated)?.format('DD MMM, YYYY')}
-      </p>
-      <p className='text-sm lg:text-xl font-normal leading-[23px] text-[#411DC9] mr-[27px] ml-[14px]'>
-        {text}
-      </p>
-    </div>
-  );
-};
+// const openForVotingTag = (): JSX.Element => {
+//   return (
+//     <div className='flex flex-row items-center'>
+//       <div className='h-[15px] w-[15px] rounded-[7.5px] bg-[#BAFF36]' />
+//       <p className='text-xl font-normal leading-[23px] text-[#BAFF36] mr-[27px] ml-[14px]'>
+//         Open for Voting
+//       </p>
+//     </div>
+//   );
+// };
 
 function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
   const [targetUser, setTargetUser] = useState<any>({});
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
+  console.log("🚀 ~ file: [id].tsx:91 ~ Project ~ onChainProject:", onChainProject)
   // const [user, setUser] = useState<User | any>();
   const { user, loading: userLoading } = useSelector(
     (state: RootState) => state.userState
@@ -119,11 +110,12 @@ function Project() {
   const [wait, setWait] = useState<boolean>(false);
   const [waitMessage, setWaitMessage] = useState<string>('');
   const [success, setSuccess] = useState<boolean>(false);
+  const [refunded, setRefunded] = useState<boolean>(false);
   const [successTitle, setSuccessTitle] = useState<string>('');
   const [error, setError] = useState<any>();
   const [balance, setBalance] = useState<any>(0);
   const [requiredBalance, setRequiredBalance] = useState<any>(0);
-  const [approversPreview, setApproverPreview] = useState<any>([]);
+  const [approversPreview, setApproverPreview] = useState<User[]>([]);
   const [isApprover, setIsApprover] = useState<boolean>(false);
   const [approverVotedOnRefund, setApproverVotedOnRefund] =
     useState<boolean>(false);
@@ -203,8 +195,7 @@ function Project() {
           break;
         case OffchainProjectState.Refunded:
           setWait(false);
-          setSuccess(true);
-          setSuccessTitle('This project has been refunded!');
+          setRefunded(true);
           break;
         case OffchainProjectState.Completed:
           setWait(false);
@@ -280,21 +271,24 @@ function Project() {
             approversPreviewList.push(approver);
           } else {
             approversPreviewList.push({
-              // id: 6,
+              id: 0,
               display_name: '',
-              profile_photo: null,
+              profile_photo: '',
               username: '',
               web3_address: approverAddress,
+              getstream_token: ''
+
             });
           }
         });
       } else {
         approversPreviewList.push({
-          // id: 6,
+          id: owner?.id,
           display_name: owner?.display_name,
           profile_photo: owner?.profile_photo,
           username: owner?.username,
           web3_address: owner?.web3_address,
+          getstream_token: owner?.getstream_token
         });
       }
       setApproverPreview(approversPreviewList);
@@ -306,7 +300,7 @@ function Project() {
         projectRes?.currency_id || 0,
         user
       );
-      const totalCost = Number(Number(projectRes?.total_cost_without_fee) + Number(projectRes?.imbue_fee) );
+      const totalCost = Number(Number(projectRes?.total_cost_without_fee) + Number(projectRes?.imbue_fee));
       setRequiredBalance(totalCost * 0.95);
       if (!balance) {
         handlePopUpForUser();
@@ -566,7 +560,7 @@ function Project() {
     const [expanded, setExpanded] = useState(false);
 
     return (
-      <div className='mt-8 relative bg-white px-5 border border-white rounded-2xl lg:px-12 max-width-750px:!pb-[30px]'>
+      <div className='mb-2 relative bg-white px-5 border border-white rounded-2xl lg:px-12 max-width-750px:!pb-[30px]'>
         <div
           onClick={() => {
             setExpanded(!expanded);
@@ -591,12 +585,27 @@ function Project() {
           </div>
           <div className='flex flex-row items-center max-width-750px:w-full max-width-750px:justify-between'>
             {milestone?.is_approved
-              ? projectStateTag(modified, 'Completed')
+              ? <ProjectStateTag
+                dateCreated={modified}
+                text='Completed'
+                voters={approversPreview}
+                allApprovers={approversPreview}
+              />
               : milestone?.milestone_key == firstPendingMilestone &&
                 projectInMilestoneVoting
-              ? openForVotingTag()
-              : projectStateTag(modified, 'Not Started')}
-
+                ? <ProjectStateTag
+                  dateCreated={modified}
+                  text='Completed'
+                  voters={approversPreview}
+                  allApprovers={approversPreview}
+                />
+                : <ProjectStateTag
+                  dateCreated={modified}
+                  text='Pending'
+                  voters={approversPreview}
+                  allApprovers={approversPreview}
+                />
+            }
             <Image
               src={require(expanded
                 ? '@/assets/svgs/minus_btn.svg'
@@ -637,9 +646,8 @@ function Project() {
                 }
               >
                 <button
-                  className={`primary-btn in-dark w-button ${
-                    !canVote && '!bg-gray-300 !text-gray-400'
-                  } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
+                  className={`primary-btn in-dark w-button ${!canVote && '!bg-gray-300 !text-gray-400'
+                    } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
                   data-testid='next-button'
                   onClick={() => canVote && vote()}
                 >
@@ -660,10 +668,9 @@ function Project() {
                 }
               >
                 <button
-                  className={`primary-btn in-dark w-button mt-3 ${
-                    !balance &&
+                  className={`primary-btn in-dark w-button mt-3 ${!balance &&
                     '!bg-gray-300 !text-gray-400 !cursor-not-allowed'
-                  }`}
+                    }`}
                   data-testid='next-button'
                   onClick={() => balance && submitMilestone()}
                 >
@@ -674,9 +681,8 @@ function Project() {
 
           {isApplicant && milestone.is_approved && (
             <button
-              className={`primary-btn in-dark w-button ${
-                !balance && '!bg-gray-300 !text-gray-400'
-              } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
+              className={`primary-btn in-dark w-button ${!balance && '!bg-gray-300 !text-gray-400'
+                } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
               data-testid='next-button'
               onClick={() => withdraw()}
               disabled={!balance}
@@ -790,10 +796,10 @@ function Project() {
                 </span>
               </p>
               {balance >=
-              Number(
-                Number(project?.total_cost_without_fee) +
+                Number(
+                  Number(project?.total_cost_without_fee) +
                   Number(project?.imbue_fee)
-              ) ? (
+                ) ? (
                 <p className='ml-auto text-sm text-imbue-purple'>Done</p>
               ) : (
                 <p className='ml-auto text-sm text-imbue-coral'>Not Done</p>
@@ -814,17 +820,8 @@ function Project() {
           showFreelancerProfile={!isApplicant}
         />
       )}
-      <div
-        className='flex 
-      flex-row
-       bg-white 
-       rounded-[20px] 
-       p-12
-       max-lg:p-5
-       max-lg:flex-col
-       '
-      >
-        <div className='flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] max-lg:basis-[60%] mr-[5%]  max-lg:mr-0 relative'>
+      <div className='grid grid-cols-12 gap-5'>
+        <div className='col-span-9 flex flex-col gap-[20px] relative bg-background p-12 rounded-3xl'>
           <div className='flex flex-wrap gap-3 lg:gap-4 items-center'>
             <div className='flex items-center  w-full justify-between'>
               <div className='flex items-center'>
@@ -900,12 +897,12 @@ function Project() {
                 src={
                   targetUser?.profile_image ||
                   targetUser?.profile_photo ||
-                  require('@/assets/images/profile-image.png')
+                  freelalncerPic
                 }
                 alt='freelaner-icon'
-                height={50}
-                width={50}
-                className='rounded-full cursor-pointer'
+                height={100}
+                width={100}
+                className='rounded-full cursor-pointer w-14 h-14 object-cover border border-content-primary'
               />
 
               <p className='text-imbue-purple text-[1.25rem] font-normal leading-[1.5] p-0 mx-7 cursor-pointer'>
@@ -916,21 +913,7 @@ function Project() {
             {targetUser?.id && targetUser?.id !== user?.id && (
               <button
                 onClick={() => setShowMessageBox(true)}
-                className='primary-btn 
-        in-dark w-button 
-        !mt-0 
-        font-normal 
-        max-lg:!w-full 
-        max-lg:!text-center 
-        max-lg:!ml-0 
-        max-lg:!mt-5 
-        items-center 
-        content-center 
-        !py-0 ml-[40px] 
-        px-8
-        max-lg:!mr-0
-        h-[2.6rem]
-        '
+                className='primary-btn in-dark w-button !mt-0 max-lg:!w-full max-lg:!text-center max-lg:!ml-0 max-lg:!mt-5 items-center content-center !py-0 ml-[40px] px-8 max-lg:!mr-0 h-[2.6rem]'
                 data-testid='next-button'
               >
                 Message
@@ -951,10 +934,9 @@ function Project() {
                   className='cursor-pointer'
                 >
                   <button
-                    className={`border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors ${
-                      approverVotedOnRefund &&
-                      '!bg-gray-300 !text-gray-400 !cursor-not-allowed'
-                    }`}
+                    className={`border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors ${approverVotedOnRefund &&
+                      '!bg-gray-300 !text-gray-400 !border-gray-400 !cursor-not-allowed'
+                      }`}
                     onClick={async () => {
                       if (!approverVotedOnRefund) {
                         // set submitting mile stone to true
@@ -991,23 +973,22 @@ function Project() {
                   {approversPreview?.map((approver: any, index: number) => (
                     <div
                       key={index}
-                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${
-                        approver?.display_name && 'cursor-pointer'
-                      }`}
+                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${approver?.display_name && 'cursor-pointer'
+                        }`}
                       onClick={() =>
                         approver.display_name &&
                         router.push(`/profile/${approver.username}`)
                       }
                     >
                       <Image
-                        height={40}
-                        width={40}
+                        height={80}
+                        width={80}
                         src={
                           approver?.profile_photo ??
                           'http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png'
                         }
                         alt=''
-                        className='rounded-full'
+                        className='rounded-full w-10 h-10 object-cover'
                       />
                       <div className='flex flex-col'>
                         <span className='text-base'>
@@ -1025,7 +1006,7 @@ function Project() {
           )}
         </div>
 
-        <div className='flex flex-col gap-[30px] max-lg:mt-10 lg:w-56'>
+        <div className='flex flex-col gap-[30px] max-lg:mt-10 col-span-3 bg-background w-full p-12 rounded-3xl'>
           <div className='flex flex-col'>
             <div className='flex flex-row items-start gap-3'>
               <Image
@@ -1039,7 +1020,7 @@ function Project() {
               <div className='w-full'>
                 <h3 className='text-lg lg:text-[1.25rem] leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0 flex'>
                   Milestone{' '}
-                  <span className='text-imbue-purple-dark  ml-2'>
+                  <span className='text-imbue-purple-dark ml-2'>
                     {approvedMilestones?.length}/{project?.milestones?.length}
                   </span>
                 </h3>
@@ -1047,23 +1028,21 @@ function Project() {
                 <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
                   <div
                     style={{
-                      width: `${
-                        (onChainProject?.milestones?.filter?.(
-                          (m: any) => m?.is_approved
-                        )?.length /
-                          onChainProject?.milestones?.length) *
+                      width: `${(onChainProject?.milestones?.filter?.(
+                        (m: any) => m?.is_approved
+                      )?.length /
+                        onChainProject?.milestones?.length) *
                         100
-                      }%`,
+                        }%`,
                     }}
-                    className='h-full rounded-xl Accepted-button absolute'
+                    className='h-full rounded-xl bg-content-primary absolute'
                   ></div>
                   <div className='flex justify-evenly'>
                     {onChainProject?.milestones?.map((m: any, i: number) => (
                       <div
                         key={i}
-                        className={`h-4 w-4 ${
-                          m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
-                        } rounded-full -mt-1.5`}
+                        className={`h-4 w-4 ${m.is_approved ? 'bg-content-primary' : 'bg-[#E1DDFF]'
+                          } rounded-full -mt-1.5`}
                       ></div>
                     ))}
                   </div>
@@ -1085,7 +1064,7 @@ function Project() {
                 <h3 className='text-xl leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0'>
                   {Number(
                     Number(project?.total_cost_without_fee) +
-                      Number(project?.imbue_fee)
+                    Number(project?.imbue_fee)
                   )?.toLocaleString()}{' '}
                   ${Currency[project?.currency_id || 0]}
                 </h3>
@@ -1157,43 +1136,99 @@ function Project() {
             </div>
           )}
         </div>
+        <div className='col-span-9'>
+          {onChainProject?.milestones?.map?.(
+            (milestone: Milestone, index: number) => {
+              return (
+                <ExpandableDropDowns
+                  key={`${index}-milestone`}
+                  index={index}
+                  milestone={milestone}
+                  modified={milestone?.modified as Date}
+                  vote={async () => {
+                    // show polkadot account modal
+                    await setShowPolkadotAccounts(true);
+                    // set submitting mile stone to false
+                    await setSubmittingMilestone(false);
+                    // setMile stone key in view
+                    await setMilestoneKeyInView(milestone.milestone_key);
+                  }}
+                  submitMilestone={async () => {
+                    // set submitting mile stone to true
+                    await setSubmittingMilestone(true);
+                    // show polkadot account modal
+                    await setShowPolkadotAccounts(true);
+                    // setMile stone key in view
+                    await setMilestoneKeyInView(milestone.milestone_key);
+                  }}
+                  withdraw={async () => {
+                    // set submitting mile stone to true
+                    await setWithdrawMilestone(true);
+                    // show polkadot account modal
+                    await setShowPolkadotAccounts(true);
+                    // setMile stone key in view
+                    await setMilestoneKeyInView(milestone.milestone_key);
+                  }}
+                />
+              );
+            }
+          )}
+        </div>
+
+        <div className='bg-background rounded-3xl h-full w-full col-span-3 py-6 px-12'>
+          <p className='text-content border-b pb-2 text-2xl mb-6'>Impressions</p>
+          {
+            onChainProject?.milestones?.map?.(
+              (milestone: Milestone, index: number) => {
+                //TODO: const votedCount = 
+                return (
+                  <div key={index}
+                    className='flex items-center justify-between mb-8'
+                  >
+                    <div className='flex items-center gap-3'>
+                      <p
+                        className='text-xl text-content-primary'
+                      >
+                        Milestone {index + 1}
+                      </p>
+                      {
+                        (approversPreview?.length) && (
+                          <AvatarGroup spacing={8} max={approversPreview.length}>
+                            {
+                              approversPreview.map((approver: any) => {
+                                //TODO: if(approver Has voted)
+                                return (
+                                  <figure key={approver.id} className='w-6 h-6 rounded-full overflow-hidden border border-black'>
+                                    <Image height={100} width={100} className='h-full w-full object-cover' src={approversPreview[0]?.profile_photo || freelalncerPic} alt="" />
+                                  </figure>
+                                )
+                              })
+                            }
+                          </AvatarGroup>
+                        )
+                      }
+                    </div>
+                    <p className='text-xl text-content flex flex-wrap items-center'>
+                      {
+                        firstPendingMilestone !== undefined &&
+                          milestone?.milestone_key <= firstPendingMilestone &&
+                          projectInMilestoneVoting
+                          ? (<>{
+                            milestone.is_approved
+                              ? <p>Yes({2})</p>
+                              : <p>No({2})</p>
+                          }</>)
+                          : <p className='text-gray-500 text-opacity-30'>Pending</p>
+                      }
+                    </p>
+                  </div>
+                )
+              }
+            )
+          }
+        </div>
       </div>
-      {onChainProject?.milestones?.map?.(
-        (milestone: Milestone, index: number) => {
-          return (
-            <ExpandableDropDowns
-              key={`${index}-milestone`}
-              index={index}
-              milestone={milestone}
-              modified={milestone?.modified as Date}
-              vote={async () => {
-                // show polkadot account modal
-                await setShowPolkadotAccounts(true);
-                // set submitting mile stone to false
-                await setSubmittingMilestone(false);
-                // setMile stone key in view
-                await setMilestoneKeyInView(milestone.milestone_key);
-              }}
-              submitMilestone={async () => {
-                // set submitting mile stone to true
-                await setSubmittingMilestone(true);
-                // show polkadot account modal
-                await setShowPolkadotAccounts(true);
-                // setMile stone key in view
-                await setMilestoneKeyInView(milestone.milestone_key);
-              }}
-              withdraw={async () => {
-                // set submitting mile stone to true
-                await setWithdrawMilestone(true);
-                // show polkadot account modal
-                await setShowPolkadotAccounts(true);
-                // setMile stone key in view
-                await setMilestoneKeyInView(milestone.milestone_key);
-              }}
-            />
-          );
-        }
-      )}
+
       {showPolkadotAccounts && renderPolkadotJSModal}
       {showVotingModal && renderVotingModal}
       <Login
@@ -1238,6 +1273,9 @@ function Project() {
           </button>
         </div>
       </SuccessScreen>
+
+      <RefundScreen open={refunded} setOpen={setSuccess} />
+
       <WaitingScreen title={waitMessage} open={wait} setOpen={setWait}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button
