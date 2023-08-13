@@ -192,6 +192,7 @@ export type BriefSqlFilter = {
   search_input: string;
   items_per_page: number;
   page: number;
+  skills_range: Array<number>;
 };
 
 export type FreelancerSqlFilter = {
@@ -462,6 +463,17 @@ export const updateProject =
   (id: string | number, project: Project) => async (tx: Knex.Transaction) =>
     (
       await tx<Project>('projects').update(project).where({ id }).returning('*')
+    )[0];
+
+export const rejectOtherApplications =
+  (briefID: string | number, projectID: string | number) =>
+  async (tx: Knex.Transaction) =>
+    (
+      await tx<Project>('projects')
+        .where({ brief_id: briefID })
+        .whereNot({ id: projectID })
+        .update({ status_id: ProjectStatus.Rejected })
+        .returning('*')
     )[0];
 
 export const updateProjectProperties =
@@ -1389,6 +1401,7 @@ export const searchBriefs =
   (filter: BriefSqlFilter) => async (tx: Knex.Transaction) =>
     // select everything that is associated with brief.
     fetchAllBriefs()(tx)
+      .distinct('briefs.id')
       .whereNull('briefs.project_id')
       .modify(function (builder) {
         if (filter?.items_per_page > 0)
@@ -1399,7 +1412,7 @@ export const searchBriefs =
             .limit(Number(filter.items_per_page) || 5);
       })
       .where(function () {
-        if (filter.submitted_range.length > 0) {
+        if (filter.submitted_range?.length > 0) {
           this.whereBetween('users.briefs_submitted', [
             filter.submitted_range[0].toString(),
             Math.max(...filter.submitted_range).toString(),
@@ -1414,56 +1427,29 @@ export const searchBriefs =
         }
       })
       .where(function () {
-        if (filter.experience_range.length > 0) {
+        if (filter.experience_range?.length > 0) {
           this.whereIn('experience_id', filter.experience_range);
         }
       })
       .where(function () {
-        if (filter.length_range.length > 0) {
+        if (filter?.length_range?.length > 0) {
           this.whereIn('duration_id', filter.length_range);
         }
-        if (filter.length_is_max) {
+        if (filter?.length_is_max) {
           this.orWhere('duration_id', '>=', Math.max(...filter.length_range));
         }
       })
-      .where('headline', 'ilike', filter.search_input + '%')
-      .distinct('briefs.id');
+      .where(function () {
+        if (filter?.skills_range?.length > 0) {
+          this.whereIn('brief_skills.skill_id', filter.skills_range);
+        }
+      })
+      .where('headline', 'ilike', filter.search_input + '%');
 
 export const searchBriefsCount =
   (filter: BriefSqlFilter) => async (tx: Knex.Transaction) =>
     // select everything that is associated with brief.
-    fetchAllBriefs()(tx)
-      .whereNull('briefs.project_id')
-      .where(function () {
-        if (filter.submitted_range.length > 0) {
-          this.whereBetween('users.briefs_submitted', [
-            filter.submitted_range[0].toString(),
-            Math.max(...filter.submitted_range).toString(),
-          ]);
-        }
-        if (filter.submitted_is_max) {
-          this.orWhere(
-            'users.briefs_submitted',
-            '>=',
-            Math.max(...filter.submitted_range)
-          );
-        }
-      })
-      .where(function () {
-        if (filter.experience_range.length > 0) {
-          this.whereIn('experience_id', filter.experience_range);
-        }
-      })
-      .where(function () {
-        if (filter.length_range.length > 0) {
-          this.whereIn('duration_id', filter.length_range);
-        }
-        if (filter.length_is_max) {
-          this.orWhere('duration_id', '>=', Math.max(...filter.length_range));
-        }
-      })
-      .where('headline', 'ilike', filter.search_input + '%')
-      .then((res) => res.length);
+    searchBriefs(filter)(tx).then((res) => res?.length);
 
 export const paginatedData = (
   currentPage: number,

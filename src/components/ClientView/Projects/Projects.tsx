@@ -9,7 +9,7 @@ export default function Projects({ briefs }: { briefs: any }) {
   };
   if (briefs?.acceptedBriefs?.length === 0) {
     return (
-      <div className='flex justify-center w-full'>
+      <div className='flex justify-center w-full my-5'>
         <button
           onClick={() => {
             redirectToNewBrief();

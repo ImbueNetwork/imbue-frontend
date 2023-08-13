@@ -215,7 +215,7 @@
 
 .Rejected-btn {
   background-color: var(--theme-error);
-  color: #000;
+  color: white;
 }
 
 .Requested-btn {

@@ -15,7 +15,7 @@ export default function Grants({
   };
   if (ongoingGrants?.length === 0) {
     return (
-      <div className='flex justify-center w-full'>
+      <div className='flex justify-center w-full my-5'>
         <button
           onClick={() => {
             redirectToNewBrief();
@@ -32,7 +32,7 @@ export default function Grants({
     <div>
       {ongoingGrants?.length && (
         <>
-          <div className='bg-background rounded-xl overflow-hidden'>
+          <div className='bg-background rounded-xl'>
             <OngoingProject projects={ongoingGrants} />
           </div>
         </>

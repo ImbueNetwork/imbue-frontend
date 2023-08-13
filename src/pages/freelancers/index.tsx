@@ -1,13 +1,14 @@
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
 import VerifiedIcon from '@mui/icons-material/Verified';
-import { Grid } from '@mui/material';
+import { Grid, TextField } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 import { strToIntRange } from '@/utils/helper';
 
+import ErrorScreen from '@/components/ErrorScreen';
 import FilterModal from '@/components/Filter/FilterModal';
 
 import {
@@ -47,9 +48,10 @@ const Freelancers = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(true);
   const [itemsPerPage, setItemsPerPage] = useState<number>(12);
   const [searhInput, setSearchInput] = useState<string>("")
+  const [pageInput, setPageInput] = useState<number>(1);
 
   const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
-
+  const [error, setError] = useState<any>()
   const router = useRouter();
 
   const {
@@ -248,7 +250,8 @@ const Freelancers = (): JSX.Element => {
         if (languagesRangeProps) {
           const range = strToIntRange(languagesRangeProps);
           range?.forEach?.((v: any) => {
-            setSlectedFilterIds([...selectedFilterIds, `2-${v}`]);
+            if (!selectedFilterIds.includes(`2-${v}`))
+              setSlectedFilterIds([...selectedFilterIds, `2-${v}`]);
           });
           filter = {
             ...filter,
@@ -264,22 +267,27 @@ const Freelancers = (): JSX.Element => {
             setSlectedFilterIds([...selectedFilterIds, '3-0']); // FIXME:
           }
         }
-        const { currentData, totalFreelancers } = await callSearchFreelancers(
-          filter
-        );
+        try {
+          const { currentData, totalFreelancers } = await callSearchFreelancers(
+            filter
+          );
 
-        const totalPages = Math.ceil(totalFreelancers / (filter?.items_per_page || 12))
+          const totalPages = Math.ceil(totalFreelancers / (filter?.items_per_page || 12))
 
-        if (totalPages < filter.page && totalPages > 0) {
-          router.query.page = totalPages.toString()
-          router.push(router, undefined, { shallow: true })
-          filter.page = totalPages
+          if (totalPages < filter.page && totalPages > 0) {
+            router.query.page = totalPages.toString()
+            router.push(router, undefined, { shallow: true })
+            filter.page = totalPages
+          }
+
+          setCurrentPage(filter.page)
+          setFreelancers(currentData);
+          setFreelancersTotal(totalFreelancers);
+        } catch (error) {
+          setError({ message: "Could not get the results. Please try again" })
+        } finally {
+          setLoading(false)
         }
-
-        setCurrentPage(filter.page)
-        setFreelancers(currentData);
-        setFreelancersTotal(totalFreelancers);
-        setLoading(false)
       }
     };
 
@@ -406,8 +414,6 @@ const Freelancers = (): JSX.Element => {
     setFilterVisible(!filterVisble);
   };
 
-  
-
   const reset = async () => {
     await router.push({
       pathname,
@@ -427,15 +433,26 @@ const Freelancers = (): JSX.Element => {
     setFilterVisible(false);
   };
 
+  const setPageNumber = (e: any) => {
+    const pageNumber = Number(e.target.value) || 1;
+    const totalPages = Math.ceil(freelancers_total / itemsPerPage)
+
+    if ((e.key === 'Enter' || e.key === 'Enter') && (pageNumber <= totalPages)) {
+      setCurrentPage(pageNumber);
+      router.query.page = pageNumber.toString()
+      router.push(router, undefined, { shallow: true });
+    }
+  }
+
   if (loading) return <LoadingFreelancers />;
 
   return (
     <div>
       <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
         <FilterModal open={filterVisble} handleClose={() => toggleFilter()}
-        {
-          ...{selectedFilterIds,handleSetId, cancelFilters, customDropdownConfigs, onSearch}
-        }
+          {
+          ...{ selectedFilterIds, handleSetId, cancelFilters, customDropdownConfigs, onSearch }
+          }
         />
         <div
           className={`${styles.freelancersView} max-width-750px:!w-full max-width-750px:px-5`}
@@ -583,8 +600,27 @@ const Freelancers = (): JSX.Element => {
                 Previous
               </button>
 
-              <div className='mx-[1.62rem] text-[#5E5E5E] text-[0.7rem] lg:text-[1rem] font-normal'>
-                {currentPage} of {Math.ceil(freelancers_total / itemsPerPage)}
+              <div className='mx-[1.62rem] text-[#5E5E5E] text-[0.7rem] lg:text-[1rem] font-normal flex items-center gap-3'>
+                <TextField
+                  id="standard-size-small"
+                  className='!mb-0'
+                  inputProps={{
+                    className: "w-6 text-right px-1",
+                    type: "number",
+                    min: 1,
+                    max: Math.ceil(freelancers_total / itemsPerPage)
+                  }}
+                  onChange={(e) => setPageInput(Number(e.target.value))}
+                  onKeyDown={(e) => setPageNumber(e)}
+                  value={pageInput}
+                  variant="standard" />
+                <span>
+                  of
+                </span>
+                <span>
+                  {Math.ceil(freelancers_total / itemsPerPage)}
+                </span>
+                {/* {currentPage} of {Math.ceil(freelancers_total / itemsPerPage)} */}
               </div>
 
               <button
@@ -628,6 +664,22 @@ const Freelancers = (): JSX.Element => {
           </div>
         </div>
       </div>
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
     </div>
   );
 };

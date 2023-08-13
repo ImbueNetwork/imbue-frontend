@@ -258,6 +258,7 @@ const Freelancer = (): JSX.Element => {
           sx={{ width: '100%' }}
           onChange={(e, value) => setLanguages(value)}
           defaultValue={languages}
+          ListboxProps={{className: "max-h-[280px]"}}
           renderInput={(params) => (
             <TextField
               autoComplete='off'
@@ -288,6 +289,7 @@ const Freelancer = (): JSX.Element => {
           sx={{ width: '100%' }}
           onChange={(e, value) => setSkills(value)}
           defaultValue={skills}
+          ListboxProps={{className: "max-h-[260px]"}}
           renderInput={(params) => (
             <TextField
               autoComplete='off'

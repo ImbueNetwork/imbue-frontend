@@ -38,7 +38,7 @@ export const BriefLists = ({
 
   if (briefs?.length === 0 && showNewBriefButton)
     return (
-      <div className='flex justify-center w-full'>
+      <div className='flex justify-center w-full my-5'>
         <button
           onClick={() => {
             redirectToNewBrief();
@@ -56,15 +56,15 @@ export const BriefLists = ({
 
   return (
     <>
-      <div className='bg-white mb-8 overflow-hidden rounded-xl'>
+      <div className='bg-white mb-8 overflow-hidden'>
         {briefs?.map(
           (brief, index) =>
             index <
-              Math.min(Math.max(loadValue, openBriefLimit), briefs.length) && (
+            Math.min(Math.max(loadValue, openBriefLimit), briefs.length) && (
               <div
                 key={index}
                 onClick={() => handleItemClick(brief)}
-                className={`flex cursor-pointer group hover:bg-imbue-light-purple-hover px-5 py-3 lg:px-10 lg:py-8 justify-between border-b border-b-imbue-light-purple last:border-b-0`}
+                className={`flex cursor-pointer group hover:bg-imbue-light-purple-hover px-5 py-3 lg:px-10 lg:py-8 justify-between border-b border-b-imbue-light-purple ${briefs.length < 2 && 'last:border-b-0'}`}
               >
                 <div className='flex flex-col gap-2 lg:gap-3 w-2/3'>
                   <span className='text-sm text-imbue-purple-dark lg:text-xl'>

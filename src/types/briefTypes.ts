@@ -12,7 +12,8 @@ export enum BriefFilterOption {
   ExpLevel = 0,
   AmountSubmitted = 1,
   Length = 2,
-  HoursPerWeek = 3,
+  // HoursPerWeek = 3,
+  Skills = 3,
 }
 
 export type BriefState = {
@@ -38,4 +39,8 @@ export type BriefStepProps = {
   paginate: (_page: number) => void;
 };
 
-export type PaginatedResponse = { currentData: unknown[]; totalBriefs: number };
+export type PaginatedResponse = {
+  statuud: number;
+  currentData: unknown[];
+  totalBriefs: number;
+};
