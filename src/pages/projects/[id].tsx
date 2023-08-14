@@ -106,7 +106,6 @@ function Project() {
   const [showRefundButton, setShowRefundButton] = useState<boolean>();
   const [milestoneVotes, setMilestoneVotes] = useState<any>({});
   const votes = Object.keys(milestoneVotes)?.map((key) => ({ voterAddress: key, vote: milestoneVotes[key] })) || []
-  console.log("🚀 ~ file: [id].tsx:109 ~ Project ~ votes:", Object.keys(milestoneVotes))
   const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
     useState<boolean>();
   const [projectInVotingOfNoConfidence, setProjectInVotingOfNoConfidence] =
@@ -173,8 +172,6 @@ function Project() {
       setProjectInVotingOfNoConfidence(
         onChainProjectRes.projectInVotingOfNoConfidence
       );
-
-
 
       if (
         user.web3_address &&
@@ -374,21 +371,23 @@ function Project() {
           account
         )) as ImbueChainPollResult;
       }
+      else {
+        setError({ message: result.errorMessage });
+      }
 
-      while (true) {
-        if (result.status || result.txError) {
-          if (result.status) {
-            if (pollResult == ImbueChainPollResult.EventFound) {
-              await updateMilestone(projectId, milestoneKeyInView, true);
-            }
-            setSuccess(true);
-            setSuccessTitle('Your vote was successful');
-          } else if (result.txError) {
-            setError({ message: result.errorMessage });
+      while (!result.txError) {
+        if (result.status) {
+          if (pollResult == ImbueChainPollResult.EventFound) {
+            await updateMilestone(projectId, milestoneKeyInView, true);
           }
-          if (pollResult != ImbueChainPollResult.Pending) {
-            break;
-          }
+          setSuccess(true);
+          setSuccessTitle('Your vote was successful');
+        } else if (result.txError) {
+          setError({ message: result.errorMessage });
+          break;
+        }
+        if (pollResult != ImbueChainPollResult.Pending) {
+          break;
         }
         await new Promise((f) => setTimeout(f, 1000));
       }
@@ -654,7 +653,7 @@ function Project() {
                 followCursor
                 title={
                   !canVote &&
-                  'Only approvers are allowed to vote on a milestone and you cannot vote more than once'
+                  `Only approvers are allowed to vote on a milestone and you cannot vote more than once.${user.web3_address && `You are currently on wallet: ${user.web3_address}`}`
                 }
               >
                 <button
@@ -981,11 +980,11 @@ function Project() {
                 Approvers
               </p>
               {approversPreview?.length > 0 && (
-                <div className='flex flex-row flex-wrap gap-4'>
+                <div className='flex flex-row flex-wrap gap-10'>
                   {approversPreview?.map((approver: any, index: number) => (
                     <div
                       key={index}
-                      className={`flex text-content gap-3 items-center border border-content-primary p-3 rounded-full ${approver?.display_name && 'cursor-pointer'
+                      className={`flex text-content gap-4 items-center ${approver?.display_name && 'cursor-pointer'
                         }`}
                       onClick={() =>
                         approver.display_name &&
@@ -1007,7 +1006,7 @@ function Project() {
                           {approver?.display_name}
                         </span>
                         <p className='text-xs break-all text-imbue-purple-dark text-opacity-40'>
-                          {approver?.web3_address.substring(0,4) + "..." + approver?.web3_address.substring(44)}
+                          {approver?.web3_address.substring(0, 4) + "..." + approver?.web3_address.substring(44)}
                         </p>
                       </div>
                     </div>
