@@ -48,7 +48,7 @@ export default nextConnect()
               existingUser[0]?.username
             )(tx);
 
-            if (existingUsername?.id !== user?.id) {
+            if (existingUsername?.id && existingUsername?.id !== user?.id) {
               return res.status(409).send({
                 status: 'Failed',
                 message: 'Username already exists.',

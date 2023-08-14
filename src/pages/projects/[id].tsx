@@ -106,6 +106,7 @@ function Project() {
   const [showRefundButton, setShowRefundButton] = useState<boolean>();
   const [milestoneVotes, setMilestoneVotes] = useState<any>({});
   const votes = Object.keys(milestoneVotes)?.map((key) => ({ voterAddress: key, vote: milestoneVotes[key] })) || []
+  console.log("🚀 ~ file: [id].tsx:109 ~ Project ~ votes:", Object.keys(milestoneVotes))
   const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
     useState<boolean>();
   const [projectInVotingOfNoConfidence, setProjectInVotingOfNoConfidence] =
@@ -128,7 +129,7 @@ function Project() {
     null
   );
   const [isModalOpen, setModalOpen] = useState(false);
-  const canVote = isApprover || (projectType === 'brief' && isProjectOwner);
+  const canVote = (isApprover && user.web3_address && !Object.keys(milestoneVotes).includes(user.web3_address)) || (projectType === 'brief' && isProjectOwner);
   const [expandProjectDesc, setExpandProjectDesc] = useState<number>(500);
   const [openVotingList, setOpenVotingList] = useState<boolean>(false)
 
@@ -653,7 +654,7 @@ function Project() {
                 followCursor
                 title={
                   !canVote &&
-                  'Only approvers are allowed to vote on a milestone'
+                  'Only approvers are allowed to vote on a milestone and you cannot vote more than once'
                 }
               >
                 <button
