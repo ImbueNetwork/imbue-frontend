@@ -187,9 +187,9 @@ function Project() {
         }
       }
 
-      if (user.web3_address && onChainProjectRes.projectInMilestoneVoting) {
+      if (onChainProjectRes.projectInMilestoneVoting) {
         const milestoneVotes: Vote[] = await chainService.getMilestoneVotes(onChainProjectRes.id, firstPendingMilestone);
-        setMilestoneVotes(milestoneVotes)
+        setMilestoneVotes(milestoneVotes);
       }
 
       setOnChainProject(onChainProjectRes);
