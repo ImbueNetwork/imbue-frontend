@@ -106,7 +106,6 @@ function Project() {
   const [showRefundButton, setShowRefundButton] = useState<boolean>();
   const [milestoneVotes, setMilestoneVotes] = useState<any>({});
   const votes = Object.keys(milestoneVotes)?.map((key) => ({ voterAddress: key, vote: milestoneVotes[key] })) || []
-  console.log("🚀 ~ file: [id].tsx:109 ~ Project ~ votes:", Object.keys(milestoneVotes))
   const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
     useState<boolean>();
   const [projectInVotingOfNoConfidence, setProjectInVotingOfNoConfidence] =

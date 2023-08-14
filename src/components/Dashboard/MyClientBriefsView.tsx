@@ -10,7 +10,7 @@ import {
 } from '@/redux/services/briefService';
 import { getUsersOngoingGrants } from '@/redux/services/projectServices';
 
-// import OngoingProject from './FreelacerView/OngoingProject/OngoinProject';
+// import OngoingProject from './FreelacerView/OngoingProject/OngoingProject';
 // import { ApplicationContainer } from '../Briefs/ApplicationContainer';
 // import ApplicationSkeleton from '../Briefs/ApplicationSkeleton';
 // import { BriefLists } from '../Briefs/BriefsList';
