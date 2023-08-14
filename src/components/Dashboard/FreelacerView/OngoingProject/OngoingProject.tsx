@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 import { ProgressBar } from '@/components/ProgressBar';
 
-import { Project, applicationStatusId } from '@/model';
+import { applicationStatusId,Project } from '@/model';
 
 interface OngoingProjectProps {
   projects: Project[];
