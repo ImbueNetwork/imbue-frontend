@@ -224,6 +224,10 @@ const GrantApplication = (): JSX.Element => {
         grant_id
       );
 
+      if (result.txError) {
+        setError({ message: 'Failed to submit a grant' });
+      }
+
       // eslint-disable-next-line no-constant-condition
       while (!result.txError) {
         if (result.status || result.txError) {
@@ -620,9 +624,8 @@ const GrantApplication = (): JSX.Element => {
                                   ''}
                               </p>
                               <div className='text-imbue-purple text-sm ml-auto text-right'>
-                                {`${
-                                  milestones[index].description?.length || 0
-                                }/5000`}
+                                {`${milestones[index].description?.length || 0
+                                  }/5000`}
                               </div>
                             </div>
                           </div>
@@ -696,9 +699,8 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${
-                  currencies[currencyId]
-                }`}
+                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
+                  }`}
               </div>
             </div>
 
@@ -718,9 +720,8 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${
-                  currencies[currencyId]
-                }`}
+                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
+                  }`}
               </div>
             </div>
 
@@ -746,9 +747,8 @@ const GrantApplication = (): JSX.Element => {
         >
           <button
             // disabled={!formDataValid}
-            className={`primary-btn in-dark w-button ${
-              disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
-            }`}
+            className={`primary-btn in-dark w-button ${disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
+              }`}
             onClick={() => !disableSubmit && handleSubmit()}
           >
             Submit
@@ -801,9 +801,8 @@ const GrantApplication = (): JSX.Element => {
           </button>
         </div>
         <Alert
-          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${
-            copied ? 'flex' : 'hidden'
-          }`}
+          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${copied ? 'flex' : 'hidden'
+            }`}
           severity='success'
         >
           Grant Wallet Address Copied to clipboard
