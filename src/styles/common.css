@@ -218,6 +218,11 @@
   color: white;
 }
 
+.Refunded-btn {
+  background-color: var(--theme-error);
+  color: white;
+}
+
 .Requested-btn {
   background-color: yellow;
   color: #000;

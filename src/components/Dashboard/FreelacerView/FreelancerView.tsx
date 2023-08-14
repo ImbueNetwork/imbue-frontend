@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { displayState,Project } from '@/model';
 
 import BreifApplication from './BriefApplication/BreifApplication';
-import OngoingProject from './OngoingProject/OngoinProject';
+import OngoingProject from './OngoingProject/OngoingProject';
 
 interface FreelacerViewProps {
   myApplications: any;

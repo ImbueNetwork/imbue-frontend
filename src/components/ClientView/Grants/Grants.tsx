@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 
-import OngoingProject from '@/components/Dashboard/FreelacerView/OngoingProject/OngoinProject';
+import OngoingProject from '@/components/Dashboard/FreelacerView/OngoingProject/OngoingProject';
 
 import { Project } from '@/model';
 

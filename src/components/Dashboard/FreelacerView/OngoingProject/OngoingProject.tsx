@@ -1,5 +1,4 @@
 import { Divider } from '@mui/material';
-import classNames from 'classnames';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import router from 'next/router';
@@ -7,9 +6,9 @@ import { useState } from 'react';
 
 import { ProgressBar } from '@/components/ProgressBar';
 
-import { Project } from '@/model';
+import { applicationStatusId,Project } from '@/model';
 
-interface OnGoinProjectProps {
+interface OngoingProjectProps {
   projects: Project[];
 }
 
@@ -17,10 +16,10 @@ TimeAgo.addLocale(en);
 
 const timeAgo = new TimeAgo('en-US');
 
-const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
+const OngoingProject: React.FC<OngoingProjectProps> = ({ projects }) => {
   /// limit ongoing project
-  const ongoinProjectLimit = 10;
-  const [value, setValue] = useState(ongoinProjectLimit);
+  const OngoingProjectLimit = 10;
+  const [value, setValue] = useState(OngoingProjectLimit);
   const redirectToApplication = (project: Project) => {
     router.push(`/projects/${project.id}`);
   };
@@ -48,7 +47,7 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
       {projects?.map(
         (project, index: number) =>
           index <
-            Math.min(Math.max(value, ongoinProjectLimit), projects.length) && (
+            Math.min(Math.max(value, OngoingProjectLimit), projects.length) && (
             <>
               <div
                 key={project.id}
@@ -83,12 +82,11 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
                       </>
                     )}
                     <button
-                      className={classNames(
-                        ' text-black flex px-5 py-3 text-sm ml-auto rounded-full',
-                        !project.completed ? 'bg-light-grey' : 'bg-primary'
-                      )}
+                      className={`${
+                        applicationStatusId[project?.status_id]
+                      }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
                     >
-                      {project.completed ? 'completed' : 'In progress'}
+                      {applicationStatusId[project?.status_id]}
                     </button>
                   </div>
                   <p className='text-imbue-purple-dark text-sm sm:text-lg'>
@@ -120,7 +118,7 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
             <div className='w-full flex justify-center py-6'>
               <button
                 onClick={() => {
-                  setValue((value) => value + ongoinProjectLimit);
+                  setValue((value) => value + OngoingProjectLimit);
                 }}
                 className='primary-btn in-dark w-button lg:w-1/3'
                 style={{ textAlign: 'center' }}
@@ -130,12 +128,12 @@ const OngoingProject: React.FC<OnGoinProjectProps> = ({ projects }) => {
             </div>
           </div>
         )}
-        {value > ongoinProjectLimit && projects.length > ongoinProjectLimit && (
+        {value > OngoingProjectLimit && projects.length > OngoingProjectLimit && (
           <div className='flex w-full justify-center my-7 items-center '>
             <div className='w-full flex justify-center py-6'>
               <button
                 onClick={() => {
-                  setValue((value) => value - ongoinProjectLimit);
+                  setValue((value) => value - OngoingProjectLimit);
                 }}
                 className='primary-btn in-dark w-button lg:w-1/3'
                 style={{ textAlign: 'center' }}

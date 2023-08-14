@@ -24,6 +24,7 @@ export const applicationStatusId = [
   'Rejected',
   'Accepted',
   'Refunded',
+  'Completed',
 ];
 
 export function displayState(state: OffchainProjectState) {
