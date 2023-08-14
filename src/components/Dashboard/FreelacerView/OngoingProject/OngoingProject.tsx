@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 import { ProgressBar } from '@/components/ProgressBar';
 
-import { applicationStatusId,Project } from '@/model';
+import { applicationStatusId, Project } from '@/model';
 
 interface OngoingProjectProps {
   projects: Project[];
@@ -47,7 +47,7 @@ const OngoingProject: React.FC<OngoingProjectProps> = ({ projects }) => {
       {projects?.map(
         (project, index: number) =>
           index <
-            Math.min(Math.max(value, OngoingProjectLimit), projects.length) && (
+          Math.min(Math.max(value, OngoingProjectLimit), projects.length) && (
             <>
               <div
                 key={project.id}
@@ -81,13 +81,15 @@ const OngoingProject: React.FC<OngoingProjectProps> = ({ projects }) => {
                         </p>
                       </>
                     )}
-                    <button
-                      className={`${
-                        applicationStatusId[project?.status_id]
-                      }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
-                    >
-                      {applicationStatusId[project?.status_id]}
-                    </button>
+                    {
+                      project.status_id && (<button
+                        className={`${applicationStatusId[project.status_id]
+                          }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[10px]`}
+                      >
+                        {applicationStatusId[project.status_id]}
+                      </button>)
+                    }
+
                   </div>
                   <p className='text-imbue-purple-dark text-sm sm:text-lg'>
                     {project.name}
