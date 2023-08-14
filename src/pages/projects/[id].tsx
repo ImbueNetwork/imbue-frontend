@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
-import { AvatarGroup, Modal, Tooltip } from '@mui/material';
+import { Modal, Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -24,7 +24,9 @@ import ErrorScreen from '@/components/ErrorScreen';
 import RefundScreen from '@/components/Grant/Refund';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 import Login from '@/components/Login';
+import Impressions from '@/components/Project/Impressions';
 import ProjectStateTag from '@/components/Project/ProjectStateTag';
+import VotingList from '@/components/Project/VotingList';
 import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
 
@@ -102,7 +104,8 @@ function Project() {
   const [isApplicant, setIsApplicant] = useState<boolean>(false);
   const [isProjectOwner, setIsProjectOwner] = useState<boolean>(false);
   const [showRefundButton, setShowRefundButton] = useState<boolean>();
-  const [milestoneVotes, setMilestoneVotes] = useState<Vote[]>([]);
+  const [milestoneVotes, setMilestoneVotes] = useState<any>({});
+  const votes = Object.keys(milestoneVotes)?.map((key) => ({ voterAddress: key, vote: milestoneVotes[key] })) || []
   const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
     useState<boolean>();
   const [projectInVotingOfNoConfidence, setProjectInVotingOfNoConfidence] =
@@ -127,6 +130,7 @@ function Project() {
   const [isModalOpen, setModalOpen] = useState(false);
   const canVote = isApprover || (projectType === 'brief' && isProjectOwner);
   const [expandProjectDesc, setExpandProjectDesc] = useState<number>(500);
+  const [openVotingList, setOpenVotingList] = useState<boolean>(false)
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -183,8 +187,8 @@ function Project() {
         }
       }
 
-      if(user.web3_address && onChainProjectRes.projectInMilestoneVoting) {
-        const milestoneVotes: Vote[] = await chainService.getMilestoneVotes(onChainProjectRes.id,firstPendingMilestone);
+      if (user.web3_address && onChainProjectRes.projectInMilestoneVoting) {
+        const milestoneVotes: Vote[] = await chainService.getMilestoneVotes(onChainProjectRes.id, firstPendingMilestone);
         setMilestoneVotes(milestoneVotes)
       }
 
@@ -590,6 +594,7 @@ function Project() {
           <div className='flex flex-row items-center max-width-750px:w-full max-width-750px:justify-between'>
             {milestone?.is_approved
               ? <ProjectStateTag
+                openVotingList={setOpenVotingList}
                 dateCreated={modified}
                 text='Completed'
                 voters={approversPreview}
@@ -598,12 +603,14 @@ function Project() {
               : milestone?.milestone_key == firstPendingMilestone &&
                 projectInMilestoneVoting
                 ? <ProjectStateTag
+                  openVotingList={setOpenVotingList}
                   dateCreated={modified}
-                  text='Completed'
+                  text='Ongoing'
                   voters={approversPreview}
                   allApprovers={approversPreview}
                 />
                 : <ProjectStateTag
+                  openVotingList={setOpenVotingList}
                   dateCreated={modified}
                   text='Pending'
                   voters={approversPreview}
@@ -1179,58 +1186,13 @@ function Project() {
           )}
         </div>
 
-        <div className='bg-background rounded-3xl h-full w-full col-span-3 py-6 px-12'>
-          <p className='text-content border-b pb-2 text-2xl mb-6'>Impressions</p>
-          {
-            onChainProject?.milestones?.map?.(
-              (milestone: Milestone, index: number) => {
-                //TODO: const votedCount = 
-                return (
-                  <div key={index}
-                    className='flex items-center justify-between mb-8'
-                  >
-                    <div className='flex items-center gap-3'>
-                      <p
-                        className='text-xl text-content-primary'
-                      >
-                        Milestone {index + 1}
-                      </p>
-                      {
-                        (approversPreview?.length) && (
-                          <AvatarGroup spacing={8} max={approversPreview.length}>
-                            {
-                              approversPreview.map((approver: any) => {
-                                //TODO: if(approver Has voted)
-                                return (
-                                  <figure key={approver.id} className='w-6 h-6 rounded-full overflow-hidden border border-black'>
-                                    <Image height={100} width={100} className='h-full w-full object-cover' src={approversPreview[0]?.profile_photo || freelalncerPic} alt="" />
-                                  </figure>
-                                )
-                              })
-                            }
-                          </AvatarGroup>
-                        )
-                      }
-                    </div>
-                    <p className='text-xl text-content flex flex-wrap items-center'>
-                      {
-                        firstPendingMilestone !== undefined &&
-                          milestone?.milestone_key <= firstPendingMilestone &&
-                          projectInMilestoneVoting
-                          ? (<>{
-                            milestone.is_approved
-                              ? <p>Yes({2})</p>
-                              : <p>No({2})</p>
-                          }</>)
-                          : <p className='text-gray-500 text-opacity-30'>Pending</p>
-                      }
-                    </p>
-                  </div>
-                )
-              }
-            )
-          }
-        </div>
+        <Impressions onChainProject={onChainProject}
+          firstPendingMilestone={firstPendingMilestone}
+          projectInMilestoneVoting={projectInMilestoneVoting}
+          approversPreview={approversPreview}
+          votes={votes}
+          setOpenVotingList={setOpenVotingList}
+        />
       </div>
 
       {showPolkadotAccounts && renderPolkadotJSModal}
@@ -1296,6 +1258,13 @@ function Project() {
           </button>
         </div>
       </WaitingScreen>
+
+      <VotingList
+        open={openVotingList}
+        setOpenVotingList={setOpenVotingList}
+        votes={votes}
+        approvers={approversPreview}
+      />
       <BackDropLoader open={loading} />
     </div>
   );
