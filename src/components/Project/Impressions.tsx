@@ -61,7 +61,7 @@ const Impressions = ({ onChainProject, firstPendingMilestone, projectInMilestone
                                             ? <>{
                                                 milestone.is_approved
                                                     ? <p className='text-lg cursor-pointer !text-content-primary'>Completed</p>
-                                                    : <p onClick={() => setOpenVotingList(true)} className='text-lg cursor-pointer'>See Votings</p>
+                                                    : <p onClick={() => setOpenVotingList(true)} className='text-lg cursor-pointer'>Votes</p>
                                             }
                                             </>
                                             : <>{
