@@ -1006,7 +1006,7 @@ function Project() {
                           {approver?.display_name}
                         </span>
                         <p className='text-xs break-all text-imbue-purple-dark text-opacity-40'>
-                          {approver?.web3_address}
+                          {approver?.web3_address.substring(0,4) + "..." + approver?.web3_address.substring(44)}
                         </p>
                       </div>
                     </div>
