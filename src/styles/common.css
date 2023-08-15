@@ -213,6 +213,11 @@
   color: #000;
 }
 
+.Completed-btn {
+  background-color: var(--theme-primary);
+  color: #000;
+}
+
 .Rejected-btn {
   background-color: var(--theme-error);
   color: white;
