@@ -18,7 +18,7 @@
 }
 
 .str-chat__list {
-  padding-top: 60px;
+  padding-top: 30px;
 }
 
 .pin-text {
@@ -231,4 +231,26 @@
   .str-chat__channel-list .str-chat__channel-list-messenger {
     height: 66vh !important;
   }
+}
+
+.str-chat__message-simple__actions {
+  width: 100%;
+}
+.str-chat__message-actions-box {
+  inset-block-end: -550% !important;
+  inset-inline-start: -550% !important;
+}
+
+.str-chat__li--bottom .str-chat__message-actions-box {
+  inset-block-end: 70% !important;
+  inset-inline-start: -550% !important;
+}
+.str-chat__li--middle:nth-last-child(2) .str-chat__message-actions-box {
+  inset-block-end: 70% !important;
+  inset-inline-start: -550% !important;
+}
+
+.str-chat__li--middle:nth-last-child(3) .str-chat__message-actions-box {
+  inset-block-end: 70% !important;
+  inset-inline-start: -550% !important;
 }

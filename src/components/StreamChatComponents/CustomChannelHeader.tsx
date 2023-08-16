@@ -3,7 +3,11 @@ import PushPinIcon from '@mui/icons-material/PushPin';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import { useChannelStateContext, useChatContext } from 'stream-chat-react';
+import {
+  useChannelActionContext,
+  useChannelStateContext,
+  useChatContext,
+} from 'stream-chat-react';
 
 import PinnedMessageList from './pinnedMessageList';
 
@@ -15,6 +19,7 @@ export function CustomChannelHeader(props: any) {
   const { client, channel } = useChatContext();
   const [pinnedMessage, setPinnedMessage] = useState<any>([]);
   const [isOpen, setOpen] = useState(false);
+  const { jumpToMessage } = useChannelActionContext();
 
   const membersCount = Object.keys(members).length;
   let chatTitle = 'Not Found';
@@ -90,6 +95,7 @@ export function CustomChannelHeader(props: any) {
       </div>
       {!chatPopUp && (
         <PinnedMessageList
+          jumpToMessage={jumpToMessage}
           isOpen={isOpen}
           pinnedMessage={pinnedMessage}
           setOpen={setOpen}
