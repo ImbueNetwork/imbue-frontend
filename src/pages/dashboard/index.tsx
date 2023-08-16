@@ -39,7 +39,6 @@ const Dashboard = (): JSX.Element => {
     loading: loadingUser,
     error: userError,
   } = useSelector((state: RootState) => state.userState);
-  const filters = { members: { $in: [user?.username] } };
   const [selectedOption, setSelectedOption] = useState<number>(1);
   const [unreadMessages, setUnreadMsg] = useState<number>(0);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
@@ -85,13 +84,14 @@ const Dashboard = (): JSX.Element => {
     setupStreamChat();
   }, [user]);
 
+
   useEffect(() => {
-    
     if (client && user?.username && !loadingStreamChat) {
-      client?.connectUser(
+       client?.connectUser(
         {
-          id: user.username,
-          name: user.username,
+          id: String(user.id),
+          username: user.username,
+          name: user.display_name,
         },
         user.getstream_token
       );
@@ -118,9 +118,8 @@ const Dashboard = (): JSX.Element => {
         >
           <BottomNavigationAction label='Client View' value={1} />
           <BottomNavigationAction
-            label={`Messages ${
-              unreadMessages > 0 ? `(${unreadMessages})` : ''
-            }`}
+            label={`Messages ${unreadMessages > 0 ? `(${unreadMessages})` : ''
+              }`}
             value={2}
           />
           <BottomNavigationAction label='Freelancer View' value={3} />
@@ -138,7 +137,7 @@ const Dashboard = (): JSX.Element => {
         />
       )}
       {selectedOption === 2 && (
-        <DashboardChatBox client={client} filters={filters} />
+        <DashboardChatBox client={client} />
       )}
       {selectedOption === 3 && (
         <MyFreelancerApplications

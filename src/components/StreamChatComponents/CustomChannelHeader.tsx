@@ -18,17 +18,22 @@ export function CustomChannelHeader(props: any) {
 
   const membersCount = Object.keys(members).length;
   let chatTitle = 'Not Found';
+  let username = 'Not Found';
 
   Object.keys(members).forEach(function (key) {
-    if (membersCount === 2 && key !== client.userID) chatTitle = key;
+    if (membersCount === 2 && key !== client.userID) {
+      username = members[key]?.user?.username || 'Not Found'
+      chatTitle = members[key]?.user?.name || "Unknown User"
+    }
   });
 
   const navigateToProfile = () => {
-    if (chatTitle !== 'Not Found') {
-      if (showFreelancerProfile) router.push(`/freelancers/${chatTitle}`);
-      else router.push(`/profile/${chatTitle}`);
+    if (username !== 'Not Found') {
+      if (showFreelancerProfile) router.push(`/freelancers/${username}`);
+      else router.push(`/profile/${username}`);
     }
   };
+  
   const getPinedMessage = async () => {
     const channelState = await client
       .channel('messaging', channel?.id)

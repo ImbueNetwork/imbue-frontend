@@ -22,14 +22,13 @@ import { CustomChannelHeader } from '../StreamChatComponents/CustomChannelHeader
 
 function DashboardChatBox({
   client,
-  filters,
 }: {
   client: StreamChat;
-  filters: object;
 }) {
   const mobileView = useMediaQuery('(max-width:500px)');
   const [channels, setChannels] = useState<any>([]);
   const [channel, setChannel] = useState<any>();
+  const filters = client &&  { members: { $in: [String(client.user?.id)] } };
   const router = useRouter();
 
   useEffect(() => {
@@ -52,12 +51,12 @@ function DashboardChatBox({
       const array: any = Object.values(channels[index]?.state?.members);
       let username = 'Not Found';
 
-      array.forEach(function (key: any) {
+      array?.forEach(function (key: any) {
         if (array.length === 2 && key.user_id !== client.userID) {
           username =
-            key.user_id.length > 22
-              ? `${key.user_id?.substring(0, 22)}...`
-              : key.user_id;
+            key?.user?.name?.length > 22
+              ? `${key?.user?.name?.substring(0, 22)}...`
+              : key?.user?.name;
         }
       });
       return username;
@@ -196,8 +195,8 @@ function DashboardChatBox({
           <div className='flex h-full'>
             <div className='chat-list-container border-r border-r-white'>
               <ChannelList
-                renderChannels={renderChannels}
-                List={CustomListContainer}
+                // renderChannels={renderChannels}
+                // List={CustomListContainer}
                 filters={filters}
                 showChannelSearch={true}
               />

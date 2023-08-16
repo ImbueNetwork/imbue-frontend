@@ -8,7 +8,6 @@ import db from '@/db';
 
 import { authenticate, verifyUserIdFromJwt } from '../../auth/common';
 import * as models from '../../../../lib/models';
-import { generateGetStreamToken } from '../../../../lib/models';
 
 export default nextConnect()
   .use(passport.initialize())
@@ -82,12 +81,19 @@ export default nextConnect()
                 message: 'Bad words are not allowed in username name',
               });
             }
-            const token = await generateGetStreamToken(user);
+            
+            const result : any = await models.updateGetStreamUserName(user);
+
+            if(!result?.users) return res.status(400).json({
+              status: 'Failed',
+              message: 'Could not update getStream user information',
+            })
+            
             const userData = {
               id: user?.id,
               display_name: user?.display_name,
               username: user?.username,
-              getstream_token: token,
+              getstream_token: user?.getstream_token,
               web3_address: user?.web3_address,
               profile_photo: user?.profile_photo,
               country: user?.country,

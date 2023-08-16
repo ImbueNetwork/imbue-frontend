@@ -387,9 +387,31 @@ export const generateGetStreamToken = async (user: User) => {
       process.env.GETSTREAM_API_KEY,
       process.env.GETSTREAM_SECRET_KEY
     );
-    const token = client.createToken(user.username);
-    await client.upsertUser({ id: user.username });
+    const token = client.createToken(String(user.id));
+    await client.upsertUser({ 
+      id: String(user.id)
+      
+    });
     return token;
+  }
+  return '';
+};
+
+export const updateGetStreamUserName = async (user: User) => {
+  if (process.env.GETSTREAM_API_KEY && process.env.GETSTREAM_SECRET_KEY) {
+    const client: StreamChat = new StreamChat(
+      process.env.GETSTREAM_API_KEY,
+      process.env.GETSTREAM_SECRET_KEY
+    );
+    const resp = await client.partialUpdateUser({
+      id: String(user.id),
+      set: {
+        name: user.display_name,
+        username: user.username,
+      },
+    });
+
+    return resp;
   }
   return '';
 };
