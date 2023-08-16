@@ -157,14 +157,14 @@ function DashboardChatBox({
 
   const CustomMessage = (props: any) => {
     const { message } = useMessageContext();
+
     if (message.pinned)
       return <MessageSimple {...props} renderText={customPinnedRenderText} />;
-
     return <MessageSimple {...props} renderText={customRenderText} />;
   };
 
   return (
-    <div className='custom-chat-container relative w-full rounded-2xl h-[75vh] bg---theme-grey-dark border border-white border-opacity-25 overflow-hidden -mt-4'>
+    <div className='custom-chat-container relative w-full rounded-2xl h-[75vh] bg---theme-grey-dark border border-white border-opacity-25 overflow-hidden -mt-2'>
       <Chat client={client} theme='str-chat__theme-light'>
         {mobileView ? (
           <>
