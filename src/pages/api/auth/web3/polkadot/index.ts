@@ -38,6 +38,10 @@ export default nextConnect().post(
           return res.status(403);
         }
         const loggedInUser = req.body.logged_in_user;
+        console.log(
+          '🚀 ~ file: index.ts:41 ~ db.transaction ~ loggedInUser:',
+          loggedInUser
+        );
         if (loggedInUser) {
           verifyUserIdFromJwt(req, res, [loggedInUser.id]);
           db.transaction(async (tx) => {
@@ -59,6 +63,11 @@ export default nextConnect().post(
           });
         } else {
           const userExists = await fetchWeb3AccountByAddress(address)(tx);
+
+          if (!userExists.getstream_token) {
+            const token = await models.generateGetStreamToken(userExists);
+            await models.updateUserGetStreamToken(userExists?.id, token)(tx);
+          }
 
           if (userExists) {
             const payload = { id: userExists?.user_id };

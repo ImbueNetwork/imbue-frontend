@@ -218,7 +218,10 @@ export const resetUserWeb3Addresses =
 
 export const fetchWeb3AccountByAddress =
   (address: string) => (tx: Knex.Transaction) =>
-    fetchAllWeb3Account()(tx).where({ address }).first();
+    fetchAllWeb3Account()(tx)
+    .where({ address })
+    .leftJoin('users', {'users.id' : 'web3_accounts.user_id'})
+    .first();
 
 export const fetchAllWeb3Account = () => (tx: Knex.Transaction) =>
   tx<Web3Account>('web3_accounts').select();
