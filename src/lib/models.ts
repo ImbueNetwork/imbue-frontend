@@ -387,10 +387,11 @@ export const generateGetStreamToken = async (user: User) => {
       process.env.GETSTREAM_API_KEY,
       process.env.GETSTREAM_SECRET_KEY
     );
-    const token = client.createToken(String(user.id));
-    await client.upsertUser({ 
-      id: String(user.id)
-      
+    const token = client.createToken(String(user?.id));
+    await client.upsertUser({
+      id: String(user?.id),
+      name: user?.display_name,
+      username: user?.username,
     });
     return token;
   }
