@@ -87,9 +87,9 @@ export const ChatBox = ({
         if (client) {
           const currentChannel = `${targetUser.display_name} <> ${user.display_name}`;
 
-          client.connectUser(
+          await client.connectUser(
             {
-              id: user.username,
+              id: String(user.id),
               name: user.display_name,
             },
             user.getstream_token
@@ -98,7 +98,7 @@ export const ChatBox = ({
           const channel = client.channel('messaging', {
             image: 'https://www.drupal.org/files/project-images/react.png',
             name: currentChannel,
-            members: [user.username, targetUser.username],
+            members: [String(user.id), String(targetUser.id)],
           });
 
           await channel.watch();

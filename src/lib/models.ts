@@ -218,7 +218,10 @@ export const resetUserWeb3Addresses =
 
 export const fetchWeb3AccountByAddress =
   (address: string) => (tx: Knex.Transaction) =>
-    fetchAllWeb3Account()(tx).where({ address }).first();
+    fetchAllWeb3Account()(tx)
+    .where({ address })
+    .leftJoin('users', {'users.id' : 'web3_accounts.user_id'})
+    .first();
 
 export const fetchAllWeb3Account = () => (tx: Knex.Transaction) =>
   tx<Web3Account>('web3_accounts').select();
@@ -387,10 +390,11 @@ export const generateGetStreamToken = async (user: User) => {
       process.env.GETSTREAM_API_KEY,
       process.env.GETSTREAM_SECRET_KEY
     );
-    const token = client.createToken(String(user.id));
-    await client.upsertUser({ 
-      id: String(user.id)
-      
+    const token = client.createToken(String(user?.id));
+    await client.upsertUser({
+      id: String(user?.id),
+      name: user?.display_name,
+      username: user?.username,
     });
     return token;
   }
@@ -1007,12 +1011,12 @@ export const getOrCreateFederatedUser = (
        * Do we already have a federated_credential ?
        */
       const federated = await tx<FederatedCredential>('federated_credentials')
-        .select()
-        .where({
-          subject: username,
-        })
-        .first();
-
+      .select()
+      .where({
+        subject: username,
+      })
+      .first();
+      
       /**
        * If not, create the `user`, then the `federated_credential`
        */
@@ -1035,7 +1039,7 @@ export const getOrCreateFederatedUser = (
         }
         user = user_;
       }
-
+      
       if (!user.getstream_token) {
         const token = await generateGetStreamToken(user);
         await updateUserGetStreamToken(user.id, token)(tx);

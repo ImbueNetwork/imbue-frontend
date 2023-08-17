@@ -130,6 +130,8 @@ const Profile = ({ initUser, browsingUser }: any) => {
         const userResponse: any = await updateUser(filterdUser);
 
         if (userResponse.status === 'Successful') {
+          router.push(`/profile/${userResponse.user.username}`, undefined, { shallow: true })
+          dispatch(fetchUserRedux())
           setSuccess(true);
           setPrevUserName(user.username);
         } else {
@@ -137,7 +139,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
         }
       }
     } catch (error) {
-      // setError({ message: error });
+      setError({ message: "Something went wrong. Please try again" });
       console.log(error);
     } finally {
       setLoading(false);

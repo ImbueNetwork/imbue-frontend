@@ -25,6 +25,10 @@ export default nextConnect().post(
           (await fetchUserOrEmail(email)(tx)) ??
           (await fetchUserOrEmail(username)(tx));
         if (usernameExists?.id) {
+          if (!usernameExists.getstream_token) {
+            const token = await models.generateGetStreamToken(usernameExists);
+            await models.updateUserGetStreamToken(usernameExists.id, token)(tx);
+          }
           const payload = { id: usernameExists?.id };
           const token = await jwt.sign(payload, jwtOptions.secretOrKey);
           await setTokenCookie(res, token);
