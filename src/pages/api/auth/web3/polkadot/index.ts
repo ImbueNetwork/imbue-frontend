@@ -38,10 +38,7 @@ export default nextConnect().post(
           return res.status(403);
         }
         const loggedInUser = req.body.logged_in_user;
-        console.log(
-          '🚀 ~ file: index.ts:41 ~ db.transaction ~ loggedInUser:',
-          loggedInUser
-        );
+        
         if (loggedInUser) {
           verifyUserIdFromJwt(req, res, [loggedInUser.id]);
           db.transaction(async (tx) => {
