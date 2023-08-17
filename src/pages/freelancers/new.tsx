@@ -6,7 +6,7 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import * as utils from '@/utils';
-import { validateInputLength } from '@/utils/helper';
+import { isUrlExist, validateInputLength } from '@/utils/helper';
 
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
@@ -258,7 +258,7 @@ const Freelancer = (): JSX.Element => {
           sx={{ width: '100%' }}
           onChange={(e, value) => setLanguages(value)}
           defaultValue={languages}
-          ListboxProps={{className: "max-h-[280px]"}}
+          ListboxProps={{ className: 'max-h-[280px]' }}
           renderInput={(params) => (
             <TextField
               autoComplete='off'
@@ -289,7 +289,7 @@ const Freelancer = (): JSX.Element => {
           sx={{ width: '100%' }}
           onChange={(e, value) => setSkills(value)}
           defaultValue={skills}
-          ListboxProps={{className: "max-h-[260px]"}}
+          ListboxProps={{ className: 'max-h-[260px]' }}
           renderInput={(params) => (
             <TextField
               autoComplete='off'
@@ -398,12 +398,17 @@ const Freelancer = (): JSX.Element => {
       return false;
     } else if (step === 2 && !goal) {
       return false;
-    } else if (step === 3 && (!title || !validateInputLength(title, 10, 50))) {
+    } else if (
+      step === 3 &&
+      (!title || isUrlExist(title) || !validateInputLength(title, 10, 50))
+    ) {
       // TODO: minimum required length for description
       return false;
     } else if (
       step === 4 &&
-      (!education || !validateInputLength(education, 10, 100))
+      (!education ||
+        isUrlExist(education) ||
+        !validateInputLength(education, 10, 100))
     ) {
       return false;
     }

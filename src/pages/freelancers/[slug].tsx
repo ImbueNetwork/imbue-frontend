@@ -43,6 +43,7 @@ import { MdOutlineWatchLater } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { checkEnvironment, fetchUser, matchedByUserName } from '@/utils';
+import { isUrlAndSpecialCharacterExist, isUrlExist } from '@/utils/helper';
 
 import AccountChoice from '@/components/AccountChoice';
 import { TextArea } from '@/components/Briefs/TextArea';
@@ -89,11 +90,11 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [projects, setProjects] = useState<Project[]>();
   const [loadValue, setLoadValue] = useState(5);
-  const [displayError, setDisplayNameError] = useState(false);
-  const [userNameError, setUserNameError] = useState(false);
+  const [displayError, setDisplayNameError] = useState<string | null>(null);
+  const [userNameError, setUserNameError] = useState<string | null>(null);
   const memberSince = moment(freelancer?.created).format('MMMM YYYY');
   const [prevUserName, setprevUserName] = useState(freelancer.username);
-
+  const [titleError, settitleError] = useState<string | null>(null);
   const [skills, setSkills] = useState<string[]>(
     freelancer?.skills?.map(
       (skill: { id: number; name: string }) =>
@@ -150,6 +151,14 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const onSave = async () => {
     try {
       if (freelancer) {
+        if (filter.isProfane(freelancer.display_name)) {
+          setError({ message: 'Remove bad word from name' });
+          return;
+        }
+        if (filter.isProfane(freelancer.username)) {
+          setError({ message: 'Remove bad word from username' });
+          return;
+        }
         if (userNameError || displayError || userNameExist) {
           setError({ message: 'Invalid input' });
           return;
@@ -206,22 +215,30 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const handleUpdateState = async (e: any) => {
     const newFreelancer = {
       ...freelancer,
-      [e?.target?.name]: e?.target?.value.trim().length
-        ? filter.clean(e.target.value).trim()
-        : '',
+      [e?.target?.name]: e.target.value,
     };
-    if (
-      e.target.name === 'display_name' &&
-      newFreelancer.display_name.trim().length < 1
-    ) {
-      setDisplayNameError(true);
-    } else if (e.target.name === 'display_name') {
-      setDisplayNameError(false);
+
+    if (e.target.name === 'title') {
+      if (isUrlExist(e.target.value))
+        settitleError('Url is not allowed in the title');
+      else settitleError(null);
     }
+    if (e.target.name === 'display_name') {
+      if (newFreelancer.display_name.trim().length < 1) {
+        setDisplayNameError('Display name must be at least 1 character long');
+      } else if (isUrlAndSpecialCharacterExist(e.target.value)) {
+        setDisplayNameError(
+          'URL,special characters are not allowed in display name'
+        );
+      } else setDisplayNameError(null);
+    }
+
     if (e.target.name === 'username') {
       if (e.target.value.length < 5 || e.target.value.length > 30)
-        setUserNameError(true);
-      else setUserNameError(false);
+        setUserNameError('username must be at least 5 to 30 characters long');
+      else if (isUrlAndSpecialCharacterExist(e.target.value)) {
+        setUserNameError('URL,special characters are not allowed in username');
+      } else setUserNameError(null);
       const data = await matchedByUserName(e.target.value);
       if (data && e.target.value !== prevUserName) {
         setUserNameExist(true);
@@ -486,7 +503,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                         className={`text-xs text-imbue-light-purple-two mt-[-34px]
                     `}
                       >
-                        Name must contain atleast 1 character
+                        {displayError}
                       </p>
                     )}
                   </>
@@ -525,7 +542,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                           className={`text-xs text-imbue-light-purple-two mt-[-34px]
                     `}
                         >
-                          username must contain min 5 max 30 character
+                          {userNameError}
                         </p>
                       )}
                       {userNameExist && (
@@ -545,17 +562,27 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
 
                   <div className='flex items-center gap-2 w-full'>
                     {isEditMode ? (
-                      <TextField
-                        color='secondary'
-                        onChange={(e) => handleUpdateState(e)}
-                        className='w-full'
-                        id='outlined-basic'
-                        name='title'
-                        label='Tittle'
-                        variant='outlined'
-                        defaultValue={freelancer?.title}
-                        autoComplete='off'
-                      />
+                      <div>
+                        <TextField
+                          color='secondary'
+                          onChange={(e) => handleUpdateState(e)}
+                          className='w-full'
+                          id='outlined-basic'
+                          name='title'
+                          label='Tittle'
+                          variant='outlined'
+                          defaultValue={freelancer?.title}
+                          autoComplete='off'
+                        />
+                        {titleError && (
+                          <p
+                            className={`text-xs text-imbue-light-purple-two mt-[-15px]
+                    `}
+                          >
+                            {titleError}
+                          </p>
+                        )}
+                      </div>
                     ) : (
                       <>
                         <IoPeople color='var(--theme-secondary)' size='24px' />

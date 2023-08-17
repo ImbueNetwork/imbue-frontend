@@ -12,6 +12,8 @@ import { BiEdit } from 'react-icons/bi';
 import { FaStar } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
 
+import { isUrlAndSpecialCharacterExist } from '@/utils/helper';
+
 import AccountChoice from '@/components/AccountChoice';
 import { TextArea } from '@/components/Briefs/TextArea';
 import ChatPopup from '@/components/ChatPopup';
@@ -57,8 +59,8 @@ const Profile = ({ initUser, browsingUser }: any) => {
   const [error, setError] = useState<any>();
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [displayNameError, setDisplayNameError] = useState(false);
-  const [userNameError, setUserNameError] = useState(false);
+  const [displayNameError, setDisplayNameError] = useState<string | null>(null);
+  const [userNameError, setUserNameError] = useState<string | null>(null);
   const [userNameExist, setUserNameExist] = useState(false);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -82,6 +84,16 @@ const Profile = ({ initUser, browsingUser }: any) => {
     try {
       if (filter.isProfane(user.display_name)) {
         setError({ message: 'remove bad word from display name' });
+        return;
+      } else if (isUrlAndSpecialCharacterExist(user.display_name)) {
+        setError({
+          message: 'URL , special characters are not allowed in name',
+        });
+        return;
+      } else if (isUrlAndSpecialCharacterExist(user.username)) {
+        setError({
+          message: 'URL , special characters are not allowed in username',
+        });
         return;
       } else if (filter.isProfane(user.username)) {
         setError({ message: 'remove bad word from username' });
@@ -188,13 +200,21 @@ const Profile = ({ initUser, browsingUser }: any) => {
   // };
   const handleChange = async (e: any) => {
     if (e.target.name === 'display_name') {
-      if (e.target.value.length < 1) setDisplayNameError(true);
-      else setDisplayNameError(false);
+      console.log(isUrlAndSpecialCharacterExist(e.target.value));
+      if (isUrlAndSpecialCharacterExist(e.target.value)) {
+        setDisplayNameError('URL , special characters are not allowed in name');
+      } else if (e.target.value.length < 1)
+        setDisplayNameError('name must be at least 1 character');
+      else setDisplayNameError(null);
     }
     if (e.target.name === 'username') {
       if (e.target.value.length < 5 || e.target.value.length > 30)
-        setUserNameError(true);
-      else setUserNameError(false);
+        setUserNameError('username must be at least 5 to 30 characters long');
+      else if (isUrlAndSpecialCharacterExist(e.target.value)) {
+        setUserNameError(
+          'URL , special characters are not allowed in username'
+        );
+      } else setUserNameError(null);
       const data = await matchedByUserName(e.target.value);
       if (data && e.target.value !== prevUserName) {
         setUserNameExist(true);
@@ -214,7 +234,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
     if (!regEx.test(link)) link = `https://${link}`;
     window.open(link, '_blank');
   };
-
+  console.log(displayNameError);
   return (
     <div className='profile-container'>
       <div className='cursor-pointer absolute top-28 left-16 lg:left-24 z-[1]'>
@@ -270,7 +290,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                       className={`text-xs text-imbue-light-purple-two mt-[-34px]
                     `}
                     >
-                      Name must contain atleast 1 character
+                      {displayNameError}
                     </p>
                   )}
 
@@ -305,7 +325,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                       className={`text-xs text-imbue-light-purple-two mt-[-34px]
                     `}
                     >
-                      username must contain min 5 character max 30 character
+                      {userNameError}
                     </p>
                   )}
                   {userNameExist && (

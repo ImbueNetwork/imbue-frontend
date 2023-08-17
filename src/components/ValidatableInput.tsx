@@ -1,6 +1,8 @@
 import { TextField } from '@mui/material';
 import React, { ChangeEvent, useState } from 'react';
 
+import { isUrlExist } from '@/utils/helper';
+
 const ValidatableInput = (props: any) => {
   const {
     minLength = 10,
@@ -24,6 +26,11 @@ const ValidatableInput = (props: any) => {
       setError(
         `Valid ${name} is required between ${minLength} and ${maxLength}`
       );
+    } else if (
+      name === 'title' ||
+      (name === 'education' && isUrlExist(value))
+    ) {
+      setError(`URL is not allowed in ${name}`);
     } else {
       setError('');
     }
