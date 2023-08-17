@@ -1011,12 +1011,12 @@ export const getOrCreateFederatedUser = (
        * Do we already have a federated_credential ?
        */
       const federated = await tx<FederatedCredential>('federated_credentials')
-        .select()
-        .where({
-          subject: username,
-        })
-        .first();
-
+      .select()
+      .where({
+        subject: username,
+      })
+      .first();
+      
       /**
        * If not, create the `user`, then the `federated_credential`
        */
@@ -1039,7 +1039,7 @@ export const getOrCreateFederatedUser = (
         }
         user = user_;
       }
-
+      
       if (!user.getstream_token) {
         const token = await generateGetStreamToken(user);
         await updateUserGetStreamToken(user.id, token)(tx);
