@@ -5,7 +5,6 @@ import nextConnect from 'next-connect';
 import * as models from '@/lib/models';
 
 import db from '@/db';
-import { User } from '@/model';
 
 export default nextConnect().get(
   async (req: NextApiRequest, res: NextApiResponse) => {
@@ -16,11 +15,9 @@ export default nextConnect().get(
 
     await db.transaction(async (tx) => {
       try {
-        const user: User = (
-          await models.fetchUserWithUsernameOrAddress(userName.toString())(tx)
-        )[0] as User;
+        const user = await models.fetchUserWithUsernameOrAddress(userName.toString())(tx);
 
-       // if (!user) return res.status(401).send({ error: 'No user found' });
+       if (!user) return res.status(401).send({ error: 'No user found' });
 
         return res.status(201).send(user);
       } catch (e) {
