@@ -18,7 +18,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { appLogo, cancelIcon, hamburgerIcon } from '@/assets/svgs';
-import { fetchUser } from '@/redux/reducers/userReducers';
+import { fetchUserRedux } from '@/redux/reducers/userReducers';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { AppDispatch, RootState } from '@/redux/store/store';
 
@@ -40,7 +40,7 @@ function Navbar() {
   const open = Boolean(anchorEl);
   const [openMenu, setOpenMenu] = useState(false);
 
-  const user = useSelector((state: RootState) => state.userState.user);
+  const { user, loading: loadingUser } = useSelector((state: RootState) => state.userState);
   const dispatch = useDispatch<AppDispatch>();
 
   const [expanded, setExpanded] = useState(false);
@@ -56,7 +56,7 @@ function Navbar() {
 
   useEffect(() => {
     const setup = async () => {
-      dispatch(fetchUser());
+      dispatch(fetchUserRedux());
       try {
         if (user?.username) {
           const res = await getFreelancerProfile(user.username);
@@ -119,11 +119,10 @@ function Navbar() {
 
             <div className='relative items-center z-0 hidden lg:flex'>
               <div
-                className={`${
-                  expanded
-                    ? 'translate-x-0 opacity-100 duration-700'
-                    : '-translate-x-full opacity-0 duration-1000'
-                } flex items-center ml-1 transition-all`}
+                className={`${expanded
+                  ? 'translate-x-0 opacity-100 duration-700'
+                  : '-translate-x-full opacity-0 duration-1000'
+                  } flex items-center ml-1 transition-all`}
               >
                 <Link
                   onClick={() => setExpanded(false)}
@@ -133,13 +132,17 @@ function Navbar() {
                   Submit a Brief
                 </Link>
 
-                <Link
-                  onClick={() => setExpanded(false)}
-                  className={`mx-1 lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
-                  href='/grants/new'
-                >
-                  Submit a Grant
-                </Link>
+                {
+                  user?.id && (
+                    <Link
+                      onClick={() => setExpanded(false)}
+                      className={`mx-1 lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
+                      href='/grants/new'
+                    >
+                      Submit a Grant
+                    </Link>
+                  )
+                }
 
                 <Link
                   onClick={() => setExpanded(false)}
@@ -174,9 +177,8 @@ function Navbar() {
                 onClick={() => {
                   setExpanded(!expanded);
                 }}
-                className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${
-                  !expanded && cancelClass
-                } ${expanded ? 'lg:invisible' : 'visible delay-700'} absolute`}
+                className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${!expanded && cancelClass
+                  } ${expanded ? 'lg:invisible' : 'visible delay-700'} absolute`}
               >
                 <Image
                   src={expanded ? cancelIcon : hamburgerIcon}
@@ -243,7 +245,7 @@ function Navbar() {
               )}
             </Tooltip>
 
-            {!user.username && (
+            {!loadingUser && !user.username && (
               <button
                 className='mx-1 text-xs lg:text-sm bg-theme-grey-dark hover:bg-primary hover:text-black transition-all px-6 py-2 rounded-full hidden lg:inline-block'
                 onClick={() => setLoginModal(true)}

@@ -58,7 +58,7 @@ export const getProjectId = async () => {
   return null;
 };
 
-export const fetchProject = async (projectId: string | number | null) => {
+export const fetchProjectById = async (projectId: string | number | null) => {
   try {
     const resp = await fetch(`${config.apiBase}project/${projectId}`, {
       headers: config.getAPIHeaders,
@@ -72,7 +72,27 @@ export const fetchProject = async (projectId: string | number | null) => {
   }
 };
 
-export const fetchUser = async (id: number) => {
+export const fetchProject = async (
+  projectId: string | number | null,
+  brief_id: string | number | null
+) => {
+  try {
+    const resp = await fetch(
+      `${config.apiBase}project/${projectId}/${brief_id}`,
+      {
+        headers: config.getAPIHeaders,
+        method: 'get',
+      }
+    );
+    if (resp.ok) {
+      return (await resp.json()) as Project;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const fetchUser = async (id: number | string) => {
   const resp = await fetch(`${config.apiBase}users/byid/${id}`, {
     headers: config.getAPIHeaders,
   });
@@ -86,10 +106,32 @@ export const fetchUserByUsernameOrAddress = async (
   usernameOrAddress: string
 ) => {
   try {
+    const resp = await fetch(
+      `/api/users/byUsernameOrAddress/${usernameOrAddress}`
+    );
+    return await resp.json();
+  } catch (error) {
+    return [];
+  }
+};
+
+export const searchUserByUsernameOrAddress = async (
+  usernameOrAddress: string
+) => {
+  try {
     const resp = await fetch(`/api/users/search/${usernameOrAddress}`);
     return await resp.json();
   } catch (error) {
     return [];
+  }
+};
+
+export const matchedByUserName = async (usernameOrAddress: string) => {
+  try {
+    const resp = await fetch(`/api/users/matchUserName/${usernameOrAddress}`);
+    return await resp.json();
+  } catch (error) {
+    return null;
   }
 };
 
@@ -131,7 +173,7 @@ export const checkEnvironment = () => {
 };
 
 export const updateUser = async (user: User) => {
-  const resp = { status: 401, message: 'could not fetch' };
+  const resp = { status: 401, message: 'User is not Authenticated' };
   try {
     const update = await fetch(`${config.apiBase}/info/user/update`, {
       headers: config.postAPIHeaders,
@@ -142,7 +184,7 @@ export const updateUser = async (user: User) => {
     if (update.status === 200) {
       return update.json();
     } else {
-      return resp;
+      return { status: update.status, message: update.statusText };
     }
   } catch (error) {
     return resp;

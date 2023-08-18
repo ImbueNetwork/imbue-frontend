@@ -124,6 +124,7 @@ export type Project = {
   // project_type: number;
   escrow_address?: string;
   duration_id: number;
+  completed?: boolean;
 };
 
 export type ProjectProperties = {
@@ -191,13 +192,14 @@ export type BriefSqlFilter = {
   search_input: string;
   items_per_page: number;
   page: number;
+  skills_range: Array<number>;
 };
 
 export type FreelancerSqlFilter = {
   skills_range: Array<number>;
   services_range: Array<number>;
   languages_range: Array<number>;
-  search_input: string;
+  name: string;
   items_per_page: number;
   page: number;
   verified: boolean;
@@ -208,9 +210,18 @@ export type PagerProps = {
   totalItems: number;
 };
 
+export const resetUserWeb3Addresses =
+  (address: string) => (tx: Knex.Transaction) =>
+    tx.raw(
+      `UPDATE USERS SET web3_address=NULL WHERE web3_address='${address}'`
+    );
+
 export const fetchWeb3AccountByAddress =
   (address: string) => (tx: Knex.Transaction) =>
-    fetchAllWeb3Account()(tx).where({ address }).first();
+    fetchAllWeb3Account()(tx)
+    .where({ address })
+    .leftJoin('users', {'users.id' : 'web3_accounts.user_id'})
+    .first();
 
 export const fetchAllWeb3Account = () => (tx: Knex.Transaction) =>
   tx<Web3Account>('web3_accounts').select();
@@ -224,50 +235,71 @@ export const fetchWeb3AccountsByUserId =
     fetchAllWeb3Account()(tx).where({ user_id }).select();
 
 export const fetchAllUser = () => (tx: Knex.Transaction) =>
-  tx<User>('users').select(
-    'id',
-    'display_name',
-    'profile_photo',
-    'username',
-    'web3_address'
-  );
+  tx<User>('users')
+    .select('id', 'display_name', 'profile_photo', 'username', 'web3_address')
+    .orderBy('web3_address');
 
 export const fetchUserWithUsernameOrAddress =
   (usernameOrAddress: string) => (tx: Knex.Transaction) =>
     tx<User>('users')
-      .where('username', 'ilike', `%${usernameOrAddress}%`)
-      .orWhere('web3_address', 'ilike', `%${usernameOrAddress}%`)
-      .select(
-        'id',
-        'display_name',
-        'profile_photo',
-        'username',
-        'web3_address'
-      );
+      .where((builder) =>
+        builder
+          .whereRaw('LOWER(username) = ?', usernameOrAddress.toLowerCase())
+          .orWhereRaw(
+            'LOWER(web3_address) = ?',
+            usernameOrAddress.toLowerCase()
+          )
+      )
+      .select('id', 'display_name', 'profile_photo', 'username', 'web3_address')
+      .limit(1);
 
-export const fetchUser = (id: number) => (tx: Knex.Transaction) =>
-  tx<User>('users').where({ id }).first();
+export const searchUserWithNameOrAddress =
+  (usernameOrAddress: string) => (tx: Knex.Transaction) =>
+    tx<User>('users')
+      .where('display_name', 'ilike', `%${usernameOrAddress}%`)
+      .orWhere('web3_address', 'ilike', `%${usernameOrAddress}%`)
+      .select('id', 'display_name', 'profile_photo', 'username', 'web3_address')
+      .orderBy('web3_address', 'asc');
+
+export const fetchUser = (id: number) => (tx: Knex.Transaction) => {
+  return tx<User>('users').where({ id }).limit(1);
+};
 
 export const updateUserData =
   (id: number, data: Partial<User>) => async (tx: Knex.Transaction) =>
     (await tx<User>('users').update(data).where({ id }).returning('*'))[0];
 
 export const fetchUserOrEmail =
-  (userOrEmail: string) => (tx: Knex.Transaction) =>
-    tx<User>('users')
-      .where({ username: userOrEmail.toLocaleLowerCase() })
-      .orWhere({ email: userOrEmail.toLowerCase() })
-      .first();
+  (userOrEmail: string) => (tx: Knex.Transaction) => {
+    // get all db users
+    return tx<User>('users')
+      .select()
+      .then((users) => {
+        // check if userOrEmail is in db
+        const user = users.find(
+          (u) =>
+            u.username === userOrEmail.toLowerCase() ||
+            u.email === userOrEmail.toLowerCase()
+        );
+        if (user) {
+          return user;
+        } else {
+          return null;
+        }
+      });
+  };
 
 export const upsertWeb3Challenge =
   (user: User, address: string, type: string, challenge: string) =>
   async (
     tx: Knex.Transaction
   ): Promise<[web3Account: Web3Account, isInsert: boolean]> => {
-    const updatedUser = await tx<User>('users')
+    await resetUserWeb3Addresses(address)(tx);
+    await tx<User>('users')
       .update({ web3_address: address })
       .where({ id: user.id })
       .returning('*');
+
     const web3Account = await tx<Web3Account>('web3_accounts')
       .select()
       .where({
@@ -358,9 +390,32 @@ export const generateGetStreamToken = async (user: User) => {
       process.env.GETSTREAM_API_KEY,
       process.env.GETSTREAM_SECRET_KEY
     );
-    const token = client.createToken(user.username);
-    await client.upsertUser({ id: user.username });
+    const token = client.createToken(String(user?.id));
+    await client.upsertUser({
+      id: String(user?.id),
+      name: user?.display_name,
+      username: user?.username,
+    });
     return token;
+  }
+  return '';
+};
+
+export const updateGetStreamUserName = async (user: User) => {
+  if (process.env.GETSTREAM_API_KEY && process.env.GETSTREAM_SECRET_KEY) {
+    const client: StreamChat = new StreamChat(
+      process.env.GETSTREAM_API_KEY,
+      process.env.GETSTREAM_SECRET_KEY
+    );
+    const resp = await client.partialUpdateUser({
+      id: String(user.id),
+      set: {
+        name: user.display_name,
+        username: user.username,
+      },
+    });
+
+    return resp;
   }
   return '';
 };
@@ -418,6 +473,14 @@ export const updateFederatedLoginUser =
         .returning('*')
     )[0];
 
+export const getApproverProjects =
+  (wallet: string | string[]) => async (tx: Knex.Transaction) =>
+    await tx<Project>('project_approvers')
+      .leftJoin('projects', 'project_approvers.project_id', '=', 'projects.id')
+      .select()
+      .where({ approver: wallet })
+      .orderBy('projects.created', 'desc');
+
 export const insertProject =
   (project: Project) => async (tx: Knex.Transaction) =>
     (await tx<Project>('projects').insert(project).returning('*'))[0];
@@ -426,6 +489,17 @@ export const updateProject =
   (id: string | number, project: Project) => async (tx: Knex.Transaction) =>
     (
       await tx<Project>('projects').update(project).where({ id }).returning('*')
+    )[0];
+
+export const rejectOtherApplications =
+  (briefID: string | number, projectID: string | number) =>
+  async (tx: Knex.Transaction) =>
+    (
+      await tx<Project>('projects')
+        .where({ brief_id: briefID })
+        .whereNot({ id: projectID })
+        .update({ status_id: ProjectStatus.Rejected })
+        .returning('*')
     )[0];
 
 export const updateProjectProperties =
@@ -443,8 +517,17 @@ export const fetchUserBriefApplications =
   (tx: Knex.Transaction) =>
     tx<Project>('projects').select().where({ user_id, brief_id }).first();
 
-export const fetchProject = (id: string | number) => (tx: Knex.Transaction) =>
-  tx<Project>('projects').select().where({ id: id }).first();
+export const fetchBriefProject =
+  (id: string | number, brief_id: string | undefined) =>
+  (tx: Knex.Transaction) =>
+    tx<Project>('projects')
+      .select()
+      .where({ id: id, brief_id: brief_id })
+      .first();
+
+export const fetchProjectById =
+  (id: string | number) => (tx: Knex.Transaction) =>
+    tx<Project>('projects').select().where({ id: id }).first();
 
 export const fetchGrantProject =
   (project_id: number) => (tx: Knex.Transaction) =>
@@ -488,7 +571,16 @@ export const fetchUserProject =
 
 export const fetchUserProjects =
   (id: string | number) => (tx: Knex.Transaction) =>
-    fetchAllProjects()(tx).where({ user_id: id });
+    fetchAllProjects()(tx).where({ user_id: id }).orderBy('created', 'desc');
+
+export const fetchUserOnGoingProjects =
+  (id: string | number, skip: number, limit: number) =>
+  (tx: Knex.Transaction) =>
+    fetchAllProjects()(tx)
+      .where({ user_id: id })
+      .whereNot({ chain_project_id: null })
+      .offset(skip)
+      .limit(limit);
 
 export const insertMilestones = (
   milestones: ProposedMilestone[],
@@ -518,6 +610,21 @@ export const fetchProjectApprovers =
       .select('approver')
       .where({ project_id: id });
 
+export const fetchProjectApproverUserIds =
+  (id: string | number) => async (tx: Knex.Transaction) =>
+    (
+      await tx<User>('project_approvers')
+        .select('users.id')
+        .join(
+          'web3_accounts',
+          'project_approvers.approver',
+          'web3_accounts.address'
+        )
+        .join('users', 'web3_accounts.user_id', 'users.id')
+        .where('project_approvers.project_id', '=', id)
+        .returning('users.id')
+    ).map((row) => row.id);
+
 export const updateMilestoneDetails =
   (id: string | number, milestoneId: string | number, details: string) =>
   (tx: Knex.Transaction) =>
@@ -525,6 +632,15 @@ export const updateMilestoneDetails =
       .where({ project_id: id })
       .where('index', '=', milestoneId)
       .update('details', details)
+      .returning('*');
+
+export const updateMilestone =
+  (id: string | number, milestoneId: string | number, details: any) =>
+  (tx: Knex.Transaction) =>
+    tx<Milestone>('milestones')
+      .where({ project_id: id })
+      .where('milestone_index', '=', milestoneId)
+      .update(details)
       .returning('*');
 
 export const insertMilestoneDetails =
@@ -626,9 +742,32 @@ export const fetchAllGrants = () => (tx: Knex.Transaction) =>
     .innerJoin('users', { 'grants.user_id': 'users.id' })
     .orderBy('grants.created', 'desc');
 
+export const countAllBriefs = () => async (tx: Knex.Transaction) =>
+  tx('briefs').count('id').whereNull('briefs.project_id').first();
+
 export const fetchProfileImages =
   (id: number, tableName: string) => async (tx: Knex.Transaction) =>
     tx(tableName).select('profile_image').where({ user_id: id }).first();
+
+export const fetchAllImbueSkills = (limit: number) => (tx: Knex.Transaction) =>
+  tx<Skill>('imbue_skills').select().limit(limit);
+
+export const allImbueSkillsSuggestion =
+  (limit: number) => (tx: Knex.Transaction) =>
+    tx<Skill>('imbue_skills').select().offset(980).limit(limit);
+
+export const searchImbueSkillsByName =
+  (name: string) => (tx: Knex.Transaction) =>
+    tx<Skill>('imbue_skills')
+      .select()
+      .where('name', 'ilike', `${name}%`)
+      .limit(10);
+
+export const searchIndustryByName = (name: string) => (tx: Knex.Transaction) =>
+  tx<Skill>('industries').select().where('name', 'ilike', `${name}%`).limit(10);
+
+export const searchLanguageByName = (name: string) => (tx: Knex.Transaction) =>
+  tx<Skill>('languages').select().where('name', 'ilike', `${name}%`).limit(10);
 
 // Insert a brief and their respective skill and industry_ids.
 export const insertBrief =
@@ -726,11 +865,14 @@ export const findSavedBriefById =
       .first();
 
 export const deleteSavedBrief =
-  (brief_id: string, userId: string) => async (tx: Knex.Transaction) =>
+  (brief_id: string, userId: string) => async (tx: Knex.Transaction) => {
     await tx('saved_briefs')
       .where({ brief_id: brief_id, user_id: userId })
       .delete()
       .returning('*');
+
+    return getSavedBriefs(userId)(tx);
+  };
 
 export const updateBrief =
   (
@@ -869,12 +1011,12 @@ export const getOrCreateFederatedUser = (
        * Do we already have a federated_credential ?
        */
       const federated = await tx<FederatedCredential>('federated_credentials')
-        .select()
-        .where({
-          subject: username,
-        })
-        .first();
-
+      .select()
+      .where({
+        subject: username,
+      })
+      .first();
+      
       /**
        * If not, create the `user`, then the `federated_credential`
        */
@@ -897,7 +1039,7 @@ export const getOrCreateFederatedUser = (
         }
         user = user_;
       }
-
+      
       if (!user.getstream_token) {
         const token = await generateGetStreamToken(user);
         await updateUserGetStreamToken(user.id, token)(tx);
@@ -918,6 +1060,11 @@ export const fetchFreelancerDetailsByUsername =
   (username: string | string[]) => (tx: Knex.Transaction) =>
     fetchAllFreelancers()(tx).where({ username: username }).first();
 
+export const searchFreelancerProfile = (query: any) => (tx: Knex.Transaction) =>
+  fetchAllFreelancers()(tx).where({
+    display_name: query?.search_input,
+  });
+
 export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
   tx
     .select(
@@ -935,11 +1082,13 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
       'bio',
       'freelancers.user_id',
       'username',
-      'profile_image',
+      'users.profile_photo as profile_image',
       'display_name',
       'web3_accounts.address as web3_address',
       'freelancers.created',
-      'verified'
+      'verified',
+      'users.country',
+      'users.region'
       // tx.raw('ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills'),
       // tx.raw('ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids'),
 
@@ -972,9 +1121,6 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
     //   'freelancers.id': 'freelancer_clients.freelancer_id',
     // })
     // .leftJoin('clients', { 'freelancer_clients.client_id': 'clients.id' })
-    .leftJoin('freelancer_profile_image', {
-      'freelancers.id': 'freelancer_profile_image.freelancer_id',
-    })
     // Join skills and many to many
     // .leftJoin('freelancer_skills', {
     // 'freelancers.id': 'freelancer_skills.freelancer_id',
@@ -988,12 +1134,16 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
     // 'freelancer_languages.language_id': 'languages.id',
     // })
     .innerJoin('users', { 'freelancers.user_id': 'users.id' })
+    // .leftJoin("freelancer_skills", { 'freelancers.id': 'freelancer_skills.freelancer_id' })s
+    // .leftJoin("freelancer_services", { 'freelancers.id': 'freelancer_services.freelancer_id' })
     // .leftJoin('freelancer_ratings', {
     // 'freelancers.id': 'freelancer_ratings.freelancer_id',
     // })
     .leftJoin('web3_accounts', {
       'freelancers.user_id': 'web3_accounts.user_id',
-    });
+    })
+    .orderBy('freelancers.id');
+
 // order and group by many-many selects
 // .orderBy('profile_image', 'asc')
 // .orderBy('freelancers.modified', 'desc')
@@ -1003,7 +1153,9 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
 // .groupBy('address')
 // .groupBy('profile_image')
 // TODO Add limit until we have spinning loading icon in freelancers page
-// .limit(100);
+
+export const countAllFreelancers = () => async (tx: Knex.Transaction) =>
+  tx('freelancers').count('id');
 
 export const fetchFreelancerMetadata =
   (type: string, freelancer_id: number) => async (tx: Knex.Transaction) =>
@@ -1133,7 +1285,8 @@ export const updateFreelancerDetails =
     web3_type: string,
     web3_challenge: string,
     // eslint-disable-next-line unused-imports/no-unused-vars
-    freelancer_clients: Array<{ id: number; name: string; img: string }>
+    freelancer_clients: Array<{ id: number; name: string; img: string }>,
+    token: string
   ) =>
   async (tx: Knex.Transaction) =>
     await tx<Freelancer>('freelancers')
@@ -1157,6 +1310,10 @@ export const updateFreelancerDetails =
         if (userId) {
           await tx('users').where({ id: userId }).update({
             display_name: f.display_name,
+            username: f.username,
+            country: country,
+            region: region,
+            getstream_token: token,
           });
         }
 
@@ -1266,84 +1423,181 @@ export const updateFreelancerDetails =
 // The search briefs and all these lovely parameters.
 // Since we are using checkboxes only i unfortunatly ended up using all these parameters.
 // Because we could have multiple ranges of values and open ended ors.
-export const searchBriefs = async (
-  tx: Knex.Transaction,
-  filter: BriefSqlFilter
-) =>
-  // select everything that is associated with brief.
-  fetchAllBriefs()(tx)
-    .where(function () {
-      if (filter.submitted_range.length > 0) {
-        this.whereBetween('users.briefs_submitted', [
-          filter.submitted_range[0].toString(),
-          Math.max(...filter.submitted_range).toString(),
-        ]);
-      }
-      if (filter.submitted_is_max) {
-        this.orWhere(
-          'users.briefs_submitted',
-          '>=',
-          Math.max(...filter.submitted_range)
-        );
-      }
-    })
-    .where(function () {
-      if (filter.experience_range.length > 0) {
-        this.whereIn('experience_id', filter.experience_range);
-      }
-    })
-    .where(function () {
-      if (filter.length_range.length > 0) {
-        this.whereIn('duration_id', filter.length_range);
-      }
-      if (filter.length_is_max) {
-        this.orWhere('duration_id', '>=', Math.max(...filter.length_range));
-      }
-    })
-    .where('headline', 'ilike', '%' + filter.search_input + '%');
+export const searchBriefs =
+  (filter: BriefSqlFilter) => async (tx: Knex.Transaction) =>
+    // select everything that is associated with brief.
+    fetchAllBriefs()(tx)
+      .distinct('briefs.id')
+      .whereNull('briefs.project_id')
+      .modify(function (builder) {
+        if (filter?.items_per_page > 0)
+          builder
+            .offset(
+              (Number(filter.page) - 1) * Number(filter.items_per_page) || 0
+            )
+            .limit(Number(filter.items_per_page) || 5);
+      })
+      .where(function () {
+        if (filter.submitted_range?.length > 0) {
+          this.whereBetween('users.briefs_submitted', [
+            filter.submitted_range[0].toString(),
+            Math.max(...filter.submitted_range).toString(),
+          ]);
+        }
+        if (filter.submitted_is_max) {
+          this.orWhere(
+            'users.briefs_submitted',
+            '>=',
+            Math.max(...filter.submitted_range)
+          );
+        }
+      })
+      .where(function () {
+        if (filter.experience_range?.length > 0) {
+          this.whereIn('experience_id', filter.experience_range);
+        }
+      })
+      .where(function () {
+        if (filter?.length_range?.length > 0) {
+          this.whereIn('duration_id', filter.length_range);
+        }
+        if (filter?.length_is_max) {
+          this.orWhere('duration_id', '>=', Math.max(...filter.length_range));
+        }
+      })
+      .where(function () {
+        if (filter?.skills_range?.length > 0) {
+          this.whereIn('brief_skills.skill_id', filter.skills_range);
+        }
+      })
+      .where('headline', 'ilike', filter.search_input + '%');
+
+export const searchBriefsCount =
+  (filter: BriefSqlFilter) => async (tx: Knex.Transaction) =>
+    // select everything that is associated with brief.
+    searchBriefs(filter)(tx).then((res) => res?.length);
 
 export const paginatedData = (
   currentPage: number,
   itemsPerPage: number,
   data: any[]
 ): PagerProps => {
-  const indexOfLastBrief = currentPage * itemsPerPage;
-  const indexOfFirstBrief = indexOfLastBrief - itemsPerPage;
-  const currentData = data.slice(indexOfFirstBrief, indexOfLastBrief);
-  return { currentData, totalItems: data.length };
+  const offset = (currentPage - 1) * itemsPerPage;
+  const paginatedItems = data.slice(offset).slice(0, itemsPerPage);
+
+  return {
+    totalItems: data.length,
+    currentData: paginatedItems,
+  };
 };
 
-export const searchFreelancers = async (
+export const searchFreelancers =
+  (filter: FreelancerSqlFilter) => (tx: Knex.Transaction) =>
+    tx
+      .select(
+        'freelancers.id',
+        'freelanced_before',
+        'freelancing_goal',
+        'work_type',
+        'education',
+        'experience',
+        'facebook_link',
+        'twitter_link',
+        'telegram_link',
+        'discord_link',
+        'title',
+        'bio',
+        'freelancers.user_id',
+        'username',
+        'users.profile_photo as profile_image',
+        'display_name',
+        'web3_accounts.address as web3_address',
+        'freelancers.created',
+        'verified',
+        'users.country',
+        'users.region'
+      )
+      .from<Freelancer>('freelancers')
+      .innerJoin('users', { 'freelancers.user_id': 'users.id' })
+      .leftJoin('freelancer_skills', {
+        'freelancers.id': 'freelancer_skills.freelancer_id',
+      })
+      .leftJoin('freelancer_services', {
+        'freelancers.id': 'freelancer_services.freelancer_id',
+      })
+      .leftJoin('freelancer_languages', {
+        'freelancers.id': 'freelancer_languages.freelancer_id',
+      })
+      .leftJoin('web3_accounts', {
+        'freelancers.user_id': 'web3_accounts.user_id',
+      })
+      .orderBy('freelancers.id')
+      .where(function () {
+        if (filter?.skills_range?.length > 0) {
+          this.whereIn('freelancer_skills.skill_id', filter.skills_range);
+        }
+      })
+      .where(function () {
+        if (filter.services_range?.length > 0) {
+          this.whereIn('freelancer_services.service_id', filter.services_range);
+        }
+      })
+      .where(function () {
+        if (filter.languages_range?.length > 0) {
+          this.whereIn(
+            'freelancer_languages.language_id',
+            filter.languages_range
+          );
+        }
+      })
+      .where(function () {
+        if (filter?.verified) {
+          this.where('verified', true);
+        }
+      })
+      .where(function () {
+        if (filter?.name) {
+          this.where('display_name', 'ilike', `${filter.name}%`);
+        }
+      })
+      .distinct('freelancers.id')
+      .modify(function (builder) {
+        if (Number(filter?.items_per_page) > 0) {
+          builder
+            .offset(
+              (Number(filter.page) - 1) * Number(filter.items_per_page) || 0
+            )
+            .limit(Number(filter.items_per_page) || 5);
+        }
+      });
+
+export const searchFreelancersCount = async (
   tx: Knex.Transaction,
   filter: FreelancerSqlFilter
 ) =>
-  fetchAllFreelancers()(tx)
-    .where(function () {
-      if (filter.skills_range.length > 0) {
-        this.whereIn('freelancer_skills.skill_id', filter.skills_range);
-      }
-    })
-    .where(function () {
-      if (filter.services_range.length > 0) {
-        this.whereIn('freelancer_services.service_id', filter.services_range);
-      }
-    })
-    .where(function () {
-      if (filter.languages_range.length > 0) {
-        this.whereIn(
-          'freelancer_languages.language_id',
-          filter.languages_range
-        );
-      }
-    })
-    .where(function () {
-      if (filter.verified) {
-        this.where('verified', true);
-      }
-    })
-    .where('username', 'ilike', '%' + filter.search_input + '%')
-    .where('title', 'ilike', '%' + filter.search_input + '%')
-    .where('bio', 'ilike', '%' + filter.search_input + '%');
+  searchFreelancers(filter)(tx).then((freelancers) => freelancers?.length || 0);
+
+export const getFreelancerBySkills =
+  (skills: Array<number>) => async (tx: Knex.Transaction) =>
+    tx(`freelancer_skills`)
+      .select(`freelancer_id as id`)
+      .whereIn('skill_id', skills);
+
+export const getFreelancerFilterItems =
+  (item: string) => async (tx: Knex.Transaction) =>
+    tx(`freelancer_${item}s`)
+      .distinct(`${item}_id as id`)
+      .join(`${item}s`, `freelancer_${item}s.${item}_id`, '=', `${item}s.id`)
+      .select(`${item}s.name`)
+      .orderBy('name');
+
+export const getBriefFilterItems =
+  (item: string) => async (tx: Knex.Transaction) =>
+    tx(`brief_${item}s`)
+      .distinct(`${item}_id as id`)
+      .join(`${item}s`, `brief_${item}s.${item}_id`, '=', `${item}s.id`)
+      .select(`${item}s.name`)
+      .orderBy('name');
 
 export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
   const {
@@ -1376,6 +1630,7 @@ export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
     total_cost_without_fee,
     imbue_fee,
     duration_id,
+    status_id: ProjectStatus.Accepted,
     // project_type: project_type ?? models.ProjectType.Brief
   })(tx);
 

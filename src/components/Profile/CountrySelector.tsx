@@ -6,32 +6,34 @@ import { CountryDropdown, RegionDropdown } from 'react-country-region-selector';
 
 type CountrySelectorProps = {
   user: any;
-  setUser: (value: any) => void;
-  isEditMode: boolean;
+  setUser?: (value: any) => void;
+  isEditMode?: boolean;
 };
 
 const CountrySelector = ({
   setUser,
   user,
-  isEditMode,
+  isEditMode = false,
 }: CountrySelectorProps) => {
-  const [country, setCountry] = useState<string>(user?.country || '');
-  const [region, setRegion] = useState(user?.region || '');
+  const [country, setCountry] = useState<string>(user?.country || "");
+  const [region, setRegion] = useState(user?.region || "");
 
   const handleCountry = (countryName: string) => {
     setCountry(countryName);
-    setUser({ ...user, country: countryName });
+    setUser?.({ ...user, country: countryName });
   };
 
   const handleRegion = (regionName: string) => {
     setRegion(regionName);
-    setUser({ ...user, region: regionName });
+    setUser?.({ ...user, region: regionName });
   };
 
   const findFlag = () => {
-    if (country === 'United States') return getCode('United States of America');
-    if (country === 'United Kingdom') return 'UK';
-    else return getCode(country);
+    if (!user.country) return
+    if (user?.country === 'United States') return getCode('United States of America');
+    if (user?.country === 'United Kingdom') return 'UK';
+    if (user?.country === 'Turkey') return 'TR';
+    else return getCode(user?.country);
   };
 
   return (
@@ -55,11 +57,11 @@ const CountrySelector = ({
         </div>
       ) : (
         <div className='flex gap-3'>
-          {country && (
+          {user?.country && (
             <>
-              <ReactCountryFlag countryCode={findFlag() || ''} />
+              <ReactCountryFlag countryCode={findFlag() || 'TR'} />
               <p className='text-base leading-[1.2] text-imbue-purple-dark'>
-                {region}, {country}
+                {user?.region && `${user?.region}, `} {user?.country}
               </p>
             </>
           )}

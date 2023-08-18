@@ -6,7 +6,7 @@ import passport from 'passport';
 
 import {
   fetchBriefApplications,
-  fetchProject,
+  fetchProjectById,
   fetchProjectMilestones,
   fetchUserBriefs,
 } from '@/lib/models';
@@ -43,7 +43,7 @@ export default nextConnect()
               briefsWithProjects.map(async (brief) => {
                 return {
                   ...brief,
-                  project: await fetchProject(brief.project_id)(tx),
+                  project: await fetchProjectById(brief.project_id)(tx),
                   milestones: await fetchProjectMilestones(brief.project_id)(
                     tx
                   ),

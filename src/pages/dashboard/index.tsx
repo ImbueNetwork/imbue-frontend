@@ -21,7 +21,6 @@ import Login from '@/components/Login';
 
 import { Freelancer, Project, User } from '@/model';
 import { Brief } from '@/model';
-import { getUserBriefs } from '@/redux/services/briefService';
 import { getFreelancerApplications } from '@/redux/services/freelancerService';
 import { RootState } from '@/redux/store/store';
 
@@ -40,15 +39,10 @@ const Dashboard = (): JSX.Element => {
     loading: loadingUser,
     error: userError,
   } = useSelector((state: RootState) => state.userState);
-  const filters = { members: { $in: [user?.username] } };
   const [selectedOption, setSelectedOption] = useState<number>(1);
   const [unreadMessages, setUnreadMsg] = useState<number>(0);
-  // FIXME: setBriefs
-  const [briefs, _setBriefs] = useState<any>();
-  // const [briefId, setBriefId] = useState<number | undefined>();
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
-  // FIXME: setMyApplications
   const [myApplications, _setMyApplications] = useState<Project[]>();
   const [loadingStreamChat, setLoadingStreamChat] = useState<boolean>(true);
 
@@ -78,12 +72,10 @@ const Dashboard = (): JSX.Element => {
     const setupStreamChat = async () => {
       try {
         if (!user?.username && !loadingUser) return router.push('/');
-
         setClient(await getStreamChat());
-        _setBriefs(await getUserBriefs(user?.id));
         _setMyApplications(await getFreelancerApplications(user?.id));
       } catch (error) {
-        setError(error);
+        setError({ message: error });
       } finally {
         setLoadingStreamChat(false);
       }
@@ -92,12 +84,14 @@ const Dashboard = (): JSX.Element => {
     setupStreamChat();
   }, [user]);
 
+
   useEffect(() => {
     if (client && user?.username && !loadingStreamChat) {
-      client?.connectUser(
+       client?.connectUser(
         {
-          id: user.username,
-          name: user.username,
+          id: String(user.id),
+          username: user.username,
+          name: user.display_name,
         },
         user.getstream_token
       );
@@ -124,9 +118,8 @@ const Dashboard = (): JSX.Element => {
         >
           <BottomNavigationAction label='Client View' value={1} />
           <BottomNavigationAction
-            label={`Messages ${
-              unreadMessages > 0 ? `(${unreadMessages})` : ''
-            }`}
+            label={`Messages ${unreadMessages > 0 ? `(${unreadMessages})` : ''
+              }`}
             value={2}
           />
           <BottomNavigationAction label='Freelancer View' value={3} />
@@ -136,7 +129,7 @@ const Dashboard = (): JSX.Element => {
       {selectedOption === 1 && (
         <MyClientBriefsView
           {...{
-            briefs,
+            user,
             briefId,
             handleMessageBoxClick,
             redirectToBriefApplications,
@@ -144,10 +137,13 @@ const Dashboard = (): JSX.Element => {
         />
       )}
       {selectedOption === 2 && (
-        <DashboardChatBox client={client} filters={filters} />
+        <DashboardChatBox client={client} />
       )}
       {selectedOption === 3 && (
-        <MyFreelancerApplications myApplications={myApplications} />
+        <MyFreelancerApplications
+          user_id={user.id}
+          myApplications={myApplications}
+        />
       )}
 
       {user && showMessageBox && (
@@ -156,6 +152,7 @@ const Dashboard = (): JSX.Element => {
           setShowMessageBox={setShowMessageBox}
           targetUser={targetUser}
           browsingUser={user}
+          showFreelancerProfile={true}
         />
       )}
 

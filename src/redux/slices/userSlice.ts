@@ -4,7 +4,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { User } from '@/model';
 
-import { fetchUser, logout } from '../reducers/userReducers';
+import { fetchUserRedux, logout } from '../reducers/userReducers';
 
 export const initialState: { user: User; loading: boolean; error: any } = {
   user: {
@@ -13,7 +13,7 @@ export const initialState: { user: User; loading: boolean; error: any } = {
     username: '',
     getstream_token: '',
   },
-  loading: false,
+  loading: true,
   error: {},
 };
 
@@ -27,7 +27,7 @@ export const userState = createSlice({
       return state;
     });
 
-    builder.addCase(fetchUser.fulfilled, (state, action) => {
+    builder.addCase(fetchUserRedux.fulfilled, (state, action) => {
       if (action?.payload?.status === 'failed') {
         state.error = action?.payload?.error;
       }
@@ -35,7 +35,7 @@ export const userState = createSlice({
       state.loading = false;
     });
 
-    builder.addCase(fetchUser.pending, (state) => {
+    builder.addCase(fetchUserRedux.pending, (state) => {
       state.loading = true;
     });
   },

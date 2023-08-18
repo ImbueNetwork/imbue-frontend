@@ -1,46 +1,104 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { Autocomplete, TextField, Tooltip } from '@mui/material';
+import Filter from 'bad-words';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { ChangeEvent, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import * as utils from '@/utils';
+import { isUrlExist, validateInputLength } from '@/utils/helper';
 
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
+import ValidatableInput from '@/components/ValidatableInput';
 
 import {
   freelancedBefore,
   freelancingGoal,
   // importInformation,
   stepData,
-  suggestedFreelancingSkills,
-  suggestedLanguages,
   suggestedServices,
 } from '@/config/freelancer-data';
+import { fetchUserRedux } from '@/redux/reducers/userReducers';
+import {
+  searchLanguageByName,
+  searchSkills,
+} from '@/redux/services/briefService';
 import { createFreelancingProfile } from '@/redux/services/freelancerService';
-import { RootState } from '@/redux/store/store';
+import { AppDispatch, RootState } from '@/redux/store/store';
 
 import { TagsInput } from '../../components/TagsInput';
 import styles from '../../styles/modules/Freelancers/new-Freelancer.module.css';
 
 const Freelancer = (): JSX.Element => {
   const router = useRouter();
+  const filter = new Filter({ placeHolder: ' ' });
   const [step, setStep] = useState(0);
   const { user, loading: userLoading } = useSelector(
     (state: RootState) => state.userState
   );
   const displayName = user?.display_name;
-  const [freelancingBefore, setFreelancingBefore] = useState('');
-  const [goal, setGoal] = useState('');
-  // const [resume, setResume] = useState('');
-  const [title, setTitle] = useState('');
+  const [freelancingBefore, setFreelancingBefore] = useState<string>();
+  const [goal, setGoal] = useState<any>();
+  // const [resume, setResume] = useState<any>();
+  const [title, setTitle] = useState<string>('');
   const [education, setEducation] = useState<string>('');
   const [languages, setLanguages] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
-  const [bio, setBio] = useState('');
+  const [bio, setBio] = useState<any>();
   const [services, setServices] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
   const [error, setError] = useState<any>();
+  const [suggestedFreelancingSkills, setSuggestedSkills] = useState<string[]>(
+    []
+  );
+  const [suggestedLanguages, setSuggestedLanguages] = useState<string[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    if (!userLoading && (!user || !user?.id)) {
+      router.push('/');
+    } else if (!userLoading) setLoading(false);
+  }, [userLoading, user]);
+
+  useEffect(() => {
+    fetchSuggestedSkills();
+    fetchSuggestedLanguage();
+  }, []);
+
+  const fetchSuggestedSkills = async () => {
+    const skillsRes = await searchSkills('');
+    if (skillsRes) {
+      setSuggestedSkills(skillsRes?.skills.map((skill) => skill.name));
+    }
+  };
+
+  const fetchSuggestedLanguage = async () => {
+    const languageRes = await searchLanguageByName('e');
+    if (languageRes) {
+      setSuggestedLanguages(
+        languageRes?.languages.map((language) => language.name)
+      );
+    }
+  };
+
+  const searchLanguage = async (name: string) => {
+    const languageRes = await searchLanguageByName(
+      name.length > 0 ? name : 'e'
+    );
+    if (languageRes) {
+      setSuggestedLanguages(
+        languageRes?.languages.map((language) => language.name)
+      );
+    }
+  };
+
+  const searchSkill = async (name: string) => {
+    const skillRes = await searchSkills(name);
+    if (!skillRes || !skillRes?.skills.length) return;
+    setSuggestedSkills(skillRes?.skills.map((skill) => skill.name));
+  };
 
   const HelloPanel = (
     <div className={styles.helloPanel}>
@@ -136,13 +194,14 @@ const Freelancer = (): JSX.Element => {
         ))}
       </div>
       <div className={styles.namePanelInputWrapper}>
-        <input
-          className={`${styles.fieldInput} placeholder:text-imbue-light-purple`}
-          placeholder='Enter your title'
-          data-testid='title'
+        <ValidatableInput
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setTitle(e.target.value)
+          }
           name='title'
+          data-testid='title'
+          placeholder='Enter your title'
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
         />
       </div>
     </div>
@@ -166,13 +225,18 @@ const Freelancer = (): JSX.Element => {
         ))}
       </div>
       <div className={styles.namePanelInputWrapper}>
-        <input
+        <ValidatableInput
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setEducation(e.target.value)
+          }
+          maxLength={100}
           className={`${styles.fieldInput} placeholder:text-imbue-light-purple`}
           placeholder='Enter your education'
           name='education'
           data-testid='education'
           value={education}
-          onChange={(e) => setEducation(e.target.value)}
+          minLength={10}
+          type='text'
         />
       </div>
     </div>
@@ -186,11 +250,23 @@ const Freelancer = (): JSX.Element => {
         ))}
       </div>
       <div className='mt-6 pb-20'>
-        <TagsInput
-          suggestData={suggestedLanguages}
-          data-testid='languages'
-          tags={languages}
-          onChange={(tags: string[]) => setLanguages(tags)}
+        <Autocomplete
+          id='tags-standard'
+          multiple
+          getOptionLabel={(option) => option}
+          options={suggestedLanguages}
+          sx={{ width: '100%' }}
+          onChange={(e, value) => setLanguages(value)}
+          defaultValue={languages}
+          ListboxProps={{ className: 'max-h-[280px]' }}
+          renderInput={(params) => (
+            <TextField
+              autoComplete='off'
+              color='secondary'
+              onChange={(e) => searchLanguage(e.target.value)}
+              {...params}
+            />
+          )}
         />
       </div>
     </div>
@@ -205,11 +281,29 @@ const Freelancer = (): JSX.Element => {
       </div>
       <h3 className='text-lg text-black mt-5'>Your Skills</h3>
       <div className='mt-5 mb-20'>
-        <TagsInput
-          suggestData={suggestedFreelancingSkills}
-          tags={skills}
-          onChange={(tags: string[]) => setSkills(tags)}
+        <Autocomplete
+          id='tags-standard'
+          multiple
+          getOptionLabel={(option) => option}
+          options={suggestedFreelancingSkills}
+          sx={{ width: '100%' }}
+          onChange={(e, value) => setSkills(value)}
+          defaultValue={skills}
+          ListboxProps={{ className: 'max-h-[260px]' }}
+          renderInput={(params) => (
+            <TextField
+              autoComplete='off'
+              color='secondary'
+              onChange={(e) => searchSkill(e.target.value)}
+              {...params}
+            />
+          )}
         />
+        {!skills.length && (
+          <p className='mt-2 text-imbue-coral text-sm capitalize-first'>
+            Please add at least 1 skill
+          </p>
+        )}
       </div>
     </div>
   );
@@ -223,15 +317,18 @@ const Freelancer = (): JSX.Element => {
       </div>
 
       <div className={styles.namePanelInputWrapper}>
-        <textarea
+        <ValidatableInput
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setBio(e.target.value)
+          }
           className={`${styles.fieldInput} ${styles.large}`}
           placeholder='Enter your bio'
           data-testid='bio'
           name='bio'
           maxLength={5000}
+          minLength={50}
           rows={6}
           value={bio}
-          onChange={(e) => setBio(e.target.value)}
         />
       </div>
     </div>
@@ -250,6 +347,11 @@ const Freelancer = (): JSX.Element => {
           tags={services}
           onChange={(tags: string[]) => setServices(tags)}
         />
+        {!services.length && (
+          <p className='mt-4 text-imbue-coral text-sm capitalize-first'>
+            Please add at least 1 service
+          </p>
+        )}
       </div>
     </div>
   );
@@ -277,32 +379,48 @@ const Freelancer = (): JSX.Element => {
     ConfirmPanel,
   ];
 
+  useEffect(() => {
+    setDisableSubmit(!validate());
+  }, [
+    freelancingBefore,
+    goal,
+    title,
+    education,
+    skills?.length,
+    bio,
+    services?.length,
+    step,
+  ]);
+
   const validate = (): boolean => {
     // TODO: show notification
     if (step === 1 && !freelancingBefore) {
       return false;
-    }
-    if (step === 2 && !goal) {
+    } else if (step === 2 && !goal) {
       return false;
-    }
-    if (step === 3 && !title) {
+    } else if (
+      step === 3 &&
+      (!title || isUrlExist(title) || !validateInputLength(title, 10, 50))
+    ) {
       // TODO: minimum required length for description
       return false;
-    }
-    if (step === 4 && !education) {
+    } else if (
+      step === 4 &&
+      (!education ||
+        isUrlExist(education) ||
+        !validateInputLength(education, 10, 100))
+    ) {
       return false;
     }
     // Freelancers might only speak 1 language
     // if (step === 5 && !languages.length) {
     //   return false;
     // }
-    if (step === 6 && !skills.length) {
+    else if (step === 6 && !skills.length) {
       return false;
-    }
-    if (step === 7 && !bio) {
+    } else if (step === 7 && (!bio || !validateInputLength(bio, 50, 5000))) {
       return false;
-    }
-    if (step === 8 && !services.length) {
+    } else if (step === 8 && !services.length) {
       return false;
     }
     return true;
@@ -311,18 +429,25 @@ const Freelancer = (): JSX.Element => {
   async function createProfile() {
     try {
       setLoading(true);
-      const response: any = await createFreelancingProfile({
+
+      const freelancerData = {
         id: 0,
-        bio,
-        education: education,
+        bio: filter.clean(bio).trim(),
+        education: filter.clean(education).trim(),
         experience: freelancingBefore,
         freelanced_before: freelancingBefore,
         freelancing_goal: goal,
         work_type: '',
-        skills,
-        title,
-        languages,
-        services,
+        skills: skills.map((item) =>
+          item.trim().length ? filter.clean(item).trim() : ''
+        ),
+        title: filter.clean(title).trim(),
+        languages: languages.map((item) =>
+          item.trim().length ? filter.clean(item).trim() : ''
+        ),
+        services: services.map((item) =>
+          item.trim().length ? filter.clean(item).trim() : ''
+        ),
         user_id: user?.id,
         username: user?.display_name,
         display_name: user?.display_name,
@@ -334,9 +459,12 @@ const Freelancer = (): JSX.Element => {
         client_images: [],
         num_ratings: 0,
         profileImageUrl: require('@/assets/images/profile-image.png'),
-      });
+      };
+
+      const response: any = await createFreelancingProfile(freelancerData);
 
       if (response.status === 201) {
+        dispatch(fetchUserRedux());
         setStep(step + 1);
       } else {
         setError({
@@ -344,7 +472,7 @@ const Freelancer = (): JSX.Element => {
         });
       }
     } catch (error) {
-      setError(error);
+      setError({ message: error });
     } finally {
       setLoading(false);
     }
@@ -388,23 +516,43 @@ const Freelancer = (): JSX.Element => {
                 Discover Briefs
               </button>
             ) : step === stepData.length - 2 ? (
-              <button
-                className='primary-btn in-dark w-button'
-                data-testid='submit-button'
-                disabled={!validate()}
-                onClick={() => createProfile()}
+              <Tooltip
+                followCursor
+                leaveTouchDelay={10}
+                title={
+                  disableSubmit && 'Please fill all the required input fields'
+                }
               >
-                Submit
-              </button>
+                <button
+                  className={`primary-btn in-dark w-button !mt-0 ${
+                    disableSubmit &&
+                    '!bg-gray-400 !text-white !cursor-not-allowed'
+                  }`}
+                  data-testid='submit-button'
+                  onClick={() => !disableSubmit && createProfile()}
+                >
+                  Submit
+                </button>
+              </Tooltip>
             ) : (
-              <button
-                className='primary-btn in-dark w-button !mt-0'
-                data-testid='next-button'
-                disabled={!validate()}
-                onClick={() => setStep(step + 1)}
+              <Tooltip
+                followCursor
+                leaveTouchDelay={10}
+                title={
+                  disableSubmit && 'Please fill all the required input fields'
+                }
               >
-                Next
-              </button>
+                <button
+                  className={`primary-btn in-dark w-button !mt-0 ${
+                    disableSubmit &&
+                    '!bg-gray-400 !text-white !cursor-not-allowed'
+                  }`}
+                  data-testid='next-button'
+                  onClick={() => !disableSubmit && setStep(step + 1)}
+                >
+                  Next
+                </button>
+              </Tooltip>
             )}
           </div>
         </div>

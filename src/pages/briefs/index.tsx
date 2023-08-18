@@ -1,17 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
+import { TextField } from '@mui/material';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import Pagination from 'rc-pagination';
 import React, { useEffect, useState } from 'react';
+import { IoTrashBin } from 'react-icons/io5';
 import { useSelector } from 'react-redux';
 
-import CustomDropDown from '@/components/CustomDropDown';
-import CustomModal from '@/components/CustomModal';
+import { strToIntRange } from '@/utils/helper';
+
 import ErrorScreen from '@/components/ErrorScreen';
-import FullScreenLoader from '@/components/FullScreenLoader';
+import FilterModal from '@/components/Filter/FilterModal';
+import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 
 import {
   chevLeftIcon,
@@ -20,11 +22,13 @@ import {
   savedIcon,
   searchSvg,
 } from '@/assets/svgs';
-import { Brief, BriefSqlFilter } from '@/model';
+import { Brief, BriefSqlFilter, Item } from '@/model';
 import {
   callSearchBriefs,
+  deleteSavedBrief,
   getAllBriefs,
   getAllSavedBriefs,
+  getAllSkills,
 } from '@/redux/services/briefService';
 import { RootState } from '@/redux/store/store';
 
@@ -34,35 +38,39 @@ TimeAgo.addLocale(en);
 
 const timeAgo = new TimeAgo('en-US');
 
-interface FilterModalProps {
-  open: boolean;
-  handleClose: () => void;
-}
+// interface FilterModalProps {
+//   open: boolean;
+//   handleClose: () => void;
+// }
 
-export const strToIntRange = (strList: any) => {
-  return Array.isArray(strList)
-    ? strList?.[0]?.split?.(',')?.map?.((v: any) => Number(v))
-    : strList?.split?.(',')?.map((v: any) => Number(v));
-};
 
 const Briefs = (): JSX.Element => {
   const [briefs, setBriefs] = useState<Brief[]>([]);
   const [briefs_total, setBriefsTotal] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   // FIXME: setLoading
-  const [loading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const router = useRouter();
-  const itemsPerPage = 6;
+  const [itemsPerPage, setItemsPerPage] = useState<number>(6);
 
   const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
   // FIXME: openDropdown
-  const [_openDropDown, setOpenDropDown] = useState<string>('');
+  // const [_openDropDown, setOpenDropDown] = useState<string>('');
+  const [savedBriefsActive, setSavedBriefsActive] = useState<boolean>(false);
+
+  // search input value
+  const [searchInput, setSearchInput] = useState<string>('');
+  const [pageInput, setPageInput] = useState<number>(1);
+
+  const [skills, setSkills] = useState<Item[]>([{ name: "", id: 0 }]);
 
   const [error, setError] = useState<any>();
-  const { expRange, submitRange, lengthRange, heading } = router.query;
+  const { expRange, submitRange, lengthRange, heading, size: sizeProps, skillsProps } = router.query;
 
   const { pathname } = router;
+
+  const pageItems = [6, 12, 18, 24, 30];
 
   const { user: currentUser } = useSelector(
     (state: RootState) => state.userState
@@ -180,48 +188,63 @@ const Briefs = (): JSX.Element => {
     ],
   };
 
-  const hoursPwFilter = {
-    filterType: BriefFilterOption.HoursPerWeek,
-    label: 'Hours Per Week',
-    options: [
-      {
-        interiorIndex: 0,
-        // This will be 0-30 as we actually use this as max value
-        search_for: [30],
-        or_max: false,
-        value: '30hrs/week',
-      },
-      {
-        interiorIndex: 1,
-        // Same goes for this
-        search_for: [50],
-        value: '50hrs/week',
-        or_max: true,
-      },
-    ],
+  // const hoursPwFilter = {
+  //   filterType: BriefFilterOption.HoursPerWeek,
+  //   label: 'Hours Per Week',
+  //   options: [
+  //     {
+  //       interiorIndex: 0,
+  //       // This will be 0-30 as we actually use this as max value
+  //       search_for: [30],
+  //       or_max: false,
+  //       value: '30hrs/week',
+  //     },
+  //     {
+  //       interiorIndex: 1,
+  //       // Same goes for this
+  //       search_for: [50],
+  //       value: '50hrs/week',
+  //       or_max: true,
+  //     },
+  //   ],
+  // };
+
+  const skillsFilter = {
+    filterType: BriefFilterOption.Skills,
+    label: 'Skills required',
+    options: skills?.map((s) => ({
+      interiorIndex: s.id,
+      search_for: [s.id],
+      value: s.name,
+    }))
   };
 
   const customDropdownConfigs = [
     {
-      name: 'Project Length',
+      label: 'Project Length',
       filterType: BriefFilterOption.Length,
-      filterOptions: lengthFilters.options,
+      options: lengthFilters.options,
     },
     {
-      name: 'Proposal Submitted',
+      label: 'Proposal Submitted',
       filterType: BriefFilterOption.AmountSubmitted,
-      filterOptions: submittedFilters.options,
+      options: submittedFilters.options,
     },
     {
-      name: 'Experience Level',
+      label: 'Experience Level',
       filterType: BriefFilterOption.ExpLevel,
-      filterOptions: expfilter.options,
+      options: expfilter.options,
     },
     {
-      name: 'Hours Per Week',
-      filterType: BriefFilterOption.HoursPerWeek,
-      filterOptions: hoursPwFilter.options,
+      label: 'Skills Required',
+      filterType: BriefFilterOption.Skills,
+      options: skillsFilter.options,
     },
+    // {
+    //   name: 'Hours Per Week',
+    //   filterType: BriefFilterOption.HoursPerWeek,
+    //   filterOptions: hoursPwFilter.options,
+    // },
   ];
 
   const handleSetId = (id: string | string[]) => {
@@ -234,60 +257,119 @@ const Briefs = (): JSX.Element => {
 
   useEffect(() => {
     const fetchAndSetBriefs = async () => {
-      if (!Object.keys(router?.query).length) {
-        const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
-        setBriefs(briefs_all?.currentData);
-        setBriefsTotal(briefs_all?.totalBriefs);
-      } else {
-        let filter: BriefSqlFilter = {
-          experience_range: [],
-          submitted_range: [],
-          submitted_is_max: false,
-          length_range: [],
-          length_is_max: false,
-          search_input: '',
-          items_per_page: itemsPerPage,
-          page: currentPage,
-        };
+      setLoading(true)
+      try {
+        if (!Object.keys(router?.query).length) {
+          const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
+          if (briefs_all.status === 200) {
+            setBriefs(briefs_all?.currentData);
+            setBriefsTotal(briefs_all?.totalBriefs);
+          }
+          else {
+            setError({ message: "Something went wrong. Please try again" })
+          }
 
-        if (expRange) {
-          const range = strToIntRange(expRange);
-          range?.forEach?.((v: any) => {
-            selectedFilterIds.push(`0-${v - 1}`);
-          });
+        } else {
 
-          filter = { ...filter, experience_range: strToIntRange(expRange) };
+          let filter: BriefSqlFilter = {
+            experience_range: [],
+            submitted_range: [],
+            submitted_is_max: false,
+            length_range: [],
+            skills_range: [],
+            length_is_max: false,
+            search_input: '',
+            items_per_page: itemsPerPage,
+            page: currentPage,
+          };
+
+          if (router.query.page) {
+            const pageQuery = Number(router.query.page)
+            filter.page = pageQuery;
+            setCurrentPage(pageQuery)
+            setPageInput(pageQuery)
+          }
+
+          if (sizeProps) {
+            filter.items_per_page = Number(sizeProps)
+            setItemsPerPage(Number(sizeProps))
+          }
+
+          if (expRange) {
+            const range = strToIntRange(expRange);
+            range?.forEach?.((v: any) => {
+              if (!selectedFilterIds.includes(`0-${v - 1}`))
+                selectedFilterIds.push(`0-${v - 1}`);
+            });
+
+            filter = { ...filter, experience_range: strToIntRange(expRange) };
+          }
+
+          if (skillsProps) {
+            const range = strToIntRange(skillsProps);
+            range?.forEach?.((v: any) => {
+              if (!selectedFilterIds.includes(`3-${v}`))
+                selectedFilterIds.push(`3-${v}`);
+            });
+
+            filter = { ...filter, skills_range: range };
+          }
+
+          if (submitRange) {
+            const range = strToIntRange(submitRange);
+            range?.forEach?.((v: any) => {
+              if (v > 0 && v < 5) selectedFilterIds.push(`1-${0}`);
+
+              if (v >= 5 && v < 10) selectedFilterIds.push(`1-${1}`);
+
+              if (v >= 10 && v < 15) selectedFilterIds.push(`1-${2}`);
+
+              if (v > 15) selectedFilterIds.push(`1-${3}`);
+            });
+            filter = { ...filter, submitted_range: strToIntRange(submitRange) };
+          }
+          if (heading) {
+            filter = { ...filter, search_input: heading };
+            // const input = document.getElementById(
+            //   'search-input'
+            // ) as HTMLInputElement;
+            // if (input) input.value = heading.toString();
+            setSearchInput(heading.toString())
+          }
+          if (lengthRange) {
+            const range = strToIntRange(lengthRange);
+            range?.forEach?.((v: any) => {
+              if (!selectedFilterIds.includes(`2-${v - 1}`))
+                selectedFilterIds.push(`2-${v - 1}`);
+            });
+            filter = { ...filter, length_range: strToIntRange(lengthRange) };
+          }
+
+
+          const result: any = await callSearchBriefs(filter);
+
+          if (result.status === 200) {
+            const totalPages = Math.ceil(result?.totalBriefs / (filter?.items_per_page || 6))
+
+            if (totalPages < filter.page && totalPages > 0) {
+              router.query.page = totalPages.toString()
+              router.push(router, undefined, { shallow: true })
+              filter.page = totalPages
+            }
+
+            setBriefs(result?.currentData);
+            setBriefsTotal(result?.totalBriefs);
+          }
+
+          else {
+            setError({ message: "Something went wrong. Please try again" })
+          }
         }
-        if (submitRange) {
-          const range = strToIntRange(submitRange);
-          range?.forEach?.((v: any) => {
-            if (v > 0 && v < 5) selectedFilterIds.push(`1-${0}`);
-
-            if (v >= 5 && v < 10) selectedFilterIds.push(`1-${1}`);
-
-            if (v >= 10 && v < 15) selectedFilterIds.push(`1-${2}`);
-
-            if (v > 15) selectedFilterIds.push(`1-${3}`);
-          });
-          filter = { ...filter, submitted_range: strToIntRange(submitRange) };
-        }
-        if (heading) {
-          filter = { ...filter, search_input: heading };
-          const input = document.getElementById(
-            'search-input'
-          ) as HTMLInputElement;
-          if (input) input.value = heading.toString();
-        }
-        if (lengthRange) {
-          const range = strToIntRange(lengthRange);
-          range?.forEach?.((v: any) => {
-            selectedFilterIds.push(`2-${v - 1}`);
-          });
-          filter = { ...filter, length_range: strToIntRange(lengthRange) };
-        }
-        const result: any = await callSearchBriefs(filter);
-        setBriefs(result?.currentData);
-        setBriefsTotal(result?.totalBriefs);
+      } catch (error) {
+        setError({ message: "Something went wrong. Please try again" })
+      }
+      finally {
+        setLoading(false)
       }
     };
 
@@ -305,7 +387,7 @@ const Briefs = (): JSX.Element => {
   // Here we have to get all the checked boxes and try and construct a query out of it...
   const onSearch = async () => {
     // The filter initially should return all values
-
+    setLoading(true);
     let is_search = false;
 
     let exp_range: number[] = [];
@@ -314,6 +396,7 @@ const Briefs = (): JSX.Element => {
     let length_range: number[] = [];
     let length_is_max = false;
     let length_range_prop: number[] = [];
+    let skills_prop: number[] = [];
 
     // default is max
     // const hpw_max = 50;
@@ -368,17 +451,24 @@ const Briefs = (): JSX.Element => {
               }
               break;
 
+            case BriefFilterOption.Skills:
+              {
+                skills_prop = [...skills_prop, parseInt(interiorIndex)];
+              }
+              break;
+
             default:
               // eslint-disable-next-line no-console
               console.log(
                 'Invalid filter option selected or unimplemented. type:' +
-                  filterType
+                filterType
               );
           }
         }
       }
     }
 
+    router.query.page = '1';
     router.query.heading = search_value !== '' ? search_value : [];
     router.query.expRange = exp_range.length ? exp_range.toString() : [];
     router.query.submitRange = submitted_range.length
@@ -390,6 +480,9 @@ const Briefs = (): JSX.Element => {
     router.query.lengthRange = length_range_prop.length
       ? length_range_prop.toString()
       : [];
+    router.query.skillsProps = skills_prop.length
+      ? skills_prop.toString()
+      : [];
     router.push(router, undefined, { shallow: true });
 
     try {
@@ -400,9 +493,10 @@ const Briefs = (): JSX.Element => {
           submitted_is_max,
           length_range,
           length_is_max,
+          skills_range: skills_prop,
           search_input: search_value,
           items_per_page: itemsPerPage,
-          page: currentPage,
+          page: 1,
         };
 
         if (search_value.length === 0) {
@@ -420,11 +514,24 @@ const Briefs = (): JSX.Element => {
         setBriefsTotal(briefs_all?.totalBriefs);
       }
     } catch (error) {
-      setError(error);
+      setError({ message: error });
+    }
+    finally {
+      setLoading(false)
     }
   };
 
+  useEffect(() => {
+    const getAllFilters = async () => {
+      const filteredItems = await getAllSkills()
+      setSkills(filteredItems?.skills);
+    }
+
+    getAllFilters()
+  }, [])
+
   const onSavedBriefs = async () => {
+    setSavedBriefsActive(true);
     const briefs_all: any = await getAllSavedBriefs(
       itemsPerPage,
       currentPage,
@@ -449,14 +556,23 @@ const Briefs = (): JSX.Element => {
   // };
 
   const reset = async () => {
+    setSavedBriefsActive(false);
     await router.push({
       pathname,
       query: {},
     });
     const allBriefs: any = await getAllBriefs(itemsPerPage, currentPage);
-    await setSlectedFilterIds([]);
+    setSlectedFilterIds([]);
     setBriefs(allBriefs?.currentData);
-    setBriefsTotal(allBriefs?.totalFreelancers);
+    setBriefsTotal(allBriefs?.totalBriefs);
+    setSearchInput('');
+  };
+
+  const deleteBrief = async (briefId: string | number) => {
+    const allBriefs: any = await deleteSavedBrief(briefId, currentUser?.id);
+    setSlectedFilterIds([]);
+    setBriefs(allBriefs?.currentData);
+    setBriefsTotal(allBriefs?.totalBriefs);
   };
 
   const cancelFilters = async () => {
@@ -464,67 +580,48 @@ const Briefs = (): JSX.Element => {
     setFilterVisible(false);
   };
 
-  const FilterModal = ({ open, handleClose }: FilterModalProps) => {
-    return (
-      <CustomModal
-        open={open}
-        onClose={handleClose}
-        className='flex justify-center items-center flex-wrap bg-black bg-opacity-50 top-0 left-0 w-full h-full z-[100] fixed'
-      >
-        <div
-          onClick={(e: any) => {
-            e?.stopPropagation();
-          }}
-          className='bg-white rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] lg:w-[60%] w-[95vw] self-center relative'
-        >
-          <p className='font-normal text-base text-black mb-9'>Filter by:</p>
+  const nextPage = () => {
+    if (briefs_total > currentPage * itemsPerPage) {
+      setCurrentPage(currentPage + 1);
+      setPageInput(currentPage + 1);
+      router.query.page = (currentPage + 1).toString()
+      router.push(router, undefined, { shallow: true });
+    }
+  }
 
-          <div className='grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5'>
-            {customDropdownConfigs
-              ?.filter(
-                (item) => item?.filterOptions && item?.filterOptions?.length > 0
-              )
-              ?.map?.(({ name, filterType, filterOptions }) => (
-                <CustomDropDown
-                  key={name}
-                  name={name}
-                  filterType={filterType}
-                  filterOptions={filterOptions}
-                  setId={handleSetId}
-                  ids={selectedFilterIds}
-                  setOpenDropDown={setOpenDropDown}
-                />
-              ))}
-          </div>
+  const previousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      setPageInput(currentPage - 1);
+      router.query.page = (currentPage - 1).toString()
+      router.push(router, undefined, { shallow: true });
+    }
+  }
 
-          <div className='h-[39px] text-center gap-5 flex items-center absolute md:bottom-10 bottom-5 right-10'>
-            <button
-              onClick={cancelFilters}
-              data-testid='cancel'
-              className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-coral flex items-center cursor-pointer hover:scale-105 hover:bg-primary hover:text-content'
-            >
-              Cancel
-            </button>
+  const setPageNumber = (e: any) => {
+    const pageNumber = Number(e.target.value) || 1;
+    const totalPages = Math.ceil(briefs_total / itemsPerPage)
 
-            <button
-              onClick={onSearch}
-              data-testid='Apply'
-              className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 hover:bg-primary hover:text-content'
-            >
-              Apply
-            </button>
-          </div>
-        </div>
-      </CustomModal>
-    );
-  };
+    if ((e.key === 'Enter' || e.key === 'Enter') && (pageNumber <= totalPages) && (pageNumber > 0)) {
+      setCurrentPage(pageNumber);
+      setPageInput(pageNumber);
+      router.query.page = pageNumber.toString()
+      router.push(router, undefined, { shallow: true });
+    }
+  }
 
-  if (loading) return <FullScreenLoader />;
+  const briefsData = savedBriefsActive
+    ? briefs?.filter((brief) =>
+      brief?.headline.toLocaleLowerCase().includes(searchInput)
+    )
+    : briefs;
 
   return (
     <div className='flex flex-col'>
       <div className='search-briefs-container !overflow-hidden max-width-868px:px-5'>
-        <FilterModal open={filterVisble} handleClose={() => toggleFilter()} />
+        <FilterModal open={filterVisble} handleClose={() => toggleFilter()}
+          {...{ cancelFilters, handleSetId, onSearch, customDropdownConfigs, selectedFilterIds }}
+        />
 
         <div className='briefs-section !overflow-hidden'>
           <div className='briefs-heading'>
@@ -532,13 +629,16 @@ const Briefs = (): JSX.Element => {
               <div>
                 <div className='flex items-center'>
                   <input
+                    autoComplete='off'
                     id='search-input'
                     className='search-input px-[12px] !w-full  lg:!w-[20rem] !h-[2.875rem] !rounded-tr-[0px] !rounded-br-[0px]'
                     placeholder='Search'
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
                   />
                   <div
                     role='button'
-                    onClick={onSearch}
+                    onClick={() => !savedBriefsActive && onSearch()}
                     className='h-[2.975rem] w-[3.0625rem] rounded-tr-[8px] rounded-br-[8px] bg-imbue-purple flex justify-center items-center cursor-pointer'
                   >
                     <Image src={searchSvg} alt='Search' role='button' />
@@ -546,18 +646,33 @@ const Briefs = (): JSX.Element => {
                 </div>
 
                 <p className='text-[1rem] text-imbue-purple-dark mt-[0.75rem]'>
-                  {Number(briefs_total) === 0 ? 'No' : briefs_total} brief
-                  {Number(briefs_total) === 1 ? '' : 's'} found
+                  {savedBriefsActive ? briefsData.length : briefs_total} brief
+                  {(
+                    savedBriefsActive
+                      ? briefsData.length === 1
+                      : briefs_total === 1
+                  )
+                    ? ''
+                    : 's'}{' '}
+                  found
                 </p>
               </div>
 
               <div className='flex items-center mt-[2rem] lg:mt-0 gap-4'>
-                {selectedFilterIds?.length > 0 && (
+                {(selectedFilterIds?.length > 0 || searchInput.length > 0) && (
                   <button
                     onClick={reset}
-                    className='h-[43px] lg:mr-4 px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 lg:ml-[44px]'
+                    className='h-[43px] px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 lg:ml-[44px]'
                   >
                     Reset
+                  </button>
+                )}
+                {savedBriefsActive && (
+                  <button
+                    onClick={reset}
+                    className='h-[43px] px-[20px] rounded-[10px] border bg-white border-imbue-purple text-imbue-purple-dark flex items-center cursor-pointer hover:scale-105 lg:ml-[44px]'
+                  >
+                    Back to Briefs
                   </button>
                 )}
 
@@ -565,7 +680,7 @@ const Briefs = (): JSX.Element => {
                   onClick={() => {
                     onSavedBriefs();
                   }}
-                  className='h-[43px] px-[20px] lg:mr-12 rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 lg:ml-[44px]'
+                  className='h-[43px] px-[20px] lg:mr-12 rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105'
                 >
                   Saved Briefs
                   <Image
@@ -575,36 +690,58 @@ const Briefs = (): JSX.Element => {
                   />
                 </button>
 
-                <div
-                  className='flex items-center cursor-pointer'
-                  onClick={toggleFilter}
-                  role='button'
-                >
-                  <p className='mr-[0.25rem] text-imbue-purple-dark text-[1rem]'>
-                    Filter
-                  </p>
-                  <Image src={filterSvg} alt='Filter Icon' />
-                </div>
+                {!savedBriefsActive && (
+                  <div
+                    className='flex items-center cursor-pointer'
+                    onClick={toggleFilter}
+                    role='button'
+                  >
+                    <p className='mr-[0.25rem] text-imbue-purple-dark text-[1rem]'>
+                      Filter
+                    </p>
+                    <Image src={filterSvg} alt='Filter Icon' />
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
-          <div className='briefs-list !overflow-hidden'>
-            {briefs?.map(
-              (item, itemIndex) =>
-                !item?.project_id && (
+          <div className='briefs-list !overflow-hidden z-10'>
+            {briefsData?.map(
+              (item, itemIndex) => (
+                <div key={itemIndex} className='relative z-0'>
+                  {savedBriefsActive && (
+                    <button
+                      className='absolute top-5 z-[1000] right-5 h-[30px] w-[30px] border border-red-500 rounded-full flex justify-center items-center bg-red-500'
+                      onClick={() => {
+                        deleteBrief(item?.id);
+                      }}
+                    >
+                      <IoTrashBin color='#fff' />
+                    </button>
+                  )}
+
                   <div
-                    className='brief-item'
-                    key={itemIndex}
-                    onClick={() => router.push(`/briefs/${item?.id}/`)}
+                    className='brief-item relative z-20'
+                    onClick={() =>
+                      router.push(`/briefs/${item?.id}`)
+                    }
                   >
-                    <div className='brief-title'>{item.headline}</div>
+                    <div className='brief-title'>
+                      {item.headline.length > 50
+                        ? `${item.headline.substring(0, 50)}...`
+                        : item.headline}
+                    </div>
                     <div className='brief-time-info'>
                       {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
                     </div>
-                    <div className='brief-description'>{item.description}</div>
+                    <div className='brief-description lg:w-10/12'>
+                      {item.description.length > 500
+                        ? `${item.description.substring(0, 500)}...`
+                        : item.description}
+                    </div>
 
-                    <div className='brief-tags'>
+                    <div className='brief-tags !flex-wrap'>
                       {item.skills.map((skill: any, skillIndex: any) => (
                         <div className='tag-item' key={skillIndex}>
                           {skill.name}
@@ -627,7 +764,8 @@ const Briefs = (): JSX.Element => {
                       </div>
                     </div>
                   </div>
-                )
+                </div>
+              )
             )}
           </div>
         </div>
@@ -648,36 +786,74 @@ const Briefs = (): JSX.Element => {
             </button>
           </div>
         </ErrorScreen>
+
+        <BackDropLoader open={loading} />
       </div>
-      <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center justify-between  max-width-868px:w-[90%] self-center'>
-        <Pagination
-          pageSize={itemsPerPage}
-          total={briefs_total}
-          onChange={(page: number) => setCurrentPage(page)}
-          className='flex flex-row items-center lg:px-10'
-          itemRender={(page, type, originalElement) => {
-            if (type === 'page') {
-              return (
-                <div className='mx-[1.62rem] text-[#5E5E5E] text-[0.7rem] lg:text-[1rem] font-normal'>
-                  {page} of {(briefs_total / itemsPerPage).toFixed(0)}
-                </div>
-              );
-            }
-            return originalElement;
-          }}
-          prevIcon={
-            <button className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'>
-              <Image src={chevLeftIcon} alt='chev left' />
-              Previous
-            </button>
-          }
-          nextIcon={
-            <button className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'>
-              Next
-              <Image src={chevRightIcon} alt='chev right' />
-            </button>
-          }
-        />
+      <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center justify-between max-width-868px:w-[90%] self-center'>
+        <div className='flex items-center'>
+          <button
+            onClick={() => previousPage()}
+            className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'
+          >
+            <Image src={chevLeftIcon} alt='chev left' />
+            Previous
+          </button>
+
+          <div className='mx-[1.62rem] text-[#5E5E5E] text-[0.7rem] lg:text-[1rem] font-normal flex items-center gap-3'>
+            <TextField
+              id="standard-size-small"
+              className='!mb-0'
+              inputProps={{
+                className: "w-6 text-right px-1",
+                type: "number",
+                min: 1,
+                max: Math.ceil(briefs_total / itemsPerPage)
+              }}
+              onChange={(e) => setPageInput(Number(e.target.value))}
+              onKeyDown={(e) => setPageNumber(e)}
+              value={pageInput}
+              variant="standard" />
+            <span>
+              of
+            </span>
+            <span>
+              {Math.ceil(briefs_total / itemsPerPage)}
+            </span>
+            {/* {currentPage} of {Math.ceil(briefs_total / itemsPerPage)} */}
+          </div>
+
+          <button
+            onClick={() => nextPage()}
+            className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'
+          >
+            Next
+            <Image src={chevRightIcon} alt='chev right' />
+          </button>
+        </div>
+
+        <div className='flex items-center'>
+          <p className=' text-imbue-purple mr-[10px]'>Items per page:</p>
+          <div className='network-amount'>
+            <select
+              name='currencyId'
+              onChange={(e) => {
+                router.query.size = (e.target.value).toString()
+                router.push(router, undefined, { shallow: true });
+                setItemsPerPage(Number(e.target.value));
+              }}
+              value={itemsPerPage}
+              placeholder='Select a currency'
+              className='bg-white outline-none round border border-imbue-purple rounded-[0.5rem] text-base px-5 h-[2.75rem] text-imbue-purple-dark'
+              required
+            >
+              {[...pageItems].map((item: any) => (
+                <option value={item} key={item} className='duration-option'>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
     </div>
   );

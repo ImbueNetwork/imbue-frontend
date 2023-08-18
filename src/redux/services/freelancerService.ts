@@ -6,8 +6,15 @@ import {
   Freelancer,
   FreelancerResponse,
   FreelancerSqlFilter,
+  Item,
   Project,
 } from '@/model';
+
+type Filters = {
+  skills: Item[];
+  services: Item[];
+  languages: Item[];
+};
 
 export async function createFreelancingProfile(freelancer: any) {
   // Check that this user doesnt already have a freelancer profile.
@@ -45,7 +52,7 @@ export const getAllFreelancers = async (
 };
 
 export async function getFreelancerProfile(
-  username: string
+  username: string | number
 ): Promise<Freelancer | undefined> {
   const resp = await fetch(
     checkEnvironment().concat(`${config.apiBase}freelancers/${username}`),
@@ -76,7 +83,7 @@ export async function freelancerExists(username: string): Promise<boolean> {
   }
 }
 
-export async function updateFreelancer(freelancer: Freelancer) {
+export async function updateFreelancer(freelancer: any) {
   const resp = await fetch(
     `${config.apiBase}freelancers/${freelancer.username}`,
     {
@@ -106,11 +113,16 @@ export const callSearchFreelancers = async (
     method: 'post',
     body: JSON.stringify(filter),
   });
+
   if (resp.ok) {
     const data: FreelancerResponse = await resp.json();
     return data;
   } else {
-    throw new Error('Failed to search freelancers. status:' + resp.status);
+    return {
+      currentData: [],
+      totalFreelancers: 0,
+      message: 'Failed to search freelancers. status:' + resp.status,
+    };
   }
 };
 
@@ -122,6 +134,49 @@ export const getFreelancerApplications = async (userId: number) => {
     {
       headers: config.postAPIHeaders,
       method: 'get',
+    }
+  );
+
+  if (resp.ok) {
+    return (await resp.json()) as Array<Project>;
+  } else {
+    throw new Error(
+      'Failed to get all freelancer applications. status:' + resp.status
+    );
+  }
+};
+
+export const getFreelancerFilters = async () => {
+  const resp = await fetch(
+    checkEnvironment().concat(`${config.apiBase}freelancers/filters`),
+    {
+      headers: config.postAPIHeaders,
+      method: 'get',
+    }
+  );
+
+  if (resp.ok) {
+    return (await resp.json()) as Filters;
+  } else {
+    throw new Error(
+      'Failed to get all freelancer applications. status:' + resp.status
+    );
+  }
+};
+
+export const getOnGoingProjects = async (
+  userId: number,
+  skip: number,
+  limit: number
+) => {
+  const resp = await fetch(
+    checkEnvironment().concat(
+      `${config.apiBase}freelancers/${userId}/ongoingprojects`
+    ),
+    {
+      headers: config.postAPIHeaders,
+      method: 'post',
+      body: JSON.stringify({ skip, limit }),
     }
   );
 

@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
+import Filter from 'bad-words';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
+import passport from 'passport';
 
 import {
   fetchAllBriefs,
@@ -14,48 +16,77 @@ import * as models from '@/lib/models';
 import db from '@/db';
 import { Brief } from '@/model';
 
+import { authenticate, verifyUserIdFromJwt } from '../auth/common';
+
+const filter = new Filter();
+
 export default nextConnect()
+  .use(passport.initialize())
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
-    const data = req.query;
+    const { page, items_per_page } = req.query;
     await db.transaction(async (tx: any) => {
       try {
-        await fetchAllBriefs()(tx).then(async (briefs: any) => {
-          const { currentData } = models.paginatedData(
-            Number(data?.page || 1),
-            Number(data?.items_per_page || 5),
-            briefs
-          );
+        // await fetchAllBriefs()(tx).then(async (briefs: any) => {
+        //   const filteredOutProjects = briefs.filter(
+        //     (brief: any) => !brief.project_id
+        //   );
 
-          const filteredOutProjects = currentData.filter(
-            (brief: any) => !brief.project_id
-          );
+        //   // const { currentData } = models.paginatedData(
+        //   //   Number(page || 1),
+        //   //   Number(items_per_page || 5),
+        //   //   filteredOutProjects
+        //   // );
 
-          await Promise.all([
-            filteredOutProjects,
-            ...filteredOutProjects.map(async (brief: any) => {
-              brief.skills = await fetchItems(brief.skill_ids, 'skills')(tx);
-              brief.industries = await fetchItems(
-                brief.industry_ids,
-                'industries'
-              )(tx);
-            }),
-          ]);
+        // });
 
-          res.status(200).json({
-            currentData: filteredOutProjects,
-            totalBriefs: filteredOutProjects.length,
-          });
+        const currentData = await fetchAllBriefs()(tx)
+          .offset((Number(page || 1) - 1) * Number(items_per_page || 6))
+          .limit(Number(items_per_page || 5))
+          .distinct('briefs.id')
+          .whereNull('briefs.project_id');
+
+        await Promise.all([
+          currentData,
+          ...currentData.map(async (brief: any) => {
+            brief.skills = await fetchItems(brief.skill_ids, 'skills')(tx);
+            brief.industries = await fetchItems(
+              brief.industry_ids,
+              'industries'
+            )(tx);
+          }),
+        ]);
+
+        const briefsCount = await models.countAllBriefs()(tx);
+
+        res.status(200).json({
+          currentData: currentData,
+          totalBriefs: briefsCount?.count || 0,
         });
       } catch (e) {
-        new Error(`Failed to fetch all briefs`, { cause: e as Error });
+        res.status(401).json({
+          currentData: [],
+          totalBriefs: 0,
+        });
+        throw new Error(`Failed to fetch all briefs`, { cause: e as Error });
       }
     });
   })
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
     const brief: Brief = req.body as Brief;
     let response;
+
+    const userAuth: Partial<models.User> | any = await authenticate(
+      'jwt',
+      req,
+      res
+    );
+    verifyUserIdFromJwt(req, res, [userAuth.id]);
+
     await db.transaction(async (tx: any) => {
       try {
+        if (filter.isProfane(brief.headline)) {
+          throw new Error('Bad word is not allowed');
+        }
         const skill_ids = await upsertItems(brief.skills, 'skills')(tx);
         const industry_ids = await upsertItems(
           brief.industries,
@@ -90,6 +121,15 @@ export default nextConnect()
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
     const brief: Brief = req.body as Brief;
     let response;
+
+    const userAuth: Partial<models.User> | any = await authenticate(
+      'jwt',
+      req,
+      res
+    );
+
+    verifyUserIdFromJwt(req, res, [userAuth.id]);
+
     await db.transaction(async (tx: any) => {
       try {
         const skill_ids = await upsertItems(brief.skills, 'skills')(tx);
@@ -99,8 +139,8 @@ export default nextConnect()
         )(tx);
 
         const brief_id = await models.updateBrief(
-          brief.headline,
-          brief.description,
+          filter.clean(brief.headline),
+          filter.clean(brief.description),
           brief.scope_id,
           brief.experience_id,
           brief.duration_id,

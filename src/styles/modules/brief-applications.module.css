@@ -20,14 +20,13 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  background: var(--theme-grey-dark);
+  background: var(--theme-background);
   border-radius: 10px;
   border: 1px solid var(--theme-light-white);
 }
 
 .sectionTitle {
   margin-left: 50px;
-  font-weight: bold;
   font-size: 20px;
 }
 

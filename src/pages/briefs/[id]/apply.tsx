@@ -1,11 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
-import Image from 'next/image';
+import Filter from 'bad-words';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
+
+import {
+  handleApplicationInput,
+  validateApplicationInput,
+} from '@/utils/helper';
 
 import AccountChoice from '@/components/AccountChoice';
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
@@ -13,13 +20,14 @@ import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 import SuccessScreen from '@/components/SuccessScreen';
 
-import { dollarIcon } from '@/assets/svgs';
 import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
 import { Brief, Currency, Freelancer } from '@/model';
-import { getBrief, getFreelancerBrief } from '@/redux/services/briefService';
+import { getBrief } from '@/redux/services/briefService';
+import { getFreelancerBrief } from '@/redux/services/briefService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { selectAccount } from '@/redux/services/polkadotService';
+//import { createProject } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 interface MilestoneItem {
@@ -28,18 +36,34 @@ interface MilestoneItem {
   description: string;
 }
 
+interface InputErrorType {
+  title?: string;
+  description?: string;
+  approvers?: string;
+  milestones: Array<{ name?: string; amount?: string; description?: string }>;
+}
+
 export const SubmitProposal = (): JSX.Element => {
+  const filter = new Filter();
   const [currencyId, setCurrencyId] = useState(0);
   const [durationId, setDurationId] = useState(0);
   const [brief, setBrief] = useState<Brief | any>();
   // const [user, setUser] = useState<User>();
-  const { user } = useSelector((state: RootState) => state.userState);
+  const { user, loading: loadingUser } = useSelector(
+    (state: RootState) => state.userState
+  );
   // FIXME: freelancer
   const [_freelancer, setFreelancer] = useState<Freelancer>();
   // const userHasWeb3Addresss = !!user?.web3_address;
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [inputErrors, setInputErrors] = useState<InputErrorType>({
+    title: '',
+    description: '',
+    approvers: '',
+    milestones: [],
+  });
 
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
@@ -47,36 +71,50 @@ export const SubmitProposal = (): JSX.Element => {
   const [applicationId, setapplicationId] = useState();
   const [error, setError] = useState<any>();
   const [open, setOpen] = useState(false);
+  const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
+  // eslint-disable-next-line no-unused-vars, unused-imports/no-unused-vars
+  const [inputError, setInputError] = useState<any>([]);
 
   useEffect(() => {
     setOpen(applicationId ? true : false);
   }, [applicationId]);
 
   useEffect(() => {
-    getUserAndFreelancer();
-  }, [briefId]);
+    !loadingUser && getUserAndFreelancer();
+  }, [briefId, user?.username, loadingUser]);
 
   useEffect(() => {
-    getCurrentUserBrief();
-  }, [user]);
+    router?.isReady && getCurrentUserBrief();
+  }, [user, router.isReady]);
 
   const getUserAndFreelancer = async () => {
     const freelancer = await getFreelancerProfile(user?.username);
-    if (!freelancer?.id) {
-      router.push(`/freelancers/new`);
-    }
+    if (!freelancer?.id) router.push(`/freelancers/new`);
     setFreelancer(freelancer);
+
+    const userApplication: any = await getFreelancerBrief(user?.id, briefId);
+    if (userApplication) {
+      router.push(`/briefs/${briefId}/applications/${userApplication?.id}/`);
+    }
   };
 
   const getCurrentUserBrief = async () => {
     if (briefId && user) {
-      const userApplication: any = await getFreelancerBrief(user?.id, briefId);
-      if (userApplication) {
-        router.push(`/briefs/${briefId}/applications/${userApplication?.id}/`);
+      setLoading(true);
+      try {
+        const briefResponse: Brief | undefined = await getBrief(briefId);
+        if (briefResponse?.user_id === user.id) redirectToBreif();
+        setBrief(briefResponse);
+      } catch (error) {
+        setError({ message: 'could not find brief' });
+      } finally {
+        setLoading(false);
       }
-      const briefResponse: Brief | undefined = await getBrief(briefId);
-      setBrief(briefResponse);
     }
+  };
+
+  const redirectToBreif = () => {
+    router.push(`/briefs/${briefId}`);
   };
 
   const currencies = Object.keys(Currency).filter(
@@ -84,8 +122,9 @@ export const SubmitProposal = (): JSX.Element => {
   );
   const imbueFeePercentage = 5;
 
+  const milestonesRef = useRef<any>([]);
   const [milestones, setMilestones] = useState<MilestoneItem[]>([
-    { name: '', amount: undefined, description: '' },
+    { name: '', amount: 0, description: '' },
   ]);
 
   const durationOptions = timeData.sort((a, b) =>
@@ -100,10 +139,7 @@ export const SubmitProposal = (): JSX.Element => {
   const totalCost = imbueFee + totalCostWithoutFee;
 
   const onAddMilestone = () => {
-    setMilestones([
-      ...milestones,
-      { name: '', amount: undefined, description: '' },
-    ]);
+    setMilestones([...milestones, { name: '', amount: 0, description: '' }]);
   };
 
   const onRemoveMilestone = (index: number) => {
@@ -122,7 +158,7 @@ export const SubmitProposal = (): JSX.Element => {
       await selectAccount(account);
       await insertProject();
     } catch (error) {
-      setError(error);
+      setError({ message: error });
     } finally {
       setLoading(false);
       setShowPolkadotAccounts(false);
@@ -137,9 +173,28 @@ export const SubmitProposal = (): JSX.Element => {
     }
   }
 
+  useEffect(() => {
+    const { isValid, errors } = validateApplicationInput(
+      'brief',
+      inputErrors,
+      milestones
+    );
+    setInputErrors(errors);
+    setDisableSubmit(!isValid);
+  }, [milestones]);
+
   async function insertProject() {
-    //TODO: validate all milestone sum up to 100%
+    if (totalPercent !== 100)
+      return setError({ message: 'Total percentage must be 100%' });
+
+    if (totalCostWithoutFee > 100000000)
+      return setError({ message: 'Total cost must be less than $100,000,000' });
+
+    if (totalCostWithoutFee < 10)
+      return setError({ message: 'Total cost must be greater than $10' });
+
     setLoading(true);
+
     try {
       const resp = await fetch(`${config.apiBase}/project`, {
         headers: config.postAPIHeaders,
@@ -155,9 +210,9 @@ export const SubmitProposal = (): JSX.Element => {
             .filter((m) => m.amount !== undefined)
             .map((m) => {
               return {
-                name: m.name,
+                name: filter.clean(m.name),
                 amount: m.amount,
-                description: m.description,
+                description: filter.clean(m.description),
                 percentage_to_unlock: (
                   ((m.amount ?? 0) / totalCostWithoutFee) *
                   100
@@ -165,60 +220,74 @@ export const SubmitProposal = (): JSX.Element => {
               };
             }),
           required_funds: totalCost,
-          duration_id: durationId
+          duration_id: durationId,
+          description: brief?.description,
         }),
       });
-
       if (resp.ok) {
         const applicationId = (await resp.json()).id;
         applicationId && setapplicationId(applicationId);
       } else {
-        setError({ message: 'Failed to submit the proposal' });
+        setError({ message: resp });
       }
     } catch (error) {
-      setError(error);
+      setError({ message: error });
     } finally {
       setLoading(false);
     }
   }
 
-  const totalPercent = milestones.reduce((sum, { amount }) => {
-    const percent = Number(
-      ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
+  const totalPercent =
+    milestones.reduce((sum, { amount }) => {
+      const percent = Number(
+        ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
+      );
+      return sum + percent;
+    }, 0)
+
+  const handleMilestoneChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    milestoneIndex: number | undefined = undefined
+  ) => {
+    const { milestonesRes, errors } = handleApplicationInput(
+      event,
+      milestoneIndex,
+      inputErrors,
+      milestones,
+      brief?.headline,
+      brief?.description
     );
-    return sum + percent;
-  }, 0);
-
-  const allAmountAndNamesHaveValue = () => {
-    for (let i = 0; i < milestones.length; i++) {
-      const { amount, name, description } = milestones[i];
-
-      if (
-        amount === undefined ||
-        amount === null ||
-        amount === 0 ||
-        name === undefined ||
-        name === null ||
-        name.length === 0 ||
-        description === undefined ||
-        description === null ||
-        description.length === 0
-      ) {
-        return false;
-      }
-    }
-
-    return true;
+    setMilestones(milestonesRes);
+    setInputErrors(errors);
   };
 
-  const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
+  // const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
+
+  if (loadingUser || loading) <FullScreenLoader />;
 
   return (
     <div className='flex flex-col gap-10 text-base leading-[1.5] !mx-3 lg:!mx-auto'>
       <div className='bg-white rounded-[20px]'>
-        <h3 className='ml-4 lg:ml-[3rem] text-xl leading-[1.5] m-0 p-0  mt-[1.2rem] flex text-imbue-purple-dark font-normal'>
-          Job description
-        </h3>
+        <div className='flex gap-5 items-center'>
+          <Tooltip
+            title='Go back to previous page'
+            followCursor
+            leaveTouchDelay={10}
+            enterDelay={500}
+            className='cursor-pointer'
+          >
+            <div
+              onClick={() => router.back()}
+              className='border border-content rounded-full p-1 flex items-center justify-center cursor-pointer relative top-2 ml-7'
+            >
+              <ArrowBackIcon className='h-5 w-5' color='secondary' />
+            </div>
+          </Tooltip>
+          <h3 className='ml-7 lg:ml-0 text-xl leading-[1.5] m-0 p-0  mt-[1.2rem] flex text-imbue-purple-dark font-normal'>
+            Job description
+          </h3>
+        </div>
+
         {brief && <BriefInsights brief={brief} />}
       </div>
 
@@ -246,89 +315,94 @@ export const SubmitProposal = (): JSX.Element => {
               <div
                 className='milestone-row !px-4 !py-7 !m-0 lg:!px-14 relative border-t border-light-white border-b border-b-[#03116A1F]'
                 key={index}
+                ref={(el) => (milestonesRef.current[index] = el)}
               >
-                <span
-                  onClick={() => onRemoveMilestone(index)}
-                  className='absolute top-1 right-2 lg:right-4 text-sm lg:text-xl text-light-grey font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
-                >
-                  x
-                </span>
+                {index !== 0 && (
+                  <span
+                    onClick={() => onRemoveMilestone(index)}
+                    className='absolute top-1 right-2 lg:right-4 text-sm lg:text-xl font-bold hover:border-red-500 text-red-500 cursor-pointer'
+                  >
+                    x
+                  </span>
+                )}
+
                 <div className='text-base mr-4 lg:mr-9 text-imbue-purple-dark font-normal'>
                   {index + 1}.
                 </div>
-                <div className='flex flex-row justify-between w-full'>
-                  <div className='lg:w-2/5 w-3/5'>
+                <div className='flex flex-col lg:flex-row justify-between w-full'>
+                  <div className='lg:w-2/5 w-full'>
                     <h3 className=' text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
                       Title
                     </h3>
 
                     <input
+                      autoComplete='off'
                       type='text'
+                      maxLength={50}
                       data-testid={`milestone-title-${index}`}
-                      className='input-budget  text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-left  pl-5 mb-8'
+                      className='input-budget text-base rounded-md py-3 px-5 text-imbue-purple text-left placeholder:text-imbue-light-purple mb-1'
+                      placeholder='Add milestone name here'
                       value={name || ''}
-                      onChange={(e) =>
-                        setMilestones([
-                          ...milestones.slice(0, index),
-                          {
-                            ...milestones[index],
-                            name: e.target.value,
-                          },
-                          ...milestones.slice(index + 1),
-                        ])
-                      }
+                      name='milestoneTitle'
+                      onChange={(e) => handleMilestoneChange(e, index)}
                     />
+                    <div className='flex items-center justify-between mb-4'>
+                      {/* <p className='text-sm text-imbue-coral'>{enteredInvalid && inputError[index]?.name}</p> */}
+                      <p className={`text-xs text-imbue-light-purple-two`}>
+                        {inputErrors?.milestones[index]?.name || ''}
+                      </p>
+                      <p className='text-sm text-content my-2'>
+                        {name?.length}/50
+                      </p>
+                    </div>
 
                     <h3 className='mb-2 lg:mb-5 text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
                       Description
                     </h3>
                     <textarea
-                      className='input-description text-base'
+                      maxLength={5000}
+                      placeholder='Add milestone description here'
+                      className='input-description text-base placeholder:text-imbue-light-purple'
                       data-testid={`milestone-description-${index}`}
                       value={description}
-                      onChange={(e) =>
-                        setMilestones([
-                          ...milestones.slice(0, index),
-                          {
-                            ...milestones[index],
-                            description: e.target.value,
-                          },
-                          ...milestones.slice(index + 1),
-                        ])
-                      }
+                      name='milestoneDescription'
+                      onChange={(e) => handleMilestoneChange(e, index)}
                     />
+                    <div className='flex items-center justify-between'>
+                      <p className={`text-xs text-imbue-light-purple-two`}>
+                        {inputErrors?.milestones[index]?.description || ''}
+                      </p>
+                      <p className='text-sm text-content my-2'>
+                        {description?.length}/5000
+                      </p>
+                    </div>
                   </div>
 
-                  <div className='flex flex-col lg:w-3/12 w-4/12 lg:items-start lg:mt-[-0.5rem]'>
+                  <div className='flex flex-col lg:w-3/12 w-full lg:items-start mt-4 lg:mt-[-0.5rem]'>
                     <h3 className=' text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
                       Amount
                     </h3>
 
                     <div className='w-full relative p-0 m-0'>
-                      <Image
-                        src={dollarIcon}
-                        alt='dollar icon'
-                        height={12}
-                        width={12}
-                        className='h-fit absolute left-2 bottom-3'
-                      />
+                      <span className='h-fit absolute left-5 bottom-3 text-base text-content'>
+                        {Currency[currencyId]}
+                      </span>
+
                       <input
                         type='number'
+                        onWheel={(e) => (e.target as HTMLElement).blur()}
                         data-testid={`milestone-amount-${index}`}
-                        className='input-budget  text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-right pl-5'
+                        placeholder='Add an amount'
+                        className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
                         value={amount || ''}
-                        onChange={(e) =>
-                          setMilestones([
-                            ...milestones.slice(0, index),
-                            {
-                              ...milestones[index],
-                              amount: Number(e.target.value),
-                            },
-                            ...milestones.slice(index + 1),
-                          ])
-                        }
+                        onChange={(e) => handleMilestoneChange(e, index)}
+                        name='milestoneAmount'
                       />
                     </div>
+                    <p className={`text-xs text-imbue-light-purple-two mt-2`}>
+                      {inputErrors?.milestones[index]?.amount || ''}
+                    </p>
+
                     {totalCostWithoutFee !== 0 && (
                       <div className='flex flex-col items-end mt-3 gap-2 w-full'>
                         <div className='progress-value text-base !text-imbue-purple-dark'>
@@ -377,8 +451,15 @@ export const SubmitProposal = (): JSX.Element => {
 
           <div className='flex flex-row items-center mb-5'>
             <div className='flex flex-col flex-grow'>
-              <h3 className='text-lg lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
-                Imbue Service Fee 5% - Learn more about Imbue’s fees
+              <h3 className='text-lg lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal flex  items-center'>
+                Imbue Service Fee 5% -
+                <a
+                  href='https://www.imbue.network/faq'
+                  target='_blank'
+                  className='hover:underline ml-2 text-sm cursor-pointer'
+                >
+                  Learn more about Imbue’s fees
+                </a>
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-purple-dark font-normal'>
@@ -400,7 +481,7 @@ export const SubmitProposal = (): JSX.Element => {
       </div>
 
       <div className='bg-white rounded-[20px] py-[1.5rem]'>
-        <h3 className='ml-8 mb-2 text-[1.25rem] text-imbue-purple-dark font-normal m-0 p-0 flex'>
+        <h3 className='ml-4 mb-2 text-[1.25rem] text-imbue-purple-dark font-normal m-0 p-0 flex'>
           Payment terms
         </h3>
 
@@ -416,7 +497,7 @@ export const SubmitProposal = (): JSX.Element => {
               className='bg-white outline-none round border border-imbue-purple rounded-[0.5rem] text-base px-5 mt-4 h-[2.75rem] text-imbue-purple-dark'
               placeholder='Select a duration'
               required
-              onChange={(e)=>setDurationId(Number(e.target.value))}
+              onChange={(e) => setDurationId(Number(e.target.value))}
               value={durationId}
             >
               {durationOptions.map(({ label, value }, index) => (
@@ -454,17 +535,22 @@ export const SubmitProposal = (): JSX.Element => {
         </div>
       </div>
 
-      <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center justify-between   self-center'>
+      <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-2xl w-full p-[1rem] flex items-center justify-between   self-center'>
         <div className='buttons-container'>
-          <button
-            disabled={
-              totalPercent !== 100 || !milestoneAmountsAndNamesHaveValue
-            }
-            className='primary-btn in-dark w-button hover:!bg-imbue-purple hover:!text-white'
-            onClick={() => handleSubmit()}
+          <Tooltip
+            followCursor
+            leaveTouchDelay={10}
+            title={disableSubmit && 'Please fill all the required input fields'}
           >
-            Submit
-          </button>
+            <button
+              className={`primary-btn in-dark w-button ${disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
+                }`}
+              onClick={() => !disableSubmit && handleSubmit()}
+            >
+              Submit
+            </button>
+          </Tooltip>
+
           {/* TODO: Add Drafts Functionality */}
           {/* <button className="secondary-btn">Save draft</button> */}
         </div>
@@ -481,6 +567,7 @@ export const SubmitProposal = (): JSX.Element => {
         title={'You have successfully applied for this brief'}
         open={open}
         setOpen={setOpen}
+        noRetry
       >
         <div className='flex flex-col gap-4 w-1/2'>
           <button

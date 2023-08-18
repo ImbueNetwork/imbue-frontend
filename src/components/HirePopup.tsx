@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { useMediaQuery } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
@@ -8,8 +10,10 @@ import { blake2AsHex } from '@polkadot/util-crypto';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+
+import { getBalance } from '@/utils/helper';
 
 import { Currency, OffchainProjectState } from '@/model';
 import { changeBriefApplicationStatus } from '@/redux/services/briefService';
@@ -39,8 +43,8 @@ export const HirePopup = ({
 
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<any>();
-  // const [projectId, setProjectId] = useState<string>();
   const router = useRouter();
+  const [freelancerBalance, setFreelancerBalance] = useState<number | string>(0)
 
   const { user } = useSelector((state: RootState) => state.userState);
 
@@ -58,6 +62,21 @@ export const HirePopup = ({
     borderRadius: '20px',
     zIndex: 1,
   };
+
+  useEffect(() => {
+    const checkBalance = async () => {
+      setFreelancerBalance("Chekcing Balance")
+      const balance = await getBalance(
+        freelancer.web3_address,
+        application?.currency_id || 0,
+        user
+      );
+
+      setFreelancerBalance(balance);
+    }
+
+    openHirePopup && checkBalance()
+  }, [freelancer.web3_address, application?.currency_id, user, openHirePopup])
 
   const selectedAccount = async (account: WalletAccount) => {
     setLoading(true);
@@ -100,7 +119,11 @@ export const HirePopup = ({
           );
           setSuccess(true);
         } else if (result.txError) {
-          setError({ message: result.errorMessage });
+          let errorMessage = result.errorMessage;
+          if (result.errorMessage?.includes('1010:')) {
+            errorMessage = `${result.errorMessage}.\nYou must have minimum balance of 500 $IMBUE`;
+          }
+          setError({ message: errorMessage });
           application.status_id = OffchainProjectState.PendingReview;
         }
         break;
@@ -115,15 +138,43 @@ export const HirePopup = ({
   const FirstContent = () => {
     return (
       <div className='relative modal-container'>
-        <div className='flex w-full justify-start items-center px-5 gap-5 pt-8 md:px-10 lg:gap-11 lg:px-16 lg:pb-2'>
+        <div className='flex w-full justify-start lg:items-center px-5 gap-5 pt-8 md:px-10 lg:px-16 lg:pb-2'>
           <Image
             className='w-12 h-12 md:w-16 md:h-16 rounded-full object-cover'
-            src={require('@/assets/images/profile-image.png')}
+            src={
+              freelancer?.profile_image ||
+              require('@/assets/images/profile-image.png')
+            }
             alt='profileImage'
+            width={70}
+            height={70}
           />
-          <span className='text-xl text-secondary-dark-hover'>
-            {freelancer?.display_name}
-          </span>
+          <div className='flex flex-col gap-1'>
+            <span className='text-xl text-secondary-dark-hover'>
+              {freelancer?.display_name}
+            </span>
+            {freelancerBalance !== "Chekcing Balance"
+              ? <>
+                {
+                  Number(freelancerBalance) < 500
+                    ? (
+                      <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-imbue-coral px-3 py-1 text-sm text-white'>
+                        <ErrorOutlineOutlinedIcon className='h-4 w-4 inline' />
+                        <p className='inline'>Freelance does not currently have the necessary deposit balance (500 $IMBU) to start the work</p>
+                      </div>
+                    )
+                    : (
+                      <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-primary px-3 py-1 text-sm text-black'>
+                        <CheckCircleOutlineIcon className='h-4 w-4 inline' />
+                        <p className='inline'>Freelance currently has the necessary deposit balance (500 $IMBU) to start the work</p>
+                      </div>
+                    )
+                }
+              </>
+              : <p className='text-sm text-content-primary'>Checking Freelancer Wallet Balance</p>
+            }
+
+          </div>
         </div>
         <p className='absolute top-0 text-center w-full text-lg lg:text-xl text-imbue-purple-dark'>
           Hire This Freelancer
@@ -138,8 +189,8 @@ export const HirePopup = ({
                 <p className='mr-3 lg:mr-9 text-lg'>{index + 1}.</p>
                 <div className='flex justify-between w-full'>
                   <div>
-                    <p className='text-lg mb-1 text-content'>Description</p>
-                    <p className='text-base'>{m.name}</p>
+                    <p className='text-lg mb-1 text-content'>{m.name}</p>
+                    <p className='text-base'>{m.description.substring(0, 100) + "..."}</p>
                   </div>
                   <div className='budget-wrapper text-end'>
                     <p className='text-lg mb-1 text-content'>Amount</p>
@@ -157,7 +208,7 @@ export const HirePopup = ({
             <div className={styles.budgetDescription}>
               <p className='mb-2 text-lg'>Total price of the project</p>
               <div className='text-imbue-purple text-sm'>
-                (This includes all milestonees, and is the amount client will
+                (This includes all milestones, and is the amount client will
                 see)
               </div>
             </div>
@@ -204,11 +255,11 @@ export const HirePopup = ({
           from your account once the freelancer starts the project.
         </p>
         <p className='text-center w-full text-lg lg:text-xl my-4'>
-          The funds are then paid to the freelancer iin stages only when you
+          The funds are then paid to the freelancer in stages only when you
           approve the completion of each milestone
         </p>
         <p className='mb-10'>
-          <span className='primary-text mr-1'>
+          <span className='text-lg lg:text-xl text-imbue-lemon mr-1'>
             {Number(totalCost.toFixed(2)).toLocaleString()}
           </span>
           ${Currency[application.currency_id]}
@@ -247,7 +298,7 @@ export const HirePopup = ({
         }}
         closeAfterTransition
         slots={{ backdrop: Backdrop }}
-        sx={{ zIndex: 4 }}
+        sx={{ zIndex: 4, marginTop: "30px" }}
         slotProps={{
           backdrop: {
             timeout: 500,

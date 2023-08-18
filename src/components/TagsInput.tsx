@@ -5,15 +5,20 @@ export type TagsInputProps = {
   tags: string[];
   suggestData: string[];
   onChange: (_tags: string[]) => void;
+  limit?: number;
+  hideInput?: boolean;
+  showSearch?: boolean;
 };
 
 export const TagsInput = ({
   tags,
   suggestData,
   onChange,
+  limit,
+  hideInput,
 }: TagsInputProps): JSX.Element => {
   const [vtags, setTags] = useState<string[]>(tags);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState<any>();
 
   const handleDelete = (targetIndex: number) => {
     const newTags = tags.filter((_, index) => index !== targetIndex);
@@ -26,6 +31,9 @@ export const TagsInput = ({
       e.preventDefault();
     }
     if (['Tab', 'Enter'].includes(e.key) && input) {
+      if (limit && vtags.length >= limit) return;
+      if (vtags.includes(input)) return;
+
       const newTags = [...vtags, input];
       setTags(newTags);
       setInput('');
@@ -34,15 +42,27 @@ export const TagsInput = ({
   };
 
   const addItem = (item: string) => {
+    if (limit && vtags.length >= limit) return;
     const newTags = [...tags, item];
     setTags(newTags);
     onChange(newTags);
   };
 
+  const handleChange = (text: string) => {
+    const value = text;
+    const sanitizedValue = value.replace(/[^\w\s]/gi, ''); // Regex to remove special characters
+
+    setInput(sanitizedValue);
+
+    if (sanitizedValue === '') {
+      return;
+    }
+  };
+
   return (
     <>
-      <div className='selected-tags'>
-        {tags.map((tag, i) => (
+      <div className='selected-tags min-h-[3.5rem]'>
+        {tags?.map((tag, i) => (
           <div
             key={i}
             className='selected-tag-item cursor-pointer !bg-white'
@@ -54,25 +74,34 @@ export const TagsInput = ({
             </div>
           </div>
         ))}
-        <input
-          type='text'
-          className='new-tag-input text-black'
-          data-testid='tag-input'
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
+
+        {(limit && vtags.length >= limit) || hideInput ? null : (
+          <input
+            autoFocus
+            type='text'
+            className='new-tag-input text-black '
+            data-testid='tag-input'
+            value={input}
+            maxLength={25}
+            onChange={(e) => handleChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            autoComplete='off'
+          />
+        )}
       </div>
-      <div className='tags-suggestion-container'>
+      <div className='tags-suggestion-container mt-4'>
         {suggestData
-          .filter((item: string) => vtags.indexOf(item) === -1)
+          .filter((item: string) => vtags?.indexOf(item) === -1)
           .map((item, index) => (
             <div
               className='tag-suggestion'
               key={index}
               onClick={() => addItem(item)}
             >
-              <span className='tag-suggestion-text font-extralight text-[0.875rem] text-[#3B27C1]'>
+              <span
+                data-testid={`skill-${item}`}
+                className='tag-suggestion-text font-extralight text-[0.875rem] text-[#3B27C1]'
+              >
                 {item}
               </span>
               <span className='tag-suggest-button'>+</span>

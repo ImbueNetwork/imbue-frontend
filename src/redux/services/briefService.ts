@@ -24,9 +24,10 @@ export const callSearchBriefs = async (filter: BriefSqlFilter) => {
     body: JSON.stringify(filter),
   });
   if (resp.ok) {
-    return (await resp.json()) as PaginatedResponse;
+    const data = await resp.json();
+    return { status: resp.status, ...data } as PaginatedResponse;
   } else {
-    throw new Error('Failed to search briefs. status:' + resp.status);
+    return { status: resp.status, currentData: [], totalBriefs: 0 };
   }
 };
 
@@ -45,9 +46,32 @@ export const getAllBriefs = async (
   );
 
   if (resp.ok) {
+    const data = await resp.json();
+    return { status: resp.status, ...data } as PaginatedResponse;
+  } else {
+    return { status: resp.status, currentData: [], totalBriefs: 0 };
+  }
+};
+
+export const deleteSavedBrief = async (
+  brief_id: string | number,
+  user_id: string | number
+) => {
+  const resp = await fetch(`${config.apiBase}briefs/save`, {
+    headers: postAPIHeaders,
+    method: 'delete',
+    body: JSON.stringify({
+      brief_id,
+      user_id,
+    }),
+  });
+
+  if (resp.ok) {
     return (await resp.json()) as PaginatedResponse;
   } else {
-    throw new Error('Failed to get all briefs. status:' + resp.status);
+    throw new Error(
+      `Failed to delete brief with id ${brief_id} status:` + resp.status
+    );
   }
 };
 
@@ -241,5 +265,55 @@ export const saveBriefData = async (brief: Brief) => {
     };
   } else {
     throw new Error('Failed to save briefs ..... status:' + resp.status);
+  }
+};
+
+export const getAllSkills = async () => {
+  const resp = await fetch(`${config.apiBase}briefs/skills`, {
+    headers: getAPIHeaders,
+    method: 'get',
+  });
+  if (resp.ok) {
+    return (await resp.json()) as {
+      skills: Array<{ name: string; id: number }>;
+    };
+  } else {
+    throw new Error('Failed to get skills ..... status:' + resp.status);
+  }
+};
+
+export const searchSkills = async (name: string) => {
+  const resp = await fetch(`${config.apiBase}skills/${name}`, {
+    headers: getAPIHeaders,
+    method: 'get',
+  });
+  if (resp.ok) {
+    return (await resp.json()) as { skills: Array<{ name: string }> };
+  } else {
+    throw new Error('Failed to get skills ..... status:' + resp.status);
+  }
+};
+
+export const searchIndustries = async (name: string) => {
+  const resp = await fetch(`${config.apiBase}industry/${name}`, {
+    headers: getAPIHeaders,
+    method: 'get',
+  });
+  if (resp.ok) {
+    return (await resp.json()) as { industry: Array<{ name: string }> };
+  } else {
+    throw new Error('Failed to get industry ..... status:' + resp.status);
+  }
+};
+
+export const searchLanguageByName = async (name: string) => {
+  const resp = await fetch(`${config.apiBase}language/${name}`, {
+    headers: getAPIHeaders,
+    method: 'get',
+  });
+  if (resp.ok) {
+    return (await resp.json()) as { languages: Array<{ name: string }> };
+  } else {
+    throw new Error('Failed to get language ..... status:' + resp.status);
   }
 };

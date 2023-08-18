@@ -1,5 +1,7 @@
+import { Autocomplete, TextField, Tooltip } from '@mui/material';
+import Filter from 'bad-words';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import * as utils from '@/utils';
@@ -10,7 +12,7 @@ import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 import { Option } from '@/components/Option';
 import { ProgressBar } from '@/components/ProgressBar';
-import { TagsInput } from '@/components/TagsInput';
+import ValidatableInput from '@/components/ValidatableInput';
 
 import * as config from '@/config';
 import {
@@ -18,41 +20,131 @@ import {
   nameExamples,
   scopeData,
   stepData,
-  suggestedIndustries,
-  suggestedSkills,
   timeData,
 } from '@/config/briefs-data';
+import { searchIndustries, searchSkills } from '@/redux/services/briefService';
 import { RootState } from '@/redux/store/store';
 
 import styles from '../../styles/modules/newBrief.module.css';
 
 const NewBrief = (): JSX.Element => {
+  const filter = new Filter();
   const [step, setStep] = useState(0);
-  const [headline, setHeadline] = useState('');
+  const [headline, setHeadline] = useState<any>();
   const [industries, setIndustries] = useState<string[]>([]);
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState<any>();
   const [skills, setSkills] = useState<string[]>([]);
   const [expId, setExpId] = useState<number>();
   const [scopeId, setScopeId] = useState<number>();
   const [durationId, setDurationId] = useState<number>();
-  const [budget, setBudget] = useState<number>();
+  const [budget, setBudget] = useState<number>(0);
+  const [suggestedSkills, setSuggestedSkills] = useState<string[]>([]);
+  const [suggestedIndustries, setSuggestedIndustries] = useState<string[]>([]);
 
   const [error, setError] = useState<any>();
+  const [inputError, setInputError] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [industriesError, setIndustriesError] = useState(false);
+  const [skillError, setSkillError] = useState(false);
+  const [disableSubmit, setDisableSubmit] = useState(false);
   const router = useRouter();
 
   const { user } = useSelector((state: RootState) => state.userState);
+
+  useEffect(() => {
+    fetchSuggestedSkills();
+    fetchSuggestedIndustries();
+  }, []);
+
+  const fetchSuggestedSkills = async () => {
+    const skillsRes = await searchSkills('');
+    if (skillsRes) {
+      setSuggestedSkills(skillsRes?.skills.map((skill) => skill.name));
+    }
+  };
+
+  const fetchSuggestedIndustries = async () => {
+    const industriesRes = await searchIndustries('a');
+    if (industriesRes) {
+      setSuggestedIndustries(
+        industriesRes?.industry.map((industries) => industries.name)
+      );
+    }
+  };
+
+  const searchSkill = async (name: string) => {
+    const skillRes = await searchSkills(name);
+    if (!skillRes || !skillRes?.skills.length) return;
+    setSuggestedSkills(skillRes?.skills.map((skill) => skill.name));
+  };
+
+  const searchIndustry = async (name: string) => {
+    const industriesRes = await searchIndustries(name.length > 0 ? name : 'a');
+    if (!industriesRes || !industriesRes?.industry.length) return;
+    setSuggestedIndustries(
+      industriesRes?.industry.map((industry) => industry.name)
+    );
+  };
+
+  const handleIndustriesChange = (val: string[]) => {
+    if (val.length < 3 || val.length > 5) setIndustriesError(true);
+    else setIndustriesError(false);
+    setIndustries(val);
+  };
+
+  const handleSkillsChange = (val: string[]) => {
+    if (val.length < 3 || val.length > 10) setSkillError(true);
+    else setSkillError(false);
+    setSkills(val);
+  };
+
+  const validateInputLength = (
+    text: string,
+    min: number,
+    max: number
+  ): boolean => {
+    return text?.length >= min && text.length <= max;
+  };
+
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = event.target;
+    setInputError('');
+
+    switch (name) {
+      case 'headline':
+        if (validateInputLength(value, 10, 50)) {
+          setHeadline(value);
+          setInputError('');
+        } else {
+          setHeadline(value);
+          setInputError('Headline must be between 10 and 50 characters');
+        }
+        break;
+      case 'description':
+        if (validateInputLength(value, 50, 5000)) {
+          setDescription(value);
+          setInputError('');
+        } else {
+          setInputError('Description must be between 50 and 5000 characters');
+          setDescription(value);
+        }
+        break;
+      default:
+        break;
+    }
+  };
 
   const NamePanel = (
     <>
       <p className={styles.fieldName}>Write a headline for your brief</p>
       <div className={styles.namePanelInputWrapper}>
-        <input
-          className={styles.briefDetailFieldInput}
+        <ValidatableInput
           data-testid='headline-input'
           name='headline'
           value={headline}
-          onChange={(e) => setHeadline(e.target.value)}
+          onChange={(e: any) => setHeadline(e.target.value)}
         />
       </div>
       <p className={styles.fieldName}>Examples</p>
@@ -70,12 +162,38 @@ const NewBrief = (): JSX.Element => {
     <>
       <p className={styles.fieldName}>Search industries or add your own</p>
       <div className={styles.industryContainer}>
-        <TagsInput
+        {/* <TagsInput
           suggestData={suggestedIndustries}
           data-testid='industries-input'
           tags={industries}
-          onChange={(tags: string[]) => setIndustries(tags)}
+          onChange={(tags: string[]) => handleIndustriesChange(tags)}
+          limit={10}
+        /> */}
+        <Autocomplete
+          id='tags-standard'
+          data-testid='skills-input'
+          multiple
+          getOptionLabel={(option) => option}
+          options={suggestedIndustries}
+          sx={{ width: '100%' }}
+          onChange={(e, value) => handleIndustriesChange(value)}
+          defaultValue={industries}
+          limitTags={10}
+          ListboxProps={{className: "max-h-[250px]"}}
+          renderInput={(params) => (
+            <TextField
+              color='secondary'
+              autoComplete='off'
+              onChange={(e) => searchIndustry(e.target.value)}
+              {...params}
+            />
+          )}
         />
+      </div>
+      <div className='flex flex-wrap flex-row  justify-center relative -top-4'>
+        <span className={!industriesError ? 'hide' : 'error'}>
+          number of industries must be between 3 to 5
+        </span>
       </div>
     </>
   );
@@ -92,10 +210,11 @@ const NewBrief = (): JSX.Element => {
           name='description'
           maxLength={5000}
           className='text-black bg-white outline-none'
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-            setDescription(e.target.value)
-          }
+          onChange={handleChange}
         />
+        <div className='flex flex-wrap flex-row justify-center relative top-4'>
+          <span className={!inputError ? 'hide' : 'error'}>{inputError}</span>
+        </div>
       </div>
     </div>
   );
@@ -104,12 +223,30 @@ const NewBrief = (): JSX.Element => {
     <>
       <p className={styles.fieldName}>Search the skills</p>
       <div className={styles.skillsContainer}>
-        <TagsInput
-          suggestData={suggestedSkills}
-          tags={skills}
+        <Autocomplete
+          id='tags-standard'
           data-testid='skills-input'
-          onChange={(tags: string[]) => setSkills(tags)}
+          multiple
+          getOptionLabel={(option) => option}
+          options={suggestedSkills}
+          sx={{ width: '100%' }}
+          onChange={(e, value) => handleSkillsChange(value)}
+          defaultValue={skills}
+          ListboxProps={{className: "max-h-[250px]"}}
+          renderInput={(params) => (
+            <TextField
+              color='secondary'
+              autoComplete='off'
+              onChange={(e) => searchSkill(e.target.value)}
+              {...params}
+            />
+          )}
         />
+      </div>
+      <div className='flex flex-wrap flex-row  justify-center relative -top-8'>
+        <span className={!skillError ? 'hide' : 'error'}>
+          number of skills must be between 3 to 10
+        </span>
       </div>
     </>
   );
@@ -167,23 +304,39 @@ const NewBrief = (): JSX.Element => {
   );
 
   const BudgetPanel = (
-    <div>
+    <div className='mb-auto'>
       <p className={styles.fieldName}>Maximum project budget (USD)</p>
       <div className={styles.budgetInputContainer}>
         <input
           className={styles.briefDetailFieldInput}
           style={{ paddingLeft: '24px', height: 'auto' }}
           type='number'
+          min='0'
           data-testid='budget-input'
           value={budget || ''}
-          onChange={(e) => setBudget(Number(e.target.value))}
+          max={1000000000}
+          onChange={(e) => {
+            if (
+              Number(e.target.value) < 0 ||
+              Number(e.target.value) > 1000000000
+            ) {
+              e.preventDefault();
+            } else {
+              setBudget(Number(e.target.value));
+            }
+          }}
         />
         <div className={styles.budgetCurrencyContainer}>$</div>
       </div>
-      <div className={styles.budgetDescription}>
+      <div className={styles.budgetDescription + ' !my-2'}>
         You will be able to set milestones which divide your project into
         manageable phases.
       </div>
+      {Number(budget) < 10 && (
+        <div className={`${styles.budgetDescription} !my-5 !text-red-600`}>
+          We recommend a minimum budget of $10 for a brief.
+        </div>
+      )}
     </div>
   );
 
@@ -206,17 +359,23 @@ const NewBrief = (): JSX.Element => {
   ];
   const validate = (): boolean => {
     // TODO: show notification
-    if (step === 0 && !headline) {
+    if (step === 0 && !validateInputLength(headline, 10, 50)) {
       return false;
     }
-    if (step === 1 && !industries.length) {
+    if (
+      step === 1 &&
+      (!industries.length || industries.length < 3 || industries.length > 5)
+    ) {
       return false;
     }
-    if (step === 2 && !description) {
+    if (step === 2 && !validateInputLength(description, 50, 5000)) {
       // TODO: minimum required length for description
       return false;
     }
-    if (step === 3 && !skills.length) {
+    if (
+      step === 3 &&
+      (!skills.length || skills.length < 3 || skills.length > 10)
+    ) {
       return false;
     }
     if (step === 4 && expId === undefined) {
@@ -228,24 +387,42 @@ const NewBrief = (): JSX.Element => {
     if (step === 6 && durationId === undefined) {
       return false;
     }
-    if (step === 7 && !budget) {
+    if (step === 7 && (!budget || Number(budget) < 10)) {
       return false;
     }
     return true;
   };
 
+  useEffect(() => {
+    setDisableSubmit(!validate());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    headline,
+    industries.length,
+    description,
+    skills.length,
+    expId,
+    scopeId,
+    durationId,
+    budget,
+    step,
+  ]);
+
   const onReviewPost = async () => {
     //TODO: implement api call
     setLoading(true);
     try {
+      if (filter.isProfane(headline)) {
+        throw new Error('remove bad word from the title');
+      }
       const user_id = user?.id;
       const resp = await fetch(`${config.apiBase}/briefs/`, {
         headers: config.postAPIHeaders,
         method: 'post',
         body: JSON.stringify({
-          headline,
-          industries,
-          description,
+          headline: filter.clean(headline),
+          industries: industries.map((item) => filter.clean(item)),
+          description: filter.clean(description),
           scope_id: scopeId,
           experience_id: expId,
           duration_id: durationId,
@@ -285,7 +462,7 @@ const NewBrief = (): JSX.Element => {
           ))}
         </div>
         <div className={styles.rightPanel}>
-          <div className={styles.contents}>{panels[step] ?? <></>}</div>
+          <div className={styles.contents}>{panels[step] ?? <></>} </div>
           <div className={styles.buttons}>
             {step >= 1 && (
               <button
@@ -304,23 +481,46 @@ const NewBrief = (): JSX.Element => {
                 Discover Briefs
               </button>
             ) : step === stepData.length - 2 ? (
-              <button
-                className='primary-btn in-dark w-button !mt-0'
-                disabled={!validate()}
-                data-testid='submit-button'
-                onClick={() => onReviewPost()}
+              <Tooltip
+                followCursor
+                leaveTouchDelay={10}
+                title={
+                  disableSubmit && 'Please fill all the required input fields'
+                }
               >
-                Submit
-              </button>
+                <button
+                  className={`primary-btn in-dark w-button !mt-0 ${
+                    disableSubmit &&
+                    '!bg-gray-400 !text-white !cursor-not-allowed'
+                  }`}
+                  data-testid='submit-button'
+                  onClick={() => !disableSubmit && onReviewPost()}
+                >
+                  Submit
+                </button>
+              </Tooltip>
             ) : (
-              <button
-                className='primary-btn in-dark w-button !mt-0 hover:!bg-imbue-purple hover:!text-white'
-                data-testid='next-button'
-                onClick={() => setStep(step + 1)}
-                disabled={!validate()}
+              <Tooltip
+                followCursor
+                leaveTouchDelay={10}
+                title={
+                  disableSubmit && 'Please fill all the required input fields'
+                }
               >
-                {stepData[step].next ? `Next: ${stepData[step].next}` : 'Next'}
-              </button>
+                <button
+                  className={`primary-btn in-dark w-button !mt-0 ${
+                    disableSubmit &&
+                    '!bg-gray-400 !text-white !cursor-not-allowed'
+                  }`}
+                  data-testid='next-button'
+                  onClick={() => !disableSubmit && setStep(step + 1)}
+                  // onClick={() => console.log("hit")}
+                >
+                  {stepData[step].next
+                    ? `Next: ${stepData[step].next}`
+                    : 'Next'}
+                </button>
+              </Tooltip>
             )}
           </div>
         </div>

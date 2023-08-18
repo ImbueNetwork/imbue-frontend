@@ -91,19 +91,19 @@ export const scopeData = [
 export const timeData = [
   {
     label: '1 to 3 months',
-    value: 0,
-  },
-  {
-    label: '3-6 months',
     value: 1,
   },
   {
-    label: 'More than 6 months',
+    label: '3-6 months',
     value: 2,
   },
   {
-    label: 'More than a year',
+    label: 'More than 6 months',
     value: 3,
+  },
+  {
+    label: 'More than a year',
+    value: 4,
   },
 ];
 

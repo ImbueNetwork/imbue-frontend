@@ -1,23 +1,25 @@
-import {
-  Alert,
-  Dialog,
-  IconButton,
-  InputAdornment,
-  TextField,
-} from '@mui/material';
-// import { blake2AsHex } from '@polkadot/util-crypto';
+import { Alert, Dialog, IconButton, Tooltip } from '@mui/material';
+import { blake2AsHex } from '@polkadot/util-crypto';
 import WalletIcon from '@svgs/wallet.svg';
 import { WalletAccount } from '@talismn/connect-wallets';
+// import ChainService from '@/redux/services/chainService';
+import Filter from 'bad-words';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { FaRegCopy } from 'react-icons/fa';
 import { FiPlusCircle } from 'react-icons/fi';
+import { useSelector } from 'react-redux';
 
-import { getCurrentUser } from '@/utils';
+import { showErrorMessage } from '@/utils/errorMessages';
+import {
+  handleApplicationInput,
+  validateApplicationInput,
+} from '@/utils/helper';
+import { initImbueAPIInfo } from '@/utils/polkadot';
+import { getServerSideProps } from '@/utils/serverSideProps';
 
-// import { initImbueAPIInfo } from '@/utils/polkadot';
 import AccountChoice from '@/components/AccountChoice';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
@@ -25,8 +27,9 @@ import Approvers from '@/components/Grant/Approvers';
 
 import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
-import { Currency } from '@/model';
-// import ChainService from '@/redux/services/chainService';
+import { Currency, OffchainProjectState } from '@/model';
+import ChainService from '@/redux/services/chainService';
+import { RootState } from '@/redux/store/store';
 
 interface MilestoneItem {
   name: string;
@@ -34,13 +37,28 @@ interface MilestoneItem {
   description: string;
 }
 
+interface InputErrorType {
+  title?: string;
+  description?: string;
+  approvers?: string;
+  milestones: Array<{ name?: string; amount?: string; description?: string }>;
+}
+
 const GrantApplication = (): JSX.Element => {
   const router = useRouter();
+  const filter = new Filter();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<any>();
+  const [inputErrors, setInputErrors] = useState<InputErrorType>({
+    title: '',
+    description: '',
+    approvers: '',
+    milestones: [],
+  });
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
+  const [escrowAddress, setEscrowAddress] = useState<string>('');
   const [approvers, setApprovers] = useState<string[]>([]);
   // const [newApprover, setNewApprover] = useState<string>();
   const [currencyId, setCurrencyId] = useState<number>(0);
@@ -51,6 +69,7 @@ const GrantApplication = (): JSX.Element => {
   const [success, setSuccess] = useState(false);
   const [projectId, setProjectId] = useState<number>();
   const [copied, setCopied] = useState<boolean>(false);
+  const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
 
   const copyAddress = () => {
     setCopied(true);
@@ -60,13 +79,15 @@ const GrantApplication = (): JSX.Element => {
     }, 3000);
   };
 
-  const [escrow_address] = useState(
-    '5EYCAe5hKq6D9ACdEwwQxSSkWY9rqX4PqJyRBV3wA4NC8VSu'
+  const { user, loading: userLoading } = useSelector(
+    (state: RootState) => state.userState
   );
-
-  // const { user } = useSelector((state: RootState) => state.userState);
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
+
+  useEffect(() => {
+    !user.id && !userLoading && router.push('/');
+  }, [user.id, userLoading, router]);
 
   const durationOptions = timeData.sort((a, b) =>
     a.value > b.value ? 1 : a.value < b.value ? -1 : 0
@@ -112,35 +133,16 @@ const GrantApplication = (): JSX.Element => {
   //   setApprovers(newApprovers);
   // };
 
-  const validateFormData = () => {
-    for (let i = 0; i < milestones.length; i++) {
-      const { amount, name } = milestones[i];
+  const milestonesRef = useRef<any>([]);
 
-      if (
-        amount === undefined ||
-        amount === null ||
-        amount === 0 ||
-        name === undefined ||
-        name === null ||
-        name.length === 0
-      ) {
-        return false;
-      }
-    }
-
-    if (approvers.length === 0) return false;
-
-    return true;
-  };
-
-  const formDataValid = validateFormData();
+  // const formDataValid = validateFormData();
 
   const handleSelectAccount = async (account: WalletAccount) => {
     try {
       setLoading(true);
       await submitGrant(account);
     } catch (error) {
-      setError(error);
+      setError({ message: error });
     } finally {
       setLoading(false);
       setShowPolkadotAccounts(false);
@@ -151,25 +153,51 @@ const GrantApplication = (): JSX.Element => {
     setShowPolkadotAccounts(true);
   }
 
+  const totalPercent = milestones.reduce((sum, { amount }) => {
+    const percent = Number(
+      ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
+    );
+    return sum + percent;
+  }, 0);
+
   const submitGrant = async (account: WalletAccount) => {
     if (!account) return;
+    if (approvers.includes(account.address))
+      return setError({
+        message: "You can't use approver address for grantor payment address",
+      });
+    if (totalPercent < 100)
+      return setError({
+        message: 'Total Percentage of milestones must be equal to 100%',
+      });
+    if (totalCostWithoutFee > 1e8)
+      return setError({
+        message: 'Total cost must be Less than 100,000,000',
+      });
+
     setLoading(true);
 
     try {
-      const user_id = (await getCurrentUser())?.id;
+      // const user = await getCurrentUser();
+      if (filter.isProfane(title)) {
+        setError({ message: 'please remove bad words from the title' });
+        return;
+      }
       const grant = {
-        title,
-        description,
+        title: filter.clean(title),
+        description: filter.clean(description),
         duration_id: durationId, // TODO:
         required_funds: totalCost,
         currency_id: currencyId,
-        user_id,
+        user_id: user.id,
         owner: account.address,
         total_cost_without_fee: totalCostWithoutFee,
         imbue_fee: imbueFee,
         chain_project_id: projectId,
         milestones: milestones.map((milestone) => ({
           ...milestone,
+          name: filter.clean(milestone.name),
+          description: filter.clean(milestone.description),
           percentage_to_unlock: Math.floor(
             100 * ((milestone.amount ?? 0) / totalCostWithoutFee)
           ),
@@ -177,53 +205,78 @@ const GrantApplication = (): JSX.Element => {
         approvers,
       };
 
-      // const imbueApi = await initImbueAPIInfo();
-      // const chainService = new ChainService(imbueApi, user)
+      const imbueApi = await initImbueAPIInfo();
+      const chainService = new ChainService(imbueApi, user);
 
-      // const grantMilestones = grant.milestones.map((m) => ({
-      //   percentageToUnlock: m.percentage_to_unlock,
-      // }));
+      const grantMilestones = grant.milestones.map((m) => ({
+        percentageToUnlock: m.percentage_to_unlock,
+      }));
 
-      // const grant_id = blake2AsHex(JSON.stringify(grant));
+      const grant_id = blake2AsHex(JSON.stringify(grant));
 
-      // if (!account) return
-      // const result = await chainService.submitInitialGrant(account, grantMilestones, approvers, currencyId, totalCost, "kusama", grant_id);
+      const result = await chainService.submitInitialGrant(
+        account,
+        grantMilestones,
+        approvers,
+        currencyId,
+        totalCost,
+        'kusama',
+        grant_id
+      );
 
-      // // eslint-disable-next-line no-constant-condition
-      // while (true) {
-      //   if (result.status || result.txError) {
-      //     if (result.status) {
-      //       _setOnChainAddress(result?.eventData[5])
-      //       setSuccess(true);
-      //     } else if (result.txError) {
-      //       setError({ message: result.errorMessage });
-      //     }
-      //     break;
-      //   }
-      //   await new Promise((f) => setTimeout(f, 1000));
-      // }
-
-      const resp = await fetch(`${config.apiBase}grants`, {
-        headers: config.postAPIHeaders,
-        method: 'post',
-        body: JSON.stringify({
-          ...grant,
-          // chain_project_id: result?.eventData[2],
-          // escrow_address: result?.eventData[5]
-          chain_project_id: 217,
-          escrow_address: escrow_address,
-        }),
-      });
-
-      if (resp.status === 200 || resp.status === 201) {
-        const { grant_id } = (await resp.json()) as any;
-        setProjectId(grant_id);
-        setSuccess(true);
-      } else {
+      if (result.txError) {
         setError({ message: 'Failed to submit a grant' });
       }
+
+      // eslint-disable-next-line no-constant-condition
+      while (!result.txError) {
+        if (result.status || result.txError) {
+          if (result.status) {
+            setEscrowAddress(result?.eventData[5]);
+            const resp = await fetch(`${config.apiBase}grants`, {
+              headers: config.postAPIHeaders,
+              method: 'post',
+              body: JSON.stringify({
+                ...grant,
+                status_id: OffchainProjectState.Accepted,
+                milestones: milestones
+                  .filter((m) => m.amount !== undefined)
+                  .map((m) => {
+                    return {
+                      name: m.name,
+                      amount: m.amount,
+                      description: m.description,
+                      percentage_to_unlock: (
+                        ((m.amount ?? 0) / totalCostWithoutFee) *
+                        100
+                      ).toFixed(0),
+                    };
+                  }),
+                chain_project_id: result?.eventData[2],
+                escrow_address: result?.eventData[5],
+              }),
+            });
+
+            if (resp.status === 200 || resp.status === 201) {
+              const { grant_id } = (await resp.json()) as any;
+              setProjectId(grant_id);
+              setSuccess(true);
+            } else {
+              setError({ message: 'Failed to submit a grant' });
+            }
+            break;
+          } else if (result.txError) {
+            setError({ message: showErrorMessage(result.errorMessage) });
+            break;
+          }
+          break;
+        }
+        await new Promise((f) => setTimeout(f, 1000));
+      }
     } catch (error) {
-      setError(error);
+      // eslint-disable-next-line no-console
+      console.error(error);
+      setError({ message: 'Could not submit grant. Please Try again' });
     } finally {
       setLoading(false);
     }
@@ -239,8 +292,52 @@ const GrantApplication = (): JSX.Element => {
     setApproverPreview(newApprovers);
   };
 
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    milestoneIndex: number | undefined = undefined
+  ) => {
+    const { titleRes, descriptionRes, milestonesRes, errors } =
+      handleApplicationInput(
+        event,
+        milestoneIndex,
+        inputErrors,
+        milestones,
+        title,
+        description
+      );
+    setTitle(titleRes);
+    setDescription(descriptionRes);
+    setMilestones(milestonesRes);
+    setInputErrors(errors);
+  };
+
+  useEffect(() => {
+    setInputErrors((prev) => ({
+      ...prev,
+      approvers: approvers?.length < 4
+        ? ''
+        : 'Please select atleast 4 valid grant approvers',
+    }));
+  }, [approvers.length]);
+
+  useEffect(() => {
+    const { isValid, errors } = validateApplicationInput(
+      'grant',
+      inputErrors,
+      milestones,
+      title,
+      description,
+      approvers
+    );
+    setDisableSubmit(!isValid);
+    setInputErrors(errors);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [title, description, milestones, approvers]);
+
+  if (userLoading) return <FullScreenLoader />;
+
   return (
-    <div className='flex flex-col gap-10 leading-[1.5] hq-layout !mx-3 lg:!mx-auto'>
+    <div className='flex flex-col gap-10 leading-[1.5] !mx-3 lg:!mx-auto'>
       <div className='rounded-[20px] border border-solid border-white bg-background'>
         <p className='px-6 lg:px-12 py-5 text-[20px] text-imbue-purple-dark border-b border-imbue-light-purple'>
           Grant description
@@ -248,27 +345,51 @@ const GrantApplication = (): JSX.Element => {
         <div className='px-6 lg:px-12 py-5 lg:py-8 text-base leading-[1.2]'>
           <div className='flex flex-col-reverse lg:flex-row justify-between gap-10 lg:gap-0'>
             <div className='flex flex-col gap-8 w-full lg:w-3/5'>
-              <div className='flex flex-col gap-4 text-imbue-purple-dark'>
-                <div>Title</div>
+              <div
+                ref={(el) => (milestonesRef.current[0] = el)}
+                className='flex flex-col text-imbue-purple-dark'
+              >
+                <div>Title*</div>
                 <input
+                  autoComplete='off'
                   value={title}
+                  maxLength={50}
                   placeholder='Input title'
-                  onChange={(e) => setTitle(e.target.value)}
-                  className='bg-transparent border border-imbue-purple rounded-md p-3 placeholder:text-imbue-light-purple text-imbue-purple outline-primary'
+                  onChange={handleChange}
+                  name='mainTitle'
+                  className='bg-transparent border border-imbue-purple rounded-md p-3 placeholder:text-imbue-light-purple text-imbue-purple outline-content-primary mt-4'
                 />
+                <div className='flex items-center justify-between mt-2'>
+                  <p className={`text-xs text-imbue-light-purple-two`}>
+                    {inputErrors?.title}
+                  </p>
+                  <div className='text-imbue-purple text-sm ml-auto'>
+                    {`${title?.length || 0}/50`}
+                  </div>
+                </div>
               </div>
-              <div className='flex flex-col gap-4 text-imbue-purple-dark'>
-                <div>Description</div>
+              <div
+                ref={(el) => (milestonesRef.current[1] = el)}
+                className='flex flex-col text-imbue-purple-dark'
+              >
+                <div>Description*</div>
                 <textarea
-                  maxLength={500}
+                  autoComplete='off'
+                  maxLength={5000}
                   value={description}
                   placeholder='Input description'
-                  onChange={(e) => setDescription(e.target.value)}
-                  className='bg-transparent border border-imbue-purple rounded-md placeholder:text-imbue-light-purple text-imbue-purple outline-primary min-h-[160px] p-3'
+                  onChange={handleChange}
+                  name='mainDescription'
+                  className='bg-transparent border border-imbue-purple rounded-md placeholder:text-imbue-light-purple text-imbue-purple outline-content-primary min-h-[160px] p-3 mt-4'
                 />
-                <div className='text-imbue-purple text-sm'>{`${
-                  description?.length || 0
-                }/300`}</div>
+                <div className='flex items-center justify-between mt-2'>
+                  <p className={`text-xs text-imbue-light-purple-two`}>
+                    {inputErrors?.description}
+                  </p>
+                  <div className='text-imbue-purple text-sm text-right'>
+                    {`${description?.length || 0}/5000`}
+                  </div>
+                </div>
               </div>
             </div>
             <div className='flex flex-col gap-[50px] lg:mt-10 lg:w-60'>
@@ -358,16 +479,18 @@ const GrantApplication = (): JSX.Element => {
                   </div>
                 ))}
               </div>
-              <div className='flex flex-col'>
-                <Approvers approvers={approvers} setApprovers={setApprovers} />
-                {/* <div
-                  className='flex flex-row items-center gap-2 clickable-text cursor-pointer active:scale-105 origin-top-left ml-2 my-10'
-                  onClick={onAddApprover}
-                >
-                  <FiPlusCircle color='var(--theme-primary)' />
-                  <p className='w-full'>Add approver</p>
-
-                </div> */}
+              <div
+                ref={(el) => (milestonesRef.current[2] = el)}
+                className='flex flex-col gap-2'
+              >
+                <Approvers
+                  approvers={approvers}
+                  setApprovers={setApprovers}
+                  user={user}
+                />
+                <p className={`text-xs text-imbue-light-purple-two`}>
+                  {inputErrors?.approvers}
+                </p>
               </div>
             </div>
           </div>
@@ -420,10 +543,10 @@ const GrantApplication = (): JSX.Element => {
             </div>
           </div>
         </div>
-        <div className='flex flex-col px-6 lg:px-7 py-5'>
-          <div className='text-[20px] text-content lg:ml-5 mb-8'>
-            Milestones
-          </div>
+        <div className='text-[20px] text-content lg:pl-12 py-5 border-b'>
+          Milestones
+        </div>
+        <div className='flex flex-col px-6 lg:px-12 py-8'>
           <div className='flex flex-col gap-4'>
             {milestones.map(
               ({ name, amount, description: milestoneDescription }, index) => {
@@ -431,98 +554,115 @@ const GrantApplication = (): JSX.Element => {
                   ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
                 );
                 return (
-                  <div key={index} className='flex flex-col gap-0'>
+                  <div
+                    ref={(el) => (milestonesRef.current[index + 3] = el)}
+                    key={index}
+                    className='flex flex-col gap-0'
+                  >
                     <div className='flex flex-row relative'>
-                      <span
-                        onClick={() => onRemoveMilestone(index)}
-                        className='absolute top-[-1rem] right-2 text-sm lg:text-xl text-imbue-purple font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
-                      >
-                        x
-                      </span>
-                      <div className='text-base mr-4 lg:mr-9 text-content mt-0.5'>
+                      {index !== 0 && (
+                        <span
+                          onClick={() => onRemoveMilestone(index)}
+                          className='absolute top-[-1rem] right-2 text-sm lg:text-xl text-imbue-purple font-bold hover:border-red-500 hover:text-red-500 cursor-pointer'
+                        >
+                          x
+                        </span>
+                      )}
+
+                      <div className='text-base mr-2 lg:mr-9 text-content mt-0.5'>
                         {index + 1}.
                       </div>
 
-                      <div className='flex flex-row justify-between w-full text-content'>
-                        <div className='w-3/5'>
-                          <h3 className=' text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
-                            Title
+                      <div className='flex flex-col lg:flex-row justify-between w-full text-content'>
+                        <div className='lg:w-3/5'>
+                          <h3 className='text-base lg:text-xl mb-1 p-0 text-imbue-purple-dark font-normal'>
+                            Title*
                           </h3>
 
-                          <input
-                            type='text'
-                            data-testid={`milestone-title-${index}`}
-                            className='input-budget  text-base leading-5 rounded-[5px] py-3 px-5 text-imbue-purple text-[1rem] text-left  pl-5 mb-8'
-                            value={name || ''}
-                            onChange={(e) =>
-                              setMilestones([
-                                ...milestones.slice(0, index),
-                                {
-                                  ...milestones[index],
-                                  name: e.target.value,
-                                },
-                                ...milestones.slice(index + 1),
-                              ])
-                            }
-                          />
+                          <div className='mb-8'>
+                            <input
+                              autoComplete='off'
+                              type='text'
+                              maxLength={50}
+                              data-testid={`milestone-title-${index}`}
+                              placeholder='Add milestone title'
+                              className='input-budget text-base leading-5 rounded-[5px] !p-3 text-content-primary mb-2 outline-content-primary placeholder:text-imbue-light-purple'
+                              value={name || ''}
+                              onChange={(e) => handleChange(e, index)}
+                              name='milestoneTitle'
+                            />
+                            <div className='flex items-center justify-between'>
+                              <p
+                                className={`text-xs text-imbue-light-purple-two`}
+                              >
+                                {inputErrors?.milestones[index]?.name || ''}
+                              </p>
+                              <div className='text-imbue-purple text-sm ml-auto text-right'>
+                                {`${milestones[index].name?.length || 0}/50`}
+                              </div>
+                            </div>
+                          </div>
 
                           <p className='mb-2 lg:mb-5 text-base lg:text-lg'>
-                            Description
+                            Description*
                           </p>
-                          <textarea
-                            className='input-description text-base'
-                            value={milestoneDescription}
-                            onChange={(e) =>
-                              setMilestones([
-                                ...milestones.slice(0, index),
-                                {
-                                  ...milestones[index],
-                                  description: e.target.value,
-                                },
-                                ...milestones.slice(index + 1),
-                              ])
-                            }
-                          />
+                          <div>
+                            <textarea
+                              autoComplete='off'
+                              maxLength={5000}
+                              placeholder='Add milestone description'
+                              className='input-description text-base outline-content-primary placeholder:text-imbue-light-purple'
+                              value={milestoneDescription}
+                              onChange={(e) => handleChange(e, index)}
+                              name='milestoneDescription'
+                            />
+                            <div className='flex items-center justify-between'>
+                              <p
+                                className={`text-xs text-imbue-light-purple-two`}
+                              >
+                                {inputErrors?.milestones[index]?.description ||
+                                  ''}
+                              </p>
+                              <div className='text-imbue-purple text-sm ml-auto text-right'>
+                                {`${milestones[index].description?.length || 0
+                                  }/5000`}
+                              </div>
+                            </div>
+                          </div>
                         </div>
 
-                        <div className='flex flex-col w-4/12 mt-[-0.2rem]'>
-                          <h3 className=' text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
-                            Amount
+                        <div className='flex flex-col lg:w-4/12 mt-5 lg:mt-[-0.2rem]'>
+                          <h3 className=' text-base lg:text-xl mb-2 p-0 text-imbue-purple-dark font-normal'>
+                            Amount*
                           </h3>
-                          <TextField
-                            color='secondary'
-                            id='outlined-start-adornment'
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment
-                                  sx={{ color: 'var(--theme-purple)' }}
-                                  position='start'
-                                >
-                                  {currencies[currencyId]}
-                                </InputAdornment>
-                              ),
-                            }}
-                            className='amountInput'
-                            type='number'
-                            value={amount || ''}
-                            onChange={(e) =>
-                              setMilestones([
-                                ...milestones.slice(0, index),
-                                {
-                                  ...milestones[index],
-                                  amount: Number(e.target.value),
-                                },
-                                ...milestones.slice(index + 1),
-                              ])
-                            }
-                          />
+                          <div className='w-full relative p-0 m-0'>
+                            <span className='h-fit absolute left-5 bottom-3 text-base text-content'>
+                              {Currency[currencyId]}
+                            </span>
+
+                            <input
+                              type='number'
+                              onWheel={(e) => (e.target as HTMLElement).blur()}
+                              data-testid={`milestone-amount-${index}`}
+                              placeholder='Add an amount'
+                              className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple outline-content-primary'
+                              value={amount || ''}
+                              onChange={(e) => handleChange(e, index)}
+                              name='milestoneAmount'
+                            />
+                          </div>
+                          <p
+                            className={`text-xs text-imbue-light-purple-two mt-2`}
+                          >
+                            {inputErrors?.milestones[index]?.amount || ''}
+                          </p>
 
                           {totalCostWithoutFee !== 0 && (
-                            <div className='flex flex-col items-end mt-3 gap-2 w-full'>
+                            <div className='flex flex-col lg:items-end mt-3 gap-2 w-full'>
                               <div className='mt-2 text-base text-content-primary'>
                                 {percent}%
                               </div>
-                              <div className='progress-bar'>
+                              <div className='progress-bar !w-full'>
                                 <div
                                   className='progress'
                                   style={{
@@ -559,9 +699,8 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${
-                  currencies[currencyId]
-                }`}
+                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
+                  }`}
               </div>
             </div>
 
@@ -569,14 +708,20 @@ const GrantApplication = (): JSX.Element => {
 
             <div className='flex flex-row items-center mb-5'>
               <div className='flex flex-col flex-grow'>
-                <p className='text-lg lg:text-xl text-content m-0 p-0'>
-                  Imbue Service Fee 5% - Learn more about Imbue’s fees
+                <p className='text-lg lg:text-xl text-content m-0 p-0 flex items-center'>
+                  Imbue Service Fee 5% -
+                  <a
+                    href='https://www.imbue.network/faq'
+                    target='_blank'
+                    className='hover:underline ml-2 text-sm cursor-pointer'
+                  >
+                    Learn more about Imbue’s fees
+                  </a>
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${
-                  currencies[currencyId]
-                }`}
+                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
+                  }`}
               </div>
             </div>
 
@@ -595,13 +740,20 @@ const GrantApplication = (): JSX.Element => {
       </div>
 
       <div className='buttons-container'>
-        <button
-          disabled={!formDataValid}
-          className='primary-btn in-dark w-button'
-          onClick={() => handleSubmit()}
+        <Tooltip
+          followCursor
+          leaveTouchDelay={10}
+          title={disableSubmit && 'Please fill all the required input fields'}
         >
-          Submit
-        </button>
+          <button
+            // disabled={!formDataValid}
+            className={`primary-btn in-dark w-button ${disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
+              }`}
+            onClick={() => !disableSubmit && handleSubmit()}
+          >
+            Submit
+          </button>
+        </Tooltip>
       </div>
       {loading && <FullScreenLoader />}
       <Dialog
@@ -609,29 +761,35 @@ const GrantApplication = (): JSX.Element => {
         onClose={() => router.push(`/projects/${projectId}`)}
         aria-labelledby='alert-dialog-title'
         aria-describedby='alert-dialog-description'
-        className='p-14 errorDialogue'
+        className='px-5 md:p-0 errorDialogue'
       >
         <div className='my-auto flex flex-col gap-3 items-center p-8'>
           <div className='f-modal-alert'>
-            <div className='p-10 border-[5px] border-solid border-primary rounded-full  relative'>
-              <Image src={WalletIcon} alt='wallet icon' className='w-24 h-24' />
+            <div className='p-6 lg:p-10 border-[2px] lg:border-[5px] border-primary rounded-full relative'>
+              <Image
+                src={WalletIcon}
+                alt='wallet icon'
+                className='w-10 h-10 lg:w-24 lg:h-24'
+              />
             </div>
           </div>
-          <div className='my-2 lg:my-10'>
-            <p className='text-center text-lg lg:text-3xl font-bold'>
+          <div className='my-2 lg:my-4'>
+            <p className='text-center text-lg lg:text-3xl text-content'>
               Grant Created Successfully
             </p>
           </div>
 
-          <CopyToClipboard text={escrow_address}>
-            <div className='flex flex-row gap-4 items-center rounded-[10px] border border-solid border-light-grey py-8 px-6 text-xl text-content'>
+          <CopyToClipboard text={escrowAddress}>
+            <div className='flex flex-row gap-4 items-center rounded-[10px] border border-solid border-light-grey p-4 lg:p-6 text-xl text-content'>
               <IconButton onClick={() => copyAddress()}>
                 <FaRegCopy className='text-content' />
               </IconButton>
-              <span>{escrow_address}</span>
+              <span className='text-sm lg:text-base break-all'>
+                {escrowAddress}
+              </span>
             </div>
           </CopyToClipboard>
-          <div className='mt-6 mb-12 text-content text-lg text-center'>
+          <div className='my-6 text-content text-sm lg:text-lg text-center'>
             Please use this given address to create a proposal in your Kusama
             treasury. After the voting is passed your project will be created
           </div>
@@ -643,9 +801,8 @@ const GrantApplication = (): JSX.Element => {
           </button>
         </div>
         <Alert
-          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${
-            copied ? 'flex' : 'hidden'
-          }`}
+          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${copied ? 'flex' : 'hidden'
+            }`}
           severity='success'
         >
           Grant Wallet Address Copied to clipboard
@@ -672,5 +829,7 @@ const GrantApplication = (): JSX.Element => {
     </div>
   );
 };
+
+export { getServerSideProps };
 
 export default GrantApplication;

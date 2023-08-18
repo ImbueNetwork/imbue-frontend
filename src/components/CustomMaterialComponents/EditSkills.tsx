@@ -1,8 +1,7 @@
-import React from 'react';
+import { Autocomplete, TextField } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 
-import { suggestedFreelancingSkills } from '@/config/freelancer-data';
-
-import { TagsInput } from '../TagsInput';
+import { searchSkills } from '@/redux/services/briefService';
 
 type EditSkillsProps = {
   skills: string[];
@@ -10,13 +9,40 @@ type EditSkillsProps = {
 };
 
 const EditSkills = ({ skills, setSkills }: EditSkillsProps) => {
+  const [suggestSkill, setSuggestSkills] = useState<any>([]);
+
+  useEffect(() => {
+    const setUp = async () => {
+      await searchSkill('');
+    };
+    setUp();
+  }, []);
+
+  const searchSkill = async (name: string) => {
+    const skillRes = await searchSkills(name);
+    if (!skillRes || !skillRes?.skills.length) return;
+    setSuggestSkills(skillRes?.skills.map((skill) => skill.name));
+  };
+
   return (
     <div className='freelance-xp-container'>
       <div className='skills-container'>
-        <TagsInput
-          suggestData={suggestedFreelancingSkills}
-          tags={skills}
-          onChange={(tags) => setSkills(tags)}
+        <Autocomplete
+          id='tags-standard'
+          multiple
+          getOptionLabel={(option) => option}
+          options={suggestSkill}
+          sx={{ width: '100%' }}
+          onChange={(e, value) => setSkills(value)}
+          defaultValue={skills}
+          renderInput={(params) => (
+            <TextField
+              color='secondary'
+              onChange={(e) => searchSkill(e.target.value)}
+              {...params}
+              autoComplete='off'
+            />
+          )}
         />
       </div>
     </div>

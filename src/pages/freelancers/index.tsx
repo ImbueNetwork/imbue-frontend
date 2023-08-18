@@ -1,14 +1,15 @@
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
 import VerifiedIcon from '@mui/icons-material/Verified';
-import { Grid } from '@mui/material';
+import { Grid, TextField } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import Pagination from 'rc-pagination';
 import React, { useEffect, useState } from 'react';
 
-import CustomDropDown from '@/components/CustomDropDown';
-import CustomModal from '@/components/CustomModal';
+import { strToIntRange } from '@/utils/helper';
+
+import ErrorScreen from '@/components/ErrorScreen';
+import FilterModal from '@/components/Filter/FilterModal';
 
 import {
   chevLeftIcon,
@@ -18,7 +19,6 @@ import {
 } from '@/assets/svgs';
 import styles from '@/styles/modules/freelancers.module.css';
 
-import { strToIntRange } from '../briefs';
 import LoadingFreelancers from '../../components/Freelancers/FreelancersLoading';
 import {
   Freelancer,
@@ -29,13 +29,11 @@ import {
 import {
   callSearchFreelancers,
   getAllFreelancers,
+  getFreelancerFilters,
 } from '../../redux/services/freelancerService';
 import { FreelancerFilterOption } from '../../types/freelancerTypes';
 
-interface FilterModalProps {
-  open: boolean;
-  handleClose: () => void;
-}
+
 
 const Freelancers = (): JSX.Element => {
   const [freelancers, setFreelancers] = useState<
@@ -44,14 +42,16 @@ const Freelancers = (): JSX.Element => {
   const [freelancers_total, setFreelancersTotal] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [skills, setSkills] = useState<Item[]>();
-  const [services, setServices] = useState<Item[]>();
+  const [services, setServices] = useState<Item[]>([{ id: 0, name: "" }]);
   const [languages, setLanguages] = useState<Item[]>();
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const itemsPerPage = 12;
+  const [itemsPerPage, setItemsPerPage] = useState<number>(12);
+  const [searhInput, setSearchInput] = useState<string>("")
+  const [pageInput, setPageInput] = useState<number>(1);
 
   const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
-
+  const [error, setError] = useState<any>()
   const router = useRouter();
 
   const {
@@ -59,7 +59,9 @@ const Freelancers = (): JSX.Element => {
     servicesRangeProps,
     languagesRangeProps,
     freelancerInfoProps,
-    heading,
+    name,
+    page: pageProp,
+    size: sizeProp
   } = router.query;
 
   const { pathname } = router;
@@ -68,52 +70,73 @@ const Freelancers = (): JSX.Element => {
     router.push(`/freelancers/${username}/`);
   };
 
-  const dedupeArray = async (input: any[]) => {
-    if(input[0]) {
-    return input
-      .filter((thing: any, i: any, arr: any) => {
-        return  arr.indexOf(arr.find((t: any) => t.id === thing.id)) === i;
-      })
-      .sort(function (a: any, b: any) {
-        return a.name.localeCompare(b.name);
-      });
-    }
-  };
+  // const dedupeArray = async (input: any[]) => {
+  //   if (input[0]) {
+  //     return input
+  //       .filter((thing: any, i: any, arr: any) => {
+  //         return arr.indexOf(arr.find((t: any) => t?.id === thing?.id)) === i;
+  //       })
+  //       .sort(function (a: any, b: any) {
+  //         return a.name.localeCompare(b.name);
+  //       });
+  //   }
+  // };
 
   useEffect(() => {
     const setFilters = async () => {
       setLoading(true);
-      const data: FreelancerResponse = await getAllFreelancers(
-        itemsPerPage,
-        currentPage
-      );
-      setLoading(false);
-      const combinedSkills = Array.prototype.concat.apply(
-        [],
-        data?.currentData?.map((x: any) => x.skills)
-      ) as Item[];
+      try {
+        const data: FreelancerResponse = await getAllFreelancers(
+          itemsPerPage,
+          currentPage
+        );
+        // const combinedSkills = Array.prototype.concat.apply(
+        //   [],
+        //   data?.currentData?.map((x: any) => x.skills)
+        // ) as Item[];
 
-      const dedupedSkills = combinedSkills.length > 0 ? await dedupeArray(combinedSkills) : [];
-      const combinedServices = Array.prototype.concat.apply(
-        [],
-        data?.currentData?.map((x: any) => x.services)
-      ) as Item[];
-      const dedupedServices = combinedServices ? await dedupeArray(combinedServices) : [];
-      const combinedLanguages = Array.prototype.concat.apply(
-        [],
-        data?.currentData?.map((x: any) => x.languages)
-      ) as Item[];
-      const dedupedLanguages = combinedLanguages ? await dedupeArray(combinedLanguages) : [];
-      setSkills(dedupedSkills);
-      setServices(dedupedServices);
-      setLanguages(dedupedLanguages);
-      setFreelancers(data?.currentData);
-      setFreelancersTotal(data?.totalFreelancers);
-      setLoading(false);
+        // const dedupedSkills =
+        //   combinedSkills.length > 0 ? await dedupeArray(combinedSkills) : [];
+        // const combinedServices = Array.prototype.concat.apply(
+        //   [],
+        //   data?.currentData?.map((x: any) => x.services)
+        // ) as Item[];
+        // const dedupedServices = combinedServices
+        //   ? await dedupeArray(combinedServices)
+        //   : [];
+        // const combinedLanguages = Array.prototype.concat.apply(
+        //   [],
+        //   data?.currentData?.map((x: any) => x.languages)
+        // ) as Item[];
+        // const dedupedLanguages = combinedLanguages
+        //   ? await dedupeArray(combinedLanguages)
+        //   : [];
+        // setSkills(dedupedSkills);
+        // setServices(dedupedServices);
+        // setLanguages(dedupedLanguages);
+        setFreelancers(data?.currentData);
+        setFreelancersTotal(data?.totalFreelancers);
+      } catch (error) {
+        console.log(error);
+      }
+      finally {
+        setLoading(false)
+      }
     };
 
-    setFilters();
-  }, [currentPage, itemsPerPage]);
+    !Object.keys(router?.query).length && router.isReady && setFilters();
+  }, [currentPage, itemsPerPage, router.isReady]);
+
+  useEffect(() => {
+    const getAllFilters = async () => {
+      const filteredItems = await getFreelancerFilters()
+      setSkills(filteredItems.skills);
+      setServices(filteredItems.services);
+      setLanguages(filteredItems.languages);
+    }
+
+    getAllFilters()
+  }, [])
 
   const skillsFilter = {
     filterType: FreelancerFilterOption.Skills,
@@ -168,52 +191,71 @@ const Freelancers = (): JSX.Element => {
     freelancerInfoFilter,
   ];
 
+  const pageItems = [12, 18, 24, 30];
+
   useEffect(() => {
-    const fetchAndSetBriefs = async () => {
+    const fetchAndSetFreelancers = async () => {
       if (Object.keys(router?.query).length) {
+        setLoading(true)
         let filter: FreelancerSqlFilter = {
           skills_range: [],
           services_range: [],
           languages_range: [],
-          search_input: '',
+          name: '',
+          page: currentPage,
+          items_per_page: itemsPerPage
         };
 
-        if (heading) {
-          filter = { ...filter, search_input: heading };
-          const input = document.getElementById(
-            'search-input'
-          ) as HTMLInputElement;
-          if (input) input.value = heading.toString();
+
+        if (sizeProp) {
+          filter = { ...filter, items_per_page: Number(sizeProp) || 12 };
+          setItemsPerPage(Number(sizeProp))
+        }
+
+        if (Number(pageProp)) {
+          filter = { ...filter, page: Number(pageProp) || 1 };
+        }
+
+        if (name) {
+          filter = { ...filter, name: name };
+          // const input = document.getElementById(
+          //   'search-input'
+          // ) as HTMLInputElement;
+          // if (input) input.value = name.toString();
+          setSearchInput(name.toString())
         }
 
         if (skillsRangeProps) {
           const range = strToIntRange(skillsRangeProps);
           range?.forEach?.((v: any) => {
-            setSlectedFilterIds([...selectedFilterIds, `0-${v}`]);
+            if (!selectedFilterIds.includes(`0-${v}`))
+              setSlectedFilterIds([...selectedFilterIds, `0-${v}`]);
           });
-          filter = { ...filter, skills_range: strToIntRange(skillsRangeProps) };
+          filter = { ...filter, skills_range: range };
         }
 
         if (servicesRangeProps) {
           const range = strToIntRange(servicesRangeProps);
 
           range?.forEach?.((v: any) => {
-            setSlectedFilterIds([...selectedFilterIds, `1-${v}`]);
+            if (!selectedFilterIds.includes(`1-${v}`))
+              setSlectedFilterIds([...selectedFilterIds, `1-${v}`]);
           });
           filter = {
             ...filter,
-            services_range: strToIntRange(servicesRangeProps),
+            services_range: range,
           };
         }
 
         if (languagesRangeProps) {
           const range = strToIntRange(languagesRangeProps);
           range?.forEach?.((v: any) => {
-            setSlectedFilterIds([...selectedFilterIds, `2-${v}`]);
+            if (!selectedFilterIds.includes(`2-${v}`))
+              setSlectedFilterIds([...selectedFilterIds, `2-${v}`]);
           });
           filter = {
             ...filter,
-            services_range: strToIntRange(languagesRangeProps),
+            languages_range: strToIntRange(languagesRangeProps),
           };
         }
 
@@ -225,30 +267,51 @@ const Freelancers = (): JSX.Element => {
             setSlectedFilterIds([...selectedFilterIds, '3-0']); // FIXME:
           }
         }
+        try {
+          const { currentData, totalFreelancers } = await callSearchFreelancers(
+            filter
+          );
 
-        const { currentData, totalFreelancers } = await callSearchFreelancers(
-          filter
-        );
-        setFreelancers(currentData);
-        setFreelancersTotal(totalFreelancers);
+          const totalPages = Math.ceil(totalFreelancers / (filter?.items_per_page || 12))
+
+          if (totalPages < filter.page && totalPages > 0) {
+            router.query.page = totalPages.toString()
+            router.push(router, undefined, { shallow: true })
+            filter.page = totalPages
+          }
+
+          setCurrentPage(filter.page)
+          setPageInput(filter.page)
+          setFreelancers(currentData);
+          setFreelancersTotal(totalFreelancers);
+        } catch (error) {
+          setError({ message: "Could not get the results. Please try again" })
+        } finally {
+          setLoading(false)
+        }
       }
     };
 
-    router.isReady && fetchAndSetBriefs();
+    router.isReady && fetchAndSetFreelancers();
   }, [
-    router,
+    router.isReady,
     skills,
     services,
     languages,
     skillsRangeProps,
-    heading,
+    name,
     languagesRangeProps,
     servicesRangeProps,
     freelancerInfoProps,
+    currentPage,
+    itemsPerPage,
+    pageProp
   ]);
+
 
   const onSearch = async () => {
     // The filter initially should return all values
+    setLoading(true);
     let is_search = false;
 
     let skillsRange: number[] = [];
@@ -290,14 +353,15 @@ const Freelancers = (): JSX.Element => {
             default:
               console.log(
                 'Invalid filter option selected or unimplemented. type:' +
-                  filterType
+                filterType
               );
           }
         }
       }
     }
 
-    router.query.heading = search_value !== '' ? search_value : [];
+    router.query.page = '1';
+    router.query.name = search_value !== '' ? search_value : [];
     router.query.skillsRangeProps = skillsRange.length
       ? skillsRange.toString()
       : [];
@@ -314,88 +378,41 @@ const Freelancers = (): JSX.Element => {
     }
     router.push(router, undefined, { shallow: true });
 
-    if (is_search) {
-      const filter: FreelancerSqlFilter = {
-        skills_range: skillsRange,
-        services_range: servicesRange,
-        languages_range: languagesRange,
-        search_input: search_value,
-        items_per_page: itemsPerPage,
-        page: currentPage,
-        verified: freelancerInfo.verified,
-      };
-      if (search_value.length === 0) {
-        setFilterVisible(!filterVisble);
+    try {
+      if (is_search) {
+        const filter: FreelancerSqlFilter = {
+          skills_range: skillsRange,
+          services_range: servicesRange,
+          languages_range: languagesRange,
+          name: search_value,
+          items_per_page: itemsPerPage,
+          page: 1,
+          verified: freelancerInfo.verified,
+        };
+        if (search_value.length === 0) {
+          setFilterVisible(!filterVisble);
+        }
+        const filteredFreelancers: any = await callSearchFreelancers(filter);
+        setFreelancers(filteredFreelancers?.currentData);
+        setFreelancersTotal(filteredFreelancers?.totalFreelancers);
+      } else {
+        const allFreelancers: any = await getAllFreelancers(
+          itemsPerPage,
+          currentPage
+        );
+        setFreelancers(allFreelancers?.currentData);
+        setFreelancersTotal(allFreelancers?.totalFreelancers);
       }
-      const filteredFreelancers: any = await callSearchFreelancers(filter);
-      setFreelancers(filteredFreelancers?.currentData);
-      setFreelancersTotal(filteredFreelancers?.totalFreelancers);
-    } else {
-      const allFreelancers: any = await getAllFreelancers(
-        itemsPerPage,
-        currentPage
-      );
-      setFreelancers(allFreelancers?.currentData);
-      setFreelancersTotal(allFreelancers?.totalFreelancers);
+    } catch (error) {
+      console.error(error);
+    }
+    finally {
+      setLoading(true);
     }
   };
 
   const toggleFilter = () => {
     setFilterVisible(!filterVisble);
-  };
-
-  const FilterModal = ({ open, handleClose }: FilterModalProps) => {
-    return (
-      <CustomModal
-        open={open}
-        onClose={handleClose}
-        className='flex justify-center items-center flex-wrap bg-black bg-opacity-50 top-0 left-0 w-full h-full z-[100] fixed'
-      >
-        <div
-          onClick={(e: any) => {
-            e?.stopPropagation();
-          }}
-          className='bg-white rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[434px] md:w-[60%] w-[95vw] self-center relative'
-        >
-          <p className='font-normal text-base !text-imbue-purple-dark !mb-9'>
-            Filter
-          </p>
-
-          <div className='grid md:grid-cols-3 grid-cols-1 md:gap-10 gap-5'>
-            {customDropdownConfigs
-              ?.filter(({ options }) => options && options.length > 0)
-              ?.map(({ label, filterType, options }) => (
-                <CustomDropDown
-                  key={label}
-                  name={label}
-                  filterType={filterType}
-                  filterOptions={options}
-                  setId={handleSetId}
-                  ids={selectedFilterIds}
-                />
-              ))}
-          </div>
-
-          <div className='h-[39px] text-center gap-5 flex items-center absolute md:bottom-10 bottom-5 right-10'>
-            <button
-              onClick={cancelFilters}
-              data-testid='Apply'
-              className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-coral flex items-center cursor-pointer hover:scale-105 hover:bg-primary hover:text-content'
-            >
-              Cancel
-            </button>
-
-            <button
-              onClick={onSearch}
-              data-testid='Apply'
-              className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 hover:bg-primary hover:text-content'
-            >
-              Apply
-            </button>
-          </div>
-        </div>
-      </CustomModal>
-    );
   };
 
   const reset = async () => {
@@ -407,7 +424,7 @@ const Freelancers = (): JSX.Element => {
       itemsPerPage,
       currentPage
     );
-    await setSlectedFilterIds([]);
+    setSlectedFilterIds([]);
     setFreelancers(allFreelancers?.currentData);
     setFreelancersTotal(allFreelancers?.totalFreelancers);
   };
@@ -417,23 +434,42 @@ const Freelancers = (): JSX.Element => {
     setFilterVisible(false);
   };
 
+  const setPageNumber = (e: any) => {
+    const pageNumber = Number(e.target.value) || 1;
+    const totalPages = Math.ceil(freelancers_total / itemsPerPage)
+
+    if ((e.key === 'Enter' || e.key === 'Enter') && (pageNumber <= totalPages) && (pageNumber > 0)) {
+      setCurrentPage(pageNumber);
+      setPageInput(pageNumber);
+      router.query.page = pageNumber.toString()
+      router.push(router, undefined, { shallow: true });
+    }
+  }
+
   if (loading) return <LoadingFreelancers />;
 
   return (
     <div>
       <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
-        <FilterModal open={filterVisble} handleClose={() => toggleFilter()} />
+        <FilterModal open={filterVisble} handleClose={() => toggleFilter()}
+          {
+          ...{ selectedFilterIds, handleSetId, cancelFilters, customDropdownConfigs, onSearch }
+          }
+        />
         <div
           className={`${styles.freelancersView} max-width-750px:!w-full max-width-750px:px-5`}
         >
-          <div className='bg-white py-[1.5rem] px-[3.88rem] rounded-[1.25rem]'>
+          <div className='bg-white py-[1.5rem] px-6 lg:px-[3.88rem] rounded-[1.25rem]'>
             <div className='flex justify-between lg:flex-row flex-col items-start'>
               <div>
                 <div className='flex items-center'>
                   <input
+                    value={searhInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
                     id='search-input'
                     className='search-input px-[12px] !w-full lg:!w-[20rem] !h-[2.875rem] !rounded-tr-[0px] !rounded-br-[0px] !text-black'
                     placeholder='Search'
+                    autoComplete='off'
                   />
                   <div
                     role='button'
@@ -478,7 +514,6 @@ const Freelancers = (): JSX.Element => {
           <Grid container spacing={4} sx={{ marginTop: '0.75rem' }}>
             {freelancers?.length &&
               freelancers
-                ?.slice?.(0, 10)
                 ?.map?.(
                   (
                     {
@@ -492,7 +527,9 @@ const Freelancers = (): JSX.Element => {
                     index: number
                   ) => (
                     <Grid item xs={12} sm={12} md={3} key={index}>
-                      <div className={`${styles.freelancer} py-[0.94rem]`}>
+                      <div
+                        className={`${styles.freelancer} py-[0.94rem] h-full`}
+                      >
                         <div className='flex items-center justify-center'>
                           <Image
                             src={
@@ -510,15 +547,17 @@ const Freelancers = (): JSX.Element => {
                         </div>
                         <div className={`${styles.freelancerInfo} mt-[0.5rem]`}>
                           <div className='px-[1.25rem]'>
-                            <h3 className='text-[1.25rem] font-medium text-imbue-purple-dark text-center'>
+                            <h3 className='text-xl font-medium text-content text-center'>
                               {display_name}
                             </h3>
-                            <h5 className='text-[0.75rem] text-imbue-purple-dark font-normal'>
-                              {bio}
+                            <h5 className='text-xs lg:text-sm mt-2 text-imbue-purple-dark font-normal whitespace-pre-wrap break-all'>
+                              {bio?.length > 299
+                                ? bio.substring(0, 300) + '...'
+                                : bio}
                             </h5>
                           </div>
                           <div
-                            className={`${styles.skills} ml-4 overflow-scroll`}
+                            className={`${styles.skills} ml-4 overflow-scroll mb-4 flex-wrap`}
                           >
                             {skills
                               ?.slice(0, 3)
@@ -533,9 +572,9 @@ const Freelancers = (): JSX.Element => {
                           </div>
                         </div>
 
-                        <div className='px-[1.25rem] mt-[1.25rem]'>
+                        <div className='px-[1.25rem] mt-auto'>
                           <button
-                            className='w-full h-[2.6rem] border border-imbue-purple-dark rounded-[1.5rem] font-normal text-[1rem] text-imbue-purple-dark'
+                            className='w-full h-[2.6rem] border border-content rounded-[1.5rem] font-normal text-base text-content'
                             onClick={() => redirectToProfile(username)}
                           >
                             View Freelancer
@@ -547,38 +586,104 @@ const Freelancers = (): JSX.Element => {
                 )}
           </Grid>
 
-          <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center justify-between   self-center'>
-            <Pagination
-              pageSize={itemsPerPage}
-              total={freelancers_total}
-              onChange={(page: number) => setCurrentPage(page)}
-              className='flex flex-row items-center lg:px-10'
-              itemRender={(page, type, originalElement) => {
-                if (type === 'page') {
-                  return (
-                    <div className='mx-[1.62rem] text-[#5E5E5E] text-[0.7rem] lg:text-[1rem] font-normal'>
-                      {page} of {(freelancers_total / itemsPerPage).toFixed(0)}
-                    </div>
-                  );
-                }
-                return originalElement;
-              }}
-              prevIcon={
-                <button className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'>
-                  <Image src={chevLeftIcon} alt='chev left' />
-                  Previous
-                </button>
-              }
-              nextIcon={
-                <button className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'>
-                  Next
-                  <Image src={chevRightIcon} alt='chev right' />
-                </button>
-              }
-            />
+          <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center justify-between  max-width-868px:w-[90%] self-center'>
+            <div className='flex items-center'>
+              <button
+                onClick={() => {
+                  if (currentPage > 1) {
+                    router.query.page = String(currentPage - 1)
+                    router.push(router, undefined, { shallow: true })
+                    setCurrentPage(currentPage - 1)
+                    setPageInput(currentPage - 1)
+                  }
+                }}
+                className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'
+              >
+                <Image src={chevLeftIcon} alt='chev left' />
+                Previous
+              </button>
+
+              <div className='mx-[1.62rem] text-[#5E5E5E] text-[0.7rem] lg:text-[1rem] font-normal flex items-center gap-3'>
+                <TextField
+                  id="standard-size-small"
+                  className='!mb-0'
+                  inputProps={{
+                    className: "w-6 text-right px-1",
+                    type: "number",
+                    min: 1,
+                    max: Math.ceil(freelancers_total / itemsPerPage)
+                  }}
+                  onChange={(e) => setPageInput(Number(e.target.value))}
+                  onKeyDown={(e) => setPageNumber(e)}
+                  value={pageInput}
+                  variant="standard" />
+                <span>
+                  of
+                </span>
+                <span>
+                  {Math.ceil(freelancers_total / itemsPerPage)}
+                </span>
+                {/* {currentPage} of {Math.ceil(freelancers_total / itemsPerPage)} */}
+              </div>
+
+              <button
+                onClick={() => {
+                  if (freelancers_total > currentPage * itemsPerPage) {
+                    setCurrentPage(currentPage + 1);
+                    setPageInput(currentPage + 1);
+                    router.query.page = String(currentPage + 1)
+                    router.push(router, undefined, { shallow: true })
+                  }
+                }}
+                className='py-[0.5rem] px-[1rem] border border-imbue-purple-dark rounded-[0.5rem] bg-transparent text-[0.7rem] lg:text-[1rem] font-normal text-imbue-foundation-blue flex items-center'
+              >
+                Next
+                <Image src={chevRightIcon} alt='chev right' />
+              </button>
+            </div>
+
+            <div className='flex items-center'>
+              <p className='!text-imbue-purple !mr-[10px]'>Items per page:</p>
+              <div className='network-amount'>
+                <select
+                  name='currencyId'
+                  onChange={(e) => {
+                    router.query.size = String(e.target.value)
+                    router.push(router, undefined, { shallow: true })
+                    setItemsPerPage(Number(e.target.value));
+                  }}
+                  value={itemsPerPage}
+                  placeholder='Select a currency'
+                  className='bg-white outline-none round border border-imbue-purple rounded-[0.5rem] text-base px-5 h-[2.75rem] text-imbue-purple-dark'
+                  required
+                >
+                  {[...pageItems].map((item: any) => (
+                    <option value={item} key={item} className='duration-option'>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
     </div>
   );
 };

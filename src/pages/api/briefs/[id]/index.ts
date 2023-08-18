@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
+import passport from 'passport';
 
 import * as models from '@/lib/models';
 import { Brief, BriefSqlFilter, fetchItems } from '@/lib/models';
@@ -7,6 +8,7 @@ import { Brief, BriefSqlFilter, fetchItems } from '@/lib/models';
 import db from '@/db';
 
 export default nextConnect()
+  .use(passport.initialize())
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
     const { id } = req.query;
     if (!id) return;
@@ -32,15 +34,16 @@ export default nextConnect()
   })
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
     const data = req.body as BriefSqlFilter;
+    // const userAuth: Partial<models.User> | any = await authenticate(
+    //   'jwt',
+    //   req,
+    //   res
+    // );
+    // verifyUserIdFromJwt(req, res, [userAuth.id]);
+
     await db.transaction(async (tx: any) => {
       try {
-        const briefs: Array<Brief> = await models.searchBriefs(tx, data);
-
-        const { currentData, totalItems } = await models.paginatedData(
-          Number(data?.page || 1),
-          Number(data?.items_per_page || 5),
-          briefs
-        );
+        const currentData: Array<Brief> = await models.searchBriefs(data)(tx);
 
         await Promise.all([
           currentData,
@@ -53,9 +56,28 @@ export default nextConnect()
           }),
         ]);
 
-        res.status(200).json({ currentData, totalBriefs: totalItems });
+        // const totalBriefs = await models
+        //   .searchBriefs({
+        //     ...data,
+        //     items_per_page: 0,
+        //   })(tx)
+        //   .then((resp) => resp.length);
+
+        const briefCount = await models.searchBriefsCount({
+          ...data,
+          items_per_page: 0,
+        })(tx);
+
+        // const { currentData, totalItems } = await models.paginatedData(
+        //   Number(data?.page || 1),
+        //   Number(data?.items_per_page || 5),
+        //   briefs
+        // );
+
+        res.status(200).json({ currentData, totalBriefs: briefCount });
       } catch (e) {
-        new Error(`Failed to search for briefs ${data}`, { cause: e as Error });
+        res.status(401).json({ currentData: [], totalBriefs: 0 });
+        throw new Error(`Failed to search for briefs`, { cause: e as Error });
       }
     });
   });

@@ -1,7 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Skeleton } from '@mui/material';
-import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import {
   Channel,
@@ -9,8 +7,6 @@ import {
   MessageInput,
   MessageList,
   Thread,
-  useChannelStateContext,
-  useChatContext,
   Window,
 } from 'stream-chat-react';
 import 'stream-chat-react/dist/css/v2/index.css';
@@ -19,6 +15,8 @@ import { getStreamChat } from '@/utils';
 
 import { User } from '@/model';
 
+import { CustomChannelHeader } from './StreamChatComponents/CustomChannelHeader';
+
 
 export type ChatProps = {
   user: User;
@@ -26,49 +24,9 @@ export type ChatProps = {
   setShowMessageBox: (_show: boolean) => void;
   showMessageBox: boolean;
   chatPopUp?: boolean;
+  showFreelancerProfile: boolean;
 };
 
-export function CustomChannelHeader(props: any) {
-  const { closeChat, chatPopUp } = props;
-
-  const { members = {}, watcher_count } = useChannelStateContext();
-  const { client } = useChatContext();
-  const membersCount = Object.keys(members).length;
-  let chatTitle = 'Not Found';
-
-  Object.keys(members).forEach(function (key) {
-    if (membersCount === 2 && key !== client.userID) chatTitle = key;
-  });
-
-  return (
-    <div className='py-2 lg:py-3 border-b border-b-imbue-light-purple'>
-      <div className='w-full flex gap-2 lg:gap-3 items-center ml-3'>
-        {!chatPopUp && (
-          <span className='md:hidden' onClick={closeChat}>
-            <ArrowBackIcon />
-          </span>
-        )}
-        <div className='relative'>
-          <Image
-            src={require('@/assets/images/profile-image.png')}
-            className='w-9 h-9 lg:w-12 lg:h-12 rounded-full object-cover object-top'
-            alt='profileImage'
-          />
-          {watcher_count && watcher_count >= 2 && (
-            <div className='h-4 w-4 bg-green-500 rounded-full absolute bottom-0 right-0 border-2 border-black'></div>
-          )}
-        </div>
-        <div className='flex flex-col items-start'>
-          <span className='header-pound font-bold text-sm lg:text-lg break-words max-w-[130px] md:max-w-full text-imbue-purple'>
-            {chatTitle.length > 22
-              ? `${chatTitle?.substring(0, 22)}...`
-              : chatTitle}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function CustomSkeletonLoading() {
   return (
@@ -117,6 +75,7 @@ export const ChatBox = ({
   showMessageBox,
   setShowMessageBox,
   chatPopUp,
+  showFreelancerProfile
 }: ChatProps) => {
   const [content, setContent] = useState<any>(<CustomSkeletonLoading />);
 
@@ -128,9 +87,9 @@ export const ChatBox = ({
         if (client) {
           const currentChannel = `${targetUser.display_name} <> ${user.display_name}`;
 
-          client.connectUser(
+          await client.connectUser(
             {
-              id: user.username,
+              id: String(user.id),
               name: user.display_name,
             },
             user.getstream_token
@@ -139,7 +98,7 @@ export const ChatBox = ({
           const channel = client.channel('messaging', {
             image: 'https://www.drupal.org/files/project-images/react.png',
             name: currentChannel,
-            members: [user.username, targetUser.username],
+            members: [String(user.id), String(targetUser.id)],
           });
 
           await channel.watch();
@@ -155,7 +114,7 @@ export const ChatBox = ({
                     >
                       x
                     </div>
-                    <CustomChannelHeader chatPopUp={chatPopUp} />
+                    <CustomChannelHeader {...{ targetUser, showFreelancerProfile, chatPopUp }} />
                   </div>
                   <MessageList />
                   <div className='border-t border-t-white border-opacity-25'>

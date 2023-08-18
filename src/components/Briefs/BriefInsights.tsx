@@ -1,7 +1,7 @@
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import Image from 'next/image';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { redirect } from '@/utils';
 
@@ -14,6 +14,8 @@ interface BriefInsightsProps {
 }
 
 export const BriefInsights = ({ brief }: BriefInsightsProps) => {
+  const [expandBreifDesc, setExpandBreifDesc] = useState<number>(500)
+
   const timeAgo = new TimeAgo('en-US');
   const timePosted = brief?.created
     ? timeAgo.format(new Date(brief?.created))
@@ -38,9 +40,25 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
           </span>
         </div>
         <div className='text-inactive'>
-          <p className=' text-imbue-purple text-[1rem] leading-6'>
-            {brief?.description}
+          <p className='text-imbue-purple text-[1rem] leading-6 whitespace-pre-wrap'>
+            {
+              brief.description.length > expandBreifDesc
+                ? brief.description.substring(0, expandBreifDesc) + " ..."
+                : brief.description
+            }
+            {
+              brief.description.length > 500 && (
+                <span>
+                  {
+                    brief.description.length > expandBreifDesc
+                      ? <button onClick={() => setExpandBreifDesc((prev) => prev + 500)} className='ml-3 w-fit text-sm hover:underline text-imbue-lemon'>Show more</button>
+                      : <button onClick={() => setExpandBreifDesc(500)} className='ml-3 w-fit text-sm hover:underline text-imbue-lemon'>Show Less</button>
+                  }
+                </span>
+              )
+            }
           </p>
+
         </div>
         <p className=' text-imbue-light-purple-two text-xs leading-[1.5] m-0 p-0'>
           Posted {timePosted}{' '}

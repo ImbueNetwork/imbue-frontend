@@ -12,6 +12,7 @@ export interface TextInputProps
 
 export const TextArea = (props: TextInputProps): JSX.Element => {
   const [remaining, setRemaining] = useState(props.maxLength ?? 0);
+  
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     props.maxLength && setRemaining(props.maxLength - e.target.value.length);
     props.onChange(e);
@@ -28,10 +29,13 @@ export const TextArea = (props: TextInputProps): JSX.Element => {
       {getTitle(props.title)}
       <textarea {...props} onChange={handleChange} />
       {props.maxLength && (
-        <p className='textarea-remaining'>{`${remaining} character${
+        <p className='textarea-remaining text-content'>{`${remaining} character${
           remaining !== 1 ? 's' : ''
         } remaining`}</p>
       )}
+      {
+
+      }
     </>
   );
 };

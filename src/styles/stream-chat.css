@@ -13,12 +13,25 @@
   height: 75vh;
 }
 
+.str-chat__edit-message-form-options {
+  gap: 12px;
+}
+
+.str-chat__list {
+  padding-top: 30px;
+}
+
+.pin-text {
+  font-style: italic;
+  color: grey;
+}
+
 /* left side */
 .chat-list-container {
   width: 30%;
 }
 
-.str-chat__channel-list-react .str-chat__channel-list-messenger-react{
+.str-chat__channel-list-react .str-chat__channel-list-messenger-react {
   padding-bottom: 0 !important;
 }
 
@@ -27,6 +40,10 @@
 .str-chat__channel-preview {
   padding: 25px 20px !important;
 }
+
+/* .str-chat__message-actions-list {
+  z-index: 100 !important;
+} */
 
 .str-chat__channel-search .str-chat__channel-search-bar {
   padding: 0;
@@ -79,7 +96,7 @@
 }
 
 .str-chat ::-webkit-scrollbar-track {
-  background: var( --theme-light-grey);
+  background: var(--theme-light-grey);
   border-radius: 10px;
 }
 
@@ -119,10 +136,29 @@
   .str-chat__channel-search-input--clear-button
   svg
   path {
-    fill: var(--theme-purple) !important;
+  fill: var(--theme-purple) !important;
 }
 .str-chat svg path {
   fill: var(--theme-purple) !important;
+}
+
+.str-chat__message-input
+  .str-chat__message-textarea-container
+  .str-chat__message-textarea {
+  color: var(--theme-content) !important;
+}
+.str-chat__message
+  .str-chat__message-inner
+  .str-chat__message-bubble
+  .str-chat__message-text
+  p,
+.str-chat__quoted-message-preview
+  .str-chat__message-inner
+  .str-chat__message-bubble
+  .str-chat__message-text
+  p {
+  color: var(--theme-content) !important;
+  font-weight: 400;
 }
 
 @media screen and (max-width: 500px) {
@@ -195,4 +231,26 @@
   .str-chat__channel-list .str-chat__channel-list-messenger {
     height: 66vh !important;
   }
+}
+
+.str-chat__message-simple__actions {
+  width: 100%;
+}
+.str-chat__message-actions-box {
+  inset-block-end: -550% !important;
+  inset-inline-start: -550% !important;
+}
+
+.str-chat__li--bottom .str-chat__message-actions-box {
+  inset-block-end: 70% !important;
+  inset-inline-start: -550% !important;
+}
+.str-chat__li--middle:nth-last-child(2) .str-chat__message-actions-box {
+  inset-block-end: 70% !important;
+  inset-inline-start: -550% !important;
+}
+
+.str-chat__li--middle:nth-last-child(3) .str-chat__message-actions-box {
+  inset-block-end: 70% !important;
+  inset-inline-start: -550% !important;
 }

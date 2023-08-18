@@ -9,11 +9,11 @@ import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { FaStar } from 'react-icons/fa';
 
 import { getBalance } from '@/utils/helper';
 
 import {
+  applicationStatusId,
   Brief,
   Currency,
   Freelancer,
@@ -23,8 +23,10 @@ import {
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 
 import AccountChoice from '../AccountChoice';
+import BackButton from '../BackButton';
 import ErrorScreen from '../ErrorScreen';
 import { HirePopup } from '../HirePopup';
+import CountrySelector from '../Profile/CountrySelector';
 
 interface MilestoneItem {
   name: string;
@@ -35,7 +37,7 @@ type BriefOwnerHeaderProps = {
   brief: Brief;
   freelancer: Freelancer;
   application: Project | any;
-  handleMessageBoxClick: (_userId: number, _freelancer: any) => void;
+  handleMessageBoxClick: (_userId: number) => void;
   updateApplicationState: (
     _application: any,
     _projectStatus: OffchainProjectState
@@ -69,7 +71,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
 
   const [balance, setBalance] = useState<string>();
   const [imbueBalance, setImbueBalance] = useState<string>();
-  const [loadingWallet, setLoadingWallet] = useState<string>("");
+  const [loadingWallet, setLoadingWallet] = useState<string>('');
   const [error, setError] = useState<any>();
 
   const [openPopup, setOpenPopup] = useState<boolean>(false);
@@ -104,7 +106,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         setError({ message: 'Could not connect wallet. Please Try again' });
       }
     } catch (error) {
-      setError(error);
+      setError({ message: error });
     } finally {
       setLoadingWallet('');
     }
@@ -127,7 +129,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         setBalance(balance.toLocaleString());
         setImbueBalance(imbueBalance.toLocaleString());
       } catch (error) {
-        setError(error);
+        setError({ message: error });
       } finally {
         setLoadingWallet('');
       }
@@ -138,27 +140,43 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
   const mobileView = useMediaQuery('(max-width:480px)');
 
   return (
-    <div className='flex items-center w-full md:justify-between lg:px-10 flex-wrap gap-4'>
-      <div className='flex gap-[3rem] items-start'>
-        <Image
-          className='w-[3rem] h-[3rem] rounded-full object-cover cursor-pointer'
-          src={require('@/assets/images/profile-image.png')}
-          priority
-          alt='profileImage'
-        />
-        <div>
+    <div className='flex items-center w-full md:justify-between lg:px-10 flex-wrap gap-4 relative'>
+      <BackButton className='absolute left-0 top-5' />
+      <div className='flex items-start'>
+        <div className='flex flex-col items-start'>
           <Badge
             badgeContent={'Hired'}
-            color='primary'
+            color='secondary'
             invisible={
               !(application?.status_id === OffchainProjectState.Accepted)
             }
           >
+            <Image
+              onClick={() =>
+                router.push(`/freelancers/${freelancer?.username}`)
+              }
+              className='w-16 h-16 rounded-full object-cover cursor-pointer'
+              src={
+                freelancer?.profile_image ??
+                require('@/assets/images/profile-image.png')
+              }
+              height={200}
+              width={200}
+              priority
+              alt='profileImage'
+            />
+          </Badge>
+          <p className='text-sm mt-4 text-content-primary lg:text-center break-words'>
+            @
+            {mobileView && freelancer?.username?.length > 16
+              ? `${freelancer?.username?.substring(0, 16)}...`
+              : freelancer?.username}
+          </p>
+          <div className='flex flex-col gap-1 mt-2'>
             <p className='text-[1.25rem] font-normal capitalize text-imbue-purple'>
               {freelancer?.display_name}
             </p>
-          </Badge>
-          {/* 
+            {/* 
           <div className='flex items-center mt-[1rem]'>
             <Image
               className='h-4 w-6 object-cover'
@@ -173,41 +191,12 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
             </h3>
           </div> */}
 
-          {application?.currency_id !== Currency.IMBU && (
-            <p className='text-sm mt-[1.25rem] text-imbue-purple'>
-              {loadingWallet === 'loading' && 'Loading Wallet...'}
-              {loadingWallet === 'connecting' && 'Connecting Wallet...'}
-              {!loadingWallet &&
-                (balance === undefined
-                  ? 'No wallet found'
-                  : `Requested Currency Balance: ${balance} $${
-                      Currency[application?.currency_id ?? 0]
-                    }`)}
-            </p>
-          )}
-
-          <p className='text-sm mt-[1.25rem] text-imbue-purple'>
-            {loadingWallet === 'loading' && 'Loading Wallet...'}
-            {loadingWallet === 'connecting' && 'Connecting Wallet...'}
-            {!loadingWallet &&
-              (balance === undefined
-                ? 'No wallet found'
-                : `Your Imbue Balance: ${imbueBalance} $${Currency[Currency.IMBU]}`)}
-          </p>
+            <CountrySelector user={freelancer} />
+          </div>
         </div>
       </div>
 
-      <div className='flex flex-col justify-center items-center'>
-        {
-          <p className='text-[1rem] text-imbue-purple max-w-[55%] text-center break-words'>
-            @
-            {mobileView && freelancer?.username?.length > 16
-              ? `${freelancer?.username?.substr(0, 16)}...`
-              : freelancer?.username}
-          </p>
-        }
-
-        <div className='rating flex justify-center gap-[1.25rem] mt-[1.5rem]'>
+      {/* <div className='rating flex justify-center gap-4 mt-2 lg:mt-6'>
           <p className=''>
             <FaStar color='#BAFF36' />
             <FaStar color='#BAFF36' />
@@ -217,79 +206,89 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
           <p className='text-imbue-purple font-normal'>
             <span>Top Rated</span>
             <span className='review-count ml-1 text-imbue-purple font-normal'>
-              (1434 reviews)
+              (1,434 reviews)
             </span>
           </p>
-        </div>
-      </div>
+        </div> */}
 
-      <div className='relative flex gap-3'>
-        <button
-          className='Pending Review-btn !bg-[#BAFF36] !text-imbue-purple in-dark h-[2.68rem] text-xs lg:text-base rounded-full px-6 lg:px-6'
-          onClick={() =>
-            application.user_id &&
-            handleMessageBoxClick(application?.user_id, freelancer?.username)
-          }
-        >
-          Message
-        </button>
+      <div className='flex flex-col items-end'>
+        <div className='relative flex flex-wrap items-center gap-3'>
+          <button
+            className='primary-btn in-dark w-button !px-5 !mr-0 !bg-[#BAFF36] !text-imbue-purple in-dark'
+            onClick={() =>
+              application.user_id && handleMessageBoxClick(freelancer?.user_id)
+            }
+          >
+            Message
+          </button>
 
-        {loadingWallet || balance !== undefined ? (
-          <button
-            id='demo-customized-button'
-            aria-controls={open ? 'demo-customized-menu' : undefined}
-            aria-haspopup='true'
-            aria-expanded={open ? 'true' : undefined}
-            onClick={handleOptionsClick}
-            className='primary-btn hover:!bg-imbue-purple hover:!text-white in-dark w-button !text-xs lg:!text-base'
-            disabled={loadingWallet ? true : false}
-          >
-            {loadingWallet ? (
-              'Please Wait...'
-            ) : (
-              <>
-                Options
-                <KeyboardArrowDownIcon fontSize='small' className='ml-2' />
-              </>
-            )}
-          </button>
-        ) : (
-          <button
-            onClick={() => setOpenAccountChoice(true)}
-            className='primary-btn in-dark w-button !text-xs lg:!text-base'
-          >
-            Connect Wallet
-          </button>
-        )}
-        <Menu
-          id='basic-menu'
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleOptionsClose}
-          MenuListProps={{
-            'aria-labelledby': 'basic-button',
-          }}
-        >
-          <MenuItem
-            onClick={() => {
-              handleOptionsClose();
-              router.push(`/freelancers/${freelancer?.username}/`);
-            }}
-            className='!text-imbue-purple'
-          >
-            Freelancer Profile
-          </MenuItem>
-          {application?.status_id == OffchainProjectState.PendingReview && (
-            <div>
-              <MenuItem
-                onClick={() => {
-                  handleOptionsClose();
-                  setOpenPopup(true);
-                }}
-                className='!text-imbue-purple'
+          {loadingWallet || balance !== undefined ? (
+            <>
+              <button
+                id='demo-customized-button'
+                aria-controls={open ? 'demo-customized-menu' : undefined}
+                aria-haspopup='true'
+                aria-expanded={open ? 'true' : undefined}
+                onClick={handleOptionsClick}
+                className='primary-btn in-dark w-button !mr-0 hover:!bg-content-primary hover:!text-white'
+                disabled={loadingWallet ? true : false}
               >
-                Hire
-              </MenuItem>
+                {loadingWallet ? (
+                  'Please Wait...'
+                ) : (
+                  <>
+                    Options
+                    <KeyboardArrowDownIcon fontSize='small' className='ml-2' />
+                  </>
+                )}
+              </button>
+              <button
+                className={`${
+                  applicationStatusId[application?.status_id]
+                }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[10px]`}
+              >
+                {applicationStatusId[application?.status_id]}
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => setOpenAccountChoice(true)}
+              className='primary-btn in-dark w-button !text-xs lg:!text-base'
+            >
+              Connect Wallet
+            </button>
+          )}
+          <Menu
+            id='basic-menu'
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleOptionsClose}
+            MenuListProps={{
+              'aria-labelledby': 'basic-button',
+            }}
+          >
+            <MenuItem
+              onClick={() => {
+                handleOptionsClose();
+                router.push(`/freelancers/${freelancer?.username}/`);
+              }}
+              className='!text-imbue-purple'
+            >
+              Freelancer Profile
+            </MenuItem>
+            <div>
+              {application?.status_id !== OffchainProjectState.Accepted && (
+                <MenuItem
+                  onClick={() => {
+                    handleOptionsClose();
+                    setOpenPopup(true);
+                  }}
+                  className='!text-imbue-purple'
+                >
+                  Hire
+                </MenuItem>
+              )}
+
               <MenuItem
                 onClick={() => {
                   handleOptionsClose();
@@ -302,21 +301,47 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
               >
                 Request Changes
               </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  handleOptionsClose();
-                  updateApplicationState(
-                    application,
-                    OffchainProjectState.Rejected
-                  );
-                }}
-                className='!text-imbue-purple'
-              >
-                Reject
-              </MenuItem>
+
+              {application?.status_id !== OffchainProjectState.Rejected && (
+                <MenuItem
+                  onClick={() => {
+                    handleOptionsClose();
+                    updateApplicationState(
+                      application,
+                      OffchainProjectState.Rejected
+                    );
+                  }}
+                  className='!text-imbue-purple'
+                >
+                  Reject
+                </MenuItem>
+              )}
             </div>
+          </Menu>
+        </div>
+
+        <div className='flex flex-col gap-1 mt-5 justify-center lg:items-end'>
+          <p className='text-content'>Balance</p>
+          {application?.currency_id !== Currency.IMBU ? (
+            <p className='text-sm text-imbue-purple'>
+              {loadingWallet === 'loading' && 'Loading Wallet...'}
+              {loadingWallet === 'connecting' && 'Connecting Wallet...'}
+              {!loadingWallet &&
+                (balance === undefined
+                  ? 'No wallet found'
+                  : `$${Currency[application?.currency_id ?? 0]}: ${balance}`)}
+            </p>
+          ) : (
+            <p className='text-sm lg:text-base text-imbue-purple'>
+              {loadingWallet === 'loading' && 'Loading Wallet...'}
+              {loadingWallet === 'connecting' && 'Connecting Wallet...'}
+              {!loadingWallet &&
+                (balance === undefined
+                  ? 'No wallet found'
+                  : `$${Currency[Currency.IMBU]}: ${imbueBalance}`)}
+            </p>
           )}
-        </Menu>
+        </div>
       </div>
 
       <HirePopup

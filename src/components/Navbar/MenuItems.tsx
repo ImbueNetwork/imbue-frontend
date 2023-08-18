@@ -23,7 +23,7 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
     {
       icon: 'account_balance',
       text: 'Submit A Grant',
-      link: '/briefs/new',
+      link: '/grants/new',
       needAuthentication: true,
       duplicate: true,
     },
@@ -44,7 +44,7 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
     {
       icon: 'person',
       text: 'Profile',
-      link: `/profile/${user?.id}/`,
+      link: `/profile/${user?.username}/`,
       needAuthentication: true,
       duplicate: false,
     },
@@ -101,7 +101,7 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
                 {item?.icon}
               </i>
             </ListItemIcon>
-            <p className='text-imbue-purple-dark'>{item?.text}</p>
+            <p className='text-imbue-purple-dark text-sm lg:text-base'>{item?.text}</p>
           </MenuItem>
         ))}
       </div>

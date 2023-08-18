@@ -6,12 +6,14 @@ type SuccessScreenProps = {
   setOpen: (_open: boolean) => void;
   children: ReactNode;
   title: string;
+  noRetry?: boolean;
 };
 
 const SuccessScreen = (props: SuccessScreenProps) => {
-  const { open, setOpen, title } = props;
+  const { open, setOpen, title, noRetry = true } = props;
 
   const handleClose = () => {
+    if (noRetry) return;
     setOpen(false);
   };
 

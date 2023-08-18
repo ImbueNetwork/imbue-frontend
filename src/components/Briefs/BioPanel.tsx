@@ -1,7 +1,7 @@
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useState } from 'react';
 import { FiEdit } from 'react-icons/fi';
 
 import { Brief } from '@/model';
@@ -14,30 +14,29 @@ type BioPanelData = {
   brief: Brief;
   projectCategories: string[];
   isOwnerOfBrief?: boolean | null;
+  targetUser: any;
 };
 
 const BioPanel = ({
   brief,
   projectCategories,
   isOwnerOfBrief,
+  targetUser,
 }: BioPanelData) => {
+  const [expandBreifDesc, setExpandBreifDesc] = useState<number>(500);
   const timePosted = timeAgo.format(new Date(brief.created));
   const router = useRouter();
-
   return (
-    <div className='brief-bio py-5 px-10 max-width-750px:!p-5 max-width-750px:!w-full max-width-1100px:p-[1rem]'>
-      <div className='subsection max-width-750px:!my-0'>
-        <div className='flex flex-wrap flex-col items-start'>
+    <div className='brief-bio py-5 px-10 max-width-750px:!p-5 max-width-750px:!w-full max-width-1100px:p-[1rem] relative'>
+      <div className='mb-6'>
+        <div className='flex flex-wrap flex-col items-start mb-1'>
           <div className='header'>
-            <h2 className='text-[1.875rem] text-imbue-purple-dark !font-normal'>
-              Brief Details
-            </h2>
-            <h2 className='!text-[1.25rem] mt-[1.5rem] text-imbue-purple-dark !font-normal'>
+            <p className='!text-3xl text-imbue-purple-dark !font-normal'>
               {brief.headline}
-            </h2>
+            </p>
           </div>
 
-          {isOwnerOfBrief && (
+          {isOwnerOfBrief && !brief?.project_id && (
             <button
               className='primary-btn 
               in-dark w-[auto] 
@@ -49,7 +48,7 @@ const BioPanel = ({
               !self-start
               '
               onClick={() => {
-                router.push(`/briefs/${brief?.id}/edit`);
+                router.replace(`/briefs/${brief?.id}/edit`);
               }}
             >
               Edit Brief
@@ -57,17 +56,44 @@ const BioPanel = ({
             </button>
           )}
         </div>
-        <span className='time_posted primary-text mt-3 !text-imbue-lemon mt-[0.75rem]'>
-          Posted {timePosted} by {brief.created_by}
+        <span className='text-sm primary-text !text-imbue-lemon'>
+          Posted {timePosted} by{' '}
+          <span
+            onClick={() => router.push(`/profile/${targetUser.username}`)}
+            className='hover:underline cursor-pointer'
+          >
+            {brief.created_by}
+          </span>
         </span>
       </div>
 
-      <div className='subsection'>
+      <div className='subsection break-all'>
         <h3 className='text-imbue-purple-dark !font-normal'>
           Project Description
         </h3>
-        <p className='mt-4 font-normal text-imbue-purple-dark'>
-          {brief.description}
+        <p className='mt-4 text-imbue-purple-dark whitespace-pre-wrap !leading-normal'>
+          {brief.description.length > expandBreifDesc
+            ? brief.description.substring(0, expandBreifDesc) + ' ...'
+            : brief.description}
+          {brief.description.length > 500 && (
+            <span>
+              {brief.description.length > expandBreifDesc ? (
+                <button
+                  onClick={() => setExpandBreifDesc((prev) => prev + 500)}
+                  className='ml-3 w-fit text-sm hover:underline text-imbue-lemon'
+                >
+                  Show more
+                </button>
+              ) : (
+                <button
+                  onClick={() => setExpandBreifDesc(500)}
+                  className='ml-3 w-fit text-sm hover:underline text-imbue-lemon'
+                >
+                  Show Less
+                </button>
+              )}
+            </span>
+          )}
         </p>
       </div>
 

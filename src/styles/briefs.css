@@ -180,7 +180,7 @@ input::placeholder {
 }
 
 .proposals-count {
-  color: var(--theme-coral);
+  color: var(--theme-purple);
   font-weight: 300;
 }
 

@@ -1,33 +1,45 @@
 /* eslint-disable no-console */
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Skeleton } from '@mui/material';
+//import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 import { Freelancer, Project } from '@/model';
-import { getBriefApplications } from '@/redux/services/briefService';
+import {
+  getBriefApplications,
+  getUserBriefs,
+} from '@/redux/services/briefService';
+import { getUsersOngoingGrants } from '@/redux/services/projectServices';
 
-import { ApplicationContainer } from '../Briefs/ApplicationContainer';
-import { BriefLists } from '../Briefs/BriefsList';
+// import OngoingProject from './FreelacerView/OngoingProject/OngoingProject';
+// import { ApplicationContainer } from '../Briefs/ApplicationContainer';
+// import ApplicationSkeleton from '../Briefs/ApplicationSkeleton';
+// import { BriefLists } from '../Briefs/BriefsList';
+import ClientView from '../ClientView/ClientView';
 
 type ClientViewProps = {
   briefId: string | string[] | undefined;
   handleMessageBoxClick: (_userId: number, _freelander: Freelancer) => void;
   redirectToBriefApplications: (_applicationId: string) => void;
-  briefs: any;
+  user: any;
 };
 
 const MyClientBriefsView = (props: ClientViewProps) => {
-  const {
-    briefs,
-    briefId,
-    handleMessageBoxClick,
-    redirectToBriefApplications,
-  } = props;
+  const { user, briefId, handleMessageBoxClick, redirectToBriefApplications } =
+    props;
 
+  const [briefs, _setBriefs] = useState<any>();
   const [briefApplications, setBriefApplications] = useState<Project[]>([]);
+  const [ongoingGrants, setOngoingGrants] = useState<Project[]>([]);
   const [loadingApplications, setLoadingApplications] = useState<boolean>(true);
   const router = useRouter();
+
+  useEffect(() => {
+    const setUserBriefs = async () => {
+      if (user?.id) _setBriefs(await getUserBriefs(user?.id));
+      setOngoingGrants(await getUsersOngoingGrants(user?.web3_address));
+    };
+    setUserBriefs();
+  }, [user?.id, user?.web3_address]);
 
   useEffect(() => {
     const getApplications = async (id: string | number) => {
@@ -41,7 +53,7 @@ const MyClientBriefsView = (props: ClientViewProps) => {
       }
     };
     briefId && getApplications(briefId.toString());
-  }, [briefId]);
+  }, [briefId, user?.id]);
 
   const goBack = () => {
     router.query.briefId = [];
@@ -50,112 +62,18 @@ const MyClientBriefsView = (props: ClientViewProps) => {
 
   return (
     <div>
-      {briefId ? (
-        <div className='bg-white relative rounded-[0.75rem] '>
-          <div
-            className='absolute top-2 left-2 cursor-pointer'
-            onClick={goBack}
-          >
-            <ArrowBackIcon htmlColor='#3B27C1' />
-          </div>
-          {loadingApplications ? (
-            <ApplicationSkeleton />
-          ) : (
-            <>
-              {briefApplications?.map((application: any, index: any) => {
-                return (
-                  <ApplicationContainer
-                    application={application}
-                    handleMessageBoxClick={handleMessageBoxClick}
-                    redirectToApplication={redirectToBriefApplications}
-                    key={index}
-                  />
-                );
-              })}
-            </>
-          )}
-        </div>
-      ) : (
-        <div>
-          <h2 className='text-imbue-purple-dark text-base lg:text-xl mb-3'>Open Briefs</h2>
-          <BriefLists
-            briefs={briefs?.briefsUnderReview}
-            showNewBriefButton={true}
-          />
-
-          {
-            briefs?.acceptedBriefs?.length && (
-              <>
-                <p className='text-imbue-purple-dark text-base lg:text-xl mb-3 mt-4 lg:mt-10'>
-                  Projects
-                </p>
-                <BriefLists
-                  briefs={briefs?.acceptedBriefs}
-                  areAcceptedBriefs={true}
-                />
-              </>
-            )
-          }
-
-        </div>
-      )}
+      <ClientView
+        GoBack={goBack}
+        briefId={briefId}
+        briefs={briefs}
+        handleMessageBoxClick={handleMessageBoxClick}
+        redirectToBriefApplications={redirectToBriefApplications}
+        briefApplications={briefApplications}
+        ongoingGrants={ongoingGrants}
+        loadingApplications={loadingApplications}
+      />
     </div>
   );
 };
-
-export function ApplicationSkeleton() {
-  return (
-    <div className='bg-white overflow-hidden rounded-xl'>
-      {[1, 2].map((v, i) => (
-        <div
-          key={i}
-          className='w-full px-5 py-3 lg:px-10 lg:py-8 border-b last:border-b-0 border-b-imbue-light-purple'
-        >
-          <div className='flex justify-between items-center'>
-            <div className='flex w-full items-center gap-4'>
-              <Skeleton
-                className='w-16 h-16'
-                variant='circular'
-                sx={{ fontSize: '1rem' }}
-              />
-              <Skeleton
-                className='w-1/6 h-7'
-                variant='text'
-                sx={{ fontSize: '1rem' }}
-              />
-            </div>
-            <Skeleton
-              className='w-1/6 h-7'
-              variant='text'
-              sx={{ fontSize: '1rem' }}
-            />
-          </div>
-          <div className='flex justify-between'>
-            <Skeleton
-              className='w-5/6'
-              variant='text'
-              sx={{ fontSize: '1rem' }}
-            />
-            <Skeleton
-              className='w-1/12'
-              variant='text'
-              sx={{ fontSize: '1rem' }}
-            />
-          </div>
-          <Skeleton
-            className='w-3/5'
-            variant='text'
-            sx={{ fontSize: '1rem' }}
-          />
-          <Skeleton
-            className='w-1/12'
-            variant='text'
-            sx={{ fontSize: '1rem' }}
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export default MyClientBriefsView;

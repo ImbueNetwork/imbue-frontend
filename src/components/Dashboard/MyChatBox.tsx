@@ -2,30 +2,33 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { StreamChat } from 'stream-chat';
+import { StreamChat, UserResponse } from 'stream-chat';
 import {
   Channel,
   ChannelList,
   Chat,
   MessageInput,
   MessageList,
+  MessageSimple,
+  RenderTextOptions,
   Thread,
   useChatContext,
+  useMessageContext,
   Window,
 } from 'stream-chat-react';
+import { DefaultStreamChatGenerics } from 'stream-chat-react/dist/types/types';
 
-import { CustomChannelHeader } from '@/components/Chat';
+import { CustomChannelHeader } from '../StreamChatComponents/CustomChannelHeader';
 
 function DashboardChatBox({
   client,
-  filters,
 }: {
   client: StreamChat;
-  filters: object;
 }) {
   const mobileView = useMediaQuery('(max-width:500px)');
   const [channels, setChannels] = useState<any>([]);
   const [channel, setChannel] = useState<any>();
+  const filters = client &&  { members: { $in: [String(client.user?.id)] } };
   const router = useRouter();
 
   useEffect(() => {
@@ -48,12 +51,12 @@ function DashboardChatBox({
       const array: any = Object.values(channels[index]?.state?.members);
       let username = 'Not Found';
 
-      array.forEach(function (key: any) {
+      array?.forEach(function (key: any) {
         if (array.length === 2 && key.user_id !== client.userID) {
           username =
-            key.user_id.length > 22
-              ? `${key.user_id?.substring(0, 22)}...`
-              : key.user_id;
+            key?.user?.name?.length > 22
+              ? `${key?.user?.name?.substring(0, 22)}...`
+              : key?.user?.name;
         }
       });
       return username;
@@ -124,8 +127,43 @@ function DashboardChatBox({
     return <></>;
   }
 
+  function customRenderText(
+    text: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _mentions_user: UserResponse<DefaultStreamChatGenerics>[] | undefined,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _options: RenderTextOptions | undefined
+  ) {
+    return <p className='text-base'>{text}</p>;
+  }
+
+  function customPinnedRenderText(
+    text: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _mentions_user: UserResponse<DefaultStreamChatGenerics>[] | undefined,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _options: RenderTextOptions | undefined
+  ) {
+    return (
+      <div className='flex flex-col !space-x-2'>
+        <p className='italic w-full flex text-xs  text-gray-500 flex-row-reverse'>
+          Pinned
+        </p>
+        <p className='text-base'>{text} </p>
+      </div>
+    );
+  }
+
+  const CustomMessage = (props: any) => {
+    const { message } = useMessageContext();
+
+    if (message.pinned)
+      return <MessageSimple {...props} renderText={customPinnedRenderText} />;
+    return <MessageSimple {...props} renderText={customRenderText} />;
+  };
+
   return (
-    <div className='custom-chat-container w-full rounded-2xl h-[75vh] bg---theme-grey-dark border border-white border-opacity-25 overflow-hidden -mt-4'>
+    <div className='custom-chat-container relative w-full rounded-2xl h-[75vh] bg---theme-grey-dark border border-white border-opacity-25 overflow-hidden -mt-2'>
       <Chat client={client} theme='str-chat__theme-light'>
         {mobileView ? (
           <>
@@ -141,7 +179,11 @@ function DashboardChatBox({
             ) : (
               <Channel channel={channel}>
                 <Window>
-                  <CustomChannelHeader closeChat={closeChat} />
+                  <CustomChannelHeader
+                    showFreelancerProfile={false}
+                    closeChat={closeChat}
+                  />
+
                   <MessageList />
                   <MessageInput />
                 </Window>
@@ -153,15 +195,15 @@ function DashboardChatBox({
           <div className='flex h-full'>
             <div className='chat-list-container border-r border-r-white'>
               <ChannelList
-                renderChannels={renderChannels}
-                List={CustomListContainer}
+                // renderChannels={renderChannels}
+                // List={CustomListContainer}
                 filters={filters}
                 showChannelSearch={true}
               />
             </div>
-            <Channel>
+            <Channel Message={CustomMessage}>
               <Window>
-                <CustomChannelHeader />
+                <CustomChannelHeader showFreelancerProfile={false} />
                 <MessageList />
                 <MessageInput />
               </Window>

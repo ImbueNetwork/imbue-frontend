@@ -2,10 +2,11 @@
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import FingerprintIcon from '@mui/icons-material/Fingerprint';
+import { Modal, Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
-import moment from 'moment';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -16,27 +17,40 @@ import { getBalance } from '@/utils/helper';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import AccountChoice from '@/components/AccountChoice';
+import BackButton from '@/components/BackButton';
 import ChatPopup from '@/components/ChatPopup';
 import { Dialogue } from '@/components/Dialogue';
 import ErrorScreen from '@/components/ErrorScreen';
-import FullScreenLoader from '@/components/FullScreenLoader';
+import RefundScreen from '@/components/Grant/Refund';
+import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 import Login from '@/components/Login';
+import Impressions from '@/components/Project/Impressions';
+import ProjectStateTag from '@/components/Project/ProjectStateTag';
+import VotingList from '@/components/Project/VotingList';
 import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
 
+import freelalncerPic from '@/assets/images/profile-image.png'
 import { calenderIcon, shieldIcon, tagIcon } from '@/assets/svgs';
 import { timeData } from '@/config/briefs-data';
 import {
   Currency,
+  ImbueChainPollResult,
   Milestone,
   OffchainProjectState,
-  OnchainProjectState,
   Project,
   ProjectOnChain,
+  User,
+  Vote,
 } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
+import { ImbueChainEvent } from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
+import {
+  updateMilestone,
+  updateProject,
+} from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 TimeAgo.addDefaultLocale(en);
@@ -50,29 +64,16 @@ type ExpandableDropDownsProps = {
   withdraw: () => void;
 };
 
-const openForVotingTag = (): JSX.Element => {
-  return (
-    <div className='flex flex-row items-center'>
-      <div className='h-[15px] w-[15px] rounded-[7.5px] bg-[#BAFF36]' />
-      <p className='text-xl font-normal leading-[23px] text-[#BAFF36] mr-[27px] ml-[14px]'>
-        Open for Voting
-      </p>
-    </div>
-  );
-};
-
-const projectStateTag = (dateCreated: Date, text: string): JSX.Element => {
-  return (
-    <div className='flex flex-row items-center'>
-      <p className='text-sm font-normal leading-[16px] text-white'>
-        {moment(dateCreated)?.format('DD MMM YYYY')}
-      </p>
-      <p className='text-sm lg:text-xl font-normal leading-[23px] text-[#411DC9] mr-[27px] ml-[14px]'>
-        {text}
-      </p>
-    </div>
-  );
-};
+// const openForVotingTag = (): JSX.Element => {
+//   return (
+//     <div className='flex flex-row items-center'>
+//       <div className='h-[15px] w-[15px] rounded-[7.5px] bg-[#BAFF36]' />
+//       <p className='text-xl font-normal leading-[23px] text-[#BAFF36] mr-[27px] ml-[14px]'>
+//         Open for Voting
+//       </p>
+//     </div>
+//   );
+// };
 
 function Project() {
   const router = useRouter();
@@ -87,6 +88,8 @@ function Project() {
     useState<boolean>(false);
   const [submittingMilestone, setSubmittingMilestone] =
     useState<boolean>(false);
+  const [raiseVoteOfNoConfidence, setRaiseVoteOfNoConfidence] =
+    useState<boolean>(false);
   const [withdrawMilestone, setWithdrawMilestone] = useState<boolean>(false);
   const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
   const [votingWalletAccount, setVotingWalletAccount] = useState<
@@ -97,16 +100,37 @@ function Project() {
   const [loading, setLoading] = useState<boolean>(true);
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const projectId: any = router?.query?.id || 0;
-  const [milestoneBeingVotedOn, setMilestoneBeingVotedOn] = useState<number>();
-  const [isApplicant, setIsApplicant] = useState<boolean>();
+  const [firstPendingMilestone, setFirstPendingMilestone] = useState<number>();
+  const [isApplicant, setIsApplicant] = useState<boolean>(false);
+  const [isProjectOwner, setIsProjectOwner] = useState<boolean>(false);
+  const [showRefundButton, setShowRefundButton] = useState<boolean>();
+  const [milestoneVotes, setMilestoneVotes] = useState<any>({});
+  const votes = Object.keys(milestoneVotes)?.map((key) => ({ voterAddress: key, vote: milestoneVotes[key] })) || []
+  const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
+    useState<boolean>();
+  const [projectInVotingOfNoConfidence, setProjectInVotingOfNoConfidence] =
+    useState<boolean>();
 
   const [wait, setWait] = useState<boolean>(false);
-  const [waitMessage, setWaitMessage] = useState<string>("");
+  const [waitMessage, setWaitMessage] = useState<string>('');
   const [success, setSuccess] = useState<boolean>(false);
+  const [refunded, setRefunded] = useState<boolean>(false);
   const [successTitle, setSuccessTitle] = useState<string>('');
   const [error, setError] = useState<any>();
   const [balance, setBalance] = useState<any>(0);
-  const [approversPreview, setApproverPreview] = useState<any>([]);
+  const [requiredBalance, setRequiredBalance] = useState<any>(0);
+  const [approversPreview, setApproverPreview] = useState<User[]>([]);
+  const [isApprover, setIsApprover] = useState<boolean>(false);
+  const [approverVotedOnRefund, setApproverVotedOnRefund] =
+    useState<boolean>(false);
+
+  const [projectType, setProjectType] = useState<'grant' | 'brief' | null>(
+    null
+  );
+  const [isModalOpen, setModalOpen] = useState(false);
+  const canVote = (isApprover && user.web3_address && !Object.keys(milestoneVotes).includes(user.web3_address)) || (projectType === 'brief' && isProjectOwner);
+  const [expandProjectDesc, setExpandProjectDesc] = useState<number>(500);
+  const [openVotingList, setOpenVotingList] = useState<boolean>(false)
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -115,89 +139,165 @@ function Project() {
     }
   }, [projectId, userLoading]);
 
+  const handlePopUpForUser = () => {
+    if (!localStorage.getItem('isShown')) {
+      localStorage.setItem('isShown', 'true');
+      setModalOpen(true);
+    }
+  };
+
   const getChainProject = async (project: Project, freelancer: any) => {
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
     const onChainProjectRes = await chainService.getProject(projectId);
 
+    project = await chainService.syncOffChainDb(project, onChainProjectRes);
     if (onChainProjectRes) {
       const isApplicant = onChainProjectRes.initiator == user.web3_address;
       setIsApplicant(isApplicant);
-      if (onChainProjectRes.projectState == OnchainProjectState.OpenForVoting) {
-        const firstPendingMilestone =
-          await chainService.findFirstPendingMilestone(
-            onChainProjectRes.milestones
-          );
-        setMilestoneBeingVotedOn(firstPendingMilestone);
+      // TODO Enable refunds first
+      const userIsApprover = onChainProjectRes.contributions
+        .map((c) => c.accountId)
+        .includes(user.web3_address!);
+      if (userIsApprover) {
+        setShowRefundButton(onChainProjectRes.fundingType.Grant);
+      }
+
+      const firstPendingMilestone =
+        await chainService.findFirstPendingMilestone(
+          onChainProjectRes.milestones
+        );
+      setFirstPendingMilestone(firstPendingMilestone);
+      setProjectInMilestoneVoting(onChainProjectRes.projectInMilestoneVoting);
+      setProjectInVotingOfNoConfidence(
+        onChainProjectRes.projectInVotingOfNoConfidence
+      );
+
+      if (
+        user.web3_address &&
+        onChainProjectRes.projectInVotingOfNoConfidence
+      ) {
+        const voters = await chainService.getNoConfidenceVoters(
+          onChainProjectRes.id
+        );
+        if (voters.includes(user.web3_address)) {
+          setApproverVotedOnRefund(true);
+        }
+      }
+
+      if (onChainProjectRes.projectInMilestoneVoting) {
+        const milestoneVotes: Vote[] = await chainService.getMilestoneVotes(onChainProjectRes.id, firstPendingMilestone);
+        setMilestoneVotes(milestoneVotes);
       }
 
       setOnChainProject(onChainProjectRes);
-    } else {
+    } else if (project.chain_project_id && project.owner) {
       switch (project.status_id) {
         case OffchainProjectState.PendingReview:
-          setWaitMessage("This project is pending review");
+          setWaitMessage('This project is pending review');
           break;
         case OffchainProjectState.ChangesRequested:
-          setWaitMessage("Changes have been requested");
+          setWaitMessage('Changes have been requested');
+          break;
+        case OffchainProjectState.Refunded:
+          setWait(false);
+          setRefunded(true);
+          break;
+        case OffchainProjectState.Completed:
+          setWait(false);
+          setSuccess(true);
+          setSuccessTitle('This project has been successfully delivered!');
           break;
         case OffchainProjectState.Accepted:
           if (!project.chain_project_id) {
-            setWaitMessage(`Waiting for ${freelancer.display_name} to start the work`);
+            setWaitMessage(
+              `Waiting for ${freelancer.display_name} to start the work`
+            );
           } else {
-            setWaitMessage(`Your project is being created on the chain. This may take up to 6 seconds`);
+            setWaitMessage(
+              `Your project is being created on the chain. This may take up to 6 seconds`
+            );
           }
           break;
       }
-      setWait(true)
+      if (
+        project.status_id !== OffchainProjectState.Refunded &&
+        project.status_id !== OffchainProjectState.Completed
+      ) {
+        setWait(true);
+      }
     }
   };
 
   const getProject = async () => {
     try {
-      const projectRes = await getProjectById(projectId);
+      const projectRes: Project = await getProjectById(projectId);
       // showing owner profile if the current user if the applicant freelancer
-      const brief = await getBrief(projectRes.brief_id);
-      const owner = brief?.user_id
-        ? await utils.fetchUser(brief?.user_id)
-        : null;
-
-      const freelancerRes = await getFreelancerProfile(projectRes?.user_id);
-      if (projectRes?.user_id == user?.id) {
-        setTargetUser(owner);
-      } else {
-        setTargetUser(freelancerRes);
+      let owner;
+      let freelancerRes;
+      if (!projectRes) {
+        setError({ message: 'No project is found!' });
+        setLoading(false);
+        router.push('/error');
       }
+      if (projectRes?.brief_id && projectRes?.user_id) {
+        setProjectType('brief');
+
+        const brief = await getBrief(projectRes.brief_id);
+        owner = brief?.user_id ? await utils.fetchUser(brief?.user_id) : null;
+        freelancerRes = await getFreelancerProfile(projectRes?.user_id);
+        if (owner?.id == user?.id) {
+          setTargetUser(freelancerRes);
+        } else {
+          setTargetUser(owner);
+        }
+      } else {
+        setProjectType('grant');
+        if (!projectRes?.user_id) return;
+
+        owner = await utils.fetchUser(projectRes?.user_id);
+        setTargetUser(owner);
+      }
+
+      setIsProjectOwner(owner?.id === user.id);
+
       setProject(projectRes);
+
       // setting approver list
       const approversPreviewList = [...approversPreview];
 
       if (projectRes?.approvers?.length && approversPreviewList.length === 0) {
-        projectRes?.approvers.map(async (v: any) => {
-          const user = await utils.fetchUserByUsernameOrAddress(v);
-          if (user?.length) {
-            approversPreviewList.push(...user);
+        projectRes?.approvers.map(async (approverAddress: any) => {
+          if (approverAddress === user?.web3_address) setIsApprover(true);
+
+          const approver = await utils.fetchUserByUsernameOrAddress(
+            approverAddress
+          );
+          if (approver?.id) {
+            approversPreviewList.push(approver);
           } else {
             approversPreviewList.push({
-              // id: 6,
+              id: 0,
               display_name: '',
-              profile_photo: null,
+              profile_photo: '',
               username: '',
-              web3_address: v,
+              web3_address: approverAddress,
+              getstream_token: ''
+
             });
           }
         });
       } else {
         approversPreviewList.push({
-          // id: 6,
+          id: owner?.id,
           display_name: owner?.display_name,
           profile_photo: owner?.profile_photo,
           username: owner?.username,
           web3_address: owner?.web3_address,
+          getstream_token: owner?.getstream_token
         });
       }
       setApproverPreview(approversPreviewList);
-
-
       // api  project response
       await getChainProject(projectRes, freelancerRes);
 
@@ -206,32 +306,14 @@ function Project() {
         projectRes?.currency_id || 0,
         user
       );
-
+      const totalCost = Number(Number(projectRes?.total_cost_without_fee) + Number(projectRes?.imbue_fee));
+      setRequiredBalance(totalCost * 0.95);
+      if (!balance) {
+        handlePopUpForUser();
+      }
       setBalance(balance || 0);
     } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // voting on a mile stone
-  const voteOnMilestone = async (account: WalletAccount, vote: boolean) => {
-    setLoading(true);
-    try {
-      const imbueApi = await initImbueAPIInfo();
-      // const userRes: User | any = await utils.getCurrentUser();
-      const chainService = new ChainService(imbueApi, user);
-      await chainService.voteOnMilestone(
-        account,
-        onChainProject,
-        milestoneKeyInView,
-        vote
-      );
-      setSuccess(true);
-      setSuccessTitle('Your vote was successfull');
-    } catch (error) {
-      setError({ message: 'Could not vote. Please try again later' });
+      setError({ message: 'can not find the project ' + error });
     } finally {
       setLoading(false);
     }
@@ -240,6 +322,7 @@ function Project() {
   // submitting a milestone
   const submitMilestone = async (account: WalletAccount) => {
     setLoading(true);
+
     const imbueApi = await initImbueAPIInfo();
     // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
@@ -264,16 +347,79 @@ function Project() {
     setLoading(false);
   };
 
-  // submitting a milestone
+  // voting on a mile stone
+  const voteOnMilestone = async (account: WalletAccount, vote: boolean) => {
+    setLoading(true);
+
+    try {
+      const imbueApi = await initImbueAPIInfo();
+      // const userRes: User | any = await utils.getCurrentUser();
+      const chainService = new ChainService(imbueApi, user);
+
+      const result = await chainService.voteOnMilestone(
+        account,
+        onChainProject,
+        milestoneKeyInView,
+        vote
+      );
+
+      let pollResult = ImbueChainPollResult.Pending;
+
+      if (!result.txError) {
+        pollResult = (await chainService.pollChainMessage(
+          ImbueChainEvent.ApproveMilestone,
+          account
+        )) as ImbueChainPollResult;
+      }
+      else {
+        setError({ message: result.errorMessage });
+      }
+
+      while (!result.txError) {
+        if (result.status) {
+          if (pollResult == ImbueChainPollResult.EventFound) {
+            await updateMilestone(projectId, milestoneKeyInView, true);
+          }
+          setSuccess(true);
+          setSuccessTitle('Your vote was successful');
+        } else if (result.txError) {
+          setError({ message: result.errorMessage });
+          break;
+        }
+        if (pollResult != ImbueChainPollResult.Pending) {
+          break;
+        }
+        await new Promise((f) => setTimeout(f, 1000));
+      }
+    } catch (error) {
+      setError({ message: 'Could not vote. Please try again later' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // withdrawing funds
   const withdraw = async (account: WalletAccount) => {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
+    const projectMilestones = onChainProject.milestones;
     // const user: User | any = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi, user);
     const result = await chainService.withdraw(account, onChainProject);
+
     while (true) {
       if (result.status || result.txError) {
         if (result.status) {
+          const haveAllMilestonesBeenApproved = projectMilestones
+            .map((m: any) => m.is_approved)
+            .every(Boolean);
+
+          if (haveAllMilestonesBeenApproved) {
+            project.status_id = OffchainProjectState.Completed;
+
+            await updateProject(project?.id, project);
+          }
+
           setSuccess(true);
           setSuccessTitle('Withdraw successfull');
         } else if (result.txError) {
@@ -286,8 +432,64 @@ function Project() {
     setLoading(false);
   };
 
-  const handleRefund = async () => {
-    // TODO: create vote of no confidence for refund
+  const refund = async (account: WalletAccount) => {
+    // TODO make this a popup value like vote on milestone
+    const vote = false;
+    setLoading(true);
+    const imbueApi = await initImbueAPIInfo();
+    const chainService = new ChainService(imbueApi, user);
+    if (projectInVotingOfNoConfidence) {
+      const result = await chainService.voteOnNoConfidence(
+        account,
+        onChainProject,
+        vote
+      );
+
+      let pollResult = ImbueChainPollResult.Pending;
+      if (!result.txError) {
+        pollResult = (await chainService.pollChainMessage(
+          ImbueChainEvent.NoConfidenceRoundFinalised,
+          account
+        )) as ImbueChainPollResult;
+      }
+
+      while (true) {
+        if (result.status || result.txError) {
+          if (result.status) {
+            if (pollResult == ImbueChainPollResult.EventFound) {
+              project.status_id = OffchainProjectState.Refunded;
+              await updateProject(project?.id, project);
+            }
+            setSuccess(true);
+            setSuccessTitle('Your vote was successful');
+          } else if (result.txError) {
+            setError({ message: result.errorMessage });
+          }
+          if (pollResult != ImbueChainPollResult.Pending) {
+            break;
+          }
+        }
+        await new Promise((f) => setTimeout(f, 1000));
+      }
+    } else {
+      const result = await chainService.raiseVoteOfNoConfidence(
+        account,
+        onChainProject
+      );
+      while (true) {
+        if (result.status || result.txError) {
+          if (result.status) {
+            setSuccess(true);
+            setSuccessTitle('Vote of no confidence raised.');
+          } else if (result.txError) {
+            setError({ message: result.errorMessage });
+          }
+          break;
+        }
+        await new Promise((f) => setTimeout(f, 1000));
+      }
+    }
+    setLoading(false);
   };
 
   const renderPolkadotJSModal = (
@@ -296,6 +498,8 @@ function Project() {
         accountSelected={async (account: WalletAccount) => {
           if (submittingMilestone) {
             submitMilestone(account);
+          } else if (raiseVoteOfNoConfidence) {
+            refund(account);
           } else if (withdrawMilestone) {
             withdraw(account);
           } else {
@@ -314,7 +518,7 @@ function Project() {
   const renderVotingModal = (
     <Dialogue
       title='Want to appove milestone?'
-      closeDialouge={() => setShowVotingModal(false)}
+      // closeDialouge={() => setShowVotingModal(false)}
       actionList={
         <>
           <li className='button-container !bg-transparent !hover:bg-gray-950  !border !border-solid !border-white'>
@@ -344,7 +548,7 @@ function Project() {
     />
   );
 
-  const approvedMilestones = project?.milestones?.filter?.(
+  const approvedMilestones = onChainProject?.milestones?.filter?.(
     (milstone: Milestone) => milstone?.is_approved === true
   );
 
@@ -364,7 +568,7 @@ function Project() {
     const [expanded, setExpanded] = useState(false);
 
     return (
-      <div className='mt-8 relative bg-white px-5 border border-white rounded-2xl lg:px-12 max-width-750px:!pb-[30px]'>
+      <div className='mb-2 relative bg-white px-5 border border-white rounded-2xl lg:px-12 max-width-750px:!pb-[30px]'>
         <div
           onClick={() => {
             setExpanded(!expanded);
@@ -376,23 +580,43 @@ function Project() {
           w-full 
           items-center 
           max-width-750px:flex-col 
-          max-width-750px:flex'
+          max-width-750px:flex
+          cursor-pointer'
         >
           <div className='flex flex-row max-width-750px:w-full'>
             <h3 className='text-[2rem] text-imbue-purple max-width-750px:text-[24px] font-normal leading-[60px]'>
               Milestone {index + 1}
             </h3>
-            <h3 className='text-[1.5rem] text-imbue-purple ml-[32px] font-normal leading-[60px]'>
+            <h3 className='text-[1.5rem] break-all text-imbue-purple ml-[32px] font-normal leading-[60px]'>
               {milestone?.name}
             </h3>
           </div>
           <div className='flex flex-row items-center max-width-750px:w-full max-width-750px:justify-between'>
             {milestone?.is_approved
-              ? projectStateTag(modified, 'Completed')
-              : milestone?.milestone_key == milestoneBeingVotedOn
-                ? openForVotingTag()
-                : projectStateTag(modified, 'Not Started')}
-
+              ? <ProjectStateTag
+                openVotingList={setOpenVotingList}
+                dateCreated={modified}
+                text='Completed'
+                voters={approversPreview}
+                allApprovers={approversPreview}
+              />
+              : milestone?.milestone_key == firstPendingMilestone &&
+                projectInMilestoneVoting
+                ? <ProjectStateTag
+                  openVotingList={setOpenVotingList}
+                  dateCreated={modified}
+                  text='Ongoing'
+                  voters={approversPreview}
+                  allApprovers={approversPreview}
+                />
+                : <ProjectStateTag
+                  openVotingList={setOpenVotingList}
+                  dateCreated={modified}
+                  text='Pending'
+                  voters={approversPreview}
+                  allApprovers={approversPreview}
+                />
+            }
             <Image
               src={require(expanded
                 ? '@/assets/svgs/minus_btn.svg'
@@ -418,37 +642,61 @@ function Project() {
             </span>
           </p>
 
-          <p className=' text-base font-normal text-[#3B27C180] leading-[178.15%] mt-[23px] w-[80%]'>
+          <p className=' text-base font-normal text-[#3B27C180] break-all leading-[178.15%] mt-[23px] w-[80%]'>
             {milestone?.description}
           </p>
 
-          {!isApplicant && milestone.milestone_key == milestoneBeingVotedOn && (
-            <button
-              className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8'
-              data-testid='next-button'
-              onClick={() => vote()}
-            >
-              Vote
-            </button>
-          )}
-
-          {isApplicant &&
-            onChainProject?.projectState !==
-            OnchainProjectState.OpenForVoting && (
-              <button
-                className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
-                data-testid='next-button'
-                onClick={() => submitMilestone()}
+          {!isApplicant &&
+            milestone.milestone_key == firstPendingMilestone &&
+            projectInMilestoneVoting && (
+              <Tooltip
+                followCursor
+                title={
+                  !canVote &&
+                  `Only approvers are allowed to vote on a milestone and you cannot vote more than once.${user.web3_address && `You are currently on wallet: ${user.web3_address}`}`
+                }
               >
-                Submit
-              </button>
+                <button
+                  className={`primary-btn in-dark w-button ${!canVote && '!bg-gray-300 !text-gray-400'
+                    } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
+                  data-testid='next-button'
+                  onClick={() => canVote && vote()}
+                >
+                  Vote
+                </button>
+              </Tooltip>
+            )}
+
+          {(isApplicant || (projectType === 'grant' && isProjectOwner)) &&
+            milestone.milestone_key == firstPendingMilestone &&
+            !projectInMilestoneVoting &&
+            !milestone?.is_approved && (
+              <Tooltip
+                followCursor
+                title={
+                  !balance &&
+                  'The escrow wallet balance cannot be 0 while submiting a milestone'
+                }
+              >
+                <button
+                  className={`primary-btn in-dark w-button mt-3 ${!balance &&
+                    '!bg-gray-300 !text-gray-400 !cursor-not-allowed'
+                    }`}
+                  data-testid='next-button'
+                  onClick={() => balance && submitMilestone()}
+                >
+                  Submit
+                </button>
+              </Tooltip>
             )}
 
           {isApplicant && milestone.is_approved && (
             <button
-              className='primary-btn in-dark w-button font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8'
+              className={`primary-btn in-dark w-button ${!balance && '!bg-gray-300 !text-gray-400'
+                } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
               data-testid='next-button'
               onClick={() => withdraw()}
+              disabled={!balance}
             >
               Withdraw
             </button>
@@ -459,8 +707,119 @@ function Project() {
   };
 
   return (
-    <div className='max-lg:p-[var(--hq-layout-padding)]'>
-      {loading && <FullScreenLoader />}
+    <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
+      <Modal
+        sx={{
+          color: '#fff',
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          outline: 0,
+          border: 'none',
+        }}
+        open={isModalOpen}
+        onClose={() => setModalOpen(false)}
+      >
+        <div className='bg-white rounded-2xl absolute top-28 right-14 min-w-[32.5625rem] py-7 px-6 text-imbue-purple-dark'>
+          <div
+            onClick={() => setModalOpen(false)}
+            className='pb-7 flex-row-reverse cursor-pointer  items-center flex'
+          >
+            <Image
+              className='ml-2'
+              src={'/cross.svg'}
+              width={30}
+              height={30}
+              alt='close'
+            />
+            <p>close</p>
+          </div>
+          <div className='flex flex-col items-center'>
+            <Image
+              src={'/round-dimond.svg'}
+              height={50}
+              width={50}
+              alt='rounded dimond'
+            />
+            <p className='text-3xl pt-3'>Pending</p>
+            <p className='py-2'>
+              steps required to submit/withdraw a milestone
+            </p>
+          </div>
+          <div className='flex  mt-7 items-center w-full'>
+            <Image
+              className='bg-transparent drop-shadow-sm mr-3'
+              src={'/checked.svg'}
+              width={35}
+              height={30}
+              alt='checked'
+            />
+            <div className='flex bg-imbue-light-purple-three rounded-xl px-3 py-2 w-full justify-between items-center '>
+              <p className='flex text-xl flex-col'>
+                {projectType}
+                <span className='text-xs text-imbue-light-purple-two'>
+                  create {projectType}
+                </span>
+              </p>
+              <p className='ml-auto text-imbue-purple text-sm'>Done</p>
+            </div>
+          </div>
+          <div className='flex  mt-2 items-center w-full'>
+            <Image
+              className='bg-transparent  drop-shadow-sm mr-2'
+              src={'/checked.svg'}
+              width={40}
+              height={30}
+              alt='checked'
+            />
+            <div className='flex bg-imbue-light-purple-three rounded-xl px-3 py-2 w-full justify-between items-center '>
+              <p className='flex text-xl flex-col'>
+                Address
+                <span className='text-xs text-imbue-light-purple-two'>
+                  copy escrow address and submit this proposal to kusama
+                </span>
+              </p>
+              <p className='ml-auto text-sm text-imbue-purple'>Done</p>
+            </div>
+          </div>
+          <div className='flex  mt-2 items-center w-full'>
+            {balance >= requiredBalance ? (
+              <Image
+                className='bg-transparent  drop-shadow-sm mr-2'
+                src={'/checked.svg'}
+                width={40}
+                height={30}
+                alt='checked'
+              />
+            ) : (
+              <Image
+                className='bg-transparent  drop-shadow-sm mr-2'
+                src={'/unchecked.svg'}
+                width={40}
+                height={30}
+                alt='checked'
+              />
+            )}
+
+            <div className='flex bg-imbue-light-purple-three rounded-xl px-3 py-2 w-full justify-between items-center '>
+              <p className='flex text-xl flex-col'>
+                Funds deposited
+                <span className='text-xs text-imbue-light-purple-two'>
+                  Raised through governance
+                </span>
+              </p>
+              {balance >=
+                Number(
+                  Number(project?.total_cost_without_fee) +
+                  Number(project?.imbue_fee)
+                ) ? (
+                <p className='ml-auto text-sm text-imbue-purple'>Done</p>
+              ) : (
+                <p className='ml-auto text-sm text-imbue-coral'>Not Done</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </Modal>
+
       {user && showMessageBox && (
         <ChatPopup
           {...{
@@ -469,94 +828,148 @@ function Project() {
             browsingUser: user,
             targetUser,
           }}
+          showFreelancerProfile={!isApplicant}
         />
       )}
-      <div
-        className='flex 
-      flex-row
-       bg-white 
-       rounded-[20px] 
-       p-12
-       max-lg:p-5
-       max-lg:flex-col
-       '
-      >
-        <div className='flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] max-lg:basis-[60%] mr-[5%]  max-lg:mr-0'>
-          <div className='brief-title'>
-            <h3 className='text-[2rem] max-lg:text-[24px] leading-[1.5] font-normal m-0 p-0 text-imbue-purple'>
-              {project?.name}
-            </h3>
+      <div className='grid grid-cols-12 gap-5'>
+        <div className='col-span-9 flex flex-col gap-[20px] relative bg-background p-12 rounded-3xl'>
+          <div className='flex flex-wrap gap-3 lg:gap-4 items-center'>
+            <div className='flex items-center  w-full justify-between'>
+              <div className='flex items-center'>
+                <BackButton className='mr-1 -ml-3' />
+                <h3 className='text-[2rem] max-lg:text-[24px] break-all leading-[1.5] font-normal m-0 p-0 text-imbue-purple'>
+                  {project?.name}
+                </h3>
+              </div>
+            </div>
+
             {project?.brief_id && (
               <span
-                onClick={() => {
-                  // TODO:
-                }}
-                className=' text-imbue-lemon cursor-pointer text-[1.25rem]  max-lg:text-base  font-normal !m-0 !p-0 relative top-4'
+                onClick={() => router.push(`/briefs/${project?.brief_id}`)}
+                className=' text-imbue-lemon cursor-pointer text-xs lg:text-base font-normal !m-0 !p-0 hover:underline'
               >
-                {`View full brief`}
+                {`View full ${projectType}`}
               </span>
             )}
           </div>
-          <div className='text-inactive lg:w-[80%]'>
-            <p className='text-[1rem] text-[#3B27C180] font-normal leading-[178.15%]'>
-              {project?.description}
-            </p>
-          </div>
-          <p className='text-[1rem] text-[#3B27C180] font-normalleading-[1.5] m-0 p-0'>
+
+          <p className='text-sm lg:text-base text-content font-normal leading-[178.15%] lg:w-[80%]'>
+            Project Type :{' '}
+            <span className='ml-1 capitalize'>{projectType}</span>
+          </p>
+
+          <p className='text-base text-content font-normal leading-[178.15%] break-all lg:w-[80%] whitespace-pre-wrap'>
+            {project?.description?.length > expandProjectDesc
+              ? project?.description?.substring(0, expandProjectDesc) + ' ...'
+              : project?.description}
+            {project?.description?.length > 500 && (
+              <span>
+                {project?.description?.length > expandProjectDesc ? (
+                  <button
+                    onClick={() => setExpandProjectDesc((prev) => prev + 500)}
+                    className='mt-3 ml-2 w-fit text-sm hover:underline text-imbue-lemon'
+                  >
+                    Show more
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setExpandProjectDesc(500)}
+                    className='mt-3 ml-2 w-fit text-sm hover:underline text-imbue-lemon'
+                  >
+                    Show Less
+                  </button>
+                )}
+              </span>
+            )}
+          </p>
+
+          <p className='text-sm text-content-primary leading-[1.5] m-0 p-0'>
             Posted {timePosted}
           </p>
 
           <p className='text-imbue-purple text-[1.25rem] font-normal leading-[1.5] mt-[16px] p-0'>
-            {isApplicant || project?.approvers?.length
-              ? 'Project Owner'
-              : 'Freelancer hired'}
+            {isProjectOwner && projectType === 'brief'
+              ? 'Freelancer hired'
+              : 'Project Owner'}
           </p>
 
           <div className='flex flex-row items-center max-lg:flex-wrap'>
-            <Image
-              src={
-                targetUser?.profile_image ||
-                targetUser?.profile_photo ||
-                require('@/assets/images/profile-image.png')
+            <div
+              onClick={() =>
+                router.push(
+                  isProjectOwner
+                    ? `/freelancers/${targetUser?.username}`
+                    : `/profile/${targetUser?.username}`
+                )
               }
-              alt='freelaner-icon'
-              height={50}
-              width={50}
-              className='rounded-full'
-            />
-
-            <p className='text-imbue-purple text-[1.25rem] font-normal leading-[1.5] p-0 mx-7'>
-              {targetUser?.display_name}
-            </p>
-
-            <button
-              onClick={() => setShowMessageBox(true)}
-              className='primary-btn 
-              in-dark w-button 
-              !mt-0 
-              font-normal 
-              max-lg:!w-full 
-              max-lg:!text-center 
-              max-lg:!ml-0 
-              max-lg:!mt-5 
-              items-center 
-              content-center 
-              !py-0 ml-[40px] 
-              px-8
-              max-lg:!mr-0
-              h-[2.6rem]
-              '
-              data-testid='next-button'
+              className='flex items-center'
             >
-              Message
-            </button>
+              <Image
+                src={
+                  targetUser?.profile_image ||
+                  targetUser?.profile_photo ||
+                  freelalncerPic
+                }
+                alt='freelaner-icon'
+                height={100}
+                width={100}
+                className='rounded-full cursor-pointer w-14 h-14 object-cover border border-content-primary'
+              />
 
-            {isApplicant && (
+              <p className='text-imbue-purple text-[1.25rem] font-normal leading-[1.5] p-0 mx-7 cursor-pointer'>
+                {targetUser?.display_name}
+              </p>
+            </div>
+
+            {targetUser?.id && targetUser?.id !== user?.id && (
               <button
-                className='border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors'
-                onClick={() => handleRefund()}
+                onClick={() => setShowMessageBox(true)}
+                className='primary-btn in-dark w-button !mt-0 max-lg:!w-full max-lg:!text-center max-lg:!ml-0 max-lg:!mt-5 items-center content-center !py-0 ml-[40px] px-8 max-lg:!mr-0 h-[2.6rem]'
+                data-testid='next-button'
               >
-                Refund
+                Message
+              </button>
+            )}
+
+            {showRefundButton && (
+              <>
+                <Tooltip
+                  title={
+                    approverVotedOnRefund
+                      ? 'Your vote has already been registered'
+                      : 'Vote on refunds'
+                  }
+                  followCursor
+                  leaveTouchDelay={10}
+                  enterDelay={500}
+                  className='cursor-pointer'
+                >
+                  <button
+                    className={`border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors ${approverVotedOnRefund &&
+                      '!bg-gray-300 !text-gray-400 !border-gray-400 !cursor-not-allowed'
+                      }`}
+                    onClick={async () => {
+                      if (!approverVotedOnRefund) {
+                        // set submitting mile stone to true
+                        await setRaiseVoteOfNoConfidence(true);
+                        // show polkadot account modal
+                        await setShowPolkadotAccounts(true);
+                      }
+                    }}
+                  >
+                    Refund
+                  </button>
+                </Tooltip>
+              </>
+            )}
+            {onChainProject && projectInVotingOfNoConfidence && (
+              <button
+                disabled={true}
+                className={
+                  ' text-black flex px-5 py-3 text-sm ml-auto rounded-full Rejected-btn'
+                }
+              >
+                Project undergoing vote of no confidence
               </button>
             )}
           </div>
@@ -567,28 +980,33 @@ function Project() {
                 Approvers
               </p>
               {approversPreview?.length > 0 && (
-                <div className='flex flex-row flex-wrap gap-4'>
+                <div className='flex flex-row flex-wrap gap-10'>
                   {approversPreview?.map((approver: any, index: number) => (
                     <div
                       key={index}
-                      className='flex text-content gap-3 items-center border border-content-primary p-3 rounded-full'
+                      className={`flex text-content gap-4 items-center ${approver?.display_name && 'cursor-pointer'
+                        }`}
+                      onClick={() =>
+                        approver.display_name &&
+                        router.push(`/profile/${approver.username}`)
+                      }
                     >
                       <Image
-                        height={40}
-                        width={40}
+                        height={80}
+                        width={80}
                         src={
                           approver?.profile_photo ??
                           'http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png'
                         }
                         alt=''
-                        className='rounded-full'
+                        className='rounded-full w-10 h-10 object-cover'
                       />
                       <div className='flex flex-col'>
                         <span className='text-base'>
                           {approver?.display_name}
                         </span>
                         <p className='text-xs break-all text-imbue-purple-dark text-opacity-40'>
-                          {approver?.web3_address}
+                          {approver?.web3_address.substring(0, 4) + "..." + approver?.web3_address.substring(44)}
                         </p>
                       </div>
                     </div>
@@ -598,7 +1016,8 @@ function Project() {
             </>
           )}
         </div>
-        <div className='flex flex-col gap-[30px] max-lg:mt-10 lg:w-56'>
+
+        <div className='flex flex-col gap-[30px] max-lg:mt-10 col-span-3 bg-background w-full p-12 rounded-3xl'>
           <div className='flex flex-col'>
             <div className='flex flex-row items-start gap-3'>
               <Image
@@ -612,7 +1031,7 @@ function Project() {
               <div className='w-full'>
                 <h3 className='text-lg lg:text-[1.25rem] leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0 flex'>
                   Milestone{' '}
-                  <span className='text-imbue-purple-dark  ml-2'>
+                  <span className='text-imbue-purple-dark ml-2'>
                     {approvedMilestones?.length}/{project?.milestones?.length}
                   </span>
                 </h3>
@@ -627,13 +1046,13 @@ function Project() {
                         100
                         }%`,
                     }}
-                    className='h-full rounded-xl Accepted-button absolute'
+                    className='h-full rounded-xl bg-content-primary absolute'
                   ></div>
                   <div className='flex justify-evenly'>
                     {onChainProject?.milestones?.map((m: any, i: number) => (
                       <div
                         key={i}
-                        className={`h-4 w-4 ${m.is_approved ? 'Accepted-button' : 'bg-[#E1DDFF]'
+                        className={`h-4 w-4 ${m.is_approved ? 'bg-content-primary' : 'bg-[#E1DDFF]'
                           } rounded-full -mt-1.5`}
                       ></div>
                     ))}
@@ -654,7 +1073,10 @@ function Project() {
               />
               <div className='flex flex-col'>
                 <h3 className='text-xl leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0'>
-                  {Number(project?.total_cost_without_fee)?.toLocaleString()}{' '}
+                  {Number(
+                    Number(project?.total_cost_without_fee) +
+                    Number(project?.imbue_fee)
+                  )?.toLocaleString()}{' '}
                   ${Currency[project?.currency_id || 0]}
                 </h3>
                 <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
@@ -663,25 +1085,6 @@ function Project() {
               </div>
             </div>
           </div>
-
-          {project?.escrow_address && (
-            <div className='flex flex-col'>
-              <div className='flex flex-row items-start gap-3'>
-                <AccountBalanceWalletOutlinedIcon className='mt-1 text-imbue-purple-dark' />
-                <div className='flex flex-col'>
-                  <h3 className='text-lg lg:text-[1.25rem] text-imbue-purple-dark leading-[1.5] font-normal m-0 p-0'>
-                    Wallet Address
-                  </h3>
-                  <div className='text-[1rem] text-imbue-light-purple-two mt-2 text-xs break-all'>
-                    {project?.escrow_address}
-                  </div>
-                  <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
-                    balance : {balance}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
 
           <div className='flex flex-col'>
             <div className='flex flex-row items-start gap-3'>
@@ -702,45 +1105,95 @@ function Project() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {onChainProject?.milestones?.map?.(
-        (milestone: Milestone, index: number) => {
-          return (
-            <ExpandableDropDowns
-              key={`${index}-milestone`}
-              index={index}
-              milestone={milestone}
-              modified={milestone?.modified as Date}
-              vote={async () => {
-                // show polkadot account modal
-                await setShowPolkadotAccounts(true);
-                // set submitting mile stone to false
-                await setSubmittingMilestone(false);
-                // setMile stone key in view
-                await setMilestoneKeyInView(milestone.milestone_key);
-              }}
-              submitMilestone={async () => {
-                // set submitting mile stone to true
-                await setSubmittingMilestone(true);
-                // show polkadot account modal
-                await setShowPolkadotAccounts(true);
-                // setMile stone key in view
-                await setMilestoneKeyInView(milestone.milestone_key);
-              }}
-              withdraw={async () => {
-                // set submitting mile stone to true
-                await setWithdrawMilestone(true);
-                // show polkadot account modal
-                await setShowPolkadotAccounts(true);
-                // setMile stone key in view
-                await setMilestoneKeyInView(milestone.milestone_key);
-              }}
-            />
-          );
-        }
-      )}
+          {project?.escrow_address && (
+            <div className='flex flex-col'>
+              <div className='flex flex-row items-start gap-3'>
+                <AccountBalanceWalletOutlinedIcon className='mt-1 text-imbue-purple-dark' />
+                <div className='flex flex-col'>
+                  <h3 className='text-lg flex items-center lg:text-[1.25rem] text-imbue-purple-dark leading-[1.5] font-normal m-0 p-0'>
+                    Wallet Address
+                    <span
+                      onClick={() => setModalOpen(true)}
+                      className='bg-indigo-700 ml-2 h-5 w-5 py-1 px-1.5 cursor-pointer text-xs !text-white rounded-full flex justify-center items-center'
+                    >
+                      ?
+                    </span>
+                  </h3>
+                  <div className='text-[1rem] text-imbue-light-purple-two mt-2 text-xs break-all'>
+                    {project?.escrow_address}
+                  </div>
+                  <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
+                    Balance : {balance} ${Currency[project?.currency_id]}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {project?.chain_project_id && (
+            <div className='flex flex-col'>
+              <div className='flex flex-row items-start gap-3'>
+                <FingerprintIcon className='mt-1 text-imbue-purple-dark' />
+                <div className='flex flex-col'>
+                  <h3 className='text-lg lg:text-[1.25rem] text-imbue-purple-dark leading-[1.5] font-normal m-0 p-0'>
+                    On-Chain Project ID
+                  </h3>
+                  <div className='text-[1rem] text-imbue-light-purple-two mt-2 text-xs break-all'>
+                    {project?.chain_project_id}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className='col-span-9'>
+          {onChainProject?.milestones?.map?.(
+            (milestone: Milestone, index: number) => {
+              return (
+                <ExpandableDropDowns
+                  key={`${index}-milestone`}
+                  index={index}
+                  milestone={milestone}
+                  modified={milestone?.modified as Date}
+                  vote={async () => {
+                    // show polkadot account modal
+                    await setShowPolkadotAccounts(true);
+                    // set submitting mile stone to false
+                    await setSubmittingMilestone(false);
+                    // setMile stone key in view
+                    await setMilestoneKeyInView(milestone.milestone_key);
+                  }}
+                  submitMilestone={async () => {
+                    // set submitting mile stone to true
+                    await setSubmittingMilestone(true);
+                    // show polkadot account modal
+                    await setShowPolkadotAccounts(true);
+                    // setMile stone key in view
+                    await setMilestoneKeyInView(milestone.milestone_key);
+                  }}
+                  withdraw={async () => {
+                    // set submitting mile stone to true
+                    await setWithdrawMilestone(true);
+                    // show polkadot account modal
+                    await setShowPolkadotAccounts(true);
+                    // setMile stone key in view
+                    await setMilestoneKeyInView(milestone.milestone_key);
+                  }}
+                />
+              );
+            }
+          )}
+        </div>
+
+        <Impressions onChainProject={onChainProject}
+          firstPendingMilestone={firstPendingMilestone}
+          projectInMilestoneVoting={projectInMilestoneVoting}
+          approversPreview={approversPreview}
+          votes={votes}
+          setOpenVotingList={setOpenVotingList}
+        />
+      </div>
 
       {showPolkadotAccounts && renderPolkadotJSModal}
       {showVotingModal && renderVotingModal}
@@ -751,7 +1204,6 @@ function Project() {
         }}
         redirectUrl={`/project/${projectId}/`}
       />
-
       <ErrorScreen {...{ error, setError }}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button
@@ -768,11 +1220,13 @@ function Project() {
           </button>
         </div>
       </ErrorScreen>
-
       <SuccessScreen title={successTitle} open={success} setOpen={setSuccess}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button
-            onClick={() => setSuccess(false)}
+            onClick={() => {
+              setSuccess(false);
+              window.location.reload();
+            }}
             className='primary-btn in-dark w-button w-full !m-0'
           >
             Continue to Project
@@ -786,9 +1240,9 @@ function Project() {
         </div>
       </SuccessScreen>
 
-      <WaitingScreen title={waitMessage}
-        open={wait}
-        setOpen={setWait}>
+      <RefundScreen open={refunded} setOpen={setSuccess} />
+
+      <WaitingScreen title={waitMessage} open={wait} setOpen={setWait}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => window.location.reload()}
@@ -804,9 +1258,16 @@ function Project() {
           </button>
         </div>
       </WaitingScreen>
+
+      <VotingList
+        open={openVotingList}
+        setOpenVotingList={setOpenVotingList}
+        votes={votes}
+        approvers={approversPreview}
+      />
+      <BackDropLoader open={loading} />
     </div>
   );
 }
 
 export default Project;
-

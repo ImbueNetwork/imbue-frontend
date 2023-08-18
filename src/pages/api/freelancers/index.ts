@@ -1,50 +1,77 @@
+import Filter from 'bad-words';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
 import {
+  countAllFreelancers,
   fetchAllFreelancers,
   fetchFreelancerClients,
   fetchFreelancerMetadata,
   insertFreelancerDetails,
-  paginatedData,
   upsertItems,
 } from '@/lib/models';
 
 import db from '@/db';
 
 import { verifyUserIdFromJwt } from '../auth/common';
-
 export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
     const { query: data } = req;
     db.transaction(async (tx) => {
       try {
-        await fetchAllFreelancers()(tx).then(async (freelancers: any) => {
-          const { currentData, totalItems } = await paginatedData(
-            Number(data?.page || 1),
-            Number(data?.items_per_page || 5),
-            freelancers
-          );
-          await Promise.all([
-            ...currentData.map(async (freelancer: any) => {
-                 freelancer.skills = await fetchFreelancerMetadata("skill",freelancer.id)(tx);
-                 freelancer.services = await fetchFreelancerMetadata("service",freelancer.id)(tx);
-                 freelancer.languages = await fetchFreelancerMetadata("language",freelancer.id)(tx);
-                 freelancer.clients = await fetchFreelancerClients(freelancer.id)(tx);
-            }),
-          ]);
-          res.status(200).json({ currentData, totalFreelancers: totalItems });
-        });
+        const offset =
+          (Number(data?.page) - 1) * Number(data?.items_per_page) || 0;
+
+        await fetchAllFreelancers()(tx)
+          .offset(offset)
+          .limit(Number(data?.items_per_page) || 100)
+          .then(async (freelancers: any) => {
+            const freelancerCount: any = await countAllFreelancers()(tx);
+
+            //TODO Get all freelancers skills, and properties
+            await Promise.all([
+              ...freelancers.map(async (freelancer: any) => {
+                freelancer.skills = await fetchFreelancerMetadata(
+                  'skill',
+                  freelancer.id
+                )(tx);
+                freelancer.services = await fetchFreelancerMetadata(
+                  'service',
+                  freelancer.id
+                )(tx);
+                freelancer.languages = await fetchFreelancerMetadata(
+                  'language',
+                  freelancer.id
+                )(tx);
+                freelancer.clients = await fetchFreelancerClients(
+                  freelancer.id
+                )(tx);
+              }),
+            ]);
+
+            res.status(200).json({
+              currentData: freelancers,
+              totalFreelancers: freelancerCount[0].count,
+              // totalFreelancers: 26,
+            });
+          });
       } catch (e) {
-        new Error(`Failed to fetch all freelancers`, { cause: e as Error });
+        res.status(401).json({
+          currentData: null,
+          totalFreelancers: null,
+        });
+        throw new Error(`Failed to fetch all freelancers`, {
+          cause: e as Error,
+        });
       }
     });
   })
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
+    const filter = new Filter({ placeHolder: ' ' });
     const { body } = req;
     const freelancer = body.freelancer;
 
-    verifyUserIdFromJwt(req, res, freelancer.user_id);
+    verifyUserIdFromJwt(req, res, [freelancer.user_id]);
     db.transaction(async (tx) => {
       try {
         const skill_ids = await upsertItems(freelancer.skills, 'skills')(tx);
@@ -61,8 +88,24 @@ export default nextConnect()
         if (freelancer.clients) {
           client_ids = await upsertItems(freelancer.clients, 'services')(tx);
         }
+        const filterdData = {
+          ...freelancer,
+          bio: filter.clean(freelancer.bio).trim(),
+          education: filter.clean(freelancer.education).trim(),
+          skills: freelancer.skills.map((item: string) =>
+            item.trim().length ? filter.clean(item).trim() : ''
+          ),
+          title: filter.clean(freelancer.title).trim(),
+          languages: freelancer.languages.map((item: string) =>
+            item.trim().length ? filter.clean(item).trim() : ''
+          ),
+          services: freelancer.services.map((item: string) =>
+            item.trim().length ? filter.clean(item).trim() : ''
+          ),
+        };
+
         const freelancer_id = await insertFreelancerDetails(
-          freelancer,
+          filterdData,
           skill_ids,
           language_ids,
           client_ids,

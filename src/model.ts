@@ -1,8 +1,8 @@
 export enum Currency {
   IMBU = 0,
   KSM = 1,
-  AUSD = 2,
-  KAR = 3,
+  // AUSD = 2,
+  // KAR = 3,
   MGX = 4,
 }
 
@@ -13,7 +13,19 @@ export enum OffchainProjectState {
   ChangesRequested = 2,
   Rejected = 3,
   Accepted = 4,
+  Refunded = 5,
+  Completed = 6,
 }
+
+export const applicationStatusId = [
+  'Draft',
+  'Pending Review',
+  'Changes Requested',
+  'Rejected',
+  'Accepted',
+  'Refunded',
+  'Completed',
+];
 
 export function displayState(state: OffchainProjectState) {
   switch (state) {
@@ -35,11 +47,13 @@ export enum OnchainProjectState {
   PendingMilestoneApproval = 4,
   OpenForVoting = 5,
   OpenForWithdraw = 6,
+  OpenForVotingOfNoConfidence = 7,
 }
 
 export enum RoundType {
-  ContributionRound,
   VotingRound,
+  VoteOfNoConfidence,
+  ContributionRound,
 }
 
 export enum ButtonState {
@@ -51,6 +65,12 @@ export enum ButtonState {
 export enum ProjectType {
   Brief = 0,
   Grant = 1,
+}
+
+export enum ImbueChainPollResult {
+  Pending,
+  EventFound,
+  EventNotFound,
 }
 
 export type Project = {
@@ -73,10 +93,13 @@ export type Project = {
   approvers: string[];
   created?: string;
   duration_id: number;
+  escrow_address: string;
+  completed: boolean;
+  milestones: Milestone[];
 };
 
 export type ProjectOnChain = {
-  id?: string | number;
+  id: string | number;
   requiredFunds: bigint;
   requiredFundsFormatted: number;
   raisedFunds: bigint;
@@ -92,9 +115,13 @@ export type ProjectOnChain = {
   roundKey?: number | undefined;
   cancelled: boolean;
   projectState: OnchainProjectState;
+  fundingType: any;
+  projectInMilestoneVoting: boolean;
+  projectInVotingOfNoConfidence: boolean;
 };
 
 export type Milestone = {
+  approvedForFunding?: boolean;
   project_id: number;
   project_chain_id: number;
   milestone_key: number;
@@ -133,7 +160,14 @@ export type User = {
   about?: string;
   website?: string;
   industry?: string;
+  created?: string;
 };
+
+export type Vote = {
+  voterAddress: string;
+  vote: boolean;
+}
+
 export interface BasicTxResponse {
   errorMessage: string | null;
   callHash?: string;
@@ -173,6 +207,7 @@ export type Freelancer = {
 export type FreelancerResponse = {
   currentData: Array<Freelancer>;
   totalFreelancers: number;
+  message?: string;
 };
 
 export function getDefaultFreelancer(): Freelancer {
@@ -239,16 +274,17 @@ export type BriefSqlFilter = {
   length_is_max: boolean;
   search_input: string | string[];
   items_per_page?: number;
-  page?: number;
+  page: number;
+  skills_range: Array<number>;
 };
 
 export type FreelancerSqlFilter = {
   skills_range: Array<number>;
   services_range: Array<number>;
   languages_range: Array<number>;
-  search_input: string | string[];
+  name: string | string[];
   items_per_page?: number;
-  page?: number;
+  page: number;
   verified?: boolean;
 };
 export type ApplicationData = {

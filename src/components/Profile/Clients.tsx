@@ -50,7 +50,8 @@ const Clients = ({
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const handleClose = () => setOpen(false);
-
+  const [error, setError] = useState<any>({});
+  const [inputFile, setInputFile] = useState<any>([]);
   // const [openAddClient] = useState<boolean>(false)
 
   const removeClient = (e: any, logo: string) => {
@@ -62,27 +63,50 @@ const Clients = ({
   };
 
   const handleLogoUpload = async (files: FileList | null) => {
-    if (files?.length) {
+    // setInputFile(files)
+    if (files?.length && files[0]?.type?.includes('image')) {
       setLoading(true);
+      removeImgError();
       try {
         const data = await uploadPhoto(files[0]);
         if (data.url) {
           setNewClient((prev: any) => {
             return { ...prev, logo: data.url };
           });
+        } else {
+          setErrorMessage('imgUp');
         }
       } catch (error) {
-        console.log(error);
+        setErrorMessage('imgUp');
       } finally {
         setLoading(false);
+        setInputFile([]);
       }
+    } else {
+      setErrorMessage('imgType');
+      setInputFile([]);
     }
   };
 
   const allClientsDataIsFilled = (): boolean => {
+    setError({});
+    const urlRegex =
+      /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/gi;
+    const regex = new RegExp(urlRegex);
+
     const usersClients = [newClient];
     const isFilled = usersClients.every((client) => {
-      return client.name && client.logo && client.website;
+      if (!client.name) setErrorMessage('name');
+      if (!client.logo) setErrorMessage('img');
+      if (!client.website || !client.website.match(regex))
+        setErrorMessage('website');
+
+      return (
+        client.name &&
+        client.logo &&
+        client.website &&
+        client.website.match(regex)
+      );
     });
     return isFilled;
   };
@@ -95,20 +119,41 @@ const Clients = ({
   };
 
   const handleSubmit = () => {
+    if (!allClientsDataIsFilled()) return;
     const newClients = [...clients, newClient];
     setClients(newClients);
     setFreelancer((prev: Freelancer) => ({ ...prev, clients: newClients }));
     setOpen(false);
     setNewClient({});
+    setError({});
+  };
+
+  const setErrorMessage = (field: string) => {
+    setError((prev: any) => ({ ...prev, [field]: true }));
+  };
+
+  const removeImgError = () => {
+    setError((prev: any) => ({ ...prev, imgUp: false, imgType: false }));
+  };
+
+  const navigateToLink = (link: string) => {
+    if (!link) return;
+
+    const regEx = /^http/;
+    if (!regEx.test(link)) link = `https://${link}`;
+    window.open(link, '_blank');
   };
 
   return (
     <>
       <div className='grid grid-cols-2 justify-center md:grid-cols-3 w-full mt-2'>
         {clients?.map((client: any, index: string) => (
-          <div key={index}>
+          <div
+            key={index}
+            onClick={() => !isEditMode && navigateToLink(client?.website)}
+          >
             <Tooltip title={client?.website} placement='top' arrow>
-              <div className='flex items-center gap-3 w-fit'>
+              <div className='flex items-center gap-3 w-fit cursor-pointer'>
                 <Badge
                   onClick={(e) => removeClient(e, client?.logo)}
                   className='client-badge'
@@ -140,10 +185,10 @@ const Clients = ({
           aria-describedby='modal-modal-description'
         >
           <Box sx={style}>
-            {newClient?.logo ? (
+            {newClient?.logo && !loading ? (
               <label
                 htmlFor='client-logo'
-                className='w-32 h-32 mx-auto overflow-hidden rounded-xl mb-5 cursor-pointer relative group'
+                className='w-32 h-32 mx-auto overflow-hidden rounded-xl cursor-pointer relative group'
               >
                 <div className='bg-black absolute left-0 right-0 top-0 bottom-0 bg-opacity-50 hidden group-hover:flex justify-center items-center '>
                   <span className='text-white font-bold'>Change Photo</span>
@@ -159,7 +204,7 @@ const Clients = ({
               </label>
             ) : (
               <label
-                className='w-32 h-32 mb-5 rounded-xl my-auto text-content border border-content-primary mx-auto hover:border-primary hover:text-primary flex items-center justify-center cursor-pointer'
+                className='w-32 h-32 rounded-xl my-auto text-content border border-content-primary mx-auto hover:border-primary hover:text-primary flex items-center justify-center cursor-pointer'
                 htmlFor='client-logo'
               >
                 {loading ? (
@@ -169,9 +214,19 @@ const Clients = ({
                 )}
               </label>
             )}
+            <p
+              className={`text-center mt-2 mb-3 text-sm text-red-500 ${
+                error.img || error.imgType || 'invisible'
+              }`}
+            >
+              {error.imgType
+                ? 'A valid logo is required. Please try with a PNG/JPG file'
+                : 'Image failed to upload.'}
+            </p>
 
             <input
               onChange={(e) => handleLogoUpload(e.target.files)}
+              value={inputFile}
               className='hidden'
               id='client-logo'
               type='file'
@@ -183,7 +238,17 @@ const Clients = ({
               variant='outlined'
               color='secondary'
               name='name'
+              className='!mb-0'
+              autoComplete='off'
             />
+            <p
+              className={`text-center mt-2 mb-3 text-sm text-red-500 ${
+                !error.name && 'invisible'
+              }`}
+            >
+              Please fill the Client Name field
+            </p>
+
             <TextField
               onChange={(e) => handleNewClientData(e)}
               id='outlined-basic'
@@ -191,9 +256,19 @@ const Clients = ({
               variant='outlined'
               color='secondary'
               name='website'
+              className='!mb-0'
+              autoComplete='off'
             />
+            <p
+              className={`text-center mt-2 mb-3 text-sm text-red-500 ${
+                !error.website && 'invisible'
+              }`}
+            >
+              A valid client website link is required
+            </p>
+
             <button
-              disabled={!allClientsDataIsFilled()}
+              // disabled={!allClientsDataIsFilled()}
               onClick={handleSubmit}
               className='primary-btn in-dark w-button'
             >

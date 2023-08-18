@@ -1,26 +1,35 @@
 /* eslint-disable no-constant-condition */
-import { useMediaQuery } from '@mui/material';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Brief } from '@/lib/models';
+import { showErrorMessage } from '@/utils/errorMessages';
+import { getBalance } from '@/utils/helper';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
-import { Freelancer, Project, User } from '@/model';
+import {
+  applicationStatusId,
+  Currency,
+  OffchainProjectState,
+  Project,
+  User,
+} from '@/model';
 import ChainService from '@/redux/services/chainService';
 
 import AccountChoice from '../AccountChoice';
+import BackButton from '../BackButton';
 import ErrorScreen from '../ErrorScreen';
+import CountrySelector from '../Profile/CountrySelector';
 import SuccessScreen from '../SuccessScreen';
 
 type ApplicationOwnerProps = {
   briefOwner: any;
   brief: Brief;
-  handleMessageBoxClick: (_user_id: number, _freelancer: any) => Promise<void>;
-  freelancer: Freelancer;
+  handleMessageBoxClick: (_user_id: number) => Promise<void>;
   application: Project | any;
   setLoading: (_loading: boolean) => void;
   updateProject: (
@@ -35,103 +44,149 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
     briefOwner,
     brief,
     handleMessageBoxClick,
-    freelancer,
     application,
     setLoading,
     updateProject,
     user,
   } = props;
-
+    console.log("🚀 ~ file: ApplicationOwnerHeader.tsx:52 ~ ApplicationOwnerHeader ~ brief:", brief)
   const [openPopup, setOpenPopup] = useState(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<any>();
-  // const [projectId, setProjectId] = useState<string>();
+  const [loadingWallet, setLoadingWallet] = useState<string>('');
+  const [balance, setBalance] = useState<string>();
 
   const router = useRouter();
-  // const { applicationId }: any = router.query;
 
-  const applicationStatusId = [
-    'Draft',
-    'Pending Review',
-    'Changes Requested',
-    'Rejected',
-    'Accepted',
-  ];
-  const mobileView = useMediaQuery('(max-width:480px)');
+  useEffect(() => {
+    const showBalance = async () => {
+      try {
+        setLoadingWallet('loading');
+        const balance = await getBalance(
+          user?.web3_address,
+          application?.currency_id ?? Currency.IMBU,
+          user
+        );
+        setBalance(balance.toLocaleString());
+      } catch (error) {
+        setError({ message: error });
+      } finally {
+        setLoadingWallet('');
+      }
+    };
+    user?.web3_address && showBalance();
+  }, [user?.web3_address, application?.currency_id, user]);
 
   const startWork = async (account: WalletAccount) => {
     setLoading(true);
-    const imbueApi = await initImbueAPIInfo();
-    const chainService = new ChainService(imbueApi, user);
-    delete application.modified;
-    const briefHash = blake2AsHex(JSON.stringify(application));
-    const result = await chainService?.commenceWork(account, briefHash);
 
-    while (true) {
-      if (result.status || result.txError) {
-        if (result.status) {
-          const projectId = parseInt(result.eventData[2]);
-          const escrow_address = result.eventData[5];
-          // setProjectId(applicationId);
-          await updateProject(projectId, escrow_address);
-          setSuccess(true);
-        } else if (result.txError) {
-          setError({ message: result.errorMessage });
+    try {
+      const imbueApi = await initImbueAPIInfo();
+      const chainService = new ChainService(imbueApi, user);
+      delete application.modified;
+      const briefHash = blake2AsHex(JSON.stringify(application));
+      const result = await chainService?.commenceWork(account, briefHash);
+
+      while (true) {
+        if (result.status || result.txError) {
+          if (result.status) {
+            const projectId = parseInt(result.eventData[2]);
+            const escrow_address = result.eventData[5];
+            // setProjectId(applicationId);
+            await updateProject(projectId, escrow_address);
+            setSuccess(true);
+          } else if (result.txError) {
+            let errorMessage = showErrorMessage(result.errorMessage);
+
+            if (result?.errorMessage?.includes('1010:')) {
+              errorMessage = showErrorMessage(1010);
+            }
+
+            setError({ message: errorMessage });
+          }
+          break;
         }
-        break;
+        await new Promise((f) => setTimeout(f, 1000));
       }
-      await new Promise((f) => setTimeout(f, 1000));
+    } catch (error) {
+      setError({ message: 'Something went wrong' });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
-    <div className='flex items-center w-full lg:justify-between lg:px-10 flex-wrap'>
-      <div className='flex gap-5 items-center'>
-        <Image
-          className='w-16 h-16 rounded-full object-cover cursor-pointer'
-          src={require('@/assets/images/profile-image.png')}
-          priority
-          alt='profileImage'
-        />
-        <p className='text-[1.25rem] font-normal capitalize text-imbue-purple'>
-          {briefOwner?.display_name}
-        </p>
+    <div className='flex items-center w-full lg:justify-between lg:px-10 flex-wrap relative'>
+      <BackButton className='absolute left-0 top-5' />
+      <div className='flex items-start'>
+        <div className='flex flex-col gap-2'>
+          <Image
+            onClick={() => router.push(`/profile/${briefOwner?.username}`)}
+            className='w-16 h-16 rounded-full object-cover cursor-pointer'
+            src={
+              briefOwner?.profile_photo ??
+              require('@/assets/images/profile-image.png')
+            }
+            height={200}
+            width={200}
+            priority
+            alt='profileImage'
+          />
+          <p className='text-sm text-content-primary break-all mt-5 lg:mt-2'>
+            @
+            {briefOwner?.username?.length > 16
+              ? `${briefOwner?.username.substr(0, 16)}...`
+              : briefOwner?.username}
+          </p>
+          <div className='flex flex-col gap-2'>
+            <p className='text-[1.25rem] font-normal capitalize text-imbue-purple'>
+              {briefOwner?.display_name}
+            </p>
+            <CountrySelector user={briefOwner} />
+          </div>
+        </div>
       </div>
-      {
-        <p className='text-[1rem] text-imbue-purple max-w-[55%] text-center break-words'>
-          @
-          {mobileView && briefOwner?.username?.length > 16
-            ? `${briefOwner?.username.substr(0, 16)}...`
-            : briefOwner?.username}
-        </p>
-      }
-
-      <div className='ml-auto lg:ml-0 flex items-center gap-2 mt-3 lg:mt-0'>
-        <button
-          className='primary-btn in-dark w-button !text-xs lg:!text-base'
-          onClick={() =>
-            brief && handleMessageBoxClick(brief?.user_id, freelancer?.username)
-          }
-        >
-          Message
-        </button>
-        {application?.status_id === 4 ? (
+      <div>
+        <div className='ml-auto lg:ml-0 flex items-center justify-end gap-2 mt-3 lg:mt-0'>
           <button
-            className='Accepted-btn h-[2.7rem] text-black in-dark text-xs lg:text-base rounded-full px-3 ml-3 lg:ml-0 lg:px-6'
-            onClick={() => brief?.project_id && setOpenPopup(true)}
+            className='primary-btn in-dark w-button !text-xs lg:!text-base'
+            onClick={() => brief && handleMessageBoxClick(briefOwner.id)}
           >
-            Start Work
+            Message
           </button>
-        ) : (
-          <button
-            className={`${
-              applicationStatusId[application?.status_id]
-            }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[10px]`}
-          >
-            {applicationStatusId[application?.status_id]}
-          </button>
-        )}
+          {application?.status_id === OffchainProjectState.Accepted ? (
+            <button
+              className='Accepted-btn h-[2.7rem] text-black in-dark text-xs lg:text-base rounded-full px-3 ml-3 lg:ml-0 lg:px-6'
+              onClick={() => brief?.project_id && setOpenPopup(true)}
+            >
+              Start Work
+            </button>
+          ) : (
+            <button
+              className={`${
+                applicationStatusId[application?.status_id]
+              }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
+            >
+              {applicationStatusId[application?.status_id]}
+            </button>
+          )}
+        </div>
+        <div>
+          <p className='text-sm lg:text-base mt-5 mb-3 text-imbue-purple text-right'>
+            {loadingWallet === 'loading' && 'Loading Wallet...'}
+            {loadingWallet === 'connecting' && 'Connecting Wallet...'}
+            {!loadingWallet &&
+              (balance === undefined
+                ? 'No wallet found'
+                : `Your Balance: ${balance} $${Currency[Currency.IMBU]}`)}
+          </p>
+          {Number(balance) < 500 && (
+            <div className='flex rounded-2xl gap-2 bg-imbue-coral px-2 py-1'>
+              <ErrorOutlineOutlinedIcon />
+              <p>the imbu balance is less than 500 $IMBU</p>
+            </div>
+          )}
+        </div>
       </div>
       <AccountChoice
         accountSelected={(account) => startWork(account)}

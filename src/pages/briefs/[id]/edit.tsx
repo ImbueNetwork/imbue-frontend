@@ -2,6 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import styled from '@emotion/styled';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Autocomplete, TextField, Tooltip } from '@mui/material';
+import Filter from 'bad-words';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -11,20 +14,18 @@ import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 import { Option } from '@/components/Option';
 import SuccessScreen from '@/components/SuccessScreen';
-import { TagsInput } from '@/components/TagsInput';
 
 import { timeData } from '@/config/briefs-data';
-import {
-  experiencedLevel,
-  scopeData,
-  suggestedIndustries,
-  suggestedSkills,
-} from '@/config/briefs-data';
+import { experiencedLevel, scopeData } from '@/config/briefs-data';
 import { Brief } from '@/model';
-import { getBrief, updateBriefById } from '@/redux/services/briefService';
+import {
+  getBrief,
+  searchIndustries,
+  searchSkills,
+  updateBriefById,
+} from '@/redux/services/briefService';
 import { RootState } from '@/redux/store/store';
 import styles from '@/styles/modules/newBrief.module.css';
-
 const SpacedRow = styled.div`
   display: flex;
   flex-direction: row;
@@ -39,14 +40,35 @@ const SpacedRow = styled.div`
   }
 `;
 
+type ErrorObjectType = {
+  headline: string;
+  description: string;
+  budget: string;
+  skills: string;
+  industries: string;
+  message: string;
+};
+
 export const EditProposal = (): JSX.Element => {
+  const filter = new Filter();
   // FIXME: brief
+
+  /// error handling objects
+  const initErrorObject: ErrorObjectType = {
+    headline: '',
+    description: '',
+    budget: '',
+    skills: '',
+    industries: '',
+    message: '',
+  };
+
   const [_brief, setBrief] = useState<Brief | any>();
   // FIXME: user
   const { user } = useSelector((state: RootState) => state.userState);
   const [industries, setIndustries] = useState<string[]>([]);
-  const [description, setDescription] = useState('');
-  const [headline, setHeadline] = useState('');
+  const [description, setDescription] = useState<any>();
+  const [headline, setHeadline] = useState<any>();
   const [expId, setExpId] = useState<number>();
   const [scopeId, setScopeId] = useState<number>();
   const [durationId, setDurationId] = useState<number>();
@@ -55,6 +77,11 @@ export const EditProposal = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<any>();
   const [success, setSuccess] = useState<boolean>(false);
+  const [suggestedSkills, setSuggestedSkills] = useState<string[]>([]);
+  const [suggestedIndustries, setSuggestedIndustries] = useState<string[]>([]);
+
+  const [inputError, setInputError] =
+    useState<ErrorObjectType>(initErrorObject);
 
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
@@ -62,6 +89,39 @@ export const EditProposal = (): JSX.Element => {
   useEffect(() => {
     router.isReady && getCurrentUserBrief();
   }, [briefId]);
+
+  useEffect(() => {
+    fetchSuggestedSkills();
+    fetchSuggestedIndustries();
+  }, []);
+
+  const fetchSuggestedIndustries = async () => {
+    const industriesRes = await searchIndustries('a');
+    if (industriesRes) {
+      setSuggestedIndustries(
+        industriesRes?.industry.map((industries) => industries.name)
+      );
+    }
+  };
+
+  const fetchSuggestedSkills = async () => {
+    const skillsRes = await searchSkills('');
+    if (skillsRes) {
+      setSuggestedSkills(skillsRes?.skills.map((skill) => skill.name));
+    }
+  };
+
+  const isinputError = () => {
+    if (
+      inputError.headline.length ||
+      inputError.description.length ||
+      inputError.industries.length ||
+      inputError.skills.length ||
+      inputError.budget.length
+    )
+      return true;
+    return false;
+  };
 
   const getCurrentUserBrief = async () => {
     try {
@@ -107,11 +167,15 @@ export const EditProposal = (): JSX.Element => {
     try {
       setLoading(true);
       const updateBriefResponse = await updateBriefById({
-        description,
-        headline: headline,
-        industries,
+        description: filter.clean(description),
+        headline: filter.clean(headline),
+        industries: industries.map((item) =>
+          item.trim().length ? filter.clean(item) : ''
+        ),
         scope_id: scopeId,
-        skills,
+        skills: skills.map((item) =>
+          item.trim().length ? filter.clean(item) : ''
+        ),
         duration_id: durationId,
         experience_id: expId,
         budget,
@@ -129,9 +193,188 @@ export const EditProposal = (): JSX.Element => {
     }
   }
 
-  function filterStrings(arr1: string[], arr2: string[]): string[] {
-    return arr1.filter((str) => !arr2.includes(str.toLocaleLowerCase()));
-  }
+  // function filterStrings(arr1: string[], arr2: string[]): string[] {
+  //   return arr1.filter((str) => !arr2.includes(str.toLocaleLowerCase()));
+  // }
+
+  const validateInputLength = (
+    text: string,
+    min: number,
+    max: number
+  ): boolean => {
+    return text.length >= min && text.length <= max;
+  };
+
+  const validateSkillsAndIndustry = (
+    text: string,
+    value: string[],
+    min: number,
+    max: number
+  ): boolean => {
+    if (text === 'skills') {
+      return value.length >= min && value.length <= max;
+    }
+    if (text === 'industries') {
+      return value.length >= min && value.length <= max;
+    }
+    return false;
+  };
+
+  const handleSkillChange = (val: string[]) => {
+    setSkills(val);
+    if (validateSkillsAndIndustry('skills', val, 3, 10)) {
+      setInputError((val) => {
+        return { ...val, skills: '' };
+      });
+    } else {
+      setInputError((val) => {
+        return { ...val, skills: 'Number of skills must be between 3 to 10' };
+      });
+    }
+  };
+
+  const searchSkill = async (name: string) => {
+    const skillRes = await searchSkills(name);
+    if (!skillRes || !skillRes?.skills.length) return;
+    setSuggestedSkills(skillRes?.skills.map((skill) => skill.name));
+  };
+
+  const searchIndustry = async (name: string) => {
+    const industriesRes = await searchIndustries(name.length > 0 ? name : 'a');
+    if (!industriesRes || !industriesRes?.industry.length) return;
+    setSuggestedIndustries(
+      industriesRes?.industry.map((industry) => industry.name)
+    );
+  };
+
+  const handleIndustriesChange = (val: string[]) => {
+    setIndustries(val);
+    if (validateSkillsAndIndustry('industries', val, 3, 5)) {
+      setInputError((val) => {
+        return { ...val, industries: '' };
+      });
+    } else {
+      setInputError((val) => {
+        return {
+          ...val,
+          industries: 'Number of industries must be between 3 to 5',
+        };
+      });
+    }
+  };
+
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = event.target;
+    switch (name) {
+      case 'headline':
+        if (validateInputLength(value, 10, 50)) {
+          setHeadline(value);
+          setInputError((val) => {
+            return { ...val, headline: '' };
+          });
+        } else {
+          setHeadline(value);
+          setInputError((val) => {
+            return {
+              ...val,
+              headline: 'Headline must be between 10 and 50 characters',
+            };
+          });
+        }
+        break;
+      case 'description':
+        if (validateInputLength(value, 50, 5000)) {
+          setDescription(value);
+          setInputError((val) => {
+            return {
+              ...val,
+              description: '',
+            };
+          });
+        } else {
+          setInputError((val) => {
+            return {
+              ...val,
+              description: 'Description must be between 50 and 5000 characters',
+            };
+          });
+
+          setDescription(value);
+        }
+        break;
+      case 'budget':
+        if (Number(value) < 10 || Number(value) > 1000000000) {
+          setInputError((val) => {
+            return {
+              ...val,
+              budget: 'Budget must be between $10 and $1,000,000,000',
+            };
+          });
+
+          setBudget(value);
+        } else {
+          setInputError((val) => {
+            return {
+              ...val,
+              budget: '',
+            };
+          });
+          setBudget(value);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
+  const SkillPanel = () => {
+    return (
+      <Autocomplete
+        id='tags-standard'
+        data-testid='skills-input'
+        multiple
+        getOptionLabel={(option) => option}
+        options={suggestedSkills}
+        sx={{ width: '100%' }}
+        onChange={(e, value) => handleSkillChange(value)}
+        defaultValue={skills}
+        renderInput={(params) => (
+          <TextField
+            color='secondary'
+            autoComplete='off'
+            onChange={(e) => searchSkill(e.target.value)}
+            {...params}
+          />
+        )}
+      />
+    );
+  };
+
+  const IndustryPannel = () => {
+    return (
+      <Autocomplete
+        id='tags-standard'
+        data-testid='skills-input'
+        multiple
+        getOptionLabel={(option) => option}
+        options={suggestedIndustries}
+        sx={{ width: '100%' }}
+        onChange={(e, value) => handleIndustriesChange(value)}
+        defaultValue={industries}
+        limitTags={10}
+        renderInput={(params) => (
+          <TextField
+            color='secondary'
+            autoComplete='off'
+            onChange={(e) => searchIndustry(e.target.value)}
+            {...params}
+          />
+        )}
+      />
+    );
+  };
 
   return (
     <div className='flex flex-row max-width-868px:block max-md:px-7'>
@@ -143,11 +386,33 @@ export const EditProposal = (): JSX.Element => {
       max-width-868px:max-w-[unset]
       md:w-[70%]
       md:mr-20 
+
+      bg-white 
+      lg:p-[2rem] 
+      rounded-[1.25rem]
+      flex
+      self-start
       '
       >
-        <h1 className='lg:text-4xl text-[1.5rem] leading-[50px] !text-imbue-purple m-0 font-normal mx-0'>
-          Edit Brief Details
-        </h1>
+        <div className='flex gap-5 items-center'>
+          <Tooltip
+            title='Go back to previous page'
+            followCursor
+            leaveTouchDelay={10}
+            enterDelay={500}
+            className='cursor-pointer'
+          >
+            <div
+              onClick={() => router.back()}
+              className='border border-content rounded-full p-1 flex items-center justify-center cursor-pointer relative '
+            >
+              <ArrowBackIcon className='h-5 w-5' color='secondary' />
+            </div>
+          </Tooltip>
+          <h1 className='lg:text-3xl text-[1.5rem] leading-[50px] !text-imbue-purple m-0 font-normal mx-0'>
+            Edit Brief Details
+          </h1>
+        </div>
       </header>
       <div className='imbu-proposals-draft-submission-form'>
         <fieldset className='bg-white p-[1rem] lg:p-[2rem] rounded-[1.25rem]'>
@@ -158,12 +423,19 @@ export const EditProposal = (): JSX.Element => {
           </p>
           <div className={`${styles.budgetInputContainer} !mt-[0.5rem]`}>
             <input
+              autoComplete='off'
               className={styles.briefDetailFieldInput}
               style={{ paddingLeft: '24px', height: 'auto' }}
               type='text'
               value={headline || ''}
-              onChange={(e) => setHeadline(e.target.value)}
+              onChange={handleChange}
+              name='headline'
             />
+            <span
+              className={`text-xs ${'text-imbue-light-purple-two'} mt-[-10px]`}
+            >
+              {inputError?.headline}
+            </span>
           </div>
 
           <h1 className='!text-[1.3rem] lg:!text-3xl m-0 font-normal !my-0 mx-0 !mb-3'>
@@ -171,25 +443,24 @@ export const EditProposal = (): JSX.Element => {
           </h1>
 
           <div className={`${styles.skillsContainer} !mt-0 !py-0 mb-6 `}>
-            <TagsInput
-              suggestData={filterStrings(suggestedSkills, skills)}
-              tags={skills}
-              onChange={(tags: string[]) => setSkills([...tags])}
-            />
+            <SkillPanel />
+            <div className='mt-4'>
+              <span className={`text-xs ${'text-imbue-light-purple-two'} `}>
+                {inputError?.skills}
+              </span>
+            </div>
           </div>
 
           <h1 className='!text-[1.3rem] lg:!text-3xl m-0 font-normal my-0 mx-0'>
             Industries
           </h1>
           <div className={`${styles.industryContainer} !mt-[0.5rem] !py-0 `}>
-            <TagsInput
-              suggestData={filterStrings(suggestedIndustries, industries)}
-              data-testid='industries-input'
-              tags={industries}
-              onChange={(tags: string[]) => {
-                setIndustries([...tags]);
-              }}
-            />
+            <IndustryPannel />
+            <div className='mt-4'>
+              <span className={`text-xs ${'text-imbue-light-purple-two'} `}>
+                {inputError?.industries}
+              </span>
+            </div>
           </div>
 
           <div>
@@ -202,23 +473,34 @@ export const EditProposal = (): JSX.Element => {
               className={`${styles.budgetInputContainer} !mt-[0.5rem] !py-0 !mb-3`}
             >
               <input
+                autoComplete='off'
                 className={`${styles.briefDetailFieldInput}`}
                 style={{
                   paddingLeft: '24px',
                   height: 'auto',
                 }}
                 type='number'
+                min='0'
+                max={1000000000}
                 value={budget || ''}
-                onChange={(e) => setBudget(Number(e.target.value))}
+                onChange={handleChange}
+                name='budget'
               />
               <div className={styles.budgetCurrencyContainer}>$</div>
             </div>
-            <div
-              className={`${styles.budgetDescription} !text-imbue-purple !mb-0 !mt-0`}
-            >
-              You will be able to set milestones which divide your project into
-              manageable phases.
-            </div>
+
+            {inputError?.budget ? (
+              <span className={`!text-imbue-purple text-xs`}>
+                {inputError?.budget}
+              </span>
+            ) : (
+              <div
+                className={`${styles.budgetDescription} !text-imbue-purple !mb-0 !mt-0 text-xs`}
+              >
+                You will be able to set milestones which divide your project
+                into manageable phases.
+              </div>
+            )}
           </div>
         </fieldset>
 
@@ -233,10 +515,13 @@ export const EditProposal = (): JSX.Element => {
               maxLength={5000}
               className='text-black bg-transparent'
               rows={10}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                setDescription(e.target.value)
-              }
+              onChange={handleChange}
             />
+            <span
+              className={`text-xs ${'text-imbue-light-purple-two'} mt-[-10px]`}
+            >
+              {inputError?.description}
+            </span>
           </div>
 
           <SpacedRow>
@@ -294,7 +579,7 @@ export const EditProposal = (): JSX.Element => {
         <fieldset>
           <div className='buttons-container mb-[2rem]'>
             <button
-              disabled={false}
+              disabled={loading || isinputError()}
               className='primary-btn in-dark w-button w-full !mr-0 hover:!bg-imbue-purple !text-[1rem] hover:!text-white h-[2.6rem]'
               onClick={() => handleSubmit()}
             >
@@ -313,7 +598,7 @@ export const EditProposal = (): JSX.Element => {
       >
         <div className='flex flex-col gap-4 w-1/2'>
           <button
-            onClick={() => router.push(`/briefs/${briefId}/`)}
+            onClick={() => router.replace(`/briefs/${briefId}/`)}
             className='primary-btn in-dark w-button w-full !m-0'
           >
             See Updated Brief

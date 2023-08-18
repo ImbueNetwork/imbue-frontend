@@ -10,11 +10,14 @@ type ErrorScreenProps = {
 const ErrorScreen = (props: ErrorScreenProps) => {
   const { error, setError } = props;
   const handleClose = () => {
+    if(error.noRetry) return
+    
     setError && setError(null);
   };
 
   return (
     <Dialog
+      disableRestoreFocus
       open={error?.message ? true : false}
       onClose={handleClose}
       aria-labelledby='alert-dialog-title'
@@ -35,7 +38,7 @@ const ErrorScreen = (props: ErrorScreenProps) => {
           <p className='text-center text-lg lg:text-2xl font-bold text-content-primary'>
             An unexpected error occured
           </p>
-          <p className='text-center lg:text-xl my-2 lg:my-5 text-content'>
+          <p className='text-center lg:text-xl my-2 lg:my-5 text-content whitespace-pre-line !leading-relaxed'>
             {error?.message}
           </p>
         </div>

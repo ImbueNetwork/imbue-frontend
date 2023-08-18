@@ -18,7 +18,7 @@ export default nextConnect()
 
     await db.transaction(async (tx) => {
       try {
-        const project = await models.fetchProject(projectId.toString())(tx);
+        const project = await models.fetchProjectById(projectId.toString())(tx);
 
         if (!project) {
           return project;

@@ -138,7 +138,6 @@
   background-color: transparent;
   height: 11rem;
   padding: 10px 20px;
-  outline: none;
   color: #3b27c1;
 }
 
@@ -157,7 +156,6 @@
   border-radius: 5px;
   padding: 10px 20px;
   width: 100%;
-  outline: none;
 }
 
 .value-input .input-budget:before {

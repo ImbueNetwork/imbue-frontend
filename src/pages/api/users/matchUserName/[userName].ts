@@ -9,23 +9,22 @@ import { User } from '@/model';
 
 export default nextConnect().get(
   async (req: NextApiRequest, res: NextApiResponse) => {
-    const { usernameOrAddress } = req.query;
+    const { userName } = req.query;
 
-    if (usernameOrAddress === undefined)
+    if (userName === undefined)
       return res.status(401).send({ error: 'Username of Email not found' });
 
     await db.transaction(async (tx) => {
       try {
-        const users: User[] = (await models.fetchUserWithUsernameOrAddress(
-          usernameOrAddress.toString()
-        )(tx)) as User[];
+        const user: User = (
+          await models.fetchUserWithUsernameOrAddress(userName.toString())(tx)
+        )[0] as User;
 
-        if (!users) return res.status(401).send({ error: 'No user found' });
+       // if (!user) return res.status(401).send({ error: 'No user found' });
 
-        return res.status(201).send(users);
-        
+        return res.status(201).send(user);
       } catch (e) {
-        new Error(`Failed to fetch user ${usernameOrAddress}`, {
+        new Error(`Failed to fetch user ${userName}`, {
           cause: e as Error,
         });
       }

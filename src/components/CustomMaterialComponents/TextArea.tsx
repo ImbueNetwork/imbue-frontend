@@ -43,7 +43,7 @@ const TextArea = ({
   mt,
 }: TextAreaProps): JSX.Element => {
   const [focused, setFocused] = useState(false);
-  const [text, setText] = useState('');
+  const [text, setText] = useState<any>();
 
   const countText = (str: string): number => {
     return str.length;
@@ -67,6 +67,7 @@ const TextArea = ({
         <Input
           id='component-filled'
           name={name}
+          autoComplete='off'
           multiline
           rows={12}
           error={error}

@@ -21,4 +21,5 @@ export default {
   getstreamApiKey: process.env.GETSTREAM_API_KEY,
   imbueNetworkWebsockAddr: process.env.IMBUE_NETWORK_WEBSOCK_ADDR,
   relayChainWebsockAddr: process.env.RELAY_CHAIN_WEBSOCK_ADDR,
+  imageTag: process.env.IMAGE_TAG,
 };
