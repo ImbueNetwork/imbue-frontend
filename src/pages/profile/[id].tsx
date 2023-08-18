@@ -12,7 +12,10 @@ import { BiEdit } from 'react-icons/bi';
 import { FaStar } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
 
-import { isUrlAndSpecialCharacterExist } from '@/utils/helper';
+import {
+  isUrlAndSpecialCharacterExist,
+  isValidAddressPolkadotAddress,
+} from '@/utils/helper';
 
 import AccountChoice from '@/components/AccountChoice';
 import { TextArea } from '@/components/Briefs/TextArea';
@@ -99,7 +102,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
         setError({ message: 'remove bad word from username' });
         return;
       } else if (userNameError || displayNameError) {
-        setError({ message: 'fill the required fields' });
+        setError({ message: userNameError || displayNameError });
         return;
       } else if (userNameExist && user.username !== prevUserName) {
         setError({ message: 'username is already exist' });
@@ -130,8 +133,10 @@ const Profile = ({ initUser, browsingUser }: any) => {
         const userResponse: any = await updateUser(filterdUser);
 
         if (userResponse.status === 'Successful') {
-          router.push(`/profile/${userResponse.user.username}`, undefined, { shallow: true })
-          dispatch(fetchUserRedux())
+          router.push(`/profile/${userResponse.user.username}`, undefined, {
+            shallow: true,
+          });
+          dispatch(fetchUserRedux());
           setSuccess(true);
           setPrevUserName(user.username);
         } else {
@@ -139,11 +144,15 @@ const Profile = ({ initUser, browsingUser }: any) => {
         }
       }
     } catch (error) {
-      setError({ message: "Something went wrong. Please try again" });
+      setError({ message: 'Something went wrong. Please try again' });
       console.log(error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const isNumOrSpecialCharacter = (character: string) => {
+    return /[^A-Za-z]/g.test(character);
   };
 
   const cancelEdit = async () => {
@@ -202,9 +211,13 @@ const Profile = ({ initUser, browsingUser }: any) => {
   // };
   const handleChange = async (e: any) => {
     if (e.target.name === 'display_name') {
-      console.log(isUrlAndSpecialCharacterExist(e.target.value));
       if (isUrlAndSpecialCharacterExist(e.target.value)) {
         setDisplayNameError('URL , special characters are not allowed in name');
+      } else if (
+        e.target.value &&
+        isNumOrSpecialCharacter(e.target.value.at(0))
+      ) {
+        setDisplayNameError('sentence must start with a character');
       } else if (e.target.value.length < 1)
         setDisplayNameError('name must be at least 1 character');
       else setDisplayNameError(null);
@@ -212,7 +225,13 @@ const Profile = ({ initUser, browsingUser }: any) => {
     if (e.target.name === 'username') {
       if (e.target.value.length < 5 || e.target.value.length > 30)
         setUserNameError('username must be at least 5 to 30 characters long');
-      else if (isUrlAndSpecialCharacterExist(e.target.value)) {
+      else if (
+        !isValidAddressPolkadotAddress(e.target.value) &&
+        e.target.value.length > 0 &&
+        isNumOrSpecialCharacter(e.target.value.at(0))
+      ) {
+        setUserNameError('sentence must start with a character');
+      } else if (isUrlAndSpecialCharacterExist(e.target.value)) {
         setUserNameError(
           'URL , special characters are not allowed in username'
         );
@@ -236,7 +255,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
     if (!regEx.test(link)) link = `https://${link}`;
     window.open(link, '_blank');
   };
-  console.log(displayNameError);
+
   return (
     <div className='profile-container'>
       <div className='cursor-pointer absolute top-28 left-16 lg:left-24 z-[1]'>

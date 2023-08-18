@@ -11,6 +11,7 @@ import {
   generateGetStreamToken,
   User,
 } from '@/lib/models';
+import { isUrlAndSpecialCharacterExist, isUrlExist } from '@/utils/helper';
 
 import db from '@/db';
 
@@ -183,6 +184,17 @@ export default nextConnect()
           const freelancer_clients = freelancer?.clients;
 
           const token = await generateGetStreamToken(freelancer);
+
+          if (
+            isUrlAndSpecialCharacterExist(freelancer.display_name) ||
+            isUrlAndSpecialCharacterExist(freelancer.username) ||
+            isUrlExist(freelancer.title)
+          ) {
+            return res.status(401).send({
+              status: 'Failed',
+              error: new Error('Failed to update freelancer details.'),
+            });
+          }
 
           const freelancer_id = await models.updateFreelancerDetails(
             freelancer.user_id,

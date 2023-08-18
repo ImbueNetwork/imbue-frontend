@@ -392,3 +392,7 @@ export const strToIntRange = (strList: any) => {
     ? strList?.[0]?.split?.(',')?.map?.((v: any) => Number(v))
     : strList?.split?.(',')?.map((v: any) => Number(v));
 };
+
+export const isNumOrSpecialCharacter = (character: string) => {
+  return /[^A-Za-z]/g.test(character);
+};

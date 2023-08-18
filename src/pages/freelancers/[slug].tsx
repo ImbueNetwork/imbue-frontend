@@ -43,7 +43,12 @@ import { MdOutlineWatchLater } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { checkEnvironment, fetchUser, matchedByUserName } from '@/utils';
-import { isUrlAndSpecialCharacterExist, isUrlExist } from '@/utils/helper';
+import {
+  isNumOrSpecialCharacter,
+  isUrlAndSpecialCharacterExist,
+  isUrlExist,
+  isValidAddressPolkadotAddress,
+} from '@/utils/helper';
 
 import AccountChoice from '@/components/AccountChoice';
 import { TextArea } from '@/components/Briefs/TextArea';
@@ -159,8 +164,12 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           setError({ message: 'Remove bad word from username' });
           return;
         }
-        if (userNameError || displayError || userNameExist) {
-          setError({ message: 'Invalid input' });
+        if (userNameError || displayError) {
+          setError({ message: userNameError || displayError });
+          return;
+        }
+        if (userNameExist) {
+          setError({ message: 'Username is already exist try another one' });
           return;
         }
         setLoading(true);
@@ -226,6 +235,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     if (e.target.name === 'display_name') {
       if (newFreelancer.display_name.trim().length < 1) {
         setDisplayNameError('Display name must be at least 1 character long');
+      } else if (isNumOrSpecialCharacter(e.target.value.at(0))) {
+        setDisplayNameError('sentence must start with a character');
       } else if (isUrlAndSpecialCharacterExist(e.target.value)) {
         setDisplayNameError(
           'URL,special characters are not allowed in display name'
@@ -238,6 +249,11 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         setUserNameError('username must be at least 5 to 30 characters long');
       else if (isUrlAndSpecialCharacterExist(e.target.value)) {
         setUserNameError('URL,special characters are not allowed in username');
+      } else if (
+        !isValidAddressPolkadotAddress(e.target.value) &&
+        isNumOrSpecialCharacter(e.target.value.at(0))
+      ) {
+        setUserNameError('sentence must start with a character');
       } else setUserNameError(null);
       const data = await matchedByUserName(e.target.value);
       if (data && e.target.value !== prevUserName) {
