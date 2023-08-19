@@ -887,7 +887,8 @@ export const updateBrief =
     budget: bigint,
     brief_id: number | string,
     skill_ids: number[],
-    industry_ids: number[]
+    industry_ids: number[],
+    verified_only: boolean
   ) =>
   async (tx: Knex.Transaction) =>
     await tx<Brief>('briefs')
@@ -898,6 +899,7 @@ export const updateBrief =
         duration_id: duration_id,
         budget: budget,
         experience_id: experience_id,
+        verified_only,
       })
       .where({ id: brief_id })
       .returning('briefs.id')

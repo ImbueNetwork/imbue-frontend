@@ -32,6 +32,7 @@ export type BriefInfo = {
   budget: bigint | undefined;
   user_id?: number | undefined;
   brief_id?: number | undefined;
+  verified_only: boolean;
 };
 
 export type BriefStepProps = {

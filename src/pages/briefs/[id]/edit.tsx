@@ -79,7 +79,7 @@ export const EditProposal = (): JSX.Element => {
   const [scopeId, setScopeId] = useState<number>();
   const [durationId, setDurationId] = useState<number>();
   const [budget, setBudget] = useState<number | bigint | any>();
-  const [verified_only, setVerified_only] = useState<boolean | undefined>(true);
+  const [verified_only, setVerified_only] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<any>();
   const [success, setSuccess] = useState<boolean>(false);
@@ -167,10 +167,6 @@ export const EditProposal = (): JSX.Element => {
   };
 
   async function handleSubmit() {
-    await editProject();
-  }
-
-  async function editProject() {
     try {
       setLoading(true);
       const updateBriefResponse = await updateBriefById({
@@ -187,6 +183,7 @@ export const EditProposal = (): JSX.Element => {
         experience_id: expId,
         budget,
         brief_id: briefId,
+        verified_only
       });
       if (updateBriefResponse) {
         setSuccess(true);

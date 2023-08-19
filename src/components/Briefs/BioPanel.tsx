@@ -1,4 +1,3 @@
-import VerifiedIcon from '@mui/icons-material/Verified';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import { useRouter } from 'next/router';
@@ -32,12 +31,6 @@ const BioPanel = ({
       <div className='mb-6'>
         <div className='flex flex-wrap flex-col items-start mb-1'>
           <div className='header'>
-            {brief.verified_only && (
-              <p className='text-imbue-purple flex items-center  mb-1.5'>
-                <VerifiedIcon className='text-base mr-2' />
-                only verified freelancer can apply
-              </p>
-            )}
             <p className='!text-3xl text-imbue-purple-dark !font-normal'>
               {brief.headline}
             </p>
