@@ -35,6 +35,8 @@ module.exports = {
         'imbue-light-purple-three': '#F6F5FF',
         'imbue-coral': '#FC6760',
         'imbue-foundation-blue': '#00234C',
+        'imbue-lime': '#BAFF36',
+        'imbue-lime-light': '#EAFFC2',
         'imbue-lemon': '#7AA822',
         'background': "#FFFFFF",
         'background-dark': "#",

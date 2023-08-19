@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
+import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
 import { TextField } from '@mui/material';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -748,6 +749,15 @@ const Briefs = (): JSX.Element => {
                         </div>
                       ))}
                     </div>
+
+                    {
+                      item?.verified_only && (
+                        <div className='flex items-center gap-2'>
+                          <VerifiedRoundedIcon fontSize='small' htmlColor='#38e894' />
+                          <p className='text-content-primary'>Only verified freelancers can apply</p>
+                        </div>
+                      )
+                    }
 
                     <div className='flex justify-between lg:flex-row flex-col lg:w-[400px] lg:items-center'>
                       <div className='brief-proposals'>
