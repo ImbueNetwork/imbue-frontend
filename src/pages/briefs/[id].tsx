@@ -54,6 +54,7 @@ const BriefDetails = (): JSX.Element => {
     experience_id: 0,
     number_of_briefs_submitted: 0,
     user_id: 0,
+    verified_only: false
   });
 
   // const [browsingUser, setBrowsingUser] = useState<User | null>(null);
