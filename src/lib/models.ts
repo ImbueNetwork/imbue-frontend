@@ -779,9 +779,8 @@ export const insertBrief =
     scope_id: number,
     duration_id: number
   ) =>
-  async (tx: Knex.Transaction) => {
-    console.log(brief.headline);
-    return await tx('briefs')
+  async (tx: Knex.Transaction) =>
+    await tx('briefs')
       .insert({
         headline: brief.headline,
         description: brief.description,
@@ -817,7 +816,6 @@ export const insertBrief =
         }
         return ids[0];
       });
-  };
 
 // save a brief
 export const insertSavedBrief =
