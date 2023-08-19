@@ -56,7 +56,7 @@ export default nextConnect()
         if (!brief) {
           return new Error('Brief does not exist.');
         }
-        const briefOwner = (await fetchUser(brief.user_id)(tx))[0] as User;
+        const briefOwner = await fetchUser(brief.user_id)(tx) as User;
         verifyUserIdFromJwt(req, res, [briefOwner?.id]);
         const project = await fetchProjectById(projectId)(tx);
         if (!project) {

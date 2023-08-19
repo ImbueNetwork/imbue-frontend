@@ -12,18 +12,13 @@ export default nextConnect()
     const id: any = query.id;
     db.transaction(async (tx) => {
       try {
-        const usernameRes: User = (
-          await models.fetchUserWithUsernameOrAddress(id.toString())(tx)
-        )[0] as User;
+        const usernameRes =  await models.fetchUserWithUsernameOrAddress(id.toString())(tx);
 
         if (!usernameRes) {
           return res.status(404).end();
         }
 
-        const user: User = (
-          await models.fetchUser(usernameRes?.id)(tx)
-        )[0] as User;
-
+        const user = await models.fetchUser(usernameRes?.id)(tx) as User;
         if (!user) {
           return res.status(404).end();
         }
@@ -157,9 +152,7 @@ export async function fetchUserById(userId: string) {
   let response;
   await db.transaction(async (tx) => {
     try {
-      const user: User = (
-        await models.fetchUser(Number(userId))(tx)
-      )[0] as User;
+      const user = await models.fetchUser(Number(userId))(tx);
       if (user) {
         response = {
           id: user.id,
