@@ -144,8 +144,11 @@ const BioInsights = ({
               gap-2
               !m-0
               !px-4
-              ${!canSubmitProposal && '!bg-gray-300 !text-gray-400 !cursor-not-allowed'}
-              ` }
+              ${
+                (!canSubmitProposal || isOwnerOfBrief) &&
+                '!bg-gray-300 !text-gray-400 !cursor-not-allowed'
+              }
+              `}
                   onClick={() =>
                     canSubmitProposal && !isOwnerOfBrief && redirectToApply()
                   }
