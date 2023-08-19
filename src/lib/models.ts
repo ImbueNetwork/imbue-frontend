@@ -699,6 +699,7 @@ export const fetchAllBriefs = () => (tx: Knex.Transaction) =>
       'briefs.created',
       'briefs.user_id',
       'briefs.project_id',
+      'briefs.verified_only',
       'users.briefs_submitted as number_of_briefs_submitted',
       tx.raw('ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills'),
       tx.raw('ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids'),

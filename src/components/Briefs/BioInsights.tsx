@@ -32,7 +32,7 @@ type BioInsightsProps = {
   setShowMessageBox: (_: boolean) => void;
   targetUser: User | null;
   browsingUser: User | null;
-  canSubmitProposal: boolean;
+  canSubmitProposal: boolean | undefined;
   isSavedBrief?: boolean;
   unsaveBrief?: () => Promise<void>;
 };

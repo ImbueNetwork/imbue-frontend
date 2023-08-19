@@ -234,7 +234,7 @@ const BriefDetails = (): JSX.Element => {
           setShowMessageBox={setShowMessageBox}
           targetUser={targetUser}
           browsingUser={browsingUser}
-          canSubmitProposal={freelancer?.verified ?? false}
+          canSubmitProposal={brief.verified_only ? freelancer?.verified : true}
         />
       </div>
       <ClientsHistory briefId={id} client={targetUser} />
