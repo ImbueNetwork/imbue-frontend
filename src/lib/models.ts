@@ -153,6 +153,7 @@ export type Brief = {
   experience_id: number;
   user_id: number;
   project_id: number;
+  verified_only: boolean;
 };
 
 export type Freelancer = {
@@ -219,9 +220,9 @@ export const resetUserWeb3Addresses =
 export const fetchWeb3AccountByAddress =
   (address: string) => (tx: Knex.Transaction) =>
     fetchAllWeb3Account()(tx)
-    .where({ address })
-    .leftJoin('users', {'users.id' : 'web3_accounts.user_id'})
-    .first();
+      .where({ address })
+      .leftJoin('users', { 'users.id': 'web3_accounts.user_id' })
+      .first();
 
 export const fetchAllWeb3Account = () => (tx: Knex.Transaction) =>
   tx<Web3Account>('web3_accounts').select();
@@ -778,8 +779,9 @@ export const insertBrief =
     scope_id: number,
     duration_id: number
   ) =>
-  async (tx: Knex.Transaction) =>
-    await tx('briefs')
+  async (tx: Knex.Transaction) => {
+    console.log(brief.headline);
+    return await tx('briefs')
       .insert({
         headline: brief.headline,
         description: brief.description,
@@ -788,6 +790,7 @@ export const insertBrief =
         user_id: brief.user_id,
         budget: brief.budget,
         experience_id: brief.experience_id,
+        verified_only: brief.verified_only,
       })
       .returning('briefs.id')
       .then(async (ids) => {
@@ -814,6 +817,7 @@ export const insertBrief =
         }
         return ids[0];
       });
+  };
 
 // save a brief
 export const insertSavedBrief =
@@ -1011,12 +1015,12 @@ export const getOrCreateFederatedUser = (
        * Do we already have a federated_credential ?
        */
       const federated = await tx<FederatedCredential>('federated_credentials')
-      .select()
-      .where({
-        subject: username,
-      })
-      .first();
-      
+        .select()
+        .where({
+          subject: username,
+        })
+        .first();
+
       /**
        * If not, create the `user`, then the `federated_credential`
        */
@@ -1039,7 +1043,7 @@ export const getOrCreateFederatedUser = (
         }
         user = user_;
       }
-      
+
       if (!user.getstream_token) {
         const token = await generateGetStreamToken(user);
         await updateUserGetStreamToken(user.id, token)(tx);

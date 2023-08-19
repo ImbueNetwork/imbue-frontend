@@ -1,4 +1,4 @@
-import { Autocomplete, TextField, Tooltip } from '@mui/material';
+import { Autocomplete, Checkbox, FormControlLabel, TextField, Tooltip } from '@mui/material';
 import Filter from 'bad-words';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -30,10 +30,11 @@ import styles from '../../styles/modules/newBrief.module.css';
 const NewBrief = (): JSX.Element => {
   const filter = new Filter();
   const [step, setStep] = useState(0);
-  const [headline, setHeadline] = useState<any>();
+  const [headline, setHeadline] = useState<string>("");
   const [industries, setIndustries] = useState<string[]>([]);
-  const [description, setDescription] = useState<any>();
+  const [description, setDescription] = useState<string>("");
   const [skills, setSkills] = useState<string[]>([]);
+  const [verified_only, setVerified_only] = useState<boolean>(true);
   const [expId, setExpId] = useState<number>();
   const [scopeId, setScopeId] = useState<number>();
   const [durationId, setDurationId] = useState<number>();
@@ -179,7 +180,7 @@ const NewBrief = (): JSX.Element => {
           onChange={(e, value) => handleIndustriesChange(value)}
           defaultValue={industries}
           limitTags={10}
-          ListboxProps={{className: "max-h-[250px]"}}
+          ListboxProps={{ className: "max-h-[250px]" }}
           renderInput={(params) => (
             <TextField
               color='secondary'
@@ -232,7 +233,7 @@ const NewBrief = (): JSX.Element => {
           sx={{ width: '100%' }}
           onChange={(e, value) => handleSkillsChange(value)}
           defaultValue={skills}
-          ListboxProps={{className: "max-h-[250px]"}}
+          ListboxProps={{ className: "max-h-[250px]" }}
           renderInput={(params) => (
             <TextField
               color='secondary'
@@ -242,12 +243,24 @@ const NewBrief = (): JSX.Element => {
             />
           )}
         />
+        <FormControlLabel control={
+          <Checkbox
+            checked={verified_only}
+            onChange={(e) => setVerified_only(e.target.checked)}
+            defaultChecked color='secondary'
+          />
+        }
+          label="Only verified freelancers can apply to this brief"
+          className='text-content-primary'
+        />
       </div>
       <div className='flex flex-wrap flex-row  justify-center relative -top-8'>
         <span className={!skillError ? 'hide' : 'error'}>
           number of skills must be between 3 to 10
         </span>
       </div>
+
+
     </>
   );
 
@@ -420,15 +433,16 @@ const NewBrief = (): JSX.Element => {
         headers: config.postAPIHeaders,
         method: 'post',
         body: JSON.stringify({
-          headline: filter.clean(headline),
+          headline: filter.clean(headline.trim()),
           industries: industries.map((item) => filter.clean(item)),
-          description: filter.clean(description),
+          description: filter.clean(description.trim()),
           scope_id: scopeId,
           experience_id: expId,
           duration_id: durationId,
           skills,
           budget,
           user_id,
+          verified_only
         }),
       });
       if (resp.status === 200 || resp.status === 201) {
@@ -489,10 +503,9 @@ const NewBrief = (): JSX.Element => {
                 }
               >
                 <button
-                  className={`primary-btn in-dark w-button !mt-0 ${
-                    disableSubmit &&
+                  className={`primary-btn in-dark w-button !mt-0 ${disableSubmit &&
                     '!bg-gray-400 !text-white !cursor-not-allowed'
-                  }`}
+                    }`}
                   data-testid='submit-button'
                   onClick={() => !disableSubmit && onReviewPost()}
                 >
@@ -508,13 +521,12 @@ const NewBrief = (): JSX.Element => {
                 }
               >
                 <button
-                  className={`primary-btn in-dark w-button !mt-0 ${
-                    disableSubmit &&
+                  className={`primary-btn in-dark w-button !mt-0 ${disableSubmit &&
                     '!bg-gray-400 !text-white !cursor-not-allowed'
-                  }`}
+                    }`}
                   data-testid='next-button'
                   onClick={() => !disableSubmit && setStep(step + 1)}
-                  // onClick={() => console.log("hit")}
+                // onClick={() => console.log("hit")}
                 >
                   {stepData[step].next
                     ? `Next: ${stepData[step].next}`

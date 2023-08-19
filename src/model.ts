@@ -166,7 +166,7 @@ export type User = {
 export type Vote = {
   voterAddress: string;
   vote: boolean;
-}
+};
 
 export interface BasicTxResponse {
   errorMessage: string | null;
@@ -264,6 +264,7 @@ export type Brief = {
   user_id: number;
   project_id?: number;
   currentUserId?: number;
+  verified_only?: boolean;
 };
 
 export type BriefSqlFilter = {

@@ -92,6 +92,7 @@ export default nextConnect()
           brief.industries,
           'industries'
         )(tx);
+
         const brief_id = await insertBrief(
           brief,
           skill_ids,
