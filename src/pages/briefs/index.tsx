@@ -407,7 +407,7 @@ const Briefs = (): JSX.Element => {
     };
 
     router.isReady && fetchAndSetBriefs();
-  }, [router.isReady]);
+  }, [router.isReady, currentPage, itemsPerPage]);
 
   // Here we have to get all the checked boxes and try and construct a query out of it...
   const onSearch = async () => {

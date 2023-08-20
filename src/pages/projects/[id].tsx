@@ -232,6 +232,7 @@ function Project() {
   const getProject = async () => {
     try {
       const projectRes: Project = await getProjectById(projectId);
+
       // showing owner profile if the current user if the applicant freelancer
       let owner;
       let freelancerRes;
@@ -262,6 +263,13 @@ function Project() {
       setIsProjectOwner(owner?.id === user.id);
 
       setProject(projectRes);
+
+      if (projectRes.status_id === 4 && !projectRes.chain_project_id && projectRes.brief_id) {
+        setWait(true)
+        return setWaitMessage(
+          `Waiting for ${freelancerRes?.display_name} to start the work`
+        );
+      }
 
       // setting approver list
       const approversPreviewList = [...approversPreview];
