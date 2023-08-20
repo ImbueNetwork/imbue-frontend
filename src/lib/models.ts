@@ -194,6 +194,7 @@ export type BriefSqlFilter = {
   items_per_page: number;
   page: number;
   skills_range: Array<number>;
+  verified_only: boolean;
 };
 
 export type FreelancerSqlFilter = {
@@ -679,8 +680,9 @@ export const fetchAcceptedBriefs =
 export const fetchBrief = (id: string | string[]) => (tx: Knex.Transaction) =>
   fetchAllBriefs()(tx).where({ 'briefs.id': id }).first();
 
-export const fetchUserBriefs = (user_id: string | number) => (tx: Knex.Transaction) =>
-  fetchAllBriefs()(tx).where({ user_id }).select();
+export const fetchUserBriefs =
+  (user_id: string | number) => (tx: Knex.Transaction) =>
+    fetchAllBriefs()(tx).where({ user_id }).select();
 
 export const fetchAllBriefs = () => (tx: Knex.Transaction) =>
   tx
@@ -1468,6 +1470,11 @@ export const searchBriefs =
         }
         if (filter?.length_is_max) {
           this.orWhere('duration_id', '>=', Math.max(...filter.length_range));
+        }
+      })
+      .where(function () {
+        if (filter?.verified_only) {
+          this.where('verified_only', true);
         }
       })
       .where(function () {

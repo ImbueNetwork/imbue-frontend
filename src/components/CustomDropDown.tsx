@@ -27,7 +27,6 @@ const CustomDropDown = (
   }: CustomDropDownProps): JSX.Element => {
     const [isOpen, setIsOpen] = useState(false);
     const [options, setOptions] = useState(filterOptions);
-    console.log("🚀 ~ file: CustomDropDown.tsx:30 ~ filterOptions:", filterOptions)
 
     // useEffect(() => {
     //   const storedState = localStorage.getItem(name);
@@ -91,7 +90,8 @@ const CustomDropDown = (
         {isOpen && (
           <div
             data-testid='filterOptions'
-            className='w-full -mt-6 bg-white rounded-[10px] rounded-t-none absolute z-10 transition-all duration-300 ease-in-out shadow-sm shadow-slate-300 overflow-y-auto max-h-[200px]'
+            className={`w-full -mt-6 bg-white rounded-[10px] rounded-t-none absolute transition-all duration-300 ease-in-out shadow-sm shadow-slate-300 overflow-y-auto max-h-[170px]`}
+            style={{zIndex: 20 - filterType}}
           >
             <BriefFilter
               label=''

@@ -277,6 +277,7 @@ export type BriefSqlFilter = {
   items_per_page?: number;
   page: number;
   skills_range: Array<number>;
+  verified_only: boolean;
 };
 
 export type FreelancerSqlFilter = {

@@ -1,16 +1,17 @@
 import React from 'react';
 
-import CustomDropDown from '@/components/CustomDropDown';
 import CustomModal from '@/components/CustomModal';
+
+import CustomDropDown from '../CustomDropDown';
 
 
 interface FilterModalProps {
     open: boolean;
     handleClose: () => void;
     cancelFilters: () => void;
-    handleSetId: (id: string | string[]) => void;
+    handleSetId: (_id: string | string[]) => void;
     onSearch: () => void;
-    selectedFilterIds?: string[];    
+    selectedFilterIds?: string[];
     customDropdownConfigs: any;
 }
 
@@ -31,6 +32,39 @@ const FilterModal = ({ open, handleClose, customDropdownConfigs, cancelFilters, 
                     Filter
                 </p>
 
+                {/* <div className='grid md:grid-cols-4 grid-cols-1 md:gap-10 gap-5'>
+                    {customDropdownConfigs
+                        ?.filter(({ options }: any) => options && options.length > 0)
+                        ?.map(({ label, filterType, options }: any) => {
+                            console.log(options);
+                            return (
+                                <Autocomplete
+                                    key={label}
+                                    multiple
+                                    id="checkboxes-tags-demo"
+                                    options={options}
+                                    disableCloseOnSelect
+                                    limitTags={0}
+                                    getOptionLabel={(option:any) => option.value}
+                                    renderOption={(props, option:any, { selected }) => (
+                                        <li {...props}>
+                                            <Checkbox
+                                                // icon={icon}
+                                                // checkedIcon={checkedIcon}
+                                                style={{ marginRight: 8 }}
+                                                checked={selected}
+                                            />
+                                            {option.value}
+                                        </li>
+                                    )}
+                                    style={{ width: 500 }}
+                                    renderInput={(params) => (
+                                        <TextField {...params} className='w-1/2' label={label} color='secondary' />
+                                    )}
+                                />
+                            )
+                        })}
+                </div> */}
                 <div className='grid md:grid-cols-4 grid-cols-1 md:gap-10 gap-5'>
                     {customDropdownConfigs
                         ?.filter(({ options }: any) => options && options.length > 0)
