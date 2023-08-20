@@ -253,7 +253,7 @@ const Briefs = (): JSX.Element => {
       options: skillsFilter.options,
     },
     {
-      label: 'Freealncer Information',
+      label: 'Freelancer Information',
       filterType: BriefFilterOption.FreelancerInfo,
       options: freelancerInfoFilter.options,
     },
