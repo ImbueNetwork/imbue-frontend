@@ -252,7 +252,7 @@ export const fetchUserWithUsernameOrAddress =
           )
       )
       .select('id', 'display_name', 'profile_photo', 'username', 'web3_address')
-      .limit(1);
+      .first();
 
 export const searchUserWithNameOrAddress =
   (usernameOrAddress: string) => (tx: Knex.Transaction) =>
@@ -263,7 +263,7 @@ export const searchUserWithNameOrAddress =
       .orderBy('web3_address', 'asc');
 
 export const fetchUser = (id: number) => (tx: Knex.Transaction) => {
-  return tx<User>('users').where({ id }).limit(1);
+  return tx<User>('users').where({ id }).first();
 };
 
 export const updateUserData =
@@ -679,7 +679,7 @@ export const fetchAcceptedBriefs =
 export const fetchBrief = (id: string | string[]) => (tx: Knex.Transaction) =>
   fetchAllBriefs()(tx).where({ 'briefs.id': id }).first();
 
-export const fetchUserBriefs = (user_id: string) => (tx: Knex.Transaction) =>
+export const fetchUserBriefs = (user_id: string | number) => (tx: Knex.Transaction) =>
   fetchAllBriefs()(tx).where({ user_id }).select();
 
 export const fetchAllBriefs = () => (tx: Knex.Transaction) =>
