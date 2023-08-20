@@ -153,6 +153,7 @@ export type Brief = {
   experience_id: number;
   user_id: number;
   project_id: number;
+  verified_only: boolean;
 };
 
 export type Freelancer = {
@@ -193,6 +194,7 @@ export type BriefSqlFilter = {
   items_per_page: number;
   page: number;
   skills_range: Array<number>;
+  verified_only: boolean;
 };
 
 export type FreelancerSqlFilter = {
@@ -219,9 +221,9 @@ export const resetUserWeb3Addresses =
 export const fetchWeb3AccountByAddress =
   (address: string) => (tx: Knex.Transaction) =>
     fetchAllWeb3Account()(tx)
-    .where({ address })
-    .leftJoin('users', {'users.id' : 'web3_accounts.user_id'})
-    .first();
+      .where({ address })
+      .leftJoin('users', { 'users.id': 'web3_accounts.user_id' })
+      .first();
 
 export const fetchAllWeb3Account = () => (tx: Knex.Transaction) =>
   tx<Web3Account>('web3_accounts').select();
@@ -678,8 +680,9 @@ export const fetchAcceptedBriefs =
 export const fetchBrief = (id: string | string[]) => (tx: Knex.Transaction) =>
   fetchAllBriefs()(tx).where({ 'briefs.id': id }).first();
 
-export const fetchUserBriefs = (user_id: string | number) => (tx: Knex.Transaction) =>
-  fetchAllBriefs()(tx).where({ user_id }).select();
+export const fetchUserBriefs =
+  (user_id: string | number) => (tx: Knex.Transaction) =>
+    fetchAllBriefs()(tx).where({ user_id }).select();
 
 export const fetchAllBriefs = () => (tx: Knex.Transaction) =>
   tx
@@ -698,6 +701,7 @@ export const fetchAllBriefs = () => (tx: Knex.Transaction) =>
       'briefs.created',
       'briefs.user_id',
       'briefs.project_id',
+      'briefs.verified_only',
       'users.briefs_submitted as number_of_briefs_submitted',
       tx.raw('ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills'),
       tx.raw('ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids'),
@@ -788,6 +792,7 @@ export const insertBrief =
         user_id: brief.user_id,
         budget: brief.budget,
         experience_id: brief.experience_id,
+        verified_only: brief.verified_only,
       })
       .returning('briefs.id')
       .then(async (ids) => {
@@ -884,7 +889,8 @@ export const updateBrief =
     budget: bigint,
     brief_id: number | string,
     skill_ids: number[],
-    industry_ids: number[]
+    industry_ids: number[],
+    verified_only: boolean
   ) =>
   async (tx: Knex.Transaction) =>
     await tx<Brief>('briefs')
@@ -895,6 +901,7 @@ export const updateBrief =
         duration_id: duration_id,
         budget: budget,
         experience_id: experience_id,
+        verified_only,
       })
       .where({ id: brief_id })
       .returning('briefs.id')
@@ -1011,12 +1018,12 @@ export const getOrCreateFederatedUser = (
        * Do we already have a federated_credential ?
        */
       const federated = await tx<FederatedCredential>('federated_credentials')
-      .select()
-      .where({
-        subject: username,
-      })
-      .first();
-      
+        .select()
+        .where({
+          subject: username,
+        })
+        .first();
+
       /**
        * If not, create the `user`, then the `federated_credential`
        */
@@ -1039,7 +1046,7 @@ export const getOrCreateFederatedUser = (
         }
         user = user_;
       }
-      
+
       if (!user.getstream_token) {
         const token = await generateGetStreamToken(user);
         await updateUserGetStreamToken(user.id, token)(tx);
@@ -1463,6 +1470,11 @@ export const searchBriefs =
         }
         if (filter?.length_is_max) {
           this.orWhere('duration_id', '>=', Math.max(...filter.length_range));
+        }
+      })
+      .where(function () {
+        if (filter?.verified_only) {
+          this.where('verified_only', true);
         }
       })
       .where(function () {

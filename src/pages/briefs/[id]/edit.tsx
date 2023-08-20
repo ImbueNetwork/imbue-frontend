@@ -3,7 +3,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import styled from '@emotion/styled';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Autocomplete, TextField, Tooltip } from '@mui/material';
+import {
+  Autocomplete,
+  Checkbox,
+  FormControlLabel,
+  TextField,
+  Tooltip,
+} from '@mui/material';
 import Filter from 'bad-words';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -73,7 +79,7 @@ export const EditProposal = (): JSX.Element => {
   const [scopeId, setScopeId] = useState<number>();
   const [durationId, setDurationId] = useState<number>();
   const [budget, setBudget] = useState<number | bigint | any>();
-
+  const [verified_only, setVerified_only] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<any>();
   const [success, setSuccess] = useState<boolean>(false);
@@ -140,6 +146,7 @@ export const EditProposal = (): JSX.Element => {
         const projectDuration = briefResponse?.duration_id;
 
         setBrief(briefResponse);
+        setVerified_only(briefResponse?.verified_only);
         setSkills(skillNames);
         setIndustries(industryNames);
         setBudget(projectBudget);
@@ -160,10 +167,6 @@ export const EditProposal = (): JSX.Element => {
   };
 
   async function handleSubmit() {
-    await editProject();
-  }
-
-  async function editProject() {
     try {
       setLoading(true);
       const updateBriefResponse = await updateBriefById({
@@ -180,6 +183,7 @@ export const EditProposal = (): JSX.Element => {
         experience_id: expId,
         budget,
         brief_id: briefId,
+        verified_only
       });
       if (updateBriefResponse) {
         setSuccess(true);
@@ -501,6 +505,21 @@ export const EditProposal = (): JSX.Element => {
                 into manageable phases.
               </div>
             )}
+          </div>
+          <div className='mt-4'>
+            {' '}
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={verified_only}
+                  onChange={(e) => setVerified_only(e.target.checked)}
+                  defaultChecked
+                  color='secondary'
+                />
+              }
+              label='Only verified freelancers can apply to this brief'
+              className='text-content-primary'
+            />
           </div>
         </fieldset>
 

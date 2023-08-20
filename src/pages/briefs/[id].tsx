@@ -54,6 +54,7 @@ const BriefDetails = (): JSX.Element => {
     experience_id: 0,
     number_of_briefs_submitted: 0,
     user_id: 0,
+    verified_only: false
   });
 
   // const [browsingUser, setBrowsingUser] = useState<User | null>(null);
@@ -234,7 +235,7 @@ const BriefDetails = (): JSX.Element => {
           setShowMessageBox={setShowMessageBox}
           targetUser={targetUser}
           browsingUser={browsingUser}
-          canSubmitProposal={freelancer?.verified ?? false}
+          canSubmitProposal={brief.verified_only ? freelancer?.verified : true}
         />
       </div>
       <ClientsHistory briefId={id} client={targetUser} />

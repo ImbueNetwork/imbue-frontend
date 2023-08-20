@@ -14,6 +14,7 @@ export enum BriefFilterOption {
   Length = 2,
   // HoursPerWeek = 3,
   Skills = 3,
+  FreelancerInfo = 4,
 }
 
 export type BriefState = {
@@ -32,6 +33,7 @@ export type BriefInfo = {
   budget: bigint | undefined;
   user_id?: number | undefined;
   brief_id?: number | undefined;
+  verified_only: boolean;
 };
 
 export type BriefStepProps = {

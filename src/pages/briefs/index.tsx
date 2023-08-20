@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
+import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
 import { TextField } from '@mui/material';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -66,7 +67,7 @@ const Briefs = (): JSX.Element => {
   const [skills, setSkills] = useState<Item[]>([{ name: "", id: 0 }]);
 
   const [error, setError] = useState<any>();
-  const { expRange, submitRange, lengthRange, heading, size: sizeProps, skillsProps } = router.query;
+  const { expRange, submitRange, lengthRange, heading, size: sizeProps, skillsProps, verified_only: verifiedOnlyProp } = router.query;
 
   const { pathname } = router;
 
@@ -219,6 +220,17 @@ const Briefs = (): JSX.Element => {
     }))
   };
 
+  const freelancerInfoFilter = {
+    filterType: BriefFilterOption.FreelancerInfo,
+    label: 'Freelancer Info',
+    options: [
+      {
+        interiorIndex: 0,
+        value: 'Verified',
+      },
+    ],
+  };
+
   const customDropdownConfigs = [
     {
       label: 'Project Length',
@@ -239,6 +251,11 @@ const Briefs = (): JSX.Element => {
       label: 'Skills Required',
       filterType: BriefFilterOption.Skills,
       options: skillsFilter.options,
+    },
+    {
+      label: 'Freealncer Information',
+      filterType: BriefFilterOption.FreelancerInfo,
+      options: freelancerInfoFilter.options,
     },
     // {
     //   name: 'Hours Per Week',
@@ -281,7 +298,10 @@ const Briefs = (): JSX.Element => {
             search_input: '',
             items_per_page: itemsPerPage,
             page: currentPage,
+            verified_only: false,
           };
+
+          const verifiedOnlyPropIndex = selectedFilterIds.indexOf('4-0');
 
           if (router.query.page) {
             const pageQuery = Number(router.query.page)
@@ -336,6 +356,19 @@ const Briefs = (): JSX.Element => {
             // if (input) input.value = heading.toString();
             setSearchInput(heading.toString())
           }
+
+          if (verifiedOnlyProp) {
+            if (!selectedFilterIds.includes(`4-0`))
+              selectedFilterIds.push(`4-0`);
+
+            filter = { ...filter, verified_only: true };
+          }
+          else if (verifiedOnlyPropIndex !== -1) {
+            // const newFileter = [...selectedFilterIds].filter((f) => f !== '4-0')
+            // setSlectedFilterIds(newFileter)
+            selectedFilterIds.splice(verifiedOnlyPropIndex, 1)
+          }
+
           if (lengthRange) {
             const range = strToIntRange(lengthRange);
             range?.forEach?.((v: any) => {
@@ -374,15 +407,7 @@ const Briefs = (): JSX.Element => {
     };
 
     router.isReady && fetchAndSetBriefs();
-  }, [
-    expRange,
-    heading,
-    lengthRange,
-    router,
-    submitRange,
-    currentPage,
-    itemsPerPage,
-  ]);
+  }, [router.isReady]);
 
   // Here we have to get all the checked boxes and try and construct a query out of it...
   const onSearch = async () => {
@@ -397,6 +422,7 @@ const Briefs = (): JSX.Element => {
     let length_is_max = false;
     let length_range_prop: number[] = [];
     let skills_prop: number[] = [];
+    let verified_only = false;
 
     // default is max
     // const hpw_max = 50;
@@ -457,6 +483,12 @@ const Briefs = (): JSX.Element => {
               }
               break;
 
+            case BriefFilterOption.FreelancerInfo:
+              {
+                verified_only = true;
+              }
+              break;
+
             default:
               // eslint-disable-next-line no-console
               console.log(
@@ -469,6 +501,7 @@ const Briefs = (): JSX.Element => {
     }
 
     router.query.page = '1';
+    router.query.verified_only = verified_only ? '1' : [];
     router.query.heading = search_value !== '' ? search_value : [];
     router.query.expRange = exp_range.length ? exp_range.toString() : [];
     router.query.submitRange = submitted_range.length
@@ -497,6 +530,7 @@ const Briefs = (): JSX.Element => {
           search_input: search_value,
           items_per_page: itemsPerPage,
           page: 1,
+          verified_only: verified_only
         };
 
         if (search_value.length === 0) {
@@ -518,6 +552,7 @@ const Briefs = (): JSX.Element => {
     }
     finally {
       setLoading(false)
+      setFilterVisible(false);
     }
   };
 
@@ -748,6 +783,15 @@ const Briefs = (): JSX.Element => {
                         </div>
                       ))}
                     </div>
+
+                    {
+                      item?.verified_only && (
+                        <div className='flex items-center gap-2'>
+                          <VerifiedRoundedIcon fontSize='small' htmlColor='#38e894' />
+                          <p className='text-content-primary'>Only verified freelancers can apply</p>
+                        </div>
+                      )
+                    }
 
                     <div className='flex justify-between lg:flex-row flex-col lg:w-[400px] lg:items-center'>
                       <div className='brief-proposals'>

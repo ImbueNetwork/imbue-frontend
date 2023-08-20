@@ -32,7 +32,7 @@ type BioInsightsProps = {
   setShowMessageBox: (_: boolean) => void;
   targetUser: User | null;
   browsingUser: User | null;
-  canSubmitProposal: boolean;
+  canSubmitProposal: boolean | undefined;
   isSavedBrief?: boolean;
   unsaveBrief?: () => Promise<void>;
 };
@@ -118,11 +118,10 @@ const BioInsights = ({
             <div className='flex gap-3 lg:items-center mt-4 flex-wrap'>
               <button
                 onClick={() => (isSavedBrief ? unsaveBrief?.() : saveBrief?.())}
-                className={` ${
-                  isSavedBrief
+                className={` ${isSavedBrief
                     ? 'bg-imbue-coral text-white border-imbue-coral'
                     : 'bg-transparent text-content border border-content'
-                } rounded-3xl h-[2.48rem] text-base font-normal px-5 max-width-1100px:w-full max-width-500px:w-auto `}
+                  } rounded-3xl h-[2.48rem] text-base font-normal px-5 max-width-1100px:w-full max-width-500px:w-auto `}
               >
                 {isSavedBrief ? 'Unsave' : 'Save'}
               </button>
@@ -144,8 +143,10 @@ const BioInsights = ({
               gap-2
               !m-0
               !px-4
-              ${!canSubmitProposal && '!bg-gray-300 !text-gray-400 !cursor-not-allowed'}
-              ` }
+              ${(!canSubmitProposal || isOwnerOfBrief) &&
+                    '!bg-gray-300 !text-gray-400 !cursor-not-allowed'
+                    }
+              `}
                   onClick={() =>
                     canSubmitProposal && !isOwnerOfBrief && redirectToApply()
                   }
@@ -174,6 +175,12 @@ const BioInsights = ({
       </div>
 
       <div className='subsection !mb-[0.75rem]'>
+        {brief.verified_only && (
+          <p className='text-imbue-purple flex items-center mb-4'>
+            <VerifiedIcon className='mr-2' fontSize='small' htmlColor='#38e894' />
+            Only verified freelancer can apply
+          </p>
+        )}
         <div className='brief-insights-stat'>
           <div className='flex items-center text-imbue-purple-dark '>
             Applications:
@@ -233,21 +240,18 @@ const BioInsights = ({
       </h3>
 
       <div className=' bg-imbue-light-purple-three p-[1rem] rounded-[0.5rem] mt-3'>
-        <div className='subsection pb-2 !mt-0 !mb-[1.2rem] '>
+        <div className='mb-5'>
           <div className='brief-insights-stat flex gap-2 justify-start items-center max-width-1800px:flex-wrap '>
             {targetUser?.web3_address ? (
               <>
-                <VerifiedIcon
-                  className='secondary-icon'
-                  sx={{ height: '1rem' }}
-                />
+                <VerifiedIcon fontSize='small' color='secondary'/>
                 <span className='font-normal text-imbue-purple-dark text-[1rem] mr-3'>
                   Payment method verified
                 </span>
               </>
             ) : (
               <>
-                <CancelIcon color='error' sx={{ height: '1rem' }} />
+                <CancelIcon fontSize='small' color='error' />
                 <span className='font-normal text-imbue-purple-dark text-[1rem] mr-3'>
                   Payment method not verified
                 </span>
@@ -265,14 +269,14 @@ const BioInsights = ({
           </div>
         </div>
 
-        <div className='subsection pb-2 !mt-[0px]'>
+        <div className='mb-5'>
           <div className='brief-insights-stat flex flex-col'>
-            <div className='flex items-center text-imbue-purple-dark !font-normal'>
-              <MarkEmailUnreadOutlinedIcon sx={{ height: '1rem' }} />
-              <h3 className='ml-1 !font-normal'>
+            <div className='flex gap-2 items-center text-imbue-purple-dark !font-normal'>
+              <MarkEmailUnreadOutlinedIcon fontSize='small' />
+              <div className='text-lg'>
                 <span className='mr-2 '>{clientBriefs.length}</span>
                 {`Project${clientBriefs?.length > 1 ? 's' : ''} Posted`}
-              </h3>
+              </div>
             </div>
             <p className='mt-2 text-imbue-purple text-[1rem]'>
               1 hire rate, {openBriefs?.length || 0} open job
@@ -291,7 +295,7 @@ const BioInsights = ({
             </div>
           </div>
         )}
-        <p className='mt-2 text-imbue-purple text-[1rem]'>
+        <p className='text-imbue-purple !text-sm'>
           Member since {moment(targetUser?.created).format('MMM DD, YYYY')}
         </p>
         {/* {
@@ -364,9 +368,8 @@ const BioInsights = ({
       </div>
 
       <Alert
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${
-          copied ? 'right-5' : '-right-full'
-        }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
+          }`}
         severity='success'
       >
         {`Brief link copied to clipboard`}
