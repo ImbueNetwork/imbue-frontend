@@ -293,7 +293,7 @@ const Freelancers = (): JSX.Element => {
     };
 
     router.isReady && fetchAndSetFreelancers();
-  }, [router.isReady]);
+  }, [router.isReady, currentPage, itemsPerPage]);
 
 
   const onSearch = async () => {

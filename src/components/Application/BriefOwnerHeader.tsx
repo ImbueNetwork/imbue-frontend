@@ -106,7 +106,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         setError({ message: 'Could not connect wallet. Please Try again' });
       }
     } catch (error) {
-      setError({ message: error });
+      setError({ message: 'Could not connect wallet. Please Try again' });
     } finally {
       setLoadingWallet('');
     }
