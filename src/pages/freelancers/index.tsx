@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
-import VerifiedIcon from '@mui/icons-material/Verified';
+import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
 import { Grid, TextField } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -293,20 +293,7 @@ const Freelancers = (): JSX.Element => {
     };
 
     router.isReady && fetchAndSetFreelancers();
-  }, [
-    router.isReady,
-    skills,
-    services,
-    languages,
-    skillsRangeProps,
-    name,
-    languagesRangeProps,
-    servicesRangeProps,
-    freelancerInfoProps,
-    currentPage,
-    itemsPerPage,
-    pageProp
-  ]);
+  }, [router.isReady, currentPage, itemsPerPage]);
 
 
   const onSearch = async () => {
@@ -407,7 +394,7 @@ const Freelancers = (): JSX.Element => {
       console.error(error);
     }
     finally {
-      setLoading(true);
+      setLoading(false);
     }
   };
 
@@ -541,15 +528,18 @@ const Freelancers = (): JSX.Element => {
                             width={100}
                             alt=''
                           />
-                          {verified && (
-                            <VerifiedIcon className={styles.verifiedIcon} />
-                          )}
                         </div>
                         <div className={`${styles.freelancerInfo} mt-[0.5rem]`}>
                           <div className='px-[1.25rem]'>
-                            <h3 className='text-xl font-medium text-content text-center'>
-                              {display_name}
-                            </h3>
+                            <div className='flex items-center justify-center gap-2'>
+                              <h3 className='text-xl font-medium text-content text-center'>
+                                {display_name}
+                              </h3>
+
+                              {verified && (
+                                <VerifiedRoundedIcon fontSize='small' htmlColor='#38e894' />
+                              )}
+                            </div>
                             <h5 className='text-xs lg:text-sm mt-2 text-imbue-purple-dark font-normal whitespace-pre-wrap break-all'>
                               {bio?.length > 299
                                 ? bio.substring(0, 300) + '...'

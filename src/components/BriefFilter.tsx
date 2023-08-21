@@ -14,7 +14,7 @@ type BriefFilterProps = {
 
 export const BriefFilter = (
   ({
-    label,
+    // label,
     filter_options,
     filter_type,
     setId,
@@ -31,8 +31,8 @@ export const BriefFilter = (
 
     return (
       <div className='filter-section'>
-        <div className='filter-label'>{label}</div>
-        <div className='filter-option-list !mb-0 !gap-0'>
+        {/* <div className='filter-label'>{label}</div> */}
+        <div className='filter-option-list mt-2 !mb-0 !gap-0'>
           {filter_options?.map(({ value, interiorIndex }) => (
             <div
               className='filter-option flex items-center justify-between w-full hover:bg-imbue-light-purple px-4 py-2 cursor-pointer'

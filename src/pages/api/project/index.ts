@@ -32,6 +32,7 @@ export default nextConnect()
       total_cost_without_fee,
       imbue_fee,
       duration_id,
+      verified_only,
       // project_type,
     } = req.body;
 
@@ -50,7 +51,7 @@ export default nextConnect()
           user.id
         )(tx);
 
-        if (!freelancer?.verified) {
+        if (!freelancer?.verified && verified_only) {
           return res
             .status(401)
             .send('Only verified freelancers can apply for a brief');
@@ -74,7 +75,7 @@ export default nextConnect()
         })(tx);
 
         if (!project?.id) {
-          return new Error('project_id missing.');
+          return res.status(401).send(new Error('project_id missing.'));
         }
 
         const pkg: ProjectPkg = {

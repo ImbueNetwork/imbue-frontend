@@ -222,16 +222,18 @@ export const SubmitProposal = (): JSX.Element => {
           required_funds: totalCost,
           duration_id: durationId,
           description: brief?.description,
+          verified_only: brief.verified_only,
         }),
       });
       if (resp.ok) {
         const applicationId = (await resp.json()).id;
         applicationId && setapplicationId(applicationId);
       } else {
-        setError({ message: resp });
+        setError({ message: "Could not submit applicaton" });
       }
     } catch (error) {
-      setError({ message: error });
+      console.log(error);
+      setError({ message: "Could not submit applicaton" });
     } finally {
       setLoading(false);
     }

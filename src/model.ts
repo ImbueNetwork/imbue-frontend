@@ -264,7 +264,7 @@ export type Brief = {
   user_id: number;
   project_id?: number;
   currentUserId?: number;
-  verified_only?: boolean;
+  verified_only: boolean;
 };
 
 export type BriefSqlFilter = {
@@ -277,6 +277,7 @@ export type BriefSqlFilter = {
   items_per_page?: number;
   page: number;
   skills_range: Array<number>;
+  verified_only: boolean;
 };
 
 export type FreelancerSqlFilter = {

@@ -194,6 +194,7 @@ export type BriefSqlFilter = {
   items_per_page: number;
   page: number;
   skills_range: Array<number>;
+  verified_only: boolean;
 };
 
 export type FreelancerSqlFilter = {
@@ -252,7 +253,7 @@ export const fetchUserWithUsernameOrAddress =
           )
       )
       .select('id', 'display_name', 'profile_photo', 'username', 'web3_address')
-      .limit(1);
+      .first();
 
 export const searchUserWithNameOrAddress =
   (usernameOrAddress: string) => (tx: Knex.Transaction) =>
@@ -263,7 +264,7 @@ export const searchUserWithNameOrAddress =
       .orderBy('web3_address', 'asc');
 
 export const fetchUser = (id: number) => (tx: Knex.Transaction) => {
-  return tx<User>('users').where({ id }).limit(1);
+  return tx<User>('users').where({ id }).first();
 };
 
 export const updateUserData =
@@ -679,8 +680,9 @@ export const fetchAcceptedBriefs =
 export const fetchBrief = (id: string | string[]) => (tx: Knex.Transaction) =>
   fetchAllBriefs()(tx).where({ 'briefs.id': id }).first();
 
-export const fetchUserBriefs = (user_id: string) => (tx: Knex.Transaction) =>
-  fetchAllBriefs()(tx).where({ user_id }).select();
+export const fetchUserBriefs =
+  (user_id: string | number) => (tx: Knex.Transaction) =>
+    fetchAllBriefs()(tx).where({ user_id }).select();
 
 export const fetchAllBriefs = () => (tx: Knex.Transaction) =>
   tx
@@ -887,7 +889,8 @@ export const updateBrief =
     budget: bigint,
     brief_id: number | string,
     skill_ids: number[],
-    industry_ids: number[]
+    industry_ids: number[],
+    verified_only: boolean
   ) =>
   async (tx: Knex.Transaction) =>
     await tx<Brief>('briefs')
@@ -898,6 +901,7 @@ export const updateBrief =
         duration_id: duration_id,
         budget: budget,
         experience_id: experience_id,
+        verified_only,
       })
       .where({ id: brief_id })
       .returning('briefs.id')
@@ -1466,6 +1470,11 @@ export const searchBriefs =
         }
         if (filter?.length_is_max) {
           this.orWhere('duration_id', '>=', Math.max(...filter.length_range));
+        }
+      })
+      .where(function () {
+        if (filter?.verified_only) {
+          this.where('verified_only', true);
         }
       })
       .where(function () {

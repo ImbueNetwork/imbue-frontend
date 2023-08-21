@@ -148,7 +148,8 @@ export default nextConnect()
           brief.budget,
           brief.id,
           skill_ids,
-          industry_ids
+          industry_ids,
+          brief.verified_only
         )(tx);
 
         if (!brief_id) {
