@@ -29,7 +29,7 @@ const Impressions = ({
   return (
     <div className='bg-background rounded-3xl h-full w-full col-span-3 py-6 px-12'>
       <p className='text-content border-b pb-2 text-2xl mb-6'>Impressions</p>
-      {!isChainLoading &&
+      {isChainLoading &&
         numberOfMileSotnes?.map((item: any) => (
           <div
             key={'impression__' + item}

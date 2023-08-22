@@ -1201,7 +1201,7 @@ function Project() {
           )}
         </div>
         <div className='col-span-9'>
-          {!chainLoading &&
+          {chainLoading &&
             project?.milestones?.map((item: any) => (
               <div
                 key={
