@@ -27,8 +27,8 @@ const ValidatableInput = (props: any) => {
         `Valid ${name} is required between ${minLength} and ${maxLength}`
       );
     } else if (
-      name === 'title' ||
-      (name === 'education' && isUrlExist(value))
+      (name === 'title' || name === 'education') &&
+      isUrlExist(value)
     ) {
       setError(`URL is not allowed in ${name}`);
     } else {
