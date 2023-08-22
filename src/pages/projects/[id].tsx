@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
-import { Modal, Tooltip } from '@mui/material';
+import { Modal, Skeleton, Tooltip, Typography } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -13,7 +13,6 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import * as utils from '@/utils';
-import { getBalance } from '@/utils/helper';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import AccountChoice from '@/components/AccountChoice';
@@ -25,12 +24,14 @@ import RefundScreen from '@/components/Grant/Refund';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 import Login from '@/components/Login';
 import Impressions from '@/components/Project/Impressions';
+import ProjectApprovers from '@/components/Project/ProjectApprovers';
+import ProjectBalance from '@/components/Project/ProjectBalance';
 import ProjectStateTag from '@/components/Project/ProjectStateTag';
 import VotingList from '@/components/Project/VotingList';
 import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
 
-import freelalncerPic from '@/assets/images/profile-image.png'
+import freelalncerPic from '@/assets/images/profile-image.png';
 import { calenderIcon, shieldIcon, tagIcon } from '@/assets/svgs';
 import { timeData } from '@/config/briefs-data';
 import {
@@ -95,6 +96,7 @@ function Project() {
   const [votingWalletAccount, setVotingWalletAccount] = useState<
     WalletAccount | any
   >({});
+  const [chainLoading, setChainLoading] = useState<boolean>(true);
   const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -103,9 +105,14 @@ function Project() {
   const [firstPendingMilestone, setFirstPendingMilestone] = useState<number>();
   const [isApplicant, setIsApplicant] = useState<boolean>(false);
   const [isProjectOwner, setIsProjectOwner] = useState<boolean>(false);
+  const [projectOwner, setProjectOwner] = useState<User>();
   const [showRefundButton, setShowRefundButton] = useState<boolean>();
   const [milestoneVotes, setMilestoneVotes] = useState<any>({});
-  const votes = Object.keys(milestoneVotes)?.map((key) => ({ voterAddress: key, vote: milestoneVotes[key] })) || []
+  const votes =
+    Object.keys(milestoneVotes)?.map((key) => ({
+      voterAddress: key,
+      vote: milestoneVotes[key],
+    })) || [];
   const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
     useState<boolean>();
   const [projectInVotingOfNoConfidence, setProjectInVotingOfNoConfidence] =
@@ -128,9 +135,13 @@ function Project() {
     null
   );
   const [isModalOpen, setModalOpen] = useState(false);
-  const canVote = (isApprover && user.web3_address && !Object.keys(milestoneVotes).includes(user.web3_address)) || (projectType === 'brief' && isProjectOwner);
+  const canVote =
+    (isApprover &&
+      user.web3_address &&
+      !Object.keys(milestoneVotes).includes(user.web3_address)) ||
+    (projectType === 'brief' && isProjectOwner);
   const [expandProjectDesc, setExpandProjectDesc] = useState<number>(500);
-  const [openVotingList, setOpenVotingList] = useState<boolean>(false)
+  const [openVotingList, setOpenVotingList] = useState<boolean>(false);
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -186,7 +197,10 @@ function Project() {
       }
 
       if (onChainProjectRes.projectInMilestoneVoting) {
-        const milestoneVotes: Vote[] = await chainService.getMilestoneVotes(onChainProjectRes.id, firstPendingMilestone);
+        const milestoneVotes: Vote[] = await chainService.getMilestoneVotes(
+          onChainProjectRes.id,
+          firstPendingMilestone
+        );
         setMilestoneVotes(milestoneVotes);
       }
 
@@ -261,8 +275,20 @@ function Project() {
       }
 
       setIsProjectOwner(owner?.id === user.id);
-
+      setProjectOwner(owner);
       setProject(projectRes);
+      setLoading(false);
+
+      if (
+        projectRes.status_id === 4 &&
+        !projectRes.chain_project_id &&
+        projectRes.brief_id
+      ) {
+        setWait(true);
+        return setWaitMessage(
+          `Waiting for ${freelancerRes?.display_name} to start the work`
+        );
+      }
 
       if (projectRes.status_id === 4 && !projectRes.chain_project_id && projectRes.brief_id) {
         setWait(true)
@@ -271,59 +297,20 @@ function Project() {
         );
       }
 
-      // setting approver list
-      const approversPreviewList = [...approversPreview];
+      const totalCost = Number(
+        Number(projectRes?.total_cost_without_fee) +
+        Number(projectRes?.imbue_fee)
+      );
+      setRequiredBalance(totalCost * 0.95);
 
-      if (projectRes?.approvers?.length && approversPreviewList.length === 0) {
-        projectRes?.approvers.map(async (approverAddress: any) => {
-          if (approverAddress === user?.web3_address) setIsApprover(true);
-
-          const approver = await utils.fetchUserByUsernameOrAddress(
-            approverAddress
-          );
-          if (approver?.id) {
-            approversPreviewList.push(approver);
-          } else {
-            approversPreviewList.push({
-              id: 0,
-              display_name: '',
-              profile_photo: '',
-              username: '',
-              web3_address: approverAddress,
-              getstream_token: ''
-
-            });
-          }
-        });
-      } else {
-        approversPreviewList.push({
-          id: owner?.id,
-          display_name: owner?.display_name,
-          profile_photo: owner?.profile_photo,
-          username: owner?.username,
-          web3_address: owner?.web3_address,
-          getstream_token: owner?.getstream_token
-        });
-      }
-      setApproverPreview(approversPreviewList);
       // api  project response
       await getChainProject(projectRes, freelancerRes);
 
-      const balance = await getBalance(
-        projectRes?.escrow_address,
-        projectRes?.currency_id || 0,
-        user
-      );
-      const totalCost = Number(Number(projectRes?.total_cost_without_fee) + Number(projectRes?.imbue_fee));
-      setRequiredBalance(totalCost * 0.95);
-      if (!balance) {
-        handlePopUpForUser();
-      }
-      setBalance(balance || 0);
     } catch (error) {
       setError({ message: 'can not find the project ' + error });
     } finally {
       setLoading(false);
+      setChainLoading(false);
     }
   };
 
@@ -378,8 +365,7 @@ function Project() {
           ImbueChainEvent.ApproveMilestone,
           account
         )) as ImbueChainPollResult;
-      }
-      else {
+      } else {
         setError({ message: result.errorMessage });
       }
 
@@ -600,31 +586,32 @@ function Project() {
             </h3>
           </div>
           <div className='flex flex-row items-center max-width-750px:w-full max-width-750px:justify-between'>
-            {milestone?.is_approved
-              ? <ProjectStateTag
+            {milestone?.is_approved ? (
+              <ProjectStateTag
                 openVotingList={setOpenVotingList}
                 dateCreated={modified}
                 text='Completed'
                 voters={approversPreview}
                 allApprovers={approversPreview}
               />
-              : milestone?.milestone_key == firstPendingMilestone &&
-                projectInMilestoneVoting
-                ? <ProjectStateTag
-                  openVotingList={setOpenVotingList}
-                  dateCreated={modified}
-                  text='Ongoing'
-                  voters={approversPreview}
-                  allApprovers={approversPreview}
-                />
-                : <ProjectStateTag
-                  openVotingList={setOpenVotingList}
-                  dateCreated={modified}
-                  text='Pending'
-                  voters={approversPreview}
-                  allApprovers={approversPreview}
-                />
-            }
+            ) : milestone?.milestone_key == firstPendingMilestone &&
+              projectInMilestoneVoting ? (
+              <ProjectStateTag
+                openVotingList={setOpenVotingList}
+                dateCreated={modified}
+                text='Ongoing'
+                voters={approversPreview}
+                allApprovers={approversPreview}
+              />
+            ) : (
+              <ProjectStateTag
+                openVotingList={setOpenVotingList}
+                dateCreated={modified}
+                text='Pending'
+                voters={approversPreview}
+                allApprovers={approversPreview}
+              />
+            )}
             <Image
               src={require(expanded
                 ? '@/assets/svgs/minus_btn.svg'
@@ -661,7 +648,9 @@ function Project() {
                 followCursor
                 title={
                   !canVote &&
-                  `Only approvers are allowed to vote on a milestone and you cannot vote more than once.${user.web3_address && `You are currently on wallet: ${user.web3_address}`}`
+                  `Only approvers are allowed to vote on a milestone and you cannot vote more than once.${user.web3_address &&
+                  `You are currently on wallet: ${user.web3_address}`
+                  }`
                 }
               >
                 <button
@@ -987,40 +976,13 @@ function Project() {
               <p className='text-imbue-purple-dark text-[1.25rem] font-normal leading-[1.5] mt-[16px] p-0'>
                 Approvers
               </p>
-              {approversPreview?.length > 0 && (
-                <div className='flex flex-row flex-wrap gap-10'>
-                  {approversPreview?.map((approver: any, index: number) => (
-                    <div
-                      key={index}
-                      className={`flex text-content gap-4 items-center ${approver?.display_name && 'cursor-pointer'
-                        }`}
-                      onClick={() =>
-                        approver.display_name &&
-                        router.push(`/profile/${approver.username}`)
-                      }
-                    >
-                      <Image
-                        height={80}
-                        width={80}
-                        src={
-                          approver?.profile_photo ??
-                          'http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png'
-                        }
-                        alt=''
-                        className='rounded-full w-10 h-10 object-cover'
-                      />
-                      <div className='flex flex-col'>
-                        <span className='text-base'>
-                          {approver?.display_name}
-                        </span>
-                        <p className='text-xs break-all text-imbue-purple-dark text-opacity-40'>
-                          {approver?.web3_address.substring(0, 4) + "..." + approver?.web3_address.substring(44)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <ProjectApprovers {...{
+                approversPreview,
+                project,
+                setIsApprover,
+                setApproverPreview,
+                projectOwner
+              }} />
             </>
           )}
         </div>
@@ -1037,11 +999,18 @@ function Project() {
               />
 
               <div className='w-full'>
-                <h3 className='text-lg lg:text-[1.25rem] leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0 flex'>
+                <h3 className='text-lg lg:text-[1.25rem] leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0 flex items-center'>
                   Milestone{' '}
-                  <span className='text-imbue-purple-dark ml-2'>
-                    {approvedMilestones?.length}/{project?.milestones?.length}
-                  </span>
+                  {chainLoading && (
+                    <span className='text-imbue-purple-dark text-xs ml-2'>
+                      loading...
+                    </span>
+                  )}
+                  {!chainLoading && (
+                    <span className='text-imbue-purple-dark ml-2'>
+                      {approvedMilestones?.length}/{project?.milestones?.length}
+                    </span>
+                  )}
                 </h3>
                 {/* mile stone step indicator */}
                 <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
@@ -1130,9 +1099,14 @@ function Project() {
                   </h3>
                   <div className='text-[1rem] text-imbue-light-purple-two mt-2 text-xs break-all'>
                     {project?.escrow_address}
-                  </div>
-                  <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
-                    Balance : {balance} ${Currency[project?.currency_id]}
+                    <ProjectBalance {...{
+                      balance,
+                      project,
+                      user,
+                      handlePopUpForUser,
+                      setBalance
+                    }}
+                    />
                   </div>
                 </div>
               </div>
@@ -1156,50 +1130,84 @@ function Project() {
           )}
         </div>
         <div className='col-span-9'>
-          {onChainProject?.milestones?.map?.(
-            (milestone: Milestone, index: number) => {
-              return (
-                <ExpandableDropDowns
-                  key={`${index}-milestone`}
-                  index={index}
-                  milestone={milestone}
-                  modified={milestone?.modified as Date}
-                  vote={async () => {
-                    // show polkadot account modal
-                    await setShowPolkadotAccounts(true);
-                    // set submitting mile stone to false
-                    await setSubmittingMilestone(false);
-                    // setMile stone key in view
-                    await setMilestoneKeyInView(milestone.milestone_key);
-                  }}
-                  submitMilestone={async () => {
-                    // set submitting mile stone to true
-                    await setSubmittingMilestone(true);
-                    // show polkadot account modal
-                    await setShowPolkadotAccounts(true);
-                    // setMile stone key in view
-                    await setMilestoneKeyInView(milestone.milestone_key);
-                  }}
-                  withdraw={async () => {
-                    // set submitting mile stone to true
-                    await setWithdrawMilestone(true);
-                    // show polkadot account modal
-                    await setShowPolkadotAccounts(true);
-                    // setMile stone key in view
-                    await setMilestoneKeyInView(milestone.milestone_key);
-                  }}
-                />
-              );
-            }
-          )}
+          {chainLoading &&
+            project?.milestones?.map((item: any) => (
+              <div
+                key={
+                  'chainLoading__' +
+                  item.project_id +
+                  ' ' +
+                  item.milestone_index
+                }
+                className='h-20 w-full my-4 px-5 flex justify-between items-center  bg-gray-50 rounded-xl'
+              >
+                <div className='flex w-full items-center'>
+                  <Typography variant='h4' className='w-44'>
+                    <Skeleton />
+                  </Typography>
+                  <Typography variant='h5' className=' ml-5 w-[40%]'>
+                    <Skeleton />
+                  </Typography>
+                </div>
+                <div className='flex  items-center'>
+                  <Typography variant='body2' className=' w-24 mr-4'>
+                    <Skeleton />
+                  </Typography>
+                  <Typography variant='body2' className=' w-28 mr-9'>
+                    <Skeleton />
+                  </Typography>
+                </div>
+              </div>
+            ))}
+
+          {!chainLoading &&
+            onChainProject?.milestones?.map?.(
+              (milestone: Milestone, index: number) => {
+                return (
+                  <ExpandableDropDowns
+                    key={`${index}-milestone`}
+                    index={index}
+                    milestone={milestone}
+                    modified={milestone?.modified as Date}
+                    vote={async () => {
+                      // show polkadot account modal
+                      await setShowPolkadotAccounts(true);
+                      // set submitting mile stone to false
+                      await setSubmittingMilestone(false);
+                      // setMile stone key in view
+                      await setMilestoneKeyInView(milestone.milestone_key);
+                    }}
+                    submitMilestone={async () => {
+                      // set submitting mile stone to true
+                      await setSubmittingMilestone(true);
+                      // show polkadot account modal
+                      await setShowPolkadotAccounts(true);
+                      // setMile stone key in view
+                      await setMilestoneKeyInView(milestone.milestone_key);
+                    }}
+                    withdraw={async () => {
+                      // set submitting mile stone to true
+                      await setWithdrawMilestone(true);
+                      // show polkadot account modal
+                      await setShowPolkadotAccounts(true);
+                      // setMile stone key in view
+                      await setMilestoneKeyInView(milestone.milestone_key);
+                    }}
+                  />
+                );
+              }
+            )}
         </div>
 
-        <Impressions onChainProject={onChainProject}
+        <Impressions
+          onChainProject={onChainProject}
           firstPendingMilestone={firstPendingMilestone}
           projectInMilestoneVoting={projectInMilestoneVoting}
           approversPreview={approversPreview}
           votes={votes}
           setOpenVotingList={setOpenVotingList}
+          numberOfMileSotnes={project.milestones}
+          isChainLoading={chainLoading}
         />
       </div>
 
