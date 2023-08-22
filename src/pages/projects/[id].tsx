@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
-import { Modal, Tooltip } from '@mui/material';
+import { Modal, Skeleton, Tooltip, Typography } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -1066,10 +1066,10 @@ function Project() {
               />
 
               <div className='w-full'>
-                <h3 className='text-lg lg:text-[1.25rem] leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0 flex'>
+                <h3 className='text-lg lg:text-[1.25rem] leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0 flex items-center'>
                   Milestone{' '}
                   {chainLoading && (
-                    <span className='text-imbue-purple-dark ml-2'>
+                    <span className='text-imbue-purple-dark text-xs ml-2'>
                       loading...
                     </span>
                   )}
@@ -1170,7 +1170,9 @@ function Project() {
                     {project?.escrow_address}
                   </div>
                   <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
-                    {chainLoading && <span> loading ...</span>}
+                    {chainLoading && (
+                      <span className='text-xs'> loading ...</span>
+                    )}
                     {!chainLoading && (
                       <p>
                         Balance : {balance} ${Currency[project?.currency_id]}
@@ -1199,7 +1201,7 @@ function Project() {
           )}
         </div>
         <div className='col-span-9'>
-          {chainLoading &&
+          {!chainLoading &&
             project?.milestones?.map((item: any) => (
               <div
                 key={
@@ -1208,8 +1210,25 @@ function Project() {
                   ' ' +
                   item.milestone_index
                 }
-                className=' animate-pulse h-20 w-full my-4  bg-gray-50 rounded-xl dark:bg-gray-700'
-              ></div>
+                className='h-20 w-full my-4 px-5 flex justify-between items-center  bg-gray-50 rounded-xl'
+              >
+                <div className='flex w-full items-center'>
+                  <Typography variant='h4' className='w-44'>
+                    <Skeleton />
+                  </Typography>
+                  <Typography variant='h5' className=' ml-5 w-[40%]'>
+                    <Skeleton />
+                  </Typography>
+                </div>
+                <div className='flex  items-center'>
+                  <Typography variant='body2' className=' w-24 mr-4'>
+                    <Skeleton />
+                  </Typography>
+                  <Typography variant='body2' className=' w-28 mr-9'>
+                    <Skeleton />
+                  </Typography>
+                </div>
+              </div>
             ))}
 
           {!chainLoading &&

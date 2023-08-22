@@ -1,3 +1,4 @@
+import { Skeleton, Typography } from '@mui/material';
 import React from 'react';
 
 import { Milestone } from '@/model';
@@ -28,12 +29,19 @@ const Impressions = ({
   return (
     <div className='bg-background rounded-3xl h-full w-full col-span-3 py-6 px-12'>
       <p className='text-content border-b pb-2 text-2xl mb-6'>Impressions</p>
-      {isChainLoading &&
+      {!isChainLoading &&
         numberOfMileSotnes?.map((item: any) => (
           <div
             key={'impression__' + item}
-            className=' animate-pulse h-6 w-full my-6  bg-gray-50 rounded-xl dark:bg-gray-700'
-          ></div>
+            className='h-6 items-center justify-between flex w-full my-6'
+          >
+            <Typography variant='h5' className='w-28'>
+              <Skeleton />
+            </Typography>
+            <Typography variant='body1' className='w-20'>
+              <Skeleton />
+            </Typography>
+          </div>
         ))}
 
       {!isChainLoading &&
