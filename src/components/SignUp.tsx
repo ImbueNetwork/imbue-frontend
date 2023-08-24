@@ -16,6 +16,7 @@ import { useState } from 'react';
 import PasswordStrengthBar from 'react-password-strength-bar';
 
 import * as utils from '@/utils';
+import { matchedByUserName } from '@/utils';
 
 import { postAPIHeaders } from '@/config';
 
@@ -45,8 +46,14 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
     'admin',
   ];
 
+  const fullData = user?.length && email?.length && password?.length;
+
   const disableSubmit =
-    password != matchPassword || loading || error || !agreedToTerms;
+    !fullData ||
+    password != matchPassword ||
+    loading ||
+    error ||
+    !agreedToTerms;
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -106,8 +113,15 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
     );
   };
 
-  const handleChange = (event: any) => {
+  const handleChange = async (event: any) => {
     const { name, value } = event.target;
+    if (name === 'user') {
+      const data = await matchedByUserName(value);
+      if (data?.id) {
+        setError('Username already taken');
+        return;
+      } else setError(null);
+    }
     switch (name) {
       case 'email':
         if (!isValidEmail(value)) {
@@ -180,7 +194,7 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
       return;
     }
 
-    if (!validatePassword(password)) {
+    if (password && !validatePassword(password)) {
       setError(
         'Password must be between 6 and 15 characters and contain at least one number and one special character'
       );
