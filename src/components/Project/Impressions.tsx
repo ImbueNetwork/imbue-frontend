@@ -30,9 +30,9 @@ const Impressions = ({
     <div className='bg-background rounded-3xl h-full w-full col-span-3 py-6 px-12'>
       <p className='text-content border-b pb-2 text-2xl mb-6'>Impressions</p>
       {isChainLoading &&
-        numberOfMileSotnes?.map((item: any) => (
+        numberOfMileSotnes?.map((item: any, index: number) => (
           <div
-            key={'impression__' + item}
+            key={index}
             className='h-6 items-center justify-between flex w-full my-6'
           >
             <Typography variant='h5' className='w-28'>
@@ -76,8 +76,8 @@ const Impressions = ({
                 </div>
                 <div className='text-xl text-content flex flex-wrap items-center'>
                   {firstPendingMilestone !== undefined &&
-                  milestone?.milestone_key <= firstPendingMilestone &&
-                  projectInMilestoneVoting ? (
+                    milestone?.milestone_key <= firstPendingMilestone &&
+                    projectInMilestoneVoting ? (
                     <>
                       {milestone.is_approved ? (
                         <p className='text-lg cursor-pointer !text-content-primary'>

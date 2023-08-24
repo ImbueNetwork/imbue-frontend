@@ -44,7 +44,7 @@ export default nextConnect()
             const existingUser: any = await models.fetchUser(user.id)(tx);
 
             const existingUsername = await models.fetchUserOrEmail(
-              existingUser[0]?.username
+              existingUser?.username
             )(tx);
 
             if (existingUsername?.id && existingUsername?.id !== user?.id) {
@@ -54,7 +54,7 @@ export default nextConnect()
               });
             }
 
-            if (user.email) {
+            if (user?.email) {
               const existingEmail = await models.fetchUserOrEmail(user.email)(
                 tx
               );
@@ -81,14 +81,15 @@ export default nextConnect()
                 message: 'Bad words are not allowed in username name',
               });
             }
-            
-            const result : any = await models.updateGetStreamUserName(user);
 
-            if(!result?.users) return res.status(400).json({
-              status: 'Failed',
-              message: 'Could not update getStream user information',
-            })
-            
+            const result: any = await models.updateGetStreamUserName(user);
+
+            if (!result?.users)
+              return res.status(400).json({
+                status: 'Failed',
+                message: 'Could not update getStream user information',
+              });
+
             const userData = {
               id: user?.id,
               display_name: user?.display_name,
@@ -112,15 +113,19 @@ export default nextConnect()
             const userResp = await models.updateUserData(user.id, userData)(tx);
 
             if (!userResp) {
-              return new Error('User not found!.');
+              return res.status(400).json({
+                status: 'Failed',
+                message: 'User not found!',
+              });
             }
 
             response = userResp;
           } catch (e) {
-            new Error(`Failed to update user name: ${user.display_name}`, {
-              cause: e as Error,
-            });
             console.log(e);
+            return res.status(400).json({
+              status: 'Failed',
+              message: `Failed to update user name: ${user.display_name}`,
+            });
           }
         });
         res.status(200).json({

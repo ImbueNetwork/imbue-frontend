@@ -256,7 +256,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         setUserNameError('sentence must start with a character');
       } else setUserNameError(null);
       const data = await matchedByUserName(e.target.value);
-      if (data && e.target.value !== prevUserName) {
+      if (data.id && e.target.value !== prevUserName) {
         setUserNameExist(true);
       } else setUserNameExist(false);
     }
@@ -492,14 +492,18 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
 
               <UploadImage
                 isEditMode={isEditMode}
-                user={{
-                  ...freelancer,
-                  skills: skills,
-                  clients: clients,
+                initUserData={{
+                  ...initFreelancer,
+                  skills: freelancer?.skills?.map(
+                    (skill: { id: number; name: string }) =>
+                      skill?.name?.charAt(0).toUpperCase() + skill?.name?.slice(1)
+                  ),
                   logged_in_user: browsingUser,
                 }}
+                currentUserData={freelancer}
                 setUser={setFreelancer}
                 saveChanges={updateFreelancer}
+                setError={setError}
               />
               <div className='w-full flex flex-col gap-[16px] mt-5'>
                 {isEditMode ? (
@@ -511,7 +515,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                       label='Name'
                       variant='outlined'
                       color='secondary'
-                      defaultValue={freelancer?.display_name}
+                      defaultValue={freelancer?.display_name || ""}
                       autoComplete='off'
                     />
                     {displayError && (
@@ -550,7 +554,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                         label='Username'
                         variant='outlined'
                         color='secondary'
-                        defaultValue={freelancer?.username}
+                        defaultValue={freelancer?.username || ""}
                         autoComplete='off'
                       />
                       {userNameError && (
@@ -587,7 +591,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                           name='title'
                           label='Tittle'
                           variant='outlined'
-                          defaultValue={freelancer?.title}
+                          defaultValue={freelancer?.title || ""}
                           autoComplete='off'
                         />
                         {titleError && (
@@ -857,7 +861,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                                     <TextField
                                       color='secondary'
                                       autoComplete='off'
-                                      value={freelancer && freelancer[key]}
+                                      value={freelancer && freelancer[key] || ""}
                                       onChange={(e) => {
                                         if (freelancer) {
                                           setFreelancer({
@@ -1021,7 +1025,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
               <>
                 <TextArea
                   maxLength={1000}
-                  value={freelancer?.bio}
+                  value={freelancer?.bio || ""}
                   onChange={(e) => {
                     if (freelancer) {
                       setFreelancer({
@@ -1049,7 +1053,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
               <>
                 <TextArea
                   maxLength={1000}
-                  value={freelancer?.education}
+                  value={freelancer?.education || ""}
                   onChange={(e) => {
                     if (freelancer) {
                       setFreelancer({
@@ -1347,9 +1351,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         </div>
       </ErrorScreen>
       <div
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${
-          copied ? 'right-5' : '-right-full'
-        }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
+          }`}
       >
         <Alert severity='success'>{`${copied} Copied to clipboard`}</Alert>
       </div>

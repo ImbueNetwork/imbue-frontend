@@ -13,7 +13,6 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import * as utils from '@/utils';
-import { getBalance } from '@/utils/helper';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import AccountChoice from '@/components/AccountChoice';
@@ -25,6 +24,8 @@ import RefundScreen from '@/components/Grant/Refund';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 import Login from '@/components/Login';
 import Impressions from '@/components/Project/Impressions';
+import ProjectApprovers from '@/components/Project/ProjectApprovers';
+import ProjectBalance from '@/components/Project/ProjectBalance';
 import ProjectStateTag from '@/components/Project/ProjectStateTag';
 import VotingList from '@/components/Project/VotingList';
 import SuccessScreen from '@/components/SuccessScreen';
@@ -104,6 +105,7 @@ function Project() {
   const [firstPendingMilestone, setFirstPendingMilestone] = useState<number>();
   const [isApplicant, setIsApplicant] = useState<boolean>(false);
   const [isProjectOwner, setIsProjectOwner] = useState<boolean>(false);
+  const [projectOwner, setProjectOwner] = useState<User>();
   const [showRefundButton, setShowRefundButton] = useState<boolean>();
   const [milestoneVotes, setMilestoneVotes] = useState<any>({});
   const votes =
@@ -273,7 +275,7 @@ function Project() {
       }
 
       setIsProjectOwner(owner?.id === user.id);
-
+      setProjectOwner(owner);
       setProject(projectRes);
       setLoading(false);
       if (
@@ -287,57 +289,22 @@ function Project() {
         );
       }
 
-      // setting approver list
-      const approversPreviewList = [...approversPreview];
-
-      if (projectRes?.approvers?.length && approversPreviewList.length === 0) {
-        projectRes?.approvers.map(async (approverAddress: any) => {
-          if (approverAddress === user?.web3_address) setIsApprover(true);
-
-          const approver = await utils.fetchUserByUsernameOrAddress(
-            approverAddress
-          );
-          if (approver?.id) {
-            approversPreviewList.push(approver);
-          } else {
-            approversPreviewList.push({
-              id: 0,
-              display_name: '',
-              profile_photo: '',
-              username: '',
-              web3_address: approverAddress,
-              getstream_token: '',
-            });
-          }
-        });
-      } else {
-        approversPreviewList.push({
-          id: owner?.id,
-          display_name: owner?.display_name,
-          profile_photo: owner?.profile_photo,
-          username: owner?.username,
-          web3_address: owner?.web3_address,
-          getstream_token: owner?.getstream_token,
-        });
+      if (projectRes.status_id === 4 && !projectRes.chain_project_id && projectRes.brief_id) {
+        setWait(true)
+        return setWaitMessage(
+          `Waiting for ${freelancerRes?.display_name} to start the work`
+        );
       }
-      setApproverPreview(approversPreviewList);
+
+      const totalCost = Number(
+        Number(projectRes?.total_cost_without_fee) +
+        Number(projectRes?.imbue_fee)
+      );
+      setRequiredBalance(totalCost * 0.95);
+
       // api  project response
       await getChainProject(projectRes, freelancerRes);
 
-      const balance = await getBalance(
-        projectRes?.escrow_address,
-        projectRes?.currency_id || 0,
-        user
-      );
-      const totalCost = Number(
-        Number(projectRes?.total_cost_without_fee) +
-          Number(projectRes?.imbue_fee)
-      );
-      setRequiredBalance(totalCost * 0.95);
-      if (!balance) {
-        handlePopUpForUser();
-      }
-      setBalance(balance || 0);
     } catch (error) {
       setError({ message: 'can not find the project ' + error });
     } finally {
@@ -680,9 +647,8 @@ function Project() {
                 followCursor
                 title={
                   !canVote &&
-                  `Only approvers are allowed to vote on a milestone and you cannot vote more than once.${
-                    user.web3_address &&
-                    `You are currently on wallet: ${user.web3_address}`
+                  `Only approvers are allowed to vote on a milestone and you cannot vote more than once.${user.web3_address &&
+                  `You are currently on wallet: ${user.web3_address}`
                   }`
                 }
               >
@@ -1013,43 +979,13 @@ function Project() {
               <p className='text-imbue-purple-dark text-[1.25rem] font-normal leading-[1.5] mt-[16px] p-0'>
                 Approvers
               </p>
-              {approversPreview?.length > 0 && (
-                <div className='flex flex-row flex-wrap gap-10'>
-                  {approversPreview?.map((approver: any, index: number) => (
-                    <div
-                      key={index}
-                      className={`flex text-content gap-4 items-center ${
-                        approver?.display_name && 'cursor-pointer'
-                      }`}
-                      onClick={() =>
-                        approver.display_name &&
-                        router.push(`/profile/${approver.username}`)
-                      }
-                    >
-                      <Image
-                        height={80}
-                        width={80}
-                        src={
-                          approver?.profile_photo ??
-                          'http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png'
-                        }
-                        alt=''
-                        className='rounded-full w-10 h-10 object-cover'
-                      />
-                      <div className='flex flex-col'>
-                        <span className='text-base'>
-                          {approver?.display_name}
-                        </span>
-                        <p className='text-xs break-all text-imbue-purple-dark text-opacity-40'>
-                          {approver?.web3_address.substring(0, 4) +
-                            '...' +
-                            approver?.web3_address.substring(44)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <ProjectApprovers {...{
+                approversPreview,
+                project,
+                setIsApprover,
+                setApproverPreview,
+                projectOwner
+              }} />
             </>
           )}
         </div>
@@ -1168,16 +1104,14 @@ function Project() {
                   </h3>
                   <div className='text-[1rem] text-imbue-light-purple-two mt-2 text-xs break-all'>
                     {project?.escrow_address}
-                  </div>
-                  <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
-                    {chainLoading && (
-                      <span className='text-xs'> loading ...</span>
-                    )}
-                    {!chainLoading && (
-                      <p>
-                        Balance : {balance} ${Currency[project?.currency_id]}
-                      </p>
-                    )}
+                    <ProjectBalance {...{
+                      balance,
+                      project,
+                      user,
+                      handlePopUpForUser,
+                      setBalance
+                    }}
+                    />
                   </div>
                 </div>
               </div>
@@ -1220,7 +1154,7 @@ function Project() {
                     <Skeleton />
                   </Typography>
                 </div>
-                <div className='flex items-center'>
+                <div className='flex  items-center'>
                   <Typography variant='body2' className=' w-24 mr-4'>
                     <Skeleton />
                   </Typography>

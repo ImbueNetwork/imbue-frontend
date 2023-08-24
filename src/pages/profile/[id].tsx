@@ -133,7 +133,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
         const userResponse: any = await updateUser(filterdUser);
 
         if (userResponse.status === 'Successful') {
-          router.push(`/profile/${userResponse.user.username}`, undefined, {
+          router.push(`/profile/${filterdUser.username}`, undefined, {
             shallow: true,
           });
           dispatch(fetchUserRedux());
@@ -236,8 +236,9 @@ const Profile = ({ initUser, browsingUser }: any) => {
           'URL , special characters are not allowed in username'
         );
       } else setUserNameError(null);
+
       const data = await matchedByUserName(e.target.value);
-      if (data && e.target.value !== prevUserName) {
+      if (data?.id && e.target.value !== prevUserName) {
         setUserNameExist(true);
       } else setUserNameExist(false);
     }
@@ -288,9 +289,11 @@ const Profile = ({ initUser, browsingUser }: any) => {
             <div className='w-fit'>
               <UploadImage
                 setUser={setUser}
-                user={user}
+                currentUserData={user}
+                initUserData={initUser}
                 isEditMode={isEditMode}
                 saveChanges={updateUser}
+                setError={setError}
               />
             </div>
             <div className='w-full flex flex-col gap-6'>
