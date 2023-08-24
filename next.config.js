@@ -1,10 +1,15 @@
 /** @type {import('next').NextConfig} */
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+
 const nextConfig = {
   reactStrictMode: true,
   env: {
     PORT: 8080,
-    IMBUE_NETWORK_WEBSOCK_ADDR: 'wss://rococo.imbue.network',
-    RELAY_CHAIN_WEBSOCK_ADDR: 'wss://rococo-rpc.polkadot.io',
+    IMBUE_NETWORK_WEBSOCK_ADDR: process.env.IMBUE_NETWORK_WEBSOCK_ADDR,
+    RELAY_CHAIN_WEBSOCK_ADDR: process.env.RELAY_CHAIN_WEBSOCK_ADDR,
     GETSTREAM_API_KEY: process.env.GETSTREAM_API_KEY,
     GETSTREAM_SECRET_KEY: process.env.GETSTREAM_SECRET_KEY,
     CLOUD_NAME: process.env.CLOUD_NAME,
@@ -50,4 +55,11 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+
+
+module.exports = withBundleAnalyzer({});
+
+
+// module.exports = nextConfig;
+
+
