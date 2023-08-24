@@ -1220,7 +1220,7 @@ function Project() {
                     <Skeleton />
                   </Typography>
                 </div>
-                <div className='flex  items-center'>
+                <div className='flex items-center'>
                   <Typography variant='body2' className=' w-24 mr-4'>
                     <Skeleton />
                   </Typography>
