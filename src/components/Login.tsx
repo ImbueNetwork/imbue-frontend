@@ -12,6 +12,7 @@ import {
 import { SignerResult } from '@polkadot/api/types';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { WalletAccount } from '@talismn/connect-wallets';
+import dynamic from 'next/dynamic'
 import Image from 'next/image';
 import React, { useState } from 'react';
 
@@ -24,7 +25,7 @@ import { postAPIHeaders } from '@/config';
 import * as config from '@/config';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 
-import SignUp from './SignUp';
+const SignUp = dynamic(() => import("./SignUp"));
 
 type LoginProps = {
   visible: boolean;
