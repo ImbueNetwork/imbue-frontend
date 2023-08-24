@@ -14,7 +14,8 @@ import {
 } from '@/utils/helper';
 
 import ApplicationOwnerHeader from '@/components/Application/ApplicationOwnerHeader';
-import BriefOwnerHeader from '@/components/Application/BriefOwnerHeader';
+const BriefOwnerHeader = dynamic(() => import("@/components/Application/BriefOwnerHeader"));
+
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
