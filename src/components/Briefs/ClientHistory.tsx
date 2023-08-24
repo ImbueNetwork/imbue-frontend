@@ -83,7 +83,7 @@ const ClientsHistory = ({ client, briefId }: ClientsHistoryType) => {
                                     Thanks for choosing me. All the best for your future works...
                                 </span>
                             </div> */}
-                            <p className='text-base text-content h-14 w-5/6'>
+                            <p className='text-base text-content line-clamp-4  w-5/6'>
                                 {
                                     brief?.description?.length > 500
                                         ? brief?.description.substring(0, 500) + "..."

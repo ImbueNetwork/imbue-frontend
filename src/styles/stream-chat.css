@@ -21,6 +21,14 @@
   padding-top: 30px;
 }
 
+.str-chat__message-reaction-selector {
+  inset-block-end: -180% !important ;
+  z-index: 1;
+}
+.str-chat__message--with-reactions .str-chat__message-reaction-selector{
+  inset-block-end: -100% !important ;
+}
+
 .pin-text {
   font-style: italic;
   color: grey;

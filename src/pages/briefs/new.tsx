@@ -259,6 +259,8 @@ const NewBrief = (): JSX.Element => {
           number of skills must be between 3 to 10
         </span>
       </div>
+
+
     </>
   );
 
