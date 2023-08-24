@@ -289,9 +289,11 @@ const Profile = ({ initUser, browsingUser }: any) => {
             <div className='w-fit'>
               <UploadImage
                 setUser={setUser}
-                user={user}
+                currentUserData={user}
+                initUserData={initUser}
                 isEditMode={isEditMode}
                 saveChanges={updateUser}
+                setError={setError}
               />
             </div>
             <div className='w-full flex flex-col gap-6'>
