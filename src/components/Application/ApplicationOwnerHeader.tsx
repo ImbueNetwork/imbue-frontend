@@ -49,7 +49,6 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
     updateProject,
     user,
   } = props;
-    console.log("🚀 ~ file: ApplicationOwnerHeader.tsx:52 ~ ApplicationOwnerHeader ~ brief:", brief)
   const [openPopup, setOpenPopup] = useState(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<any>();
