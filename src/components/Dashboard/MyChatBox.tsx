@@ -27,6 +27,7 @@ function DashboardChatBox({
 }) {
   const mobileView = useMediaQuery('(max-width:500px)');
   const [channels, setChannels] = useState<any>([]);
+  console.log("🚀 ~ file: MyChatBox.tsx:30 ~ channels:", channels)
   const [channel, setChannel] = useState<any>();
   const filters = client &&  { members: { $in: [String(client.user?.id)] } };
   const router = useRouter();
@@ -70,6 +71,7 @@ function DashboardChatBox({
     };
 
     const handleChatClick = (selectedChannel: any) => {
+      console.log("🚀 ~ file: MyChatBox.tsx:73 ~ handleChatClick ~ selectedChannel:", selectedChannel)
       setChannel(selectedChannel);
       setActiveChannel(selectedChannel);
 
@@ -123,6 +125,7 @@ function DashboardChatBox({
   }
 
   function renderChannels(channels: any) {
+    console.log("🚀 ~ file: MyChatBox.tsx:128 ~ renderChannels ~ channels:", channels)
     setChannels(channels);
     return <></>;
   }

@@ -85,8 +85,13 @@ export default nextConnect()
     await db.transaction(async (tx: any) => {
       try {
         if (filter.isProfane(brief.headline)) {
+          res.status(401).json({
+            status: 'Failed',
+            message: 'Bad word is not allowed',
+          });
           throw new Error('Bad word is not allowed');
         }
+
         const skill_ids = await upsertItems(brief.skills, 'skills')(tx);
         const industry_ids = await upsertItems(
           brief.industries,
@@ -101,17 +106,24 @@ export default nextConnect()
           brief.duration_id
         )(tx);
         if (!brief_id) {
+          res.status(401).json({
+            status: 'Failed',
+            message: 'Failed to create brief.',
+          });
           return new Error('Failed to create brief.');
         }
         await incrementUserBriefSubmissions(brief.user_id)(tx);
 
         response = brief_id;
       } catch (e) {
-        new Error(
+        res.status(401).json({
+          status: 'Failed',
+          message: `Failed to create brief for brief with name: ${brief.headline}. Cause ${e}`,
+        });
+        throw new Error(
           `Failed to create brief for brief with name: ${brief.headline}`,
           { cause: e as Error }
         );
-        console.log(e);
       }
     });
     res.status(200).json({

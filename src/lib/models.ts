@@ -71,6 +71,7 @@ export type ProposedMilestone = {
   percentage_to_unlock: number;
   amount: number;
   description: string;
+  chain_project_id?: string;
 };
 
 export type GrantApprover = string;

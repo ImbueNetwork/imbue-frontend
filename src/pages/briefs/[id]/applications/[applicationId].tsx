@@ -300,6 +300,7 @@ const ApplicationPreview = (): JSX.Element => {
                 ((m.amount ?? 0) / totalCostWithoutFee) *
                 100
               ).toFixed(0),
+              chain_project_id: chainProjectId
             };
           }),
         required_funds: totalCost,
@@ -330,6 +331,7 @@ const ApplicationPreview = (): JSX.Element => {
         setError({ message: `${resp.status} ${resp.message}` });
       }
     } catch (error) {
+      console.log("🚀 ~ file: [applicationId].tsx:334 ~ ApplicationPreview ~ error:", error)
       setError({ message: error });
     } finally {
       setLoading(false);

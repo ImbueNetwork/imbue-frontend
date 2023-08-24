@@ -49,7 +49,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
     updateProject,
     user,
   } = props;
-    console.log("🚀 ~ file: ApplicationOwnerHeader.tsx:52 ~ ApplicationOwnerHeader ~ brief:", brief)
+
   const [openPopup, setOpenPopup] = useState(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<any>();
@@ -109,7 +109,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         await new Promise((f) => setTimeout(f, 1000));
       }
     } catch (error) {
-      setError({ message: 'Something went wrong' });
+      setError({ message: `Something went wrong ${error}` });
     } finally {
       setLoading(false);
     }
@@ -163,9 +163,8 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
             </button>
           ) : (
             <button
-              className={`${
-                applicationStatusId[application?.status_id]
-              }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
+              className={`${applicationStatusId[application?.status_id]
+                }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
             >
               {applicationStatusId[application?.status_id]}
             </button>
