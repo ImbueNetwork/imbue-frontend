@@ -1,5 +1,5 @@
 import { Dialog } from '@mui/material';
-import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic';
 import React, { ReactNode } from 'react';
 const Lottie = dynamic(() => import("react-lottie"));
 

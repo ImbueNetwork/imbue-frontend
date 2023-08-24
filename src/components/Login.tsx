@@ -12,7 +12,7 @@ import {
 import { SignerResult } from '@polkadot/api/types';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { WalletAccount } from '@talismn/connect-wallets';
-import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import React, { useState } from 'react';
 

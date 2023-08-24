@@ -11,7 +11,7 @@ import {
   Skeleton,
   Tooltip,
 } from '@mui/material';
-import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -24,7 +24,6 @@ import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { AppDispatch, RootState } from '@/redux/store/store';
 
 import MenuItems from './MenuItems';
-// import Login from '../Login';
 const Login = dynamic(() => import("../Login"));
 
 import defaultProfile from '../../assets/images/profile-image.png';

@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Tooltip } from '@mui/material';
 import Filter from 'bad-words';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import { FiEdit, FiPlusCircle } from 'react-icons/fi';
@@ -18,7 +19,8 @@ import { BriefInsights } from '@/components/Briefs/BriefInsights';
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
-import Login from '@/components/Login';
+const Login = dynamic(() => import("@/components/Login"));
+
 import SuccessScreen from '@/components/SuccessScreen';
 
 import { timeData } from '@/config/briefs-data';

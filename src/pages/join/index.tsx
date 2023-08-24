@@ -4,6 +4,7 @@ import { SignerResult } from '@polkadot/api/types';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { WalletAccount } from '@talismn/connect-wallets';
 import bcrypt from 'bcryptjs';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import React, { useRef } from 'react';
 import { useState } from 'react';
@@ -11,7 +12,7 @@ import { useState } from 'react';
 import * as utils from '@/utils';
 
 import AccountChoice from '@/components/AccountChoice';
-import Login from '@/components/Login';
+const Login = dynamic(() => import("@/components/Login"));
 
 import { walletIcon } from '@/assets/svgs';
 import { postAPIHeaders } from '@/config';

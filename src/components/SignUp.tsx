@@ -11,7 +11,7 @@ import {
   OutlinedInput,
 } from '@mui/material';
 import bcrypt from 'bcryptjs';
-import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 const PasswordStrengthBar = dynamic(() => import("react-password-strength-bar"));
