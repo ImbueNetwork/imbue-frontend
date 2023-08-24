@@ -12,11 +12,13 @@ import { AppDispatch } from '@/redux/store/store';
 type UploadImageProps = {
   isEditMode: boolean;
   setUser: (value: any) => void;
-  user: any;
+  currentUserData: any;
+  initUserData: any;
   saveChanges?: (user: any) => Promise<any>;
+  setError: (_error: any) => void;
 };
 
-const UploadImage = ({ isEditMode, setUser, user, saveChanges }: UploadImageProps) => {
+const UploadImage = ({ isEditMode, setUser, initUserData, currentUserData, saveChanges, setError }: UploadImageProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -24,21 +26,27 @@ const UploadImage = ({ isEditMode, setUser, user, saveChanges }: UploadImageProp
   const handleUpload = async (files: FileList | null) => {
     if (files?.length) {
       setLoading(true);
-      const data = await uploadPhoto(files[0]);
-      if (data.url) {
-        await saveChanges?.({
-          ...user,
-          profile_photo: data.url,
-          profile_image: data.url
-        })
-        setUser((prev: any) => {
-          return {
-            ...prev,
+
+      try {
+        const data = await uploadPhoto(files[0]);
+        if (data.url) {
+          await saveChanges?.({
+            ...initUserData,
             profile_photo: data.url,
-            profile_image: data.url
-          };
-        });
-        dispatch(fetchUserRedux());
+            profile_image: data.url,
+          })
+          setUser((prev: any) => {
+            return {
+              ...prev,
+              profile_photo: data.url,
+              profile_image: data.url
+            };
+          });
+          dispatch(fetchUserRedux());
+        }
+      } catch (error) {
+        setError({ message: "Could not updpate profile photo" })
+        setLoading(false);
       }
     }
   };
@@ -46,7 +54,7 @@ const UploadImage = ({ isEditMode, setUser, user, saveChanges }: UploadImageProp
   return (
     <div className='h-32 w-32 bg-white rounded-full relative -mt-12 unset border border-light-purple'>
       <Image
-        src={user?.profile_photo || user?.profile_image || require('@/assets/images/profile-image.png')}
+        src={currentUserData?.profile_photo || currentUserData?.profile_image || require('@/assets/images/profile-image.png')}
         alt='profile image'
         width={300}
         height={300}
