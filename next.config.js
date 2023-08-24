@@ -57,9 +57,10 @@ const nextConfig = {
 
 
 
-module.exports = withBundleAnalyzer({});
+// module.exports = withBundleAnalyzer({});
 
 
 // module.exports = nextConfig;
+module.exports = withBundleAnalyzer(nextConfig);
 
 
