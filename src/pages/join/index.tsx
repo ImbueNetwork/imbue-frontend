@@ -143,7 +143,7 @@ const Join = (): JSX.Element => {
     <div>
       <div
         id='registration-form'
-        className='registration-container bg-white w-[70%] py-5 -mt-3 rounded-2xl mx-auto'
+        className='registration-container bg-white w-[70%] py-7   rounded-2xl mx-auto'
       >
         <div className='flex flex-col w-[75%] justify-center items-center mx-auto'>
           <div className='flex flex-col gap-4'>
@@ -154,6 +154,37 @@ const Join = (): JSX.Element => {
           </div>
 
           <div className='w-full max-w-[50%] mx-auto mt-3'>
+            <div
+              onClick={() => closeModal()}
+              className='login justify-center items-center w-full flex flex-col cursor-pointer'
+            >
+              <button className='h-[2.6rem] rounded-[1.56rem] border border-imbue-purple-dark w-full justify-center bg-[#E1DDFF]'>
+                <div className='flex text-imbue-purple-dark text-base justify-center items-center'>
+                  <Image
+                    src={walletIcon}
+                    alt='Wallet-icon'
+                    className='relative right-2'
+                  />
+                  Sign in with a wallet
+                </div>
+              </button>
+            </div>
+            <div className='login flex  mt-5 flex-col justify-center items-center '>
+              <GoogleOAuthProvider clientId={config?.googleClientId}>
+                <GoogleLogin
+                  width={`${googleParentRef?.current?.clientWidth}`}
+                  logo_alignment='center'
+                  shape='circle'
+                  size='large'
+                  useOneTap={true}
+                  onSuccess={(creds: any) => googleLogin(creds)}
+                  onError={() => {
+                    // FIXME: error handling
+                    console.log('Login Failed');
+                  }}
+                />
+              </GoogleOAuthProvider>
+            </div>
             <form
               id='contribution-submission-form'
               name='contribution-submission-form'
@@ -161,6 +192,11 @@ const Join = (): JSX.Element => {
               onSubmit={handleSubmit}
               className='w-full'
             >
+              <div className='w-full my-4 flex justify-between items-center'>
+                <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
+                <p className='text-base text-imbue-purple-dark'>or</p>
+                <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
+              </div>
               <div className='flex flex-col justify-center pb-[10px] w-full mt-2'>
                 <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
                   Username
@@ -252,45 +288,7 @@ const Join = (): JSX.Element => {
                   Sign In
                 </span>
               </div>
-
-              <div className='w-full my-4 flex justify-between items-center'>
-                <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
-                <p className='text-base text-imbue-purple-dark'>or</p>
-                <span className='h-[1px] w-[40%] bg-[#D9D9D9]' />
-              </div>
-
-              <div className='login flex flex-col justify-center items-center w-full'>
-                <GoogleOAuthProvider clientId={config?.googleClientId}>
-                  <GoogleLogin
-                    width={`${googleParentRef?.current?.clientWidth}`}
-                    logo_alignment='center'
-                    shape='circle'
-                    size='large'
-                    useOneTap={true}
-                    onSuccess={(creds: any) => googleLogin(creds)}
-                    onError={() => {
-                      // FIXME: error handling
-                      console.log('Login Failed');
-                    }}
-                  />
-                </GoogleOAuthProvider>
-              </div>
             </form>
-            <div
-              onClick={() => closeModal()}
-              className='login justify-center items-center w-full flex flex-col cursor-pointer'
-            >
-              <button className='h-[2.6rem] rounded-[1.56rem] border border-imbue-purple-dark w-full justify-center bg-[#E1DDFF]'>
-                <div className='flex text-imbue-purple-dark text-base justify-center items-center'>
-                  <Image
-                    src={walletIcon}
-                    alt='Wallet-icon'
-                    className='relative right-2'
-                  />
-                  Sign in with a wallet
-                </div>
-              </button>
-            </div>
           </div>
         </div>
       </div>
