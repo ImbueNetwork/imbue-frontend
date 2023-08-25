@@ -628,6 +628,13 @@ export const fetchProjectApproverUserIds =
         .returning('users.id')
     ).map((row) => row.id);
 
+export const updateProjectVoting =
+  (id: string | number, voting: boolean) => (tx: Knex.Transaction) =>
+    tx('projects')
+      .where({ id: id })
+      .update('project_in_milestone_voting', voting)
+      .returning('project_in_milestone_voting');
+
 export const updateMilestoneDetails =
   (id: string | number, milestoneId: string | number, details: string) =>
   (tx: Knex.Transaction) =>

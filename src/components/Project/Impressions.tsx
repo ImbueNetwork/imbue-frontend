@@ -76,7 +76,7 @@ const Impressions = ({
                 </div>
                 <div className='text-xl text-content flex flex-wrap items-center'>
                   {firstPendingMilestone !== undefined &&
-                    milestone?.milestone_key <= firstPendingMilestone &&
+                    milestone?.milestone_index <= firstPendingMilestone &&
                     projectInMilestoneVoting ? (
                     <>
                       {milestone.is_approved ? (

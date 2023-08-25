@@ -132,10 +132,10 @@ class ChainService {
 
   public async submitMilestone(
     account: WalletAccount,
-    projectOnChain: ProjectOnChain,
+    projectId: number | string,
     milestoneKey: number
   ): Promise<BasicTxResponse> {
-    const projectId = projectOnChain.milestones[0].project_chain_id;
+    // const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic = this.imbueApi.imbue.api.tx.imbueProposals.submitMilestone(
       projectId,
       milestoneKey
@@ -622,8 +622,8 @@ class ChainService {
         (milestone: any) =>
         ({
           project_id: projectOffChain.id,
-          project_chain_id: Number(milestone.projectKey),
-          milestone_key: Number(milestone.milestoneKey),
+          chain_project_id: Number(milestone.projectKey),
+          milestone_index: Number(milestone.milestoneKey),
           name: projectOffChain.milestones[milestone.milestoneKey].name,
           description:
             projectOffChain.milestones[milestone.milestoneKey].description,
@@ -666,7 +666,7 @@ class ChainService {
       (milestone) => !milestone.is_approved
     );
     if (firstmilestone) {
-      return firstmilestone.milestone_key;
+      return firstmilestone.milestone_index;
     }
     return -1;
   }
@@ -679,7 +679,7 @@ class ChainService {
       .reverse()
       .find((milestone) => milestone.is_approved);
     if (firstmilestone) {
-      return firstmilestone.milestone_key;
+      return firstmilestone.milestone_index;
     }
     return -1;
   }

@@ -75,3 +75,21 @@ export const updateMilestone = async (projectId: number, milestoneIndex:number, 
     };
   }
 }
+
+export const updateProjectVotingState = async (projectId: number, voting:boolean) => {
+  const resp = await fetch(
+    `${config.apiBase}/project/setVoting?projectId=${projectId}&voting=${voting}`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'put',
+    }
+  );
+
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    return {
+      message: 'Failed to update voting state. status:' + resp.status,
+    };
+  }
+}
