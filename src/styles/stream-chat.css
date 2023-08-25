@@ -44,6 +44,16 @@
   padding-bottom: 0 !important;
 }
 
+/* chat reaction host */
+.str-chat__message-reactions-host {
+  grid-row-start: 2 !important;
+  grid-row-end: 2 !important;
+}
+.str-chat__message-options {
+  grid-row-start: 1 !important;
+  grid-row-end: 1 !important;
+}
+
 /* search box */
 .str-chat__channel-search,
 .str-chat__channel-preview {
@@ -132,6 +142,11 @@
   .str-chat__quoted-message-preview
   .str-chat__quoted-message-bubble {
   background: var(--theme-purple-light) !important;
+}
+
+.str-chat__message-bubble {
+  grid-row-start: 1 !important;
+  grid-row-end: 1 !important;
 }
 
 .str-chat__channel-search-input--wrapper

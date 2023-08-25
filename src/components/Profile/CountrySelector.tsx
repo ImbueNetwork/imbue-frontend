@@ -15,8 +15,8 @@ const CountrySelector = ({
   user,
   isEditMode = false,
 }: CountrySelectorProps) => {
-  const [country, setCountry] = useState<string>(user?.country || "");
-  const [region, setRegion] = useState(user?.region || "");
+  const [country, setCountry] = useState<string>(user?.country || '');
+  const [region, setRegion] = useState(user?.region || '');
 
   const handleCountry = (countryName: string) => {
     setCountry(countryName);
@@ -29,8 +29,9 @@ const CountrySelector = ({
   };
 
   const findFlag = () => {
-    if (!user.country) return
-    if (user?.country === 'United States') return getCode('United States of America');
+    if (!user.country) return;
+    if (user?.country === 'United States')
+      return getCode('United States of America');
     if (user?.country === 'United Kingdom') return 'UK';
     if (user?.country === 'Turkey') return 'TR';
     else return getCode(user?.country);
@@ -59,7 +60,10 @@ const CountrySelector = ({
         <div className='flex gap-3'>
           {user?.country && (
             <>
-              <ReactCountryFlag countryCode={findFlag() || 'TR'} />
+              <ReactCountryFlag
+                className='text-imbue-purple-dark font-bold'
+                countryCode={findFlag() || 'TR'}
+              />
               <p className='text-base leading-[1.2] text-imbue-purple-dark'>
                 {user?.region && `${user?.region}, `} {user?.country}
               </p>
