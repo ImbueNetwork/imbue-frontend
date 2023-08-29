@@ -17,9 +17,9 @@ import PasswordStrengthBar from 'react-password-strength-bar';
 
 import * as utils from '@/utils';
 import { matchedByUserName, matchedByUserNameEmail } from '@/utils';
+import { isUrlAndSpecialCharacterExist } from '@/utils/helper';
 
 import { postAPIHeaders } from '@/config';
-import { isUrlAndSpecialCharacterExist } from '@/utils/helper';
 
 type SignUpFormProps = {
   setFormContent: (value: string) => void;

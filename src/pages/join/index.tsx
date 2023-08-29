@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
+import { CircularProgress } from '@mui/material';
 import { SignerResult } from '@polkadot/api/types';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -9,6 +10,8 @@ import React, { useRef } from 'react';
 import { useState } from 'react';
 
 import * as utils from '@/utils';
+import { matchedByUserNameEmail } from '@/utils';
+import { isUrlAndSpecialCharacterExist, isValidEmail } from '@/utils/helper';
 
 import AccountChoice from '@/components/AccountChoice';
 import Login from '@/components/Login';
@@ -18,9 +21,6 @@ import { postAPIHeaders } from '@/config';
 import * as config from '@/config';
 import { authenticate } from '@/pages/api/info/user';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
-import { matchedByUserNameEmail } from '@/utils';
-import { isUrlAndSpecialCharacterExist, isValidEmail } from '@/utils/helper';
-import { CircularProgress } from '@mui/material';
 
 const Join = (): JSX.Element => {
   const [user, setUser] = useState<any>();
@@ -63,7 +63,7 @@ const Join = (): JSX.Element => {
       setError({ message: error });
     }
   } catch(error){
-
+    console.log(error);
   }finally {
     setLoading(false);
   }
@@ -166,7 +166,7 @@ const Join = (): JSX.Element => {
     }
   };
 
-  const disableSubmit = error || !user || !password || !email || user?.length < 1 || email?.length < 1 || password?.length < 1;
+  const disableSubmit = matchPassword !== password ||  error || !user || !password || !email || user?.length < 1 || email?.length < 1 || password?.length < 1;
 
 
   return (
