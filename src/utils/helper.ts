@@ -396,3 +396,7 @@ export const strToIntRange = (strList: any) => {
 export const isNumOrSpecialCharacter = (character: string) => {
   return /[^A-Za-z]/g.test(character);
 };
+
+export  const isValidEmail = (val: string) => {
+  return /\S+@\S+\.\S+/.test(val);
+};

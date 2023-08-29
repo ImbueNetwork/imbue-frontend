@@ -16,9 +16,10 @@ import { useState } from 'react';
 import PasswordStrengthBar from 'react-password-strength-bar';
 
 import * as utils from '@/utils';
-import { matchedByUserName } from '@/utils';
+import { matchedByUserName, matchedByUserNameEmail } from '@/utils';
 
 import { postAPIHeaders } from '@/config';
+import { isUrlAndSpecialCharacterExist } from '@/utils/helper';
 
 type SignUpFormProps = {
   setFormContent: (value: string) => void;
@@ -120,17 +121,32 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
       if (data?.id) {
         setError('Username already taken');
         return;
-      } else setError(null);
+      } 
+      else if(isUrlAndSpecialCharacterExist(value)) {
+        setError('Username cannot contain special characters or url');
+        return;
+      }
+      else {
+        setError(null)
+        setUser(value);
+      };
     }
+    
+    if(name === 'email') {
+     const data = await matchedByUserNameEmail(value);
+     if(data){
+      setError('Email already in use');
+     }
+    else if (!isValidEmail(value)) {
+      setError('Email is invalid');
+    } 
+     else {
+      setEmail(value);
+      setError(null);
+    }
+    }
+
     switch (name) {
-      case 'email':
-        if (!isValidEmail(value)) {
-          setError('Email is invalid');
-        } else {
-          setEmail(value);
-          setError(null);
-        }
-        break;
       case 'user':
         if (!validateInputLength(value, 5, 30)) {
           setError('Username must be between 5 and 30 characters');

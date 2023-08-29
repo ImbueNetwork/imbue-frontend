@@ -18,6 +18,9 @@ import { postAPIHeaders } from '@/config';
 import * as config from '@/config';
 import { authenticate } from '@/pages/api/info/user';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
+import { matchedByUserNameEmail } from '@/utils';
+import { isUrlAndSpecialCharacterExist, isValidEmail } from '@/utils/helper';
+import { CircularProgress } from '@mui/material';
 
 const Join = (): JSX.Element => {
   const [user, setUser] = useState<any>();
@@ -29,12 +32,15 @@ const Join = (): JSX.Element => {
   const [visible, setVisible] = useState<boolean>(false);
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
   const googleParentRef = useRef<any>();
+  const [loading,setLoading] = useState(false)
 
   // const router = useRouter();
 
   const salt = bcrypt.genSaltSync(10);
 
   const handleSubmit = async (e: any) => {
+    setLoading(true);
+    try{
     e.preventDefault();
     const hashedPassword = bcrypt.hashSync(password, salt);
 
@@ -56,6 +62,11 @@ const Join = (): JSX.Element => {
       const error = await resp.json();
       setError({ message: error });
     }
+  } catch(error){
+
+  }finally {
+    setLoading(false);
+  }
   };
 
   const closeModal = (): void => {
@@ -106,21 +117,31 @@ const Join = (): JSX.Element => {
     return passwordRegex.test(password);
   };
 
-  const handleChange = (e: any) => {
+  const handleChange = async (e: any) => {
     const { name, value } = e.target;
+    
+    if(name === 'email' && value?.length > 0) {
+    const data =  await matchedByUserNameEmail(value);
+    if(data)setError("email is already existing")
+    else if(!isValidEmail(value))setError("email is not valid")
+    else setError("")
+    setEmail(value)
+    }
+    
+    
     switch (name) {
       case 'user':
-        if (validateInputLength(value, 5, 30)) {
+        if (!validateInputLength(value, 5, 30)) {
           setUser(value);
-          setError('');
-        } else {
           setError('Username must be between 5 and 30 characters');
+        } 
+        else if(isUrlAndSpecialCharacterExist(value)){
+          setError("url and special character are not allowed in user name")
+        }
+        else {
+          setError('');
           setUser(value);
         }
-        break;
-      case 'email':
-        setEmail(value);
-        setError('');
         break;
       case 'password':
         if (validatePassword(value)) {
@@ -134,10 +155,19 @@ const Join = (): JSX.Element => {
         }
         break;
       case 'matchPassword':
-        setMatchPassword(value);
+        if(value !== password){
+          setError("password does not match");
+          setMatchPassword(value)
+        }else{
+          setMatchPassword(value);
+          setError('')
+        }
         break;
     }
   };
+
+  const disableSubmit = error || !user || !password || !email || user?.length < 1 || email?.length < 1 || password?.length < 1;
+
 
   return (
     <div>
@@ -265,14 +295,26 @@ const Join = (): JSX.Element => {
                 <span className={!error ? 'hide' : 'error'}>{error}</span>
               </div>
               <div className='flex justify-center mt-2 w-full'>
-                <input
-                  type='submit'
-                  disabled={password != matchPassword || error}
-                  className='primary-btn in-dark confirm w-full !text-center'
-                  id='create-account'
-                  value={'Sign Up'}
-                  autoComplete='off'
-                />
+              <button
+          type='submit'
+          disabled={disableSubmit}
+          className={`primary-btn in-dark w-full !text-center relative group !mx-0 ${
+            disableSubmit && '!bg-gray-400 !text-white'
+          }`}
+          id='create-account'
+        >
+          {loading && (
+            <CircularProgress
+              className='absolute left-2'
+              thickness={5}
+              size={25}
+              color='info'
+            />
+          )}
+          <span className='font-normal'>
+            {loading ? 'Signing up' : 'Sign Up'}
+          </span>
+        </button>
               </div>
 
               <div className='mx-auto w-fit mt-5'>
