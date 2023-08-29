@@ -149,11 +149,11 @@ class ChainService {
 
   public async voteOnMilestone(
     account: WalletAccount,
-    projectOnChain: any,
+    projectId: any,
     milestoneKey: number,
     userVote: boolean
   ): Promise<BasicTxResponse> {
-    const projectId = projectOnChain.milestones[0].project_chain_id;
+    // const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic = this.imbueApi.imbue.api.tx.imbueProposals.voteOnMilestone(
       projectId,
       milestoneKey,
@@ -189,7 +189,7 @@ class ChainService {
     account: WalletAccount,
     projectOnChain: any
   ): Promise<BasicTxResponse> {
-    const projectId = projectOnChain.milestones[0].project_chain_id;
+    const projectId = projectOnChain.milestones[0].chain_project_id;
     const extrinsic =
       this.imbueApi.imbue.api.tx.imbueProposals.withdraw(projectId);
     return await this.submitImbueExtrinsic(

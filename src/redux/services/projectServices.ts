@@ -58,7 +58,11 @@ export const getUsersOngoingGrants = async (walletAddress: string) => {
   }
 };
 
-export const updateMilestone = async (projectId: number, milestoneIndex:number, approve:boolean) => {
+export const updateMilestone = async (
+  projectId: number,
+  milestoneIndex: number,
+  approve: boolean
+) => {
   const resp = await fetch(
     `${config.apiBase}/project/updateMilestone?projectId=${projectId}&milestoneIndex=${milestoneIndex}&approve=${approve}`,
     {
@@ -74,9 +78,12 @@ export const updateMilestone = async (projectId: number, milestoneIndex:number, 
       message: 'Failed to get all brief applications. status:' + resp.status,
     };
   }
-}
+};
 
-export const updateProjectVotingState = async (projectId: number, voting:boolean) => {
+export const updateProjectVotingState = async (
+  projectId: number,
+  voting: boolean
+) => {
   const resp = await fetch(
     `${config.apiBase}/project/setVoting?projectId=${projectId}&voting=${voting}`,
     {
@@ -92,4 +99,25 @@ export const updateProjectVotingState = async (projectId: number, voting:boolean
       message: 'Failed to update voting state. status:' + resp.status,
     };
   }
-}
+};
+
+export const updateFirstPendingMilestone = async (
+  projectId: number,
+  milestoneIndex: number
+) => {
+  const resp = await fetch(
+    `${config.apiBase}/project/updateMilestone?projectId=${projectId}&firstPendingMilestone=${milestoneIndex}`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'put',
+    }
+  );
+
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    return {
+      message: 'Failed to update voting state. status:' + resp.status,
+    };
+  }
+};

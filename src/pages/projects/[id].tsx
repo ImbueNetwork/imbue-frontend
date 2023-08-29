@@ -23,7 +23,7 @@ import ErrorScreen from '@/components/ErrorScreen';
 import RefundScreen from '@/components/Grant/Refund';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 import Login from '@/components/Login';
-import ExpandableDropDowns from '@/components/Profile/ExpandableMilestone';
+import ExpandableDropDowns from '@/components/Project/ExpandableMilestone';
 import Impressions from '@/components/Project/Impressions';
 import ProjectApprovers from '@/components/Project/ProjectApprovers';
 import ProjectBalance from '@/components/Project/ProjectBalance';
@@ -73,6 +73,7 @@ function Project() {
   const [project, setProject] = useState<Project | any>({});
   const [targetUser, setTargetUser] = useState<any>({});
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
+  console.log("🚀 ~ file: [id].tsx:76 ~ Project ~ onChainProject:", onChainProject)
   // const [user, setUser] = useState<User | any>();
   const { user, loading: userLoading } = useSelector(
     (state: RootState) => state.userState
@@ -84,9 +85,7 @@ function Project() {
     useState<boolean>(false);
   const [withdrawMilestone, setWithdrawMilestone] = useState<boolean>(false);
   const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
-  const [votingWalletAccount, setVotingWalletAccount] = useState<
-    WalletAccount | any
-  >({});
+
   const [chainLoading, setChainLoading] = useState<boolean>(true);
   const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
@@ -99,6 +98,8 @@ function Project() {
   const [projectOwner, setProjectOwner] = useState<User>();
   const [showRefundButton, setShowRefundButton] = useState<boolean>();
   const [milestoneVotes, setMilestoneVotes] = useState<any>({});
+  const [submittingMilestone, setSubmittingMilestone] =
+    useState<boolean>(false);
   const votes =
     Object.keys(milestoneVotes)?.map((key) => ({
       voterAddress: key,
@@ -149,9 +150,9 @@ function Project() {
   };
 
   const getChainProject = async (project: Project, freelancer: any) => {
-    // const imbueApi = await initImbueAPIInfo();
-    // const chainService = new ChainService(imbueApi, user);
-    // const onChainProjectRes = await chainService.getProject(projectId);
+    const imbueApi = await initImbueAPIInfo();
+    const chainService = new ChainService(imbueApi, user);
+    const onChainProjectRes = await chainService.getProject(projectId);
 
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
     if (project.chain_project_id) {
@@ -203,8 +204,10 @@ function Project() {
       //   console.log("🚀 ~ file: [id].tsx:174 ~ getChainProject ~ firstPendingMilestone:", firstPendingMilestone)
       // }
 
-      // setOnChainProject(onChainProjectRes);
-    } else if (project.owner) {
+      setOnChainProject(onChainProjectRes);
+    }
+
+    if (project.owner) {
       switch (project.status_id) {
         case OffchainProjectState.PendingReview:
           setWaitMessage('This project is pending review');
@@ -235,6 +238,7 @@ function Project() {
           break;
       }
       if (
+        project.status_id !== OffchainProjectState.Accepted &&
         project.status_id !== OffchainProjectState.Refunded &&
         project.status_id !== OffchainProjectState.Completed
       ) {
@@ -984,47 +988,47 @@ function Project() {
             ))}
 
           {project?.milestones?.map?.(
-              (milestone: Milestone, index: number) => {
-                return (
-                  <ExpandableDropDowns
-                    {
-                    ...{
-                      setOpenVotingList, approversPreview, firstPendingMilestone, projectInMilestoneVoting, isApplicant, canVote, user, projectType, isProjectOwner, balance,
-                      setLoading, setSuccess, setSuccessTitle, setError, project
-                    }
-                    }
-                    key={`${index}-milestone`}
-                    index={index}
-                    milestone={milestone}
-                    modified={milestone?.modified as Date}
-                    vote={async () => {
-                      // show polkadot account modal
-                      await setShowPolkadotAccounts(true);
-                      // set submitting mile stone to false
-                      await setSubmittingMilestone(false);
-                      // setMile stone key in view
-                      await setMilestoneKeyInView(milestone.milestone_index);
-                    }}
-                    // submitMilestone={async () => {
-                    //   // set submitting mile stone to true
-                    //   await setSubmittingMilestone(true);
-                    //   // show polkadot account modal
-                    //   await setShowPolkadotAccounts(true);
-                    //   // setMile stone key in view
-                    //   await setMilestoneKeyInView(milestone.milestone_index);
-                    // }}
-                    withdraw={async () => {
-                      // set submitting mile stone to true
-                      await setWithdrawMilestone(true);
-                      // show polkadot account modal
-                      await setShowPolkadotAccounts(true);
-                      // setMile stone key in view
-                      await setMilestoneKeyInView(milestone.milestone_index);
-                    }}
-                  />
-                );
-              }
-            )}
+            (milestone: Milestone, index: number) => {
+              return (
+                <ExpandableDropDowns
+                  {
+                  ...{
+                    setOpenVotingList, approversPreview, firstPendingMilestone, projectInMilestoneVoting, isApplicant, canVote, user, projectType, isProjectOwner, balance,
+                    setLoading, setSuccess, setSuccessTitle, setError, project
+                  }
+                  }
+                  key={`${index}-milestone`}
+                  index={index}
+                  milestone={milestone}
+                  modified={milestone?.modified as Date}
+                  vote={async () => {
+                    // show polkadot account modal
+                    await setShowPolkadotAccounts(true);
+                    // set submitting mile stone to false
+                    await setSubmittingMilestone(false);
+                    // setMile stone key in view
+                    await setMilestoneKeyInView(milestone.milestone_index);
+                  }}
+                  // submitMilestone={async () => {
+                  //   // set submitting mile stone to true
+                  //   await setSubmittingMilestone(true);
+                  //   // show polkadot account modal
+                  //   await setShowPolkadotAccounts(true);
+                  //   // setMile stone key in view
+                  //   await setMilestoneKeyInView(milestone.milestone_index);
+                  // }}
+                  withdraw={async () => {
+                    // set submitting mile stone to true
+                    await setWithdrawMilestone(true);
+                    // show polkadot account modal
+                    await setShowPolkadotAccounts(true);
+                    // setMile stone key in view
+                    await setMilestoneKeyInView(milestone.milestone_index);
+                  }}
+                />
+              );
+            }
+          )}
         </div>
 
         <Impressions
@@ -1064,12 +1068,13 @@ function Project() {
           </button>
         </div>
       </ErrorScreen>
-      <SuccessScreen title={successTitle} open={success} setOpen={setSuccess}>
+      <SuccessScreen noRetry={!(project?.status_id === OffchainProjectState.Completed)} title={successTitle} open={success} setOpen={setSuccess}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => {
               setSuccess(false);
-              window.location.reload();
+              if ((project?.status_id !== OffchainProjectState.Completed))
+                window.location.reload();
             }}
             className='primary-btn in-dark w-button w-full !m-0'
           >

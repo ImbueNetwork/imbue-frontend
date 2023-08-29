@@ -5,12 +5,13 @@ import { useState } from "react";
 
 import { initImbueAPIInfo } from "@/utils/polkadot";
 
-import { Milestone, Project, User } from "@/model";
-import ChainService from "@/redux/services/chainService";
-import { updateProjectVotingState } from "@/redux/services/projectServices";
+import { ImbueChainPollResult, Milestone, Project, User } from "@/model";
+import ChainService, { ImbueChainEvent } from "@/redux/services/chainService";
+import { updateFirstPendingMilestone, updateMilestone, updateProjectVotingState } from "@/redux/services/projectServices";
 
+import ProjectStateTag from "./ProjectStateTag";
 import AccountChoice from "../AccountChoice";
-import ProjectStateTag from "../Project/ProjectStateTag";
+import { Dialogue } from "../Dialogue";
 
 type ExpandableDropDownsProps = {
     milestone: Milestone;
@@ -37,7 +38,7 @@ type ExpandableDropDownsProps = {
 
 const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
 
-    const { setLoading, project, setSuccess, setSuccessTitle, setError, milestone, index, modified, vote, withdraw, setOpenVotingList, approversPreview, firstPendingMilestone, projectInMilestoneVoting, isApplicant, canVote, user, projectType, isProjectOwner, balance } = props
+    const { setLoading, project, setSuccess, setSuccessTitle, setError, milestone, index, modified, withdraw, setOpenVotingList, approversPreview, firstPendingMilestone, projectInMilestoneVoting, isApplicant, canVote, user, projectType, isProjectOwner, balance } = props
 
     const [expanded, setExpanded] = useState(false);
     const [showPolkadotAccounts, setShowPolkadotAccounts] =
@@ -45,6 +46,11 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
     const [submittingMilestone, setSubmittingMilestone] =
         useState<boolean>(false);
     const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
+    const [votingWalletAccount, setVotingWalletAccount] = useState<
+        WalletAccount | any
+    >({});
+    const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
+
 
     // submitting a milestone
     const submitMilestone = async (account: WalletAccount) => {
@@ -63,7 +69,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
             while (true) {
                 if (result.status || result.txError) {
                     if (result.status) {
-                        const resp = await updateProjectVotingState(Number(project.id) || 500, true)
+                        const resp = await updateProjectVotingState(Number(project.id), true)
                         if (resp) {
                             setSuccess(true);
                             setSuccessTitle('Milestone Submitted Successfully');
@@ -85,10 +91,82 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
     };
 
     const handleSubmitMilestone = (milestone_index: number) => {
-        setSubmittingMilestone(true)
+        // show polkadot account modal
         setShowPolkadotAccounts(true);
+        // set submitting mile stone to false
+        setSubmittingMilestone(true)
+        // setMile stone key in view
         setMilestoneKeyInView(milestone_index)
     }
+
+
+
+    // voting on a mile stone
+
+    const handleVoting = (milestone_index: number) => {
+        // show polkadot account modal
+        setShowPolkadotAccounts(true);
+        // set submitting mile stone to false
+        setSubmittingMilestone(false);
+        // setMile stone key in view
+        setMilestoneKeyInView(milestone_index);
+    }
+
+    const voteOnMilestone = async (account: WalletAccount, vote: boolean) => {
+        setLoading(true);
+
+        try {
+            const imbueApi = await initImbueAPIInfo();
+            // const userRes: User | any = await utils.getCurrentUser();
+            const chainService = new ChainService(imbueApi, user);
+
+            const result = await chainService.voteOnMilestone(
+                account,
+                milestone.chain_project_id,
+                milestoneKeyInView,
+                vote
+            );
+
+            let pollResult = ImbueChainPollResult.Pending;
+
+            if (!result.txError) {
+                pollResult = (await chainService.pollChainMessage(
+                    ImbueChainEvent.ApproveMilestone,
+                    account
+                )) as ImbueChainPollResult;
+            } else {
+                setError({ message: result.errorMessage });
+            }
+
+            // eslint-disable-next-line no-constant-condition
+            while (true) {
+                console.log("🚀 ~ file: ExpandableMilestone.tsx:131 ~ voteOnMilestone ~ pollResult:", pollResult)
+
+                if (result.status || pollResult == ImbueChainPollResult.EventFound) {
+                    await updateMilestone(milestone.project_id, milestoneKeyInView, true);
+                    await updateProjectVotingState(Number(project.id), false)
+                    await updateFirstPendingMilestone(Number(project.id), (Number(project.first_pending_milestone) + 1))
+                    setSuccess(true);
+                    setSuccessTitle('Your vote was successful');
+                    break;
+
+                } else if (result.txError) {
+                    setError({ message: result.errorMessage });
+                    break;
+                }
+                else if (pollResult != ImbueChainPollResult.Pending) {
+                    break;
+                }
+                await new Promise((f) => setTimeout(f, 1000));
+            }
+        } catch (error) {
+            setError({ message: 'Could not vote. Please try again later' });
+            // eslint-disable-next-line no-console
+            console.error(error)
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className='mb-2 relative bg-white px-5 border border-white rounded-2xl lg:px-12 max-width-750px:!pb-[30px]'>
@@ -97,15 +175,15 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
                     accountSelected={async (account: WalletAccount) => {
                         if (submittingMilestone) {
                             submitMilestone(account);
+                            // }
+                            // else if (raiseVoteOfNoConfidence) {
+                            //     refund(account);
+                            // } else if (withdrawMilestone) {
+                            //     withdraw(account);
+                        } else {
+                            setVotingWalletAccount(account);
+                            setShowVotingModal(true);
                         }
-                        // else if (raiseVoteOfNoConfidence) {
-                        //     refund(account);
-                        // } else if (withdrawMilestone) {
-                        //     withdraw(account);
-                        // } else {
-                        //     await setVotingWalletAccount(account);
-                        //     await setShowVotingModal(true);
-                        // }
                     }}
                     visible={showPolkadotAccounts}
                     setVisible={setShowPolkadotAccounts}
@@ -113,6 +191,39 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
                     filterByInitiator
                 />)
             }
+            {showVotingModal && (
+                <Dialogue
+                    title='Want to appove milestone?'
+                    // closeDialouge={() => setShowVotingModal(false)}
+                    actionList={
+                        <>
+                            <li className='button-container !bg-transparent !hover:bg-gray-950  !border !border-solid !border-white'>
+                                <button
+                                    className='primary !bg-transparent !hover:bg-transparent'
+                                    onClick={() => {
+                                        voteOnMilestone(votingWalletAccount, true);
+                                        setShowVotingModal(false);
+                                    }}
+                                >
+                                    Yes
+                                </button>
+                            </li>
+                            <li className='button-container !bg-transparent !hover:bg-transparent  !border !border-solid !border-white'>
+                                <button
+                                    className='primary !bg-transparent !hover:bg-transparent'
+                                    onClick={() => {
+                                        voteOnMilestone(votingWalletAccount, false);
+                                        setShowVotingModal(false);
+                                    }}
+                                >
+                                    No
+                                </button>
+                            </li>
+                        </>
+                    }
+                />
+            )}
+
             <div
                 onClick={() => {
                     setExpanded(!expanded);
@@ -199,7 +310,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
                                 className={`primary-btn in-dark w-button ${!canVote && '!bg-gray-300 !text-gray-400'
                                     } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
                                 data-testid='next-button'
-                                onClick={() => canVote && vote()}
+                                onClick={() => canVote && handleVoting(milestone.milestone_index)}
                             >
                                 Vote
                             </button>

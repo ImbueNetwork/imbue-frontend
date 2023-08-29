@@ -126,6 +126,7 @@ export type Project = {
   escrow_address?: string;
   duration_id: number;
   completed?: boolean;
+  first_pending_milestone?: number;
 };
 
 export type ProjectProperties = {
@@ -605,7 +606,10 @@ export const deleteMilestones =
 
 export const fetchProjectMilestones =
   (id: string | number) => (tx: Knex.Transaction) =>
-    tx<Milestone>('milestones').select().where({ project_id: id });
+    tx<Milestone>('milestones')
+      .select()
+      .where({ project_id: id })
+      .orderBy('milestone_index');
 
 export const fetchProjectApprovers =
   (id: string | number) => (tx: Knex.Transaction) =>
@@ -634,6 +638,13 @@ export const updateProjectVoting =
       .where({ id: id })
       .update('project_in_milestone_voting', voting)
       .returning('project_in_milestone_voting');
+
+export const updateFirstPendingMilestoneService =
+  (id: string | number, milestone_index: number) => (tx: Knex.Transaction) =>
+    tx<Project>('projects')
+      .where({ id: id })
+      .update('first_pending_milestone', milestone_index)
+      // .returning('project_in_milestone_voting');
 
 export const updateMilestoneDetails =
   (id: string | number, milestoneId: string | number, details: string) =>

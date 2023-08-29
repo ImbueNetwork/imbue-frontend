@@ -6,19 +6,20 @@ import * as models from '@/lib/models';
 
 import db from '@/db';
 
-import { authenticate, verifyUserIdFromJwt, } from '../../auth/common';
+import { authenticate, verifyUserIdFromJwt } from '../../auth/common';
 
 export default nextConnect()
   .use(passport.initialize())
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
     db.transaction(async (tx) => {
       try {
-        const { projectId, milestoneIndex, approve } = req.query;
+        const { projectId, milestoneIndex, approve, firstPendingMilestone } =
+          req.query;
 
-        if (!projectId || !milestoneIndex || !approve) {
+        if (!projectId) {
           return res
             .status(401)
-            .json({ message: 'No milestone found for update' });
+            .json({ message: 'No project found for update' });
         }
 
         const userAuth: Partial<models.User> | any = await authenticate(
@@ -26,10 +27,26 @@ export default nextConnect()
           req,
           res
         );
-        const projectApproverIds = await models.fetchProjectApproverUserIds(Number(projectId))(tx);
+        const projectApproverIds = await models.fetchProjectApproverUserIds(
+          Number(projectId)
+        )(tx);
         verifyUserIdFromJwt(req, res, [userAuth.id, ...projectApproverIds]);
 
-        const is_approved = approve === "true" ? true : false;
+        if (firstPendingMilestone !== undefined) {
+          const response = await models.updateFirstPendingMilestoneService(
+            Number(projectId),
+            Number(firstPendingMilestone)
+          )(tx);
+
+          return res.status(200).send(response);
+        }
+
+        if (milestoneIndex == undefined || approve == undefined)
+          return res
+            .status(401)
+            .json({ message: 'No milestone found for update' });
+
+        const is_approved = approve === 'true' ? true : false;
 
         const result = await models.updateMilestone(
           Number(projectId),
