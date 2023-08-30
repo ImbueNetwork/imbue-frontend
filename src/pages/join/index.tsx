@@ -10,7 +10,7 @@ import React, { useRef } from 'react';
 import { useState } from 'react';
 
 import * as utils from '@/utils';
-import { matchedByUserNameEmail } from '@/utils';
+import { matchedByUserName, matchedByUserNameEmail } from '@/utils';
 import { isUrlAndSpecialCharacterExist, isValidEmail } from '@/utils/helper';
 
 import AccountChoice from '@/components/AccountChoice';
@@ -22,12 +22,39 @@ import * as config from '@/config';
 import { authenticate } from '@/pages/api/info/user';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 
+
+type FormErrorMessage={
+  username: string
+  email: string
+  password: string
+  confirmPassword: string
+  message:string
+}
+
+const initialState = {
+  username: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  message: '',
+}
+
+const invalidUsernames = [
+  'username',
+  'imbue',
+  'imbuenetwork',
+  'polkadot',
+  'password',
+  'admin',
+];
+
+
 const Join = (): JSX.Element => {
   const [user, setUser] = useState<any>();
   const [email, setEmail] = useState<any>();
   const [password, setPassword] = useState<any>();
   const [matchPassword, setMatchPassword] = useState<any>();
-  const [error, setError] = useState<any>();
+  const [error, setError] = useState<FormErrorMessage>(initialState);
 
   const [visible, setVisible] = useState<boolean>(false);
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
@@ -60,10 +87,18 @@ const Join = (): JSX.Element => {
       await utils.redirectBack();
     } else {
       const error = await resp.json();
-      setError({ message: error });
+      setError( (val)=> {return{ 
+        ...val,  
+        message:error
+      }}
+      );
     }
-  } catch(error){
-    console.log(error);
+  } catch(error:any){
+      setError((val)=>{return{ 
+       ...val,  
+         message:error.message
+      }}
+      );
   }finally {
     setLoading(false);
   }
@@ -100,7 +135,7 @@ const Join = (): JSX.Element => {
     if (resp.ok) {
       utils.redirect('/dashboard');
     } else {
-      setError('incorrect username or password');
+      console.log('invalid username or pa')
     }
   };
 
@@ -117,56 +152,133 @@ const Join = (): JSX.Element => {
     return passwordRegex.test(password);
   };
 
-  const handleChange = async (e: any) => {
-    const { name, value } = e.target;
-    
-    if(name === 'email' && value?.length > 0) {
-    const data =  await matchedByUserNameEmail(value);
-    if(data)setError("email is already existing")
-    else if(!isValidEmail(value))setError("email is not valid")
-    else setError("")
-    setEmail(value)
+  const fullData = user?.length && email?.length && password?.length;
+  const ErrorFound = !!(error.confirmPassword?.length ||
+                     error.password?.length ||
+                     error.username?.length || 
+                     error.email?.length)
+
+  const disableSubmit =
+    !fullData ||
+    password != matchPassword ||
+    loading || ErrorFound 
+
+  const handleChange = async (event: any) => {
+    const { name, value } = event.target;
+    if (name === 'user') {
+      const data = await matchedByUserName(value);
+      if (data?.id) {
+        setError((val)=>{return {
+          ...val,
+          username: 'Username already taken'
+        }} );
+        return;
+      } 
+      else if(invalidUsernames.includes(value)){
+         
+        setError((val)=>{return {
+          ...val,
+          username: 'Username is not allowed'
+        }});
+      }
+      else if(value.includes(" ")){
+        setError((val)=> {return {
+        ...val,
+          username: 'Username cannot contain spaces'
+        }} );
+        return;
+      }
+      else if(!validateInputLength(value, 5, 30)){
+        setError( (val)=> {return {
+        ...val,
+          username: 'Username must be between 5 and 30 characters'
+        }} );
+        return;
+      }
+      else if(isUrlAndSpecialCharacterExist(value)) {
+        setError( (val)=> {return {
+          ...val,
+          username: 'Username cannot contain special characters or url'
+        }} );
+        return;
+      }
+      else {
+        setError( (val)=> {return {
+          ...val,
+          username: ''
+        }} );
+        setUser(value);
+      };
     }
-    
-    
+    if(name === 'email') {
+     const data = await matchedByUserNameEmail(value);
+     if(data){
+      setError( (val)=> {return {
+       ...val,
+         email: 'Email already in use'
+      }} );
+      return;
+     }
+    else if (!isValidEmail(value)) {
+      setError( (val)=> {return {
+      ...val,
+        email: 'Email is invalid'
+      }} );
+      return;
+    } 
+     else {
+      setError( (val)=> {return {
+        ...val,
+          email: ''
+        }} );
+      setEmail(value);
+    }
+    }
+
     switch (name) {
-      case 'user':
-        if (!validateInputLength(value, 5, 30)) {
-          setUser(value);
-          setError('Username must be between 5 and 30 characters');
-        } 
-        else if(isUrlAndSpecialCharacterExist(value)){
-          setError("url and special character are not allowed in user name")
+      case 'password':
+        if(value?.length < 5){
+          setError( (val)=> {return {
+          ...val,
+            password: 'password must be at least 5 characters'
+          }} );
+          return;
+        }
+        else if(!validatePassword(value)){
+          setError( (val)=> {return {
+         ...val,
+
+          password: 'Password must be between 6 and 15 characters and contain at least one number and one special character'
+          } } );
         }
         else {
-          setError('');
-          setUser(value);
+          setError( (val)=> {return {
+            ...val,
+              password: ''
+            }} );
         }
-        break;
-      case 'password':
-        if (validatePassword(value)) {
-          setPassword(value);
-          setError('');
-        } else {
-          setError(
-            'Password must be between 6 and 15 characters and contain at least one special character'
-          );
-          setPassword(value);
-        }
+        setPassword(value);
         break;
       case 'matchPassword':
-        if(value !== password){
-          setError("password does not match");
-          setMatchPassword(value)
-        }else{
+        if (value !== password) {
+          setError((val)=>{return {
+            ... val,
+            confirmPassword:"Passwords do not match"
+          }});
+        } else {
+          setError((val)=>{return {
+            ... val,
+            confirmPassword:""
+          }});
           setMatchPassword(value);
-          setError('')
         }
+        break;
+      default:
         break;
     }
   };
 
-  const disableSubmit = matchPassword !== password ||  error || !user || !password || !email || user?.length < 1 || email?.length < 1 || password?.length < 1;
+  
 
 
   return (
@@ -240,6 +352,9 @@ const Join = (): JSX.Element => {
                   name='user'
                   autoComplete='off'
                 />
+              <div className='flex flex-wrap flex-row '>
+                <span className={!error.username.length ? 'hide' : 'error'}>{error.username}</span>
+              </div>
               </div>
 
               <div className='flex flex-col justify-center pb-[10px] w-full mt-2'>
@@ -257,6 +372,9 @@ const Join = (): JSX.Element => {
                   name='email'
                   autoComplete='off'
                 />
+              <div className='flex flex-wrap flex-row'>
+                <span className={!error.email.length ? 'hide' : 'error'}>{error.email}</span>
+              </div>
               </div>
 
               <div className='flex flex-col justify-center pb-[10px] w-full mt-2'>
@@ -273,6 +391,9 @@ const Join = (): JSX.Element => {
                   name='password'
                   autoComplete='off'
                 />
+                <div className='flex flex-wrap flex-row'>
+                <span className={!error.password.length ? 'hide' : 'error'}>{error.password}</span>
+              </div>
               </div>
 
               <div className='flex flex-col justify-center pb-[10px] w-full mt-2'>
@@ -290,9 +411,12 @@ const Join = (): JSX.Element => {
                   autoComplete='off'
                 />
               </div>
+              <div className='flex flex-wrap flex-row'>
+                <span className={!error.confirmPassword.length ? 'hide' : 'error'}>{error.confirmPassword}</span>
+              </div>
 
               <div className='flex flex-wrap flex-row justify-center'>
-                <span className={!error ? 'hide' : 'error'}>{error}</span>
+                <span className={!error.message.length ? 'hide' : 'error'}>{error.message}</span>
               </div>
               <div className='flex justify-center mt-2 w-full'>
               <button
