@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { getBalance } from '@/utils/helper';
 
-import { Currency, Project, User } from '@/model';
+import { Currency, OffchainProjectState, Project, User } from '@/model';
 
 type ProjectBalanceType = {
     balance: number;
@@ -25,7 +25,7 @@ const ProjectBalance = (props: ProjectBalanceType) => {
                     user
                 );
 
-                if (!balance) {
+                if (!balance && project.status_id !== OffchainProjectState.Completed) {
                     handlePopUpForUser();
                 }
                 setBalance(balance || 0);

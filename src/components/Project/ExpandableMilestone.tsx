@@ -5,9 +5,9 @@ import { useState } from "react";
 
 import { initImbueAPIInfo } from "@/utils/polkadot";
 
-import { ImbueChainPollResult, Milestone, Project, User } from "@/model";
+import { ImbueChainPollResult, Milestone, OffchainProjectState, Project, User } from "@/model";
 import ChainService, { ImbueChainEvent } from "@/redux/services/chainService";
-import { updateFirstPendingMilestone, updateMilestone, updateProjectVotingState } from "@/redux/services/projectServices";
+import { updateFirstPendingMilestone, updateMilestone, updateProject, updateProjectVotingState } from "@/redux/services/projectServices";
 
 import ProjectStateTag from "./ProjectStateTag";
 import AccountChoice from "../AccountChoice";
@@ -17,8 +17,8 @@ type ExpandableDropDownsProps = {
     milestone: Milestone;
     index: number;
     modified: Date;
-    vote: () => void;
-    withdraw: () => void;
+    // vote: () => void;
+    // withdraw: () => void;
     setOpenVotingList: (_value: boolean) => void;
     setLoading: (_value: boolean) => void;
     setSuccess: (_value: boolean) => void;
@@ -38,7 +38,8 @@ type ExpandableDropDownsProps = {
 
 const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
 
-    const { setLoading, project, setSuccess, setSuccessTitle, setError, milestone, index, modified, withdraw, setOpenVotingList, approversPreview, firstPendingMilestone, projectInMilestoneVoting, isApplicant, canVote, user, projectType, isProjectOwner, balance } = props
+    const { setLoading, project, setSuccess, setSuccessTitle, setError, milestone, index, modified, setOpenVotingList, approversPreview, firstPendingMilestone, projectInMilestoneVoting, isApplicant, canVote, user, projectType, isProjectOwner, balance } = props
+    console.log("🚀 ~ file: ExpandableMilestone.tsx:42 ~ ExpandableDropDowns ~ milestone:", milestone)
 
     const [expanded, setExpanded] = useState(false);
     const [showPolkadotAccounts, setShowPolkadotAccounts] =
@@ -46,10 +47,12 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
     const [submittingMilestone, setSubmittingMilestone] =
         useState<boolean>(false);
     const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
+    console.log("🚀 ~ file: ExpandableMilestone.tsx:49 ~ ExpandableDropDowns ~ milestoneKeyInView:", milestoneKeyInView)
     const [votingWalletAccount, setVotingWalletAccount] = useState<
         WalletAccount | any
     >({});
     const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
+    const [withdrawMilestone, setWithdrawMilestone] = useState<boolean>(false);
 
 
     // submitting a milestone
@@ -100,9 +103,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
     }
 
 
-
     // voting on a mile stone
-
     const handleVoting = (milestone_index: number) => {
         // show polkadot account modal
         setShowPolkadotAccounts(true);
@@ -140,7 +141,6 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
 
             // eslint-disable-next-line no-constant-condition
             while (true) {
-                console.log("🚀 ~ file: ExpandableMilestone.tsx:131 ~ voteOnMilestone ~ pollResult:", pollResult)
 
                 if (result.status || pollResult == ImbueChainPollResult.EventFound) {
                     await updateMilestone(milestone.project_id, milestoneKeyInView, true);
@@ -168,6 +168,54 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
         }
     };
 
+
+    // voting on a mile stone
+    const handleWithdraw = (milestone_index: number) => {
+        // set submitting mile stone to true
+        setWithdrawMilestone(true);
+        // show polkadot account modal
+        setShowPolkadotAccounts(true);
+        // setMile stone key in view
+        setMilestoneKeyInView(milestone_index);
+    }
+
+
+    // withdrawing funds
+    const withdraw = async (account: WalletAccount) => {
+        setLoading(true);
+        const imbueApi = await initImbueAPIInfo();
+        const projectMilestones = project.milestones;
+        // const user: User | any = await utils.getCurrentUser();
+        const chainService = new ChainService(imbueApi, user);
+        const result = await chainService.withdraw(account, project.chain_project_id);
+
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+            if (result.status || result.txError) {
+                if (result.status) {
+                    const haveAllMilestonesBeenApproved = projectMilestones
+                        .map((m: any) => m.is_approved)
+                        .every(Boolean);
+
+                    if (haveAllMilestonesBeenApproved) {
+                        project.status_id = OffchainProjectState.Completed;
+                        project.completed = true;
+
+                        await updateProject(Number(project?.id), project);
+                    }
+
+                    setSuccess(true);
+                    setSuccessTitle('Withdraw successfull');
+                } else if (result.txError) {
+                    setError({ message: result.errorMessage });
+                }
+                break;
+            }
+            await new Promise((f) => setTimeout(f, 1000));
+        }
+        setLoading(false);
+    };
+
     return (
         <div className='mb-2 relative bg-white px-5 border border-white rounded-2xl lg:px-12 max-width-750px:!pb-[30px]'>
             {showPolkadotAccounts && (
@@ -178,8 +226,8 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
                             // }
                             // else if (raiseVoteOfNoConfidence) {
                             //     refund(account);
-                            // } else if (withdrawMilestone) {
-                            //     withdraw(account);
+                        } else if (withdrawMilestone) {
+                            withdraw(account);
                         } else {
                             setVotingWalletAccount(account);
                             setShowVotingModal(true);
@@ -345,7 +393,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
                         className={`primary-btn in-dark w-button ${!balance && '!bg-gray-300 !text-gray-400'
                             } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
                         data-testid='next-button'
-                        onClick={() => withdraw()}
+                        onClick={() => handleWithdraw(milestone.milestone_index)}
                         disabled={!balance}
                     >
                         Withdraw
