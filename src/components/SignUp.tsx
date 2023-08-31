@@ -11,12 +11,13 @@ import {
   OutlinedInput,
 } from '@mui/material';
 import bcrypt from 'bcryptjs';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useState } from 'react';
 import PasswordStrengthBar from 'react-password-strength-bar';
 
 import * as utils from '@/utils';
-import { matchedByUserName } from '@/utils';
+import { matchedByUserName, matchedByUserNameEmail } from '@/utils';
+import { isUrlAndSpecialCharacterExist } from '@/utils/helper';
 
 import { postAPIHeaders } from '@/config';
 
@@ -25,6 +26,20 @@ type SignUpFormProps = {
   redirectUrl: string;
 };
 
+type FormErrorMessage={
+  username: string
+  email: string
+  password: string
+  confirmPassword: string
+}
+
+const initialState = {
+  username: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+}
+
 const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
   const [user, setUser] = useState<any>();
   const [email, setEmail] = useState<any>();
@@ -32,7 +47,7 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
   const [password, setPassword] = useState<any>();
   const [matchPassword, setMatchPassword] = useState<any>();
   const [agreedToTerms, setAgreedToTerms] = useState<boolean>(false);
-  const [error, setError] = useState<any>();
+  const [error, setError] = useState<FormErrorMessage>(initialState);
   const [loading, setLoading] = useState<boolean>(false);
 
   const salt = bcrypt.genSaltSync(10);
@@ -47,12 +62,15 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
   ];
 
   const fullData = user?.length && email?.length && password?.length;
+  const ErrorFound = !!(error.confirmPassword?.length ||
+                     error.password?.length ||
+                     error.username?.length || 
+                     error.email?.length)
 
   const disableSubmit =
     !fullData ||
     password != matchPassword ||
-    loading ||
-    error ||
+    loading || ErrorFound || 
     !agreedToTerms;
 
   const handleSubmit = async (e: any) => {
@@ -118,36 +136,109 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
     if (name === 'user') {
       const data = await matchedByUserName(value);
       if (data?.id) {
-        setError('Username already taken');
+        setError((val)=>{return {
+          ...val,
+          username: 'Username already taken'
+        }} );
         return;
-      } else setError(null);
+      } 
+      else if(invalidUsernames.includes(value)){
+         
+        setError((val)=>{return {
+          ...val,
+          username: 'Username is not allowed'
+        }});
+      }
+      else if(value.includes(" ")){
+        setError((val)=> {return {
+        ...val,
+          username: 'Username cannot contain spaces'
+        }} );
+        return;
+      }
+      else if(!validateInputLength(value, 5, 30)){
+        setError( (val)=> {return {
+        ...val,
+          username: 'Username must be between 5 and 30 characters'
+        }} );
+        return;
+      }
+      else if(isUrlAndSpecialCharacterExist(value)) {
+        setError( (val)=> {return {
+          ...val,
+          username: 'Username cannot contain special characters or url'
+        }} );
+        return;
+      }
+      else {
+        setError( (val)=> {return {
+          ...val,
+          username: ''
+        }} );
+        setUser(value);
+      };
     }
+    if(name === 'email') {
+     const data = await matchedByUserNameEmail(value);
+     if(data){
+      setError( (val)=> {return {
+       ...val,
+         email: 'Email already in use'
+      }} );
+      return;
+     }
+    else if (!isValidEmail(value)) {
+      setError( (val)=> {return {
+      ...val,
+        email: 'Email is invalid'
+      }} );
+      return;
+    } 
+     else {
+      setError( (val)=> {return {
+        ...val,
+          email: ''
+        }} );
+      setEmail(value);
+    }
+    }
+
     switch (name) {
-      case 'email':
-        if (!isValidEmail(value)) {
-          setError('Email is invalid');
-        } else {
-          setEmail(value);
-          setError(null);
-        }
-        break;
-      case 'user':
-        if (!validateInputLength(value, 5, 30)) {
-          setError('Username must be between 5 and 30 characters');
-        } else {
-          setUser(value);
-          setError(null);
-        }
-        break;
       case 'password':
+        if(value?.length < 5){
+          setError( (val)=> {return {
+          ...val,
+            password: 'password must be at least 5 characters'
+          }} );
+          return;
+        }
+        else if(!validatePassword(value)){
+          setError( (val)=> {return {
+         ...val,
+
+          password: 'Password must be between 6 and 15 characters and contain at least one number and one special character'
+          } } );
+        }
+        else {
+          setError( (val)=> {return {
+            ...val,
+              password: ''
+            }} );
+        }
         setPassword(value);
         break;
       case 'matchPassword':
         if (value !== password) {
-          setError('Passwords do not match');
+          setError((val)=>{return {
+            ... val,
+            confirmPassword:"Passwords do not match"
+          }});
         } else {
+          setError((val)=>{return {
+            ... val,
+            confirmPassword:""
+          }});
           setMatchPassword(value);
-          setError(null);
         }
         break;
       default:
@@ -155,58 +246,92 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
     }
   };
 
-  const validateInput = () => {
-    if (password !== matchPassword) {
-      setError('Passwords do not match');
-      return;
-    }
+  // const validateInput = () => {
+  //   if ( matchPassword && password !== matchPassword) {
+  //     setError((val)=>{return {
+  //       ... val,
+  //       confirmPassword:"Passwords do not match"
+  //     }});
+  //     return;
+  //   }
 
-    if (user && email && user.toLowerCase() === email.toLowerCase()) {
-      setError('Username and email cannot be the same');
-      return;
-    }
+  //   // if (user && email && user.toLowerCase() === email.toLowerCase()) {
+  //   //   setError('Username and email cannot be the same');
+  //   //   return;
+  //   // }
 
-    if (user && isValidEmail(user)) {
-      setError('Username cannot be an email');
-      return;
-    }
+  //   if (user && isValidEmail(user)) {
+  //     setError((val)=>{
+  //       return {
+  //       ...val,
+  //       username:'Username cannot be an email'
+  //     }})
+  //     return;
+  //   }
 
-    if (password && password.length < 5) {
-      setError('Password must be at least 5 characters');
-      return;
-    }
+  //   if (password && password.length < 5) {
+  //     setError(val=>{
+  //       return {
+  //       ...val,
+  //         password: 'Password must be at least 5 characters'
+  //       }
+  //     })
+  //     return;
+  //   }
 
-    if (user && user.length < 4) {
-      setError('Username must be at least 4 characters');
-      return;
-    }
+  //   if (user && user.length < 4) {
+  //     setError((val)=>{
+  //       return {
+  //         ...val,
+  //       username: 'Username must be at least 4 characters'
+  //     }})
+  //     return;
+  //   }
 
-    if (user && invalidUsernames.includes(user)) {
-      setError('Username is not allowed');
-      return;
-    }
-    if (user && user.includes(' ')) {
-      setError('space is not allowed in username');
-      return;
-    }
-    if (user && password && user.toLowerCase() === password.toLowerCase()) {
-      setError('Username and password cannot be the same');
-      return;
-    }
+  //   if (user && invalidUsernames.includes(user)) {
+  //     setError(val=>{
+  //       return {
+  //        ...val,
+  //         username: 'Username is not allowed'
+  //       }
+  //     })
+  //     return;
+  //   }
+  //   if (user && user.includes(' ')) {
+  //     setError((val)=>{
+  //       return {
+  //       ...val,
+  //         username: 'Username cannot contain spaces'
+  //       }
+  //     })
+  //   }
+  //   if (user && password && user.toLowerCase() === password.toLowerCase()) {
+  //     setError((val)=>{
+  //       return {
+  //         ...val,
+  //         password:'Username and password cannot be the same'
+  //       }
+  //     })
+  //     return;
+  //   }
 
-    if (password && !validatePassword(password)) {
-      setError(
-        'Password must be between 6 and 15 characters and contain at least one number and one special character'
-      );
-      return;
-    }
+  //   if (password && !validatePassword(password)) {
+  //     setError((val)=>{
+  //       return {
+  //         ...val,
+        
+  //       password:'Password must be between 6 and 15 characters and contain at least one number and one special character'
+  //       }
+  //     })
+  //     return;
+  //   }
 
-    setError(null);
-  };
+  //   setError(initialState);
+  // };
 
-  useEffect(() => {
-    validateInput();
-  }, [matchPassword, password, user, email]);
+  // useEffect(() => {
+  //   validateInput();
+  // }, [matchPassword, password, user, email]);
 
   return (
     <form
@@ -229,6 +354,9 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
           className='outlinedInput'
           name='user'
         />
+        <p className={`${!error ? 'hide' : 'error'} w-full text-sm mt-1`}>
+        {error.username}
+      </p>
       </div>
 
       <div className='flex flex-col justify-center pb-[10px] w-full mt-2'>
@@ -246,6 +374,9 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
           name='email'
           autoComplete='off'
         />
+        <p className={`${!error ? 'hide' : 'error'} w-full text-sm mt-1`}>
+        {error.email}
+      </p>
       </div>
 
       <div className='flex flex-col justify-center pb-[10px] w-full mt-2'>
@@ -273,6 +404,9 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
           }
         />
         <PasswordStrengthBar password={password} />
+        <p className={`${!error ? 'hide' : 'error'} w-full text-sm mt-1`}>
+        {error.password}
+      </p>
       </div>
 
       <div className='flex flex-col justify-center pb-[10px] w-full mt-0'>
@@ -282,17 +416,21 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
 
         <input
           placeholder='Confirm your Password'
-          onChange={(e: any) => setMatchPassword(e.target.value)}
+          onChange={handleChange}
           className='outlinedInput'
           required
+          name='matchPassword'
           type='password'
           autoComplete='off'
         />
+        <p className={`${!error ? 'hide' : 'error'} w-full text-sm mt-1`}>
+        {error.confirmPassword}
+      </p>
       </div>
 
-      <p className={`${!error ? 'hide' : 'error'} w-full text-sm text-center`}>
+      {/* <p className={`${!error ? 'hide' : 'error'} w-full text-sm text-center`}>
         {error}
-      </p>
+      </p> */}
 
       <div className='flex items-center mb-2 justify-center'>
         <Checkbox

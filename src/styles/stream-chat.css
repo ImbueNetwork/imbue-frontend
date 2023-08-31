@@ -25,7 +25,8 @@
   inset-block-end: -180% !important ;
   z-index: 1;
 }
-.str-chat__message--with-reactions .str-chat__message-reaction-selector{
+
+.str-chat__message--with-reactions .str-chat__message-reaction-selector {
   inset-block-end: -100% !important ;
 }
 
@@ -41,6 +42,16 @@
 
 .str-chat__channel-list-react .str-chat__channel-list-messenger-react {
   padding-bottom: 0 !important;
+}
+
+/* chat reaction host */
+.str-chat__message-reactions-host {
+  grid-row-start: 2 !important;
+  grid-row-end: 2 !important;
+}
+.str-chat__message-options {
+  grid-row-start: 1 !important;
+  grid-row-end: 1 !important;
 }
 
 /* search box */
@@ -131,6 +142,11 @@
   .str-chat__quoted-message-preview
   .str-chat__quoted-message-bubble {
   background: var(--theme-purple-light) !important;
+}
+
+.str-chat__message-bubble {
+  grid-row-start: 1 !important;
+  grid-row-end: 1 !important;
 }
 
 .str-chat__channel-search-input--wrapper
