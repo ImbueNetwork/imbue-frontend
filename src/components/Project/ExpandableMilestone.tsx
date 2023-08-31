@@ -39,7 +39,6 @@ type ExpandableDropDownsProps = {
 const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
 
     const { setLoading, project, setSuccess, setSuccessTitle, setError, milestone, index, modified, setOpenVotingList, approversPreview, firstPendingMilestone, projectInMilestoneVoting, isApplicant, canVote, user, projectType, isProjectOwner, balance } = props
-    console.log("🚀 ~ file: ExpandableMilestone.tsx:42 ~ ExpandableDropDowns ~ milestone:", milestone)
 
     const [expanded, setExpanded] = useState(false);
     const [showPolkadotAccounts, setShowPolkadotAccounts] =
@@ -47,16 +46,17 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
     const [submittingMilestone, setSubmittingMilestone] =
         useState<boolean>(false);
     const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
-    console.log("🚀 ~ file: ExpandableMilestone.tsx:49 ~ ExpandableDropDowns ~ milestoneKeyInView:", milestoneKeyInView)
     const [votingWalletAccount, setVotingWalletAccount] = useState<
         WalletAccount | any
     >({});
     const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
     const [withdrawMilestone, setWithdrawMilestone] = useState<boolean>(false);
 
-
     // submitting a milestone
     const submitMilestone = async (account: WalletAccount) => {
+        if (!project?.chain_project_id)
+            return setError({ message: "No project found" })
+
         setLoading(true);
 
         try {
@@ -64,7 +64,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
             const chainService = new ChainService(imbueApi, user);
             const result = await chainService.submitMilestone(
                 account,
-                milestone.chain_project_id,
+                project.chain_project_id,
                 milestoneKeyInView
             );
 
@@ -123,7 +123,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
 
             const result = await chainService.voteOnMilestone(
                 account,
-                milestone.chain_project_id,
+                project.chain_project_id,
                 milestoneKeyInView,
                 vote
             );
@@ -142,12 +142,17 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
             // eslint-disable-next-line no-constant-condition
             while (true) {
 
-                if (result.status || pollResult == ImbueChainPollResult.EventFound) {
+                if (pollResult == ImbueChainPollResult.EventFound) {
                     await updateMilestone(milestone.project_id, milestoneKeyInView, true);
                     await updateProjectVotingState(Number(project.id), false)
                     await updateFirstPendingMilestone(Number(project.id), (Number(project.first_pending_milestone) + 1))
                     setSuccess(true);
-                    setSuccessTitle('Your vote was successful');
+                    setSuccessTitle('Your vote was successful. This milestone has been completed.');
+                    break;
+                }
+                else if (result.status) {
+                    setSuccess(true);
+                    setSuccessTitle('Your vote was successful.');
                     break;
 
                 } else if (result.txError) {
@@ -155,6 +160,8 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
                     break;
                 }
                 else if (pollResult != ImbueChainPollResult.Pending) {
+                    setSuccess(true);
+                    setSuccessTitle('Request resolved successfully');
                     break;
                 }
                 await new Promise((f) => setTimeout(f, 1000));

@@ -15,6 +15,7 @@ import { useSelector } from 'react-redux';
 import * as utils from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
+import AccountChoice from '@/components/AccountChoice';
 import BackButton from '@/components/BackButton';
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
@@ -25,7 +26,7 @@ import ExpandableDropDowns from '@/components/Project/ExpandableMilestone';
 import Impressions from '@/components/Project/Impressions';
 import ProjectApprovers from '@/components/Project/ProjectApprovers';
 import ProjectBalance from '@/components/Project/ProjectBalance';
-import VotingList from '@/components/Project/VotingList';
+import VotingList from '@/components/Project/VotingList/VotingList';
 import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
 
@@ -68,9 +69,9 @@ TimeAgo.addDefaultLocale(en);
 function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
+  console.log("🚀 ~ file: [id].tsx:71 ~ Project ~ project:", project)
   const [targetUser, setTargetUser] = useState<any>({});
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
-  console.log("🚀 ~ file: [id].tsx:76 ~ Project ~ onChainProject:", onChainProject)
   // const [user, setUser] = useState<User | any>();
   const { user, loading: userLoading } = useSelector(
     (state: RootState) => state.userState
@@ -80,11 +81,9 @@ function Project() {
 
   const [raiseVoteOfNoConfidence, setRaiseVoteOfNoConfidence] =
     useState<boolean>(false);
-  const [withdrawMilestone, setWithdrawMilestone] = useState<boolean>(false);
   const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
 
   const [chainLoading, setChainLoading] = useState<boolean>(true);
-  const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [loginModal, setLoginModal] = useState<boolean>(false);
@@ -93,15 +92,9 @@ function Project() {
   const [isApplicant, setIsApplicant] = useState<boolean>(false);
   const [isProjectOwner, setIsProjectOwner] = useState<boolean>(false);
   const [projectOwner, setProjectOwner] = useState<User>();
-  const [showRefundButton, setShowRefundButton] = useState<boolean>();
+  const [showRefundButton, setShowRefundButton] = useState<boolean>(false);
   const [milestoneVotes, setMilestoneVotes] = useState<any>({});
-  const [submittingMilestone, setSubmittingMilestone] =
-    useState<boolean>(false);
-  const votes =
-    Object.keys(milestoneVotes)?.map((key) => ({
-      voterAddress: key,
-      vote: milestoneVotes[key],
-    })) || [];
+
   const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
     useState<boolean>();
   const [projectInVotingOfNoConfidence, setProjectInVotingOfNoConfidence] =
@@ -147,50 +140,49 @@ function Project() {
   };
 
   const getChainProject = async (project: Project, freelancer: any) => {
-    const imbueApi = await initImbueAPIInfo();
-    const chainService = new ChainService(imbueApi, user);
-    const onChainProjectRes = await chainService.getProject(projectId);
-    setOnChainProject(onChainProjectRes);
+    // const imbueApi = await initImbueAPIInfo();
+    // const chainService = new ChainService(imbueApi, user);
+    // const onChainProjectRes = await chainService.getProject(projectId);
+    // setOnChainProject(onChainProjectRes);
 
 
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
     if (project.chain_project_id) {
       // const isApplicant = onChainProjectRes.initiator == user.web3_address;
       // setIsApplicant(isApplicant);
-      // // TODO Enable refunds first
-      // const userIsApprover = onChainProjectRes.contributions
-      //   .map((c) => c.accountId)
-      //   .includes(user.web3_address!);
-      // if (userIsApprover) {
-      //   setShowRefundButton(onChainProjectRes.fundingType.Grant);
-      // }
-      setShowRefundButton(!project.brief_id);
+      // TODO Enable refunds first
+      if (project?.approvers?.length && user.web3_address) {
+        const userIsApprover = project.approvers?.includes(user.web3_address);
+        if (userIsApprover) {
+          setShowRefundButton(true);
+        }
+      }
 
       // setFirstPendingMilestone(firstPendingMilestone);
       // setProjectInMilestoneVoting(onChainProjectRes.projectInMilestoneVoting);
       // setProjectInVotingOfNoConfidence(
       //   onChainProjectRes.projectInVotingOfNoConfidence
       // );
-      setFirstPendingMilestone(project.first_pending_milestone);
+      setFirstPendingMilestone(project.first_pending_milestone ?? -1);
       setProjectInMilestoneVoting(project.project_in_milestone_voting);
       setProjectInVotingOfNoConfidence(project.project_in_voting_of_no_confidence);
 
       // if (
       //   user.web3_address &&
-      //   onChainProjectRes.projectInVotingOfNoConfidence
+      //   project.project_in_voting_of_no_confidence
       // ) {
-      // const voters = await chainService.getNoConfidenceVoters(
-      //   project.chain_project_id
-      // );
-      // if (user?.web3_address && voters?.includes(user.web3_address)) {
-      //   setApproverVotedOnRefund(true);
-      // }
+      //   const voters = await chainService.getNoConfidenceVoters(
+      //     project.chain_project_id
+      //   );
+      //   if (user?.web3_address && voters?.includes(user.web3_address)) {
+      //     setApproverVotedOnRefund(true);
+      //   }
       // }
 
-      // if (onChainProjectRes.projectInMilestoneVoting) {
+      // if (onChainProjectRes?.projectInMilestoneVoting) {
       //   const milestoneVotes: Vote[] = await chainService.getMilestoneVotes(
       //     onChainProjectRes.id,
-      //     firstPendingMilestone
+      //     -1
       //   );
       //   setMilestoneVotes(milestoneVotes);
       // }
@@ -275,6 +267,7 @@ function Project() {
         if (!projectRes?.user_id) return;
 
         owner = await utils.fetchUser(projectRes?.user_id);
+        if (projectRes?.user_id === user?.id) setIsApplicant(true)
         setTargetUser(owner);
       }
 
@@ -463,26 +456,27 @@ function Project() {
     setLoading(false);
   };
 
-  // const renderPolkadotJSModal = (
-  //   <div>
-  //     <AccountChoice
-  //       accountSelected={async (account: WalletAccount) => {
-  //         if (raiseVoteOfNoConfidence) {
-  //           refund(account);
-  //         } else if (withdrawMilestone) {
-  //           withdraw(account);
-  //         } else {
-  //           await setVotingWalletAccount(account);
-  //           await setShowVotingModal(true);
-  //         }
-  //       }}
-  //       visible={showPolkadotAccounts}
-  //       setVisible={setShowPolkadotAccounts}
-  //       initiatorAddress={onChainProject?.initiator}
-  //       filterByInitiator
-  //     />
-  //   </div>
-  // );
+  const renderPolkadotJSModal = (
+    <div>
+      <AccountChoice
+        accountSelected={async (account: WalletAccount) => {
+          if (raiseVoteOfNoConfidence) {
+            refund(account);
+          }
+          // else if (withdrawMilestone) {
+          //   withdraw(account);
+          // } else {
+          //   await setVotingWalletAccount(account);
+          //   await setShowVotingModal(true);
+          // }
+        }}
+        visible={showPolkadotAccounts}
+        setVisible={setShowPolkadotAccounts}
+        initiatorAddress={onChainProject?.initiator}
+        filterByInitiator
+      />
+    </div>
+  );
 
   // const renderVotingModal = (
   //   <Dialogue
@@ -530,6 +524,7 @@ function Project() {
 
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
+      {showPolkadotAccounts && renderPolkadotJSModal}
       <Modal
         sx={{
           color: '#fff',
@@ -999,30 +994,30 @@ function Project() {
                   index={index}
                   milestone={milestone}
                   modified={milestone?.modified as Date}
-                  // vote={async () => {
-                  //   // show polkadot account modal
-                  //   await setShowPolkadotAccounts(true);
-                  //   // set submitting mile stone to false
-                  //   await setSubmittingMilestone(false);
-                  //   // setMile stone key in view
-                  //   await setMilestoneKeyInView(milestone.milestone_index);
-                  // }}
-                  // submitMilestone={async () => {
-                  //   // set submitting mile stone to true
-                  //   await setSubmittingMilestone(true);
-                  //   // show polkadot account modal
-                  //   await setShowPolkadotAccounts(true);
-                  //   // setMile stone key in view
-                  //   await setMilestoneKeyInView(milestone.milestone_index);
-                  // }}
-                  // withdraw={async () => {
-                  //   // set submitting mile stone to true
-                  //   await setWithdrawMilestone(true);
-                  //   // show polkadot account modal
-                  //   await setShowPolkadotAccounts(true);
-                  //   // setMile stone key in view
-                  //   await setMilestoneKeyInView(milestone.milestone_index);
-                  // }}
+                // vote={async () => {
+                //   // show polkadot account modal
+                //   await setShowPolkadotAccounts(true);
+                //   // set submitting mile stone to false
+                //   await setSubmittingMilestone(false);
+                //   // setMile stone key in view
+                //   await setMilestoneKeyInView(milestone.milestone_index);
+                // }}
+                // submitMilestone={async () => {
+                //   // set submitting mile stone to true
+                //   await setSubmittingMilestone(true);
+                //   // show polkadot account modal
+                //   await setShowPolkadotAccounts(true);
+                //   // setMile stone key in view
+                //   await setMilestoneKeyInView(milestone.milestone_index);
+                // }}
+                // withdraw={async () => {
+                //   // set submitting mile stone to true
+                //   await setWithdrawMilestone(true);
+                //   // show polkadot account modal
+                //   await setShowPolkadotAccounts(true);
+                //   // setMile stone key in view
+                //   await setMilestoneKeyInView(milestone.milestone_index);
+                // }}
                 />
               );
             }
@@ -1034,15 +1029,13 @@ function Project() {
           firstPendingMilestone={firstPendingMilestone}
           projectInMilestoneVoting={projectInMilestoneVoting}
           approversPreview={approversPreview}
-          votes={votes}
+          // votes={votes}
           setOpenVotingList={setOpenVotingList}
           numberOfMileSotnes={project.milestones}
           isChainLoading={chainLoading}
         />
       </div>
 
-      {showPolkadotAccounts && renderPolkadotJSModal}
-      {showVotingModal && renderVotingModal}
       <Login
         visible={loginModal}
         setVisible={(val) => {
@@ -1108,9 +1101,10 @@ function Project() {
 
       <VotingList
         open={openVotingList}
+        firstPendingMilestone={firstPendingMilestone}
         setOpenVotingList={setOpenVotingList}
-        votes={votes}
         approvers={approversPreview}
+        chainProjectId={project.chain_project_id}
       />
       <BackDropLoader open={loading} />
     </div>

@@ -229,7 +229,7 @@ const GrantApplication = (): JSX.Element => {
       }
 
       // eslint-disable-next-line no-constant-condition
-      while (!result.txError) {
+      while (true) {
         if (result.status || result.txError) {
           if (result.status) {
             setEscrowAddress(result?.eventData[5]);
