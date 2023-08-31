@@ -368,7 +368,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                   </p>
                 </>
               ) : (
-                <p className='text-base text-primary max-w-full break-words'>
+                <p className='text-base text-imbue-purple-dark max-w-full break-words'>
                   @{user?.username}
                 </p>
               )}
