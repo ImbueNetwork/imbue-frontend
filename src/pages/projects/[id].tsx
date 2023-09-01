@@ -69,7 +69,6 @@ TimeAgo.addDefaultLocale(en);
 function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
-  console.log("🚀 ~ file: [id].tsx:71 ~ Project ~ project:", project)
   const [targetUser, setTargetUser] = useState<any>({});
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
   // const [user, setUser] = useState<User | any>();
@@ -402,6 +401,9 @@ function Project() {
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
+    let pollResult = ImbueChainPollResult.Pending;
+    let noConfidencePoll = ImbueChainPollResult.Pending;
+
     if (projectInVotingOfNoConfidence) {
       const result = await chainService.voteOnNoConfidence(
         account,
@@ -409,23 +411,39 @@ function Project() {
         vote
       );
 
-      let pollResult = ImbueChainPollResult.Pending;
+
       if (!result.txError) {
         pollResult = (await chainService.pollChainMessage(
           ImbueChainEvent.NoConfidenceRoundFinalised,
+          account
+        )) as ImbueChainPollResult;
+        noConfidencePoll = (await chainService.pollChainMessage(
+          ImbueChainEvent.VoteOnNoConfidenceRound,
           account
         )) as ImbueChainPollResult;
       }
 
       while (true) {
         if (result.status || result.txError) {
-          if (result.status) {
-            if (pollResult == ImbueChainPollResult.EventFound) {
-              project.status_id = OffchainProjectState.Refunded;
-              await updateProject(project?.id, project);
-            }
+
+          if (pollResult == ImbueChainPollResult.EventFound) {
+            project.status_id = OffchainProjectState.Refunded;
+            await updateProject(project?.id, project);
             setSuccess(true);
-            setSuccessTitle('Your vote was successful');
+            setSuccessTitle('Your vote for refund was successful. Project has been refunded.');
+            break;
+          } else if (noConfidencePoll == ImbueChainPollResult.EventFound) {
+            // TODO: Update no voters list
+            // project.status_id = OffchainProjectState.Refunded;
+            // await updateProject(project?.id, project);
+            setSuccess(true);
+            setSuccessTitle('Your vote for refund was successful');
+            break;
+          } else if (result.status) {
+            setSuccess(true);
+            setSuccessTitle('Request resolved successfully');
+            break;
+
           } else if (result.txError) {
             setError({ message: result.errorMessage });
           }
@@ -440,9 +458,24 @@ function Project() {
         account,
         onChainProject
       );
+
+      if (!result.txError) {
+        pollResult = (await chainService.pollChainMessage(
+          ImbueChainEvent.RaiseNoConfidenceRound,
+          account
+        )) as ImbueChainPollResult;
+      }
+
       while (true) {
-        if (result.status || result.txError) {
-          if (result.status) {
+        if (result.status || result.txError || pollResult == ImbueChainPollResult.EventFound) {
+          if (pollResult == ImbueChainPollResult.EventFound) {
+
+            //  TODO: update no confidence voters list
+            // project.status_id = OffchainProjectState.Refunded;
+            // await updateProject(project?.id, project);
+            setSuccess(true);
+            setSuccessTitle('Vote of no confidence raised.');
+          } else if (result.status) {
             setSuccess(true);
             setSuccessTitle('Vote of no confidence raised.');
           } else if (result.txError) {
