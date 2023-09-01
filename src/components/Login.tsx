@@ -30,6 +30,7 @@ type LoginProps = {
   visible: boolean;
   redirectUrl: string;
   setVisible: (_visible: boolean) => void;
+  
 };
 
 const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
@@ -40,7 +41,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  const [formContent, setFormContent] = useState<string>('login');
+  const [formContent, setFormContent] = useState<string>(  'login');
 
   const imbueLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     setErrorMessage(undefined);
