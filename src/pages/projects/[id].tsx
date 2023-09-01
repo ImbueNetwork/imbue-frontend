@@ -40,7 +40,6 @@ import {
   Milestone,
   OffchainProjectState,
   Project,
-  ProjectOnChain,
   User,
 } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
@@ -73,8 +72,7 @@ function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
   const [targetUser, setTargetUser] = useState<any>({});
-  const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
-  console.log("🚀 ~ file: [id].tsx:77 ~ Project ~ onChainProject:", onChainProject)
+  // const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
   // const [user, setUser] = useState<User | any>();
   const { user, loading: userLoading } = useSelector(
     (state: RootState) => state.userState
@@ -95,7 +93,8 @@ function Project() {
   const [isProjectOwner, setIsProjectOwner] = useState<boolean>(false);
   const [projectOwner, setProjectOwner] = useState<User>();
   const [showRefundButton, setShowRefundButton] = useState<boolean>(false);
-  const [milestoneVotes, setMilestoneVotes] = useState<any>({});
+  // TODO: Create votes table
+  const [milestoneVotes] = useState<any>({});
 
   const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
     useState<boolean>();
@@ -441,7 +440,7 @@ function Project() {
   //   />
   // );
 
-  const approvedMilestones = onChainProject?.milestones?.filter?.(
+  const approvedMilestones = project?.milestones?.filter?.(
     (milstone: Milestone) => milstone?.is_approved === true
   );
 
@@ -449,7 +448,6 @@ function Project() {
   const timePosted = project?.created
     ? timeAgo.format(new Date(project?.created))
     : 0;
-
 
 
   return (
@@ -699,9 +697,9 @@ function Project() {
                     onClick={async () => {
                       if (!approverVotedOnRefund) {
                         // set submitting mile stone to true
-                        await setRaiseVoteOfNoConfidence(true);
+                        setRaiseVoteOfNoConfidence(true);
                         // show polkadot account modal
-                        await setShowPolkadotAccounts(true);
+                        setShowPolkadotAccounts(true);
                       }
                     }}
                   >

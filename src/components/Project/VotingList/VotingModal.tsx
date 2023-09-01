@@ -1,7 +1,8 @@
 import { WalletAccount } from '@talismn/connect-wallets';
 import React from 'react';
 
-import { Dialogue } from '../Dialogue';
+import { Dialogue } from '@/components/Dialogue';
+
 
 type VotingModalProps = {
     voteOnMilestone: (_account: WalletAccount, _vote: boolean) => void;
