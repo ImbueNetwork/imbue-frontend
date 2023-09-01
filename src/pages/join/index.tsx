@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
+
 import { SignerResult } from '@polkadot/api/types';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -17,6 +18,10 @@ import * as config from '@/config';
 import { postAPIHeaders } from '@/config';
 import { authenticate } from '@/pages/api/info/user';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
+
+
+
+
 
 const Join = (): JSX.Element => {
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
@@ -61,6 +66,9 @@ const Join = (): JSX.Element => {
     }
   };
 
+
+
+  
 
 
   return (
