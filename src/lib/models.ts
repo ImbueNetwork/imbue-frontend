@@ -127,6 +127,7 @@ export type Project = {
   duration_id: number;
   completed?: boolean;
   first_pending_milestone?: number;
+  project_in_voting_of_no_confidence?: boolean;
 };
 
 export type ProjectProperties = {

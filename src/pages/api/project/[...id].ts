@@ -38,6 +38,7 @@ export default nextConnect()
 
         const milestones = await models.fetchProjectMilestones(projectId)(tx);
         const approvers = await models.fetchProjectApprovers(projectId)(tx);
+
         const pkg: ProjectPkg = {
           ...project,
           milestones,
@@ -90,6 +91,7 @@ export default nextConnect()
           escrow_address,
           duration_id,
           status_id,
+          project_in_voting_of_no_confidence,
         } = body;
 
         // ensure the project exists first
@@ -120,6 +122,7 @@ export default nextConnect()
           duration_id,
           status_id,
           completed: status_id === OffchainProjectState.Completed,
+          project_in_voting_of_no_confidence,
         })(tx);
 
         if (!project.id) {
@@ -149,7 +152,10 @@ export default nextConnect()
 
         return res.status(200).send(pkg);
       } catch (cause) {
-        console.log("🚀 ~ file: [...id].ts:152 ~ db.transaction ~ cause:", cause)
+        console.log(
+          '🚀 ~ file: [...id].ts:152 ~ db.transaction ~ cause:',
+          cause
+        );
         return res.status(500).json({ error: cause });
       }
     });

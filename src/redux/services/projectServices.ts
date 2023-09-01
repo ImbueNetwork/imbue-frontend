@@ -1,4 +1,5 @@
 import * as config from '@/config';
+import { User } from '@/model';
 
 export const createProject = async (project: any) => {
   try {
@@ -21,7 +22,10 @@ export const createProject = async (project: any) => {
   }
 };
 
-export const updateProject = async (application_id: number, project: any) => {
+export const updateProject = async (
+  application_id: number | string,
+  project: any
+) => {
   try {
     const resp = await fetch(`${config.apiBase}/project/${application_id}`, {
       headers: config.postAPIHeaders,
@@ -121,3 +125,47 @@ export const updateFirstPendingMilestone = async (
     };
   }
 };
+
+export const getProjectNoConfidenceVoters = async (
+  projectId: number | string,
+) => {
+  const resp = await fetch(
+    `${config.apiBase}/project/noConfidenceVote/getVoters?projectId=${projectId}`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'get',
+    }
+  );
+
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    return {
+      message: 'Failed to get voters. status:' + resp.status,
+    };
+  }
+};
+
+
+export const insertNoConfidenceVoter = async (
+  projectId: number | string,
+  voter: User
+) => {
+  const resp = await fetch(
+    `${config.apiBase}/project/noConfidenceVote?projectId=${projectId}`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'post',
+      body: JSON.stringify(voter),
+    }
+  );
+
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    return {
+      message: 'Failed to update voting state. status:' + resp.status,
+    };
+  }
+};
+

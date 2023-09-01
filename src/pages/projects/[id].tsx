@@ -12,6 +12,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { NoConfidenceVoter } from '@/lib/queryServices/projectQueries';
 import * as utils from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
@@ -47,6 +48,8 @@ import ChainService from '@/redux/services/chainService';
 import { ImbueChainEvent } from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import {
+  getProjectNoConfidenceVoters,
+  insertNoConfidenceVoter,
   updateProject,
 } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
@@ -71,6 +74,7 @@ function Project() {
   const [project, setProject] = useState<Project | any>({});
   const [targetUser, setTargetUser] = useState<any>({});
   const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
+  console.log("🚀 ~ file: [id].tsx:77 ~ Project ~ onChainProject:", onChainProject)
   // const [user, setUser] = useState<User | any>();
   const { user, loading: userLoading } = useSelector(
     (state: RootState) => state.userState
@@ -80,7 +84,6 @@ function Project() {
 
   const [raiseVoteOfNoConfidence, setRaiseVoteOfNoConfidence] =
     useState<boolean>(false);
-  const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
 
   const [chainLoading, setChainLoading] = useState<boolean>(true);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
@@ -97,7 +100,7 @@ function Project() {
   const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
     useState<boolean>();
   const [projectInVotingOfNoConfidence, setProjectInVotingOfNoConfidence] =
-    useState<boolean>();
+    useState<boolean>(false);
 
   const [wait, setWait] = useState<boolean>(false);
   const [waitMessage, setWaitMessage] = useState<string>('');
@@ -109,13 +112,14 @@ function Project() {
   const [requiredBalance, setRequiredBalance] = useState<any>(0);
   const [approversPreview, setApproverPreview] = useState<User[]>([]);
   const [isApprover, setIsApprover] = useState<boolean>(false);
-  const [approverVotedOnRefund, setApproverVotedOnRefund] =
-    useState<boolean>(false);
+  const [approverVotedOnRefund, setApproverVotedOnRefund] = useState<boolean>(false);
 
   const [projectType, setProjectType] = useState<'grant' | 'brief' | null>(
     null
   );
+
   const [isModalOpen, setModalOpen] = useState(false);
+  // TODO: Create votes table
   const canVote =
     (isApprover &&
       user.web3_address &&
@@ -144,11 +148,10 @@ function Project() {
     // const onChainProjectRes = await chainService.getProject(projectId);
     // setOnChainProject(onChainProjectRes);
 
-
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
-    if (project.chain_project_id) {
-      // const isApplicant = onChainProjectRes.initiator == user.web3_address;
-      // setIsApplicant(isApplicant);
+
+    if (project?.chain_project_id && project?.id) {
+
       // TODO Enable refunds first
       if (project?.approvers?.length && user.web3_address) {
         const userIsApprover = project.approvers?.includes(user.web3_address);
@@ -157,43 +160,20 @@ function Project() {
         }
       }
 
-      // setFirstPendingMilestone(firstPendingMilestone);
-      // setProjectInMilestoneVoting(onChainProjectRes.projectInMilestoneVoting);
-      // setProjectInVotingOfNoConfidence(
-      //   onChainProjectRes.projectInVotingOfNoConfidence
-      // );
       setFirstPendingMilestone(project.first_pending_milestone ?? -1);
       setProjectInMilestoneVoting(project.project_in_milestone_voting);
-      setProjectInVotingOfNoConfidence(project.project_in_voting_of_no_confidence);
+      setProjectInVotingOfNoConfidence(project?.project_in_voting_of_no_confidence ?? false);
 
-      // if (
-      //   user.web3_address &&
-      //   project.project_in_voting_of_no_confidence
-      // ) {
-      //   const voters = await chainService.getNoConfidenceVoters(
-      //     project.chain_project_id
-      //   );
-      //   if (user?.web3_address && voters?.includes(user.web3_address)) {
-      //     setApproverVotedOnRefund(true);
-      //   }
-      // }
-
-      // if (onChainProjectRes?.projectInMilestoneVoting) {
-      //   const milestoneVotes: Vote[] = await chainService.getMilestoneVotes(
-      //     onChainProjectRes.id,
-      //     -1
-      //   );
-      //   setMilestoneVotes(milestoneVotes);
-      // }
-
-      // if (onChainProjectRes) {
-      //   const firstPendingMilestone =
-      //     await chainService.findFirstPendingMilestone(
-      //       onChainProjectRes.milestones
-      //     );
-      //   console.log("🚀 ~ file: [id].tsx:174 ~ getChainProject ~ firstPendingMilestone:", firstPendingMilestone)
-      // }
-
+      if (
+        user.web3_address &&
+        project.project_in_voting_of_no_confidence
+      ) {
+        const voters: NoConfidenceVoter[] = await getProjectNoConfidenceVoters(project.id)
+        const isApprover = voters?.find(voter => voter.web3_address === user.web3_address)
+        if (user?.web3_address && isApprover?.web3_address) {
+          setApproverVotedOnRefund(true);
+        }
+      }
     }
 
     if (project.owner) {
@@ -311,182 +291,105 @@ function Project() {
   };
 
 
-  // // voting on a mile stone
-  // const voteOnMilestone = async (account: WalletAccount, vote: boolean) => {
-  //   setLoading(true);
-
-  //   try {
-  //     const imbueApi = await initImbueAPIInfo();
-  //     // const userRes: User | any = await utils.getCurrentUser();
-  //     const chainService = new ChainService(imbueApi, user);
-
-  //     const result = await chainService.voteOnMilestone(
-  //       account,
-  //       onChainProject,
-  //       milestoneKeyInView,
-  //       vote
-  //     );
-
-  //     let pollResult = ImbueChainPollResult.Pending;
-
-  //     if (!result.txError) {
-  //       pollResult = (await chainService.pollChainMessage(
-  //         ImbueChainEvent.ApproveMilestone,
-  //         account
-  //       )) as ImbueChainPollResult;
-  //     } else {
-  //       setError({ message: result.errorMessage });
-  //     }
-
-  //     while (!result.txError) {
-  //       if (result.status) {
-  //         if (pollResult == ImbueChainPollResult.EventFound) {
-  //           await updateMilestone(projectId, milestoneKeyInView, true);
-  //         }
-  //         setSuccess(true);
-  //         setSuccessTitle('Your vote was successful');
-  //       } else if (result.txError) {
-  //         setError({ message: result.errorMessage });
-  //         break;
-  //       }
-  //       if (pollResult != ImbueChainPollResult.Pending) {
-  //         break;
-  //       }
-  //       await new Promise((f) => setTimeout(f, 1000));
-  //     }
-  //   } catch (error) {
-  //     setError({ message: 'Could not vote. Please try again later' });
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // // withdrawing funds
-  // const withdraw = async (account: WalletAccount) => {
-  //   setLoading(true);
-  //   const imbueApi = await initImbueAPIInfo();
-  //   const projectMilestones = onChainProject.milestones;
-  //   // const user: User | any = await utils.getCurrentUser();
-  //   const chainService = new ChainService(imbueApi, user);
-  //   const result = await chainService.withdraw(account, onChainProject);
-
-  //   while (true) {
-  //     if (result.status || result.txError) {
-  //       if (result.status) {
-  //         const haveAllMilestonesBeenApproved = projectMilestones
-  //           .map((m: any) => m.is_approved)
-  //           .every(Boolean);
-
-  //         if (haveAllMilestonesBeenApproved) {
-  //           project.status_id = OffchainProjectState.Completed;
-
-  //           await updateProject(project?.id, project);
-  //         }
-
-  //         setSuccess(true);
-  //         setSuccessTitle('Withdraw successfull');
-  //       } else if (result.txError) {
-  //         setError({ message: result.errorMessage });
-  //       }
-  //       break;
-  //     }
-  //     await new Promise((f) => setTimeout(f, 1000));
-  //   }
-  //   setLoading(false);
-  // };
-
   const refund = async (account: WalletAccount) => {
+    if (!project?.id || !project.chain_project_id) return setError({ message: "No project found. Please try reloading the page" })
+
     // TODO make this a popup value like vote on milestone
     const vote = false;
     setLoading(true);
-    const imbueApi = await initImbueAPIInfo();
-    const chainService = new ChainService(imbueApi, user);
-    let pollResult = ImbueChainPollResult.Pending;
-    let noConfidencePoll = ImbueChainPollResult.Pending;
 
-    if (projectInVotingOfNoConfidence) {
-      const result = await chainService.voteOnNoConfidence(
-        account,
-        onChainProject,
-        vote
-      );
+    try {
+      const imbueApi = await initImbueAPIInfo();
+      const chainService = new ChainService(imbueApi, user);
+      let pollResult = ImbueChainPollResult.Pending;
+      let noConfidencePoll = ImbueChainPollResult.Pending;
 
+      if (projectInVotingOfNoConfidence) {
+        const result = await chainService.voteOnNoConfidence(
+          account,
+          project.chain_project_id,
+          vote
+        );
 
-      if (!result.txError) {
-        pollResult = (await chainService.pollChainMessage(
-          ImbueChainEvent.NoConfidenceRoundFinalised,
-          account
-        )) as ImbueChainPollResult;
-        noConfidencePoll = (await chainService.pollChainMessage(
-          ImbueChainEvent.VoteOnNoConfidenceRound,
-          account
-        )) as ImbueChainPollResult;
-      }
-
-      while (true) {
-        if (result.status || result.txError) {
-
-          if (pollResult == ImbueChainPollResult.EventFound) {
-            project.status_id = OffchainProjectState.Refunded;
-            await updateProject(project?.id, project);
-            setSuccess(true);
-            setSuccessTitle('Your vote for refund was successful. Project has been refunded.');
-            break;
-          } else if (noConfidencePoll == ImbueChainPollResult.EventFound) {
-            // TODO: Update no voters list
-            // project.status_id = OffchainProjectState.Refunded;
-            // await updateProject(project?.id, project);
-            setSuccess(true);
-            setSuccessTitle('Your vote for refund was successful');
-            break;
-          } else if (result.status) {
-            setSuccess(true);
-            setSuccessTitle('Request resolved successfully');
-            break;
-
-          } else if (result.txError) {
-            setError({ message: result.errorMessage });
-          }
-          if (pollResult != ImbueChainPollResult.Pending) {
-            break;
-          }
+        if (!result.txError) {
+          pollResult = (await chainService.pollChainMessage(
+            ImbueChainEvent.NoConfidenceRoundFinalised,
+            account
+          )) as ImbueChainPollResult;
+          noConfidencePoll = (await chainService.pollChainMessage(
+            ImbueChainEvent.VoteOnNoConfidenceRound,
+            account
+          )) as ImbueChainPollResult;
         }
-        await new Promise((f) => setTimeout(f, 1000));
-      }
-    } else {
-      const result = await chainService.raiseVoteOfNoConfidence(
-        account,
-        onChainProject
-      );
 
-      if (!result.txError) {
-        pollResult = (await chainService.pollChainMessage(
-          ImbueChainEvent.RaiseNoConfidenceRound,
-          account
-        )) as ImbueChainPollResult;
-      }
+        while (true) {
+          if (result.status || result.txError) {
+            if (pollResult == ImbueChainPollResult.EventFound) {
+              project.status_id = OffchainProjectState.Refunded;
+              await updateProject(project?.id, project);
+              await insertNoConfidenceVoter(project?.id, user)
 
-      while (true) {
-        if (result.status || result.txError || pollResult == ImbueChainPollResult.EventFound) {
-          if (pollResult == ImbueChainPollResult.EventFound) {
+              setSuccess(true);
+              setSuccessTitle('Your vote for refund was successful. Project has been refunded.');
+              break;
+            } else if (noConfidencePoll == ImbueChainPollResult.EventFound) {
+              await insertNoConfidenceVoter(project?.id, user)
 
-            //  TODO: update no confidence voters list
-            // project.status_id = OffchainProjectState.Refunded;
-            // await updateProject(project?.id, project);
-            setSuccess(true);
-            setSuccessTitle('Vote of no confidence raised.');
-          } else if (result.status) {
-            setSuccess(true);
-            setSuccessTitle('Vote of no confidence raised.');
-          } else if (result.txError) {
-            setError({ message: result.errorMessage });
+              setSuccess(true);
+              setSuccessTitle('Your vote for refund was successful');
+              break;
+            } else if (result.status) {
+              setSuccess(true);
+              setSuccessTitle('Request resolved successfully');
+              break;
+            } else if (result.txError) {
+              setError({ message: result.errorMessage });
+              break
+            }
+            if (pollResult != ImbueChainPollResult.Pending) {
+              break;
+            }
           }
-          break;
+          await new Promise((f) => setTimeout(f, 1000));
         }
-        await new Promise((f) => setTimeout(f, 1000));
+      } else {
+        const result = await chainService.raiseVoteOfNoConfidence(
+          account,
+          project.chain_project_id
+        );
+
+        if (!result.txError) {
+          pollResult = (await chainService.pollChainMessage(
+            ImbueChainEvent.RaiseNoConfidenceRound,
+            account
+          )) as ImbueChainPollResult;
+        }
+
+        while (true) {
+          if (result.status || result.txError || pollResult == ImbueChainPollResult.EventFound) {
+            if (pollResult == ImbueChainPollResult.EventFound) {
+
+              project.project_in_voting_of_no_confidence = true;
+              await updateProject(project?.id, project);
+              await insertNoConfidenceVoter(project?.id, user)
+              setSuccess(true);
+              setSuccessTitle('Vote of no confidence raised.');
+            } else if (result.status) {
+              setSuccess(true);
+              setSuccessTitle('Request resolved successfully.');
+            } else if (result.txError) {
+              setError({ message: result.errorMessage });
+            }
+            break;
+          }
+          await new Promise((f) => setTimeout(f, 1000));
+        }
       }
+    } catch (error) {
+      setError({ message: "Something went wrong", error })
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const renderPolkadotJSModal = (
@@ -496,16 +399,10 @@ function Project() {
           if (raiseVoteOfNoConfidence) {
             refund(account);
           }
-          // else if (withdrawMilestone) {
-          //   withdraw(account);
-          // } else {
-          //   await setVotingWalletAccount(account);
-          //   await setShowVotingModal(true);
-          // }
         }}
         visible={showPolkadotAccounts}
         setVisible={setShowPolkadotAccounts}
-        initiatorAddress={onChainProject?.initiator}
+        initiatorAddress={user.web3_address}
         filterByInitiator
       />
     </div>
@@ -557,7 +454,6 @@ function Project() {
 
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
-      {showPolkadotAccounts && renderPolkadotJSModal}
       <Modal
         sx={{
           color: '#fff',
@@ -669,6 +565,8 @@ function Project() {
           </div>
         </div>
       </Modal>
+
+      {showPolkadotAccounts && renderPolkadotJSModal}
 
       {user && showMessageBox && (
         <ChatPopup
@@ -812,7 +710,7 @@ function Project() {
                 </Tooltip>
               </>
             )}
-            {onChainProject && projectInVotingOfNoConfidence && (
+            {projectInVotingOfNoConfidence && (
               <button
                 disabled={true}
                 className={
@@ -1027,30 +925,6 @@ function Project() {
                   index={index}
                   milestone={milestone}
                   modified={milestone?.modified as Date}
-                // vote={async () => {
-                //   // show polkadot account modal
-                //   await setShowPolkadotAccounts(true);
-                //   // set submitting mile stone to false
-                //   await setSubmittingMilestone(false);
-                //   // setMile stone key in view
-                //   await setMilestoneKeyInView(milestone.milestone_index);
-                // }}
-                // submitMilestone={async () => {
-                //   // set submitting mile stone to true
-                //   await setSubmittingMilestone(true);
-                //   // show polkadot account modal
-                //   await setShowPolkadotAccounts(true);
-                //   // setMile stone key in view
-                //   await setMilestoneKeyInView(milestone.milestone_index);
-                // }}
-                // withdraw={async () => {
-                //   // set submitting mile stone to true
-                //   await setWithdrawMilestone(true);
-                //   // show polkadot account modal
-                //   await setShowPolkadotAccounts(true);
-                //   // setMile stone key in view
-                //   await setMilestoneKeyInView(milestone.milestone_index);
-                // }}
                 />
               );
             }

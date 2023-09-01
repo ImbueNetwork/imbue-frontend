@@ -187,7 +187,7 @@ class ChainService {
 
   public async withdraw(
     account: WalletAccount,
-    projectId: string | number | undefined,
+    projectId: string | number | undefined
   ): Promise<BasicTxResponse> {
     // const projectId = projectOnChain.milestones[0].chain_project_id;
     const extrinsic =
@@ -201,10 +201,10 @@ class ChainService {
 
   public async voteOnNoConfidence(
     account: WalletAccount,
-    projectOnChain: any,
+    projectId: number | string,
     userVote: boolean
   ): Promise<BasicTxResponse> {
-    const projectId = projectOnChain.milestones[0].project_chain_id;
+    // const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic =
       this.imbueApi.imbue.api.tx.imbueProposals.voteOnNoConfidenceRound(
         projectId,
@@ -306,9 +306,9 @@ class ChainService {
 
   public async raiseVoteOfNoConfidence(
     account: WalletAccount,
-    projectOnChain: any
+    projectId: number | string
   ): Promise<BasicTxResponse> {
-    const projectId = projectOnChain.milestones[0].project_chain_id;
+    // const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic =
       this.imbueApi.imbue.api.tx.imbueProposals.raiseVoteOfNoConfidence(
         projectId

@@ -20,7 +20,7 @@ type VotingListProps = {
     firstPendingMilestone: number | undefined;
     setOpenVotingList: (_value: boolean) => void;
     approvers: User[];
-    chainProjectId: number;
+    chainProjectId: number | undefined;
 }
 
 type MilestoneVotes = {

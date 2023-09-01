@@ -96,8 +96,8 @@ export type Project = {
   escrow_address: string;
   completed: boolean;
   milestones: Milestone[];
-  project_in_voting_of_no_confidence?: false;
-  project_in_milestone_voting?: false;
+  project_in_voting_of_no_confidence?: boolean;
+  project_in_milestone_voting?: boolean;
   first_pending_milestone?: number;
 };
 
