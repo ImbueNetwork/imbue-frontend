@@ -180,20 +180,21 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
     }
     if(name === 'email') {
      const data = await matchedByUserNameEmail(value);
-     if(data){
-      setError( (val)=> {return {
-       ...val,
-         email: 'Email already in use'
-      }} );
-      return;
-     }
-    else if (!isValidEmail(value)) {
+     
+     if (!isValidEmail(value)) {
       setError( (val)=> {return {
       ...val,
         email: 'Email is invalid'
       }} );
       return;
     } 
+    else if(data){
+      setError( (val)=> {return {
+       ...val,
+         email: 'Email already in use'
+      }} );
+      return;
+     }
      else {
       setError( (val)=> {return {
         ...val,
@@ -334,12 +335,13 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
   // }, [matchPassword, password, user, email]);
 
   return (
+    
     <form
       id='contribution-submission-form'
       name='contribution-submission-form'
       method='get'
       onSubmit={handleSubmit}
-      className='w-full max-w-[450px]'
+      className='w-full  max-w-[450px]'
     >
       <div className='flex flex-col justify-center pb-[10px] w-full mt-2'>
         <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
@@ -484,6 +486,7 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
         </span>
       </div>
     </form>
+    
   );
 };
 

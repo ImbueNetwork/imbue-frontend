@@ -120,9 +120,10 @@
 .loginModal .MuiDialog-paper {
   /* margin: auto 6rem; */
   border-radius: 20px;
-  max-height: fit-content;
+  max-height: 100vh;
   max-width: fit-content;
   padding: 2rem 4rem;
+  
 }
 
 .freelancer .MuiSkeleton-root {
