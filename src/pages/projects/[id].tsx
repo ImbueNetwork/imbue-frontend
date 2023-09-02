@@ -7,6 +7,7 @@ import { Modal, Skeleton, Tooltip, Typography } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -22,8 +23,10 @@ import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
 import RefundScreen from '@/components/Grant/Refund';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
-import Login from '@/components/Login';
-import ExpandableDropDowns from '@/components/Project/ExpandableMilestone';
+
+const Login = dynamic(() => import("@/components/Login"));
+const ExpandableDropDowns = dynamic(() => import("@/components/Project/ExpandableMilestone"));
+
 import Impressions from '@/components/Project/Impressions';
 import ProjectApprovers from '@/components/Project/ProjectApprovers';
 import ProjectBalance from '@/components/Project/ProjectBalance';

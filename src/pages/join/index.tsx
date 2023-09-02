@@ -4,14 +4,16 @@
 import { SignerResult } from '@polkadot/api/types';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { WalletAccount } from '@talismn/connect-wallets';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useState } from 'react';
 
 import * as utils from '@/utils';
 
 import AccountChoice from '@/components/AccountChoice';
-import Login from '@/components/Login';
-import SignUp from '@/components/SignUp';
+
+const Login = dynamic(() => import("@/components/Login"));
+const SignUp = dynamic(() => import("@/components/SignUp"));
 
 import { walletIcon } from '@/assets/svgs';
 import * as config from '@/config';

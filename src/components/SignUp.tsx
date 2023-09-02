@@ -11,9 +11,10 @@ import {
   OutlinedInput,
 } from '@mui/material';
 import bcrypt from 'bcryptjs';
+import dynamic from 'next/dynamic';
 import React from 'react';
 import { useState } from 'react';
-import PasswordStrengthBar from 'react-password-strength-bar';
+const PasswordStrengthBar = dynamic(() => import("react-password-strength-bar"));
 
 import * as utils from '@/utils';
 import { matchedByUserName, matchedByUserNameEmail } from '@/utils';
