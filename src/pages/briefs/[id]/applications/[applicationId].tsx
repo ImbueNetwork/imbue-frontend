@@ -331,7 +331,6 @@ const ApplicationPreview = (): JSX.Element => {
         setError({ message: `${resp.status} ${resp.message}` });
       }
     } catch (error) {
-      console.log("🚀 ~ file: [applicationId].tsx:334 ~ ApplicationPreview ~ error:", error)
       setError({ message: error });
     } finally {
       setLoading(false);
