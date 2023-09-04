@@ -92,6 +92,8 @@ export default nextConnect()
           duration_id,
           status_id,
           project_in_voting_of_no_confidence,
+          first_pending_milestone,
+          project_in_milestone_voting
         } = body;
 
         // ensure the project exists first
@@ -105,7 +107,7 @@ export default nextConnect()
           return res.status(403).end();
         }
 
-        const project = await models.updateProject(projectId, {
+        const newProject : any = {
           name,
           logo,
           description,
@@ -123,7 +125,15 @@ export default nextConnect()
           status_id,
           completed: status_id === OffchainProjectState.Completed,
           project_in_voting_of_no_confidence,
-        })(tx);
+        };
+
+        if (first_pending_milestone)
+          newProject.first_pending_milestone = first_pending_milestone;
+
+        if (project_in_milestone_voting)
+          newProject.project_in_milestone_voting = project_in_milestone_voting;
+
+        const project = await models.updateProject(projectId, newProject)(tx);
 
         if (!project.id) {
           return new Error('Cannot update milestones: `project_id` missing.');
@@ -152,10 +162,6 @@ export default nextConnect()
 
         return res.status(200).send(pkg);
       } catch (cause) {
-        console.log(
-          '🚀 ~ file: [...id].ts:152 ~ db.transaction ~ cause:',
-          cause
-        );
         return res.status(500).json({ error: cause });
       }
     });

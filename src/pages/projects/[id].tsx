@@ -116,19 +116,21 @@ function Project() {
   const [isApprover, setIsApprover] = useState<boolean>(false);
   const [approverVotedOnRefund, setApproverVotedOnRefund] = useState<boolean>(false);
 
-  const [projectType, setProjectType] = useState<'grant' | 'brief' | null>(
-    null
-  );
-
+  const [projectType, setProjectType] = useState<'grant' | 'brief' | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
+
+  const [expandProjectDesc, setExpandProjectDesc] = useState<number>(500);
+  const [openVotingList, setOpenVotingList] = useState<boolean>(false);
+
+  const [syncing, setSyncing] = useState<boolean>(false);
+
   // TODO: Create votes table
   const canVote =
     (isApprover &&
       user.web3_address &&
       !Object.keys(milestoneVotes).includes(user.web3_address)) ||
     (projectType === 'brief' && isProjectOwner);
-  const [expandProjectDesc, setExpandProjectDesc] = useState<number>(500);
-  const [openVotingList, setOpenVotingList] = useState<boolean>(false);
+
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -145,12 +147,8 @@ function Project() {
   };
 
   const getChainProject = async (project: Project, freelancer: any) => {
-    // const imbueApi = await initImbueAPIInfo();
-    // const chainService = new ChainService(imbueApi, user);
-    // const onChainProjectRes = await chainService.getProject(projectId);
-    // setOnChainProject(onChainProjectRes);
-
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
+    syncProject(project)
 
     if (project?.chain_project_id && project?.id) {
 
@@ -254,7 +252,7 @@ function Project() {
 
       setIsProjectOwner(owner?.id === user.id);
       setProjectOwner(owner);
-      setProject(projectRes);
+      setProject(projectRes)
       setLoading(false);
       setChainLoading(false);
       if (
@@ -285,12 +283,52 @@ function Project() {
       await getChainProject(projectRes, freelancerRes);
 
     } catch (error) {
+      console.error(error)
       setError({ message: 'can not find the project ' + error });
     } finally {
       setLoading(false);
       setChainLoading(false);
     }
   };
+  
+  const syncProject = async (project : Project) => {
+    setSyncing(true)
+    try {
+      const imbueApi = await initImbueAPIInfo();
+      const chainService = new ChainService(imbueApi, user);
+      const onChainProjectRes = await chainService.getProject(projectId);
+
+      if (onChainProjectRes && project?.id) {
+        const firstPendingMilestoneChain = await chainService.findFirstPendingMilestone(
+          onChainProjectRes.milestones
+        );
+
+        const newProject = {
+          ...project,
+          project_in_milestone_voting : onChainProjectRes.projectInMilestoneVoting,
+          first_pending_milestone: firstPendingMilestoneChain,
+          project_in_voting_of_no_confidence : onChainProjectRes.projectInVotingOfNoConfidence,
+          milestones : onChainProjectRes.milestones
+        }
+
+        project.project_in_milestone_voting = onChainProjectRes.projectInMilestoneVoting
+        project.first_pending_milestone = firstPendingMilestoneChain
+        project.project_in_voting_of_no_confidence = onChainProjectRes.projectInVotingOfNoConfidence
+        project.milestones = onChainProjectRes.milestones
+
+        await updateProject(project.id, newProject);
+        setProject(newProject);
+        setFirstPendingMilestone(firstPendingMilestoneChain)
+        setProjectInMilestoneVoting(onChainProjectRes.projectInMilestoneVoting)
+        setProjectInVotingOfNoConfidence(onChainProjectRes.projectInVotingOfNoConfidence)
+      }
+    } catch (error) {
+      console.error(error)
+      setError({ message: "Could sync project. ", error })
+    } finally {
+      setSyncing(false);
+    }
+  }
 
 
   const refund = async (account: WalletAccount) => {
@@ -388,7 +426,7 @@ function Project() {
         }
       }
     } catch (error) {
-      setError({ message: "Something went wrong", error })
+      setError({ message: "Something went wrong. ", error })
     } finally {
       setLoading(false);
     }
@@ -410,39 +448,6 @@ function Project() {
     </div>
   );
 
-  // const renderVotingModal = (
-  //   <Dialogue
-  //     title='Want to appove milestone?'
-  //     // closeDialouge={() => setShowVotingModal(false)}
-  //     actionList={
-  //       <>
-  //         <li className='button-container !bg-transparent !hover:bg-gray-950  !border !border-solid !border-white'>
-  //           <button
-  //             className='primary !bg-transparent !hover:bg-transparent'
-  //             onClick={() => {
-  //               voteOnMilestone(votingWalletAccount, true);
-  //               setShowVotingModal(false);
-  //             }}
-  //           >
-  //             Yes
-  //           </button>
-  //         </li>
-  //         <li className='button-container !bg-transparent !hover:bg-transparent  !border !border-solid !border-white'>
-  //           <button
-  //             className='primary !bg-transparent !hover:bg-transparent'
-  //             onClick={() => {
-  //               voteOnMilestone(votingWalletAccount, false);
-  //               setShowVotingModal(false);
-  //             }}
-  //           >
-  //             No
-  //           </button>
-  //         </li>
-  //       </>
-  //     }
-  //   />
-  // );
-
   const approvedMilestones = project?.milestones?.filter?.(
     (milstone: Milestone) => milstone?.is_approved === true
   );
@@ -451,7 +456,6 @@ function Project() {
   const timePosted = project?.created
     ? timeAgo.format(new Date(project?.created))
     : 0;
-
 
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
@@ -670,7 +674,7 @@ function Project() {
               </p>
             </div>
 
-            {targetUser?.id && targetUser?.id !== user?.id && (
+            {targetUser?.id && user?.id && targetUser?.id !== user?.id && (
               <button
                 onClick={() => setShowMessageBox(true)}
                 className='primary-btn in-dark w-button !mt-0 max-lg:!w-full max-lg:!text-center max-lg:!ml-0 max-lg:!mt-5 items-center content-center !py-0 ml-[40px] px-8 max-lg:!mr-0 h-[2.6rem]'
@@ -722,6 +726,9 @@ function Project() {
               </button>
             )}
           </div>
+          {
+            syncing && <p className='text-content-primary text-sm text-right'>Syncing Project with chain...</p>
+          }
 
           {project?.approvers && (
             <>

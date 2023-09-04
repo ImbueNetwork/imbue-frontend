@@ -4,9 +4,8 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import * as utils from '@/utils';
-
 import { Project, User } from '@/model';
+import { getApproverProfiles } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 type ProjectApproversType = {
@@ -19,6 +18,7 @@ type ProjectApproversType = {
 
 const ProjectApprovers = (props: ProjectApproversType) => {
     const { approversPreview, project, setIsApprover, setApproverPreview, projectOwner } = props;
+    // console.log("🚀 ~ file: ProjectApprovers.tsx:23 ~ ProjectApprovers ~ project:", project.approvers)
 
     const { user } = useSelector(
         (state: RootState) => state.userState
@@ -26,53 +26,71 @@ const ProjectApprovers = (props: ProjectApproversType) => {
 
     const [loading, setLoading] = useState(true);
 
-
     const router = useRouter()
 
     useEffect(() => {
         const getAndSetApprovers = async () => {
             // setting approver list
-            const approversPreviewList = [...approversPreview];
+            let approversPreviewList: any = [...approversPreview];
 
             try {
+                // if (project?.approvers?.length) {
+                //     const promises: Promise<User>[] = [];
+
+                //     project?.approvers.map((approverAddress: any) => {
+                //         if (approverAddress === user?.web3_address) setIsApprover(true);
+
+                //         promises.push(utils.fetchUserByUsernameOrAddress(approverAddress))
+                //     })
+
+                //     const approversList = await Promise.all(promises)
+
+                //     approversList.map((approver, index) => {
+                //         if (approver?.id) {
+                //             approversPreviewList.push(approver);
+                //         } else {
+                //             approversPreviewList.push({
+                //                 id: 0,
+                //                 display_name: '',
+                //                 profile_photo: '',
+                //                 username: '',
+                //                 web3_address: project.approvers[index],
+                //                 getstream_token: '',
+                //             });
+                //         }
+                //     })
+
+                // } else if (approversPreviewList.length === 0 && projectOwner) {
+                //     approversPreviewList.push({
+                //         id: projectOwner?.id,
+                //         display_name: projectOwner?.display_name,
+                //         profile_photo: projectOwner?.profile_photo,
+                //         username: projectOwner?.username,
+                //         web3_address: projectOwner?.web3_address,
+                //         getstream_token: projectOwner?.getstream_token,
+                //     });
+                // }
+                // setApproverPreview(approversPreviewList);
+
                 if (project?.approvers?.length) {
-                    const promises: Promise<User>[] = [];
-
-                    project?.approvers.map((approverAddress: any) => {
-                        if (approverAddress === user?.web3_address) setIsApprover(true);
-
-                        promises.push(utils.fetchUserByUsernameOrAddress(approverAddress))
-                    })
-
-                    const approversList = await Promise.all(promises)
-
-                    approversList.map((approver, index) => {
-                        if (approver?.id) {
-                            approversPreviewList.push(approver);
-                        } else {
-                            approversPreviewList.push({
-                                id: 0,
-                                display_name: '',
-                                profile_photo: '',
-                                username: '',
-                                web3_address: project.approvers[index],
-                                getstream_token: '',
-                            });
+                    const approvers = await getApproverProfiles(project.approvers)
+                    approversPreviewList = approvers
+                }
+                else {
+                    approversPreviewList = [
+                        {
+                            id: projectOwner?.id,
+                            display_name: projectOwner?.display_name,
+                            profile_photo: projectOwner?.profile_photo,
+                            username: projectOwner?.username,
+                            web3_address: projectOwner?.web3_address,
+                            getstream_token: projectOwner?.getstream_token,
                         }
-                    })
-
-                } else if (approversPreviewList.length === 0 && projectOwner) {
-                    approversPreviewList.push({
-                        id: projectOwner?.id,
-                        display_name: projectOwner?.display_name,
-                        profile_photo: projectOwner?.profile_photo,
-                        username: projectOwner?.username,
-                        web3_address: projectOwner?.web3_address,
-                        getstream_token: projectOwner?.getstream_token,
-                    });
+                    ]
                 }
                 setApproverPreview(approversPreviewList);
             } catch (error) {
+                // eslint-disable-next-line no-console
                 console.error(error);
             } finally {
                 setLoading(false);
