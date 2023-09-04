@@ -122,8 +122,6 @@ function Project() {
   const [expandProjectDesc, setExpandProjectDesc] = useState<number>(500);
   const [openVotingList, setOpenVotingList] = useState<boolean>(false);
 
-  const [syncing, setSyncing] = useState<boolean>(false);
-
   // TODO: Create votes table
   const canVote =
     (isApprover &&
@@ -290,9 +288,11 @@ function Project() {
       setChainLoading(false);
     }
   };
-  
-  const syncProject = async (project : Project) => {
-    setSyncing(true)
+
+  const syncProject = async (project: Project) => {
+    setWait(true)
+    setWaitMessage("Getting project info")
+
     try {
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);
@@ -303,12 +303,21 @@ function Project() {
           onChainProjectRes.milestones
         );
 
+        console.log("🚀 ~ file: [id].tsx:309 ~ syncProject ~ firstPendingMilestoneChain === firstPendingMilestone:", firstPendingMilestoneChain === project.first_pending_milestone)
+        if (firstPendingMilestoneChain === project.first_pending_milestone &&
+          project.project_in_milestone_voting === onChainProjectRes.projectInMilestoneVoting &&
+          project.project_in_voting_of_no_confidence === onChainProjectRes.projectInVotingOfNoConfidence
+        )
+          return
+
+        setWaitMessage("Syncing project with chain")
+
         const newProject = {
           ...project,
-          project_in_milestone_voting : onChainProjectRes.projectInMilestoneVoting,
+          project_in_milestone_voting: onChainProjectRes.projectInMilestoneVoting,
           first_pending_milestone: firstPendingMilestoneChain,
-          project_in_voting_of_no_confidence : onChainProjectRes.projectInVotingOfNoConfidence,
-          milestones : onChainProjectRes.milestones
+          project_in_voting_of_no_confidence: onChainProjectRes.projectInVotingOfNoConfidence,
+          milestones: onChainProjectRes.milestones
         }
 
         project.project_in_milestone_voting = onChainProjectRes.projectInMilestoneVoting
@@ -326,7 +335,7 @@ function Project() {
       console.error(error)
       setError({ message: "Could sync project. ", error })
     } finally {
-      setSyncing(false);
+      setWait(false)
     }
   }
 
@@ -726,9 +735,6 @@ function Project() {
               </button>
             )}
           </div>
-          {
-            syncing && <p className='text-content-primary text-sm text-right'>Syncing Project with chain...</p>
-          }
 
           {project?.approvers && (
             <>

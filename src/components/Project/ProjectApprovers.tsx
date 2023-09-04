@@ -88,6 +88,13 @@ const ProjectApprovers = (props: ProjectApproversType) => {
                         }
                     ]
                 }
+
+                if (
+                    user.web3_address &&
+                    (project?.approvers?.includes(user.web3_address) || projectOwner?.web3_address === user.web3_address)
+                )
+                    setIsApprover(true)
+
                 setApproverPreview(approversPreviewList);
             } catch (error) {
                 // eslint-disable-next-line no-console
