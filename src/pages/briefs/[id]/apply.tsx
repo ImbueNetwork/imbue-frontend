@@ -210,9 +210,9 @@ export const SubmitProposal = (): JSX.Element => {
             .filter((m) => m.amount !== undefined)
             .map((m) => {
               return {
-                name: filter.clean(m.name),
+                name: filter.clean(m.name.trim()),
                 amount: m.amount,
-                description: filter.clean(m.description),
+                description: filter.clean(m.description.trim()),
                 percentage_to_unlock: (
                   ((m.amount ?? 0) / totalCostWithoutFee) *
                   100

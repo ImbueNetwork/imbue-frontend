@@ -1,6 +1,7 @@
 import { Dialog } from '@mui/material';
+import dynamic from 'next/dynamic';
 import React, { ReactNode } from 'react';
-import Lottie from 'react-lottie';
+const Lottie = dynamic(() => import("react-lottie"));
 
 import animationIcon from '../assets/svgs/glassLoading.json'
 

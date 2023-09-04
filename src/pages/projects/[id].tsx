@@ -7,27 +7,30 @@ import { Modal, Skeleton, Tooltip, Typography } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { NoConfidenceVoter } from '@/lib/queryServices/projectQueries';
 import * as utils from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import AccountChoice from '@/components/AccountChoice';
 import BackButton from '@/components/BackButton';
 import ChatPopup from '@/components/ChatPopup';
-import { Dialogue } from '@/components/Dialogue';
 import ErrorScreen from '@/components/ErrorScreen';
 import RefundScreen from '@/components/Grant/Refund';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
-import Login from '@/components/Login';
+
+const Login = dynamic(() => import("@/components/Login"));
+const ExpandableDropDowns = dynamic(() => import("@/components/Project/ExpandableMilestone"));
+
 import Impressions from '@/components/Project/Impressions';
 import ProjectApprovers from '@/components/Project/ProjectApprovers';
 import ProjectBalance from '@/components/Project/ProjectBalance';
-import ProjectStateTag from '@/components/Project/ProjectStateTag';
-import VotingList from '@/components/Project/VotingList';
+import VotingList from '@/components/Project/VotingList/VotingList';
 import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
 
@@ -40,30 +43,22 @@ import {
   Milestone,
   OffchainProjectState,
   Project,
-  ProjectOnChain,
   User,
-  Vote,
 } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
 import { ImbueChainEvent } from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import {
-  updateMilestone,
+  getProjectNoConfidenceVoters,
+  insertNoConfidenceVoter,
   updateProject,
 } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 TimeAgo.addDefaultLocale(en);
 
-type ExpandableDropDownsProps = {
-  milestone: Milestone;
-  index: number;
-  modified: Date;
-  vote: () => void;
-  submitMilestone: () => void;
-  withdraw: () => void;
-};
+
 
 // const openForVotingTag = (): JSX.Element => {
 //   return (
@@ -80,24 +75,18 @@ function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
   const [targetUser, setTargetUser] = useState<any>({});
-  const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
+  // const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
   // const [user, setUser] = useState<User | any>();
   const { user, loading: userLoading } = useSelector(
     (state: RootState) => state.userState
   );
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
     useState<boolean>(false);
-  const [submittingMilestone, setSubmittingMilestone] =
-    useState<boolean>(false);
+
   const [raiseVoteOfNoConfidence, setRaiseVoteOfNoConfidence] =
     useState<boolean>(false);
-  const [withdrawMilestone, setWithdrawMilestone] = useState<boolean>(false);
-  const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
-  const [votingWalletAccount, setVotingWalletAccount] = useState<
-    WalletAccount | any
-  >({});
+
   const [chainLoading, setChainLoading] = useState<boolean>(true);
-  const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [loginModal, setLoginModal] = useState<boolean>(false);
@@ -106,17 +95,14 @@ function Project() {
   const [isApplicant, setIsApplicant] = useState<boolean>(false);
   const [isProjectOwner, setIsProjectOwner] = useState<boolean>(false);
   const [projectOwner, setProjectOwner] = useState<User>();
-  const [showRefundButton, setShowRefundButton] = useState<boolean>();
-  const [milestoneVotes, setMilestoneVotes] = useState<any>({});
-  const votes =
-    Object.keys(milestoneVotes)?.map((key) => ({
-      voterAddress: key,
-      vote: milestoneVotes[key],
-    })) || [];
+  const [showRefundButton, setShowRefundButton] = useState<boolean>(false);
+  // TODO: Create votes table
+  const [milestoneVotes] = useState<any>({});
+
   const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
     useState<boolean>();
   const [projectInVotingOfNoConfidence, setProjectInVotingOfNoConfidence] =
-    useState<boolean>();
+    useState<boolean>(false);
 
   const [wait, setWait] = useState<boolean>(false);
   const [waitMessage, setWaitMessage] = useState<string>('');
@@ -128,13 +114,14 @@ function Project() {
   const [requiredBalance, setRequiredBalance] = useState<any>(0);
   const [approversPreview, setApproverPreview] = useState<User[]>([]);
   const [isApprover, setIsApprover] = useState<boolean>(false);
-  const [approverVotedOnRefund, setApproverVotedOnRefund] =
-    useState<boolean>(false);
+  const [approverVotedOnRefund, setApproverVotedOnRefund] = useState<boolean>(false);
 
   const [projectType, setProjectType] = useState<'grant' | 'brief' | null>(
     null
   );
+
   const [isModalOpen, setModalOpen] = useState(false);
+  // TODO: Create votes table
   const canVote =
     (isApprover &&
       user.web3_address &&
@@ -158,54 +145,40 @@ function Project() {
   };
 
   const getChainProject = async (project: Project, freelancer: any) => {
-    const imbueApi = await initImbueAPIInfo();
-    const chainService = new ChainService(imbueApi, user);
-    const onChainProjectRes = await chainService.getProject(projectId);
+    // const imbueApi = await initImbueAPIInfo();
+    // const chainService = new ChainService(imbueApi, user);
+    // const onChainProjectRes = await chainService.getProject(projectId);
+    // setOnChainProject(onChainProjectRes);
 
-    project = await chainService.syncOffChainDb(project, onChainProjectRes);
-    if (onChainProjectRes) {
-      const isApplicant = onChainProjectRes.initiator == user.web3_address;
-      setIsApplicant(isApplicant);
+    // project = await chainService.syncOffChainDb(project, onChainProjectRes);
+
+    if (project?.chain_project_id && project?.id) {
+
       // TODO Enable refunds first
-      const userIsApprover = onChainProjectRes.contributions
-        .map((c) => c.accountId)
-        .includes(user.web3_address!);
-      if (userIsApprover) {
-        setShowRefundButton(onChainProjectRes.fundingType.Grant);
-      }
-
-      const firstPendingMilestone =
-        await chainService.findFirstPendingMilestone(
-          onChainProjectRes.milestones
-        );
-      setFirstPendingMilestone(firstPendingMilestone);
-      setProjectInMilestoneVoting(onChainProjectRes.projectInMilestoneVoting);
-      setProjectInVotingOfNoConfidence(
-        onChainProjectRes.projectInVotingOfNoConfidence
-      );
-
-      if (
-        user.web3_address &&
-        onChainProjectRes.projectInVotingOfNoConfidence
-      ) {
-        const voters = await chainService.getNoConfidenceVoters(
-          onChainProjectRes.id
-        );
-        if (voters.includes(user.web3_address)) {
-          setApproverVotedOnRefund(true);
+      if (project?.approvers?.length && user.web3_address) {
+        const userIsApprover = project.approvers?.includes(user.web3_address);
+        if (userIsApprover) {
+          setShowRefundButton(true);
         }
       }
 
-      if (onChainProjectRes.projectInMilestoneVoting) {
-        const milestoneVotes: Vote[] = await chainService.getMilestoneVotes(
-          onChainProjectRes.id,
-          firstPendingMilestone
-        );
-        setMilestoneVotes(milestoneVotes);
-      }
+      setFirstPendingMilestone(project.first_pending_milestone ?? -1);
+      setProjectInMilestoneVoting(project.project_in_milestone_voting);
+      setProjectInVotingOfNoConfidence(project?.project_in_voting_of_no_confidence ?? false);
 
-      setOnChainProject(onChainProjectRes);
-    } else if (project.chain_project_id && project.owner) {
+      if (
+        user.web3_address &&
+        project.project_in_voting_of_no_confidence
+      ) {
+        const voters: NoConfidenceVoter[] = await getProjectNoConfidenceVoters(project.id)
+        const isApprover = voters?.find(voter => voter.web3_address === user.web3_address)
+        if (user?.web3_address && isApprover?.web3_address) {
+          setApproverVotedOnRefund(true);
+        }
+      }
+    }
+
+    if (project.owner) {
       switch (project.status_id) {
         case OffchainProjectState.PendingReview:
           setWaitMessage('This project is pending review');
@@ -227,14 +200,16 @@ function Project() {
             setWaitMessage(
               `Waiting for ${freelancer.display_name} to start the work`
             );
-          } else {
-            setWaitMessage(
-              `Your project is being created on the chain. This may take up to 6 seconds`
-            );
           }
+          // else {
+          //   setWaitMessage(
+          //     `Your project is being created on the chain. This may take up to 6 seconds`
+          //   );
+          // }
           break;
       }
       if (
+        project.status_id !== OffchainProjectState.Accepted &&
         project.status_id !== OffchainProjectState.Refunded &&
         project.status_id !== OffchainProjectState.Completed
       ) {
@@ -261,6 +236,8 @@ function Project() {
         const brief = await getBrief(projectRes.brief_id);
         owner = brief?.user_id ? await utils.fetchUser(brief?.user_id) : null;
         freelancerRes = await getFreelancerProfile(projectRes?.user_id);
+
+        if (freelancerRes?.user_id === user?.id) setIsApplicant(true)
         if (owner?.id == user?.id) {
           setTargetUser(freelancerRes);
         } else {
@@ -271,6 +248,7 @@ function Project() {
         if (!projectRes?.user_id) return;
 
         owner = await utils.fetchUser(projectRes?.user_id);
+        if (projectRes?.user_id === user?.id) setIsApplicant(true)
         setTargetUser(owner);
       }
 
@@ -278,6 +256,7 @@ function Project() {
       setProjectOwner(owner);
       setProject(projectRes);
       setLoading(false);
+      setChainLoading(false);
       if (
         projectRes.status_id === 4 &&
         !projectRes.chain_project_id &&
@@ -313,235 +292,158 @@ function Project() {
     }
   };
 
-  // submitting a milestone
-  const submitMilestone = async (account: WalletAccount) => {
-    setLoading(true);
 
-    const imbueApi = await initImbueAPIInfo();
-    // const user: User | any = await utils.getCurrentUser();
-    const chainService = new ChainService(imbueApi, user);
-    const result = await chainService.submitMilestone(
-      account,
-      onChainProject,
-      milestoneKeyInView
-    );
-    while (true) {
-      if (result.status || result.txError) {
-        if (result.status) {
-          setSuccess(true);
-          setSuccessTitle('Milestone Submitted Successfully');
-        } else if (result.txError) {
-          // TODO: show error screen
-          setError({ message: result.errorMessage });
-        }
-        break;
-      }
-      await new Promise((f) => setTimeout(f, 1000));
-    }
-    setLoading(false);
-  };
+  const refund = async (account: WalletAccount) => {
+    if (!project?.id || !project.chain_project_id) return setError({ message: "No project found. Please try reloading the page" })
 
-  // voting on a mile stone
-  const voteOnMilestone = async (account: WalletAccount, vote: boolean) => {
+    // TODO make this a popup value like vote on milestone
+    const vote = false;
     setLoading(true);
 
     try {
       const imbueApi = await initImbueAPIInfo();
-      // const userRes: User | any = await utils.getCurrentUser();
       const chainService = new ChainService(imbueApi, user);
-
-      const result = await chainService.voteOnMilestone(
-        account,
-        onChainProject,
-        milestoneKeyInView,
-        vote
-      );
-
       let pollResult = ImbueChainPollResult.Pending;
+      let noConfidencePoll = ImbueChainPollResult.Pending;
 
-      if (!result.txError) {
-        pollResult = (await chainService.pollChainMessage(
-          ImbueChainEvent.ApproveMilestone,
-          account
-        )) as ImbueChainPollResult;
-      } else {
-        setError({ message: result.errorMessage });
-      }
+      if (projectInVotingOfNoConfidence) {
+        const result = await chainService.voteOnNoConfidence(
+          account,
+          project.chain_project_id,
+          vote
+        );
 
-      while (!result.txError) {
-        if (result.status) {
-          if (pollResult == ImbueChainPollResult.EventFound) {
-            await updateMilestone(projectId, milestoneKeyInView, true);
-          }
-          setSuccess(true);
-          setSuccessTitle('Your vote was successful');
-        } else if (result.txError) {
-          setError({ message: result.errorMessage });
-          break;
+        if (!result.txError) {
+          pollResult = (await chainService.pollChainMessage(
+            ImbueChainEvent.NoConfidenceRoundFinalised,
+            account
+          )) as ImbueChainPollResult;
+          noConfidencePoll = (await chainService.pollChainMessage(
+            ImbueChainEvent.VoteOnNoConfidenceRound,
+            account
+          )) as ImbueChainPollResult;
         }
-        if (pollResult != ImbueChainPollResult.Pending) {
-          break;
-        }
-        await new Promise((f) => setTimeout(f, 1000));
-      }
-    } catch (error) {
-      setError({ message: 'Could not vote. Please try again later' });
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  // withdrawing funds
-  const withdraw = async (account: WalletAccount) => {
-    setLoading(true);
-    const imbueApi = await initImbueAPIInfo();
-    const projectMilestones = onChainProject.milestones;
-    // const user: User | any = await utils.getCurrentUser();
-    const chainService = new ChainService(imbueApi, user);
-    const result = await chainService.withdraw(account, onChainProject);
-
-    while (true) {
-      if (result.status || result.txError) {
-        if (result.status) {
-          const haveAllMilestonesBeenApproved = projectMilestones
-            .map((m: any) => m.is_approved)
-            .every(Boolean);
-
-          if (haveAllMilestonesBeenApproved) {
-            project.status_id = OffchainProjectState.Completed;
-
-            await updateProject(project?.id, project);
-          }
-
-          setSuccess(true);
-          setSuccessTitle('Withdraw successfull');
-        } else if (result.txError) {
-          setError({ message: result.errorMessage });
-        }
-        break;
-      }
-      await new Promise((f) => setTimeout(f, 1000));
-    }
-    setLoading(false);
-  };
-
-  const refund = async (account: WalletAccount) => {
-    // TODO make this a popup value like vote on milestone
-    const vote = false;
-    setLoading(true);
-    const imbueApi = await initImbueAPIInfo();
-    const chainService = new ChainService(imbueApi, user);
-    if (projectInVotingOfNoConfidence) {
-      const result = await chainService.voteOnNoConfidence(
-        account,
-        onChainProject,
-        vote
-      );
-
-      let pollResult = ImbueChainPollResult.Pending;
-      if (!result.txError) {
-        pollResult = (await chainService.pollChainMessage(
-          ImbueChainEvent.NoConfidenceRoundFinalised,
-          account
-        )) as ImbueChainPollResult;
-      }
-
-      while (true) {
-        if (result.status || result.txError) {
-          if (result.status) {
+        while (true) {
+          if (result.status || result.txError) {
             if (pollResult == ImbueChainPollResult.EventFound) {
               project.status_id = OffchainProjectState.Refunded;
               await updateProject(project?.id, project);
+              await insertNoConfidenceVoter(project?.id, user)
+
+              setSuccess(true);
+              setSuccessTitle('Your vote for refund was successful. Project has been refunded.');
+              break;
+            } else if (noConfidencePoll == ImbueChainPollResult.EventFound) {
+              await insertNoConfidenceVoter(project?.id, user)
+
+              setSuccess(true);
+              setSuccessTitle('Your vote for refund was successful');
+              break;
+            } else if (result.status) {
+              setSuccess(true);
+              setSuccessTitle('Request resolved successfully');
+              break;
+            } else if (result.txError) {
+              setError({ message: result.errorMessage });
+              break
             }
-            setSuccess(true);
-            setSuccessTitle('Your vote was successful');
-          } else if (result.txError) {
-            setError({ message: result.errorMessage });
+            if (pollResult != ImbueChainPollResult.Pending) {
+              break;
+            }
           }
-          if (pollResult != ImbueChainPollResult.Pending) {
+          await new Promise((f) => setTimeout(f, 1000));
+        }
+      } else {
+        const result = await chainService.raiseVoteOfNoConfidence(
+          account,
+          project.chain_project_id
+        );
+
+        if (!result.txError) {
+          pollResult = (await chainService.pollChainMessage(
+            ImbueChainEvent.RaiseNoConfidenceRound,
+            account
+          )) as ImbueChainPollResult;
+        }
+
+        while (true) {
+          if (result.status || result.txError || pollResult == ImbueChainPollResult.EventFound) {
+            if (pollResult == ImbueChainPollResult.EventFound) {
+
+              project.project_in_voting_of_no_confidence = true;
+              await updateProject(project?.id, project);
+              await insertNoConfidenceVoter(project?.id, user)
+              setSuccess(true);
+              setSuccessTitle('Vote of no confidence raised.');
+            } else if (result.status) {
+              setSuccess(true);
+              setSuccessTitle('Request resolved successfully.');
+            } else if (result.txError) {
+              setError({ message: result.errorMessage });
+            }
             break;
           }
+          await new Promise((f) => setTimeout(f, 1000));
         }
-        await new Promise((f) => setTimeout(f, 1000));
       }
-    } else {
-      const result = await chainService.raiseVoteOfNoConfidence(
-        account,
-        onChainProject
-      );
-      while (true) {
-        if (result.status || result.txError) {
-          if (result.status) {
-            setSuccess(true);
-            setSuccessTitle('Vote of no confidence raised.');
-          } else if (result.txError) {
-            setError({ message: result.errorMessage });
-          }
-          break;
-        }
-        await new Promise((f) => setTimeout(f, 1000));
-      }
+    } catch (error) {
+      setError({ message: "Something went wrong", error })
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const renderPolkadotJSModal = (
     <div>
       <AccountChoice
         accountSelected={async (account: WalletAccount) => {
-          if (submittingMilestone) {
-            submitMilestone(account);
-          } else if (raiseVoteOfNoConfidence) {
+          if (raiseVoteOfNoConfidence) {
             refund(account);
-          } else if (withdrawMilestone) {
-            withdraw(account);
-          } else {
-            await setVotingWalletAccount(account);
-            await setShowVotingModal(true);
           }
         }}
         visible={showPolkadotAccounts}
         setVisible={setShowPolkadotAccounts}
-        initiatorAddress={onChainProject?.initiator}
+        initiatorAddress={user.web3_address}
         filterByInitiator
       />
     </div>
   );
 
-  const renderVotingModal = (
-    <Dialogue
-      title='Want to appove milestone?'
-      // closeDialouge={() => setShowVotingModal(false)}
-      actionList={
-        <>
-          <li className='button-container !bg-transparent !hover:bg-gray-950  !border !border-solid !border-white'>
-            <button
-              className='primary !bg-transparent !hover:bg-transparent'
-              onClick={() => {
-                voteOnMilestone(votingWalletAccount, true);
-                setShowVotingModal(false);
-              }}
-            >
-              Yes
-            </button>
-          </li>
-          <li className='button-container !bg-transparent !hover:bg-transparent  !border !border-solid !border-white'>
-            <button
-              className='primary !bg-transparent !hover:bg-transparent'
-              onClick={() => {
-                voteOnMilestone(votingWalletAccount, false);
-                setShowVotingModal(false);
-              }}
-            >
-              No
-            </button>
-          </li>
-        </>
-      }
-    />
-  );
+  // const renderVotingModal = (
+  //   <Dialogue
+  //     title='Want to appove milestone?'
+  //     // closeDialouge={() => setShowVotingModal(false)}
+  //     actionList={
+  //       <>
+  //         <li className='button-container !bg-transparent !hover:bg-gray-950  !border !border-solid !border-white'>
+  //           <button
+  //             className='primary !bg-transparent !hover:bg-transparent'
+  //             onClick={() => {
+  //               voteOnMilestone(votingWalletAccount, true);
+  //               setShowVotingModal(false);
+  //             }}
+  //           >
+  //             Yes
+  //           </button>
+  //         </li>
+  //         <li className='button-container !bg-transparent !hover:bg-transparent  !border !border-solid !border-white'>
+  //           <button
+  //             className='primary !bg-transparent !hover:bg-transparent'
+  //             onClick={() => {
+  //               voteOnMilestone(votingWalletAccount, false);
+  //               setShowVotingModal(false);
+  //             }}
+  //           >
+  //             No
+  //           </button>
+  //         </li>
+  //       </>
+  //     }
+  //   />
+  // );
 
-  const approvedMilestones = onChainProject?.milestones?.filter?.(
+  const approvedMilestones = project?.milestones?.filter?.(
     (milstone: Milestone) => milstone?.is_approved === true
   );
 
@@ -550,160 +452,6 @@ function Project() {
     ? timeAgo.format(new Date(project?.created))
     : 0;
 
-  const ExpandableDropDowns = ({
-    milestone,
-    index,
-    modified,
-    vote,
-    submitMilestone,
-    withdraw,
-  }: ExpandableDropDownsProps) => {
-    const [expanded, setExpanded] = useState(false);
-
-    return (
-      <div className='mb-2 relative bg-white px-5 border border-white rounded-2xl lg:px-12 max-width-750px:!pb-[30px]'>
-        <div
-          onClick={() => {
-            setExpanded(!expanded);
-          }}
-          className='
-          py-6
-          flex 
-          justify-between 
-          w-full 
-          items-center 
-          max-width-750px:flex-col 
-          max-width-750px:flex
-          cursor-pointer'
-        >
-          <div className='flex flex-row max-width-750px:w-full'>
-            <h3 className='text-[2rem] text-imbue-purple max-width-750px:text-[24px] font-normal leading-[60px]'>
-              Milestone {index + 1}
-            </h3>
-            <h3 className='text-[1.5rem] break-all text-imbue-purple ml-[32px] font-normal leading-[60px]'>
-              {milestone?.name}
-            </h3>
-          </div>
-          <div className='flex flex-row items-center max-width-750px:w-full max-width-750px:justify-between'>
-            {milestone?.is_approved ? (
-              <ProjectStateTag
-                openVotingList={setOpenVotingList}
-                dateCreated={modified}
-                text='Completed'
-                voters={approversPreview}
-                allApprovers={approversPreview}
-              />
-            ) : milestone?.milestone_key == firstPendingMilestone &&
-              projectInMilestoneVoting ? (
-              <ProjectStateTag
-                openVotingList={setOpenVotingList}
-                dateCreated={modified}
-                text='Ongoing'
-                voters={approversPreview}
-                allApprovers={approversPreview}
-              />
-            ) : (
-              <ProjectStateTag
-                openVotingList={setOpenVotingList}
-                dateCreated={modified}
-                text='Pending'
-                voters={approversPreview}
-                allApprovers={approversPreview}
-              />
-            )}
-            <Image
-              src={require(expanded
-                ? '@/assets/svgs/minus_btn.svg'
-                : '@/assets/svgs/plus_btn.svg')}
-              height={25}
-              width={25}
-              alt='dropdownstate'
-            />
-          </div>
-        </div>
-
-        <div className={`${!expanded && 'hidden'} mb-6`}>
-          <p className='text-[14px] font-normal text-imbue-purple'>
-            Percentage of funds to be released{' '}
-            <span className=' text-imbue-lemon'>
-              {milestone?.percentage_to_unlock}%
-            </span>
-          </p>
-          <p className='text-[14px] font-normal text-imbue-purple'>
-            Funding to be released{' '}
-            <span className='text-imbue-lemon'>
-              {Number(milestone?.amount)?.toLocaleString?.()} $IMBU
-            </span>
-          </p>
-
-          <p className=' text-base font-normal text-[#3B27C180] break-all leading-[178.15%] mt-[23px] w-[80%]'>
-            {milestone?.description}
-          </p>
-
-          {!isApplicant &&
-            milestone.milestone_key == firstPendingMilestone &&
-            projectInMilestoneVoting && (
-              <Tooltip
-                followCursor
-                title={
-                  !canVote &&
-                  `Only approvers are allowed to vote on a milestone and you cannot vote more than once.${user.web3_address &&
-                  `You are currently on wallet: ${user.web3_address}`
-                  }`
-                }
-              >
-                <button
-                  className={`primary-btn in-dark w-button ${
-                    !canVote && '!bg-gray-300 !text-gray-400'
-                  } font-normal max-width-750px:!px-[40px] h-[2.6rem] items-center content-center !py-0 mt-[25px] px-8`}
-                  data-testid='next-button'
-                  onClick={() => canVote && vote()}
-                >
-                  Vote
-                </button>
-              </Tooltip>
-            )}
-
-          {(isApplicant || (projectType === 'grant' && isProjectOwner)) &&
-            milestone.milestone_key == firstPendingMilestone &&
-            !projectInMilestoneVoting &&
-            !milestone?.is_approved && (
-              <Tooltip
-                followCursor
-                title={
-                  !balance &&
-                  'The escrow wallet balance cannot be 0 while submiting a milestone'
-                }
-              >
-                <button
-                  className={`primary-btn in-dark w-button mt-3 ${
-                    !balance &&
-                    '!bg-gray-300 !text-gray-400 !cursor-not-allowed'
-                  }`}
-                  data-testid='next-button'
-                  onClick={() => balance && submitMilestone()}
-                >
-                  Submit
-                </button>
-              </Tooltip>
-            )}
-
-          {isApplicant && milestone.is_approved && (
-            <button
-              className={`primary-btn in-dark w-button ${
-                !balance && '!bg-gray-300 !text-gray-400'
-              } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}
-              data-testid='next-button'
-              onClick={() => withdraw()}
-              disabled={!balance}
-            >
-              Withdraw
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
@@ -806,10 +554,10 @@ function Project() {
                 </span>
               </p>
               {balance >=
-              Number(
-                Number(project?.total_cost_without_fee) +
+                Number(
+                  Number(project?.total_cost_without_fee) +
                   Number(project?.imbue_fee)
-              ) ? (
+                ) ? (
                 <p className='ml-auto text-sm text-imbue-purple'>Done</p>
               ) : (
                 <p className='ml-auto text-sm text-imbue-coral'>Not Done</p>
@@ -818,6 +566,8 @@ function Project() {
           </div>
         </div>
       </Modal>
+
+      {showPolkadotAccounts && renderPolkadotJSModal}
 
       {user && showMessageBox && (
         <ChatPopup
@@ -944,16 +694,15 @@ function Project() {
                   className='cursor-pointer'
                 >
                   <button
-                    className={`border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors ${
-                      approverVotedOnRefund &&
+                    className={`border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors ${approverVotedOnRefund &&
                       '!bg-gray-300 !text-gray-400 !border-gray-400 !cursor-not-allowed'
-                    }`}
+                      }`}
                     onClick={async () => {
                       if (!approverVotedOnRefund) {
                         // set submitting mile stone to true
-                        await setRaiseVoteOfNoConfidence(true);
+                        setRaiseVoteOfNoConfidence(true);
                         // show polkadot account modal
-                        await setShowPolkadotAccounts(true);
+                        setShowPolkadotAccounts(true);
                       }
                     }}
                   >
@@ -962,7 +711,7 @@ function Project() {
                 </Tooltip>
               </>
             )}
-            {onChainProject && projectInVotingOfNoConfidence && (
+            {projectInVotingOfNoConfidence && (
               <button
                 disabled={true}
                 className={
@@ -1019,23 +768,21 @@ function Project() {
                 <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
                   <div
                     style={{
-                      width: `${
-                        (onChainProject?.milestones?.filter?.(
-                          (m: any) => m?.is_approved
-                        )?.length /
-                          onChainProject?.milestones?.length) *
+                      width: `${(project?.milestones?.filter?.(
+                        (m: any) => m?.is_approved
+                      )?.length /
+                        project?.milestones?.length) *
                         100
-                      }%`,
+                        }%`,
                     }}
                     className='h-full rounded-xl bg-content-primary absolute'
                   ></div>
                   <div className='flex justify-evenly'>
-                    {onChainProject?.milestones?.map((m: any, i: number) => (
+                    {project?.milestones?.map((m: any, i: number) => (
                       <div
                         key={i}
-                        className={`h-4 w-4 ${
-                          m.is_approved ? 'bg-content-primary' : 'bg-[#E1DDFF]'
-                        } rounded-full -mt-1.5`}
+                        className={`h-4 w-4 ${m.is_approved ? 'bg-content-primary' : 'bg-[#E1DDFF]'
+                          } rounded-full -mt-1.5`}
                       ></div>
                     ))}
                   </div>
@@ -1057,7 +804,7 @@ function Project() {
                 <h3 className='text-xl leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0'>
                   {Number(
                     Number(project?.total_cost_without_fee) +
-                      Number(project?.imbue_fee)
+                    Number(project?.imbue_fee)
                   )?.toLocaleString()}{' '}
                   ${Currency[project?.currency_id || 0]}
                 </h3>
@@ -1165,59 +912,38 @@ function Project() {
               </div>
             ))}
 
-          {!chainLoading &&
-            onChainProject?.milestones?.map?.(
-              (milestone: Milestone, index: number) => {
-                return (
-                  <ExpandableDropDowns
-                    key={`${index}-milestone`}
-                    index={index}
-                    milestone={milestone}
-                    modified={milestone?.modified as Date}
-                    vote={async () => {
-                      // show polkadot account modal
-                      await setShowPolkadotAccounts(true);
-                      // set submitting mile stone to false
-                      await setSubmittingMilestone(false);
-                      // setMile stone key in view
-                      await setMilestoneKeyInView(milestone.milestone_key);
-                    }}
-                    submitMilestone={async () => {
-                      // set submitting mile stone to true
-                      await setSubmittingMilestone(true);
-                      // show polkadot account modal
-                      await setShowPolkadotAccounts(true);
-                      // setMile stone key in view
-                      await setMilestoneKeyInView(milestone.milestone_key);
-                    }}
-                    withdraw={async () => {
-                      // set submitting mile stone to true
-                      await setWithdrawMilestone(true);
-                      // show polkadot account modal
-                      await setShowPolkadotAccounts(true);
-                      // setMile stone key in view
-                      await setMilestoneKeyInView(milestone.milestone_key);
-                    }}
-                  />
-                );
-              }
-            )}
+          {project?.milestones?.map?.(
+            (milestone: Milestone, index: number) => {
+              return (
+                <ExpandableDropDowns
+                  {
+                  ...{
+                    setOpenVotingList, approversPreview, firstPendingMilestone, projectInMilestoneVoting, isApplicant, canVote, user, projectType, isProjectOwner, balance,
+                    setLoading, setSuccess, setSuccessTitle, setError, project
+                  }
+                  }
+                  key={`${index}-milestone`}
+                  index={index}
+                  milestone={milestone}
+                  modified={milestone?.modified as Date}
+                />
+              );
+            }
+          )}
         </div>
 
         <Impressions
-          onChainProject={onChainProject}
+          project={project}
           firstPendingMilestone={firstPendingMilestone}
           projectInMilestoneVoting={projectInMilestoneVoting}
           approversPreview={approversPreview}
-          votes={votes}
+          // votes={votes}
           setOpenVotingList={setOpenVotingList}
           numberOfMileSotnes={project.milestones}
           isChainLoading={chainLoading}
         />
       </div>
 
-      {showPolkadotAccounts && renderPolkadotJSModal}
-      {showVotingModal && renderVotingModal}
       <Login
         visible={loginModal}
         setVisible={(val) => {
@@ -1241,12 +967,13 @@ function Project() {
           </button>
         </div>
       </ErrorScreen>
-      <SuccessScreen title={successTitle} open={success} setOpen={setSuccess}>
+      <SuccessScreen noRetry={!(project?.status_id === OffchainProjectState.Completed)} title={successTitle} open={success} setOpen={setSuccess}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button
             onClick={() => {
               setSuccess(false);
-              window.location.reload();
+              if ((project?.status_id !== OffchainProjectState.Completed))
+                window.location.reload();
             }}
             className='primary-btn in-dark w-button w-full !m-0'
           >
@@ -1282,9 +1009,10 @@ function Project() {
 
       <VotingList
         open={openVotingList}
+        firstPendingMilestone={firstPendingMilestone}
         setOpenVotingList={setOpenVotingList}
-        votes={votes}
         approvers={approversPreview}
+        chainProjectId={project.chain_project_id}
       />
       <BackDropLoader open={loading} />
     </div>

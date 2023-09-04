@@ -53,6 +53,7 @@ export default nextConnect()
             ...milestone,
             name: filter.clean(milestone.name),
             description: filter.clean(milestone.description),
+            chain_project_id: grant.chain_project_id.toString(),
           })),
         };
 

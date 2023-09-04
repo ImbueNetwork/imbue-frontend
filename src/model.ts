@@ -96,6 +96,9 @@ export type Project = {
   escrow_address: string;
   completed: boolean;
   milestones: Milestone[];
+  project_in_voting_of_no_confidence?: boolean;
+  project_in_milestone_voting?: boolean;
+  first_pending_milestone?: number;
 };
 
 export type ProjectOnChain = {
@@ -123,8 +126,8 @@ export type ProjectOnChain = {
 export type Milestone = {
   approvedForFunding?: boolean;
   project_id: number;
-  project_chain_id: number;
-  milestone_key: number;
+  chain_project_id: number;
+  milestone_index: number;
   name: string;
   modified?: Date;
   percentage_to_unlock: number;

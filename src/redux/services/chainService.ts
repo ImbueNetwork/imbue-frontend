@@ -28,17 +28,17 @@ const WAIT_FOR_EVENT_IN_MS = 12_000; // WAIT FOR 1 MIN
 
 /* eslint-disable no-unused-vars */
 export enum ImbueChainEvent {
-  Contribute = "ContributeSucceeded",
-  SubmitMilestone = "MilestoneSubmitted",
-  VoteOnMilestone = "VoteSubmitted",
-  ApproveMilestone = "MilestoneApproved",
-  RaiseNoConfidenceRound = "NoConfidenceRoundCreated",
-  VoteOnNoConfidenceRound = "NoConfidenceRoundVotedUpon",
-  NoConfidenceRoundFinalised = "NoConfidenceRoundFinalised",
-  Withraw = "ProjectFundsWithdrawn",
-  CreateBrief = "BriefSubmitted",
-  CommenceWork = "ProjectCreated",
-  SubmitInitialGrant = "ProjectCreated",
+  Contribute = 'ContributeSucceeded',
+  SubmitMilestone = 'MilestoneSubmitted',
+  VoteOnMilestone = 'VoteSubmitted',
+  ApproveMilestone = 'MilestoneApproved',
+  RaiseNoConfidenceRound = 'NoConfidenceRoundCreated',
+  VoteOnNoConfidenceRound = 'NoConfidenceRoundVotedUpon',
+  NoConfidenceRoundFinalised = 'NoConfidenceRoundFinalised',
+  Withraw = 'ProjectFundsWithdrawn',
+  CreateBrief = 'BriefSubmitted',
+  CommenceWork = 'ProjectCreated',
+  SubmitInitialGrant = 'ProjectCreated',
 }
 
 class ChainService {
@@ -132,10 +132,10 @@ class ChainService {
 
   public async submitMilestone(
     account: WalletAccount,
-    projectOnChain: ProjectOnChain,
+    projectId: number | string,
     milestoneKey: number
   ): Promise<BasicTxResponse> {
-    const projectId = projectOnChain.milestones[0].project_chain_id;
+    // const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic = this.imbueApi.imbue.api.tx.imbueProposals.submitMilestone(
       projectId,
       milestoneKey
@@ -149,11 +149,11 @@ class ChainService {
 
   public async voteOnMilestone(
     account: WalletAccount,
-    projectOnChain: any,
+    projectId: any,
     milestoneKey: number,
     userVote: boolean
   ): Promise<BasicTxResponse> {
-    const projectId = projectOnChain.milestones[0].project_chain_id;
+    // const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic = this.imbueApi.imbue.api.tx.imbueProposals.voteOnMilestone(
       projectId,
       milestoneKey,
@@ -187,9 +187,9 @@ class ChainService {
 
   public async withdraw(
     account: WalletAccount,
-    projectOnChain: any
+    projectId: string | number | undefined
   ): Promise<BasicTxResponse> {
-    const projectId = projectOnChain.milestones[0].project_chain_id;
+    // const projectId = projectOnChain.milestones[0].chain_project_id;
     const extrinsic =
       this.imbueApi.imbue.api.tx.imbueProposals.withdraw(projectId);
     return await this.submitImbueExtrinsic(
@@ -201,12 +201,15 @@ class ChainService {
 
   public async voteOnNoConfidence(
     account: WalletAccount,
-    projectOnChain: any,
+    projectId: number | string,
     userVote: boolean
   ): Promise<BasicTxResponse> {
-    const projectId = projectOnChain.milestones[0].project_chain_id;
+    // const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic =
-      this.imbueApi.imbue.api.tx.imbueProposals.voteOnNoConfidenceRound(projectId, userVote);
+      this.imbueApi.imbue.api.tx.imbueProposals.voteOnNoConfidenceRound(
+        projectId,
+        userVote
+      );
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
@@ -215,15 +218,15 @@ class ChainService {
   }
 
   public async pollChainMessage(eventName: string, account: WalletAccount) {
-    const asyncTimeout = (imbueApi: any, account: WalletAccount)  => {
-      const timeoutPromise =  new Promise((resolve,_) => {
+    const asyncTimeout = (imbueApi: any, account: WalletAccount) => {
+      const timeoutPromise = new Promise((resolve, _) => {
         setTimeout(
           () => resolve(ImbueChainPollResult.EventNotFound),
           WAIT_FOR_EVENT_IN_MS
         );
       });
 
-      const imbuePoll =  new Promise((resolve,_) => {
+      const imbuePoll = new Promise((resolve, _) => {
         try {
           imbueApi.imbue.api.query.system.events((events: EventRecord[]) => {
             events
@@ -233,67 +236,83 @@ class ChainService {
                   section === 'imbueBriefs' ||
                   section === 'system'
               )
-              .forEach(
-                ({
-                  event: { data, method },
-                }: EventRecord) => {
-                  if (
-                    eventName
-                    && method === eventName
-                    && data[0].toHuman() === account.address
-                  ) {
-                     resolve(ImbueChainPollResult.EventFound);
-                  }
+              .forEach(({ event: { data, method } }: EventRecord) => {
+                if (
+                  eventName &&
+                  method === eventName &&
+                  data[0].toHuman() === account.address
+                ) {
+                  resolve(ImbueChainPollResult.EventFound);
                 }
-              );
+              });
           });
         } catch (ex) {
           return false;
         }
       });
 
-      return Promise.race([imbuePoll,timeoutPromise]);
-    }
+      return Promise.race([imbuePoll, timeoutPromise]);
+    };
     return (async (imbueApi) => {
       try {
         const result = await asyncTimeout(imbueApi, account);
-        return result
+        return result;
       } catch (ex) {
         return false;
       }
-    })(this.imbueApi)
+    })(this.imbueApi);
   }
 
   public async getCompletedUserProjects(userAddress: string) {
-    const completedProjects = await this.imbueApi.imbue.api.query.imbueProposals.completedProjects(userAddress);
-    return (completedProjects.toHuman() as string[]);
+    const completedProjects =
+      await this.imbueApi.imbue.api.query.imbueProposals.completedProjects(
+        userAddress
+      );
+    return completedProjects.toHuman() as string[];
   }
 
-  public async hasProjectCompleted(userAddress: string, chain_project_id: number) {
-    const completedUserProjects: string[] = await this.getCompletedUserProjects(userAddress);
+  public async hasProjectCompleted(
+    userAddress: string,
+    chain_project_id: number
+  ) {
+    const completedUserProjects: string[] = await this.getCompletedUserProjects(
+      userAddress
+    );
     return completedUserProjects.includes(chain_project_id.toString());
   }
 
   public async getNoConfidenceVoters(chain_project_id: string | number) {
     const lookupKey = [chain_project_id, RoundType.VoteOfNoConfidence, 0];
-    const noConfidenceVotes = await this.imbueApi.imbue.api.query.imbueProposals.userHasVoted(lookupKey);
-    const voters = Object.keys(JSON.parse(JSON.stringify(noConfidenceVotes.toJSON())));
+    const noConfidenceVotes =
+      await this.imbueApi.imbue.api.query.imbueProposals.userHasVoted(
+        lookupKey
+      );
+    const voters = Object.keys(
+      JSON.parse(JSON.stringify(noConfidenceVotes.toJSON()))
+    );
     return voters;
   }
 
-  public async getMilestoneVotes(chain_project_id: string | number, milestone: number) {
+  public async getMilestoneVotes(
+    chain_project_id: string | number,
+    milestone: number
+  ) {
     const lookupKey = [chain_project_id, RoundType.VotingRound, milestone];
-    const milestoneVotes = (await this.imbueApi.imbue.api.query.imbueProposals.userHasVoted(lookupKey)).toHuman() as Vote[];
+    const milestoneVotes = (
+      await this.imbueApi.imbue.api.query.imbueProposals.userHasVoted(lookupKey)
+    ).toHuman() as Vote[];
     return milestoneVotes;
   }
 
   public async raiseVoteOfNoConfidence(
     account: WalletAccount,
-    projectOnChain: any
+    projectId: number | string
   ): Promise<BasicTxResponse> {
-    const projectId = projectOnChain.milestones[0].project_chain_id;
+    // const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic =
-      this.imbueApi.imbue.api.tx.imbueProposals.raiseVoteOfNoConfidence(projectId);
+      this.imbueApi.imbue.api.tx.imbueProposals.raiseVoteOfNoConfidence(
+        projectId
+      );
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
@@ -458,7 +477,10 @@ class ChainService {
     return await this.convertToOnChainProject(project);
   }
 
-  public async syncOffChainDb(offChainProject: any, onChainProject?: ProjectOnChain) {
+  public async syncOffChainDb(
+    offChainProject: any,
+    onChainProject?: ProjectOnChain
+  ) {
     if (!onChainProject) {
       const projectHasBeenCompleted = await this.hasProjectCompleted(
         offChainProject.owner,
@@ -468,21 +490,34 @@ class ChainService {
         offChainProject.status_id = OffchainProjectState.Completed;
         await updateProject(offChainProject.id, offChainProject);
         offChainProject.milestones.map(async (milestone: any) => {
-          await updateMilestone(milestone.project_id, milestone.milestone_index, true);
+          await updateMilestone(
+            milestone.project_id,
+            milestone.milestone_index,
+            true
+          );
         });
       }
     } else {
-      const offChainMilestones = offChainProject.milestones.map((milestone: any) => milestone.is_approved);
-      const onChainProjectMilestones = onChainProject.milestones.map((milestone) => milestone.is_approved);;
-      const milestonesSynced = JSON.stringify(offChainMilestones) === JSON.stringify(onChainProjectMilestones);
+      const offChainMilestones = offChainProject.milestones.map(
+        (milestone: any) => milestone.is_approved
+      );
+      const onChainProjectMilestones = onChainProject.milestones.map(
+        (milestone) => milestone.is_approved
+      );
+      const milestonesSynced =
+        JSON.stringify(offChainMilestones) ===
+        JSON.stringify(onChainProjectMilestones);
       if (!milestonesSynced) {
         offChainProject.milestones.map(async (milestone: any) => {
-          await updateMilestone(milestone.project_id, milestone.milestone_index, onChainProject.milestones[milestone.milestone_index].is_approved);
+          await updateMilestone(
+            milestone.project_id,
+            milestone.milestone_index,
+            onChainProject.milestones[milestone.milestone_index].is_approved
+          );
         });
       }
     }
     return offChainProject;
-
   }
 
   async convertToOnChainProject(project: Project) {
@@ -527,7 +562,10 @@ class ChainService {
       const expiringBlockHuman = BigInt(
         expiringBlock.toHuman().replaceAll(',', '')
       );
-      if (roundProjectId == project.chain_project_id && expiringBlockHuman > currentBlockNumber) {
+      if (
+        roundProjectId == project.chain_project_id &&
+        expiringBlockHuman > currentBlockNumber
+      ) {
         if (
           projectOnChain.approvedForFunding &&
           roundTypeHuman == RoundType[RoundType.ContributionRound]
@@ -553,7 +591,6 @@ class ChainService {
       }
     } else if (projectInMilestoneVoting) {
       projectState = OnchainProjectState.OpenForVoting;
-
     } else if (projectInVotingOfNoConfidence) {
       projectState = OnchainProjectState.OpenForVotingOfNoConfidence;
     } else {
@@ -579,21 +616,21 @@ class ChainService {
       milestones: milestones,
       contributions: Object.keys(projectOnChain.contributions).map(
         (accountId: string) =>
-        ({
-          value: BigInt(
-            projectOnChain.contributions[accountId].value?.replaceAll(
-              ',',
-              ''
-            ) || 0
-          ),
-          accountId: accountId,
-          timestamp: BigInt(
-            projectOnChain.contributions[accountId].timestamp?.replaceAll(
-              ',',
-              ''
-            ) || 0
-          ),
-        } as Contribution)
+          ({
+            value: BigInt(
+              projectOnChain.contributions[accountId].value?.replaceAll(
+                ',',
+                ''
+              ) || 0
+            ),
+            accountId: accountId,
+            timestamp: BigInt(
+              projectOnChain.contributions[accountId].timestamp?.replaceAll(
+                ',',
+                ''
+              ) || 0
+            ),
+          } as Contribution)
       ),
       initiator: projectOnChain.initiator,
       createBlockNumber: BigInt(
@@ -605,7 +642,7 @@ class ChainService {
       projectState,
       fundingType: projectOnChain.fundingType,
       projectInMilestoneVoting,
-      projectInVotingOfNoConfidence
+      projectInVotingOfNoConfidence,
       // roundKey,
     };
 
@@ -620,24 +657,24 @@ class ChainService {
       .map((milestoneItem: any) => projectOnChain.milestones[milestoneItem])
       .map(
         (milestone: any) =>
-        ({
-          project_id: projectOffChain.id,
-          project_chain_id: Number(milestone.projectKey),
-          milestone_key: Number(milestone.milestoneKey),
-          name: projectOffChain.milestones[milestone.milestoneKey].name,
-          description:
-            projectOffChain.milestones[milestone.milestoneKey].description,
-          modified:
-            projectOffChain.milestones[milestone.milestoneKey].modified,
-          percentage_to_unlock: Number(
-            projectOffChain.milestones[milestone.milestoneKey]
-              .percentage_to_unlock
-          ),
-          amount: Number(
-            projectOffChain.milestones[milestone.milestoneKey].amount
-          ),
-          is_approved: milestone.isApproved,
-        } as Milestone)
+          ({
+            project_id: projectOffChain.id,
+            chain_project_id: Number(milestone.projectKey),
+            milestone_index: Number(milestone.milestoneKey),
+            name: projectOffChain.milestones[milestone.milestoneKey].name,
+            description:
+              projectOffChain.milestones[milestone.milestoneKey].description,
+            modified:
+              projectOffChain.milestones[milestone.milestoneKey].modified,
+            percentage_to_unlock: Number(
+              projectOffChain.milestones[milestone.milestoneKey]
+                .percentage_to_unlock
+            ),
+            amount: Number(
+              projectOffChain.milestones[milestone.milestoneKey].amount
+            ),
+            is_approved: milestone.isApproved,
+          } as Milestone)
       );
 
     return milestones;
@@ -666,7 +703,7 @@ class ChainService {
       (milestone) => !milestone.is_approved
     );
     if (firstmilestone) {
-      return firstmilestone.milestone_key;
+      return firstmilestone.milestone_index;
     }
     return -1;
   }
@@ -679,7 +716,7 @@ class ChainService {
       .reverse()
       .find((milestone) => milestone.is_approved);
     if (firstmilestone) {
-      return firstmilestone.milestone_key;
+      return firstmilestone.milestone_index;
     }
     return -1;
   }

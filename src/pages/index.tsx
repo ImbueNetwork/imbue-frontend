@@ -1,11 +1,12 @@
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import FullScreenLoader from '@/components/FullScreenLoader';
-import Login from '@/components/Login';
+const Login = dynamic(() => import("@/components/Login"));
 
 import { RootState } from '@/redux/store/store';
 

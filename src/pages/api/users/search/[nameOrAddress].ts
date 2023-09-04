@@ -19,11 +19,6 @@ export default nextConnect().get(
         const user = (await models.searchUserWithNameOrAddress(
           nameOrAddress.toString()
         )(tx)) as User[];
-        console.log(
-          '🚀 ~ file: [nameOrAddress].ts:23 ~ awaitdb.transaction ~ user:',
-          !user
-        );
-
         if (!user) return res.status(401).send({ error: 'No user found' });
 
         return res.status(200).json(user);

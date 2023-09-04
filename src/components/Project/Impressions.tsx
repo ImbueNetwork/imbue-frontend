@@ -6,7 +6,7 @@ import { Milestone } from '@/model';
 const Impressions = ({
   isChainLoading,
   numberOfMileSotnes,
-  onChainProject,
+  project,
   firstPendingMilestone,
   projectInMilestoneVoting,
   setOpenVotingList,
@@ -45,7 +45,7 @@ const Impressions = ({
         ))}
 
       {!isChainLoading &&
-        onChainProject?.milestones?.map?.(
+        project?.milestones?.map?.(
           (milestone: Milestone, index: number) => {
             //TODO: const votedCount =
             return (
@@ -72,11 +72,13 @@ const Impressions = ({
                                                 }
                                             </AvatarGroup>
                                         )
-                                    } */}
+                                    } 
+                                    */
+                  }
                 </div>
                 <div className='text-xl text-content flex flex-wrap items-center'>
                   {firstPendingMilestone !== undefined &&
-                    milestone?.milestone_key <= firstPendingMilestone &&
+                    milestone?.milestone_index <= firstPendingMilestone &&
                     projectInMilestoneVoting ? (
                     <>
                       {milestone.is_approved ? (
