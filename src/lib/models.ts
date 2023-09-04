@@ -271,6 +271,14 @@ export const updateUserData =
   (id: number, data: Partial<User>) => async (tx: Knex.Transaction) =>
     (await tx<User>('users').update(data).where({ id }).returning('*'))[0];
 
+    export const updateFederatedCredentials = (id: number,username:string)=> async (tx: Knex.Transaction) =>(await tx<FederatedCredential>('federated_credentials')
+.update({subject:username})
+.where({
+  id: id,
+})
+)
+
+
 export const fetchUserOrEmail =
   (userOrEmail: string) => (tx: Knex.Transaction) => {
     // get all db users

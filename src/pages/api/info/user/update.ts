@@ -8,6 +8,7 @@ import db from '@/db';
 
 import { authenticate, verifyUserIdFromJwt } from '../../auth/common';
 import * as models from '../../../../lib/models';
+import { updateFederatedCredentials } from '../../../../lib/models';
 
 export default nextConnect()
   .use(passport.initialize())
@@ -110,6 +111,8 @@ export default nextConnect()
               industry: user?.industry,
             };
 
+            
+            await updateFederatedCredentials(user.id, userData.username)(tx);
             const userResp = await models.updateUserData(user.id, userData)(tx);
 
             if (!userResp) {
@@ -121,7 +124,7 @@ export default nextConnect()
 
             response = userResp;
           } catch (e) {
-            console.log(e);
+            
             return res.status(400).json({
               status: 'Failed',
               message: `Failed to update user name: ${user.display_name}`,
