@@ -90,7 +90,7 @@ function Project() {
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [loginModal, setLoginModal] = useState<boolean>(false);
-  const projectId: any = router?.query?.id || 0;
+  const projectId: any = router?.query?.id;
   const [firstPendingMilestone, setFirstPendingMilestone] = useState<number>();
   const [isApplicant, setIsApplicant] = useState<boolean>(false);
   const [isProjectOwner, setIsProjectOwner] = useState<boolean>(false);
@@ -215,6 +215,9 @@ function Project() {
   };
 
   const getProject = async () => {
+
+    if (!projectId) return
+
     try {
       const projectRes: Project = await getProjectById(projectId);
 
@@ -290,9 +293,6 @@ function Project() {
   };
 
   const syncProject = async (project: Project) => {
-    setWait(true)
-    setWaitMessage("Getting project info")
-
     try {
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);
@@ -303,13 +303,13 @@ function Project() {
           onChainProjectRes.milestones
         );
 
-        console.log("🚀 ~ file: [id].tsx:309 ~ syncProject ~ firstPendingMilestoneChain === firstPendingMilestone:", firstPendingMilestoneChain === project.first_pending_milestone)
         if (firstPendingMilestoneChain === project.first_pending_milestone &&
           project.project_in_milestone_voting === onChainProjectRes.projectInMilestoneVoting &&
           project.project_in_voting_of_no_confidence === onChainProjectRes.projectInVotingOfNoConfidence
         )
           return
 
+        setWait(true)
         setWaitMessage("Syncing project with chain")
 
         const newProject = {
