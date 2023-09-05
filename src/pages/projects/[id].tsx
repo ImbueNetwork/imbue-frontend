@@ -180,9 +180,11 @@ function Project() {
     if (project.owner) {
       switch (project.status_id) {
         case OffchainProjectState.PendingReview:
+          setWait(true);
           setWaitMessage('This project is pending review');
           break;
         case OffchainProjectState.ChangesRequested:
+          setWait(true);
           setWaitMessage('Changes have been requested');
           break;
         case OffchainProjectState.Refunded:
@@ -196,24 +198,27 @@ function Project() {
           break;
         case OffchainProjectState.Accepted:
           if (!project.chain_project_id) {
+            setWait(true);
             setWaitMessage(
               `Waiting for ${freelancer.display_name} to start the work`
             );
           }
-          else {
+
+          if (!project.chain_project_id && project.brief_id) {
+            setWait(true);
             setWaitMessage(
               `Your project is being created on the chain. This may take up to 6 seconds`
             );
           }
           break;
       }
-      if (
-        project.status_id !== OffchainProjectState.Accepted &&
-        project.status_id !== OffchainProjectState.Refunded &&
-        project.status_id !== OffchainProjectState.Completed
-      ) {
-        setWait(true);
-      }
+      // if (
+      //   project.status_id !== OffchainProjectState.Accepted &&
+      //   project.status_id !== OffchainProjectState.Refunded &&
+      //   project.status_id !== OffchainProjectState.Completed
+      // ) {
+      //   setWait(true);
+      // }
     }
   };
 
@@ -336,6 +341,7 @@ function Project() {
         project.milestones = onChainProjectRes.milestones
 
         await updateProject(project.id, newProject);
+        setWait(false)
         setProject(newProject);
         setFirstPendingMilestone(firstPendingMilestoneChain)
         setProjectInMilestoneVoting(onChainProjectRes.projectInMilestoneVoting)
@@ -354,7 +360,6 @@ function Project() {
       setError({ message: "Could sync project. ", error })
     } finally {
       setLoading(false)
-      setWait(false)
     }
   }
 
