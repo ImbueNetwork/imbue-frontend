@@ -72,7 +72,7 @@ function Navbar() {
       }
     };
     setup();
-  }, [dispatch, user.username]);
+  }, [dispatch, user?.username]);
 
   const navigateToPage = (url: string) => {
     if (user?.username) {

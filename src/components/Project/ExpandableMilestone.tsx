@@ -210,17 +210,17 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
 
                         await updateProject(Number(project?.id), project);
                     }
-
+                    setLoading(false);
                     setSuccess(true);
                     setSuccessTitle('Withdraw successfull');
                 } else if (result.txError) {
+                    setLoading(false);
                     setError({ message: result.errorMessage });
                 }
                 break;
             }
             await new Promise((f) => setTimeout(f, 1000));
         }
-        setLoading(false);
     };
 
     return (
