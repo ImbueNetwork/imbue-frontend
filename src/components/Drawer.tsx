@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
@@ -6,7 +7,7 @@ import { getCurrentUser } from '@/utils';
 import { User } from '@/model';
 import { freelancerExists } from '@/redux/services/freelancerService';
 
-import Login from './Login';
+const Login = dynamic(() => import("./Login"));
 
 type DrawerProps = {
   visible: boolean;

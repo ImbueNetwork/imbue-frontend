@@ -11,9 +11,10 @@ import {
   OutlinedInput,
 } from '@mui/material';
 import bcrypt from 'bcryptjs';
+import dynamic from 'next/dynamic';
 import React from 'react';
 import { useState } from 'react';
-import PasswordStrengthBar from 'react-password-strength-bar';
+const PasswordStrengthBar = dynamic(() => import("react-password-strength-bar"));
 
 import * as utils from '@/utils';
 import { matchedByUserName, matchedByUserNameEmail } from '@/utils';
@@ -247,92 +248,6 @@ const SignUp = ({ setFormContent, redirectUrl }: SignUpFormProps) => {
     }
   };
 
-  // const validateInput = () => {
-  //   if ( matchPassword && password !== matchPassword) {
-  //     setError((val)=>{return {
-  //       ... val,
-  //       confirmPassword:"Passwords do not match"
-  //     }});
-  //     return;
-  //   }
-
-  //   // if (user && email && user.toLowerCase() === email.toLowerCase()) {
-  //   //   setError('Username and email cannot be the same');
-  //   //   return;
-  //   // }
-
-  //   if (user && isValidEmail(user)) {
-  //     setError((val)=>{
-  //       return {
-  //       ...val,
-  //       username:'Username cannot be an email'
-  //     }})
-  //     return;
-  //   }
-
-  //   if (password && password.length < 5) {
-  //     setError(val=>{
-  //       return {
-  //       ...val,
-  //         password: 'Password must be at least 5 characters'
-  //       }
-  //     })
-  //     return;
-  //   }
-
-  //   if (user && user.length < 4) {
-  //     setError((val)=>{
-  //       return {
-  //         ...val,
-  //       username: 'Username must be at least 4 characters'
-  //     }})
-  //     return;
-  //   }
-
-  //   if (user && invalidUsernames.includes(user)) {
-  //     setError(val=>{
-  //       return {
-  //        ...val,
-  //         username: 'Username is not allowed'
-  //       }
-  //     })
-  //     return;
-  //   }
-  //   if (user && user.includes(' ')) {
-  //     setError((val)=>{
-  //       return {
-  //       ...val,
-  //         username: 'Username cannot contain spaces'
-  //       }
-  //     })
-  //   }
-  //   if (user && password && user.toLowerCase() === password.toLowerCase()) {
-  //     setError((val)=>{
-  //       return {
-  //         ...val,
-  //         password:'Username and password cannot be the same'
-  //       }
-  //     })
-  //     return;
-  //   }
-
-  //   if (password && !validatePassword(password)) {
-  //     setError((val)=>{
-  //       return {
-  //         ...val,
-        
-  //       password:'Password must be between 6 and 15 characters and contain at least one number and one special character'
-  //       }
-  //     })
-  //     return;
-  //   }
-
-  //   setError(initialState);
-  // };
-
-  // useEffect(() => {
-  //   validateInput();
-  // }, [matchPassword, password, user, email]);
 
   return (
     

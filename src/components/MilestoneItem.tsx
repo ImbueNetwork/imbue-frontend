@@ -101,7 +101,7 @@ const MilestoneItem = ({
       <div
         className='milestone-row'
         onClick={() => {
-          toggleMilestone(milestone.milestone_key);
+          toggleMilestone(milestone.milestone_index);
         }}
       >
         <span>{milestone.name}</span>

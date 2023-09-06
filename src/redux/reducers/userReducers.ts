@@ -8,17 +8,27 @@ import { getCurrentUser, redirect } from '@/utils';
 
 import { postAPIHeaders } from '@/config';
 
-export const fetchUserRedux = createAsyncThunk('user/fetchUserRedux', async () => {
-  try {
-    const resp = await getCurrentUser();
-    return resp;
-  } catch (error) {
-    return {
-      status: 'failed',
-      error,
-    };
+export const fetchUserRedux = createAsyncThunk(
+  'user/fetchUserRedux',
+  async () => {
+    try {
+      const resp = await getCurrentUser();
+      return resp;
+    } catch (error) {
+      await fetch(`/api/auth/logout`, {
+        headers: postAPIHeaders,
+        method: 'get',
+      });
+      googleLogout();
+      redirect('/');
+      
+      return {
+        status: 'failed',
+        error,
+      };
+    }
   }
-});
+);
 
 export const logout = createAsyncThunk('users/logout', async () => {
   try {

@@ -3,6 +3,7 @@
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import { StyledEngineProvider } from '@mui/material/styles';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -17,7 +18,7 @@ import MyClientBriefsView from '@/components/Dashboard/MyClientBriefsView';
 import MyFreelancerApplications from '@/components/Dashboard/MyFreelancerApplications';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
-import Login from '@/components/Login';
+const Login = dynamic(() => import("@/components/Login"));
 
 import { Freelancer, Project, User } from '@/model';
 import { Brief } from '@/model';

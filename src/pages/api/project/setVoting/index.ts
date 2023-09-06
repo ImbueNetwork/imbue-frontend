@@ -13,8 +13,7 @@ export default nextConnect()
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
     db.transaction(async (tx) => {
       try {
-        const { projectId, milestoneIndex, approve, firstPendingMilestone } =
-          req.query;
+        const { projectId, voting } = req.query;
 
         if (!projectId) {
           return res
@@ -32,26 +31,11 @@ export default nextConnect()
         )(tx);
         verifyUserIdFromJwt(req, res, [userAuth.id, ...projectApproverIds]);
 
-        if (firstPendingMilestone !== undefined) {
-          const response = await models.updateFirstPendingMilestoneService(
-            Number(projectId),
-            Number(firstPendingMilestone)
-          )(tx);
+        const startVote = voting === 'true' ? true : false;
 
-          return res.status(200).send(response);
-        }
-
-        if (milestoneIndex == undefined || approve == undefined)
-          return res
-            .status(401)
-            .json({ message: 'No milestone found for update' });
-
-        const is_approved = approve === 'true' ? true : false;
-
-        const result = await models.updateMilestone(
+        const result = await models.updateProjectVoting(
           Number(projectId),
-          Number(milestoneIndex),
-          { is_approved }
+          startVote
         )(tx);
         return res.status(201).json(result);
       } catch (cause) {

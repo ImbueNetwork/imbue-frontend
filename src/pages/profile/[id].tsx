@@ -202,13 +202,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
     }
   };
 
-  // const validateInputLength = (
-  //   text: string,
-  //   min: number,
-  //   max: number
-  // ): boolean => {
-  //   return text.length >= min && text.length <= max;
-  // };
+
   const handleChange = async (e: any) => {
     if (e.target.name === 'display_name') {
       if (isUrlAndSpecialCharacterExist(e.target.value)) {

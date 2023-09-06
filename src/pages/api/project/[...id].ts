@@ -38,6 +38,7 @@ export default nextConnect()
 
         const milestones = await models.fetchProjectMilestones(projectId)(tx);
         const approvers = await models.fetchProjectApprovers(projectId)(tx);
+
         const pkg: ProjectPkg = {
           ...project,
           milestones,
@@ -90,6 +91,9 @@ export default nextConnect()
           escrow_address,
           duration_id,
           status_id,
+          project_in_voting_of_no_confidence,
+          first_pending_milestone,
+          project_in_milestone_voting
         } = body;
 
         // ensure the project exists first
@@ -103,7 +107,7 @@ export default nextConnect()
           return res.status(403).end();
         }
 
-        const project = await models.updateProject(projectId, {
+        const newProject : any = {
           name,
           logo,
           description,
@@ -120,7 +124,18 @@ export default nextConnect()
           duration_id,
           status_id,
           completed: status_id === OffchainProjectState.Completed,
-        })(tx);
+          project_in_voting_of_no_confidence,
+          first_pending_milestone,
+          project_in_milestone_voting
+        };
+
+        // if (first_pending_milestone)
+        //   newProject.first_pending_milestone = first_pending_milestone;
+
+        // if (project_in_milestone_voting)
+        //   newProject.project_in_milestone_voting = project_in_milestone_voting;
+
+        const project = await models.updateProject(projectId, newProject)(tx);
 
         if (!project.id) {
           return new Error('Cannot update milestones: `project_id` missing.');

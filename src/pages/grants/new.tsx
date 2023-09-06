@@ -225,11 +225,11 @@ const GrantApplication = (): JSX.Element => {
       );
 
       if (result.txError) {
-        setError({ message: 'Failed to submit a grant' });
+        setError({ message: `Failed to submit a grant ${result.errorMessage}` });
       }
 
       // eslint-disable-next-line no-constant-condition
-      while (!result.txError) {
+      while (true) {
         if (result.status || result.txError) {
           if (result.status) {
             setEscrowAddress(result?.eventData[5]);
@@ -262,7 +262,8 @@ const GrantApplication = (): JSX.Element => {
               setProjectId(grant_id);
               setSuccess(true);
             } else {
-              setError({ message: 'Failed to submit a grant' });
+              const errorBody = await resp.json();
+              setError({ message: `Failed to submit a grant. (${errorBody})` });
             }
             break;
           } else if (result.txError) {

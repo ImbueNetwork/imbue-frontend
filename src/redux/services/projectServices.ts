@@ -1,4 +1,5 @@
 import * as config from '@/config';
+import { User } from '@/model';
 
 export const createProject = async (project: any) => {
   try {
@@ -21,7 +22,10 @@ export const createProject = async (project: any) => {
   }
 };
 
-export const updateProject = async (application_id: number, project: any) => {
+export const updateProject = async (
+  application_id: number | string,
+  project: any
+) => {
   try {
     const resp = await fetch(`${config.apiBase}/project/${application_id}`, {
       headers: config.postAPIHeaders,
@@ -58,7 +62,27 @@ export const getUsersOngoingGrants = async (walletAddress: string) => {
   }
 };
 
-export const updateMilestone = async (projectId: number, milestoneIndex:number, approve:boolean) => {
+export const getApproverProfiles = async (walletAddresses: string[]) => {
+  const resp = await fetch(`${config.apiBase}/users/byList`, {
+    headers: config.postAPIHeaders,
+    method: 'post',
+    body: JSON.stringify(walletAddresses),
+});
+
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    return {
+      message: 'Failed to get all brief applications. status:' + resp.status,
+    };
+  }
+};
+
+export const updateMilestone = async (
+  projectId: number,
+  milestoneIndex: number,
+  approve: boolean
+) => {
   const resp = await fetch(
     `${config.apiBase}/project/updateMilestone?projectId=${projectId}&milestoneIndex=${milestoneIndex}&approve=${approve}`,
     {
@@ -74,4 +98,90 @@ export const updateMilestone = async (projectId: number, milestoneIndex:number, 
       message: 'Failed to get all brief applications. status:' + resp.status,
     };
   }
-}
+};
+
+export const updateProjectVotingState = async (
+  projectId: number,
+  voting: boolean
+) => {
+  const resp = await fetch(
+    `${config.apiBase}/project/setVoting?projectId=${projectId}&voting=${voting}`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'put',
+    }
+  );
+
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    return {
+      message: 'Failed to update voting state. status:' + resp.status,
+    };
+  }
+};
+
+export const updateFirstPendingMilestone = async (
+  projectId: number,
+  milestoneIndex: number
+) => {
+  const resp = await fetch(
+    `${config.apiBase}/project/updateMilestone?projectId=${projectId}&firstPendingMilestone=${milestoneIndex}`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'put',
+    }
+  );
+
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    return {
+      message: 'Failed to update voting state. status:' + resp.status,
+    };
+  }
+};
+
+export const getProjectNoConfidenceVoters = async (
+  projectId: number | string,
+) => {
+  const resp = await fetch(
+    `${config.apiBase}/project/noConfidenceVote/getVoters?projectId=${projectId}`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'get',
+    }
+  );
+
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    return {
+      message: 'Failed to get voters. status:' + resp.status,
+    };
+  }
+};
+
+
+export const insertNoConfidenceVoter = async (
+  projectId: number | string,
+  voter: User
+) => {
+  const resp = await fetch(
+    `${config.apiBase}/project/noConfidenceVote?projectId=${projectId}`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'post',
+      body: JSON.stringify(voter),
+    }
+  );
+
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    return {
+      message: 'Failed to update voting state. status:' + resp.status,
+    };
+  }
+};
+
