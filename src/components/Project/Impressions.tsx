@@ -10,6 +10,7 @@ const Impressions = ({
   firstPendingMilestone,
   projectInMilestoneVoting,
   setOpenVotingList,
+  milestoneLoding
 }: any) => {
   // const votedYes: User[] = []
   // const votedNo: User[] = []
@@ -73,40 +74,50 @@ const Impressions = ({
                                             </AvatarGroup>
                                         )
                                     } 
-                                    */
-                  }
+                   */}
                 </div>
                 <div className='text-xl text-content flex flex-wrap items-center'>
-                  {firstPendingMilestone !== undefined &&
-                    milestone?.milestone_index <= firstPendingMilestone &&
-                    projectInMilestoneVoting ? (
-                    <>
-                      {milestone.is_approved ? (
-                        <p className='text-lg cursor-pointer !text-content-primary'>
-                          Completed
-                        </p>
-                      ) : (
-                        <p
-                          onClick={() => setOpenVotingList(true)}
-                          className='text-lg cursor-pointer'
-                        >
-                          Votes
-                        </p>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {milestone.is_approved ? (
-                        <p className='text-lg cursor-pointer !text-content-primary'>
-                          Completed
-                        </p>
-                      ) : (
-                        <p className='text-gray-500 text-opacity-30 cursor-pointer'>
-                          Pending
-                        </p>
-                      )}
-                    </>
-                  )}
+                  {
+                    milestoneLoding
+                      ? <p className='text-gray-500 text-opacity-30 cursor-pointer'>Loading...</p>
+                      : (
+                        <>
+                          {firstPendingMilestone !== undefined &&
+                            milestone?.milestone_index <= firstPendingMilestone &&
+                            projectInMilestoneVoting
+                            ? (
+                              <>
+                                {milestone.is_approved
+                                  ? (
+                                    <p className='text-lg cursor-pointer !text-content-primary'>
+                                      Completed
+                                    </p>)
+                                  : (
+                                    <p
+                                      onClick={() => setOpenVotingList(true)}
+                                      className='text-lg cursor-pointer'
+                                    >
+                                      Votes
+                                    </p>
+                                  )}
+                              </>)
+                            : (
+                              <>
+                                {milestone.is_approved
+                                  ? (
+                                    <p className='text-lg cursor-pointer !text-content-primary'>
+                                      Completed
+                                    </p>)
+                                  : (
+                                    <p className='text-gray-500 text-opacity-30 cursor-pointer'>
+                                      Pending
+                                    </p>
+                                  )}
+                              </>
+                            )}
+                        </>)
+                  }
+
                 </div>
               </div>
             );

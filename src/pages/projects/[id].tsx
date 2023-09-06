@@ -95,7 +95,8 @@ function Project() {
   const [projectOwner, setProjectOwner] = useState<User>();
   const [showRefundButton, setShowRefundButton] = useState<boolean>(false);
   // TODO: Create votes table
-  const [milestoneVotes] = useState<any>({});
+  const [milestoneVotes, setMilestoneVotes] = useState<any>({});
+  const [milestonLoadingTitle, setMilestoneLoadingTitle] = useState<string>("")
 
   const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
     useState<boolean>();
@@ -141,7 +142,7 @@ function Project() {
   // fetching the project data from api and from chain
   useEffect(() => {
     if (projectId && !userLoading) {
-      console.log("useeffect hit");
+      console.log("🚀 ~ file: [id].tsx:144 ~ useEffect ~ projectId:", projectId)
       getProject();
     }
   }, [projectId, userLoading]);
@@ -198,17 +199,17 @@ function Project() {
           break;
         case OffchainProjectState.Accepted:
           if (!project.chain_project_id) {
-            setWait(true);
             setWaitMessage(
               `Waiting for ${freelancer.display_name} to start the work`
             );
+            setWait(true);
           }
 
           if (!project.chain_project_id && project.brief_id) {
-            setWait(true);
             setWaitMessage(
               `Your project is being created on the chain. This may take up to 6 seconds`
             );
+            setWait(true);
           }
           break;
       }
@@ -307,6 +308,7 @@ function Project() {
   };
 
   const syncProject = async (project: Project) => {
+    setMilestoneLoadingTitle("Loading Votes ...")
     try {
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);
@@ -324,21 +326,22 @@ function Project() {
         )
           return
 
-        setWait(true)
-        setWaitMessage("Syncing project with chain")
+        // setWaitMessage("Syncing project with chain")
+        // setWait(true)
+        // setMilestoneLoadingTitle("Getting milestone data from chain...")
 
         const newProject = {
           ...project,
           project_in_milestone_voting: onChainProjectRes.projectInMilestoneVoting,
           first_pending_milestone: firstPendingMilestoneChain,
           project_in_voting_of_no_confidence: onChainProjectRes.projectInVotingOfNoConfidence,
-          milestones: onChainProjectRes.milestones
+          // milestones: onChainProjectRes.milestones
         }
 
         project.project_in_milestone_voting = onChainProjectRes.projectInMilestoneVoting
         project.first_pending_milestone = firstPendingMilestoneChain
         project.project_in_voting_of_no_confidence = onChainProjectRes.projectInVotingOfNoConfidence
-        project.milestones = onChainProjectRes.milestones
+        // project.milestones = onChainProjectRes.milestones
 
         await updateProject(project.id, newProject);
         setWait(false)
@@ -359,6 +362,7 @@ function Project() {
       console.error(error)
       setError({ message: "Could sync project. ", error })
     } finally {
+      setMilestoneLoadingTitle("")
       setLoading(false)
     }
   }
@@ -850,6 +854,7 @@ function Project() {
                   index={index}
                   milestone={milestone}
                   modified={milestone?.modified as Date}
+                  milestonLoadingTitle={milestonLoadingTitle}
                 />
               );
             }
@@ -865,6 +870,7 @@ function Project() {
           setOpenVotingList={setOpenVotingList}
           numberOfMileSotnes={project.milestones}
           isChainLoading={chainLoading}
+          milestoneLoding={milestonLoadingTitle ? true : false}
         />
       </div>
 
@@ -937,6 +943,7 @@ function Project() {
         setOpenVotingList={setOpenVotingList}
         approvers={approversPreview}
         chainProjectId={project.chain_project_id}
+        setMilestoneVotes={setMilestoneVotes}
       />
       <BackDropLoader open={loading || userLoading} />
     </div>

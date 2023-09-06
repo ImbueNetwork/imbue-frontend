@@ -125,13 +125,15 @@ export default nextConnect()
           status_id,
           completed: status_id === OffchainProjectState.Completed,
           project_in_voting_of_no_confidence,
+          first_pending_milestone,
+          project_in_milestone_voting
         };
 
-        if (first_pending_milestone)
-          newProject.first_pending_milestone = first_pending_milestone;
+        // if (first_pending_milestone)
+        //   newProject.first_pending_milestone = first_pending_milestone;
 
-        if (project_in_milestone_voting)
-          newProject.project_in_milestone_voting = project_in_milestone_voting;
+        // if (project_in_milestone_voting)
+        //   newProject.project_in_milestone_voting = project_in_milestone_voting;
 
         const project = await models.updateProject(projectId, newProject)(tx);
 
