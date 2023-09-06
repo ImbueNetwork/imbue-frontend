@@ -295,7 +295,10 @@ function Project() {
       setLoading(false);
       setChainLoading(false);
 
-      if (projectRes.status_id !== OffchainProjectState.Completed) {
+      if (
+        projectRes.status_id !== OffchainProjectState.Completed &&
+        projectRes.status_id !== OffchainProjectState.Refunded
+      ) {
         await syncProject(projectRes)
       }
 
