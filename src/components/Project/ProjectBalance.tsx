@@ -38,7 +38,7 @@ const ProjectBalance = (props: ProjectBalanceType) => {
 
         getAndSetBalace()
 
-    }, [handlePopUpForUser, project?.currency_id, project?.escrow_address, setBalance, user])
+    }, [handlePopUpForUser, project?.currency_id, project?.escrow_address, project.status_id, setBalance, user])
 
     return (
         <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
