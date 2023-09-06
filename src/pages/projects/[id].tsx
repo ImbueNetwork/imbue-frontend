@@ -142,7 +142,6 @@ function Project() {
   // fetching the project data from api and from chain
   useEffect(() => {
     if (projectId && !userLoading) {
-      console.log("🚀 ~ file: [id].tsx:144 ~ useEffect ~ projectId:", projectId)
       getProject();
     }
   }, [projectId, userLoading]);
@@ -296,7 +295,9 @@ function Project() {
       setLoading(false);
       setChainLoading(false);
 
-      await syncProject(projectRes)
+      if (projectRes.status_id !== OffchainProjectState.Completed) {
+        await syncProject(projectRes)
+      }
 
     } catch (error) {
       console.error(error)
