@@ -1,13 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
-import * as models from '@/lib/models';
+// import * as models from '@/lib/models';
 import { fetchUserByList } from '@/lib/queryServices/userQueries';
 
 import db from '@/db';
 import { User } from '@/model';
 
-import { authenticate, verifyUserIdFromJwt } from '../../auth/common';
+//import { authenticate, verifyUserIdFromJwt } from '../../auth/common';
 
 export default nextConnect().post(
   async (req: NextApiRequest, res: NextApiResponse) => {
@@ -15,13 +15,13 @@ export default nextConnect().post(
 
     db.transaction(async (tx) => {
       try {
-        const userAuth: Partial<models.User> | any = await authenticate(
-          'jwt',
-          req,
-          res
-        );
+        // const userAuth: Partial<models.User> | any = await authenticate(
+        //   'jwt',
+        //   req,
+        //   res
+        // );
 
-        verifyUserIdFromJwt(req, res, [userAuth.id]);
+        //verifyUserIdFromJwt(req, res, [userAuth.id]);
 
         const users = (await fetchUserByList(walletList)(tx)) as User[];
 

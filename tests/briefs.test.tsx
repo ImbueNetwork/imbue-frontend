@@ -23,6 +23,7 @@ jest.mock('@/redux/services/briefService', () => ({
   deleteSavedBrief: jest.fn(),
   getAllSavedBriefs: jest.fn(),
   searchSkills: jest.fn(),
+  getAllSkills:jest.fn(),
 }));
 
 jest.mock('next/router', () => ({
