@@ -281,6 +281,7 @@ export type BriefSqlFilter = {
   page: number;
   skills_range: Array<number>;
   verified_only: boolean;
+  non_verified: boolean;
 };
 
 export type FreelancerSqlFilter = {

@@ -6,7 +6,7 @@ import { getServerSideProps } from '@/utils/serverSideProps';
 
 import NewBrief from '@/pages/briefs/new';
 import { Providers } from '@/redux/providers/userProviders';
-import { searchSkills } from '@/redux/services/briefService';
+import { searchIndustries, searchSkills } from '@/redux/services/briefService';
 
 import { dummyUser, getServerSideData } from './__mocks__/userData';
 
@@ -19,10 +19,11 @@ jest.mock('@/utils/serverSideProps', () => ({
 
 jest.mock('@/redux/services/briefService', () => ({
   searchSkills: jest.fn(),
+  searchIndustries:jest.fn(),
 }));
 
 const skills = [{ name: 'java' }, { name: 'c++' }, { name: 'python' }];
-
+const industries = [{name:"Industry1"},{name:"Industry2"},{name:"Industry3"}]
 describe('NewBrief', () => {
   beforeAll(() => {
     // Mock the utils.getCurrentUser method to return a fixed array of briefs
@@ -33,6 +34,9 @@ describe('NewBrief', () => {
     const mockgetAllSkills = searchSkills as jest.MockedFunction<
       typeof searchSkills
     >;
+    const mocksearchIndustries = searchIndustries as jest.MockedFunction<
+      typeof searchIndustries
+    >;
 
     mockGetAllBriefs.mockResolvedValue(dummyUser);
     // Mock the utils.getCurrentUser method to return a fixed array of briefs
@@ -41,14 +45,19 @@ describe('NewBrief', () => {
     >;
     mockGetServerSideProps.mockResolvedValue(getServerSideData);
     mockgetAllSkills.mockResolvedValue({ skills });
+    mocksearchIndustries.mockResolvedValue({ industry:industries });
   });
 
-  beforeEach(() => {
-    render(
-      <Providers>
-        <NewBrief />
-      </Providers>
+  beforeEach(async() => {
+  await waitFor(()=>render(
+    <Providers>
+      <NewBrief />
+    </Providers> ) 
     );
+   
+
+
+
   });
 
   test('renders the headline input field', () => {
@@ -57,16 +66,16 @@ describe('NewBrief', () => {
   });
 
   test('updates the headline value when typed into the input field', () => {
-    const headlineInput = screen.getByTestId(
-      'headline-input'
+    const headlineInput = document.getElementById(
+      'outlined-multiline-static'
     ) as HTMLInputElement;
     fireEvent.change(headlineInput, { target: { value: 'New project' } });
     expect(headlineInput.value).toBe('New project');
   });
 
   test('renders the industries input field', () => {
-    const headlineInput = screen.getByTestId(
-      'headline-input'
+    const headlineInput = document.getElementById(
+      'outlined-multiline-static'
     ) as HTMLInputElement;
     fireEvent.change(headlineInput, { target: { value: 'New project' } });
     //navigate to industries screen
@@ -79,38 +88,46 @@ describe('NewBrief', () => {
   });
 
   test('updates the industries value when tags are added', () => {
-    const headlineInput = screen.getByTestId(
-      'headline-input'
+    const headlineInput = document.getElementById(
+      'outlined-multiline-static'
     ) as HTMLInputElement;
     fireEvent.change(headlineInput, { target: { value: 'New project' } });
     //navigate to industries screen
     const nextBtn = screen.getByTestId('next-button');
     fireEvent.click(nextBtn);
 
-    const industriesInput = screen.getByTestId('tag-input') as HTMLInputElement;
+    const industriesInput = document.getElementById('tags-standard') as HTMLInputElement;
     fireEvent.change(industriesInput, { target: { value: 'Industry1' } });
-    fireEvent.keyDown(industriesInput, { key: 'Enter' });
+    const industiresOptions = screen.getByText('Industry1');
+    fireEvent.click(industiresOptions);
     fireEvent.change(industriesInput, { target: { value: 'Industry2' } });
-    fireEvent.keyDown(industriesInput, { key: 'Enter' });
+    const industiresOptions2 = screen.getByText('Industry2');
+    fireEvent.click(industiresOptions2);
     expect(industriesInput.value).toBe('');
-    const selectedTags = screen.getAllByTestId('unselect-tag');
-    expect(selectedTags).toHaveLength(2);
+    const selectedTags = document.querySelector(".MuiOutlinedInput-root") as HTMLInputElement;
+    
+    expect(selectedTags.childElementCount-3).toBe(2);
   });
 
   test('adds the project description', () => {
-    const headlineInput = screen.getByTestId(
-      'headline-input'
+    const headlineInput = document.getElementById(
+      'outlined-multiline-static'
     ) as HTMLInputElement;
     fireEvent.change(headlineInput, { target: { value: 'New project' } });
     //navigate to industries screen
     const nextBtn = screen.getByTestId('next-button');
     fireEvent.click(nextBtn);
 
-    const industriesInput = screen.getByTestId('tag-input') as HTMLInputElement;
+    const industriesInput = document.getElementById('tags-standard') as HTMLInputElement;
     fireEvent.change(industriesInput, { target: { value: 'Industry1' } });
-    fireEvent.keyDown(industriesInput, { key: 'Enter' });
+    const industiresOptions = screen.getByText('Industry1');
+    fireEvent.click(industiresOptions);
     fireEvent.change(industriesInput, { target: { value: 'Industry2' } });
-    fireEvent.keyDown(industriesInput, { key: 'Enter' });
+    const industiresOptions2 = screen.getByText('Industry2');
+    fireEvent.click(industiresOptions2);
+    fireEvent.change(industriesInput, { target: { value: 'Industry3' } });
+    const industiresOptions3 = screen.getByText('Industry3');
+    fireEvent.click(industiresOptions3);
     expect(industriesInput.value).toBe('');
 
     //navigate to description screen
@@ -125,19 +142,24 @@ describe('NewBrief', () => {
   });
 
   test('updates the skills value when tags are added', () => {
-    const headlineInput = screen.getByTestId(
-      'headline-input'
+    const headlineInput = document.getElementById(
+      'outlined-multiline-static'
     ) as HTMLInputElement;
     fireEvent.change(headlineInput, { target: { value: 'New project' } });
     //navigate to industries screen
     const nextBtn = screen.getByTestId('next-button');
     fireEvent.click(nextBtn);
 
-    const industriesInput = screen.getByTestId('tag-input') as HTMLInputElement;
+    const industriesInput = document.getElementById('tags-standard') as HTMLInputElement;
     fireEvent.change(industriesInput, { target: { value: 'Industry1' } });
-    fireEvent.keyDown(industriesInput, { key: 'Enter' });
+    const industiresOptions = screen.getByText('Industry1');
+    fireEvent.click(industiresOptions);
     fireEvent.change(industriesInput, { target: { value: 'Industry2' } });
-    fireEvent.keyDown(industriesInput, { key: 'Enter' });
+    const industiresOptions2 = screen.getByText('Industry2');
+    fireEvent.click(industiresOptions2);
+    fireEvent.change(industriesInput, { target: { value: 'Industry3' } });
+    const industiresOptions3 = screen.getByText('Industry3');
+    fireEvent.click(industiresOptions3);
     expect(industriesInput.value).toBe('');
 
     //navigate to description screen
@@ -164,19 +186,24 @@ describe('NewBrief', () => {
   });
 
   test('selects experience level', () => {
-    const headlineInput = screen.getByTestId(
-      'headline-input'
+    const headlineInput = document.getElementById(
+      'outlined-multiline-static'
     ) as HTMLInputElement;
     fireEvent.change(headlineInput, { target: { value: 'New project' } });
     //navigate to industries screen
     const nextBtn = screen.getByTestId('next-button');
     fireEvent.click(nextBtn);
 
-    const industriesInput = screen.getByTestId('tag-input') as HTMLInputElement;
+    const industriesInput = document.getElementById('tags-standard') as HTMLInputElement;
     fireEvent.change(industriesInput, { target: { value: 'Industry1' } });
-    fireEvent.keyDown(industriesInput, { key: 'Enter' });
+    const industiresOptions = screen.getByText('Industry1');
+    fireEvent.click(industiresOptions);
     fireEvent.change(industriesInput, { target: { value: 'Industry2' } });
-    fireEvent.keyDown(industriesInput, { key: 'Enter' });
+    const industiresOptions2 = screen.getByText('Industry2');
+    fireEvent.click(industiresOptions2);
+    fireEvent.change(industriesInput, { target: { value: 'Industry3' } });
+    const industiresOptions3 = screen.getByText('Industry3');
+    fireEvent.click(industiresOptions3);
     expect(industriesInput.value).toBe('');
 
     //navigate to description screen
@@ -197,9 +224,15 @@ describe('NewBrief', () => {
     fireEvent.change(skillInput, { target: { value: 'python' } });
     const pythonOption = screen.getByText('python');
     fireEvent.click(pythonOption);
+    fireEvent.change(skillInput, { target: { value: 'c++' } });
+    const cpro = screen.getByText('c++');
+    fireEvent.click(cpro);
+    fireEvent.change(skillInput, { target: { value: 'java' } });
+    const java = screen.getByText('java');
+    fireEvent.click(java);
 
     const selectedTags = screen.getAllByTestId('CancelIcon');
-    expect(selectedTags).toHaveLength(1);
+    expect(selectedTags).toHaveLength(3);
     fireEvent.click(nextBtn);
 
     //navigate to experience level screen
@@ -211,19 +244,24 @@ describe('NewBrief', () => {
   });
 
   test('selects project estimate', () => {
-    const headlineInput = screen.getByTestId(
-      'headline-input'
+    const headlineInput = document.getElementById(
+      'outlined-multiline-static'
     ) as HTMLInputElement;
     fireEvent.change(headlineInput, { target: { value: 'New project' } });
     //navigate to industries screen
     const nextBtn = screen.getByTestId('next-button');
     fireEvent.click(nextBtn);
 
-    const industriesInput = screen.getByTestId('tag-input') as HTMLInputElement;
+    const industriesInput = document.getElementById('tags-standard') as HTMLInputElement;
     fireEvent.change(industriesInput, { target: { value: 'Industry1' } });
-    fireEvent.keyDown(industriesInput, { key: 'Enter' });
+    const industiresOptions = screen.getByText('Industry1');
+    fireEvent.click(industiresOptions);
     fireEvent.change(industriesInput, { target: { value: 'Industry2' } });
-    fireEvent.keyDown(industriesInput, { key: 'Enter' });
+    const industiresOptions2 = screen.getByText('Industry2');
+    fireEvent.click(industiresOptions2);
+    fireEvent.change(industriesInput, { target: { value: 'Industry3' } });
+    const industiresOptions3 = screen.getByText('Industry3');
+    fireEvent.click(industiresOptions3);
     expect(industriesInput.value).toBe('');
 
     //navigate to description screen
@@ -238,15 +276,23 @@ describe('NewBrief', () => {
     //navigate to skills screen
     fireEvent.click(nextBtn);
 
+   
     const skillInput = document.getElementById(
       'tags-standard'
     ) as HTMLInputElement;
     fireEvent.change(skillInput, { target: { value: 'python' } });
     const pythonOption = screen.getByText('python');
     fireEvent.click(pythonOption);
+    fireEvent.change(skillInput, { target: { value: 'c++' } });
+    const cpro = screen.getByText('c++');
+    fireEvent.click(cpro);
+    fireEvent.change(skillInput, { target: { value: 'java' } });
+    const java = screen.getByText('java');
+    fireEvent.click(java);
 
     const selectedTags = screen.getAllByTestId('CancelIcon');
-    expect(selectedTags).toHaveLength(1);
+    expect(selectedTags).toHaveLength(3);
+  
 
     //navigate to experience level screen
     fireEvent.click(nextBtn);
@@ -264,19 +310,24 @@ describe('NewBrief', () => {
   });
 
   test('selects project durartion', () => {
-    const headlineInput = screen.getByTestId(
-      'headline-input'
+    const headlineInput = document.getElementById(
+      'outlined-multiline-static'
     ) as HTMLInputElement;
     fireEvent.change(headlineInput, { target: { value: 'New project' } });
     //navigate to industries screen
     const nextBtn = screen.getByTestId('next-button');
     fireEvent.click(nextBtn);
 
-    const industriesInput = screen.getByTestId('tag-input') as HTMLInputElement;
+    const industriesInput = document.getElementById('tags-standard') as HTMLInputElement;
     fireEvent.change(industriesInput, { target: { value: 'Industry1' } });
-    fireEvent.keyDown(industriesInput, { key: 'Enter' });
+    const industiresOptions = screen.getByText('Industry1');
+    fireEvent.click(industiresOptions);
     fireEvent.change(industriesInput, { target: { value: 'Industry2' } });
-    fireEvent.keyDown(industriesInput, { key: 'Enter' });
+    const industiresOptions2 = screen.getByText('Industry2');
+    fireEvent.click(industiresOptions2);
+    fireEvent.change(industriesInput, { target: { value: 'Industry3' } });
+    const industiresOptions3 = screen.getByText('Industry3');
+    fireEvent.click(industiresOptions3);
     expect(industriesInput.value).toBe('');
 
     //navigate to description screen
@@ -297,9 +348,15 @@ describe('NewBrief', () => {
     fireEvent.change(skillInput, { target: { value: 'python' } });
     const pythonOption = screen.getByText('python');
     fireEvent.click(pythonOption);
+    fireEvent.change(skillInput, { target: { value: 'c++' } });
+    const cpro = screen.getByText('c++');
+    fireEvent.click(cpro);
+    fireEvent.change(skillInput, { target: { value: 'java' } });
+    const java = screen.getByText('java');
+    fireEvent.click(java);
 
     const selectedTags = screen.getAllByTestId('CancelIcon');
-    expect(selectedTags).toHaveLength(1);
+    expect(selectedTags).toHaveLength(3);
 
     //navigate to experience level screen
     fireEvent.click(nextBtn);
@@ -325,19 +382,24 @@ describe('NewBrief', () => {
   });
 
   test('inputs budget amount', () => {
-    const headlineInput = screen.getByTestId(
-      'headline-input'
+    const headlineInput = document.getElementById(
+      'outlined-multiline-static'
     ) as HTMLInputElement;
     fireEvent.change(headlineInput, { target: { value: 'New project' } });
     //navigate to industries screen
     const nextBtn = screen.getByTestId('next-button');
     fireEvent.click(nextBtn);
 
-    const industriesInput = screen.getByTestId('tag-input') as HTMLInputElement;
+    const industriesInput = document.getElementById('tags-standard') as HTMLInputElement;
     fireEvent.change(industriesInput, { target: { value: 'Industry1' } });
-    fireEvent.keyDown(industriesInput, { key: 'Enter' });
+    const industiresOptions = screen.getByText('Industry1');
+    fireEvent.click(industiresOptions);
     fireEvent.change(industriesInput, { target: { value: 'Industry2' } });
-    fireEvent.keyDown(industriesInput, { key: 'Enter' });
+    const industiresOptions2 = screen.getByText('Industry2');
+    fireEvent.click(industiresOptions2);
+    fireEvent.change(industriesInput, { target: { value: 'Industry3' } });
+    const industiresOptions3 = screen.getByText('Industry3');
+    fireEvent.click(industiresOptions3);
     expect(industriesInput.value).toBe('');
 
     //navigate to description screen
@@ -358,9 +420,15 @@ describe('NewBrief', () => {
     fireEvent.change(skillInput, { target: { value: 'python' } });
     const pythonOption = screen.getByText('python');
     fireEvent.click(pythonOption);
+    fireEvent.change(skillInput, { target: { value: 'c++' } });
+    const cpro = screen.getByText('c++');
+    fireEvent.click(cpro);
+    fireEvent.change(skillInput, { target: { value: 'java' } });
+    const java = screen.getByText('java');
+    fireEvent.click(java);
 
     const selectedTags = screen.getAllByTestId('CancelIcon');
-    expect(selectedTags).toHaveLength(1);
+    expect(selectedTags).toHaveLength(3);
 
     //navigate to experience level screen
     fireEvent.click(nextBtn);
@@ -393,13 +461,13 @@ describe('NewBrief', () => {
 
   test('Test case for validating the form submission', () => {
     // Ensure that the form cannot be submitted if any required fields are empty.
-    const headlineInput = screen.getByTestId(
-      'headline-input'
+    const headlineInput = document.getElementById(
+      'outlined-multiline-static'
     ) as HTMLInputElement;
     fireEvent.change(headlineInput, { target: { value: '' } });
     //navigate to industries screen
     const nextBtn = screen.getByTestId('next-button');
-    fireEvent.click(nextBtn);
+   // fireEvent.click(nextBtn);
     // expect next button to be disabled
     expect(nextBtn).toBeDisabled();
   });
@@ -427,18 +495,24 @@ describe('Test case for API call', () => {
     );
   });
   test('Test case for validating the API call', () => {
-    const headlineInput = screen.getByTestId(
-      'headline-input'
+    const headlineInput = document.getElementById(
+      'outlined-multiline-static'
     ) as HTMLInputElement;
     fireEvent.change(headlineInput, { target: { value: 'New project' } });
     //navigate to industries screen
     const nextBtn = screen.getByTestId('next-button');
     fireEvent.click(nextBtn);
-    const industriesInput = screen.getByTestId('tag-input') as HTMLInputElement;
+    const industriesInput = document.getElementById('tags-standard') as HTMLInputElement;
     fireEvent.change(industriesInput, { target: { value: 'Industry1' } });
-    fireEvent.keyDown(industriesInput, { key: 'Enter' });
+    const industiresOptions = screen.getByText('Industry1');
+    fireEvent.click(industiresOptions);
     fireEvent.change(industriesInput, { target: { value: 'Industry2' } });
-    fireEvent.keyDown(industriesInput, { key: 'Enter' });
+    const industiresOptions2 = screen.getByText('Industry2');
+    fireEvent.click(industiresOptions2);
+    fireEvent.change(industriesInput, { target: { value: 'Industry3' } });
+    const industiresOptions3 = screen.getByText('Industry3');
+    fireEvent.click(industiresOptions3);
+    expect(industriesInput.value).toBe('');
     //navigate to description screen
     fireEvent.click(nextBtn);
     const descriptionInput = screen.getByTestId(
@@ -456,9 +530,16 @@ describe('Test case for API call', () => {
     fireEvent.change(skillInput, { target: { value: 'python' } });
     const pythonOption = screen.getByText('python');
     fireEvent.click(pythonOption);
+    fireEvent.change(skillInput, { target: { value: 'c++' } });
+    const cpro = screen.getByText('c++');
+    fireEvent.click(cpro);
+    fireEvent.change(skillInput, { target: { value: 'java' } });
+    const java = screen.getByText('java');
+    fireEvent.click(java);
 
     const selectedTags = screen.getAllByTestId('CancelIcon');
-    expect(selectedTags).toHaveLength(1);
+    expect(selectedTags).toHaveLength(3);
+
     fireEvent.click(nextBtn);
 
     //navigate to experience level screen
@@ -492,4 +573,4 @@ describe('Test case for API call', () => {
       expect(completedText).toBeInTheDocument();
     });
   });
-});
+ });

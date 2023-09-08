@@ -525,6 +525,7 @@ const NewBrief = (): JSX.Element => {
                     '!bg-gray-400 !text-white !cursor-not-allowed'
                     }`}
                   data-testid='next-button'
+                  disabled={disableSubmit}
                   onClick={() => !disableSubmit && setStep(step + 1)}
                 // onClick={() => console.log("hit")}
                 >

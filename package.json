@@ -78,6 +78,7 @@
     "stream-chat-react": "^10.7.3",
     "styled-components": "^5.3.9",
     "swagger-ui-react": "^4.19.0",
+    "test-utils": "^1.1.1",
     "typescript": "5.0.2",
     "uuidv4": "^6.2.12"
   },
