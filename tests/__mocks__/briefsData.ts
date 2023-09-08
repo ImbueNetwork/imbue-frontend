@@ -9,9 +9,25 @@ export const briefsData = [
         id: 23,
         name: 'finance',
       },
+      {
+        id: 23,
+        name: 'gramental',
+      },
+      {
+        id: 23,
+        name: 'agriculture',
+      },
     ],
-    description: 'finance brief',
+    description: 'finance brief briefOne has to be longer ? so make this longer briefOne has to be longer ? so make this longer',
     skills: [
+      {
+        id: 23,
+        name: 'finance',
+      },
+      {
+        id: 23,
+        name: 'finance',
+      },
       {
         id: 23,
         name: 'finance',
@@ -29,21 +45,38 @@ export const briefsData = [
     document_url: 'http://www.imbue.com',
     number_of_briefs_submitted: 12,
     user_id: 1234,
+    verified_only:false
   },
   {
     id: 2,
     headline: 'briefTwo',
     industries: [
-      {
-        id: 23,
-        name: 'finance two',
-      },
+        {
+          id: 23,
+          name: 'finance two',
+        },
+        {
+          id: 23,
+          name: 'gramental two',
+        },
+        {
+          id: 23,
+          name: 'agriculture two',
+        },
     ],
     description: 'finance brief two',
     skills: [
       {
         id: 23,
-        name: 'finance two',
+        name: 'finance',
+      },
+      {
+        id: 23,
+        name: 'finance',
+      },
+      {
+        id: 23,
+        name: 'finance',
       },
     ],
     scope_id: 123,
@@ -58,6 +91,7 @@ export const briefsData = [
     document_url: 'http://www.imbue.com',
     number_of_briefs_submitted: 3,
     user_id: 1234,
+    verified_only:true
   },
   {
     id: 3,
@@ -65,14 +99,30 @@ export const briefsData = [
     industries: [
       {
         id: 23,
-        name: 'finance three',
+        name: 'finance',
+      },
+      {
+        id: 23,
+        name: 'finance',
+      },
+      {
+        id: 23,
+        name: 'finance',
       },
     ],
     description: 'finance brief three',
     skills: [
       {
         id: 23,
-        name: 'finance three',
+        name: 'finance',
+      },
+      {
+        id: 23,
+        name: 'finance',
+      },
+      {
+        id: 23,
+        name: 'finance',
       },
     ],
     scope_id: 123,
@@ -87,6 +137,7 @@ export const briefsData = [
     document_url: 'http://www.imbue.com',
     number_of_briefs_submitted: 11,
     user_id: 1234,
+    verified_only:false
   },
 ];
 
@@ -97,14 +148,30 @@ export const searchMockResponse = [
     industries: [
       {
         id: 23,
-        name: 'finance three',
+        name: 'finance',
+      },
+      {
+        id: 23,
+        name: 'finance',
+      },
+      {
+        id: 23,
+        name: 'finance',
       },
     ],
     description: 'finance brief three',
     skills: [
       {
         id: 23,
-        name: 'finance three',
+        name: 'finance',
+      },
+      {
+        id: 23,
+        name: 'finance',
+      },
+      {
+        id: 23,
+        name: 'finance',
       },
     ],
     scope_id: 123,
@@ -328,6 +395,7 @@ export const dummyFreelancerBrief = {
   user_id: 6,
   project_id: undefined,
   number_of_briefs_submitted: 2,
+  verified_only: false,
   skills: [
     {
       id: 7,

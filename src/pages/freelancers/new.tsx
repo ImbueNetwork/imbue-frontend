@@ -199,7 +199,7 @@ const Freelancer = (): JSX.Element => {
             setTitle(e.target.value)
           }
           name='title'
-          data-testid='title'
+          testId='title-free'
           placeholder='Enter your title'
           value={title}
         />
@@ -261,6 +261,7 @@ const Freelancer = (): JSX.Element => {
           ListboxProps={{ className: 'max-h-[280px]' }}
           renderInput={(params) => (
             <TextField
+              data-testid='tag-input'
               autoComplete='off'
               color='secondary'
               onChange={(e) => searchLanguage(e.target.value)}

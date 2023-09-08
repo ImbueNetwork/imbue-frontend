@@ -47,7 +47,7 @@ const ValidatableInput = (props: any) => {
           maxLength,
         }}
         onChange={(e) => handleInput(e)}
-        className='w-full !mb-0'
+        className={'w-full !mb-0'}
         multiline
         color='secondary'
         autoComplete='off'

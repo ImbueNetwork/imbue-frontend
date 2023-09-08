@@ -240,19 +240,20 @@ describe('SubmitProposal', () => {
     const titleInput = getByTestId('milestone-title-0') as HTMLInputElement;
 
     fireEvent.change(descriptionInput, {
-      target: { value: 'Test description' },
+      target: { value: 'Test description this is a test so you have to be working fine' },
     });
 
     fireEvent.change(amountInput, { target: { value: 20 } });
 
-    fireEvent.change(titleInput, { target: { value: 'Title one' } });
+    fireEvent.change(titleInput, { target: { value: 'Title one so' } });
 
     fireEvent.click(getByText('Submit'));
+
 
     const walletPopup = getByText('Connect wallet');
 
     await waitFor(() => {
-      expect(descriptionInput.value).toBe('Test description');
+      expect(descriptionInput.value).toBe('Test description this is a test so you have to be working fine');
       expect(amountInput.value).toBe('20');
       expect(walletPopup).toBeVisible();
     });

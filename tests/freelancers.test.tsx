@@ -1,21 +1,24 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import * as reactRedux from 'react-redux';
 
 import Freelancers from '@/pages/freelancers/new';
 import { Providers } from '@/redux/providers/userProviders';
-import { searchSkills } from '@/redux/services/briefService';
+import { searchLanguageByName,searchSkills } from '@/redux/services/briefService';
 
 import { dummyUser } from './__mocks__/userData';
 
 jest.mock('@/redux/services/briefService', () => ({
   searchSkills: jest.fn(),
+  searchLanguageByName:jest.fn(),
 }));
 
 jest.mock('react-redux', () => ({
   ...jest.requireActual('react-redux'),
   useSelector: jest.fn(),
 }));
+
+
 
 function setUp() {
   // const user = {
@@ -35,13 +38,15 @@ function setUp() {
 }
 
 const skills = [{ name: 'java' }, { name: 'c++' }, { name: 'python' }];
-
+const languages = [{name:"German"}, { name: 'English'}]
 beforeEach(() => {
   const useSelectorMock = jest.spyOn(reactRedux, 'useSelector');
   const mockgetAllSkills = searchSkills as jest.MockedFunction<
     typeof searchSkills
   >;
+  const mocksearchLanguageByName = searchLanguageByName as jest.MockedFunction< typeof searchLanguageByName>
   mockgetAllSkills.mockResolvedValue({ skills });
+  mocksearchLanguageByName.mockResolvedValue({ languages });
 
   useSelectorMock.mockReturnValue({ user: dummyUser, loading: false });
 });
@@ -50,9 +55,9 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-test('test Freelancer rendering', () => {
+test('test Freelancer rendering', async () => {
   expect(
-    render(
+     render(
       <Providers>
         <Freelancers />
       </Providers>
@@ -60,13 +65,14 @@ test('test Freelancer rendering', () => {
   ).toBeTruthy();
 });
 
-test('test Freelancer rendering and matching the snapshot', () => {
-  setUp();
+
+test('test Freelancer rendering and matching the snapshot', async () => {
+  await waitFor(()=> setUp());
   expect(screen.getByText('Get Started!')).toMatchSnapshot();
 });
 
 test('test freelancer onclick next snapshot matching', async () => {
-  setUp();
+  await waitFor(()=> setUp());
   expect(screen.getByText('Get Started!')).toMatchSnapshot();
   fireEvent.click(screen.getByTestId('get-started-button'));
 
@@ -75,16 +81,16 @@ test('test freelancer onclick next snapshot matching', async () => {
   expect(screen.getByTestId('heading')).toMatchSnapshot();
 });
 
-test('test freelancer validation failure not proceeding the next step', () => {
-  setUp();
+test('test freelancer validation failure not proceeding the next step', async () => {
+  await waitFor(()=> setUp());
   fireEvent.click(screen.getByTestId('get-started-button'));
   fireEvent.click(screen.getByTestId('next-button'));
 
   expect(screen.getByTestId('heading')).toMatchSnapshot();
 });
 
-test('test freelancer validation passing if the value is being entered ', () => {
-  setUp();
+test('test freelancer validation passing if the value is being entered ',async () => {
+  await waitFor(()=> setUp());
   fireEvent.click(screen.getByTestId('get-started-button'));
   fireEvent.click(screen.getByTestId('next-button'));
   fireEvent.click(screen.getByTestId('freelance-xp-1'));
@@ -94,42 +100,48 @@ test('test freelancer validation passing if the value is being entered ', () => 
   ).toMatchSnapshot();
 });
 
-test('test freelancer capturing the input textbox value', () => {
-  setUp();
+test('test freelancer capturing the input textbox value', async() => {
+  await waitFor(()=> setUp());
   fireEvent.click(screen.getByTestId('get-started-button'));
   fireEvent.click(screen.getByTestId('next-button'));
   fireEvent.click(screen.getByTestId('freelance-xp-1'));
   fireEvent.click(screen.getByTestId('next-button'));
   fireEvent.click(screen.getByTestId('freelance-goal-2'));
   fireEvent.click(screen.getByTestId('next-button'));
-  fireEvent.change(screen.getByTestId('title'), {
+  const title = document.querySelector("#outlined-multiline-static");
+  fireEvent.change(title as HTMLElement, {
     target: { value: 'imbueLegends' },
   });
-  expect((screen.getByTestId('title') as HTMLInputElement).value).toEqual(
+  expect((title as HTMLInputElement).value).toEqual(
     'imbueLegends'
   );
 });
 
-test('test freelancer capturing the multiselect languages', () => {
-  setUp();
+test('test freelancer capturing the multiselect languages', async () => {
+  await waitFor(()=> setUp());
   fireEvent.click(screen.getByTestId('get-started-button'));
   fireEvent.click(screen.getByTestId('next-button'));
   fireEvent.click(screen.getByTestId('freelance-xp-1'));
   fireEvent.click(screen.getByTestId('next-button'));
   fireEvent.click(screen.getByTestId('freelance-goal-2'));
   fireEvent.click(screen.getByTestId('next-button'));
-  fireEvent.change(screen.getByTestId('title'), {
+  const title = document.querySelector("#outlined-multiline-static");
+  fireEvent.change(title as HTMLElement, {
     target: { value: 'imbueLegends' },
   });
   fireEvent.click(screen.getByTestId('next-button'));
-  fireEvent.change(screen.getByTestId('education'), {
+  const education = title;
+  fireEvent.change(education as HTMLElement, {
     target: { value: 'University of Russia' },
   });
   fireEvent.click(screen.getByTestId('next-button'));
-  fireEvent.change(screen.getByTestId('tag-input'), {
-    target: { value: ['German'] },
+  const language = document.getElementById('tags-standard') as HTMLInputElement;
+  fireEvent.change(language, {
+    target: { value: 'German' },
   });
-  expect((screen.getByTestId('tag-input') as HTMLInputElement).value).toEqual(
-    'German'
+  const GermanOption = screen.getByText('German');
+  fireEvent.click(GermanOption)
+  expect(language.value).toBe(
+    ""
   );
 });

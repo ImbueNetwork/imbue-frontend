@@ -228,6 +228,10 @@ const Briefs = (): JSX.Element => {
         interiorIndex: 0,
         value: 'Verified',
       },
+      {
+        interiorIndex: 1,
+        value: 'Non-verified',
+      },
     ],
   };
 
@@ -274,7 +278,7 @@ const Briefs = (): JSX.Element => {
 
   useEffect(() => {
     const fetchAndSetBriefs = async () => {
-      setLoading(true)
+      
       try {
         if (!Object.keys(router?.query).length) {
           const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
@@ -299,6 +303,7 @@ const Briefs = (): JSX.Element => {
             items_per_page: itemsPerPage,
             page: currentPage,
             verified_only: false,
+            non_verified:false
           };
 
           const verifiedOnlyPropIndex = selectedFilterIds.indexOf('4-0');
@@ -423,6 +428,7 @@ const Briefs = (): JSX.Element => {
     let length_range_prop: number[] = [];
     let skills_prop: number[] = [];
     let verified_only = false;
+    let non_verified = false;
 
     // default is max
     // const hpw_max = 50;
@@ -444,6 +450,7 @@ const Briefs = (): JSX.Element => {
           // Here we are trying to build teh paramaters required to build the query
           // We build an array for each to get the values we want through concat.
           // and also specify if we want more than using the is_max field.
+         
           switch (parseInt(filterType) as BriefFilterOption) {
             case BriefFilterOption.ExpLevel:
               {
@@ -485,7 +492,11 @@ const Briefs = (): JSX.Element => {
 
             case BriefFilterOption.FreelancerInfo:
               {
+                
+                if( parseInt(interiorIndex)=== 0)
                 verified_only = true;
+                if(parseInt(interiorIndex)=== 1)
+                 non_verified = true;
               }
               break;
 
@@ -502,6 +513,7 @@ const Briefs = (): JSX.Element => {
 
     router.query.page = '1';
     router.query.verified_only = verified_only ? '1' : [];
+    router.query.non_verified = non_verified ? '1' : [];
     router.query.heading = search_value !== '' ? search_value : [];
     router.query.expRange = exp_range.length ? exp_range.toString() : [];
     router.query.submitRange = submitted_range.length
@@ -530,7 +542,8 @@ const Briefs = (): JSX.Element => {
           search_input: search_value,
           items_per_page: itemsPerPage,
           page: 1,
-          verified_only: verified_only
+          verified_only: verified_only,
+          non_verified: false
         };
 
         if (search_value.length === 0) {
@@ -814,7 +827,7 @@ const Briefs = (): JSX.Element => {
           </div>
         </div>
 
-        <ErrorScreen {...{ error, setError }}>
+        <ErrorScreen  {...{ error, setError }}>
           <div className='flex flex-col gap-4 w-1/2'>
             <button
               onClick={() => setError(null)}

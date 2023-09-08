@@ -210,6 +210,11 @@ function Project() {
             );
             setWait(true);
           }
+          // else {
+          //   setWaitMessage(
+          //     `Your project is being created on the chain. This may take up to 6 seconds`
+          //   );
+          // }
           break;
       }
       // if (
@@ -498,6 +503,8 @@ function Project() {
         requiredBalance,
         project
       }} />}
+
+      {showPolkadotAccounts && renderPolkadotJSModal}
 
       {showPolkadotAccounts && renderPolkadotJSModal}
 
