@@ -34,11 +34,12 @@ type ExpandableDropDownsProps = {
     isProjectOwner: boolean;
     balance: number;
     project: Project;
+    milestonLoadingTitle: string;
 };
 
 const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
 
-    const { setLoading, project, setSuccess, setSuccessTitle, setError, milestone, index, modified, setOpenVotingList, approversPreview, firstPendingMilestone, projectInMilestoneVoting, isApplicant, canVote, user, projectType, isProjectOwner, balance } = props
+    const { setLoading, project, setSuccess, setSuccessTitle, setError, milestone, index, modified, setOpenVotingList, approversPreview, firstPendingMilestone, projectInMilestoneVoting, isApplicant, canVote, user, projectType, isProjectOwner, balance, milestonLoadingTitle } = props
 
     const [expanded, setExpanded] = useState(false);
     const [showPolkadotAccounts, setShowPolkadotAccounts] =
@@ -148,20 +149,24 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
                     await updateFirstPendingMilestone(Number(project.id), (Number(project.first_pending_milestone) + 1))
                     setSuccess(true);
                     setSuccessTitle('Your vote was successful. This milestone has been completed.');
+                    setLoading(false);
                     break;
                 }
                 else if (result.status) {
                     setSuccess(true);
                     setSuccessTitle('Your vote was successful.');
+                    setLoading(false);
                     break;
 
                 } else if (result.txError) {
                     setError({ message: result.errorMessage });
+                    setLoading(false);
                     break;
                 }
                 else if (pollResult != ImbueChainPollResult.Pending) {
                     setSuccess(true);
                     setSuccessTitle('Request resolved successfully');
+                    setLoading(false);
                     break;
                 }
                 await new Promise((f) => setTimeout(f, 1000));
@@ -170,9 +175,13 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
             setError({ message: 'Could not vote. Please try again later' });
             // eslint-disable-next-line no-console
             console.error(error)
-        } finally {
             setLoading(false);
         }
+        // finally {
+        //     console.log("in finally");
+
+        //     setLoading(false);
+        // }
     };
 
 
@@ -210,17 +219,17 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
 
                         await updateProject(Number(project?.id), project);
                     }
-
+                    setLoading(false);
                     setSuccess(true);
                     setSuccessTitle('Withdraw successfull');
                 } else if (result.txError) {
+                    setLoading(false);
                     setError({ message: result.errorMessage });
                 }
                 break;
             }
             await new Promise((f) => setTimeout(f, 1000));
         }
-        setLoading(false);
     };
 
     return (
@@ -294,32 +303,37 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
                     </h3>
                 </div>
                 <div className='flex flex-row items-center max-width-750px:w-full max-width-750px:justify-between'>
-                    {milestone?.is_approved ? (
-                        <ProjectStateTag
-                            openVotingList={setOpenVotingList}
-                            dateCreated={modified}
-                            text='Completed'
-                            voters={approversPreview}
-                            allApprovers={approversPreview}
-                        />
-                    ) : milestone?.milestone_index == firstPendingMilestone &&
-                        projectInMilestoneVoting ? (
-                        <ProjectStateTag
-                            openVotingList={setOpenVotingList}
-                            dateCreated={modified}
-                            text='Ongoing'
-                            voters={approversPreview}
-                            allApprovers={approversPreview}
-                        />
-                    ) : (
-                        <ProjectStateTag
-                            openVotingList={setOpenVotingList}
-                            dateCreated={modified}
-                            text='Pending'
-                            voters={approversPreview}
-                            allApprovers={approversPreview}
-                        />
-                    )}
+                    {
+                        milestonLoadingTitle
+                            ? <p className="mr-5 text-content-primary text-sm">{milestonLoadingTitle}</p>
+                            : (<>{milestone?.is_approved ? (
+                                <ProjectStateTag
+                                    openVotingList={setOpenVotingList}
+                                    dateCreated={modified}
+                                    text='Completed'
+                                    voters={approversPreview}
+                                    allApprovers={approversPreview}
+                                />
+                            ) : milestone?.milestone_index == firstPendingMilestone &&
+                                projectInMilestoneVoting ? (
+                                <ProjectStateTag
+                                    openVotingList={setOpenVotingList}
+                                    dateCreated={modified}
+                                    text='Ongoing'
+                                    voters={approversPreview}
+                                    allApprovers={approversPreview}
+                                />
+                            ) : (
+                                <ProjectStateTag
+                                    openVotingList={setOpenVotingList}
+                                    dateCreated={modified}
+                                    text='Pending'
+                                    voters={approversPreview}
+                                    allApprovers={approversPreview}
+                                />
+                            )}</>)
+                    }
+
                     <Image
                         src={require(expanded
                             ? '@/assets/svgs/minus_btn.svg'
@@ -349,7 +363,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
                     {milestone?.description}
                 </p>
 
-                {!isApplicant &&
+                {!milestonLoadingTitle && !isApplicant &&
                     milestone.milestone_index == firstPendingMilestone &&
                     projectInMilestoneVoting && (
                         <Tooltip
@@ -372,7 +386,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
                         </Tooltip>
                     )}
 
-                {(isApplicant || (projectType === 'grant' && isProjectOwner)) &&
+                {!milestonLoadingTitle && (isApplicant || (projectType === 'grant' && isProjectOwner)) &&
                     milestone.milestone_index == firstPendingMilestone &&
                     !projectInMilestoneVoting &&
                     !milestone?.is_approved && (
@@ -395,7 +409,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
                         </Tooltip>
                     )}
 
-                {isApplicant && milestone.is_approved && (
+                {!milestonLoadingTitle && isApplicant && milestone.is_approved && (
                     <button
                         className={`primary-btn in-dark w-button ${!balance && '!bg-gray-300 !text-gray-400'
                             } font-normal max-width-750px:!px-[40px] h-[43px] items-center content-center !py-0 mt-[25px] px-8`}

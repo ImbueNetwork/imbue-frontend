@@ -19,6 +19,7 @@ type VotingListProps = {
     open: boolean;
     firstPendingMilestone: number | undefined;
     setOpenVotingList: (_value: boolean) => void;
+    setMilestoneVotes: (_value: any) => void;
     approvers: User[];
     chainProjectId: number | undefined;
 }
@@ -29,7 +30,7 @@ type MilestoneVotes = {
 }
 
 const VotingList = (props: VotingListProps) => {
-    const { firstPendingMilestone, setOpenVotingList, approvers, chainProjectId, open } = props
+    const { firstPendingMilestone, setOpenVotingList, approvers, chainProjectId, open, setMilestoneVotes } = props
     const [value, setValue] = React.useState(0);
     const [list, setList] = useState<User[]>([]);
     const [votes, setVotes] = useState<MilestoneVotes[]>([])
@@ -50,6 +51,7 @@ const VotingList = (props: VotingListProps) => {
                     chainProjectId,
                     firstPendingMilestone
                 );
+                setMilestoneVotes(milestoneVotes)
 
                 const votesArray = Object.keys(milestoneVotes)
 
@@ -62,14 +64,15 @@ const VotingList = (props: VotingListProps) => {
                     setVotes(votes)
                 }
             } catch (error) {
-                console.log(error);
+                // eslint-disable-next-line no-console
+                console.error(error);
             } finally {
                 setLoading(false)
             }
         }
 
         setVotingList()
-    }, [chainProjectId, user, firstPendingMilestone])
+    }, [chainProjectId, user, firstPendingMilestone, setMilestoneVotes])
 
     useEffect(() => {
         const votedYes: User[] = []

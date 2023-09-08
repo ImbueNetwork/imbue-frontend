@@ -7,6 +7,6 @@ export const showErrorMessage = (status: number | string | null): string => {
     case 'MustBeApplicant':
       return 'You must continue with the wallet used for application';
     default:
-      return "Something went wrong. Please try again";
+      return `Something went wrong. Please try again. ${status}`;
   }
 };

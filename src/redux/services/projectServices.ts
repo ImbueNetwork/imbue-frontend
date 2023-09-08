@@ -62,6 +62,22 @@ export const getUsersOngoingGrants = async (walletAddress: string) => {
   }
 };
 
+export const getApproverProfiles = async (walletAddresses: string[]) => {
+  const resp = await fetch(`${config.apiBase}/users/byList`, {
+    headers: config.postAPIHeaders,
+    method: 'post',
+    body: JSON.stringify(walletAddresses),
+});
+
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    return {
+      message: 'Failed to get all brief applications. status:' + resp.status,
+    };
+  }
+};
+
 export const updateMilestone = async (
   projectId: number,
   milestoneIndex: number,
