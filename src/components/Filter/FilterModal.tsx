@@ -29,7 +29,7 @@ const FilterModal = ({ open, handleClose, customDropdownConfigs, cancelFilters, 
                 className='bg-white rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[450px] md:w-[60%] w-[95vw] self-center relative'
             >
                 <p className='font-normal text-base !text-imbue-purple-dark !mb-9'>
-                    Filter
+                    Filter by:
                 </p>
 
                 {/* <div className='grid md:grid-cols-4 grid-cols-1 md:gap-10 gap-5'>

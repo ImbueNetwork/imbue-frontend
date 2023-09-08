@@ -23,7 +23,7 @@ jest.mock('@/redux/services/briefService', () => ({
   deleteSavedBrief: jest.fn(),
   getAllSavedBriefs: jest.fn(),
   searchSkills: jest.fn(),
-  getAllSkills:jest.fn(),
+  getAllSkills: jest.fn(),
 }));
 
 jest.mock('next/router', () => ({
@@ -34,9 +34,10 @@ jest.mock('next/router', () => ({
   })),
 }));
 
-const mockBriefs = {
+const mockBriefs: any = {
   currentData: briefsData,
   totalBriefs: 3,
+  status: 200
 };
 
 const skills = [{ name: 'java' }, { name: 'c++' }, { name: 'python' }];
@@ -137,9 +138,11 @@ describe('Briefs Page', () => {
 
     // Simulate clicking on the experience level dropdown from filter modal
 
-    const expLevelDropdown = screen.getByTestId('Experience Level');
+    // const expLevelDropdown = screen.getByTestId('Project Length');
+    const expLevelDropdown = document.getElementsByClassName('MuiInputBase-input')[2] as HTMLInputElement;
 
-    userEvent.click(expLevelDropdown);
+    // userEvent.click(expLevelDropdown);
+    expLevelDropdown.focus()
 
     await waitFor(() => {
       expect(screen.getByTestId('filterOptions')).toBeInTheDocument();
@@ -152,7 +155,7 @@ describe('Briefs Page', () => {
     // close dropdown
     userEvent.click(expLevelDropdown);
 
-    const submitButton = screen.getByTestId('Apply');
+    const submitButton = screen.getByText('Apply');
     userEvent.click(submitButton);
 
     // Wait for updated briefs to be fetched and displayed
@@ -160,7 +163,7 @@ describe('Briefs Page', () => {
       typeof callSearchBriefs
     >;
 
-    const mockCallSearchResponse = {
+    const mockCallSearchResponse: any = {
       currentData: expertExpData,
       totalBriefs: 1,
     };

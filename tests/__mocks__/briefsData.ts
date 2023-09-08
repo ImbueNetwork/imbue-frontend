@@ -3,7 +3,7 @@ import { BriefFilterOption } from '../../src/types/briefTypes';
 export const briefsData = [
   {
     id: 1,
-    headline: 'briefOne has to be longer ? so make this longer',
+    headline: 'briefOne',
     industries: [
       {
         id: 23,
