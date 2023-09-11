@@ -67,7 +67,7 @@ export const getApproverProfiles = async (walletAddresses: string[]) => {
     headers: config.postAPIHeaders,
     method: 'post',
     body: JSON.stringify(walletAddresses),
-});
+  });
 
   if (resp.ok) {
     return await resp.json();
@@ -142,8 +142,36 @@ export const updateFirstPendingMilestone = async (
   }
 };
 
+// Voting
+
+export const voteOnMilestone = async (
+  user: User,
+  milestoneIndex: number,
+  vote: boolean
+) => {
+  try {
+    const resp = await fetch(`${config.apiBase}project/vote`, {
+      headers: config.getAPIHeaders,
+      method: 'post',
+      body: JSON.stringify({
+        projectId: 7,
+        milestoneIndex,
+        userId: user.id,
+        voterAddress: user.web3_address,
+        vote,
+      }),
+    });
+
+    return await resp.json();
+  } catch (error) {
+    return { message: 'Something went wrong' + error };
+  }
+};
+
+// no confidece votes
+
 export const getProjectNoConfidenceVoters = async (
-  projectId: number | string,
+  projectId: number | string
 ) => {
   const resp = await fetch(
     `${config.apiBase}/project/noConfidenceVote/getVoters?projectId=${projectId}`,
@@ -161,7 +189,6 @@ export const getProjectNoConfidenceVoters = async (
     };
   }
 };
-
 
 export const insertNoConfidenceVoter = async (
   projectId: number | string,
@@ -184,4 +211,3 @@ export const insertNoConfidenceVoter = async (
     };
   }
 };
-

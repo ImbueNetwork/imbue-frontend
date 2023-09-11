@@ -14,7 +14,6 @@ import VotingListSkeleton from './VotingListSkeleton';
 
 
 
-
 type VotingListProps = {
     open: boolean;
     firstPendingMilestone: number | undefined;
