@@ -529,15 +529,11 @@ const Profile = ({ initUser, browsingUser }: any) => {
                     />
                   </div>
                 ) : (
-                  <a
-                    href={user?.website}
-                    className=' no-underline'
-                    target='_blank'
-                  >
-                    <span className='text-imbue-purple break-all'>
-                      {user?.website}
-                    </span>
-                  </a>
+                  <span
+                    onClick={() => navigateToLink(user.website)}
+                    className='text-imbue-purple break-all cursor-pointer'>
+                    {user?.website}
+                  </span>
                 )}
               </div>
             )}
