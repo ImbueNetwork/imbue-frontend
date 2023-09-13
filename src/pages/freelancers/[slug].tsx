@@ -182,13 +182,13 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         let data = freelancer;
         data = {
           ...data,
-          bio: freelancer.bio.trim().length
-            ? filter.clean(freelancer.bio).trim()
+          about: freelancer?.about?.trim()?.length
+            ? filter.clean(freelancer.about).trim()
             : '',
-          education: freelancer.education.trim().length
+          education: freelancer?.education?.trim()?.length
             ? filter.clean(freelancer.education).trim()
             : '',
-          title: freelancer.title.trim().length
+          title: freelancer?.title?.trim()?.length
             ? filter.clean(freelancer.title).trim()
             : '',
           skills: skills,
@@ -201,11 +201,11 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           setSuccess(true);
           setprevUserName(data.username);
         } else {
-          setError({ message: resp.message });
+          setError({ message: 'Someting went wrong' + JSON.stringify(resp.message) });
         }
       }
     } catch (error) {
-      setError({ message: error });
+      setError({ message: 'Someting went wrong' + error });
     } finally {
       setLoading(false);
     }
@@ -1025,12 +1025,12 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
               <>
                 <TextArea
                   maxLength={1000}
-                  value={freelancer?.bio || ""}
+                  value={freelancer?.about || ""}
                   onChange={(e) => {
                     if (freelancer) {
                       setFreelancer({
                         ...freelancer,
-                        bio: e.target.value,
+                        about: e.target.value,
                       });
                     }
                   }}
@@ -1041,7 +1041,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
               </>
             ) : (
               <div className='bio text-content-primary text-base lg:mx-10 break-all whitespace-pre-wrap'>
-                {freelancer?.bio}
+                {freelancer?.about}
               </div>
             )}
             <hr className='separator' />
