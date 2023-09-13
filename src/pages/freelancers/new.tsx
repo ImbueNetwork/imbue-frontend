@@ -45,7 +45,7 @@ const Freelancer = (): JSX.Element => {
   const [education, setEducation] = useState<string>('');
   const [languages, setLanguages] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
-  const [bio, setBio] = useState<any>();
+  const [about, setAbout] = useState<any>();
   const [services, setServices] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
@@ -320,7 +320,7 @@ const Freelancer = (): JSX.Element => {
       <div className={styles.namePanelInputWrapper}>
         <ValidatableInput
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setBio(e.target.value)
+            setAbout(e.target.value)
           }
           className={`${styles.fieldInput} ${styles.large}`}
           placeholder='Enter your bio'
@@ -329,7 +329,7 @@ const Freelancer = (): JSX.Element => {
           maxLength={5000}
           minLength={50}
           rows={6}
-          value={bio}
+          value={about}
         />
       </div>
     </div>
@@ -388,7 +388,7 @@ const Freelancer = (): JSX.Element => {
     title,
     education,
     skills?.length,
-    bio,
+    about,
     services?.length,
     step,
   ]);
@@ -419,7 +419,7 @@ const Freelancer = (): JSX.Element => {
     // }
     else if (step === 6 && !skills.length) {
       return false;
-    } else if (step === 7 && (!bio || !validateInputLength(bio, 50, 5000))) {
+    } else if (step === 7 && (!about || !validateInputLength(about, 50, 5000))) {
       return false;
     } else if (step === 8 && !services.length) {
       return false;
@@ -433,7 +433,7 @@ const Freelancer = (): JSX.Element => {
 
       const freelancerData = {
         id: 0,
-        bio: filter.clean(bio).trim(),
+        about: filter.clean(about).trim(),
         education: filter.clean(education).trim(),
         experience: freelancingBefore,
         freelanced_before: freelancingBefore,

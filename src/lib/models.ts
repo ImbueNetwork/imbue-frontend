@@ -161,7 +161,7 @@ export type Brief = {
 
 export type Freelancer = {
   id: string | number;
-  bio: string;
+  about: string;
   education: string;
   experience: string;
   facebook_link: string;
@@ -274,13 +274,13 @@ export const updateUserData =
   (id: number, data: Partial<User>) => async (tx: Knex.Transaction) =>
     (await tx<User>('users').update(data).where({ id }).returning('*'))[0];
 
-    export const updateFederatedCredentials = (id: number,username:string)=> async (tx: Knex.Transaction) =>(await tx<FederatedCredential>('federated_credentials')
-.update({subject:username})
-.where({
-  id: id,
-})
-)
-
+export const updateFederatedCredentials =
+  (id: number, username: string) => async (tx: Knex.Transaction) =>
+    await tx<FederatedCredential>('federated_credentials')
+      .update({ subject: username })
+      .where({
+        id: id,
+      });
 
 export const fetchUserOrEmail =
   (userOrEmail: string) => (tx: Knex.Transaction) => {
@@ -652,8 +652,8 @@ export const updateFirstPendingMilestoneService =
   (id: string | number, milestone_index: number) => (tx: Knex.Transaction) =>
     tx<Project>('projects')
       .where({ id: id })
-      .update('first_pending_milestone', milestone_index)
-      // .returning('project_in_milestone_voting');
+      .update('first_pending_milestone', milestone_index);
+// .returning('project_in_milestone_voting');
 
 export const updateMilestoneDetails =
   (id: string | number, milestoneId: string | number, details: string) =>
@@ -1114,7 +1114,7 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
       'telegram_link',
       'discord_link',
       'title',
-      'bio',
+      // 'bio',
       'freelancers.user_id',
       'username',
       'users.profile_photo as profile_image',
@@ -1123,7 +1123,8 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
       'freelancers.created',
       'verified',
       'users.country',
-      'users.region'
+      'users.region',
+      'users.about'
       // tx.raw('ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills'),
       // tx.raw('ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids'),
 
@@ -1248,7 +1249,7 @@ export const insertFreelancerDetails =
         education: f.education,
         experience: f.experience,
         title: f.title,
-        bio: f.bio,
+        // bio: f.bio,
         facebook_link: f.facebook_link,
         twitter_link: f.twitter_link,
         telegram_link: f.telegram_link,
@@ -1257,7 +1258,13 @@ export const insertFreelancerDetails =
       })
 
       .returning('id')
-      .then((ids) => {
+      .then(async (ids) => {
+        if (f.user_id) {
+          await tx('users').where({ id: f.user_id }).update({
+            about: f.about,
+          });
+        }
+
         if (skill_ids) {
           skill_ids.forEach(async (skillId) => {
             if (skillId) {
@@ -1332,7 +1339,7 @@ export const updateFreelancerDetails =
         education: f.education,
         experience: f.experience,
         title: f.title,
-        bio: f.bio,
+        // bio: f.bio,
         facebook_link: f.facebook_link,
         twitter_link: f.twitter_link,
         telegram_link: f.telegram_link,
@@ -1349,6 +1356,7 @@ export const updateFreelancerDetails =
             country: country,
             region: region,
             getstream_token: token,
+            about: f.about,
           });
         }
 
