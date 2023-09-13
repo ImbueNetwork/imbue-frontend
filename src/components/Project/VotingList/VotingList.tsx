@@ -8,6 +8,7 @@ import { initImbueAPIInfo } from '@/utils/polkadot';
 import freelalncerPic from '@/assets/images/profile-image.png'
 import { User, Vote } from '@/model';
 import ChainService from '@/redux/services/chainService';
+import { getMillestoneVotes } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 import VotingListSkeleton from './VotingListSkeleton';
@@ -21,6 +22,7 @@ type VotingListProps = {
     setMilestoneVotes: (_value: any) => void;
     approvers: User[];
     chainProjectId: number | undefined;
+    projectId: number | undefined;
 }
 
 type MilestoneVotes = {
@@ -29,7 +31,7 @@ type MilestoneVotes = {
 }
 
 const VotingList = (props: VotingListProps) => {
-    const { firstPendingMilestone, setOpenVotingList, approvers, chainProjectId, open, setMilestoneVotes } = props
+    const { firstPendingMilestone, setOpenVotingList, approvers, chainProjectId, open, setMilestoneVotes, projectId } = props
     const [value, setValue] = React.useState(0);
     const [list, setList] = useState<User[]>([]);
     const [votes, setVotes] = useState<MilestoneVotes[]>([])
@@ -40,16 +42,21 @@ const VotingList = (props: VotingListProps) => {
 
     useEffect(() => {
         const setVotingList = async () => {
-            if (!chainProjectId || firstPendingMilestone === undefined) return
+            if (!chainProjectId || !projectId || firstPendingMilestone === undefined) return
 
             setLoading(true)
             try {
+                const voteResp = await getMillestoneVotes(projectId, firstPendingMilestone)
+                console.log("🚀 ~ file: VotingList.tsx:57 ~ setVotingList ~ voteResp:", voteResp)
+
                 const imbueApi = await initImbueAPIInfo();
                 const chainService = new ChainService(imbueApi, user);
                 const milestoneVotes: Vote[] = await chainService.getMilestoneVotes(
                     chainProjectId,
                     firstPendingMilestone
                 );
+
+                console.log("🚀 ~ file: VotingList.tsx:60 ~ setVotingList ~ milestoneVotes:", milestoneVotes)
                 setMilestoneVotes(milestoneVotes)
 
                 const votesArray = Object.keys(milestoneVotes)
@@ -71,7 +78,7 @@ const VotingList = (props: VotingListProps) => {
         }
 
         setVotingList()
-    }, [chainProjectId, user, firstPendingMilestone, setMilestoneVotes])
+    }, [chainProjectId, user, firstPendingMilestone, setMilestoneVotes, projectId])
 
     useEffect(() => {
         const votedYes: User[] = []

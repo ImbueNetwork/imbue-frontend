@@ -54,7 +54,6 @@ import {
   getProjectNoConfidenceVoters,
   insertNoConfidenceVoter,
   updateProject,
-  voteOnMilestone,
 } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
@@ -227,16 +226,6 @@ function Project() {
       // }
     }
   };
-
-  useEffect(() => {
-    const test = async () => {
-      const resp = await voteOnMilestone(user, 2, false)
-      console.log(resp);
-
-    }
-
-    user?.web3_address && test()
-  }, [user.web3_address])
 
   const getProject = async () => {
     if (!projectId) return
@@ -965,6 +954,7 @@ function Project() {
         setOpenVotingList={setOpenVotingList}
         approvers={approversPreview}
         chainProjectId={project.chain_project_id}
+        projectId={project.id}
         setMilestoneVotes={setMilestoneVotes}
       />
       <BackDropLoader open={loading || userLoading} />

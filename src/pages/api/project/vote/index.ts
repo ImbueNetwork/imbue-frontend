@@ -10,6 +10,29 @@ import { authenticate, verifyUserIdFromJwt } from '../../auth/common';
 
 export default nextConnect()
   .use(passport.initialize())
+  .get(async (req: NextApiRequest, res: NextApiResponse) => {
+    db.transaction(async (tx) => {
+      try {
+        const { projectId, milestoneIndex } = req.query;
+
+        if (projectId == undefined || milestoneIndex == undefined)
+          return res
+            .status(404)
+            .json({
+              message:
+                'Project not found. Please use valid project ID and milestone index',
+            });
+
+        const milestoneVotes = await tx('project_votes')
+          .select('*')
+          .where({ project_id: projectId, milestone_index: milestoneIndex });
+
+        res.status(200).json(milestoneVotes);
+      } catch (error) {
+        res.status(404).json({ message: `Internal Error: ${error}` });
+      }
+    });
+  })
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
     db.transaction(async (tx) => {
       try {

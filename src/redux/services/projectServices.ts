@@ -144,6 +144,27 @@ export const updateFirstPendingMilestone = async (
 
 // Voting
 
+export const getMillestoneVotes = async (
+  projectId: number,
+  milestoneIndex: number
+) => {
+  try {
+    const resp = await fetch(
+      `${config.apiBase}/project/vote?projectId=${projectId}&milestoneIndex=${milestoneIndex}`,
+      {
+        headers: config.postAPIHeaders,
+        method: 'get',
+      }
+    );
+
+    return resp.json();
+  } catch (error) {
+    return {
+      message: 'Failed to get voters. status:' + error,
+    };
+  }
+};
+
 export const voteOnMilestone = async (
   user: User,
   milestoneIndex: number,
