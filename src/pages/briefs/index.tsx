@@ -6,10 +6,11 @@ import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { IoTrashBin } from 'react-icons/io5';
 import { useSelector } from 'react-redux';
 
+import { Project } from '@/lib/models';
 import { strToIntRange } from '@/utils/helper';
 
 import ErrorScreen from '@/components/ErrorScreen';
@@ -31,6 +32,7 @@ import {
   getAllSavedBriefs,
   getAllSkills,
 } from '@/redux/services/briefService';
+import { getFreelancerApplications } from '@/redux/services/freelancerService';
 import { RootState } from '@/redux/store/store';
 
 import { BriefFilterOption } from '@/types/briefTypes';
@@ -60,12 +62,13 @@ const Briefs = (): JSX.Element => {
   // const [_openDropDown, setOpenDropDown] = useState<string>('');
   const [savedBriefsActive, setSavedBriefsActive] = useState<boolean>(false);
 
+
   // search input value
   const [searchInput, setSearchInput] = useState<string>('');
   const [pageInput, setPageInput] = useState<number>(1);
 
   const [skills, setSkills] = useState<Item[]>([{ name: "", id: 0 }]);
-
+  const [myApplications,_setMyApplications] = useState<Project[]>()
   const [error, setError] = useState<any>();
   const { expRange, submitRange, lengthRange, heading, size: sizeProps, skillsProps, verified_only: verifiedOnlyProp } = router.query;
 
@@ -81,6 +84,25 @@ const Briefs = (): JSX.Element => {
   // The interior index is used to specify which entry will be used in the search brief.
   // This is not a good implementation but im afraid if we filter and find itll be slow.
   // I can change this on request: felix
+  const handleSetItemPerPage = (val:number)=>{
+       setItemsPerPage(val);
+      const totalPage = Math.ceil(briefs_total/val);
+      if(currentPage > totalPage){
+        setCurrentPage(totalPage)
+        setPageInput(totalPage);
+        router.query.page = (totalPage).toString()
+        router.push(router, undefined, { shallow: true });
+      }
+  }
+
+  useEffect(()=>{
+    const fetchApplication = async () =>{
+    _setMyApplications(await getFreelancerApplications(currentUser?.id));
+  }
+  
+  fetchApplication()
+  
+  },[currentUser,currentUser?.id])
 
   const expfilter = {
     // This is a table named "experience"
@@ -623,6 +645,14 @@ const Briefs = (): JSX.Element => {
     setBriefsTotal(allBriefs?.totalBriefs);
   };
 
+  const appliedBreifId = useMemo(()=>{
+    const data = myApplications?.map((it:Project)=>it.brief_id
+    );
+    return data
+  }, [myApplications])
+
+  
+
   const cancelFilters = async () => {
     reset();
     setFilterVisible(false);
@@ -775,6 +805,9 @@ const Briefs = (): JSX.Element => {
                       router.push(`/briefs/${item?.id}`)
                     }
                   >
+                    {appliedBreifId?.includes(item.id) && 
+                    <div className='bg-imbue-light-purple-hover w-20 py-1 flex justify-center items-center rounded-full'><p className='text-imbue-purple-dark'>Applied</p></div>
+                  }
                     <div className='brief-title'>
                       {item.headline.length > 50
                         ? `${item.headline.substring(0, 50)}...`
@@ -896,7 +929,7 @@ const Briefs = (): JSX.Element => {
               onChange={(e) => {
                 router.query.size = (e.target.value).toString()
                 router.push(router, undefined, { shallow: true });
-                setItemsPerPage(Number(e.target.value));
+                handleSetItemPerPage(Number(e.target.value));
               }}
               value={itemsPerPage}
               placeholder='Select a currency'
