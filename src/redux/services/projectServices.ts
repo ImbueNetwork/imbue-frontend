@@ -166,19 +166,21 @@ export const getMillestoneVotes = async (
 };
 
 export const voteOnMilestone = async (
-  user: User,
+  userId: number | string | null,
+  voterAddress: string,
   milestoneIndex: number,
-  vote: boolean
+  vote: boolean,
+  projectId: number | string
 ) => {
   try {
     const resp = await fetch(`${config.apiBase}project/vote`, {
       headers: config.getAPIHeaders,
       method: 'post',
       body: JSON.stringify({
-        projectId: 7,
+        projectId: projectId,
         milestoneIndex,
-        userId: user.id,
-        voterAddress: user.web3_address,
+        userId,
+        voterAddress,
         vote,
       }),
     });

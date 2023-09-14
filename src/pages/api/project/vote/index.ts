@@ -2,11 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import passport from 'passport';
 
-import * as models from '@/lib/models';
-
 import db from '@/db';
-
-import { authenticate, verifyUserIdFromJwt } from '../../auth/common';
 
 export default nextConnect()
   .use(passport.initialize())
@@ -16,19 +12,54 @@ export default nextConnect()
         const { projectId, milestoneIndex } = req.query;
 
         if (projectId == undefined || milestoneIndex == undefined)
-          return res
-            .status(404)
-            .json({
-              message:
-                'Project not found. Please use valid project ID and milestone index',
-            });
+          return res.status(404).json({
+            message:
+              'Project not found. Please use valid project ID and milestone index',
+          });
 
-        const milestoneVotes = await tx('project_votes')
+        const pending = await tx('project_approvers')
           .select('*')
-          .where({ project_id: projectId, milestone_index: milestoneIndex });
+          .leftJoin(
+            'project_votes',
+            'project_votes.voter_address',
+            'project_approvers.approver'
+          )
+          .leftJoin('users', 'users.web3_address', 'project_approvers.approver')
+          .where({ 'project_approvers.project_id': projectId, vote: null });
 
-        res.status(200).json(milestoneVotes);
+        const yes = await tx('project_votes')
+          .select('*')
+          .where({
+            project_id: projectId,
+            milestone_index: milestoneIndex,
+            vote: true,
+          })
+          .leftJoin(
+            'users',
+            'users.web3_address',
+            'project_votes.voter_address'
+          );
+
+        const no = await tx('project_votes')
+          .select('*')
+          .where({
+            project_id: projectId,
+            milestone_index: milestoneIndex,
+            vote: false,
+          })
+          .leftJoin(
+            'users',
+            'users.web3_address',
+            'project_votes.voter_address'
+          );
+
+        res.status(200).json({
+          yes,
+          no,
+          pending,
+        });
       } catch (error) {
+        console.log('🚀 ~ file: index.ts:51 ~ db.transaction ~ error:', error);
         res.status(404).json({ message: `Internal Error: ${error}` });
       }
     });
@@ -39,16 +70,21 @@ export default nextConnect()
         const { projectId, milestoneIndex, userId, voterAddress, vote } =
           JSON.parse(req.body);
 
-        const userAuth: Partial<models.User> | any = await authenticate(
-          'jwt',
-          req,
-          res
-        );
-        verifyUserIdFromJwt(req, res, [userAuth.id]);
+        // const userAuth: Partial<models.User> | any = await authenticate(
+        //   'jwt',
+        //   req,
+        //   res
+        // );
+
+        // await verifyUserIdFromJwt(req, res, [userAuth.id]);
 
         const existingVote = await tx('project_votes')
           .select('id', 'vote')
-          .where({ project_id: projectId, milestone_index: milestoneIndex })
+          .where({
+            project_id: projectId,
+            milestone_index: milestoneIndex,
+            voter_address: voterAddress,
+          })
           .first();
 
         if (existingVote?.id && existingVote?.vote === vote)
@@ -79,6 +115,7 @@ export default nextConnect()
           if (resp) return res.status(200).json({ status: 'success' });
         }
       } catch (error) {
+        console.log('🚀 ~ file: index.ts:102 ~ db.transaction ~ error:', error);
         return res.status(401).json(new Error('Server error: ' + error));
       }
     });

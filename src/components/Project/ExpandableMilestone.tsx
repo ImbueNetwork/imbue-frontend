@@ -113,6 +113,8 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
     const handleVoteOnMilestone = async (account: WalletAccount, vote: boolean) => {
         setLoading(true);
 
+        if (!project?.id || !user.web3_address) return
+
         try {
             const imbueApi = await initImbueAPIInfo();
             // const userRes: User | any = await utils.getCurrentUser();
@@ -142,7 +144,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
                     await updateMilestone(milestone.project_id, milestoneKeyInView, true);
                     await updateProjectVotingState(Number(project.id), false)
                     await updateFirstPendingMilestone(Number(project.id), (Number(project.first_pending_milestone) + 1))
-                    await voteOnMilestone(user, milestoneKeyInView, vote)
+                    await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
 
                     setSuccess(true);
                     setSuccessTitle('Your vote was successful. This milestone has been completed.');
@@ -150,7 +152,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
                     break;
 
                 } else if (result.status) {
-                    await voteOnMilestone(user, milestoneKeyInView, vote)
+                    await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
 
                     setSuccess(true);
                     setSuccessTitle('Your vote was successful.');
@@ -163,7 +165,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
                     break;
 
                 } else if (pollResult != ImbueChainPollResult.Pending) {
-                    await voteOnMilestone(user, milestoneKeyInView, vote)
+                    await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
 
                     setSuccess(true);
                     setSuccessTitle('Request resolved successfully');
