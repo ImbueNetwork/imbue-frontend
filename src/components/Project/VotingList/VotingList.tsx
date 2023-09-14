@@ -40,38 +40,44 @@ const VotingList = (props: VotingListProps) => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        const setVotingList = async () => {
+
+        const syncVotes = async () => {
             if (!chainProjectId || !projectId || firstPendingMilestone === undefined) return
+
+            const imbueApi = await initImbueAPIInfo();
+            const chainService = new ChainService(imbueApi, user);
+            const milestoneVotes: any = await chainService.getMilestoneVotes(
+                chainProjectId,
+                firstPendingMilestone
+            );
+
+            setMilestoneVotes(milestoneVotes)
+
+            const votesArray = Object.keys(milestoneVotes)
+
+            if (votesArray.length > 0) {
+                const votes: MilestoneVotes[] = votesArray?.map((key: any) => ({
+                    voterAddress: key,
+                    vote: milestoneVotes[key],
+                })) || [];
+
+                const promises = votes.map(async (v) => await voteOnMilestone(null, v.voterAddress, firstPendingMilestone, v.vote, projectId))
+                await Promise.all(promises)
+                const voteResp = await getMillestoneVotes(projectId, firstPendingMilestone)
+                setVotes(voteResp)
+                // const resp = await syncProjectVotes(projectId, firstPendingMilestone, votes)
+            }
+        }
+
+        const setVotingList = async () => {
+            if (!projectId || firstPendingMilestone === undefined) return
 
             setLoading(true)
             try {
                 const voteResp = await getMillestoneVotes(projectId, firstPendingMilestone)
                 setVotes(voteResp)
                 // const votersAddressed = voteResp?.map((voter: any) => voter.web3_address)
-                setLoading(false)
-
-                const imbueApi = await initImbueAPIInfo();
-                const chainService = new ChainService(imbueApi, user);
-                const milestoneVotes: any = await chainService.getMilestoneVotes(
-                    chainProjectId,
-                    firstPendingMilestone
-                );
-
-                setMilestoneVotes(milestoneVotes)
-
-                const votesArray = Object.keys(milestoneVotes)
-
-                if (votesArray.length > 0) {
-                    const votes: MilestoneVotes[] = votesArray?.map((key: any) => ({
-                        voterAddress: key,
-                        vote: milestoneVotes[key],
-                    })) || [];
-
-
-                    const promises = votes.map(async (v) => await voteOnMilestone(null, v.voterAddress, firstPendingMilestone, v.vote, projectId))
-                    await Promise.all(promises)
-                    // const resp = await syncProjectVotes(projectId, firstPendingMilestone, votes)
-                }
+                syncVotes();
             } catch (error) {
                 // eslint-disable-next-line no-console
                 console.error(error);
@@ -81,7 +87,7 @@ const VotingList = (props: VotingListProps) => {
         }
 
         setVotingList()
-    }, [chainProjectId, user, firstPendingMilestone, setMilestoneVotes, projectId, approvers])
+    }, [user, firstPendingMilestone, setMilestoneVotes, projectId, approvers, chainProjectId])
 
     // useEffect(() => {
     //     const votedYes: User[] = []
