@@ -90,7 +90,7 @@ export default nextConnect()
         }
         const filterdData = {
           ...freelancer,
-          bio: filter.clean(freelancer.bio).trim(),
+          about: filter.clean(freelancer.about).trim(),
           education: filter.clean(freelancer.education).trim(),
           skills: freelancer.skills.map((item: string) =>
             item.trim().length ? filter.clean(item).trim() : ''
