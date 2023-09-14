@@ -18,11 +18,13 @@ const postAPIHeaders = {
 export const callSearchBriefs = async (filter: BriefSqlFilter) => {
   // return [] as Array<Brief>;
   //:TODO implement api for callSearchBriefs
+  
   const resp = await fetch(`${config.apiBase}briefs/search`, {
     headers: postAPIHeaders,
     method: 'post',
     body: JSON.stringify(filter),
   });
+  
   if (resp.ok) {
     const data = await resp.json();
     return { status: resp.status, ...data } as PaginatedResponse;

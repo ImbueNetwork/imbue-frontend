@@ -188,6 +188,7 @@ export type Freelancer = {
 };
 
 export type BriefSqlFilter = {
+  non_verified: boolean;
   experience_range: number[];
   submitted_range: number[];
   submitted_is_max: boolean;
@@ -1509,13 +1510,17 @@ export const searchBriefs =
         }
       })
       .where(function () {
-        if (filter?.verified_only) {
+        if (filter?.verified_only && !filter?.non_verified) {
           this.where('verified_only', true);
         }
       })
       .where(function () {
         if (filter?.skills_range?.length > 0) {
           this.whereIn('brief_skills.skill_id', filter.skills_range);
+        }
+      }).where(function(){
+        if(filter?.non_verified && !filter?.verified_only){
+          this.where('verified_only', false);
         }
       })
       .where('headline', 'ilike', filter.search_input + '%');
