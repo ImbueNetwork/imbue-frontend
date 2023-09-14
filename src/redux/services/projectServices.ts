@@ -191,6 +191,22 @@ export const voteOnMilestone = async (
   }
 };
 
+export const syncProjectVotes = async (
+  projectID: string | number,
+  milestoneIndex: string | number,
+  chainVotes: any
+) => {
+  const resp = await fetch(`${config.apiBase}project/vote/sync`, {
+    headers: config.getAPIHeaders,
+    method: 'post',
+    body: JSON.stringify({ projectID, milestoneIndex, chainVotes }),
+  });
+  console.log(
+    '🚀 ~ file: projectServices.ts:197 ~ syncProjectVotes ~ resp:',
+    resp
+  );
+};
+
 // no confidece votes
 
 export const getProjectNoConfidenceVoters = async (

@@ -48,6 +48,7 @@ const VotingList = (props: VotingListProps) => {
                 const voteResp = await getMillestoneVotes(projectId, firstPendingMilestone)
                 setVotes(voteResp)
                 // const votersAddressed = voteResp?.map((voter: any) => voter.web3_address)
+                setLoading(false)
 
                 const imbueApi = await initImbueAPIInfo();
                 const chainService = new ChainService(imbueApi, user);
@@ -66,8 +67,10 @@ const VotingList = (props: VotingListProps) => {
                         vote: milestoneVotes[key],
                     })) || [];
 
+
                     const promises = votes.map(async (v) => await voteOnMilestone(null, v.voterAddress, firstPendingMilestone, v.vote, projectId))
                     await Promise.all(promises)
+                    // const resp = await syncProjectVotes(projectId, firstPendingMilestone, votes)
                 }
             } catch (error) {
                 // eslint-disable-next-line no-console

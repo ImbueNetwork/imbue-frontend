@@ -2,6 +2,14 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import passport from 'passport';
 
+import {
+  addVoteToDB,
+  checkExistingVote,
+  getPendingVotes,
+  getYesOrNoVotes,
+  updateVoteDB,
+} from '@/lib/queryServices/projectQueries';
+
 import db from '@/db';
 
 export default nextConnect()
@@ -17,41 +25,11 @@ export default nextConnect()
               'Project not found. Please use valid project ID and milestone index',
           });
 
-        const pending = await tx('project_approvers')
-          .select('*')
-          .leftJoin(
-            'project_votes',
-            'project_votes.voter_address',
-            'project_approvers.approver'
-          )
-          .leftJoin('users', 'users.web3_address', 'project_approvers.approver')
-          .where({ 'project_approvers.project_id': projectId, vote: null });
+        const pending = await getPendingVotes(projectId)(tx);
 
-        const yes = await tx('project_votes')
-          .select('*')
-          .where({
-            project_id: projectId,
-            milestone_index: milestoneIndex,
-            vote: true,
-          })
-          .leftJoin(
-            'users',
-            'users.web3_address',
-            'project_votes.voter_address'
-          );
+        const yes = await getYesOrNoVotes(projectId, milestoneIndex, true)(tx);
 
-        const no = await tx('project_votes')
-          .select('*')
-          .where({
-            project_id: projectId,
-            milestone_index: milestoneIndex,
-            vote: false,
-          })
-          .leftJoin(
-            'users',
-            'users.web3_address',
-            'project_votes.voter_address'
-          );
+        const no = await getYesOrNoVotes(projectId, milestoneIndex, false)(tx);
 
         res.status(200).json({
           yes,
@@ -59,7 +37,8 @@ export default nextConnect()
           pending,
         });
       } catch (error) {
-        console.log('🚀 ~ file: index.ts:51 ~ db.transaction ~ error:', error);
+        // eslint-disable-next-line no-console
+        console.error(error);
         res.status(404).json({ message: `Internal Error: ${error}` });
       }
     });
@@ -78,44 +57,38 @@ export default nextConnect()
 
         // await verifyUserIdFromJwt(req, res, [userAuth.id]);
 
-        const existingVote = await tx('project_votes')
-          .select('id', 'vote')
-          .where({
-            project_id: projectId,
-            milestone_index: milestoneIndex,
-            voter_address: voterAddress,
-          })
-          .first();
+        const existingVote = await checkExistingVote(
+          projectId,
+          milestoneIndex,
+          voterAddress
+        )(tx);
 
         if (existingVote?.id && existingVote?.vote === vote)
           return res.status(500).json({ message: 'Nothing to update' });
 
         if (!existingVote?.id) {
-          const resp = await tx('project_votes')
-            .insert({
-              project_id: Number(projectId),
-              milestone_index: Number(milestoneIndex),
-              user_id: Number(userId),
-              voter_address: voterAddress,
-              vote,
-            })
-            .returning('id');
+          const resp = await addVoteToDB(
+            projectId,
+            milestoneIndex,
+            voterAddress,
+            userId,
+            vote
+          )(tx);
 
           if (resp?.length) return res.status(200).json({ status: 'success' });
         } else {
-          const resp = await tx('project_votes')
-            .update({
-              vote,
-            })
-            .where({
-              project_id: Number(projectId),
-              milestone_index: Number(milestoneIndex),
-            });
+          const resp = await updateVoteDB(
+            projectId,
+            milestoneIndex,
+            vote,
+            voterAddress
+          )(tx);
 
           if (resp) return res.status(200).json({ status: 'success' });
         }
       } catch (error) {
-        console.log('🚀 ~ file: index.ts:102 ~ db.transaction ~ error:', error);
+        // eslint-disable-next-line no-console
+        console.error(error);
         return res.status(401).json(new Error('Server error: ' + error));
       }
     });
