@@ -16,7 +16,6 @@ import {
   expertExpData,
   // intermediateExpData,
 } from './__mocks__/briefsData';
-
 jest.mock('@/redux/services/briefService', () => ({
   getAllBriefs: jest.fn(),
   callSearchBriefs: jest.fn(),
@@ -24,7 +23,12 @@ jest.mock('@/redux/services/briefService', () => ({
   getAllSavedBriefs: jest.fn(),
   searchSkills: jest.fn(),
   getAllSkills: jest.fn(),
+  
 }));
+
+jest.mock('@/redux/services/freelancerService', () =>({
+  getFreelancerApplications:jest.fn()
+}))
 
 jest.mock('next/router', () => ({
   useRouter: jest.fn(() => ({
