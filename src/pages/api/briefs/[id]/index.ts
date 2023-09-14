@@ -62,7 +62,7 @@ export default nextConnect()
         //     items_per_page: 0,
         //   })(tx)
         //   .then((resp) => resp.length);
-
+       
         const briefCount = await models.searchBriefsCount({
           ...data,
           items_per_page: 0,

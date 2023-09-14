@@ -565,13 +565,13 @@ const Briefs = (): JSX.Element => {
           items_per_page: itemsPerPage,
           page: 1,
           verified_only: verified_only,
-          non_verified: false
+          non_verified: non_verified
         };
 
         if (search_value.length === 0) {
           setFilterVisible(!filterVisble);
         }
-
+        
         const briefs_filtered: any = await callSearchBriefs(filter);
 
         setBriefs(briefs_filtered?.currentData);
