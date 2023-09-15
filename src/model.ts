@@ -182,7 +182,7 @@ export interface BasicTxResponse {
 
 export type Freelancer = {
   id: string | number;
-  bio: string;
+  about: string;
   education: string;
   experience: string;
   facebook_link: string;
@@ -216,7 +216,7 @@ export type FreelancerResponse = {
 export function getDefaultFreelancer(): Freelancer {
   return {
     id: 0,
-    bio: '',
+    about: '',
     education: '',
     experience: '',
     facebook_link: '',
