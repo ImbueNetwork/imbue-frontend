@@ -674,7 +674,7 @@ const ApplicationPreview = (): JSX.Element => {
                 </select>
               ) : (
                 <p className='text-content-primary mt-2 w-full'>
-                  {durationOptions[durationId || 0].label}
+                  {durationOptions[durationId || 0]?.label || ""}
                 </p>
               )}
             </div>
