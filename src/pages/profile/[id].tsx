@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux';
 
 import {
   isUrlAndSpecialCharacterExist,
+  isUrlExist,
   isValidAddressPolkadotAddress,
 } from '@/utils/helper';
 
@@ -205,15 +206,11 @@ const Profile = ({ initUser, browsingUser }: any) => {
 
   const handleChange = async (e: any) => {
     if (e.target.name === 'display_name') {
-      if (isUrlAndSpecialCharacterExist(e.target.value)) {
-        setDisplayNameError('URL , special characters are not allowed in name');
-      } else if (
-        e.target.value &&
-        isNumOrSpecialCharacter(e.target.value.at(0))
-      ) {
-        setDisplayNameError('sentence must start with a character');
-      } else if (e.target.value.length < 1)
-        setDisplayNameError('name must be at least 1 character');
+      if(isUrlExist(e.target.value)) {
+        setDisplayNameError('URL is not allowed in name');
+      }
+        else if (e.target.value.length < 1 && e.target.value.length > 30)
+        setDisplayNameError('name must be between 1 and 30 characters');
       else setDisplayNameError(null);
     }
     if (e.target.name === 'username') {
@@ -224,7 +221,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
         e.target.value.length > 0 &&
         isNumOrSpecialCharacter(e.target.value.at(0))
       ) {
-        setUserNameError('sentence must start with a character');
+        setUserNameError('sentence must start with 1 letter');
       } else if (isUrlAndSpecialCharacterExist(e.target.value)) {
         setUserNameError(
           'URL , special characters are not allowed in username'
@@ -302,6 +299,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                     variant='outlined'
                     defaultValue={user?.display_name}
                     autoComplete='off'
+                    inputProps={{maxLength:30}}
                   />
                   {displayNameError && (
                     <p
@@ -337,6 +335,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                     label='Username'
                     variant='outlined'
                     defaultValue={user?.username}
+                    inputProps={{maxLength:30}}
                   />
                   {userNameError && (
                     <p

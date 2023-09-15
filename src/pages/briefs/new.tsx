@@ -316,6 +316,10 @@ const NewBrief = (): JSX.Element => {
     </div>
   );
 
+  const preventChange = (e:any) =>{
+        e.target.blur()
+  }
+
   const BudgetPanel = (
     <div className='mb-auto'>
       <p className={styles.fieldName}>Maximum project budget (USD)</p>
@@ -328,13 +332,16 @@ const NewBrief = (): JSX.Element => {
           data-testid='budget-input'
           value={budget || ''}
           max={1000000000}
+          onWheel={preventChange}
           onChange={(e) => {
             if (
               Number(e.target.value) < 0 ||
               Number(e.target.value) > 1000000000
             ) {
               e.preventDefault();
-            } else {
+            } 
+           
+            else {
               setBudget(Number(e.target.value));
             }
           }}
@@ -350,6 +357,10 @@ const NewBrief = (): JSX.Element => {
           We recommend a minimum budget of $10 for a brief.
         </div>
       )}
+      {!Number.isInteger(Number(budget)) && 
+        <div className={`${styles.budgetDescription} !my-5 !text-red-600`}>
+        Please use rounded numbers
+       </div>}
     </div>
   );
 
@@ -400,7 +411,7 @@ const NewBrief = (): JSX.Element => {
     if (step === 6 && durationId === undefined) {
       return false;
     }
-    if (step === 7 && (!budget || Number(budget) < 10)) {
+    if (step === 7 && (!budget || Number(budget) < 10 || !Number.isInteger(Number(budget)))) {
       return false;
     }
     return true;

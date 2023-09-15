@@ -434,7 +434,7 @@ const Freelancers = (): JSX.Element => {
   }
 
   if (loading) return <LoadingFreelancers />;
-
+   console.log(freelancers)
   return (
     <div>
       <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
@@ -504,7 +504,7 @@ const Freelancers = (): JSX.Element => {
                 ?.map?.(
                   (
                     {
-                      bio,
+                      about,
                       username,
                       display_name,
                       skills,
@@ -541,9 +541,9 @@ const Freelancers = (): JSX.Element => {
                               )}
                             </div>
                             <h5 className='text-xs lg:text-sm mt-2 text-imbue-purple-dark font-normal whitespace-pre-wrap break-all'>
-                              {bio?.length > 299
-                                ? bio.substring(0, 300) + '...'
-                                : bio}
+                              {about?.length > 299
+                                ? about.substring(0, 300) + '...'
+                                : about}
                             </h5>
                           </div>
                           <div
