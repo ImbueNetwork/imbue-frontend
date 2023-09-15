@@ -316,6 +316,10 @@ const NewBrief = (): JSX.Element => {
     </div>
   );
 
+  const preventChange = (e:any) =>{
+        e.target.blur()
+  }
+
   const BudgetPanel = (
     <div className='mb-auto'>
       <p className={styles.fieldName}>Maximum project budget (USD)</p>
@@ -328,6 +332,7 @@ const NewBrief = (): JSX.Element => {
           data-testid='budget-input'
           value={budget || ''}
           max={1000000000}
+          onWheel={preventChange}
           onChange={(e) => {
             if (
               Number(e.target.value) < 0 ||
