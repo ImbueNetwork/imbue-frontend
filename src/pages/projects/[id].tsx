@@ -954,6 +954,7 @@ function Project() {
         setOpenVotingList={setOpenVotingList}
         approvers={approversPreview}
         chainProjectId={project.chain_project_id}
+        projectId={project.id}
         setMilestoneVotes={setMilestoneVotes}
       />
       <BackDropLoader open={loading || userLoading} />

@@ -67,7 +67,7 @@ export const getApproverProfiles = async (walletAddresses: string[]) => {
     headers: config.postAPIHeaders,
     method: 'post',
     body: JSON.stringify(walletAddresses),
-});
+  });
 
   if (resp.ok) {
     return await resp.json();
@@ -142,8 +142,75 @@ export const updateFirstPendingMilestone = async (
   }
 };
 
+// Voting
+
+export const getMillestoneVotes = async (
+  projectId: number,
+  milestoneIndex: number
+) => {
+  try {
+    const resp = await fetch(
+      `${config.apiBase}/project/vote?projectId=${projectId}&milestoneIndex=${milestoneIndex}`,
+      {
+        headers: config.postAPIHeaders,
+        method: 'get',
+      }
+    );
+
+    return resp.json();
+  } catch (error) {
+    return {
+      message: 'Failed to get voters. status:' + error,
+    };
+  }
+};
+
+export const voteOnMilestone = async (
+  userId: number | string | null,
+  voterAddress: string,
+  milestoneIndex: number,
+  vote: boolean,
+  projectId: number | string
+) => {
+  try {
+    const resp = await fetch(`${config.apiBase}project/vote`, {
+      headers: config.getAPIHeaders,
+      method: 'post',
+      body: JSON.stringify({
+        projectId: projectId,
+        milestoneIndex,
+        userId,
+        voterAddress,
+        vote,
+      }),
+    });
+
+    return await resp.json();
+  } catch (error) {
+    return { message: 'Something went wrong' + error };
+  }
+};
+
+export const syncProjectVotes = async (
+  projectID: string | number,
+  milestoneIndex: string | number,
+  chainVotes: any
+) => {
+  const resp = await fetch(`${config.apiBase}project/vote/sync`, {
+    headers: config.getAPIHeaders,
+    method: 'post',
+    body: JSON.stringify({ projectID, milestoneIndex, chainVotes }),
+  });
+  console.log(
+    '🚀 ~ file: projectServices.ts:197 ~ syncProjectVotes ~ resp:',
+    resp
+  );
+};
+
+// no confidece votes
+
 export const getProjectNoConfidenceVoters = async (
-  projectId: number | string,
+  projectId: number | string
 ) => {
   const resp = await fetch(
     `${config.apiBase}/project/noConfidenceVote/getVoters?projectId=${projectId}`,
@@ -161,7 +228,6 @@ export const getProjectNoConfidenceVoters = async (
     };
   }
 };
-
 
 export const insertNoConfidenceVoter = async (
   projectId: number | string,
@@ -184,4 +250,3 @@ export const insertNoConfidenceVoter = async (
     };
   }
 };
-
