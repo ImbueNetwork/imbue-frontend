@@ -318,7 +318,18 @@ export const EditProposal = (): JSX.Element => {
           });
 
           setBudget(value);
-        } else {
+        } 
+        else if(!Number.isInteger(Number(value))){
+          setInputError((val) => {
+            return {
+              ...val,
+              budget: 'Budget must be rounded number',
+            };
+          });
+
+          setBudget(value);
+        }
+        else {
           setInputError((val) => {
             return {
               ...val,
