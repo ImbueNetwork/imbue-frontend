@@ -671,7 +671,11 @@ const Briefs = (): JSX.Element => {
   };
 
   const nextPage = () => {
-    if (briefs_total > currentPage * itemsPerPage) {
+    if (
+      savedBriefsActive
+        ? briefsData?.length > currentPage * itemsPerPage
+        : briefs_total > currentPage * itemsPerPage
+    ) {
       setCurrentPage(currentPage + 1);
       setPageInput(currentPage + 1);
       router.query.page = (currentPage + 1).toString()
@@ -700,11 +704,11 @@ const Briefs = (): JSX.Element => {
     }
   }
 
-  // const briefsData = savedBriefsActive
-  //   ? briefs?.filter((brief) =>
-  //     brief?.headline.toLocaleLowerCase().includes(searchInput)
-  //   )
-  //   : briefs;
+  const briefsData = savedBriefsActive
+    ? briefs?.filter((brief) =>
+      brief?.headline.toLocaleLowerCase().includes(searchInput)
+    )
+    : briefs;
 
   return (
     <div className='flex flex-col'>
@@ -736,13 +740,11 @@ const Briefs = (): JSX.Element => {
                 </div>
 
                 <p className='text-[1rem] text-imbue-purple-dark mt-[0.75rem]'>
-                  {/* {savedBriefsActive ? briefsData.length : briefs_total} brief */}
-                  {briefs_total} brief
+                  {savedBriefsActive ? briefsData.length : briefs_total} brief
                   {(
-                    // savedBriefsActive
-                    //   ? briefsData.length === 1
-                    //   : briefs_total === 1
-                    briefs_total === 1
+                    savedBriefsActive
+                      ? briefsData.length === 1
+                      : briefs_total === 1
                   )
                     ? ''
                     : 's'}{' '}
@@ -799,7 +801,7 @@ const Briefs = (): JSX.Element => {
           </div>
 
           <div className='briefs-list !overflow-hidden z-10'>
-            {briefs?.map(
+            {briefsData?.map(
               (item, itemIndex) => (
                 <div key={itemIndex} className='relative z-0'>
                   {savedBriefsActive && (
@@ -911,7 +913,7 @@ const Briefs = (): JSX.Element => {
                 className: "w-6 text-right px-1",
                 type: "number",
                 min: 1,
-                max: Math.ceil(briefs_total / itemsPerPage)
+                max: Math.ceil(savedBriefsActive ? briefsData?.length / itemsPerPage : briefs_total / itemsPerPage)
               }}
               onChange={(e) => setPageInput(Number(e.target.value))}
               onKeyDown={(e) => setPageNumber(e)}
@@ -921,7 +923,10 @@ const Briefs = (): JSX.Element => {
               of
             </span>
             <span>
-              {Math.ceil(briefs_total / itemsPerPage)}
+              {/* {Math.ceil(briefs_total / itemsPerPage)} */}
+              {
+                Math.ceil(savedBriefsActive ? briefsData?.length / itemsPerPage : briefs_total / itemsPerPage)
+              }
             </span>
             {/* {currentPage} of {Math.ceil(briefs_total / itemsPerPage)} */}
           </div>
