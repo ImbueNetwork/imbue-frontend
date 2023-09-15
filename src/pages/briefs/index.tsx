@@ -671,11 +671,7 @@ const Briefs = (): JSX.Element => {
   };
 
   const nextPage = () => {
-    if (
-      savedBriefsActive
-        ? briefsData?.length > currentPage * itemsPerPage
-        : briefs_total > currentPage * itemsPerPage
-    ) {
+    if (briefs_total > currentPage * itemsPerPage) {
       setCurrentPage(currentPage + 1);
       setPageInput(currentPage + 1);
       router.query.page = (currentPage + 1).toString()
@@ -923,10 +919,7 @@ const Briefs = (): JSX.Element => {
               of
             </span>
             <span>
-              {/* {Math.ceil(briefs_total / itemsPerPage)} */}
-              {
-                Math.ceil(savedBriefsActive ? briefsData?.length / itemsPerPage : briefs_total / itemsPerPage)
-              }
+              {Math.ceil(briefs_total / itemsPerPage)}
             </span>
             {/* {currentPage} of {Math.ceil(briefs_total / itemsPerPage)} */}
           </div>
