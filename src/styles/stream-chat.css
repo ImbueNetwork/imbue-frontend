@@ -25,8 +25,37 @@
   inset-block-end: -180% !important ;
   z-index: 1;
 }
-.image-gallery-slide{
+/* .image-gallery-slide{
   position: relative !important;
+} */
+
+.image-gallery-swipe,
+.image-gallery-slides {
+  height: 100vh;
+  width: 100vw;
+}
+
+.image-gallery-slide {
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  height: 80%;
+}
+
+.image-gallery-index {
+  left: 0 !important;
+  right: auto !important;
+}
+
+.str-chat__modal--open button.str-chat__modal__close-button {
+  z-index: 100;
+}
+
+.image-gallery-content .image-gallery-slide .image-gallery-image {
+  max-height: 100% !important;
+  height: 100% !important;
 }
 
 .str-chat__message--with-reactions .str-chat__message-reaction-selector {
