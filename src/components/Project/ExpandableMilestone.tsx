@@ -8,6 +8,7 @@ import { initImbueAPIInfo } from "@/utils/polkadot";
 import { ImbueChainPollResult, Milestone, OffchainProjectState, Project, User } from "@/model";
 import ChainService, { ImbueChainEvent } from "@/redux/services/chainService";
 import { updateFirstPendingMilestone, updateMilestone, updateProject, updateProjectVotingState } from "@/redux/services/projectServices";
+import { voteOnMilestone } from "@/redux/services/projectServices";
 
 import ProjectStateTag from "./ProjectStateTag";
 import AccountChoice from "../AccountChoice";
@@ -38,18 +39,13 @@ type ExpandableDropDownsProps = {
 };
 
 const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
-
     const { setLoading, project, setSuccess, setSuccessTitle, setError, milestone, index, modified, setOpenVotingList, approversPreview, firstPendingMilestone, projectInMilestoneVoting, isApplicant, canVote, user, projectType, isProjectOwner, balance, milestonLoadingTitle } = props
 
     const [expanded, setExpanded] = useState(false);
-    const [showPolkadotAccounts, setShowPolkadotAccounts] =
-        useState<boolean>(false);
-    const [submittingMilestone, setSubmittingMilestone] =
-        useState<boolean>(false);
+    const [showPolkadotAccounts, setShowPolkadotAccounts] = useState<boolean>(false);
+    const [submittingMilestone, setSubmittingMilestone] = useState<boolean>(false);
     const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
-    const [votingWalletAccount, setVotingWalletAccount] = useState<
-        WalletAccount | any
-    >({});
+    const [votingWalletAccount, setVotingWalletAccount] = useState<WalletAccount | any>({});
     const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
     const [withdrawMilestone, setWithdrawMilestone] = useState<boolean>(false);
 
@@ -114,8 +110,10 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
         setMilestoneKeyInView(milestone_index);
     }
 
-    const voteOnMilestone = async (account: WalletAccount, vote: boolean) => {
+    const handleVoteOnMilestone = async (account: WalletAccount, vote: boolean) => {
         setLoading(true);
+
+        if (!project?.id || !user.web3_address) return
 
         try {
             const imbueApi = await initImbueAPIInfo();
@@ -142,17 +140,20 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
 
             // eslint-disable-next-line no-constant-condition
             while (true) {
-
                 if (pollResult == ImbueChainPollResult.EventFound) {
                     await updateMilestone(milestone.project_id, milestoneKeyInView, true);
                     await updateProjectVotingState(Number(project.id), false)
                     await updateFirstPendingMilestone(Number(project.id), (Number(project.first_pending_milestone) + 1))
+                    await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
+
                     setSuccess(true);
                     setSuccessTitle('Your vote was successful. This milestone has been completed.');
                     setLoading(false);
                     break;
-                }
-                else if (result.status) {
+
+                } else if (result.status) {
+                    await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
+
                     setSuccess(true);
                     setSuccessTitle('Your vote was successful.');
                     setLoading(false);
@@ -162,8 +163,10 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
                     setError({ message: result.errorMessage });
                     setLoading(false);
                     break;
-                }
-                else if (pollResult != ImbueChainPollResult.Pending) {
+
+                } else if (pollResult != ImbueChainPollResult.Pending) {
+                    await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
+
                     setSuccess(true);
                     setSuccessTitle('Request resolved successfully');
                     setLoading(false);
@@ -265,7 +268,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
                                 <button
                                     className='primary !bg-transparent !hover:bg-transparent'
                                     onClick={() => {
-                                        voteOnMilestone(votingWalletAccount, true);
+                                        handleVoteOnMilestone(votingWalletAccount, true);
                                         setShowVotingModal(false);
                                     }}
                                 >
@@ -276,7 +279,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
                                 <button
                                     className='primary !bg-transparent !hover:bg-transparent'
                                     onClick={() => {
-                                        voteOnMilestone(votingWalletAccount, false);
+                                        handleVoteOnMilestone(votingWalletAccount, false);
                                         setShowVotingModal(false);
                                     }}
                                 >
