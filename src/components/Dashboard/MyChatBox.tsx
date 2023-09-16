@@ -11,7 +11,6 @@ import {
   MessageList,
   MessageSimple,
   RenderTextOptions,
-  Thread,
   useChatContext,
   useMessageContext,
   Window,
@@ -28,7 +27,7 @@ function DashboardChatBox({
   const mobileView = useMediaQuery('(max-width:500px)');
   const [channels, setChannels] = useState<any>([]);
   const [channel, setChannel] = useState<any>();
-  const filters = client &&  { members: { $in: [String(client.user?.id)] } };
+  const filters = client && { members: { $in: [String(client.user?.id)] } };
   const router = useRouter();
 
   useEffect(() => {
@@ -85,11 +84,10 @@ function DashboardChatBox({
             <button
               key={mych.cid}
               onClick={() => handleChatClick(mych)}
-              className={`str-chat__channel-preview-messenger str-chat__channel-preview ${
-                !mobileView &&
+              className={`str-chat__channel-preview-messenger str-chat__channel-preview ${!mobileView &&
                 mych.cid === channelContext?.cid &&
                 'str-chat__channel-preview-messenger--active'
-              }`}
+                }`}
             >
               <div className='str-chat__channel-preview-messenger--left'>
                 <div className='str-chat__avatar str-chat__avatar--circle str-chat__message-sender-avatar'>
@@ -184,10 +182,13 @@ function DashboardChatBox({
                     closeChat={closeChat}
                   />
 
-                  <MessageList />
+                  <MessageList
+                    closeReactionSelectorOnClick={true}
+                    messageActions={['edit', 'delete', 'flag', 'mute', 'pin', 'quote', 'react']}
+                  />
                   <MessageInput />
                 </Window>
-                <Thread />
+                {/* <Thread /> */}
               </Channel>
             )}
           </>
@@ -204,10 +205,13 @@ function DashboardChatBox({
             <Channel Message={CustomMessage}>
               <Window>
                 <CustomChannelHeader showFreelancerProfile={false} />
-                <MessageList />
+                <MessageList
+                  closeReactionSelectorOnClick={true}
+                  messageActions={['edit', 'delete', 'flag', 'mute', 'pin', 'quote', 'react']}
+                />
                 <MessageInput />
               </Window>
-              <Thread />
+              {/* <Thread /> */}
             </Channel>
           </div>
         )}

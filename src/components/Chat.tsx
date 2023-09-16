@@ -6,7 +6,6 @@ import {
   Chat,
   MessageInput,
   MessageList,
-  Thread,
   Window,
 } from 'stream-chat-react';
 import 'stream-chat-react/dist/css/v2/index.css';
@@ -104,7 +103,7 @@ export const ChatBox = ({
           await channel.watch();
 
           setContent(
-            <Chat client={client} theme='str-chat__theme-dark'>
+            <Chat client={client} theme='str-chat__theme-light'>
               <Channel channel={channel}>
                 <Window>
                   <div>
@@ -116,12 +115,15 @@ export const ChatBox = ({
                     </div>
                     <CustomChannelHeader {...{ targetUser, showFreelancerProfile, chatPopUp }} />
                   </div>
-                  <MessageList />
+                  <MessageList
+                    closeReactionSelectorOnClick={true}
+                    messageActions={['edit', 'delete', 'flag', 'mute', 'pin', 'quote', 'react']}
+                  />
                   <div className='border-t border-t-white border-opacity-25'>
                     <MessageInput />
                   </div>
                 </Window>
-                <Thread />
+                {/* <Thread /> */}
               </Channel>
             </Chat>
           );

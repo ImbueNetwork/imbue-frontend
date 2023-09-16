@@ -21,10 +21,10 @@
   padding-top: 30px;
 }
 
-.str-chat__message-reaction-selector {
+/* .str-chat__message-reaction-selector {
   inset-block-end: -180% !important ;
   z-index: 1;
-}
+} */
 /* .image-gallery-slide{
   position: relative !important;
 } */
@@ -60,6 +60,7 @@
 
 .str-chat__message--with-reactions .str-chat__message-reaction-selector {
   inset-block-end: -100% !important ;
+  z-index: 100;
 }
 
 .pin-text {
