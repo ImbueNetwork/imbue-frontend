@@ -251,7 +251,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         !isValidAddressPolkadotAddress(e.target.value) &&
         isNumOrSpecialCharacter(e.target.value.at(0))
       ) {
-        setUserNameError('sentence must start with 1 letter');
+        setUserNameError('username must start with 1 letter');
       } else setUserNameError(null);
       const data = await matchedByUserName(e.target.value);
       if (data?.id && e.target.value !== prevUserName) {

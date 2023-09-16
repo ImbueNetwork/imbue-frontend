@@ -497,6 +497,7 @@ export const EditProposal = (): JSX.Element => {
                 type='number'
                 min='0'
                 max={1000000000}
+                onWheel={(event: any) =>{event.target.blur();}}
                 value={budget || ''}
                 onChange={handleChange}
                 name='budget'
