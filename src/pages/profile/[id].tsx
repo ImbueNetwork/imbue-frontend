@@ -221,7 +221,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
         e.target.value.length > 0 &&
         isNumOrSpecialCharacter(e.target.value.at(0))
       ) {
-        setUserNameError('sentence must start with 1 letter');
+        setUserNameError('username must start with 1 letter');
       } else if (isUrlAndSpecialCharacterExist(e.target.value)) {
         setUserNameError(
           'URL , special characters are not allowed in username'
