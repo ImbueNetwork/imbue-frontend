@@ -68,7 +68,7 @@ const Briefs = (): JSX.Element => {
   const [pageInput, setPageInput] = useState<number>(1);
 
   const [skills, setSkills] = useState<Item[]>([{ name: "", id: 0 }]);
-  const [myApplications,_setMyApplications] = useState<Project[]>()
+  const [myApplications, _setMyApplications] = useState<Project[]>()
   const [error, setError] = useState<any>();
   const { expRange, submitRange, lengthRange, heading, size: sizeProps, skillsProps, verified_only: verifiedOnlyProp } = router.query;
 
@@ -84,25 +84,25 @@ const Briefs = (): JSX.Element => {
   // The interior index is used to specify which entry will be used in the search brief.
   // This is not a good implementation but im afraid if we filter and find itll be slow.
   // I can change this on request: felix
-  const handleSetItemPerPage = (val:number)=>{
-       setItemsPerPage(val);
-      const totalPage = Math.ceil(briefs_total/val);
-      if(currentPage > totalPage){
-        setCurrentPage(totalPage)
-        setPageInput(totalPage);
-        router.query.page = (totalPage).toString()
-        router.push(router, undefined, { shallow: true });
-      }
+  const handleSetItemPerPage = (val: number) => {
+    setItemsPerPage(val);
+    const totalPage = Math.ceil(briefs_total / val);
+    if (currentPage > totalPage) {
+      setCurrentPage(totalPage)
+      setPageInput(totalPage);
+      router.query.page = (totalPage).toString()
+      router.push(router, undefined, { shallow: true });
+    }
   }
 
-  useEffect(()=>{
-    const fetchApplication = async () =>{
-    _setMyApplications(await getFreelancerApplications(currentUser?.id));
-  }
-  
-  fetchApplication()
-  
-  },[currentUser,currentUser?.id])
+  useEffect(() => {
+    const fetchApplication = async () => {
+      _setMyApplications(await getFreelancerApplications(currentUser?.id));
+    }
+
+    fetchApplication()
+
+  }, [currentUser, currentUser?.id])
 
   const expfilter = {
     // This is a table named "experience"
@@ -300,7 +300,7 @@ const Briefs = (): JSX.Element => {
 
   useEffect(() => {
     const fetchAndSetBriefs = async () => {
-      
+
       try {
         if (!Object.keys(router?.query).length) {
           const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
@@ -325,7 +325,7 @@ const Briefs = (): JSX.Element => {
             items_per_page: itemsPerPage,
             page: currentPage,
             verified_only: false,
-            non_verified:false
+            non_verified: false
           };
 
           const verifiedOnlyPropIndex = selectedFilterIds.indexOf('4-0');
@@ -410,9 +410,21 @@ const Briefs = (): JSX.Element => {
           }
 
 
-          const result: any = await callSearchBriefs(filter);
+          let result: any = [];
 
-          if (result.status === 200) {
+          if (savedBriefsActive) {
+            result = await getAllSavedBriefs(
+              filter.items_per_page || itemsPerPage,
+              currentPage,
+              currentUser?.id
+            );
+
+          } else {
+            result = await callSearchBriefs(filter);
+          }
+
+
+          if (result.status === 200 || result.totalBriefs !== undefined) {
             const totalPages = Math.ceil(result?.totalBriefs / (filter?.items_per_page || 6))
 
             if (totalPages < filter.page && totalPages > 0) {
@@ -430,7 +442,7 @@ const Briefs = (): JSX.Element => {
           }
         }
       } catch (error) {
-        setError({ message: "Something went wrong. Please try again" })
+        setError({ message: "Something went wrong. Please try again" + error })
       }
       finally {
         setLoading(false)
@@ -476,7 +488,7 @@ const Briefs = (): JSX.Element => {
           // Here we are trying to build teh paramaters required to build the query
           // We build an array for each to get the values we want through concat.
           // and also specify if we want more than using the is_max field.
-         
+
           switch (parseInt(filterType) as BriefFilterOption) {
             case BriefFilterOption.ExpLevel:
               {
@@ -518,11 +530,11 @@ const Briefs = (): JSX.Element => {
 
             case BriefFilterOption.FreelancerInfo:
               {
-                
-                if( parseInt(interiorIndex)=== 0)
-                verified_only = true;
-                if(parseInt(interiorIndex)=== 1)
-                 non_verified = true;
+
+                if (parseInt(interiorIndex) === 0)
+                  verified_only = true;
+                if (parseInt(interiorIndex) === 1)
+                  non_verified = true;
               }
               break;
 
@@ -575,7 +587,7 @@ const Briefs = (): JSX.Element => {
         if (search_value.length === 0) {
           setFilterVisible(!filterVisble);
         }
-        
+
         const briefs_filtered: any = await callSearchBriefs(filter);
 
         setBriefs(briefs_filtered?.currentData);
@@ -649,13 +661,13 @@ const Briefs = (): JSX.Element => {
     setBriefsTotal(allBriefs?.totalBriefs);
   };
 
-  const appliedBreifId = useMemo(()=>{
-    const data = myApplications?.map((it:Project)=>it.brief_id
+  const appliedBreifId = useMemo(() => {
+    const data = myApplications?.map((it: Project) => it.brief_id
     );
     return data
   }, [myApplications])
 
-  
+
 
   const cancelFilters = async () => {
     reset();
@@ -809,9 +821,9 @@ const Briefs = (): JSX.Element => {
                       router.push(`/briefs/${item?.id}`)
                     }
                   >
-                    {appliedBreifId?.includes(item.id) && 
-                    <div className='bg-imbue-light-purple-hover w-20 py-1 flex justify-center items-center rounded-full'><p className='text-imbue-purple-dark'>Applied</p></div>
-                  }
+                    {appliedBreifId?.includes(item.id) &&
+                      <div className='bg-imbue-light-purple-hover w-20 py-1 flex justify-center items-center rounded-full'><p className='text-imbue-purple-dark'>Applied</p></div>
+                    }
                     <div className='brief-title'>
                       {item.headline.length > 50
                         ? `${item.headline.substring(0, 50)}...`
@@ -901,7 +913,7 @@ const Briefs = (): JSX.Element => {
                 className: "w-6 text-right px-1",
                 type: "number",
                 min: 1,
-                max: Math.ceil(briefs_total / itemsPerPage)
+                max: Math.ceil(savedBriefsActive ? briefsData?.length / itemsPerPage : briefs_total / itemsPerPage)
               }}
               onChange={(e) => setPageInput(Number(e.target.value))}
               onKeyDown={(e) => setPageNumber(e)}
