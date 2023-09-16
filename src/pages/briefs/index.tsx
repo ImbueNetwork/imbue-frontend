@@ -337,6 +337,10 @@ const Briefs = (): JSX.Element => {
             setPageInput(pageQuery)
           }
 
+          if(router.query.non_verified) {
+            filter.non_verified = true
+          }
+
           if (sizeProps) {
             filter.items_per_page = Number(sizeProps)
             setItemsPerPage(Number(sizeProps))

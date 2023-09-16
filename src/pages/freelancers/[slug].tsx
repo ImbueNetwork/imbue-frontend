@@ -233,13 +233,11 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
       else settitleError(null);
     }
     if (e.target.name === 'display_name') {
-      if (newFreelancer.display_name.trim().length < 1) {
-        setDisplayNameError('Display name must be at least 1 character long');
-      } else if (isNumOrSpecialCharacter(e.target.value.at(0))) {
-        setDisplayNameError('sentence must start with a character');
-      } else if (isUrlAndSpecialCharacterExist(e.target.value)) {
+      if (newFreelancer.display_name.trim().length < 1 && newFreelancer.display_name.trim().length > 30) {
+        setDisplayNameError('Display name must be between 1 to 30 characters long');
+      }  else if (isUrlExist(e.target.value)) {
         setDisplayNameError(
-          'URL,special characters are not allowed in display name'
+          'URL and special characters are not allowed in display name'
         );
       } else setDisplayNameError(null);
     }
@@ -253,10 +251,10 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
         !isValidAddressPolkadotAddress(e.target.value) &&
         isNumOrSpecialCharacter(e.target.value.at(0))
       ) {
-        setUserNameError('sentence must start with a character');
+        setUserNameError('sentence must start with 1 letter');
       } else setUserNameError(null);
       const data = await matchedByUserName(e.target.value);
-      if (data.id && e.target.value !== prevUserName) {
+      if (data?.id && e.target.value !== prevUserName) {
         setUserNameExist(true);
       } else setUserNameExist(false);
     }
@@ -517,6 +515,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                       color='secondary'
                       defaultValue={freelancer?.display_name || ""}
                       autoComplete='off'
+                      inputProps={{maxLength:30}}
                     />
                     {displayError && (
                       <p
@@ -556,6 +555,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                         color='secondary'
                         defaultValue={freelancer?.username || ""}
                         autoComplete='off'
+                        inputProps={{maxLength:30}}
                       />
                       {userNameError && (
                         <p
