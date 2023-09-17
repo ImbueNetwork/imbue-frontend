@@ -26,6 +26,7 @@ function DashboardChatBox({
 }) {
   const mobileView = useMediaQuery('(max-width:500px)');
   const [channels, setChannels] = useState<any>([]);
+  console.log("🚀 ~ file: MyChatBox.tsx:29 ~ channels:", channels)
   const [channel, setChannel] = useState<any>();
   const filters = client && { members: { $in: [String(client.user?.id)] } };
   const router = useRouter();
@@ -61,6 +62,18 @@ function DashboardChatBox({
       return username;
     };
 
+    const getUserPhoto = (index: string) => {
+      const array: any = Object.values(channels[index]?.state?.members);
+      let profile_photo = 'Not Found';
+
+      array?.forEach(function (key: any) {
+        if (array.length === 2 && key.user_id !== client.userID) {
+          profile_photo = key?.user?.profile_photo
+        }
+      });
+      return profile_photo;
+    };
+
     const getLastMessage = (index: string) => {
       const messges = channels[index]?.state?.messageSets;
       const length = messges[0]?.messages.length || 0;
@@ -76,6 +89,19 @@ function DashboardChatBox({
       router.query.chat = selectedChannel.id;
       router.push(router, undefined, { shallow: true });
     };
+
+    // useEffect(() => {
+    //   const getUserInfo = async () => {
+    //     if (targetUserId === undefined) return
+
+    //     const resp = await getUserChatProfile(targetUserId);
+    //     setChatProfile(resp);
+    //   }
+
+    //   getUserInfo()
+
+
+    // }, [loading, members, targetUserId, user.id])
 
     return channels.length ? (
       <div className='str-chat__channel-list-messenger str-chat__channel-list-messenger-react'>
@@ -95,7 +121,8 @@ function DashboardChatBox({
                     height={mobileView ? 30 : 40}
                     width={mobileView ? 30 : 40}
                     src={
-                      mych.data.image ||
+                      getUserPhoto(index) ||
+                      // mych.data.image ||
                       require('@/assets/images/profile-image.png')
                     }
                     alt=''
@@ -196,8 +223,8 @@ function DashboardChatBox({
           <div className='flex h-full'>
             <div className='chat-list-container border-r border-r-white'>
               <ChannelList
-                // renderChannels={renderChannels}
-                // List={CustomListContainer}
+                renderChannels={renderChannels}
+                List={CustomListContainer}
                 filters={filters}
                 showChannelSearch={true}
               />

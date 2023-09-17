@@ -71,6 +71,9 @@ export default nextConnect().post(
               await models.updateUserGetStreamToken(userExists?.id, token)(tx);
             }
 
+            // TODO: Remove this after all the users have profile photo in chat
+            await models.updateGetStreamUserName(userExists);
+
             return res.send({ success: true });
           }
 
