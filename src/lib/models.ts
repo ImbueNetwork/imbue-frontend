@@ -409,6 +409,7 @@ export const generateGetStreamToken = async (user: User) => {
       id: String(user?.id),
       name: user?.display_name,
       username: user?.username,
+      profile_photo: user?.profile_photo,
     });
     return token;
   }
@@ -426,6 +427,7 @@ export const updateGetStreamUserName = async (user: User) => {
       set: {
         name: user.display_name,
         username: user.username,
+        profile_photo: user.profile_photo,
       },
     });
 
@@ -1518,8 +1520,9 @@ export const searchBriefs =
         if (filter?.skills_range?.length > 0) {
           this.whereIn('brief_skills.skill_id', filter.skills_range);
         }
-      }).where(function(){
-        if(filter?.non_verified && !filter?.verified_only){
+      })
+      .where(function () {
+        if (filter?.non_verified && !filter?.verified_only) {
           this.where('verified_only', false);
         }
       })
@@ -1559,7 +1562,7 @@ export const searchFreelancers =
         'telegram_link',
         'discord_link',
         'title',
-        'bio',
+        // 'bio',
         'freelancers.user_id',
         'username',
         'users.profile_photo as profile_image',
@@ -1568,7 +1571,8 @@ export const searchFreelancers =
         'freelancers.created',
         'verified',
         'users.country',
-        'users.region'
+        'users.region',
+        'users.about'
       )
       .from<Freelancer>('freelancers')
       .innerJoin('users', { 'freelancers.user_id': 'users.id' })
