@@ -1559,7 +1559,7 @@ export const searchFreelancers =
         'telegram_link',
         'discord_link',
         'title',
-        'bio',
+        // 'bio',
         'freelancers.user_id',
         'username',
         'users.profile_photo as profile_image',
@@ -1567,6 +1567,7 @@ export const searchFreelancers =
         'web3_accounts.address as web3_address',
         'freelancers.created',
         'verified',
+        'users.about',
         'users.country',
         'users.region'
       )

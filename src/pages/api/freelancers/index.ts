@@ -48,7 +48,7 @@ export default nextConnect()
                 )(tx);
               }),
             ]);
-
+           
             res.status(200).json({
               currentData: freelancers,
               totalFreelancers: freelancerCount[0].count,
