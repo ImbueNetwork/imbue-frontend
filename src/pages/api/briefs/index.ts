@@ -143,6 +143,11 @@ export default nextConnect()
 
     verifyUserIdFromJwt(req, res, [userAuth.id]);
 
+    if (!brief?.user_id || userAuth.id !== brief.user_id)
+      return res.status(401).json({
+        message: 'Only owner can update brief',
+      });
+
     await db.transaction(async (tx: any) => {
       try {
         const skill_ids = await upsertItems(brief.skills, 'skills')(tx);

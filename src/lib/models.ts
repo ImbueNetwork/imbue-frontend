@@ -1331,7 +1331,7 @@ export const updateFreelancerDetails =
     web3_challenge: string,
     // eslint-disable-next-line unused-imports/no-unused-vars
     freelancer_clients: Array<{ id: number; name: string; img: string }>,
-    token: string
+    // token: string
   ) =>
   async (tx: Knex.Transaction) =>
     await tx<Freelancer>('freelancers')
@@ -1358,7 +1358,7 @@ export const updateFreelancerDetails =
             username: f.username,
             country: country,
             region: region,
-            getstream_token: token,
+            // getstream_token: token,
             about: f.about,
           });
         }
