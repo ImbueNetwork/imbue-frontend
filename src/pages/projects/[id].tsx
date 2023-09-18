@@ -369,7 +369,7 @@ function Project() {
 
     } catch (error) {
       console.error(error)
-      setError({ message: "Could sync project. ", error })
+      setError({ message: "Could not sync project. ", error })
     } finally {
       setMilestoneLoadingTitle("")
       setLoading(false)
@@ -503,8 +503,6 @@ function Project() {
         requiredBalance,
         project
       }} />}
-
-      {showPolkadotAccounts && renderPolkadotJSModal}
 
       {showPolkadotAccounts && renderPolkadotJSModal}
 
