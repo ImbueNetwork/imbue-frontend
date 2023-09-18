@@ -69,7 +69,7 @@ export const EditProposal = (): JSX.Element => {
     message: '',
   };
 
-  const [_brief, setBrief] = useState<Brief | any>();
+  const [brief, setBrief] = useState<Brief | any>();
   // FIXME: user
   const { user } = useSelector((state: RootState) => state.userState);
   const [industries, setIndustries] = useState<string[]>([]);
@@ -183,8 +183,10 @@ export const EditProposal = (): JSX.Element => {
         experience_id: expId,
         budget,
         brief_id: briefId,
-        verified_only
+        verified_only,
+        user_id: brief.user_id
       });
+
       if (updateBriefResponse) {
         setSuccess(true);
       } else {
@@ -318,8 +320,8 @@ export const EditProposal = (): JSX.Element => {
           });
 
           setBudget(value);
-        } 
-        else if(!Number.isInteger(Number(value))){
+        }
+        else if (!Number.isInteger(Number(value))) {
           setInputError((val) => {
             return {
               ...val,
@@ -497,7 +499,7 @@ export const EditProposal = (): JSX.Element => {
                 type='number'
                 min='0'
                 max={1000000000}
-                onWheel={(event: any) =>{event.target.blur();}}
+                onWheel={(event: any) => { event.target.blur(); }}
                 value={budget || ''}
                 onChange={handleChange}
                 name='budget'
