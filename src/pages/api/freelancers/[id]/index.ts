@@ -8,7 +8,6 @@ import {
   fetchFreelancerClients,
   fetchFreelancerDetailsByUsername,
   fetchFreelancerMetadata,
-  generateGetStreamToken,
   User,
 } from '@/lib/models';
 import { isUrlAndSpecialCharacterExist, isUrlExist } from '@/utils/helper';
@@ -183,7 +182,13 @@ export default nextConnect()
           const web3_challenge = freelancer.web3_challenge;
           const freelancer_clients = freelancer?.clients;
 
-          const token = await generateGetStreamToken(freelancer);
+          // const token = await models.generateGetStreamToken(freelancer);
+          await models.updateGetStreamUserName({
+            ...userAuth,
+            display_name: freelancer.display_name,
+            username: freelancer.username,
+            profile_photo: profile_image,
+          });
 
           if (
             isUrlAndSpecialCharacterExist(freelancer.display_name) ||
@@ -209,8 +214,8 @@ export default nextConnect()
             web3_address,
             web3_type,
             web3_challenge,
-            freelancer_clients,
-            token
+            freelancer_clients
+            // token
           )(tx);
 
           if (!freelancer_id) {
@@ -225,10 +230,13 @@ export default nextConnect()
             freelancer_id: freelancer_id,
           });
         } catch (e) {
-          new Error(`Failed to update freelancer ${freelancer.display_name}`, {
-            cause: e as Error,
-          });
-          console.log(e);
+          res.status(401).json({ message: 'Error: ' + e });
+          throw new Error(
+            `Failed to update freelancer ${freelancer.display_name}`,
+            {
+              cause: e as Error,
+            }
+          );
         }
       });
       return response;
