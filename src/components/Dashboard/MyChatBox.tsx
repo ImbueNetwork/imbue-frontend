@@ -26,7 +26,6 @@ function DashboardChatBox({
 }) {
   const mobileView = useMediaQuery('(max-width:500px)');
   const [channels, setChannels] = useState<any>([]);
-  console.log("🚀 ~ file: MyChatBox.tsx:29 ~ channels:", channels)
   const [channel, setChannel] = useState<any>();
   const filters = client && { members: { $in: [String(client.user?.id)] } };
   const router = useRouter();
