@@ -22,17 +22,17 @@ import { authenticate } from '@/pages/api/info/user';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 
 
-
-
-
 const Join = (): JSX.Element => {
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
   const [ loginModal ,setLoginModal] = useState("signup");
+
+
   const closeLogInModal = (val:boolean)=>{
     if(val === false){
       setLoginModal("signup");
     }
   }
+
   const closeModal = (): void => {
     showPolkadotAccounts(true);
   };
@@ -67,10 +67,6 @@ const Join = (): JSX.Element => {
      alert('incorrect username or password');
     }
   };
-
-
-
-  
 
 
   return (
