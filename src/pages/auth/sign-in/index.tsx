@@ -255,7 +255,7 @@ export default function SignIn() {
 
           <span className='h-[1px] w-[50%] bg-[#D9D9D9]' />
         </div>
-        <p className="text-imbue-purple-dark text-xs">By signing up, you agree with Imbue’s Terms & Conditions and Privacy Policy.</p>
+        <p className="text-imbue-purple-dark text-xs">By signing up, you agree with Imbue’s <a href='#' className='underline'> Terms & Conditions </a> and Privacy Policy.</p>
       </div>
     </div>
     {/* <AccountChoice

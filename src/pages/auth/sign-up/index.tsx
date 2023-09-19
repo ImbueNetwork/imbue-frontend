@@ -464,7 +464,7 @@ export default function SignIn(){
         </span>
       </div>
     </form>
-    <p className="text-xs text-black">By signing up, you agree with Imbue’s Terms & Conditions and Privacy Policy.</p>
+    <p className="text-xs text-black">By signing up, you agree with Imbue’s <a href="#" className="underline">Terms & Conditions</a>  and Privacy Policy.</p>
         </div>
         </div>
         <AccountChoice
