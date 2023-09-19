@@ -12,7 +12,8 @@ import { useEffect, useState } from "react";
 
 import * as utils from '@/utils';
 
-import { walletIcon } from '@/assets/svgs';
+import Carousel from '@/components/Carousel/Carousel';
+
 import * as config from '@/config';
 import { postAPIHeaders } from '@/config';
 import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
@@ -115,13 +116,19 @@ export default function SignIn() {
     setSuppotedWallets(supportedWallets);
   }, [])
 
+  const slides = [
+    <Image key={"image-1"} src={"/FirstFrame.png"} height={700} width={500} alt="" />,
+    <Image key={"image-2"} src={"/SecondFrame.png"} height={700} width={500} alt="" />,
+    <Image key={"image-3"} src={"/ThirdFrame.png"} height={700} width={500} alt="" />,
+  ];
+
   return <div className="w-full flex justify-center ">
     <div className="bg-white flex space-x-5 p-2 rounded-2xl">
-      <div className="left-side">
-        <Image src={"/SecondFrame.png"} height={700} width={450} alt="" />
+      <div className="left-side w-[31.25rem]">
+        <Carousel slides={slides}/>
       </div>
       <div className="content px-8 py-16">
-        <h2 className="text-imbue-purple-dark text-4xl" >Login to your account</h2>
+        <h2 className="text-imbue-purple-dark text-3xl" >Login to your account</h2>
         <p className="text-[#9794AB]" >Welcome back to imbue</p>
         <div className="flex mt-9 space-x-4">
           <div className='login justify-center items-center w-full flex flex-col'>
@@ -152,14 +159,16 @@ export default function SignIn() {
               data-mdc-dialog-action='web3'
               onClick={() => openModal()}
             >
-              <button className='h-[2.4rem] rounded-[1.56rem] border border-imbue-purple-dark w-full justify-center bg-[#E1DDFF]'>
-                <div className='flex text-sm w-52 text-imbue-purple-dark justify-center items-center'>
+              <button className='h-[2.6rem] rounded-[1.56rem] border  w-full justify-center bg-imbue-lime-light'>
+                <div className='flex text-sm w-52  text-[#344F00] justify-center items-center'>
                   <Image
-                    src={walletIcon}
+                    src={"/wallet.svg"}
+                    width={32}
+                    height={20}
                     alt='Wallet-icon'
                     className='relative right-2'
                   />
-                  Sign in with a wallet
+                 <p>Sign in with wallet</p> 
                 </div>
               </button>
             </li>
@@ -236,7 +245,7 @@ export default function SignIn() {
         </div>
         {errorMessage && <p className="text-imbue-coral text-center">{errorMessage}</p>}
         <div className="flex justify-center space-x-3 mt-5">
-          <p className="text-[#9794AB]">new to imbue?</p>
+          <p className="text-[#9794AB]">New to Imbue?</p>
           <span
             onClick={() => { router.push("/auth/sign-up") }}
             className="text-imbue-purple-dark cursor-pointer " >Create An account</span>
