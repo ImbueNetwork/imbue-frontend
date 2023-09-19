@@ -558,7 +558,7 @@ class ChainService {
     const rounds: any[] =
       await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries([
         project.chain_project_id,
-        lastUnapprovedMilestone,
+        lastUnapprovedMilestone?.milestone_index,
       ]);
 
     for (let i = Object.keys(rounds).length - 1; i >= 0; i--) {
