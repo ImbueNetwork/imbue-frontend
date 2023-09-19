@@ -322,11 +322,13 @@ function Project() {
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);
       const onChainProjectRes = await chainService.getProject(projectId);
+      console.log("🚀 ~ file: [id].tsx:325 ~ syncProject ~ onChainProjectRes:", onChainProjectRes)
 
       if (onChainProjectRes?.id && project?.id) {
         const firstPendingMilestoneChain = await chainService.findFirstPendingMilestone(
           onChainProjectRes.milestones
         );
+        console.log("🚀 ~ file: [id].tsx:331 ~ syncProject ~ firstPendingMilestoneChain:", firstPendingMilestoneChain)
 
         if (
           firstPendingMilestoneChain === project.first_pending_milestone &&

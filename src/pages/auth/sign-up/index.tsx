@@ -5,13 +5,11 @@ import { SignerResult } from "@polkadot/api/types";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { WalletAccount } from "@talismn/connect-wallets";
 import bcrypt from 'bcryptjs';
+// const PasswordStrengthBar = dynamic(() => import('react-password-strength-bar'));
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useState } from "react";
-// import PasswordStrengthBar from "react-password-strength-bar";
-const PasswordStrengthBar = dynamic(() => import('react-password-strength-bar'));
-
-import dynamic from "next/dynamic";
+import PasswordStrengthBar from "react-password-strength-bar";
 
 import * as utils from '@/utils';
 import { matchedByUserName, matchedByUserNameEmail } from "@/utils";
@@ -389,8 +387,6 @@ export default function SignIn() {
             </p>
           </div>
 
-
-
           <div className='flex flex-col justify-center pb-[10px] w-full mt-2'>
             <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
               Password
@@ -420,6 +416,7 @@ export default function SignIn() {
               {error.password}
             </p>
           </div>
+
           <div className="flex flex-col space-y-2 text-imbue-purple-dark items-center">
             <p className="text-black">Password strength requirement</p>
             <div className="flex text-[#A1A1A1] text-sm space-x-4">
