@@ -116,16 +116,10 @@ export default function SignIn() {
     setSuppotedWallets(supportedWallets);
   }, [])
 
-  const slides = [
-    <Image key={"image-1"} src={"/FirstFrame.png"} height={700} width={500} alt="" />,
-    <Image key={"image-2"} src={"/SecondFrame.png"} height={700} width={500} alt="" />,
-    <Image key={"image-3"} src={"/ThirdFrame.png"} height={700} width={500} alt="" />,
-  ];
-
   return <div className="w-full flex justify-center ">
     <div className="bg-white flex space-x-5 p-2 rounded-2xl">
       <div className="left-side w-[31.25rem]">
-        <Carousel slides={slides}/>
+        <Carousel/>
       </div>
       <div className="content px-8 py-16">
         <h2 className="text-imbue-purple-dark text-3xl" >Login to your account</h2>
