@@ -550,10 +550,16 @@ class ChainService {
     );
     const lastHeader = await this.imbueApi.imbue.api.rpc.chain.getHeader();
     const currentBlockNumber = lastHeader.number?.toBigInt();
+
+    const lastUnapprovedMilestone = milestones.find(
+      (milestone) => !milestone.is_approved
+    );
+
     const rounds: any[] =
-      await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries(
-        project.chain_project_id
-      );
+      await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries([
+        project.chain_project_id,
+        lastUnapprovedMilestone,
+      ]);
 
     for (let i = Object.keys(rounds).length - 1; i >= 0; i--) {
       const [roundType, expiringBlock] = rounds[i];
