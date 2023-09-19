@@ -5,6 +5,7 @@ import { SignerResult } from "@polkadot/api/types";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { WalletAccount } from "@talismn/connect-wallets";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import { useState } from "react";
 
 import * as utils from '@/utils';
@@ -17,16 +18,22 @@ import { postAPIHeaders } from '@/config';
 import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
 
 export default function SignIn(){
-    const [userOrEmail, setUserOrEmail] = useState<string>();
+    const [userOrEmail, setUserOrEmail] = useState<string>("");
     const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
-    const [password, setPassword] = useState<string>();
+    const [password, setPassword] = useState<string>("");
     const [loading, setLoading]  = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState("")
+    
+    const router = useRouter()
 
     const handleSubmit = async ()=>{
       setLoading(true);
       try {
+        if(userOrEmail?.length < 1 || password?.length<1){
+          setErrorMessage("incorrect username or password")
+          return
+        }
         const resp = await fetch(`${config.apiBase}auth/imbue/`, {
           headers: postAPIHeaders,
           method: 'post',
@@ -202,11 +209,14 @@ export default function SignIn(){
                             {loading ? 'Signing In' : 'Sign In'}
                           </span>
                         </button>
-                        {errorMessage.length && <p>{errorMessage}</p>}
+                        
                       </div>
+                      {errorMessage.length && <p className="text-imbue-coral text-center">{errorMessage}</p>}
                      <div className="flex justify-center space-x-3 mt-5">
                           <p className="text-[#9794AB]">new to imbue?</p>
-                          <span className="text-imbue-purple-dark" >Create An account</span>
+                          <span
+                          onClick={()=>{router.push("/auth/sign-up")}}
+                          className="text-imbue-purple-dark cursor-pointer " >Create An account</span>
                      </div>
                      <div className='w-full mt-8 mb-5 flex justify-between items-center'>
                 <span className='h-[1px] w-[50%] bg-[#D9D9D9]' />

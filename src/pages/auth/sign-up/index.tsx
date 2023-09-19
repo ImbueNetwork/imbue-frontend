@@ -20,7 +20,8 @@ import { walletIcon } from '@/assets/svgs';
 import * as config from '@/config';
 import { postAPIHeaders } from '@/config';
 import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
-import AccountModal from "../component/AccountModal";
+
+
 
 
 type FormErrorMessage={
@@ -447,8 +448,8 @@ export default function SignIn(){
           Already on Imbue?
         </span>
         <span
-          className='signup text-imbue-coral ml-1 hover:underline cursor-pointer'
-          onClick={()=>{router.push("/auth/sign-up")}}
+          className='signup text-imbue-purple-dark  ml-1 hover:underline cursor-pointer'
+          onClick={()=>{router.push("/auth/sign-in")}}
         >
           Sign In
         </span>
@@ -462,7 +463,5 @@ export default function SignIn(){
         visible={polkadotAccountsVisible}
         setVisible={showPolkadotAccounts}
       />
-     
-      
     </div>
 }
