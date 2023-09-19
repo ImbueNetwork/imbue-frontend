@@ -1,3 +1,5 @@
+import ArrowBack from '@mui/icons-material/ArrowBackIosOutlined';
+import CloselIcon from '@mui/icons-material/Close';
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { Backdrop, Box, CircularProgress, Fade, IconButton, InputAdornment, Modal, OutlinedInput } from "@mui/material";
@@ -24,8 +26,8 @@ const style = {
   bgcolor: 'background.paper',
   borderRadius: '24px',
   boxShadow: 24,
-  minWidth: 800,
-  minHeight: 500,
+  minWidth: '50rem',
+  height: '32rem',
 };
 
 export default function SignIn() {
@@ -97,13 +99,14 @@ export default function SignIn() {
   };
 
 
-  const closeModal = (): void => {
+  const openModal = (): void => {
     showPolkadotAccounts(true);
   };
 
 
   const [supportedWallets, setSuppotedWallets] = useState<Wallet[]>([]);
-  const [selectedWallet, setSelectedWallet] = useState<Wallet>();
+  console.log("🚀 ~ file: index.tsx:108 ~ SignIn ~ supportedWallets:", supportedWallets)
+  const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
 
   const [accounts, setAccounts] = useState<WalletAccount[]>([])
 
@@ -111,9 +114,6 @@ export default function SignIn() {
     const supportedWallets = getWallets();
     setSuppotedWallets(supportedWallets);
   }, [])
-
-
-
 
   return <div className="w-full flex justify-center ">
     <div className="bg-white flex space-x-5 p-2 rounded-2xl">
@@ -150,7 +150,7 @@ export default function SignIn() {
               className='mb-4 flex flex-row items-center cursor-pointer w-full'
               tabIndex={0}
               data-mdc-dialog-action='web3'
-              onClick={() => closeModal()}
+              onClick={() => openModal()}
             >
               <button className='h-[2.4rem] rounded-[1.56rem] border border-imbue-purple-dark w-full justify-center bg-[#E1DDFF]'>
                 <div className='flex text-sm w-52 text-imbue-purple-dark justify-center items-center'>
@@ -270,19 +270,21 @@ export default function SignIn() {
     >
       <Fade in={polkadotAccountsVisible}>
         <Box sx={style}>
-          <div className="flex h-full">
-            <div className="w-1/2 p-6 border-r h-full">
+          <div className="flex items-stretch h-full">
+            <div className="w-1/2 p-6 border-r">
               <p className="text-black text-lg mb-4 font-semibold font-inter ml-2">Choose a Wallet</p>
 
               <p className="text-black text-sm text-opacity-70 mb-4 font-medium font-inter ml-2">Recommended</p>
               {
                 supportedWallets.map((wallet, index) => (
                   <div
-                    className="flex items-center justify-between gap-5 p-2 rounded-lg hover:bg-imbue-lime cursor-pointer transition-all duration-300"
+                    className={`flex items-center justify-between gap-5 p-2 rounded-lg hover:bg-imbue-lime hover:text-black ${selectedWallet?.extensionName === wallet.extensionName && "bg-imbue-purple text-white"} cursor-pointer transition-all duration-300`}
                     key={index}
 
                     onClick={async () => {
                       try {
+                        if (!wallet.installed) return window.open(wallet.installUrl)
+
                         await wallet.enable('Imbue');
                         await wallet.subscribeAccounts((accounts: WalletAccount[] | undefined) => {
                           if (accounts?.length) {
@@ -298,7 +300,7 @@ export default function SignIn() {
                   >
                     <div className="flex items-center gap-3 ">
                       <Image height={40} width={40} src={wallet.logo.src} alt={wallet.logo.alt} />
-                      <p className="text-black text-base font-inter font-semibold">
+                      <p className="text-base font-inter font-semibold">
                         {
                           wallet.title
                         }
@@ -326,19 +328,21 @@ export default function SignIn() {
               }
             </div>
 
-            <div className="w-1/2 flex items-center justify-center">
-
+            <div className="w-1/2 flex items-center justify-center h-full relative">
               {
                 selectedWallet
                   ? (
-                    <div className="my-auto w-full h-fit p-7">
+                    <div className="h-auto max-h-full w-full p-7 str-chat">
+                      <ArrowBack onClick={() => setSelectedWallet(null)} className='text-imbue-purple cursor-pointer absolute top-7 left-7' />
+                      <CloselIcon onClick={() => showPolkadotAccounts(false)} className='text-imbue-purple cursor-pointer absolute top-7 right-7 rounded-full bg-[#EBEAE2] p-0.5' />
                       <p className="text-center font-inter font-semibold text-base mb-8">Select {selectedWallet.title} account</p>
-                      <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-2 overflow-y-auto max-h-96 pr-1">
                         {
                           accounts?.map((account) => (
                             <div
                               key={account.address}
-                              className="py-4 px-6 rounded-xl bg-[#EBEAE2] w-full"
+                              className="py-4 px-6 rounded-xl bg-[#EBEAE2] hover:bg-imbue-light-purple cursor-pointer w-full"
+                              onClick={() => accountSelected(account)}
                             >
                               <p className="text-sm text-black">{account.name}</p>
                               <p className="text-black text-xs">
@@ -389,8 +393,6 @@ export default function SignIn() {
                     </div>
                   )
               }
-
-
             </div>
           </div>
         </Box>
