@@ -31,7 +31,8 @@ export default function Home() {
         // localStorage.setItem("userAuth", JSON.stringify(userAuth));
         router.push('/dashboard');
       } else {
-        setLoginModal(true);
+        // setLoginModal(true);
+        router.push('/auth/sign-in');
       }
     } catch (error) {
       // TODO: show error
