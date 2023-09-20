@@ -563,13 +563,14 @@ class ChainService {
 
     for (let i = Object.keys(rounds).length - 1; i >= 0; i--) {
       const [roundType, expiringBlock] = rounds[i];
-      const roundProjectId = roundType.toHuman()[0];
+      // const roundProjectId = roundType.toHuman()[0];
       const roundTypeHuman = roundType.toHuman()[1];
       const expiringBlockHuman = BigInt(
         expiringBlock.toHuman().replaceAll(',', '')
       );
+
       if (
-        roundProjectId == project.chain_project_id &&
+        // roundProjectId[0] == project.chain_project_id &&
         expiringBlockHuman > currentBlockNumber
       ) {
         if (
