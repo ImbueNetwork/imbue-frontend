@@ -8,7 +8,12 @@ import bcrypt from 'bcryptjs';
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
-import PasswordStrengthBar from "react-password-strength-bar";
+// import PasswordStrengthBar from "react-password-strength-bar";
+const PasswordStrengthBar = dynamic(() => import('react-password-strength-bar'), {
+  ssr: false,
+})
+
+import dynamic from "next/dynamic";
 
 import * as utils from '@/utils';
 import { matchedByUserName, matchedByUserNameEmail } from "@/utils";
