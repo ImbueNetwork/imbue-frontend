@@ -7,7 +7,6 @@ import * as config from '@/config';
 
 const GoogleSignIn = ({ sizeRef: walletRef }: any) => {
     const [googleDivWith, setGoogleDivWith] = useState('200px');
-    console.log("🚀 ~ file: GoogleSignIn.tsx:10 ~ GoogleSignIn ~ googleDivWith:", googleDivWith)
 
     useEffect(() => {
         function handleResize() {
