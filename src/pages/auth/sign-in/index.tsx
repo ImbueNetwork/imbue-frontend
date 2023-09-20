@@ -114,7 +114,7 @@ export default function SignIn() {
             >
               <GoogleOAuthProvider clientId={config?.googleClientId}>
                 <GoogleLogin
-                  width='10px'
+                  width='350px'
                   logo_alignment='center'
                   shape='circle'
                   size='large'

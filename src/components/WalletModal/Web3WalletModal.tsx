@@ -1,17 +1,17 @@
 import ArrowBack from '@mui/icons-material/ArrowBackIosOutlined';
 import CloselIcon from '@mui/icons-material/Close';
-import { Backdrop, Box, Fade, Modal } from '@mui/material';
+import { Backdrop, Modal, Slide } from '@mui/material';
 import { getWallets, Wallet, WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 
-const style = {
-    position: 'absolute' as const,
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+const style: any = {
+    position: 'absolute',
+    inset: 0,
+    // transform: 'translate(-50%, -50%)',
+    margin: 'auto',
     width: '50%',
-    bgcolor: 'background.paper',
+    bgcolor: '#ffffff',
     borderRadius: '24px',
     boxShadow: 24,
     minWidth: '50rem',
@@ -51,10 +51,10 @@ const Web3WalletModal = (props: Web3ModalProps) => {
                 },
             }}
         >
-            <Fade in={polkadotAccountsVisible}>
-                <Box sx={style}>
-                    <div className="flex items-stretch h-full">
-                        <div className="w-1/2 p-6 border-r">
+            <Slide direction="up" in={polkadotAccountsVisible}>
+                <div className='absolute bottom-0 lg:inset-0 lg:m-auto w-full lg:w-1/2 rounded-3xl shadow-xl bg-white lg:h-[32rem]  lg:min-w-[50rem]'>
+                    <div className="flex flex-col lg:flex-row items-stretch h-full">
+                        <div className="lg:w-1/2 p-6 border-r">
                             <p className="text-black text-lg mb-4 font-semibold font-inter ml-2">Choose a Wallet</p>
 
                             <p className="text-black text-sm text-opacity-70 mb-4 font-medium font-inter ml-2">Recommended</p>
@@ -111,7 +111,7 @@ const Web3WalletModal = (props: Web3ModalProps) => {
                             }
                         </div>
 
-                        <div className="w-1/2 flex items-center justify-center h-full relative">
+                        <div className="lg:w-1/2 flex items-center justify-center h-full relative">
                             {
                                 selectedWallet
                                     ? (
@@ -178,8 +178,8 @@ const Web3WalletModal = (props: Web3ModalProps) => {
                             }
                         </div>
                     </div>
-                </Box>
-            </Fade>
+                </div>
+            </Slide>
         </Modal>
     );
 };

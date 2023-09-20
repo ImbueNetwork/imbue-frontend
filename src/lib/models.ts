@@ -284,23 +284,24 @@ export const updateFederatedCredentials =
       });
 
 export const fetchUserOrEmail =
-  (userOrEmail: string) => (tx: Knex.Transaction) => {
+  (userOrEmail: string) => async (tx: Knex.Transaction) => {
     // get all db users
-    return tx<User>('users')
+    const user = await tx<User>('users')
       .select()
-      .then((users) => {
-        // check if userOrEmail is in db
-        const user = users.find(
-          (u) =>
-            u.username === userOrEmail.toLowerCase() ||
-            u.email === userOrEmail.toLowerCase()
-        );
-        if (user) {
-          return user;
-        } else {
-          return null;
-        }
-      });
+      .first()
+      .where({ username: userOrEmail })
+      .orWhere({ email: userOrEmail });
+    // check if userOrEmail is in db
+    // const user = users.find(
+    //   (u) =>
+    //     u.username === userOrEmail.toLowerCase() ||
+    //     u.email === userOrEmail.toLowerCase()
+    // );
+    if (user) {
+      return user;
+    } else {
+      return null;
+    }
   };
 
 export const upsertWeb3Challenge =
@@ -1330,7 +1331,7 @@ export const updateFreelancerDetails =
     web3_type: string,
     web3_challenge: string,
     // eslint-disable-next-line unused-imports/no-unused-vars
-    freelancer_clients: Array<{ id: number; name: string; img: string }>,
+    freelancer_clients: Array<{ id: number; name: string; img: string }>
     // token: string
   ) =>
   async (tx: Knex.Transaction) =>
