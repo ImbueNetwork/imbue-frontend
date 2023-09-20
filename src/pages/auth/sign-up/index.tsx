@@ -2,13 +2,12 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { CircularProgress, IconButton, InputAdornment, OutlinedInput } from "@mui/material";
 import { SignerResult } from "@polkadot/api/types";
-import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { WalletAccount } from "@talismn/connect-wallets";
 import bcrypt from 'bcryptjs';
 // const PasswordStrengthBar = dynamic(() => import('react-password-strength-bar'));
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import PasswordStrengthBar from "react-password-strength-bar";
 
 import * as utils from '@/utils';
@@ -16,9 +15,9 @@ import { matchedByUserName, matchedByUserNameEmail } from "@/utils";
 import { isUrlAndSpecialCharacterExist, isValidEmail, validateInputLength } from "@/utils/helper";
 
 import Carousel from "@/components/Carousel/Carousel";
+import GoogleSignIn from "@/components/GoogleSignIn";
 import Web3WalletModal from "@/components/WalletModal/Web3WalletModal";
 
-import * as config from '@/config';
 import { postAPIHeaders } from '@/config';
 import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
 
@@ -113,9 +112,6 @@ export default function SignIn() {
       setLoading(false);
     }
   };
-
-
-
 
   const accountSelected = async (account: WalletAccount): Promise<any> => {
     try {
@@ -262,75 +258,48 @@ export default function SignIn() {
   };
 
 
-
-  const googleLogin = async (response: any) => {
-    const resp = await fetch(`${config.apiBase}auth/google/`, {
-      headers: postAPIHeaders,
-      method: 'post',
-      body: JSON.stringify(response),
-    });
-
-    if (resp.ok) {
-      utils.redirect("/dashboard");
-    } else {
-      alert('incorrect username or password');
-    }
-  };
-
-
   const closeModal = (): void => {
     showPolkadotAccounts(true);
   };
 
-  return <div className="w-full flex justify-center ">
-    <div className="bg-white flex space-x-5 p-2 rounded-2xl">
+  const walletRef = useRef<any>(null)
+
+  return <div className="w-full flex justify-center mt-5">
+    <div className="bg-white flex sm:space-x-5 p-2 rounded-2xl mx-4">
       <div className="left-side">
         <div className="left-side hidden lg:block  w-[28rem]  lg:w-[31.25rem]">
           <Carousel />
         </div>
       </div>
-      <div className="content px-8 py-8">
+      <div className="content px-4 sm:px-8 py-4 lg:py-8">
         <h2 className="text-imbue-purple-dark text-3xl" >Sign up to Imbue Network</h2>
-        <p className="text-[#9794AB]" >Make web3 work for you</p>
-        <div className="flex mt-4 items-center space-x-4">
+        <p className="text-[#9794AB] mt-1" >Make web3 work for you</p>
+        <div className="flex sm:flex-row flex-col-reverse gap-2 mt-4 items-center">
           <div className='login justify-center items-center w-full flex flex-col'>
             <li
               // ref={googleParentRef}
-              className='mt-1 mb-2 w-full flex justify-center'
+              className='w-full flex justify-center'
             >
-              <GoogleOAuthProvider clientId={config?.googleClientId}>
-                <GoogleLogin
-                  width='200px'
-                  logo_alignment='center'
-                  shape='circle'
-                  size='large'
-                  useOneTap={true}
-                  onSuccess={(creds: any) => googleLogin(creds)}
-                  onError={() => {
-                    // FIXME: error handling
-                    console.log('Login Failed');
-                  }}
-                />
-              </GoogleOAuthProvider>
+              <GoogleSignIn sizeRef={walletRef} />
             </li>
           </div>
-          <div className='login justify-center items-center w-full flex flex-col'>
+          <div ref={walletRef} className='login justify-center items-center w-full flex flex-col'>
             <li
-              className='mb-4 flex flex-row items-center cursor-pointer w-full'
+              className='flex flex-row items-center cursor-pointer w-full'
               tabIndex={0}
               data-mdc-dialog-action='web3'
               onClick={() => closeModal()}
             >
-              <button className='h-[2.6rem] rounded-[1.56rem] border  w-full justify-center bg-imbue-lime-light'>
-                <div className='flex text-xs w-40 sm:text-sm sm:w-52  text-[#344F00] justify-center items-center'>
+              <button className='h-[2.6rem] rounded-[1.56rem] border w-full justify-center bg-imbue-lime-light px-5'>
+                <div className='flex text-xs sm:text-sm  text-[#344F00] justify-center items-center'>
                   <Image
                     src={"/wallet.svg"}
                     width={32}
                     height={20}
                     alt='Wallet-icon'
-                    className='relative right-2'
+                    className='relative right-2 w-5 lg:w-auto'
                   />
-                  <p>Sign up with wallet</p>
+                  <p className="lg:font-medium font-semibold font-inter">Sign up with wallet</p>
                 </div>
               </button>
             </li>
@@ -421,30 +390,30 @@ export default function SignIn() {
             <p className="text-black">Password strength requirement</p>
             <div className="flex text-[#A1A1A1] text-sm space-x-4">
               <div className="flex flex-col items-center">
-                <p className="text-xl text-lime-600 font-semibold">8+</p>
-                <p>Characters</p>
+                <p className="text-lg md:text-xl text-lime-600 font-semibold">8+</p>
+                <p className="text-xs lg:text">Characters</p>
               </div>
               <div className="flex flex-col items-center">
-                <p className="text-xl text-lime-600 font-semibold">AA</p>
-                <p>Uppercase</p>
+                <p className="text-lg md:text-xl text-lime-600 font-semibold">AA</p>
+                <p className="text-xs lg:text">Uppercase</p>
               </div>
               <div className="flex flex-col items-center">
-                <p className="text-xl text-red-600 font-semibold">aa</p>
-                <p>Lowercase</p>
+                <p className="text-lg md:text-xl text-red-600 font-semibold">aa</p>
+                <p className="text-xs lg:text">Lowercase</p>
               </div>
               <div className="flex flex-col items-center">
-                <p className="text-xl text-gray-600 font-semibold">123</p>
-                <p>Numbers</p>
+                <p className="text-lg md:text-xl text-gray-600 font-semibold">123</p>
+                <p className="text-xs lg:text">Numbers</p>
               </div>
               <div className="flex flex-col items-center">
-                <p className="text-xl text-gray-600 font-semibold" >$#^</p>
-                <p>Symbol</p>
+                <p className="text-lg md:text-xl text-gray-600 font-semibold" >$#^</p>
+                <p className="text-xs lg:text">Symbol</p>
               </div>
             </div>
           </div>
 
 
-          <div className='flex justify-center mt-2 w-full cursor-pointer'>
+          <div className='flex justify-center mt-4 w-full cursor-pointer'>
             <button
               type='submit'
 
