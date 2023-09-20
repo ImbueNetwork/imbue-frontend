@@ -555,11 +555,20 @@ class ChainService {
       (milestone) => !milestone.is_approved
     );
 
-    const rounds: any[] =
+    const votingRounds: any[] =
       await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries([
         project.chain_project_id,
         lastUnapprovedMilestone?.milestone_index,
       ]);
+
+
+    const noConfidenceRounds: any[] =
+      await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries([
+        project.chain_project_id,
+        0
+      ]);
+
+    const rounds = votingRounds.concat(noConfidenceRounds);
 
     for (let i = Object.keys(rounds).length - 1; i >= 0; i--) {
       const [roundType, expiringBlock] = rounds[i];
