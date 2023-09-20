@@ -292,7 +292,7 @@ export default function SignIn() {
       <div className="content px-8 py-8">
         <h2 className="text-imbue-purple-dark text-3xl" >Sign up to Imbue Network</h2>
         <p className="text-[#9794AB]" >Make web3 work for you</p>
-        <div className="flex mt-4 items-center space-x-4">
+        <div className="flex sm:flex-row flex-col mt-4 items-center sm:space-x-4">
           <div className='login justify-center items-center w-full flex flex-col'>
             <li
               // ref={googleParentRef}
@@ -316,7 +316,7 @@ export default function SignIn() {
           </div>
           <div className='login justify-center items-center w-full flex flex-col'>
             <li
-              className='mb-4 flex flex-row items-center cursor-pointer w-full'
+              className='mb-2 flex flex-row items-center cursor-pointer w-full'
               tabIndex={0}
               data-mdc-dialog-action='web3'
               onClick={() => closeModal()}
