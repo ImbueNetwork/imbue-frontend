@@ -285,7 +285,7 @@ export default function SignIn() {
   return <div className="w-full flex justify-center ">
     <div className="bg-white flex space-x-5 p-2 rounded-2xl">
       <div className="left-side">
-        <div className="left-side w-[31.25rem]">
+        <div className="left-side hidden lg:block  w-[28rem]  lg:w-[31.25rem]">
           <Carousel />
         </div>
       </div>
@@ -322,7 +322,7 @@ export default function SignIn() {
               onClick={() => closeModal()}
             >
               <button className='h-[2.6rem] rounded-[1.56rem] border  w-full justify-center bg-imbue-lime-light'>
-                <div className='flex text-sm w-52  text-[#344F00] justify-center items-center'>
+                <div className='flex text-xs w-40 sm:text-sm sm:w-52  text-[#344F00] justify-center items-center'>
                   <Image
                     src={"/wallet.svg"}
                     width={32}

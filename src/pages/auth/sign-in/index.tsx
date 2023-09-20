@@ -100,21 +100,21 @@ export default function SignIn() {
 
   return <div className="w-full flex justify-center ">
     <div className="bg-white flex space-x-5 p-2 rounded-2xl">
-      <div className="left-side w-[31.25rem]">
+      <div className="left-side hidden lg:block  w-[28rem]  lg:w-[31.25rem]">
         <Carousel />
       </div>
-      <div className="content px-8 py-16">
+      <div className="content px-4  lg:px-8 py-16">
         <h2 className="text-imbue-purple-dark text-3xl" >Login to your account</h2>
         <p className="text-[#9794AB]" >Welcome back to imbue</p>
         <div className="flex mt-9 space-x-4">
           <div className='login justify-center items-center w-full flex flex-col'>
             <li
               // ref={googleParentRef}
-              className='mt-1 mb-2 w-full flex justify-center'
+              className='mt-1 mb-2  w-full flex justify-center'
             >
               <GoogleOAuthProvider clientId={config?.googleClientId}>
                 <GoogleLogin
-                  width='200px'
+                  width='10px'
                   logo_alignment='center'
                   shape='circle'
                   size='large'
@@ -137,7 +137,7 @@ export default function SignIn() {
               onClick={() => openModal()}
             >
               <button className='h-[2.6rem] rounded-[1.56rem] border  w-full justify-center bg-imbue-lime-light'>
-                <div className='flex text-sm w-52  text-[#344F00] justify-center items-center'>
+                <div className='flex text-xs w-40 sm:text-sm sm:w-52  text-[#344F00] justify-center items-center'>
                   <Image
                     src={"/wallet.svg"}
                     width={32}
