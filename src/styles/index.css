@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
 h1 {
   font-size: var(--theme-h1-size);
   font-weight: var(--theme-h1-weight);
@@ -26,6 +28,10 @@ textarea {
   width: 100%;
   height: 100%;
   resize: none;
+}
+
+.font-inter {
+  font-family: 'Inter', sans-serif;
 }
 
 .dialog {
@@ -772,6 +778,39 @@ input[type='radio'] {
 
 .capitalize-first::first-letter {
   text-transform: uppercase;
+}
+
+
+.slides_bar {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+}
+
+/* Slick carousel */
+
+.slides_bar li button {
+  border: none;
+  background-color: #dddcd6;
+  color: transparent;
+  cursor: pointer;
+  display: block;
+  height: 0.5rem;
+  width: 8.5rem;
+  border-radius: 7.5px;
+}
+
+.slides_bar li.slick-active button {
+  background: var(--theme-coral);
+}
+
+.slick-active button {
+  background: var(--theme-coral) !important;
 }
 
 input:-webkit-autofill,
