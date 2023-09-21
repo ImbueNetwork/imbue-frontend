@@ -35,13 +35,23 @@ export const getPendingVotes =
   (projectId: string | string[] | number) => (tx: Knex.Transaction) =>
     tx('project_approvers')
       .select('*')
-      .leftJoin(
-        'project_votes',
-        'project_votes.voter_address',
-        'project_approvers.approver'
-      )
+      .leftJoin('project_votes', function () {
+        this.on(
+          'project_votes.project_id',
+          '=',
+          'project_approvers.project_id'
+        ).andOn(
+          'project_votes.voter_address',
+          '=',
+          'project_approvers.approver'
+        );
+      })
       .leftJoin('users', 'users.web3_address', 'project_approvers.approver')
-      .where({ 'project_approvers.project_id': projectId, vote: null });
+      .where({
+        'project_approvers.project_id': projectId,
+        'project_votes.vote': null,
+      });
+
 
 export const getYesOrNoVotes =
   (

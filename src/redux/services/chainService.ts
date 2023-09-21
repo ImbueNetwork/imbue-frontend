@@ -576,6 +576,7 @@ class ChainService {
       const expiringBlockHuman = BigInt(
         expiringBlock.toHuman().replaceAll(',', '')
       );
+
       if (
         expiringBlockHuman > currentBlockNumber
       ) {

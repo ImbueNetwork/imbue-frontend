@@ -1,22 +1,9 @@
 import ArrowBack from '@mui/icons-material/ArrowBackIosOutlined';
 import CloselIcon from '@mui/icons-material/Close';
-import { Backdrop, Box, Fade, Modal } from '@mui/material';
+import { Backdrop, Modal, Slide, useMediaQuery } from '@mui/material';
 import { getWallets, Wallet, WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
-
-const style = {
-    position: 'absolute' as const,
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: '50%',
-    bgcolor: 'background.paper',
-    borderRadius: '24px',
-    boxShadow: 24,
-    minWidth: '50rem',
-    height: '32rem',
-};
 
 interface Web3ModalProps {
     polkadotAccountsVisible: boolean;
@@ -31,6 +18,8 @@ const Web3WalletModal = (props: Web3ModalProps) => {
     const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
 
     const [accounts, setAccounts] = useState<WalletAccount[]>([])
+
+    const mobileView = useMediaQuery('(max-width:480px)');
 
     useEffect(() => {
         const supportedWallets = getWallets();
@@ -51,10 +40,12 @@ const Web3WalletModal = (props: Web3ModalProps) => {
                 },
             }}
         >
-            <Fade in={polkadotAccountsVisible}>
-                <Box sx={style}>
-                    <div className="flex items-stretch h-full">
-                        <div className="w-1/2 p-6 border-r">
+            <Slide direction="up" in={polkadotAccountsVisible}>
+                <div className='absolute bottom-0 lg:inset-0 lg:m-auto w-full lg:w-1/2 rounded-t-3xl lg:rounded-3xl shadow-xl bg-white lg:h-[32rem] lg:min-w-[50rem]'>
+                    <div className="flex flex-col lg:flex-row items-stretch h-full relative">
+                        <CloselIcon onClick={() => showPolkadotAccounts(false)} className='text-imbue-purple cursor-pointer absolute top-7 right-7 rounded-full bg-[#EBEAE2] p-0.5 md:hidden' />
+
+                        <div className={`lg:w-1/2 p-4 lg:p-6 border-r ${(mobileView && selectedWallet) && "hidden"}`}>
                             <p className="text-black text-lg mb-4 font-semibold font-inter ml-2">Choose a Wallet</p>
 
                             <p className="text-black text-sm text-opacity-70 mb-4 font-medium font-inter ml-2">Recommended</p>
@@ -111,13 +102,20 @@ const Web3WalletModal = (props: Web3ModalProps) => {
                             }
                         </div>
 
-                        <div className="w-1/2 flex items-center justify-center h-full relative">
+                        <div className="lg:w-1/2 flex items-center justify-center h-full relative">
                             {
                                 selectedWallet
                                     ? (
-                                        <div className="h-auto max-h-full w-full p-7 str-chat">
+                                        <div className="h-auto max-h-full w-full py-16 px-4 lg:p-7 str-chat rounded-t-3xl">
                                             <ArrowBack onClick={() => setSelectedWallet(null)} className='text-imbue-purple cursor-pointer absolute top-7 left-7' />
-                                            <CloselIcon onClick={() => showPolkadotAccounts(false)} className='text-imbue-purple cursor-pointer absolute top-7 right-7 rounded-full bg-[#EBEAE2] p-0.5' />
+                                            <CloselIcon
+                                                onClick={async () => {
+                                                    showPolkadotAccounts(false)
+                                                    await new Promise(res => setTimeout(res, 1000))
+                                                    setSelectedWallet(null)
+                                                }}
+                                                className='text-imbue-purple cursor-pointer absolute top-7 right-7 rounded-full bg-[#EBEAE2] p-0.5'
+                                            />
                                             <p className="text-center font-inter font-semibold text-base mb-8">Select {selectedWallet.title} account</p>
                                             <div className="flex flex-col gap-2 overflow-y-auto max-h-96 pr-1">
                                                 {
@@ -142,7 +140,7 @@ const Web3WalletModal = (props: Web3ModalProps) => {
                                             </div>
                                         </div>)
                                     : (
-                                        <div className="p-14">
+                                        <div className="p-6 lg:p-14">
                                             <p className="text-center font-inter font-semibold text-base mb-8">About Wallets?</p>
                                             <div className="flex items-start gap-4 mb-8">
                                                 <div className="w-14">
@@ -178,8 +176,8 @@ const Web3WalletModal = (props: Web3ModalProps) => {
                             }
                         </div>
                     </div>
-                </Box>
-            </Fade>
+                </div>
+            </Slide>
         </Modal>
     );
 };

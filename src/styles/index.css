@@ -780,6 +780,11 @@ input[type='radio'] {
   text-transform: uppercase;
 }
 
+.slick-list,
+.slick-track,
+.slick-initialized .slick-slide div {
+  height: 100%;
+}
 
 .slides_bar {
   display: flex !important;
