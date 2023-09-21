@@ -12,13 +12,13 @@ const Carousel: React.FC = () => {
   const sliderRef = useRef<Slider | null>(null);
 
   const slides = [
-    <Image key={"image-1"} src={"/slide_1.png"} height={700} width={500} alt="" />,
-    <Image key={"image-2"} src={"/slide_2.png"} height={700} width={500} alt="" />,
-    <Image key={"image-3"} src={"/slide_3.png"} height={700} width={500} alt="" />,
+    <Image className='h-full' key={"image-1"} src={"/slide_1.png"} height={700} width={500} alt="" />,
+    <Image className='h-full' key={"image-2"} src={"/slide_2.png"} height={700} width={500} alt="" />,
+    <Image className='h-full' key={"image-3"} src={"/slide_3.png"} height={700} width={500} alt="" />,
   ];
 
   useEffect(() => {
-    const autoplayInterval = 3000;
+    const autoplayInterval = 9000;
 
     if (sliderRef.current) {
       sliderRef.current.slickPlay();
@@ -47,9 +47,9 @@ const Carousel: React.FC = () => {
   };
 
   return (
-    <Slider arrows={false} ref={sliderRef} {...settings}>
+    <Slider className='h-full' arrows={false} ref={sliderRef} {...settings}>
       {slides.map((slide, index) => (
-        <div key={index}>{slide}</div>
+        <div className='h-full' key={index}>{slide}</div>
       ))}
     </Slider>
   );

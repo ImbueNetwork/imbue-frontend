@@ -1,6 +1,4 @@
 
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { CircularProgress, IconButton, InputAdornment, OutlinedInput } from "@mui/material";
 import { SignerResult } from "@polkadot/api/types";
 import { WalletAccount } from "@talismn/connect-wallets";
@@ -86,13 +84,13 @@ export default function SignIn() {
   const walletRef = useRef<any>(null)
 
   return (
-    <div className="w-full flex justify-center mt-5">
+    <div className="w-full flex justify-center">
       <div className="bg-white flex lg:space-x-5 p-2 rounded-2xl mx-4">
         <div className="left-side hidden lg:block w-[28rem] lg:w-[31.25rem]">
           <Carousel />
         </div>
         <div className="content px-4 lg:px-8 py-6 lg:py-16">
-          <h2 className="text-imbue-purple-dark text-3xl" >Login to your account</h2>
+          <h2 className="text-imbue-purple-dark text-[1.75rem]" >Login to your account</h2>
           <p className="text-[#9794AB] mt-1" >Welcome back to imbue</p>
           <div className="flex sm:flex-row flex-col-reverse mt-5 lg:mt-9 gap-2">
             <div className='login justify-center items-center w-full flex flex-col'>
@@ -110,7 +108,7 @@ export default function SignIn() {
                 data-mdc-dialog-action='web3'
                 onClick={() => openModal()}
               >
-                <button className='h-[2.6rem] rounded-[1.56rem] border w-full justify-center bg-imbue-lime-light px-5'>
+                <button className='h-[2.6rem] rounded-[1.56rem] border w-full justify-center hover:bg-imbue-lime-light transition-colors duration-300 px-5'>
                   <div className='flex text-xs sm:text-sm  text-[#344F00] justify-center items-center'>
                     <Image
                       src={"/wallet.svg"}
@@ -132,29 +130,35 @@ export default function SignIn() {
           </div>
 
           <div className='flex flex-col justify-center pb-2 w-full'>
-            <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
-              Username/Email
+            <label className='font-Aeonik text-base lg:text-[1rem] text-imbue-purple-dark font-normal mb-2'>
+              Email or Username
             </label>
             <OutlinedInput
               id='outlined-adornment-password'
               color='secondary'
-              className='h-[2.6rem] pl-[6px]'
+              className='h-[2.6rem] pl-[4px] text-[0.875rem]'
+              inputProps={
+                { className: 'placeholder:text-[#D1D1D1] !text-black' }
+              }
               type='text'
               name='emailorUsername'
-              placeholder='Enter your Username/Email'
+              placeholder='victorimbue@gmail.com'
               onChange={(e: any) => setUserOrEmail(e.target.value)}
               required
             />
           </div>
           <div className='flex flex-col justify-center pb-[10px] w-full mt-[1.2rem]'>
-            <label className='font-Aeonik text-base lg:text-[1.25rem] text-imbue-purple-dark font-normal mb-2'>
+            <label className='font-Aeonik text-base lg:text-[1rem] text-imbue-purple-dark font-normal mb-2'>
               Password
             </label>
             <OutlinedInput
               id='outlined-adornment-password'
               color='secondary'
-              className='h-[2.6rem] pl-[6px]'
-              placeholder='Enter your password'
+              className='h-[2.6rem] pl-1 text-[0.875rem]'
+              inputProps={
+                { className: 'placeholder:text-[#D1D1D1] !text-black' }
+              }
+              placeholder='*********'
               type={showPassword ? 'text' : 'password'}
               name='password'
               required
@@ -165,8 +169,9 @@ export default function SignIn() {
                     aria-label='toggle password visibility'
                     onClick={() => setShowPassword(!showPassword)}
                     edge='end'
+                    className="mr-0"
                   >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                    {showPassword ? <Image className="h-5 w-5" src={require("../../../assets/svgs/eye.svg")} alt="" /> :  <Image className="w-5 h-5" src={require("../../../assets/svgs/eyeClosed.svg")} alt="" /> }
                   </IconButton>
                 </InputAdornment>
               }

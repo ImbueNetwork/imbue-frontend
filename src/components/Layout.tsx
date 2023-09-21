@@ -38,7 +38,15 @@ function Layout({ children }: LayoutProps) {
         />
       )}
       <Providers>
-        <Navbar />
+        {
+          !(
+            router.asPath === "/auth/sign-up" ||
+            router.asPath === "/auth/sign-in"
+          ) && (
+            <Navbar />
+          )
+        }
+
         <main
           className={`padded lg:!px-[var(--hq-layout-padding)] !pt-[100px]`}
           id='main-content'

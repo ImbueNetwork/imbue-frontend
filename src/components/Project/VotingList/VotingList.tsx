@@ -75,7 +75,6 @@ const VotingList = (props: VotingListProps) => {
             setLoading(true)
             try {
                 const voteResp = await getMillestoneVotes(projectId, firstPendingMilestone)
-                console.log("🚀 ~ file: VotingList.tsx:78 ~ setVotingList ~ voteResp:", voteResp)
                 setVotes(voteResp)
                 // const votersAddressed = voteResp?.map((voter: any) => voter.web3_address)
                 syncVotes();
