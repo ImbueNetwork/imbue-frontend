@@ -268,7 +268,8 @@ export default function SignIn() {
   const walletRef = useRef<any>(null)
 
   return (
-    <div className="w-full flex justify-center">
+    // <div className="w-full max-width-400px:mt-0 -mt-[100px] lg:mt-0 h-screen lg:h-auto flex justify-center items-center">
+    <div className="flex justify-center items-center absolute inset-0">
       <div className="bg-white flex sm:space-x-5 p-2 rounded-2xl mx-4">
         <div className="left-side">
           <div className="left-side hidden lg:block w-[28rem] h-full lg:w-[31.25rem]">
