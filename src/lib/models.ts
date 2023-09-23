@@ -389,12 +389,14 @@ export const updateOrInsertUserWeb3Address =
   };
 
 export const insertUserByDisplayName =
-  (displayName: string, username: string) => async (tx: Knex.Transaction) =>
+  (displayName: string, username: string, email?: string, password?: string) => async (tx: Knex.Transaction) =>
     (
       await tx<User>('users')
         .insert({
           display_name: displayName,
           username: username,
+          email: email,
+          password: password,
         })
         .returning('*')
     )[0];
@@ -1041,7 +1043,9 @@ export const getOrCreateFederatedUser = (
   issuer: string,
   username: string,
   displayName: string,
-  done: CallableFunction
+  done: CallableFunction,
+  email?: string,
+  password?: string,
 ) => {
   db.transaction(async (tx) => {
     let user: User;
@@ -1060,7 +1064,7 @@ export const getOrCreateFederatedUser = (
        * If not, create the `user`, then the `federated_credential`
        */
       if (!federated) {
-        user = await insertUserByDisplayName(displayName, username)(tx);
+        user = await insertUserByDisplayName(displayName, username,email,password)(tx);
         await insertFederatedCredential(user.id, issuer, username)(tx);
       } else {
         const user_ = await db

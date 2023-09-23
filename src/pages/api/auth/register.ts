@@ -64,7 +64,9 @@ export default nextConnect().post(
             'Imbue Network',
             username.toLowerCase(),
             username.toLowerCase(),
-            updateUserDetails
+            updateUserDetails,
+            email,
+            password
           );
         }
       });
