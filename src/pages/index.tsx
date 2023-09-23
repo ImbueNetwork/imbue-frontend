@@ -6,7 +6,10 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import FullScreenLoader from '@/components/FullScreenLoader';
-const Login = dynamic(() => import("@/components/Login"));
+// const Login = dynamic(() => import("@/components/Login"));
+const LoginPopup = dynamic(() => import("@/components/LoginPopup/LoginPopup"));
+
+// import LoginPopup from '@/components/LoginPopup/LoginPopup';
 
 import { RootState } from '@/redux/store/store';
 
@@ -43,7 +46,14 @@ export default function Home() {
   if (loading) return <FullScreenLoader />;
 
   return (
-    <Login
+    // <Login
+    //   visible={loginModal && !loading}
+    //   setVisible={(val) => {
+    //     setLoginModal(val);
+    //   }}
+    //   redirectUrl={'/dashboard'}
+    // />
+    <LoginPopup
       visible={loginModal && !loading}
       setVisible={(val) => {
         setLoginModal(val);

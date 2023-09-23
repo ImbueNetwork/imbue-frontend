@@ -24,13 +24,14 @@ import ErrorScreen from '@/components/ErrorScreen';
 import RefundScreen from '@/components/Grant/Refund';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 
-const Login = dynamic(() => import("@/components/Login"));
+const LoginPopup = dynamic(() => import("@/components/LoginPopup/LoginPopup"));
 const ExpandableDropDowns = dynamic(() => import("@/components/Project/ExpandableMilestone"));
 
 import Impressions from '@/components/Project/Impressions';
 import ProjectApprovers from '@/components/Project/ProjectApprovers';
 import ProjectBalance from '@/components/Project/ProjectBalance';
 const ProjectHint = dynamic(() => import('@/components/Project/ProjectHint'))
+// import LoginPopup from '@/components/LoginPopup/LoginPopup';
 import VotingList from '@/components/Project/VotingList/VotingList';
 import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
@@ -885,7 +886,7 @@ function Project() {
         />
       </div>
 
-      <Login
+      <LoginPopup
         visible={loginModal}
         setVisible={(val) => {
           setLoginModal(val);

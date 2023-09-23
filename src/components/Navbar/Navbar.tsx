@@ -26,6 +26,7 @@ import { AppDispatch, RootState } from '@/redux/store/store';
 import MenuItems from './MenuItems';
 const Login = dynamic(() => import("../Login"));
 
+import LoginPopup from '../LoginPopup/LoginPopup';
 import defaultProfile from '../../assets/images/profile-image.png';
 
 function Navbar() {
@@ -275,7 +276,14 @@ function Navbar() {
           />
         </Menu>
       </header>
-      <Login
+      {/* <Login
+        visible={loginModal}
+        setVisible={(val: any) => {
+          setLoginModal(val);
+        }}
+        redirectUrl={router?.asPath}
+      /> */}
+      <LoginPopup
         visible={loginModal}
         setVisible={(val: any) => {
           setLoginModal(val);

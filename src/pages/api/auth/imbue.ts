@@ -37,6 +37,7 @@ export default nextConnect().post(
         await setTokenCookie(res, token);
         return res.send({ id: user.id, display_name: user.display_name });
       } catch (e) {
+        res.status(500).json({ messahe: 'Error' });
         new Error(`Failed to fetch user ${userOrEmail}`, { cause: e as Error });
       }
     });
