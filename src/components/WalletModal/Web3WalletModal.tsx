@@ -19,7 +19,7 @@ const Web3WalletModal = (props: Web3ModalProps) => {
 
     const [accounts, setAccounts] = useState<WalletAccount[]>([])
 
-    const mobileView = useMediaQuery('(max-width:480px)');
+    const mobileView = useMediaQuery('(max-width:767px)');
 
     useEffect(() => {
         const supportedWallets = getWallets();
@@ -41,11 +41,11 @@ const Web3WalletModal = (props: Web3ModalProps) => {
             }}
         >
             <Slide direction="up" in={polkadotAccountsVisible}>
-                <div className='absolute bottom-0 lg:inset-0 lg:m-auto w-full lg:w-1/2 rounded-t-3xl lg:rounded-3xl shadow-xl bg-white lg:h-[32rem] lg:min-w-[50rem]'>
-                    <div className="flex flex-col lg:flex-row items-stretch h-full relative">
+                <div className='absolute bottom-0 md:inset-0 md:m-auto w-full md:w-1/2 rounded-t-3xl md:rounded-3xl shadow-xl bg-white md:h-[32rem] md:min-w-[40rem] lg:min-w-[50rem]'>
+                    <div className="flex flex-col md:flex-row items-stretch h-full relative">
                         <CloselIcon onClick={() => showPolkadotAccounts(false)} className='text-imbue-purple cursor-pointer absolute top-7 right-7 rounded-full bg-[#EBEAE2] p-0.5 md:hidden' />
 
-                        <div className={`lg:w-1/2 p-4 lg:p-6 border-r ${(mobileView && selectedWallet) && "hidden"}`}>
+                        <div className={`md:w-1/2 p-4 md:p-6 border-r ${(mobileView && selectedWallet) && "hidden"}`}>
                             <p className="text-black text-lg mb-4 font-semibold font-inter ml-2">Choose a Wallet</p>
 
                             <p className="text-black text-sm text-opacity-70 mb-4 font-medium font-inter ml-2">Recommended</p>
@@ -102,11 +102,11 @@ const Web3WalletModal = (props: Web3ModalProps) => {
                             }
                         </div>
 
-                        <div className="lg:w-1/2 flex items-center justify-center h-full relative">
+                        <div className="md:w-1/2 flex items-center justify-center h-full relative">
                             {
                                 selectedWallet
                                     ? (
-                                        <div className="h-auto max-h-full w-full py-16 px-4 lg:p-7 str-chat rounded-t-3xl">
+                                        <div className="h-auto max-h-full w-full py-16 px-4 lg:p-7 str-chat rounded-3xl">
                                             <ArrowBack onClick={() => setSelectedWallet(null)} className='text-imbue-purple cursor-pointer absolute top-7 left-7' />
                                             <CloselIcon
                                                 onClick={async () => {

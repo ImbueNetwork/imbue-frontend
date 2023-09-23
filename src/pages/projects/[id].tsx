@@ -25,16 +25,14 @@ import ErrorScreen from '@/components/ErrorScreen';
 import RefundScreen from '@/components/Grant/Refund';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 
-const Login = dynamic(() => import('@/components/Login'));
-const ExpandableDropDowns = dynamic(
-  () => import('@/components/Project/ExpandableMilestone')
-);
-import { BsChatLeftDots } from 'react-icons/bs';
+const LoginPopup = dynamic(() => import("@/components/LoginPopup/LoginPopup"));
+const ExpandableDropDowns = dynamic(() => import("@/components/Project/ExpandableMilestone"));
 
 import Impressions from '@/components/Project/Impressions';
 import ProjectApprovers from '@/components/Project/ProjectApprovers';
 import ProjectBalance from '@/components/Project/ProjectBalance';
-const ProjectHint = dynamic(() => import('@/components/Project/ProjectHint'));
+const ProjectHint = dynamic(() => import('@/components/Project/ProjectHint'))
+// import LoginPopup from '@/components/LoginPopup/LoginPopup';
 import VotingList from '@/components/Project/VotingList/VotingList';
 import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
@@ -628,6 +626,80 @@ function Project() {
         </div>
         {/* Ending of milestone section */}
       </div>
+
+      <LoginPopup
+        visible={loginModal}
+        setVisible={(val) => {
+          setLoginModal(val);
+        }}
+        redirectUrl={`/project/${projectId}/`}
+      />
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
+      <SuccessScreen noRetry={!(project?.status_id === OffchainProjectState.Completed)} title={successTitle} open={success} setOpen={setSuccess}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => {
+              setSuccess(false);
+              if ((project?.status_id !== OffchainProjectState.Completed))
+                window.location.reload();
+            }}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Continue to Project
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to dashboard
+          </button>
+        </div>
+      </SuccessScreen>
+
+      <RefundScreen open={refunded} setOpen={setSuccess} />
+
+      <WaitingScreen title={waitMessage} open={wait} setOpen={setWait}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => window.location.reload()}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Refresh
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to dashboard
+          </button>
+        </div>
+      </WaitingScreen>
+
+      <VotingList
+        open={openVotingList}
+        firstPendingMilestone={firstPendingMilestone}
+        setOpenVotingList={setOpenVotingList}
+        approvers={approversPreview}
+        chainProjectId={project.chain_project_id}
+        projectId={project.id}
+        setMilestoneVotes={setMilestoneVotes}
+      />
+      <BackDropLoader open={loading || userLoading} />
     </div>
   );
 }

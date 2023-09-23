@@ -89,9 +89,9 @@ export default function SignIn() {
   const walletRef = useRef<any>(null);
 
   return (
-    <div className='w-full flex justify-center'>
-      <div className='bg-white flex lg:space-x-5 p-2 rounded-2xl mx-4'>
-        <div className='left-side hidden lg:block w-[28rem] lg:w-[31.25rem]'>
+    <div className="flex justify-center items-center absolute inset-0">
+      <div className="bg-white flex lg:space-x-5 p-2 rounded-2xl mx-4">
+        <div className="left-side hidden lg:block w-[28rem] lg:w-[31.25rem]">
           <Carousel />
         </div>
         <div className='content px-4 lg:px-8 py-6 lg:py-16'>
