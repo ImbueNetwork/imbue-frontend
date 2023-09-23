@@ -11,7 +11,6 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { TfiNewWindow } from 'react-icons/tfi';
 import { useSelector } from 'react-redux';
 
 import { NoConfidenceVoter } from '@/lib/queryServices/projectQueries';
@@ -29,7 +28,6 @@ const Login = dynamic(() => import('@/components/Login'));
 const ExpandableDropDowns = dynamic(
   () => import('@/components/Project/ExpandableMilestone')
 );
-import { BsChatLeftDots } from 'react-icons/bs';
 
 import Impressions from '@/components/Project/Impressions';
 import ProjectApprovers from '@/components/Project/ProjectApprovers';
@@ -233,10 +231,11 @@ function Project() {
   };
 
   const getProject = async () => {
+    console.log(projectId);
     if (!projectId) return;
 
     try {
-      const projectRes: Project = await getProjectById(projectId);
+      const projectRes: Project = await getProjectById(1);
 
       if (!projectRes) {
         setError({ message: 'No project found!' });
@@ -510,9 +509,6 @@ function Project() {
     }
   };
 
-  console.log(project);
-  console.log(projectOwner);
-
   const renderPolkadotJSModal = (
     <div>
       <AccountChoice
@@ -531,103 +527,490 @@ function Project() {
 
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
-      <div className='w-full bg-white py-5 px-7 rounded-2xl'>
-        <p className='text-black'>{projectType} information</p>
-        {/* starting of project section */}
-        <div className=' border-inherit my-5 border rounded-xl py-4 px-5'>
-          <div className='flex mb-4 items-center justify-between'>
-            <p className='text-sm text-[#747474]'>Project Description</p>
-            <p className='px-3 flex items-center  py-1.5 rounded-full border border-inherit text-sm text-black'>
-              view full Description
-              <TfiNewWindow className='ml-1.5 text-gray-500' size={14} />
-            </p>
-          </div>
-          <h4 className='text-imbue-purple-dark text-2xl'>{project.name}</h4>
-          <p className='text-black text-sm py-5'>{project.description}</p>
+      {isModalOpen && (
+        <ProjectHint
+          {...{
+            setModalOpen,
+            projectType,
+            balance,
+            requiredBalance,
+            project,
+          }}
+        />
+      )}
 
-          <div className='flex mt-5 space-x-5'>
-            <div className='bg-[#F2F0FF] justify-between py-2 px-4 flex flex-col  rounded-xl'>
-              <p className='text-imbue-purple text-sm '>Posted</p>
-              <p className='text-imbue-purple-dark text-sm'>{timePosted}</p>
-            </div>
-            <div className='bg-[#FFEBEA] flex flex-col justify-between rounded-xl space-y-3 py-2 px-2'>
-              <div className='flex space-x-3 items-center'>
-                <p className='text-sm text-[#8A5C5A]'>Shared by</p>
-                <p className='px-2 flex text-sm items-center rounded-xl  py-1 bg-white text-black'>
-                  <BsChatLeftDots
-                    className='text-imbue-purple-dark mr-1'
-                    size={16}
-                  />
-                  Chat
-                </p>
-              </div>
-              <div className='flex items-center space-x-2'>
-                <Image
-                  src={projectOwner?.profile_photo || '/profile-image.png'}
-                  width={30}
-                  height={30}
-                  alt='image'
-                />
-                <p className='text-imbue-coral'>{projectOwner?.display_name}</p>
+      {showPolkadotAccounts && renderPolkadotJSModal}
+
+      {user && showMessageBox && (
+        <ChatPopup
+          {...{
+            showMessageBox,
+            setShowMessageBox,
+            browsingUser: user,
+            targetUser,
+          }}
+          showFreelancerProfile={!isApplicant}
+        />
+      )}
+      <div className='grid grid-cols-12 gap-5'>
+        <div className='col-span-9 flex flex-col gap-[20px] relative bg-background p-12 rounded-3xl'>
+          <div className='flex flex-wrap gap-3 lg:gap-4 items-center'>
+            <div className='flex items-center  w-full justify-between'>
+              <div className='flex items-center'>
+                <BackButton className='mr-1 -ml-3' />
+                <h3 className='text-[2rem] max-lg:text-[24px] break-all leading-[1.5] font-normal m-0 p-0 text-imbue-purple'>
+                  {project?.name}
+                </h3>
               </div>
             </div>
-            <div className='bg-[#F6FFE6] flex flex-col justify-between px-4 py-3 rounded-xl'>
-              <p className='text-[#8A5C5A]'>Team</p>
-              <div className='flex'>
-                <Image
-                  src={'/profile-image.png'}
-                  width={30}
-                  height={30}
-                  alt='team'
-                />
-                <Image
-                  className='-ml-1'
-                  src={'/profile-image.png'}
-                  width={30}
-                  height={30}
-                  alt='team'
-                />
-                <Image
-                  className='-ml-1'
-                  src={'/profile-image.png'}
-                  width={30}
-                  height={30}
-                  alt='team'
-                />
-                <Image
-                  className='-ml-1'
-                  src={'/profile-image.png'}
-                  width={30}
-                  height={30}
-                  alt='team'
-                />
-              </div>
+
+            {project?.brief_id && (
+              <span
+                onClick={() => router.push(`/briefs/${project?.brief_id}`)}
+                className=' text-imbue-lemon cursor-pointer text-xs lg:text-base font-normal !m-0 !p-0 hover:underline'
+              >
+                {`View full ${projectType}`}
+              </span>
+            )}
+          </div>
+
+          <p className='text-sm lg:text-base text-content font-normal leading-[178.15%] lg:w-[80%]'>
+            Project Type :{' '}
+            <span className='ml-1 capitalize'>{projectType}</span>
+          </p>
+
+          <p className='text-base text-content font-normal leading-[178.15%] break-all lg:w-[80%] whitespace-pre-wrap'>
+            {project?.description?.length > expandProjectDesc
+              ? project?.description?.substring(0, expandProjectDesc) + ' ...'
+              : project?.description}
+            {project?.description?.length > 500 && (
+              <span>
+                {project?.description?.length > expandProjectDesc ? (
+                  <button
+                    onClick={() => setExpandProjectDesc((prev) => prev + 500)}
+                    className='mt-3 ml-2 w-fit text-sm hover:underline text-imbue-lemon'
+                  >
+                    Show more
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setExpandProjectDesc(500)}
+                    className='mt-3 ml-2 w-fit text-sm hover:underline text-imbue-lemon'
+                  >
+                    Show Less
+                  </button>
+                )}
+              </span>
+            )}
+          </p>
+
+          <p className='text-sm text-content-primary leading-[1.5] m-0 p-0'>
+            Posted {timePosted}
+          </p>
+
+          <p className='text-imbue-purple text-[1.25rem] font-normal leading-[1.5] mt-[16px] p-0'>
+            {isProjectOwner && projectType === 'brief'
+              ? 'Freelancer hired'
+              : 'Project Owner'}
+          </p>
+
+          <div className='flex flex-row items-center max-lg:flex-wrap'>
+            <div
+              onClick={() =>
+                router.push(
+                  isProjectOwner
+                    ? `/freelancers/${targetUser?.username}`
+                    : `/profile/${targetUser?.username}`
+                )
+              }
+              className='flex items-center'
+            >
+              <Image
+                src={
+                  targetUser?.profile_image ||
+                  targetUser?.profile_photo ||
+                  freelalncerPic
+                }
+                alt='freelaner-icon'
+                height={100}
+                width={100}
+                className='rounded-full cursor-pointer w-14 h-14 object-cover border border-content-primary'
+              />
+
+              <p className='text-imbue-purple text-[1.25rem] font-normal leading-[1.5] p-0 mx-7 cursor-pointer'>
+                {targetUser?.display_name}
+              </p>
             </div>
-            <div className=' bg-light-grey flex flex-col justify-between px-4 py-3 rounded-xl'>
-              <p className='text-[#8A5C5A] text-sm'>Approvers</p>
-              <div className='mt-3'>
-                <ProjectApprovers
-                  {...{
-                    approversPreview,
-                    project,
-                    setIsApprover,
-                    setApproverPreview,
-                    projectOwner,
-                  }}
-                />
+
+            {targetUser?.id && user?.id && targetUser?.id !== user?.id && (
+              <button
+                onClick={() => setShowMessageBox(true)}
+                className='primary-btn in-dark w-button !mt-0 max-lg:!w-full max-lg:!text-center max-lg:!ml-0 max-lg:!mt-5 items-center content-center !py-0 ml-[40px] px-8 max-lg:!mr-0 h-[2.6rem]'
+                data-testid='next-button'
+              >
+                Message
+              </button>
+            )}
+
+            {showRefundButton && (
+              <>
+                <Tooltip
+                  title={
+                    approverVotedOnRefund
+                      ? 'Your vote has already been registered'
+                      : 'Vote on refunds'
+                  }
+                  followCursor
+                  leaveTouchDelay={10}
+                  enterDelay={500}
+                  className='cursor-pointer'
+                >
+                  <button
+                    className={`border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors ${
+                      approverVotedOnRefund &&
+                      '!bg-gray-300 !text-gray-400 !border-gray-400 !cursor-not-allowed'
+                    }`}
+                    onClick={async () => {
+                      if (!approverVotedOnRefund) {
+                        // set submitting mile stone to true
+                        setRaiseVoteOfNoConfidence(true);
+                        // show polkadot account modal
+                        setShowPolkadotAccounts(true);
+                      }
+                    }}
+                  >
+                    Refund
+                  </button>
+                </Tooltip>
+              </>
+            )}
+            {projectInVotingOfNoConfidence && (
+              <button
+                disabled={true}
+                className={
+                  ' text-black flex px-5 py-3 text-sm ml-auto rounded-full Rejected-btn'
+                }
+              >
+                Project undergoing vote of no confidence
+              </button>
+            )}
+          </div>
+
+          {project?.approvers && (
+            <>
+              <p className='text-imbue-purple-dark text-[1.25rem] font-normal leading-[1.5] mt-[16px] p-0'>
+                Approvers
+              </p>
+              <ProjectApprovers
+                {...{
+                  approversPreview,
+                  project,
+                  setIsApprover,
+                  setApproverPreview,
+                  projectOwner,
+                }}
+              />
+            </>
+          )}
+        </div>
+
+        <div className='flex flex-col gap-[30px] max-lg:mt-10 col-span-3 bg-background w-full p-12 rounded-3xl'>
+          <div className='flex flex-col'>
+            <div className='flex flex-row items-start gap-3'>
+              <Image
+                src={shieldIcon}
+                height={24}
+                width={24}
+                alt={'shieldIcon'}
+                className='mt-1'
+              />
+
+              <div className='w-full'>
+                <h3 className='text-lg lg:text-[1.25rem] leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0 flex items-center'>
+                  Milestone{' '}
+                  {chainLoading && (
+                    <span className='text-imbue-purple-dark text-xs ml-2'>
+                      loading...
+                    </span>
+                  )}
+                  {!chainLoading && (
+                    <span className='text-imbue-purple-dark ml-2'>
+                      {approvedMilestones?.length}/{project?.milestones?.length}
+                    </span>
+                  )}
+                </h3>
+                {/* mile stone step indicator */}
+                <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
+                  <div
+                    style={{
+                      width: `${
+                        (project?.milestones?.filter?.(
+                          (m: any) => m?.is_approved
+                        )?.length /
+                          project?.milestones?.length) *
+                        100
+                      }%`,
+                    }}
+                    className='h-full rounded-xl bg-content-primary absolute'
+                  ></div>
+                  <div className='flex justify-evenly'>
+                    {project?.milestones?.map((m: any, i: number) => (
+                      <div
+                        key={i}
+                        className={`h-4 w-4 ${
+                          m.is_approved ? 'bg-content-primary' : 'bg-[#E1DDFF]'
+                        } rounded-full -mt-1.5`}
+                      ></div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          {/* Ending of project section */}
+
+          <div className='flex flex-col'>
+            <div className='flex flex-row items-start gap-3'>
+              <Image
+                src={tagIcon}
+                height={24}
+                width={24}
+                alt={'dollarSign'}
+                className='mt-1'
+              />
+              <div className='flex flex-col'>
+                <h3 className='text-xl leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0'>
+                  {Number(
+                    Number(project?.total_cost_without_fee) +
+                      Number(project?.imbue_fee)
+                  )?.toLocaleString()}{' '}
+                  ${Currency[project?.currency_id || 0]}
+                </h3>
+                <div className='text-[1rem] text-imbue-light-purple-two mt-2'>
+                  Budget - Fixed
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className='flex flex-col'>
+            <div className='flex flex-row items-start gap-3'>
+              <Image
+                src={calenderIcon}
+                height={24}
+                width={24}
+                alt={'calenderIcon'}
+                className='mt-1'
+              />
+              <div className='flex flex-col'>
+                <h3 className='text-lg lg:text-[1.25rem] text-imbue-purple-dark  font-normal'>
+                  {timeData[project?.duration_id || 0].label}
+                </h3>
+                <div className='text-[1rem] text-imbue-light-purple-two'>
+                  Timeline
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {project?.escrow_address && (
+            <div className='flex flex-col'>
+              <div className='flex flex-row items-start gap-3'>
+                <AccountBalanceWalletOutlinedIcon className='mt-1 text-imbue-purple-dark' />
+                <div className='flex flex-col'>
+                  <h3 className='text-lg flex items-center lg:text-[1.25rem] text-imbue-purple-dark leading-[1.5] font-normal m-0 p-0'>
+                    Wallet Address
+                    <span
+                      onClick={() => setModalOpen(true)}
+                      className='bg-indigo-700 ml-2 h-5 w-5 py-1 px-1.5 cursor-pointer text-xs !text-white rounded-full flex justify-center items-center'
+                    >
+                      ?
+                    </span>
+                  </h3>
+                  <div className='text-[1rem] text-imbue-light-purple-two mt-2 text-xs break-all'>
+                    {project?.escrow_address}
+                    <ProjectBalance
+                      {...{
+                        balance,
+                        project,
+                        user,
+                        handlePopUpForUser,
+                        setBalance,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {project?.chain_project_id && (
+            <div className='flex flex-col'>
+              <div className='flex flex-row items-start gap-3'>
+                <FingerprintIcon className='mt-1 text-imbue-purple-dark' />
+                <div className='flex flex-col'>
+                  <h3 className='text-lg lg:text-[1.25rem] text-imbue-purple-dark leading-[1.5] font-normal m-0 p-0'>
+                    On-Chain Project ID
+                  </h3>
+                  <div className='text-[1rem] text-imbue-light-purple-two mt-2 text-xs break-all'>
+                    {project?.chain_project_id}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-        {/* Starting of milestone section */}
-        <div className='bg-light-grey text-[#747474] py-5 px-5 mt-10 rounded-xl'>
-          <p className='text-[#747474] ml-5 text-sm'>Project Milestones</p>
-          <p className='mt-9 ml-5'>Title</p>
-          <div></div>
+        <div className='col-span-9'>
+          {chainLoading &&
+            project?.milestones?.map((item: any) => (
+              <div
+                key={
+                  'chainLoading__' +
+                  item.project_id +
+                  ' ' +
+                  item.milestone_index
+                }
+                className='h-20 w-full my-4 px-5 flex justify-between items-center  bg-gray-50 rounded-xl'
+              >
+                <div className='flex w-full items-center'>
+                  <Typography variant='h4' className='w-44'>
+                    <Skeleton />
+                  </Typography>
+                  <Typography variant='h5' className=' ml-5 w-[40%]'>
+                    <Skeleton />
+                  </Typography>
+                </div>
+                <div className='flex  items-center'>
+                  <Typography variant='body2' className=' w-24 mr-4'>
+                    <Skeleton />
+                  </Typography>
+                  <Typography variant='body2' className=' w-28 mr-9'>
+                    <Skeleton />
+                  </Typography>
+                </div>
+              </div>
+            ))}
+
+          {project?.milestones?.map?.((milestone: Milestone, index: number) => {
+            return (
+              <ExpandableDropDowns
+                {...{
+                  setOpenVotingList,
+                  approversPreview,
+                  firstPendingMilestone,
+                  projectInMilestoneVoting,
+                  isApplicant,
+                  canVote,
+                  user,
+                  projectType,
+                  isProjectOwner,
+                  balance,
+                  setLoading,
+                  setSuccess,
+                  setSuccessTitle,
+                  setError,
+                  project,
+                }}
+                key={`${index}-milestone`}
+                index={index}
+                milestone={milestone}
+                modified={milestone?.modified as Date}
+                milestonLoadingTitle={milestonLoadingTitle}
+              />
+            );
+          })}
         </div>
-        {/* Ending of milestone section */}
+
+        <Impressions
+          project={project}
+          firstPendingMilestone={firstPendingMilestone}
+          projectInMilestoneVoting={projectInMilestoneVoting}
+          approversPreview={approversPreview}
+          // votes={votes}
+          setOpenVotingList={setOpenVotingList}
+          numberOfMileSotnes={project.milestones}
+          isChainLoading={chainLoading}
+          milestoneLoding={milestonLoadingTitle ? true : false}
+        />
       </div>
+
+      <Login
+        visible={loginModal}
+        setVisible={(val) => {
+          setLoginModal(val);
+        }}
+        redirectUrl={`/project/${projectId}/`}
+      />
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
+      <SuccessScreen
+        noRetry={!(project?.status_id === OffchainProjectState.Completed)}
+        title={successTitle}
+        open={success}
+        setOpen={setSuccess}
+      >
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => {
+              setSuccess(false);
+              if (project?.status_id !== OffchainProjectState.Completed)
+                window.location.reload();
+            }}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Continue to Project
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to dashboard
+          </button>
+        </div>
+      </SuccessScreen>
+
+      <RefundScreen open={refunded} setOpen={setSuccess} />
+
+      <WaitingScreen title={waitMessage} open={wait} setOpen={setWait}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => window.location.reload()}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Refresh
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to dashboard
+          </button>
+        </div>
+      </WaitingScreen>
+
+      <VotingList
+        open={openVotingList}
+        firstPendingMilestone={firstPendingMilestone}
+        setOpenVotingList={setOpenVotingList}
+        approvers={approversPreview}
+        chainProjectId={project.chain_project_id}
+        projectId={project.id}
+        setMilestoneVotes={setMilestoneVotes}
+      />
+      <BackDropLoader open={loading || userLoading} />
     </div>
   );
 }

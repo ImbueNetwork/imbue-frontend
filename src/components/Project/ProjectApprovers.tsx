@@ -131,10 +131,11 @@ const ProjectApprovers = (props: ProjectApproversType) => {
         </div>
     )
 
+
     return (
         <div>
             {approversPreview?.length > 0 && (
-                <div className='flex flex-row flex-wrap gap-10'>
+                <div className='flex flex-row flex-wrap gap-5'>
                     {approversPreview?.map((approver: any, index: number) => (
                         <div
                             key={index}

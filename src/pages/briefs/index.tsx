@@ -46,7 +46,6 @@ const timeAgo = new TimeAgo('en-US');
 //   handleClose: () => void;
 // }
 
-
 const Briefs = (): JSX.Element => {
   const [briefs, setBriefs] = useState<Brief[]>([]);
   const [briefs_total, setBriefsTotal] = useState<number>(0);
@@ -62,15 +61,22 @@ const Briefs = (): JSX.Element => {
   // const [_openDropDown, setOpenDropDown] = useState<string>('');
   const [savedBriefsActive, setSavedBriefsActive] = useState<boolean>(false);
 
-
   // search input value
   const [searchInput, setSearchInput] = useState<string>('');
   const [pageInput, setPageInput] = useState<number>(1);
 
-  const [skills, setSkills] = useState<Item[]>([{ name: "", id: 0 }]);
-  const [myApplications, _setMyApplications] = useState<Project[]>()
+  const [skills, setSkills] = useState<Item[]>([{ name: '', id: 0 }]);
+  const [myApplications, _setMyApplications] = useState<Project[]>();
   const [error, setError] = useState<any>();
-  const { expRange, submitRange, lengthRange, heading, size: sizeProps, skillsProps, verified_only: verifiedOnlyProp } = router.query;
+  const {
+    expRange,
+    submitRange,
+    lengthRange,
+    heading,
+    size: sizeProps,
+    skillsProps,
+    verified_only: verifiedOnlyProp,
+  } = router.query;
 
   const { pathname } = router;
 
@@ -88,21 +94,20 @@ const Briefs = (): JSX.Element => {
     setItemsPerPage(val);
     const totalPage = Math.ceil(briefs_total / val);
     if (currentPage > totalPage) {
-      setCurrentPage(totalPage)
+      setCurrentPage(totalPage);
       setPageInput(totalPage);
-      router.query.page = (totalPage).toString()
+      router.query.page = totalPage.toString();
       router.push(router, undefined, { shallow: true });
     }
-  }
+  };
 
   useEffect(() => {
     const fetchApplication = async () => {
       _setMyApplications(await getFreelancerApplications(currentUser?.id));
-    }
+    };
 
-    fetchApplication()
-
-  }, [currentUser, currentUser?.id])
+    fetchApplication();
+  }, [currentUser, currentUser?.id]);
 
   const expfilter = {
     // This is a table named "experience"
@@ -239,7 +244,7 @@ const Briefs = (): JSX.Element => {
       interiorIndex: s.id,
       search_for: [s.id],
       value: s.name,
-    }))
+    })),
   };
 
   const freelancerInfoFilter = {
@@ -300,20 +305,16 @@ const Briefs = (): JSX.Element => {
 
   useEffect(() => {
     const fetchAndSetBriefs = async () => {
-
       try {
         if (!Object.keys(router?.query).length) {
           const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
           if (briefs_all.status === 200) {
             setBriefs(briefs_all?.currentData);
             setBriefsTotal(briefs_all?.totalBriefs);
+          } else {
+            setError({ message: 'Something went wrong. Please try again' });
           }
-          else {
-            setError({ message: "Something went wrong. Please try again" })
-          }
-
         } else {
-
           let filter: BriefSqlFilter = {
             experience_range: [],
             submitted_range: [],
@@ -325,25 +326,25 @@ const Briefs = (): JSX.Element => {
             items_per_page: itemsPerPage,
             page: currentPage,
             verified_only: false,
-            non_verified: false
+            non_verified: false,
           };
 
           const verifiedOnlyPropIndex = selectedFilterIds.indexOf('4-0');
 
           if (router.query.page) {
-            const pageQuery = Number(router.query.page)
+            const pageQuery = Number(router.query.page);
             filter.page = pageQuery;
-            setCurrentPage(pageQuery)
-            setPageInput(pageQuery)
+            setCurrentPage(pageQuery);
+            setPageInput(pageQuery);
           }
 
-          if(router.query.non_verified) {
-            filter.non_verified = true
+          if (router.query.non_verified) {
+            filter.non_verified = true;
           }
 
           if (sizeProps) {
-            filter.items_per_page = Number(sizeProps)
-            setItemsPerPage(Number(sizeProps))
+            filter.items_per_page = Number(sizeProps);
+            setItemsPerPage(Number(sizeProps));
           }
 
           if (expRange) {
@@ -385,7 +386,7 @@ const Briefs = (): JSX.Element => {
             //   'search-input'
             // ) as HTMLInputElement;
             // if (input) input.value = heading.toString();
-            setSearchInput(heading.toString())
+            setSearchInput(heading.toString());
           }
 
           if (verifiedOnlyProp) {
@@ -393,11 +394,10 @@ const Briefs = (): JSX.Element => {
               selectedFilterIds.push(`4-0`);
 
             filter = { ...filter, verified_only: true };
-          }
-          else if (verifiedOnlyPropIndex !== -1) {
+          } else if (verifiedOnlyPropIndex !== -1) {
             // const newFileter = [...selectedFilterIds].filter((f) => f !== '4-0')
             // setSlectedFilterIds(newFileter)
-            selectedFilterIds.splice(verifiedOnlyPropIndex, 1)
+            selectedFilterIds.splice(verifiedOnlyPropIndex, 1);
           }
 
           if (lengthRange) {
@@ -409,7 +409,6 @@ const Briefs = (): JSX.Element => {
             filter = { ...filter, length_range: strToIntRange(lengthRange) };
           }
 
-
           let result: any = [];
 
           if (savedBriefsActive) {
@@ -418,34 +417,31 @@ const Briefs = (): JSX.Element => {
               currentPage,
               currentUser?.id
             );
-
           } else {
             result = await callSearchBriefs(filter);
           }
 
-
           if (result.status === 200 || result.totalBriefs !== undefined) {
-            const totalPages = Math.ceil(result?.totalBriefs / (filter?.items_per_page || 6))
+            const totalPages = Math.ceil(
+              result?.totalBriefs / (filter?.items_per_page || 6)
+            );
 
             if (totalPages < filter.page && totalPages > 0) {
-              router.query.page = totalPages.toString()
-              router.push(router, undefined, { shallow: true })
-              filter.page = totalPages
+              router.query.page = totalPages.toString();
+              router.push(router, undefined, { shallow: true });
+              filter.page = totalPages;
             }
 
             setBriefs(result?.currentData);
             setBriefsTotal(result?.totalBriefs);
-          }
-
-          else {
-            setError({ message: "Something went wrong. Please try again" })
+          } else {
+            setError({ message: 'Something went wrong. Please try again' });
           }
         }
       } catch (error) {
-        setError({ message: "Something went wrong. Please try again" + error })
-      }
-      finally {
-        setLoading(false)
+        setError({ message: 'Something went wrong. Please try again' + error });
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -530,11 +526,8 @@ const Briefs = (): JSX.Element => {
 
             case BriefFilterOption.FreelancerInfo:
               {
-
-                if (parseInt(interiorIndex) === 0)
-                  verified_only = true;
-                if (parseInt(interiorIndex) === 1)
-                  non_verified = true;
+                if (parseInt(interiorIndex) === 0) verified_only = true;
+                if (parseInt(interiorIndex) === 1) non_verified = true;
               }
               break;
 
@@ -542,7 +535,7 @@ const Briefs = (): JSX.Element => {
               // eslint-disable-next-line no-console
               console.log(
                 'Invalid filter option selected or unimplemented. type:' +
-                filterType
+                  filterType
               );
           }
         }
@@ -563,9 +556,7 @@ const Briefs = (): JSX.Element => {
     router.query.lengthRange = length_range_prop.length
       ? length_range_prop.toString()
       : [];
-    router.query.skillsProps = skills_prop.length
-      ? skills_prop.toString()
-      : [];
+    router.query.skillsProps = skills_prop.length ? skills_prop.toString() : [];
     router.push(router, undefined, { shallow: true });
 
     try {
@@ -581,7 +572,7 @@ const Briefs = (): JSX.Element => {
           items_per_page: itemsPerPage,
           page: 1,
           verified_only: verified_only,
-          non_verified: non_verified
+          non_verified: non_verified,
         };
 
         if (search_value.length === 0) {
@@ -600,21 +591,20 @@ const Briefs = (): JSX.Element => {
       }
     } catch (error) {
       setError({ message: error });
-    }
-    finally {
-      setLoading(false)
+    } finally {
+      setLoading(false);
       setFilterVisible(false);
     }
   };
 
   useEffect(() => {
     const getAllFilters = async () => {
-      const filteredItems = await getAllSkills()
+      const filteredItems = await getAllSkills();
       setSkills(filteredItems?.skills);
-    }
+    };
 
-    getAllFilters()
-  }, [])
+    getAllFilters();
+  }, []);
 
   const onSavedBriefs = async () => {
     setSavedBriefsActive(true);
@@ -662,12 +652,9 @@ const Briefs = (): JSX.Element => {
   };
 
   const appliedBreifId = useMemo(() => {
-    const data = myApplications?.map((it: Project) => it.brief_id
-    );
-    return data
-  }, [myApplications])
-
-
+    const data = myApplications?.map((it: Project) => it.brief_id);
+    return data;
+  }, [myApplications]);
 
   const cancelFilters = async () => {
     reset();
@@ -678,43 +665,55 @@ const Briefs = (): JSX.Element => {
     if (briefs_total > currentPage * itemsPerPage) {
       setCurrentPage(currentPage + 1);
       setPageInput(currentPage + 1);
-      router.query.page = (currentPage + 1).toString()
+      router.query.page = (currentPage + 1).toString();
       router.push(router, undefined, { shallow: true });
     }
-  }
+  };
 
   const previousPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
       setPageInput(currentPage - 1);
-      router.query.page = (currentPage - 1).toString()
+      router.query.page = (currentPage - 1).toString();
       router.push(router, undefined, { shallow: true });
     }
-  }
+  };
 
   const setPageNumber = (e: any) => {
     const pageNumber = Number(e.target.value) || 1;
-    const totalPages = Math.ceil(briefs_total / itemsPerPage)
+    const totalPages = Math.ceil(briefs_total / itemsPerPage);
 
-    if ((e.key === 'Enter' || e.key === 'Enter') && (pageNumber <= totalPages) && (pageNumber > 0)) {
+    if (
+      (e.key === 'Enter' || e.key === 'Enter') &&
+      pageNumber <= totalPages &&
+      pageNumber > 0
+    ) {
       setCurrentPage(pageNumber);
       setPageInput(pageNumber);
-      router.query.page = pageNumber.toString()
+      router.query.page = pageNumber.toString();
       router.push(router, undefined, { shallow: true });
     }
-  }
+  };
 
   const briefsData = savedBriefsActive
     ? briefs?.filter((brief) =>
-      brief?.headline.toLocaleLowerCase().includes(searchInput)
-    )
+        brief?.headline.toLocaleLowerCase().includes(searchInput)
+      )
     : briefs;
 
   return (
     <div className='flex flex-col'>
       <div className='search-briefs-container !overflow-hidden max-width-868px:px-5'>
-        <FilterModal open={filterVisble} handleClose={() => toggleFilter()}
-          {...{ cancelFilters, handleSetId, onSearch, customDropdownConfigs, selectedFilterIds }}
+        <FilterModal
+          open={filterVisble}
+          handleClose={() => toggleFilter()}
+          {...{
+            cancelFilters,
+            handleSetId,
+            onSearch,
+            customDropdownConfigs,
+            selectedFilterIds,
+          }}
         />
 
         <div className='briefs-section !overflow-hidden'>
@@ -801,82 +800,83 @@ const Briefs = (): JSX.Element => {
           </div>
 
           <div className='briefs-list !overflow-hidden z-10'>
-            {briefsData?.map(
-              (item, itemIndex) => (
-                <div key={itemIndex} className='relative z-0'>
-                  {savedBriefsActive && (
-                    <button
-                      className='absolute top-5 z-[1000] right-5 h-[30px] w-[30px] border border-red-500 rounded-full flex justify-center items-center bg-red-500'
-                      onClick={() => {
-                        deleteBrief(item?.id);
-                      }}
-                    >
-                      <IoTrashBin color='#fff' />
-                    </button>
+            {briefsData?.map((item, itemIndex) => (
+              <div key={itemIndex} className='relative z-0'>
+                {savedBriefsActive && (
+                  <button
+                    className='absolute top-5 z-[1000] right-5 h-[30px] w-[30px] border border-red-500 rounded-full flex justify-center items-center bg-red-500'
+                    onClick={() => {
+                      deleteBrief(item?.id);
+                    }}
+                  >
+                    <IoTrashBin color='#fff' />
+                  </button>
+                )}
+
+                <div
+                  className='brief-item relative z-20'
+                  onClick={() => router.push(`/briefs/${item?.id}`)}
+                >
+                  {appliedBreifId?.includes(item.id) && (
+                    <div className='bg-imbue-light-purple-hover w-20 py-1 flex justify-center items-center rounded-full'>
+                      <p className='text-imbue-purple-dark'>Applied</p>
+                    </div>
+                  )}
+                  <div className='brief-title'>
+                    {item.headline.length > 50
+                      ? `${item.headline.substring(0, 50)}...`
+                      : item.headline}
+                  </div>
+                  <div className='brief-time-info'>
+                    {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
+                  </div>
+                  <div className='brief-description lg:w-10/12'>
+                    {item.description.length > 500
+                      ? `${item.description.substring(0, 500)}...`
+                      : item.description}
+                  </div>
+
+                  <div className='brief-tags !flex-wrap'>
+                    {item.skills.map((skill: any, skillIndex: any) => (
+                      <div className='tag-item' key={skillIndex}>
+                        {skill.name}
+                      </div>
+                    ))}
+                  </div>
+
+                  {item?.verified_only && (
+                    <div className='flex items-center gap-2'>
+                      <VerifiedRoundedIcon
+                        fontSize='small'
+                        htmlColor='#38e894'
+                      />
+                      <p className='text-content-primary'>
+                        Only verified freelancers can apply
+                      </p>
+                    </div>
                   )}
 
-                  <div
-                    className='brief-item relative z-20'
-                    onClick={() =>
-                      router.push(`/briefs/${item?.id}`)
-                    }
-                  >
-                    {appliedBreifId?.includes(item.id) &&
-                      <div className='bg-imbue-light-purple-hover w-20 py-1 flex justify-center items-center rounded-full'><p className='text-imbue-purple-dark'>Applied</p></div>
-                    }
-                    <div className='brief-title'>
-                      {item.headline.length > 50
-                        ? `${item.headline.substring(0, 50)}...`
-                        : item.headline}
-                    </div>
-                    <div className='brief-time-info'>
-                      {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
-                    </div>
-                    <div className='brief-description lg:w-10/12'>
-                      {item.description.length > 500
-                        ? `${item.description.substring(0, 500)}...`
-                        : item.description}
+                  <div className='flex justify-between lg:flex-row flex-col lg:w-[400px] lg:items-center'>
+                    <div className='brief-proposals'>
+                      <span className='proposals-heading'>
+                        Proposals Submitted:{' '}
+                      </span>
+                      <span className='proposals-count'>
+                        Less than {item.number_of_briefs_submitted}
+                      </span>
                     </div>
 
-                    <div className='brief-tags !flex-wrap'>
-                      {item.skills.map((skill: any, skillIndex: any) => (
-                        <div className='tag-item' key={skillIndex}>
-                          {skill.name}
-                        </div>
-                      ))}
-                    </div>
-
-                    {
-                      item?.verified_only && (
-                        <div className='flex items-center gap-2'>
-                          <VerifiedRoundedIcon fontSize='small' htmlColor='#38e894' />
-                          <p className='text-content-primary'>Only verified freelancers can apply</p>
-                        </div>
-                      )
-                    }
-
-                    <div className='flex justify-between lg:flex-row flex-col lg:w-[400px] lg:items-center'>
-                      <div className='brief-proposals'>
-                        <span className='proposals-heading'>
-                          Proposals Submitted:{' '}
-                        </span>
-                        <span className='proposals-count'>
-                          Less than {item.number_of_briefs_submitted}
-                        </span>
-                      </div>
-
-                      <div className='leading-none text-black mt-3 lg:mt-0'>
-                        {timeAgo.format(new Date(item?.created))}
-                      </div>
+                    <div className='leading-none text-black mt-3 lg:mt-0'>
+                      {timeAgo.format(new Date(item?.created))}
                     </div>
                   </div>
                 </div>
-              )
-            )}
+              </div>
+            ))}
           </div>
         </div>
 
-        <ErrorScreen  {...{ error, setError }}>
+        <ErrorScreen {...{ error, setError }}>
           <div className='flex flex-col gap-4 w-1/2'>
             <button
               onClick={() => setError(null)}
@@ -907,24 +907,25 @@ const Briefs = (): JSX.Element => {
 
           <div className='mx-[1.62rem] text-[#5E5E5E] text-[0.7rem] lg:text-[1rem] font-normal flex items-center gap-3'>
             <TextField
-              id="standard-size-small"
+              id='standard-size-small'
               className='!mb-0'
               inputProps={{
-                className: "w-6 text-right px-1",
-                type: "number",
+                className: 'w-6 text-right px-1',
+                type: 'number',
                 min: 1,
-                max: Math.ceil(savedBriefsActive ? briefsData?.length / itemsPerPage : briefs_total / itemsPerPage)
+                max: Math.ceil(
+                  savedBriefsActive
+                    ? briefsData?.length / itemsPerPage
+                    : briefs_total / itemsPerPage
+                ),
               }}
               onChange={(e) => setPageInput(Number(e.target.value))}
               onKeyDown={(e) => setPageNumber(e)}
               value={pageInput}
-              variant="standard" />
-            <span>
-              of
-            </span>
-            <span>
-              {Math.ceil(briefs_total / itemsPerPage)}
-            </span>
+              variant='standard'
+            />
+            <span>of</span>
+            <span>{Math.ceil(briefs_total / itemsPerPage)}</span>
             {/* {currentPage} of {Math.ceil(briefs_total / itemsPerPage)} */}
           </div>
 
@@ -943,7 +944,7 @@ const Briefs = (): JSX.Element => {
             <select
               name='currencyId'
               onChange={(e) => {
-                router.query.size = (e.target.value).toString()
+                router.query.size = e.target.value.toString();
                 router.push(router, undefined, { shallow: true });
                 handleSetItemPerPage(Number(e.target.value));
               }}
