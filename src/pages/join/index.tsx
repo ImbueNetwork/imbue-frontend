@@ -12,8 +12,10 @@ import * as utils from '@/utils';
 
 import AccountChoice from '@/components/AccountChoice';
 
-const Login = dynamic(() => import("@/components/Login"));
+const LoginPopup = dynamic(() => import("@/components/LoginPopup/LoginPopup"));
 const SignUp = dynamic(() => import("@/components/SignUp"));
+
+// import LoginPopup from '@/components/LoginPopup/LoginPopup';
 
 import { walletIcon } from '@/assets/svgs';
 import * as config from '@/config';
@@ -71,7 +73,7 @@ const Join = (): JSX.Element => {
 
   return (
     <>
-    <Login redirectUrl='/dashboard' setVisible={closeLogInModal}  visible={loginModal === "login"} />
+    <LoginPopup redirectUrl='/dashboard' setVisible={closeLogInModal}  visible={loginModal === "login"} />
    <div className='w-full flex justify-center'>
            <div className='px-10 py-10 bg-white rounded-2xl'>
             <div className='lg:min-w-[500px]  m-auto'>
