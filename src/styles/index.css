@@ -616,6 +616,13 @@ input[type='radio'] {
   z-index: 100;
 }
 
+.css-1wqgwi1-MuiLinearProgress-bar1 {
+  border-radius: 10px;
+}
+.css-w77re0-MuiLinearProgress-bar1 {
+  border-radius: 10px;
+}
+
 .progress-step-circle-primary--milestone.active {
   background-color: red;
 }

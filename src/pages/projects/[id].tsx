@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
-import { LinearProgress, Skeleton, Tooltip } from '@mui/material';
+import { LinearProgress, Modal, Skeleton, Tooltip } from '@mui/material';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -69,6 +69,8 @@ import {
 } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 import { MilestoneProgressBar } from '@/components/MilestoneProgressBar/MilestoneProgressBar';
+import ReviewModal from '@/components/ReviewModal/ReviewModal';
+import VoteModal from '@/components/ReviewModal/VoteModal';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -540,6 +542,9 @@ function Project() {
 
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
+      <Modal open={true} className='flex justify-center items-center'>
+        <VoteModal />
+      </Modal>
       <div className='w-full grid grid-cols-12 bg-white py-5 px-7 rounded-2xl'>
         <p className='text-black col-start-1 col-end-10 '>
           {projectType} information
@@ -832,16 +837,16 @@ function Project() {
               </div>
               <div className='flex w-full relative mt-5'>
                 <LinearProgress
-                  color='error'
-                  className='w-[50%] rotate-180 bg-[#DDDCD6]  h-5 rounded-full'
+                  className='w-[50%] text-imbue-coral rotate-180 before:bg-[#DDDCD6]    h-5 rounded-full'
+                  color='inherit'
                   variant='determinate'
-                  value={10}
+                  value={20}
                 />
-                <div className='w-3 left-[47%] top-[20%] absolute z-10 bg-white rounded-full h-3'></div>
+                <div className='w-3 left-[47%] top-[20%] absolute z-10 bg-[#DDDCD6] rounded-full h-3'></div>
                 <LinearProgress
                   className='w-[50%] h-5 -ml-3 rounded-full bg-[#DDDCD6]'
                   variant='determinate'
-                  value={10}
+                  value={90}
                 />
               </div>
             </div>
