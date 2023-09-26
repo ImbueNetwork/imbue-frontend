@@ -1,41 +1,46 @@
-
-import { CircularProgress, IconButton, InputAdornment, OutlinedInput } from "@mui/material";
-import { SignerResult } from "@polkadot/api/types";
-import { WalletAccount } from "@talismn/connect-wallets";
-import Image from "next/image";
-import { useRouter } from "next/router";
-import { useRef, useState } from "react";
+import {
+  CircularProgress,
+  IconButton,
+  InputAdornment,
+  OutlinedInput,
+} from '@mui/material';
+import { SignerResult } from '@polkadot/api/types';
+import { WalletAccount } from '@talismn/connect-wallets';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import { useRef, useState } from 'react';
 
 import * as utils from '@/utils';
 
 import Carousel from '@/components/Carousel/Carousel';
-const Web3WalletModal = dynamic(() => import('@/components/WalletModal/Web3WalletModal'));
+const Web3WalletModal = dynamic(
+  () => import('@/components/WalletModal/Web3WalletModal')
+);
 
-import dynamic from "next/dynamic";
+import dynamic from 'next/dynamic';
 
-import GoogleSignIn from "@/components/GoogleSignIn";
+import GoogleSignIn from '@/components/GoogleSignIn';
 
 import * as config from '@/config';
 import { postAPIHeaders } from '@/config';
-import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
-
+import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 
 export default function SignIn() {
-  const [userOrEmail, setUserOrEmail] = useState<string>("");
+  const [userOrEmail, setUserOrEmail] = useState<string>('');
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [password, setPassword] = useState<string>("");
+  const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState("")
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const router = useRouter()
+  const router = useRouter();
 
   const handleSubmit = async () => {
     setLoading(true);
     try {
       if (userOrEmail?.length < 1 || password?.length < 1) {
-        setErrorMessage("incorrect username or password")
-        return
+        setErrorMessage('incorrect username or password');
+        return;
       }
       const resp = await fetch(`${config.apiBase}auth/imbue/`, {
         headers: postAPIHeaders,
@@ -47,7 +52,7 @@ export default function SignIn() {
       });
 
       if (resp.ok) {
-        utils.redirect("/dashboard");
+        utils.redirect('/dashboard');
       } else {
         setErrorMessage('incorrect username or password');
       }
@@ -57,7 +62,7 @@ export default function SignIn() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const accountSelected = async (account: WalletAccount): Promise<any> => {
     try {
@@ -68,7 +73,7 @@ export default function SignIn() {
         account
       );
       if (resp.ok) {
-        utils.redirect("/dashboard");
+        utils.redirect('/dashboard');
       }
     } catch (error) {
       // FIXME: error handling
@@ -81,7 +86,7 @@ export default function SignIn() {
     showPolkadotAccounts(true);
   };
 
-  const walletRef = useRef<any>(null)
+  const walletRef = useRef<any>(null);
 
   return (
     <div className="flex justify-center items-center absolute inset-0">
@@ -89,10 +94,12 @@ export default function SignIn() {
         <div className="left-side hidden lg:block w-[28rem] lg:w-[31.25rem]">
           <Carousel />
         </div>
-        <div className="content px-4 lg:px-8 py-6 lg:py-16">
-          <h2 className="text-imbue-purple-dark text-[1.75rem]" >Login to your account</h2>
-          <p className="text-[#9794AB] mt-1" >Welcome back to imbue</p>
-          <div className="flex sm:flex-row flex-col-reverse mt-5 lg:mt-9 gap-2">
+        <div className='content px-4 lg:px-8 py-6 lg:py-16'>
+          <h2 className='text-imbue-purple-dark text-[1.75rem]'>
+            Login to your account
+          </h2>
+          <p className='text-[#9794AB] mt-1'>Welcome back to imbue</p>
+          <div className='flex sm:flex-row flex-col-reverse mt-5 lg:mt-9 gap-2'>
             <div className='login justify-center items-center w-full flex flex-col'>
               <li
                 // ref={googleParentRef}
@@ -101,7 +108,10 @@ export default function SignIn() {
                 <GoogleSignIn sizeRef={walletRef} />
               </li>
             </div>
-            <div ref={walletRef} className='login justify-center items-center w-full flex flex-col'>
+            <div
+              ref={walletRef}
+              className='login justify-center items-center w-full flex flex-col'
+            >
               <li
                 className='flex flex-row items-center cursor-pointer w-full'
                 tabIndex={0}
@@ -111,13 +121,15 @@ export default function SignIn() {
                 <button className='h-[2.6rem] rounded-[1.56rem] border w-full justify-center hover:bg-imbue-lime-light transition-colors duration-300 px-5'>
                   <div className='flex text-xs sm:text-sm  text-[#344F00] justify-center items-center'>
                     <Image
-                      src={"/wallet.svg"}
+                      src={'/wallet.svg'}
                       width={32}
                       height={20}
                       alt='Wallet-icon'
                       className='relative right-2 w-5 lg:w-auto'
                     />
-                    <p className="lg:font-medium font-semibold font-inter">Sign in with wallet</p>
+                    <p className='lg:font-medium font-semibold font-inter'>
+                      Sign in with wallet
+                    </p>
                   </div>
                 </button>
               </li>
@@ -137,14 +149,16 @@ export default function SignIn() {
               id='outlined-adornment-password'
               color='secondary'
               className='h-[2.6rem] pl-[4px] text-[0.875rem]'
-              inputProps={
-                { className: 'placeholder:text-[#D1D1D1] !text-black' }
-              }
+              notched={false}
+              inputProps={{
+                className: 'placeholder:text-[#D1D1D1] !text-black',
+              }}
               type='text'
               name='emailorUsername'
               placeholder='victorimbue@gmail.com'
               onChange={(e: any) => setUserOrEmail(e.target.value)}
               required
+              onKeyUp={(e) => (e.key === 'Enter') && document.getElementsByName('password')[0].focus()}
             />
           </div>
           <div className='flex flex-col justify-center pb-[10px] w-full mt-[1.2rem]'>
@@ -154,24 +168,38 @@ export default function SignIn() {
             <OutlinedInput
               id='outlined-adornment-password'
               color='secondary'
+              notched={false}
               className='h-[2.6rem] pl-1 text-[0.875rem]'
-              inputProps={
-                { className: 'placeholder:text-[#D1D1D1] !text-black' }
-              }
+              inputProps={{
+                className: 'placeholder:text-[#D1D1D1] !text-black',
+              }}
               placeholder='*********'
               type={showPassword ? 'text' : 'password'}
               name='password'
               required
               onChange={(e: any) => setPassword(e.target.value)}
+              onKeyUp={(e) => (e.key === 'Enter') && handleSubmit()}
               endAdornment={
                 <InputAdornment position='end'>
                   <IconButton
                     aria-label='toggle password visibility'
                     onClick={() => setShowPassword(!showPassword)}
                     edge='end'
-                    className="mr-0"
+                    className='mr-0'
                   >
-                    {showPassword ? <Image className="h-5 w-5" src={require("../../../assets/svgs/eye.svg")} alt="" /> :  <Image className="w-5 h-5" src={require("../../../assets/svgs/eyeClosed.svg")} alt="" /> }
+                    {showPassword ? (
+                      <Image
+                        className='h-5 w-5'
+                        src={require('../../../assets/svgs/eye.svg')}
+                        alt=''
+                      />
+                    ) : (
+                      <Image
+                        className='w-5 h-5'
+                        src={require('../../../assets/svgs/eyeClosed.svg')}
+                        alt=''
+                      />
+                    )}
                   </IconButton>
                 </InputAdornment>
               }
@@ -197,21 +225,38 @@ export default function SignIn() {
                 {loading ? 'Signing In' : 'Sign In'}
               </span>
             </button>
-
           </div>
-          {errorMessage && <p className="text-imbue-coral text-center">{errorMessage}</p>}
-          <div className="flex justify-center space-x-3 mt-5">
-            <p className="text-[#9794AB]">New to Imbue?</p>
+          {errorMessage && (
+            <p className='text-imbue-coral text-center'>{errorMessage}</p>
+          )}
+          <div className='flex justify-center space-x-3 mt-5'>
+            <p className='text-[#9794AB]'>New to Imbue?</p>
             <span
-              onClick={() => { router.push("/auth/sign-up") }}
-              className="text-imbue-purple-dark cursor-pointer " >Create An account</span>
+              onClick={() => {
+                router.push('/auth/sign-up');
+              }}
+              className='text-imbue-purple-dark cursor-pointer '
+            >
+              Create An account
+            </span>
           </div>
           <div className='w-full mt-8 mb-5 flex justify-between items-center'>
             <span className='h-[1px] w-[50%] bg-[#D9D9D9]' />
 
             <span className='h-[1px] w-[50%] bg-[#D9D9D9]' />
           </div>
-          <p className="text-imbue-purple-dark text-xs">By signing up, you agree with Imbue’s <a href='https://www.imbue.network/blogs/terms' target='_blank' className='underline'> Terms & Conditions </a> and Privacy Policy.</p>
+          <p className='text-imbue-purple-dark text-xs'>
+            By signing up, you agree with Imbue’s{' '}
+            <a
+              href='https://www.imbue.network/blogs/terms'
+              target='_blank'
+              className='underline'
+            >
+              {' '}
+              Terms & Conditions{' '}
+            </a>{' '}
+            and Privacy Policy.
+          </p>
         </div>
       </div>
 
@@ -225,10 +270,9 @@ export default function SignIn() {
         {...{
           polkadotAccountsVisible,
           showPolkadotAccounts,
-          accountSelected
+          accountSelected,
         }}
       />
-
     </div>
-  )
+  );
 }
