@@ -2,6 +2,17 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { useEffect, useState } from 'react';
 import LoadingBar from 'react-top-loading-bar';
+import '@/styles/common.css';
+import '@/styles/globals.css';
+import '@/styles/index.css';
+import '@/styles/proposal.css';
+import '@/styles/briefs.css';
+import '@/styles/new-brief.css';
+import '@/styles/brief-details.css';
+import '@/styles/submit-proposal.css';
+import '@/styles/muiGlobal.css';
+import '@/styles/stream-chat.css';
+import '@/styles/animation.css';
 
 import { Providers } from '@/redux/providers/userProviders';
 
