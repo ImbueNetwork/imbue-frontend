@@ -1,3 +1,5 @@
+import { createTheme, ThemeProvider } from '@mui/material';
+import { StyledEngineProvider } from '@mui/material/styles';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useEffect, useState } from 'react';
@@ -37,8 +39,19 @@ function Layout({ children }: LayoutProps) {
       router.events.off('routeChangeError', () => setProgress(100));
     };
   }, [router]);
-
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: '#b2ff0b',
+      },
+      secondary: {
+        main: '#3B27C1',
+      },
+    },
+  });
   return (
+    <ThemeProvider theme={theme}>
+    <StyledEngineProvider injectFirst>
     <React.Fragment>
       {progress > 0 && (
         <LoadingBar
@@ -66,6 +79,8 @@ function Layout({ children }: LayoutProps) {
         </main>
       </Providers>
     </React.Fragment>
+    </StyledEngineProvider>
+      </ThemeProvider>
   );
 }
 
