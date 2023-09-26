@@ -3,7 +3,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
-import { Skeleton, Tooltip, Typography } from '@mui/material';
+import { LinearProgress, Skeleton, Tooltip } from '@mui/material';
+import Accordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import Typography from '@mui/material/Typography';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -11,6 +15,7 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { LuTrash2 } from 'react-icons/lu';
 import { TfiNewWindow } from 'react-icons/tfi';
 import { useSelector } from 'react-redux';
 
@@ -25,14 +30,19 @@ import ErrorScreen from '@/components/ErrorScreen';
 import RefundScreen from '@/components/Grant/Refund';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 
-const LoginPopup = dynamic(() => import("@/components/LoginPopup/LoginPopup"));
-const ExpandableDropDowns = dynamic(() => import("@/components/Project/ExpandableMilestone"));
+const LoginPopup = dynamic(() => import('@/components/LoginPopup/LoginPopup'));
+const ExpandableDropDowns = dynamic(
+  () => import('@/components/Project/ExpandableMilestone')
+);
 
 import Impressions from '@/components/Project/Impressions';
 import ProjectApprovers from '@/components/Project/ProjectApprovers';
 import ProjectBalance from '@/components/Project/ProjectBalance';
-const ProjectHint = dynamic(() => import('@/components/Project/ProjectHint'))
+const ProjectHint = dynamic(() => import('@/components/Project/ProjectHint'));
 // import LoginPopup from '@/components/LoginPopup/LoginPopup';
+import classNames from 'classnames';
+import { BsChatLeftDots } from 'react-icons/bs';
+
 import VotingList from '@/components/Project/VotingList/VotingList';
 import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
@@ -58,6 +68,7 @@ import {
   updateProject,
 } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
+import { MilestoneProgressBar } from '@/components/MilestoneProgressBar/MilestoneProgressBar';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -529,10 +540,12 @@ function Project() {
 
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
-      <div className='w-full bg-white py-5 px-7 rounded-2xl'>
-        <p className='text-black'>{projectType} information</p>
+      <div className='w-full grid grid-cols-12 bg-white py-5 px-7 rounded-2xl'>
+        <p className='text-black col-start-1 col-end-10 '>
+          {projectType} information
+        </p>
         {/* starting of project section */}
-        <div className=' border-inherit my-5 border rounded-xl py-4 px-5'>
+        <div className=' border-inherit col-start-1 col-end-10 my-5 border rounded-xl py-4 px-5'>
           <div className='flex mb-4 items-center justify-between'>
             <p className='text-sm text-[#747474]'>Project Description</p>
             <p className='px-3 flex items-center  py-1.5 rounded-full border border-inherit text-sm text-black'>
@@ -569,40 +582,14 @@ function Project() {
                 <p className='text-imbue-coral'>{projectOwner?.display_name}</p>
               </div>
             </div>
-            <div className='bg-[#F6FFE6] flex flex-col justify-between px-4 py-3 rounded-xl'>
-              <p className='text-[#8A5C5A]'>Team</p>
-              <div className='flex'>
-                <Image
-                  src={'/profile-image.png'}
-                  width={30}
-                  height={30}
-                  alt='team'
-                />
-                <Image
-                  className='-ml-1'
-                  src={'/profile-image.png'}
-                  width={30}
-                  height={30}
-                  alt='team'
-                />
-                <Image
-                  className='-ml-1'
-                  src={'/profile-image.png'}
-                  width={30}
-                  height={30}
-                  alt='team'
-                />
-                <Image
-                  className='-ml-1'
-                  src={'/profile-image.png'}
-                  width={30}
-                  height={30}
-                  alt='team'
-                />
-              </div>
-            </div>
+
             <div className=' bg-light-grey flex flex-col justify-between px-4 py-3 rounded-xl'>
-              <p className='text-[#8A5C5A] text-sm'>Approvers</p>
+              <div className='flex justify-between'>
+                <p className='text-[#8A5C5A] text-sm'>Approvers</p>
+                <p className='bg-white text-black px-2 py-1 rounded-full text-xs'>
+                  see all
+                </p>
+              </div>
               <div className='mt-3'>
                 <ProjectApprovers
                   {...{
@@ -619,87 +606,248 @@ function Project() {
           {/* Ending of project section */}
         </div>
         {/* Starting of milestone section */}
-        <div className='bg-light-grey text-[#747474] py-5 px-5 mt-10 rounded-xl'>
-          <p className='text-[#747474] ml-5 text-sm'>Project Milestones</p>
-          <p className='mt-9 ml-5'>Title</p>
-          <div></div>
+        <div className='bg-light-grey col-start-1 col-end-10 text-[#747474] py-5 px-1 mt-10 rounded-xl'>
+          <p className='text-[#747474] ml-6 text-sm'>Project Milestones</p>
+
+          <div className='grid grid-cols-12 mt-16 ml-7'>
+            <p className='ml-6 col-start-1 col-end-7 '>Title</p>
+            <p className=' col-start-7 col-end-9 text-right mr-10 '>
+              Milestone Funding
+            </p>
+            <p className=' col-start-9 col-end-11 '>Milestone ends</p>
+            <p className=' col-start-11 col-end-13 text-left '>Stage</p>
+          </div>
+          {project?.milestones?.map((item: Milestone, index: number) => (
+            <Accordion
+              className='shadow-none mt-5 before:h-0 !rounded-xl py-5'
+              key={'milestone' + index}
+            >
+              <AccordionSummary
+                aria-controls='panel1a-content'
+                id='panel1a-header'
+              >
+                <Typography className='grid grid-cols-12 w-full'>
+                  <div className='col-start-1 col-end-7  flex items-center'>
+                    <div className='bg-[#2400FF] rounded-md relative  w-5 h-6  flex justify-center items-center text-white'>
+                      <span className='relative text-sm z-10'>{index + 1}</span>
+                      <div className='w-2 h-2 -rotate-45 bg-[#2400FF] absolute -bottom-0.5  '></div>
+                    </div>
+                    <p className='text-black ml-3 text-2xl'>{item.name}</p>
+                  </div>
+                  <p className='col-start-7 col-end-9 text-right mr-10'>
+                    ${item.amount}
+                  </p>
+                  <p className='col-start-9 text-sm col-end-11 ml-2  '>
+                    3rd November 2023
+                  </p>
+
+                  <p
+                    className={classNames(
+                      'px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ',
+                      item.is_approved
+                        ? 'bg-lime-100 text-lime-600'
+                        : 'bg-red-100 text-red-500'
+                    )}
+                  >
+                    {item.is_approved ? 'Completed' : 'open for voting'}
+                  </p>
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography className='px-2'>
+                  <div>
+                    <p className='text-black mt-10 font-semibold text-lg'>
+                      Milestone description and expectation
+                    </p>
+                    <p className='mt-5'>{item.description}</p>
+                    <p className='text-black mt-10 font-semibold text-lg'>
+                      Deliverables and updates
+                    </p>
+                    <p className='mt-5'>
+                      At this stage of this project, we were entirely focused on
+                      pushing out our first MVP based on our product roadmap;
+                      for this we would hired talents on imbue including a
+                      designer, a UX writer, a Full Stack Developer and a
+                      Project Manager. We estimated our MVP Design and
+                      Development to involve Key steps, Hiring, Onboarding and
+                      task delegation; and at the end of this Milestone we now
+                      have a live Website for our Waitlist. You can find a link
+                      to the live website <a href='#'>here</a>
+                    </p>
+                    <p className='text-black mt-10 font-semibold text-lg'>
+                      Project Attachments
+                    </p>
+                    <div className='flex space-x-5'>
+                      <div className='border rounded-lg mt-10 flex space-x-2 items-center px-3 text-xs py-3'>
+                        <div className='space-y-2'>
+                          <p>Landing page Development files</p>
+                          <p>3.2MB</p>
+                        </div>
+                        <LuTrash2 size={20} />
+                      </div>
+                      <div className='border rounded-lg mt-10 flex space-x-2 items-center px-3 text-xs py-3'>
+                        <div className='space-y-2'>
+                          <p>Landing page Development files</p>
+                          <p>3.2MB</p>
+                        </div>
+                        <LuTrash2 size={20} />
+                      </div>
+                      <div className='border rounded-lg mt-10 flex space-x-2 items-center px-3 text-xs py-3'>
+                        <div className='space-y-2'>
+                          <p>Landing page Development files</p>
+                          <p>3.2MB</p>
+                        </div>
+                        <LuTrash2 size={20} />
+                      </div>
+                    </div>
+                    <div className='w-full mt-7 flex'>
+                      <button
+                        className='primary-btn  ml-auto in-dark w-button lg:w-1/5'
+                        style={{ textAlign: 'center' }}
+                      >
+                        Vote for Milestone
+                      </button>
+                    </div>
+                  </div>
+                </Typography>
+              </AccordionDetails>
+            </Accordion>
+          ))}
         </div>
         {/* Ending of milestone section */}
+        {/* starting side bar for project details */}
+        <div className='col-start-10 mx-10  row-start-1 row-end-4 col-end-13'>
+          <div className='bg-light-grey mt-11 py-3 px-3 rounded-xl'>
+            <p className='text-[#747474] text-sm mb-5'>Project Overview</p>
+            <div className='space-y-2'>
+              <div className='flex bg-white justify-between px-5 py-3 rounded-xl'>
+                <p className='text-black mt-5'>Milestones</p>
+                <div className='w-48  mt-6'>
+                  <MilestoneProgressBar
+                    currentValue={1}
+                    titleArray={['1', '2', '3', '4']}
+                  />
+                </div>
+              </div>
+              <div className='flex bg-white justify-between px-5 py-3 rounded-xl'>
+                <p className='text-black mt-5'>Timeline</p>
+                <p className='text-imbue-purple-dark text-xl mt-5'>3 Months</p>
+              </div>
+              <div className='flex bg-white justify-between px-5 py-3 rounded-xl'>
+                <p className='text-black mt-5'>Grant Wallet</p>
+                <p className='text-imbue-purple-dark line-clamp-1  mt-5'>
+                  {project?.escrow_address?.slice(0, 6) +
+                    '...' +
+                    project?.escrow_address?.substr(-3)}
+                </p>
+              </div>
+              <div className='flex bg-white justify-between px-5 py-3 rounded-xl'>
+                <p className='text-black mt-5'>Total Funding</p>
+                <p className='text-imbue-purple-dark mt-5 text-xl '>
+                  40,0000 KSM
+                </p>
+              </div>
+              <div className='flex bg-white justify-between px-5 py-3 rounded-xl'>
+                <p className='text-black mt-5'>On-Chain Project ID</p>
+                <p className='text-imbue-purple-dark mt-5 text-xl '>
+                  {project.chain_project_id}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* ending side bar for project details */}
+        <div className='bg-white col-start-10  mx-10 row-start-3 mt-44 row-end-7 col-end-13 '>
+          <div className='bg-white col-start-10 px-3 rounded-xl py-3 border border-light-grey'>
+            <div className='flex justify-between text-black'>
+              <p>Milestone Vote Results</p>
+              <p>1/6</p>
+            </div>
+            <div className='bg-light-grey mt-5 py-7 rounded-xl px-3'>
+              <div className='flex text-black items-center'>
+                <div className='bg-[#2400FF] rounded-md relative  w-5 h-6  flex justify-center items-center text-white'>
+                  <span className='relative text-sm z-10'>{1}</span>
+                  <div className='w-2 h-2 -rotate-45 bg-[#2400FF] absolute -bottom-0.5  '></div>
+                </div>
+                <p className='ml-2'>This is a milestone</p>
+                <button className='bg-white text-black text-sm rounded-full px-3 py-2 ml-auto'>
+                  Vote
+                </button>
+              </div>
+              <div className='flex mt-7 justify-between'>
+                <div>
+                  <div className='img-section flex'>
+                    <Image
+                      src={'/profile-image.png'}
+                      width={20}
+                      height={20}
+                      alt='team'
+                    />
+                    <Image
+                      className='-ml-1'
+                      src={'/profile-image.png'}
+                      width={20}
+                      height={20}
+                      alt='team'
+                    />
+                  </div>
+                  <p className='text-black text-sm'>
+                    No <span className='text-gray-400'>(1 votes/5%)</span>
+                  </p>
+                </div>
+                <div>
+                  <div className='img-section flex justify-end'>
+                    <Image
+                      src={'/profile-image.png'}
+                      width={20}
+                      height={20}
+                      alt='team'
+                    />
+                    <Image
+                      className='-ml-1'
+                      src={'/profile-image.png'}
+                      width={20}
+                      height={20}
+                      alt='team'
+                    />
+                    <Image
+                      className='-ml-1'
+                      src={'/profile-image.png'}
+                      width={20}
+                      height={20}
+                      alt='team'
+                    />
+                    <Image
+                      className='-ml-1'
+                      src={'/profile-image.png'}
+                      width={20}
+                      height={20}
+                      alt='team'
+                    />
+                  </div>
+                  <p className='text-black text-sm'>
+                    <span className='text-gray-400'>(12 Votes/95%)</span>Yes
+                  </p>
+                </div>
+              </div>
+              <div className='flex w-full relative mt-5'>
+                <LinearProgress
+                  color='error'
+                  className='w-[50%] rotate-180 bg-[#DDDCD6]  h-5 rounded-full'
+                  variant='determinate'
+                  value={10}
+                />
+                <div className='w-3 left-[47%] top-[20%] absolute z-10 bg-white rounded-full h-3'></div>
+                <LinearProgress
+                  className='w-[50%] h-5 -ml-3 rounded-full bg-[#DDDCD6]'
+                  variant='determinate'
+                  value={10}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-
-      <LoginPopup
-        visible={loginModal}
-        setVisible={(val) => {
-          setLoginModal(val);
-        }}
-        redirectUrl={`/project/${projectId}/`}
-      />
-      <ErrorScreen {...{ error, setError }}>
-        <div className='flex flex-col gap-4 w-1/2'>
-          <button
-            onClick={() => setError(null)}
-            className='primary-btn in-dark w-button w-full !m-0'
-          >
-            Try Again
-          </button>
-          <button
-            onClick={() => router.push(`/dashboard`)}
-            className='underline text-xs lg:text-base font-bold'
-          >
-            Go to Dashboard
-          </button>
-        </div>
-      </ErrorScreen>
-      <SuccessScreen noRetry={!(project?.status_id === OffchainProjectState.Completed)} title={successTitle} open={success} setOpen={setSuccess}>
-        <div className='flex flex-col gap-4 w-1/2'>
-          <button
-            onClick={() => {
-              setSuccess(false);
-              if ((project?.status_id !== OffchainProjectState.Completed))
-                window.location.reload();
-            }}
-            className='primary-btn in-dark w-button w-full !m-0'
-          >
-            Continue to Project
-          </button>
-          <button
-            onClick={() => router.push(`/dashboard`)}
-            className='underline text-xs lg:text-base font-bold'
-          >
-            Go to dashboard
-          </button>
-        </div>
-      </SuccessScreen>
-
-      <RefundScreen open={refunded} setOpen={setSuccess} />
-
-      <WaitingScreen title={waitMessage} open={wait} setOpen={setWait}>
-        <div className='flex flex-col gap-4 w-1/2'>
-          <button
-            onClick={() => window.location.reload()}
-            className='primary-btn in-dark w-button w-full !m-0'
-          >
-            Refresh
-          </button>
-          <button
-            onClick={() => router.push(`/dashboard`)}
-            className='underline text-xs lg:text-base font-bold'
-          >
-            Go to dashboard
-          </button>
-        </div>
-      </WaitingScreen>
-
-      <VotingList
-        open={openVotingList}
-        firstPendingMilestone={firstPendingMilestone}
-        setOpenVotingList={setOpenVotingList}
-        approvers={approversPreview}
-        chainProjectId={project.chain_project_id}
-        projectId={project.id}
-        setMilestoneVotes={setMilestoneVotes}
-      />
-      <BackDropLoader open={loading || userLoading} />
     </div>
   );
 }
