@@ -31,8 +31,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/src ./src/
 RUN npm install knex -g
 ENV NODE_ENV production
-ENV NODE_ENV production
 ENV IMAGE_TAG $COMMIT_SHA
+ENV NEXT_PUBLIC_IMAGE_TAG $COMMIT_SHA
 ENV NEXT_PUBLIC_BASE_URL $NEXT_PUBLIC_BASE_URL
 USER nextjs
 

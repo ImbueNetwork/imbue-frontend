@@ -16,6 +16,7 @@ const nextConfig = {
     CLOUD_NAME: process.env.CLOUD_NAME,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+    NEXT_PUBLIC_IMAGE_TAG: process.env.NEXT_PUBLIC_IMAGE_TAG,
   },
   images: {
     remotePatterns: [
