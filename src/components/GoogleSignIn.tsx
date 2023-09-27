@@ -7,7 +7,7 @@ import * as config from '@/config';
 
 interface GoogleComponentProps {
     sizeRef: any;
-    redirectUrl: string;
+    redirectUrl?: string;
 }
 
 const GoogleSignIn = ({ sizeRef: walletRef, redirectUrl }: GoogleComponentProps) => {
