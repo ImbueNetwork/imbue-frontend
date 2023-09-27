@@ -18,6 +18,7 @@ type ProjectApproversType = {
 
 const ProjectApprovers = (props: ProjectApproversType) => {
     const { approversPreview, project, setIsApprover, setApproverPreview, projectOwner } = props;
+    // console.log("🚀 ~ file: ProjectApprovers.tsx:23 ~ ProjectApprovers ~ project:", project.approvers)
 
     const { user } = useSelector(
         (state: RootState) => state.userState

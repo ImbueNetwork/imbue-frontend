@@ -12,7 +12,7 @@ clean_build: clean
 	
 migrate: migrate_latest
 
-migrate_latest: 
+migrate_latest: node_modules
 	yarn run knex --cwd "./src/db" migrate:latest
 
 migrate_up: node_modules
@@ -38,7 +38,8 @@ db_up: migrate
 db_down: migrate_reset
 
 cmd: db_up
-	yarn start_prod
+	npm run build
+	yarn start
 
 .PHONY: all clean clean_build clean_deps build \
 	migrate migrate_latest migrate_up migrate_down migrate_reset \

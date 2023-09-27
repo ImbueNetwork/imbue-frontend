@@ -13,12 +13,17 @@ import nextConnect from 'next-connect';
 
 export default nextConnect().get(
   async (req: NextApiRequest, res: NextApiResponse) => {
-    res.status(200).json({
+
+    config.imageTag ? res.status(200).json({
       imbueNetworkWebsockAddr: config.imbueNetworkWebsockAddr,
       relayChainWebsockAddr: config.relayChainWebsockAddr,
       getstreamApiKey: config.getstreamApiKey,
       imageTag: config.imageTag,
-      baseUrl: config.baseUrl,
+    } as ApiInfo) :
+    res.status(200).json({
+      imbueNetworkWebsockAddr: config.imbueNetworkWebsockAddr,
+      relayChainWebsockAddr: config.relayChainWebsockAddr,
+      getstreamApiKey: config.getstreamApiKey,
     } as ApiInfo);
   }
 );

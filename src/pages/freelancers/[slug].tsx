@@ -424,7 +424,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   //   },
   // ];
 
-  const copyToClipboard = async ({
+  const copyToClipboard = ({
     text,
     title,
   }: {
@@ -434,7 +434,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     let textToCopy = text || '';
 
     if (title === 'Profile Link') {
-      textToCopy = (await checkEnvironment()).concat(`${router.asPath}`);
+      textToCopy = checkEnvironment().concat(`${router.asPath}`);
     }
 
     navigator.clipboard.writeText(textToCopy);
