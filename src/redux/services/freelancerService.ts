@@ -140,9 +140,12 @@ export const getFreelancerApplications = async (userId: number) => {
   if (resp.ok) {
     return (await resp.json()) as Array<Project>;
   } else {
-    throw new Error(
-      'Failed to get all freelancer applications. status:' + resp.status
+    console.error(
+      new Error(
+        'Failed to get all freelancer applications. status:' + resp.status
+      )
     );
+    return [];
   }
 };
 
