@@ -18,7 +18,7 @@ export default nextConnect().get(
       relayChainWebsockAddr: config.relayChainWebsockAddr,
       getstreamApiKey: config.getstreamApiKey,
       imageTag: config.imageTag,
-      baseURL: config.baseURL,
+      baseUrl: config.baseUrl,
     } as ApiInfo);
   }
 );
