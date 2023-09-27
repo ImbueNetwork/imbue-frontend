@@ -15,6 +15,8 @@ const nextConfig = {
     GETSTREAM_SECRET_KEY: process.env.GETSTREAM_SECRET_KEY,
     CLOUD_NAME: process.env.CLOUD_NAME,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    COMMIT_SHA: process.env.COMMIT_SHA,
+    NEXT_PUBLIC_COMMIT_SHA: process.env.NEXT_PUBLIC_COMMIT_SHA,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_IMAGE_TAG: process.env.NEXT_PUBLIC_IMAGE_TAG,
   },
