@@ -5,7 +5,12 @@ import * as utils from '@/utils';
 
 import * as config from '@/config';
 
-const GoogleSignIn = ({ sizeRef: walletRef }: any) => {
+interface GoogleComponentProps {
+    sizeRef: any;
+    redirectUrl: string;
+}
+
+const GoogleSignIn = ({ sizeRef: walletRef, redirectUrl }: GoogleComponentProps) => {
     const [googleDivWith, setGoogleDivWith] = useState('200px');
 
     useEffect(() => {
@@ -33,7 +38,7 @@ const GoogleSignIn = ({ sizeRef: walletRef }: any) => {
         });
 
         if (resp.ok) {
-            utils.redirect("/dashboard");
+            utils.redirect(redirectUrl || "/dashboard");
         } else {
             alert('incorrect username or password');
         }
