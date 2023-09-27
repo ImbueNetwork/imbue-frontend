@@ -1,13 +1,7 @@
 /* eslint-disable no-constant-condition */
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
-import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
-import FingerprintIcon from '@mui/icons-material/Fingerprint';
-import { LinearProgress, Modal, Skeleton, Tooltip } from '@mui/material';
-import Accordion from '@mui/material/Accordion';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import Typography from '@mui/material/Typography';
+import { LinearProgress, Modal } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -15,7 +9,6 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { LuTrash2 } from 'react-icons/lu';
 import { TfiNewWindow } from 'react-icons/tfi';
 import { useSelector } from 'react-redux';
 
@@ -24,34 +17,24 @@ import * as utils from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import AccountChoice from '@/components/AccountChoice';
-import BackButton from '@/components/BackButton';
-import ChatPopup from '@/components/ChatPopup';
-import ErrorScreen from '@/components/ErrorScreen';
-import RefundScreen from '@/components/Grant/Refund';
-import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 
 const LoginPopup = dynamic(() => import('@/components/LoginPopup/LoginPopup'));
 const ExpandableDropDowns = dynamic(
   () => import('@/components/Project/ExpandableMilestone')
 );
 
-import Impressions from '@/components/Project/Impressions';
 import ProjectApprovers from '@/components/Project/ProjectApprovers';
-import ProjectBalance from '@/components/Project/ProjectBalance';
 const ProjectHint = dynamic(() => import('@/components/Project/ProjectHint'));
 // import LoginPopup from '@/components/LoginPopup/LoginPopup';
-import classNames from 'classnames';
 import { BsChatLeftDots } from 'react-icons/bs';
 
+import ChatPopup from '@/components/ChatPopup';
+import { MilestoneProgressBar } from '@/components/MilestoneProgressBar/MilestoneProgressBar';
+import ExpandableMilestone from '@/components/Project/V2/ExpandableMilestone';
 import VotingList from '@/components/Project/VotingList/VotingList';
-import SuccessScreen from '@/components/SuccessScreen';
-import WaitingScreen from '@/components/WaitingScreen';
+import VoteModal from '@/components/ReviewModal/VoteModal';
 
-import freelalncerPic from '@/assets/images/profile-image.png';
-import { calenderIcon, shieldIcon, tagIcon } from '@/assets/svgs';
-import { timeData } from '@/config/briefs-data';
 import {
-  Currency,
   ImbueChainPollResult,
   Milestone,
   OffchainProjectState,
@@ -68,9 +51,6 @@ import {
   updateProject,
 } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
-import { MilestoneProgressBar } from '@/components/MilestoneProgressBar/MilestoneProgressBar';
-import ReviewModal from '@/components/ReviewModal/ReviewModal';
-import VoteModal from '@/components/ReviewModal/VoteModal';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -313,7 +293,7 @@ function Project() {
 
       const totalCost = Number(
         Number(projectRes?.total_cost_without_fee) +
-          Number(projectRes?.imbue_fee)
+        Number(projectRes?.imbue_fee)
       );
       setRequiredBalance(totalCost * 0.95);
 
@@ -361,9 +341,9 @@ function Project() {
         if (
           firstPendingMilestoneChain === project.first_pending_milestone &&
           project.project_in_milestone_voting ===
-            onChainProjectRes.projectInMilestoneVoting &&
+          onChainProjectRes.projectInMilestoneVoting &&
           project.project_in_voting_of_no_confidence ===
-            onChainProjectRes.projectInVotingOfNoConfidence
+          onChainProjectRes.projectInVotingOfNoConfidence
         )
           return;
 
@@ -540,58 +520,70 @@ function Project() {
     </div>
   );
 
+
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
-      <Modal open={true} className='flex justify-center items-center'>
+      <Modal open={false} className='flex justify-center items-center'>
         <VoteModal />
       </Modal>
       <div className='w-full grid grid-cols-12 bg-white py-5 px-7 rounded-2xl'>
-        <p className='text-black col-start-1 col-end-10 '>
+        <p className='text-black col-start-1 col-end-10 capitalize'>
           {projectType} information
         </p>
         {/* starting of project section */}
-        <div className=' border-inherit col-start-1 col-end-10 my-5 border rounded-xl py-4 px-5'>
+        <div className='border-inherit col-start-1 col-end-10 mt-5 border rounded-xl py-4 px-5'>
           <div className='flex mb-4 items-center justify-between'>
             <p className='text-sm text-[#747474]'>Project Description</p>
             <p className='px-3 flex items-center  py-1.5 rounded-full border border-inherit text-sm text-black'>
-              view full Description
+              View full Description
               <TfiNewWindow className='ml-1.5 text-gray-500' size={14} />
             </p>
           </div>
           <h4 className='text-imbue-purple-dark text-2xl'>{project.name}</h4>
           <p className='text-black text-sm py-5'>{project.description}</p>
 
-          <div className='flex mt-5 space-x-5'>
-            <div className='bg-[#F2F0FF] justify-between py-2 px-4 flex flex-col  rounded-xl'>
-              <p className='text-imbue-purple text-sm '>Posted</p>
+          <div className='grid grid-cols-12 gap-3 mt-5'>
+            <div className='bg-[#F2F0FF] justify-between py-2 px-3 flex flex-col col-span-2 rounded-md'>
+              <p className='text-imbue-purple text-sm'>Posted</p>
               <p className='text-imbue-purple-dark text-sm'>{timePosted}</p>
             </div>
-            <div className='bg-[#FFEBEA] flex flex-col justify-between rounded-xl space-y-3 py-2 px-2'>
-              <div className='flex space-x-3 items-center'>
+            <div className='bg-[#FFEBEA] flex flex-col justify-between rounded-md py-2 px-3 col-span-3'>
+              <div className='flex justify-between items-center'>
                 <p className='text-sm text-[#8A5C5A]'>Shared by</p>
-                <p className='px-2 flex text-sm items-center rounded-xl  py-1 bg-white text-black'>
-                  <BsChatLeftDots
-                    className='text-imbue-purple-dark mr-1'
-                    size={16}
-                  />
-                  Chat
-                </p>
+                {
+                  user.id !== targetUser.id && (
+                    <p
+                      className='px-2 flex text-sm items-center rounded-xl py-1 bg-white text-black cursor-pointer'
+                      onClick={() => setShowMessageBox(true)}
+                    >
+                      <BsChatLeftDots
+                        className='text-imbue-purple-dark mr-1'
+                        size={16}
+                      />
+                      Chat
+                    </p>
+                  )
+                }
               </div>
-              <div className='flex items-center space-x-2'>
+              <div className='flex items-center space-x-2 mt-8'>
                 <Image
                   src={projectOwner?.profile_photo || '/profile-image.png'}
                   width={30}
                   height={30}
                   alt='image'
+                  className='rounded-full'
                 />
                 <p className='text-imbue-coral'>{projectOwner?.display_name}</p>
               </div>
             </div>
 
-            <div className=' bg-light-grey flex flex-col justify-between px-4 py-3 rounded-xl'>
+            <div className='bg-light-grey flex flex-col justify-between px-4 py-3 rounded-md col-span-7'>
               <div className='flex justify-between'>
                 <p className='text-[#8A5C5A] text-sm'>Approvers</p>
-                <p className='bg-white text-black px-2 py-1 rounded-full text-xs'>
+                <p
+                  className='bg-white text-black px-2 py-1 rounded-full text-xs cursor-pointer'
+                  onClick={() => setOpenVotingList(true)}
+                >
                   see all
                 </p>
               </div>
@@ -611,113 +603,33 @@ function Project() {
           {/* Ending of project section */}
         </div>
         {/* Starting of milestone section */}
-        <div className='bg-light-grey col-start-1 col-end-10 text-[#747474] py-5 px-1 mt-10 rounded-xl'>
+        <div className='bg-light-grey col-start-1 col-end-10 text-[#747474] py-5 px-[10px] mt-5 rounded-xl'>
           <p className='text-[#747474] ml-6 text-sm'>Project Milestones</p>
 
-          <div className='grid grid-cols-12 mt-16 ml-7'>
-            <p className='ml-6 col-start-1 col-end-7 '>Title</p>
-            <p className=' col-start-7 col-end-9 text-right mr-10 '>
+          <div className='grid grid-cols-12 gap-5 mt-16 ml-6'>
+            <p className='col-start-1 col-end-7'>Title</p>
+            <p className='col-start-7 col-end-9 mr-10 '>
               Milestone Funding
             </p>
-            <p className=' col-start-9 col-end-11 '>Milestone ends</p>
-            <p className=' col-start-11 col-end-13 text-left '>Stage</p>
+            <p className='col-start-9 col-end-11'>Milestone ends</p>
+            <p className='col-start-11 col-end-13 pr-6 text-end'>Stage</p>
           </div>
-          {project?.milestones?.map((item: Milestone, index: number) => (
-            <Accordion
-              className='shadow-none mt-5 before:h-0 !rounded-xl py-5'
-              key={'milestone' + index}
-            >
-              <AccordionSummary
-                aria-controls='panel1a-content'
-                id='panel1a-header'
-              >
-                <Typography className='grid grid-cols-12 w-full'>
-                  <div className='col-start-1 col-end-7  flex items-center'>
-                    <div className='bg-[#2400FF] rounded-md relative  w-5 h-6  flex justify-center items-center text-white'>
-                      <span className='relative text-sm z-10'>{index + 1}</span>
-                      <div className='w-2 h-2 -rotate-45 bg-[#2400FF] absolute -bottom-0.5  '></div>
-                    </div>
-                    <p className='text-black ml-3 text-2xl'>{item.name}</p>
-                  </div>
-                  <p className='col-start-7 col-end-9 text-right mr-10'>
-                    ${item.amount}
-                  </p>
-                  <p className='col-start-9 text-sm col-end-11 ml-2  '>
-                    3rd November 2023
-                  </p>
-
-                  <p
-                    className={classNames(
-                      'px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ',
-                      item.is_approved
-                        ? 'bg-lime-100 text-lime-600'
-                        : 'bg-red-100 text-red-500'
-                    )}
-                  >
-                    {item.is_approved ? 'Completed' : 'open for voting'}
-                  </p>
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography className='px-2'>
-                  <div>
-                    <p className='text-black mt-10 font-semibold text-lg'>
-                      Milestone description and expectation
-                    </p>
-                    <p className='mt-5'>{item.description}</p>
-                    <p className='text-black mt-10 font-semibold text-lg'>
-                      Deliverables and updates
-                    </p>
-                    <p className='mt-5'>
-                      At this stage of this project, we were entirely focused on
-                      pushing out our first MVP based on our product roadmap;
-                      for this we would hired talents on imbue including a
-                      designer, a UX writer, a Full Stack Developer and a
-                      Project Manager. We estimated our MVP Design and
-                      Development to involve Key steps, Hiring, Onboarding and
-                      task delegation; and at the end of this Milestone we now
-                      have a live Website for our Waitlist. You can find a link
-                      to the live website <a href='#'>here</a>
-                    </p>
-                    <p className='text-black mt-10 font-semibold text-lg'>
-                      Project Attachments
-                    </p>
-                    <div className='flex space-x-5'>
-                      <div className='border rounded-lg mt-10 flex space-x-2 items-center px-3 text-xs py-3'>
-                        <div className='space-y-2'>
-                          <p>Landing page Development files</p>
-                          <p>3.2MB</p>
-                        </div>
-                        <LuTrash2 size={20} />
-                      </div>
-                      <div className='border rounded-lg mt-10 flex space-x-2 items-center px-3 text-xs py-3'>
-                        <div className='space-y-2'>
-                          <p>Landing page Development files</p>
-                          <p>3.2MB</p>
-                        </div>
-                        <LuTrash2 size={20} />
-                      </div>
-                      <div className='border rounded-lg mt-10 flex space-x-2 items-center px-3 text-xs py-3'>
-                        <div className='space-y-2'>
-                          <p>Landing page Development files</p>
-                          <p>3.2MB</p>
-                        </div>
-                        <LuTrash2 size={20} />
-                      </div>
-                    </div>
-                    <div className='w-full mt-7 flex'>
-                      <button
-                        className='primary-btn  ml-auto in-dark w-button lg:w-1/5'
-                        style={{ textAlign: 'center' }}
-                      >
-                        Vote for Milestone
-                      </button>
-                    </div>
-                  </div>
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-          ))}
+          {
+            project?.milestones?.map((item: Milestone, index: number) => (
+              <ExpandableMilestone
+                {
+                ...{
+                  project,
+                  item,
+                  index,
+                  isApplicant,
+                  projectType,
+                  isProjectOwner
+                }
+                }
+                key={index}
+              />
+            ))}
         </div>
         {/* Ending of milestone section */}
         {/* starting side bar for project details */}
@@ -749,7 +661,7 @@ function Project() {
               <div className='flex bg-white justify-between px-5 py-3 rounded-xl'>
                 <p className='text-black mt-5'>Total Funding</p>
                 <p className='text-imbue-purple-dark mt-5 text-xl '>
-                  40,0000 KSM
+                  40,000 KSM
                 </p>
               </div>
               <div className='flex bg-white justify-between px-5 py-3 rounded-xl'>
@@ -853,6 +765,27 @@ function Project() {
           </div>
         </div>
       </div>
+      {user && showMessageBox && (
+        <ChatPopup
+          {...{
+            showMessageBox,
+            setShowMessageBox,
+            browsingUser: user,
+            targetUser,
+          }}
+          showFreelancerProfile={!isApplicant}
+        />
+      )}
+
+      <VotingList
+        open={openVotingList}
+        firstPendingMilestone={firstPendingMilestone}
+        setOpenVotingList={setOpenVotingList}
+        approvers={approversPreview}
+        chainProjectId={project.chain_project_id}
+        projectId={project.id}
+        setMilestoneVotes={setMilestoneVotes}
+      />
     </div>
   );
 }

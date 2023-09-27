@@ -129,6 +129,7 @@ export const ChatBox = ({
           );
         }
       } catch (error) {
+        console.log("🚀 ~ file: Chat.tsx:132 ~ setup ~ error:", error)
         setContent(<p>GETSTREAM_API_KEY not found</p>);
       }
     }
