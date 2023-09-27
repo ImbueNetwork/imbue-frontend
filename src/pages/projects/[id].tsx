@@ -24,13 +24,14 @@ import ErrorScreen from '@/components/ErrorScreen';
 import RefundScreen from '@/components/Grant/Refund';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 
-const Login = dynamic(() => import("@/components/Login"));
+const LoginPopup = dynamic(() => import("@/components/LoginPopup/LoginPopup"));
 const ExpandableDropDowns = dynamic(() => import("@/components/Project/ExpandableMilestone"));
 
 import Impressions from '@/components/Project/Impressions';
 import ProjectApprovers from '@/components/Project/ProjectApprovers';
 import ProjectBalance from '@/components/Project/ProjectBalance';
 const ProjectHint = dynamic(() => import('@/components/Project/ProjectHint'))
+// import LoginPopup from '@/components/LoginPopup/LoginPopup';
 import VotingList from '@/components/Project/VotingList/VotingList';
 import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
@@ -322,11 +323,13 @@ function Project() {
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);
       const onChainProjectRes = await chainService.getProject(projectId);
+      console.log("🚀 ~ file: [id].tsx:325 ~ syncProject ~ onChainProjectRes:", onChainProjectRes)
 
       if (onChainProjectRes?.id && project?.id) {
         const firstPendingMilestoneChain = await chainService.findFirstPendingMilestone(
           onChainProjectRes.milestones
         );
+        console.log("🚀 ~ file: [id].tsx:331 ~ syncProject ~ firstPendingMilestoneChain:", firstPendingMilestoneChain)
 
         if (
           firstPendingMilestoneChain === project.first_pending_milestone &&
@@ -369,7 +372,7 @@ function Project() {
 
     } catch (error) {
       console.error(error)
-      setError({ message: "Could sync project. ", error })
+      setError({ message: "Could not sync project. ", error })
     } finally {
       setMilestoneLoadingTitle("")
       setLoading(false)
@@ -503,8 +506,6 @@ function Project() {
         requiredBalance,
         project
       }} />}
-
-      {showPolkadotAccounts && renderPolkadotJSModal}
 
       {showPolkadotAccounts && renderPolkadotJSModal}
 
@@ -885,7 +886,7 @@ function Project() {
         />
       </div>
 
-      <Login
+      <LoginPopup
         visible={loginModal}
         setVisible={(val) => {
           setLoginModal(val);

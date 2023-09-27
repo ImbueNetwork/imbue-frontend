@@ -12,8 +12,10 @@ import * as utils from '@/utils';
 
 import AccountChoice from '@/components/AccountChoice';
 
-const Login = dynamic(() => import("@/components/Login"));
+const LoginPopup = dynamic(() => import("@/components/LoginPopup/LoginPopup"));
 const SignUp = dynamic(() => import("@/components/SignUp"));
+
+// import LoginPopup from '@/components/LoginPopup/LoginPopup';
 
 import { walletIcon } from '@/assets/svgs';
 import * as config from '@/config';
@@ -22,17 +24,17 @@ import { authenticate } from '@/pages/api/info/user';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 
 
-
-
-
 const Join = (): JSX.Element => {
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
   const [ loginModal ,setLoginModal] = useState("signup");
+
+
   const closeLogInModal = (val:boolean)=>{
     if(val === false){
       setLoginModal("signup");
     }
   }
+
   const closeModal = (): void => {
     showPolkadotAccounts(true);
   };
@@ -69,13 +71,9 @@ const Join = (): JSX.Element => {
   };
 
 
-
-  
-
-
   return (
     <>
-    <Login redirectUrl='/dashboard' setVisible={closeLogInModal}  visible={loginModal === "login"} />
+    <LoginPopup redirectUrl='/dashboard' setVisible={closeLogInModal}  visible={loginModal === "login"} />
    <div className='w-full flex justify-center'>
            <div className='px-10 py-10 bg-white rounded-2xl'>
             <div className='lg:min-w-[500px]  m-auto'>

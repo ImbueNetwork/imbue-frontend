@@ -28,11 +28,16 @@ export default nextConnect().post(
           const token = await generateGetStreamToken(user);
           await updateUserGetStreamToken(user?.id, token)(tx);
         }
+
+        // TODO: Remove this after all the users have profile photo in chat
+        await models.updateGetStreamUserName(user);
+
         const payload = { id: user.id };
         const token = await jwt.sign(payload, jwtOptions.secretOrKey);
         await setTokenCookie(res, token);
         return res.send({ id: user.id, display_name: user.display_name });
       } catch (e) {
+        res.status(500).json({ messahe: 'Error' });
         new Error(`Failed to fetch user ${userOrEmail}`, { cause: e as Error });
       }
     });

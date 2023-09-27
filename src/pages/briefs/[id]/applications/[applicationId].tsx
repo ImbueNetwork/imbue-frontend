@@ -20,8 +20,9 @@ import { BriefInsights } from '@/components/Briefs/BriefInsights';
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
-const Login = dynamic(() => import("@/components/Login"));
+const LoginPopup = dynamic(() => import("@/components/LoginPopup/LoginPopup"));
 
+// import LoginPopup from '@/components/LoginPopup/LoginPopup';
 import SuccessScreen from '@/components/SuccessScreen';
 
 import { timeData } from '@/config/briefs-data';
@@ -753,7 +754,7 @@ const ApplicationPreview = (): JSX.Element => {
           </div>
         </div>
       </div>
-      <Login
+      <LoginPopup
         visible={loginModal}
         setVisible={(val) => {
           setLoginModal(val);

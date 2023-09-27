@@ -29,6 +29,10 @@ export default nextConnect().post(
             const token = await models.generateGetStreamToken(usernameExists);
             await models.updateUserGetStreamToken(usernameExists.id, token)(tx);
           }
+
+          // TODO: Remove this after all the users have profile photo in chat
+          await models.updateGetStreamUserName(usernameExists);
+
           const payload = { id: usernameExists?.id };
           const token = await jwt.sign(payload, jwtOptions.secretOrKey);
           await setTokenCookie(res, token);

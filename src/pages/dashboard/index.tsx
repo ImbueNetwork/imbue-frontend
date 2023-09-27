@@ -18,7 +18,9 @@ import MyClientBriefsView from '@/components/Dashboard/MyClientBriefsView';
 import MyFreelancerApplications from '@/components/Dashboard/MyFreelancerApplications';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
-const Login = dynamic(() => import("@/components/Login"));
+const LoginPopup = dynamic(() => import("@/components/LoginPopup/LoginPopup"));
+
+// import LoginPopup from '@/components/LoginPopup/LoginPopup';
 
 import { Freelancer, Project, User } from '@/model';
 import { Brief } from '@/model';
@@ -157,7 +159,7 @@ const Dashboard = (): JSX.Element => {
         />
       )}
 
-      <Login
+      <LoginPopup
         visible={loginModal}
         setVisible={setLoginModal}
         redirectUrl='/dashboard'

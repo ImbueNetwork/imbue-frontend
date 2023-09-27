@@ -237,7 +237,8 @@ export const updateBriefById = async (params: BriefInfo) => {
         skills: params.skills,
         budget: params.budget,
         id: params.brief_id,
-        verified_only: params.verified_only
+        verified_only: params.verified_only,
+        user_id: params.user_id
       }),
     });
     if (resp.ok) {

@@ -1,7 +1,20 @@
+import { createTheme, ThemeProvider } from '@mui/material';
+import { StyledEngineProvider } from '@mui/material/styles';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useEffect, useState } from 'react';
 import LoadingBar from 'react-top-loading-bar';
+import '@/styles/common.css';
+import '@/styles/globals.css';
+import '@/styles/index.css';
+import '@/styles/proposal.css';
+import '@/styles/briefs.css';
+import '@/styles/new-brief.css';
+import '@/styles/brief-details.css';
+import '@/styles/submit-proposal.css';
+import '@/styles/muiGlobal.css';
+import '@/styles/stream-chat.css';
+import '@/styles/animation.css';
 
 import { Providers } from '@/redux/providers/userProviders';
 
@@ -26,8 +39,19 @@ function Layout({ children }: LayoutProps) {
       router.events.off('routeChangeError', () => setProgress(100));
     };
   }, [router]);
-
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: '#b2ff0b',
+      },
+      secondary: {
+        main: '#3B27C1',
+      },
+    },
+  });
   return (
+    <ThemeProvider theme={theme}>
+    <StyledEngineProvider injectFirst>
     <React.Fragment>
       {progress > 0 && (
         <LoadingBar
@@ -38,7 +62,15 @@ function Layout({ children }: LayoutProps) {
         />
       )}
       <Providers>
-        <Navbar />
+        {
+          !(
+            router.asPath === "/auth/sign-up" ||
+            router.asPath === "/auth/sign-in"
+          ) && (
+            <Navbar />
+          )
+        }
+
         <main
           className={`padded lg:!px-[var(--hq-layout-padding)] !pt-[100px]`}
           id='main-content'
@@ -47,6 +79,8 @@ function Layout({ children }: LayoutProps) {
         </main>
       </Providers>
     </React.Fragment>
+    </StyledEngineProvider>
+      </ThemeProvider>
   );
 }
 

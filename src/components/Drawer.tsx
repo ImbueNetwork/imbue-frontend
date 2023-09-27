@@ -7,7 +7,10 @@ import { getCurrentUser } from '@/utils';
 import { User } from '@/model';
 import { freelancerExists } from '@/redux/services/freelancerService';
 
-const Login = dynamic(() => import("./Login"));
+// import LoginPopup from './LoginPopup/LoginPopup';
+
+// const Login = dynamic(() => import("./Login"));
+const LoginPopup = dynamic(() => import('./LoginPopup/LoginPopup'));
 
 type DrawerProps = {
   visible: boolean;
@@ -124,7 +127,16 @@ const Drawer = ({ visible, setSideBarIsVisible }: DrawerProps): JSX.Element => {
           </ul>
         </nav>
       </div>
-      <Login
+      {/* <Login
+        visible={loginModal}
+        setVisible={(val) => {
+          setLoginModal(val);
+          setSideBarIsVisible(false);
+        }}
+        redirectUrl={redirectURL || '/dashboard'}
+      /> */}
+
+      <LoginPopup
         visible={loginModal}
         setVisible={(val) => {
           setLoginModal(val);

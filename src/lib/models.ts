@@ -284,23 +284,24 @@ export const updateFederatedCredentials =
       });
 
 export const fetchUserOrEmail =
-  (userOrEmail: string) => (tx: Knex.Transaction) => {
+  (userOrEmail: string) => async (tx: Knex.Transaction) => {
     // get all db users
-    return tx<User>('users')
+    const user = await tx<User>('users')
       .select()
-      .then((users) => {
-        // check if userOrEmail is in db
-        const user = users.find(
-          (u) =>
-            u.username === userOrEmail.toLowerCase() ||
-            u.email === userOrEmail.toLowerCase()
-        );
-        if (user) {
-          return user;
-        } else {
-          return null;
-        }
-      });
+      .first()
+      .where({ username: userOrEmail })
+      .orWhere({ email: userOrEmail });
+    // check if userOrEmail is in db
+    // const user = users.find(
+    //   (u) =>
+    //     u.username === userOrEmail.toLowerCase() ||
+    //     u.email === userOrEmail.toLowerCase()
+    // );
+    if (user) {
+      return user;
+    } else {
+      return null;
+    }
   };
 
 export const upsertWeb3Challenge =
@@ -388,12 +389,15 @@ export const updateOrInsertUserWeb3Address =
   };
 
 export const insertUserByDisplayName =
-  (displayName: string, username: string) => async (tx: Knex.Transaction) =>
+  (displayName: string, username: string, email?: string, password?: string) =>
+  async (tx: Knex.Transaction) =>
     (
       await tx<User>('users')
         .insert({
           display_name: displayName,
           username: username,
+          email: email,
+          password: password,
         })
         .returning('*')
     )[0];
@@ -409,6 +413,7 @@ export const generateGetStreamToken = async (user: User) => {
       id: String(user?.id),
       name: user?.display_name,
       username: user?.username,
+      profile_photo: user?.profile_photo,
     });
     return token;
   }
@@ -426,6 +431,7 @@ export const updateGetStreamUserName = async (user: User) => {
       set: {
         name: user.display_name,
         username: user.username,
+        profile_photo: user.profile_photo,
       },
     });
 
@@ -1038,7 +1044,9 @@ export const getOrCreateFederatedUser = (
   issuer: string,
   username: string,
   displayName: string,
-  done: CallableFunction
+  done: CallableFunction,
+  email?: string,
+  password?: string
 ) => {
   db.transaction(async (tx) => {
     let user: User;
@@ -1057,7 +1065,12 @@ export const getOrCreateFederatedUser = (
        * If not, create the `user`, then the `federated_credential`
        */
       if (!federated) {
-        user = await insertUserByDisplayName(displayName, username)(tx);
+        user = await insertUserByDisplayName(
+          displayName,
+          username,
+          email,
+          password
+        )(tx);
         await insertFederatedCredential(user.id, issuer, username)(tx);
       } else {
         const user_ = await db
@@ -1328,8 +1341,8 @@ export const updateFreelancerDetails =
     web3_type: string,
     web3_challenge: string,
     // eslint-disable-next-line unused-imports/no-unused-vars
-    freelancer_clients: Array<{ id: number; name: string; img: string }>,
-    token: string
+    freelancer_clients: Array<{ id: number; name: string; img: string }>
+    // token: string
   ) =>
   async (tx: Knex.Transaction) =>
     await tx<Freelancer>('freelancers')
@@ -1356,7 +1369,7 @@ export const updateFreelancerDetails =
             username: f.username,
             country: country,
             region: region,
-            getstream_token: token,
+            // getstream_token: token,
             about: f.about,
           });
         }
@@ -1518,12 +1531,14 @@ export const searchBriefs =
         if (filter?.skills_range?.length > 0) {
           this.whereIn('brief_skills.skill_id', filter.skills_range);
         }
-      }).where(function(){
-        if(filter?.non_verified && !filter?.verified_only){
+      })
+      .where(function () {
+        if (filter?.non_verified && !filter?.verified_only) {
           this.where('verified_only', false);
         }
       })
-      .where('headline', 'ilike', filter.search_input + '%');
+      .where('headline', 'ilike', '%' + filter.search_input + '%');
+// .where('headline', '~', `\\` + filter.search_input);
 
 export const searchBriefsCount =
   (filter: BriefSqlFilter) => async (tx: Knex.Transaction) =>
@@ -1559,7 +1574,7 @@ export const searchFreelancers =
         'telegram_link',
         'discord_link',
         'title',
-        'bio',
+        // 'bio',
         'freelancers.user_id',
         'username',
         'users.profile_photo as profile_image',
@@ -1568,7 +1583,8 @@ export const searchFreelancers =
         'freelancers.created',
         'verified',
         'users.country',
-        'users.region'
+        'users.region',
+        'users.about'
       )
       .from<Freelancer>('freelancers')
       .innerJoin('users', { 'freelancers.user_id': 'users.id' })
@@ -1610,19 +1626,19 @@ export const searchFreelancers =
       })
       .where(function () {
         if (filter?.name) {
-          this.where('display_name', 'ilike', `${filter.name}%`);
+          this.where('display_name', 'ilike', `%${filter.name}%`);
         }
       })
       .distinct('freelancers.id')
-      .modify(function (builder) {
-        if (Number(filter?.items_per_page) > 0) {
-          builder
-            .offset(
-              (Number(filter.page) - 1) * Number(filter.items_per_page) || 0
-            )
-            .limit(Number(filter.items_per_page) || 5);
-        }
-      });
+      // .modify(function (builder) {
+      //   if (Number(filter?.items_per_page) > 0) {
+      //     builder
+      //       .offset(
+      //         (Number(filter.page) - 1) * Number(filter.items_per_page) || 0
+      //       )
+      //       .limit(Number(filter.items_per_page) || 5);
+      //   }
+      // });
 
 export const searchFreelancersCount = async (
   tx: Knex.Transaction,

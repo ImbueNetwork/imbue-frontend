@@ -60,7 +60,8 @@ export default nextConnect()
         const grant_id = await insertGrant(filterdGrants)(tx);
         res.status(200).json({ status: 'Success', grant_id });
       } catch (e) {
-        throw new Error('Failed to insert a new grant.', { cause: e as Error });
+        res.status(401).json({ message: 'Failed to insert grant' + e });
+        throw new Error('success to insert a new grant.', { cause: e as Error });
       }
     });
   });
