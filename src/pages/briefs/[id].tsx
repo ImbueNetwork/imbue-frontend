@@ -6,12 +6,11 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { getServerSideProps } from '@/utils/serverSideProps';
-
 import BioInsights from '@/components/Briefs/BioInsights';
 import BioPanel from '@/components/Briefs/BioPanel';
 import ClientsHistory from '@/components/Briefs/ClientHistory';
 import ErrorScreen from '@/components/ErrorScreen';
+import LoginPopup from '@/components/LoginPopup/LoginPopup';
 import SuccessScreen from '@/components/SuccessScreen';
 
 import { Brief, Freelancer, User } from '@/model';
@@ -65,6 +64,7 @@ const BriefDetails = (): JSX.Element => {
   const [freelancer, setFreelancer] = useState<Freelancer>();
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
+  const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
   const isOwnerOfBrief = browsingUser && browsingUser.id == brief.user_id;
   const [error, setError] = useState<any>();
 
@@ -75,7 +75,7 @@ const BriefDetails = (): JSX.Element => {
   const id: any = query?.id || 0;
 
   const fetchData = async () => {
-    if (id && browsingUser?.username) {
+    if (id) {
       try {
         const briefData: Brief | Error | undefined = await getBrief(id);
         if (briefData?.id) {
@@ -110,10 +110,11 @@ const BriefDetails = (): JSX.Element => {
   };
 
   const handleMessageBoxClick = async () => {
-    if (browsingUser) {
+    if (browsingUser.id) {
       setShowMessageBox(true);
     } else {
       // redirect("login", `/dapp/briefs/${brief.id}/`);
+      setShowLoginPopup(true);
     }
   };
 
@@ -152,16 +153,14 @@ const BriefDetails = (): JSX.Element => {
 
     return (
       <div
-        className={`transparent-conatainer !bg-imbue-light-purple-three relative ${
-          showSimilarBrief ? '!pb-[3rem]' : ''
-        } `}
+        className={`transparent-conatainer !bg-imbue-light-purple-three relative ${showSimilarBrief ? '!pb-[3rem]' : ''
+          } `}
       >
         <div className='flex justify-between w-full lg:px-[4rem] px-[1rem]'>
           <h3 className='text-imbue-purple-dark'>Similar projects on Imbue</h3>
           <div
-            className={`transition transform ease-in-out duration-600 ${
-              showSimilarBrief && 'rotate-180'
-            } cursor-pointer`}
+            className={`transition transform ease-in-out duration-600 ${showSimilarBrief && 'rotate-180'
+              } cursor-pointer`}
           >
             <ArrowIcon
               onClick={() => setShowSimilarBrief(!showSimilarBrief)}
@@ -269,10 +268,16 @@ const BriefDetails = (): JSX.Element => {
           </button>
         </div>
       </SuccessScreen>
+
+      <LoginPopup
+        visible={showLoginPopup}
+        setVisible={setShowLoginPopup}
+        redirectUrl={`/briefs/${id}`}
+      />
     </div>
   );
 };
 
-export { getServerSideProps };
+// export { getServerSideProps };
 
 export default BriefDetails;
