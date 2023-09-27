@@ -19,6 +19,7 @@ export default nextConnect().get(
       relayChainWebsockAddr: config.relayChainWebsockAddr,
       getstreamApiKey: config.getstreamApiKey,
       imageTag: config.imageTag,
+      baseURL: config.baseURL,
     } as ApiInfo) :
     res.status(200).json({
       imbueNetworkWebsockAddr: config.imbueNetworkWebsockAddr,
