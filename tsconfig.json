@@ -31,6 +31,6 @@
     "**/*.tsx",
     "types.d.ts",
     ".next/types/**/*.ts"
-  ],
+, "src/db/knexfile.js"  ],
   "exclude": ["node_modules"]
 }
