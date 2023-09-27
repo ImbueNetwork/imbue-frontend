@@ -6,7 +6,6 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 const nextConfig = {
   reactStrictMode: true,
-  output: 'standalone',
   env: {
     PORT: 8080,
     IMBUE_NETWORK_WEBSOCK_ADDR: process.env.IMBUE_NETWORK_WEBSOCK_ADDR,
@@ -15,7 +14,6 @@ const nextConfig = {
     GETSTREAM_SECRET_KEY: process.env.GETSTREAM_SECRET_KEY,
     CLOUD_NAME: process.env.CLOUD_NAME,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
   },
   images: {
     remotePatterns: [

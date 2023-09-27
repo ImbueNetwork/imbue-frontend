@@ -55,7 +55,7 @@ export async function getFreelancerProfile(
   username: string | number
 ): Promise<Freelancer | undefined> {
   const resp = await fetch(
-    (await checkEnvironment()).concat(`${config.apiBase}freelancers/${username}`),
+    checkEnvironment().concat(`${config.apiBase}freelancers/${username}`),
     {
       headers: config.getAPIHeaders,
       method: 'get',
@@ -128,7 +128,7 @@ export const callSearchFreelancers = async (
 
 export const getFreelancerApplications = async (userId: number) => {
   const resp = await fetch(
-    (await checkEnvironment()).concat(
+    checkEnvironment().concat(
       `${config.apiBase}freelancers/${userId}/applications`
     ),
     {
@@ -148,7 +148,7 @@ export const getFreelancerApplications = async (userId: number) => {
 
 export const getFreelancerFilters = async () => {
   const resp = await fetch(
-    (await checkEnvironment()).concat(`${config.apiBase}freelancers/filters`),
+    checkEnvironment().concat(`${config.apiBase}freelancers/filters`),
     {
       headers: config.postAPIHeaders,
       method: 'get',
@@ -170,7 +170,7 @@ export const getOnGoingProjects = async (
   limit: number
 ) => {
   const resp = await fetch(
-    (await checkEnvironment()).concat(
+    checkEnvironment().concat(
       `${config.apiBase}freelancers/${userId}/ongoingprojects`
     ),
     {
