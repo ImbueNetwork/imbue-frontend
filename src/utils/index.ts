@@ -176,8 +176,13 @@ function reportValidity(input: HTMLInputElement, _submitting = false) {
   input.reportValidity();
 }
 
-export const checkEnvironment = () => {
-  const base_url = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
+export const checkEnvironment = async () => {
+
+  const { baseUrl } = await fetch(`${config.apiBase}info`).then(
+    (resp) => resp.json()
+  );
+
+  const base_url = baseUrl ?? 'http://localhost:3000';
   return base_url;
 };
 

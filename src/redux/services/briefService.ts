@@ -137,7 +137,7 @@ export const getBrief = async (briefId: number | string | string[]) => {
 
 export const getUserBriefs = async (user_id: string | number) => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}users/${user_id}/briefs/`),
+    (await checkEnvironment()).concat(`${config.apiBase}users/${user_id}/briefs/`),
     {
       headers: postAPIHeaders,
       method: 'get',
@@ -157,7 +157,7 @@ export const getUserBriefs = async (user_id: string | number) => {
 
 export const getBriefApplications = async (brifId: string | number) => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}briefs/${brifId}/applications`),
+    (await checkEnvironment()).concat(`${config.apiBase}briefs/${brifId}/applications`),
     {
       headers: postAPIHeaders,
       method: 'get',

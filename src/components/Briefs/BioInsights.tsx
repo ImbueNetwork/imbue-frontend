@@ -53,6 +53,7 @@ const BioInsights = ({
 }: BioInsightsProps) => {
   const router = useRouter();
   const [copied, setCopied] = useState(false);
+  const [jobLink, setJobLink] = useState();
 
   const [clientBriefs, setClientBrief] = useState<Brief[]>([]);
   const [openBriefs, setIOpenBriefs] = useState<Brief[]>([]);
@@ -75,6 +76,8 @@ const BioInsights = ({
       const res = await getUserBriefs(targetUser?.id);
       const allBriefs = [...res.acceptedBriefs, ...res.briefsUnderReview];
 
+      setJobLink((await checkEnvironment()).concat(`${router.asPath}`));
+
       setClientBrief(allBriefs);
       setIOpenBriefs(res?.briefsUnderReview || []);
       setBriefApplications(await getBriefApplications(brief?.id));
@@ -83,8 +86,8 @@ const BioInsights = ({
     setUp();
   }, [targetUser?.id, brief?.id]);
 
-  const copyToClipboard = () => {
-    const textToCopy = checkEnvironment().concat(`${router.asPath}`);
+  const copyToClipboard = async () => {
+    const textToCopy = (await checkEnvironment()).concat(`${router.asPath}`);
 
     navigator.clipboard.writeText(textToCopy);
     setCopied(true);
@@ -344,7 +347,7 @@ const BioInsights = ({
           <div className='flex items-center gap-2'>
             <div className=' min-h-[2.625rem] rounded-[6.18rem] flex py-2 items-center px-[2rem] bg-imbue-light-purple my-2 w-full'>
               <span className='text-imbue-purple text-[1rem] w-full'>
-                {checkEnvironment().concat(`${router.asPath}`)}
+                {jobLink}
               </span>
             </div>
 

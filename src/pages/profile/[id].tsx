@@ -695,7 +695,7 @@ export const getServerSideProps = async (context: any) => {
 
   try {
     const resp = await fetch(
-      checkEnvironment().concat(`${config.apiBase}users/${query?.id}`),
+     (await checkEnvironment()).concat(`${config.apiBase}users/${query?.id}`),
       {
         headers: config.getAPIHeaders,
       }
