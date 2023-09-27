@@ -22,8 +22,5 @@ export default {
   imbueNetworkWebsockAddr: process.env.IMBUE_NETWORK_WEBSOCK_ADDR,
   relayChainWebsockAddr: process.env.RELAY_CHAIN_WEBSOCK_ADDR,
   imageTag: process.env.IMAGE_TAG,
-  publicImageTage: process.env.NEXT_PUBLIC_IMAGE_TAG,
-  commitSha: process.env.COMMIT_SHA,
-  commitSha_2: process.env.NEX_PUBLIC_COMMIT_SHA,
   baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
 };
