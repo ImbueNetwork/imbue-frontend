@@ -43,18 +43,39 @@ export default nextConnect()
 
     await db.transaction(async (tx: any) => {
       try {
-        const currentData: Array<Brief> = await models.searchBriefs(data)(tx);
+        await models
+          .searchBriefs({ ...data, items_per_page: 0 })(tx)
+          .then(async (allBriefs) => {
+            const currentData: Array<Brief> = allBriefs.slice(
+              data.items_per_page * (data.page - 1),
+              data.items_per_page * data.page
+            );
 
-        await Promise.all([
-          currentData,
-          ...currentData.map(async (brief: any) => {
-            brief.skills = await fetchItems(brief.skill_ids, 'skills')(tx);
-            brief.industries = await fetchItems(
-              brief.industry_ids,
-              'industries'
-            )(tx);
-          }),
-        ]);
+            await Promise.all([
+              ...currentData.map(async (brief: any) => {
+                brief.skills = await fetchItems(brief.skill_ids, 'skills')(tx);
+                brief.industries = await fetchItems(
+                  brief.industry_ids,
+                  'industries'
+                )(tx);
+              }),
+            ]);
+
+            return res
+              .status(200)
+              .json({ currentData, totalBriefs: allBriefs.length });
+          });
+
+        // await Promise.all([
+        //   currentData,
+        //   ...currentData.map(async (brief: any) => {
+        //     brief.skills = await fetchItems(brief.skill_ids, 'skills')(tx);
+        //     brief.industries = await fetchItems(
+        //       brief.industry_ids,
+        //       'industries'
+        //     )(tx);
+        //   }),
+        // ]);
 
         // const totalBriefs = await models
         //   .searchBriefs({
@@ -62,11 +83,11 @@ export default nextConnect()
         //     items_per_page: 0,
         //   })(tx)
         //   .then((resp) => resp.length);
-       
-        const briefCount = await models.searchBriefsCount({
-          ...data,
-          items_per_page: 0,
-        })(tx);
+
+        // const briefCount = await models.searchBriefsCount({
+        //   ...data,
+        //   items_per_page: 0,
+        // })(tx);
 
         // const { currentData, totalItems } = await models.paginatedData(
         //   Number(data?.page || 1),
@@ -74,7 +95,7 @@ export default nextConnect()
         //   briefs
         // );
 
-        res.status(200).json({ currentData, totalBriefs: briefCount });
+        // res.status(200).json({ currentData, totalBriefs: briefCount });
       } catch (e) {
         res.status(401).json({ currentData: [], totalBriefs: 0 });
         throw new Error(`Failed to search for briefs`, { cause: e as Error });

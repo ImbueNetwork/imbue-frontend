@@ -331,6 +331,7 @@ export default function SignIn() {
               <input
                 placeholder='victorimbue@gmail.com'
                 onChange={handleChange}
+                onKeyDown={(e) => (e.key === 'Enter') && document.getElementsByName('user')[0].focus()}
                 className='outlinedInput text-[0.875rem]'
                 required
                 // eslint-disable-next-line no-console
@@ -352,6 +353,7 @@ export default function SignIn() {
                 autoComplete='off'
                 placeholder='victordoe'
                 onChange={handleChange}
+                onKeyDown={(e) => (e.key === 'Enter') && document.getElementsByName('password')[0].focus()}
                 required
                 className='outlinedInput text-[0.875rem]'
                 name='user'
@@ -368,6 +370,7 @@ export default function SignIn() {
               <OutlinedInput
                 id='outlined-adornment-password'
                 color='secondary'
+                notched={false}
                 className='h-[2.6rem] pl-[6px] text-[0.875rem]'
                 inputProps={
                   { className: 'placeholder:text-[#D1D1D1] !text-black' }
@@ -376,6 +379,7 @@ export default function SignIn() {
                 type={showPassword ? 'text' : 'password'}
                 name='password'
                 onChange={handleChange}
+                onKeyDown={(e) => (e.key === 'Enter') && document.getElementsByName('submit')[0].click()}
                 endAdornment={
                   <InputAdornment position='end'>
                     <IconButton
@@ -425,7 +429,7 @@ export default function SignIn() {
             <div className='flex justify-center mt-4 w-full cursor-pointer'>
               <button
                 type='submit'
-
+                name="submit"
                 disabled={disableSubmit}
                 className={`primary-btn in-dark w-full !text-center relative group !mx-0 ${disableSubmit && '!bg-gray-400 !text-white'
                   }`}

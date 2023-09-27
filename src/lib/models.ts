@@ -389,7 +389,8 @@ export const updateOrInsertUserWeb3Address =
   };
 
 export const insertUserByDisplayName =
-  (displayName: string, username: string, email?: string, password?: string) => async (tx: Knex.Transaction) =>
+  (displayName: string, username: string, email?: string, password?: string) =>
+  async (tx: Knex.Transaction) =>
     (
       await tx<User>('users')
         .insert({
@@ -1045,7 +1046,7 @@ export const getOrCreateFederatedUser = (
   displayName: string,
   done: CallableFunction,
   email?: string,
-  password?: string,
+  password?: string
 ) => {
   db.transaction(async (tx) => {
     let user: User;
@@ -1064,7 +1065,12 @@ export const getOrCreateFederatedUser = (
        * If not, create the `user`, then the `federated_credential`
        */
       if (!federated) {
-        user = await insertUserByDisplayName(displayName, username,email,password)(tx);
+        user = await insertUserByDisplayName(
+          displayName,
+          username,
+          email,
+          password
+        )(tx);
         await insertFederatedCredential(user.id, issuer, username)(tx);
       } else {
         const user_ = await db
@@ -1531,7 +1537,8 @@ export const searchBriefs =
           this.where('verified_only', false);
         }
       })
-      .where('headline', 'ilike', filter.search_input + '%');
+      .where('headline', 'ilike', '%' + filter.search_input + '%');
+// .where('headline', '~', `\\` + filter.search_input);
 
 export const searchBriefsCount =
   (filter: BriefSqlFilter) => async (tx: Knex.Transaction) =>
@@ -1619,19 +1626,19 @@ export const searchFreelancers =
       })
       .where(function () {
         if (filter?.name) {
-          this.where('display_name', 'ilike', `${filter.name}%`);
+          this.where('display_name', 'ilike', `%${filter.name}%`);
         }
       })
       .distinct('freelancers.id')
-      .modify(function (builder) {
-        if (Number(filter?.items_per_page) > 0) {
-          builder
-            .offset(
-              (Number(filter.page) - 1) * Number(filter.items_per_page) || 0
-            )
-            .limit(Number(filter.items_per_page) || 5);
-        }
-      });
+      // .modify(function (builder) {
+      //   if (Number(filter?.items_per_page) > 0) {
+      //     builder
+      //       .offset(
+      //         (Number(filter.page) - 1) * Number(filter.items_per_page) || 0
+      //       )
+      //       .limit(Number(filter.items_per_page) || 5);
+      //   }
+      // });
 
 export const searchFreelancersCount = async (
   tx: Knex.Transaction,
