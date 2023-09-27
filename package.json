@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "start_prod": "npx knex --cwd './src/db' migrate:latest && node server.js",
     "test": "NODE_ENV=development jest --all --silent -u",
     "lint": "next lint"
   },
