@@ -37,7 +37,7 @@ db_up: migrate
 
 db_down: migrate_reset
 
-cmd: yarn build
+cmd: npm run build
 	db_up
 	yarn start
 
