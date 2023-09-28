@@ -13,7 +13,7 @@ RUN yarn install
 RUN yarn build
 
 # Production image, copy all the files and run next
-FROM node:18-alpine AS base
+FROM node:16-slim
 ARG IMAGE_TAG
 ARG COMMIT_SHA
 ARG NEXT_PUBLIC_BASE_URL
