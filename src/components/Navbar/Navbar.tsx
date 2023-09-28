@@ -1,16 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
-/* eslint-disable unused-imports/no-unused-vars */
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
-import {
-  Avatar,
-  Box,
-  IconButton,
-  Menu,
-  Skeleton,
-  Tooltip,
-} from '@mui/material';
+import { IconButton } from '@mui/material';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -24,7 +14,16 @@ import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { AppDispatch, RootState } from '@/redux/store/store';
 
 import MenuItems from './MenuItems';
-const Login = dynamic(() => import("../Login"));
+// const Login = dynamic(() => import("../Login"));
+const Avatar = dynamic(() => import("@mui/material/Avatar"));
+const Box = dynamic(() => import("@mui/material/Box"));
+const Menu = dynamic(() => import("@mui/material/Menu"), {
+  ssr: false,
+});
+const Skeleton = dynamic(() => import("@mui/material/Skeleton"));
+const Tooltip = dynamic(() => import("@mui/material/Tooltip"), {
+  ssr: false,
+});
 
 import LoginPopup from '../LoginPopup/LoginPopup';
 import defaultProfile from '../../assets/images/profile-image.png';
@@ -34,7 +33,6 @@ function Navbar() {
   const [freelancerProfile, setFreelancerProfile] = useState<any>();
   const [loading, setLoading] = useState<boolean>(true);
 
-  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   const router = useRouter();
 
   const feedbackLink = 'https://pfljr3ser45.typeform.com/to/bv00pviH';
@@ -75,13 +73,13 @@ function Navbar() {
     setup();
   }, [dispatch, user?.username]);
 
-  const navigateToPage = (url: string) => {
-    if (user?.username) {
-      router.push(url);
-    } else {
-      setLoginModal(true);
-    }
-  };
+  // const navigateToPage = (url: string) => {
+  //   if (user?.username) {
+  //     router.push(url);
+  //   } else {
+  //     setLoginModal(true);
+  //   }
+  // };
 
   const navPillclasses =
     'text-imbue-purple h-[2.9375rem] !bg-white rounded-[5.07319rem] !flex justify-center items-center px-[3rem] hover:no-underline !text-[1.10975rem] ';
@@ -109,7 +107,7 @@ function Navbar() {
           <div className={`flex items-center transition-all`}>
             <div
               onClick={() => router.push('/')}
-              className={`main-title lg:h-[2.9375rem] !bg-white rounded-[5.07319rem] w-full flex justify-center items-center cursor-pointer z-10 relative px-5 py-2 lg:!p-0`}
+              className={`main-title lg:h-[2.9375rem] !bg-white rounded-[5.07319rem] flex justify-center items-center cursor-pointer z-10 relative px-5 py-2 lg:!p-0`}
             >
               <div id='logo'>
                 <Image
@@ -276,13 +274,7 @@ function Navbar() {
           />
         </Menu>
       </header>
-      {/* <Login
-        visible={loginModal}
-        setVisible={(val: any) => {
-          setLoginModal(val);
-        }}
-        redirectUrl={router?.asPath}
-      /> */}
+
       <LoginPopup
         visible={loginModal}
         setVisible={(val: any) => {

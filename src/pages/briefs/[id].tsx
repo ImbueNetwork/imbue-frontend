@@ -3,14 +3,14 @@ import ArrowIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import BioInsights from '@/components/Briefs/BioInsights';
 import BioPanel from '@/components/Briefs/BioPanel';
 import ClientsHistory from '@/components/Briefs/ClientHistory';
 import ErrorScreen from '@/components/ErrorScreen';
-import LoginPopup from '@/components/LoginPopup/LoginPopup';
+import { LoginPopupContext, LoginPopupContextType } from '@/components/Layout';
 import SuccessScreen from '@/components/SuccessScreen';
 
 import { Brief, Freelancer, User } from '@/model';
@@ -64,7 +64,8 @@ const BriefDetails = (): JSX.Element => {
   const [freelancer, setFreelancer] = useState<Freelancer>();
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
-  const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
+  // const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
+  const { setShowLoginPopup } = useContext(LoginPopupContext) as LoginPopupContextType
   const isOwnerOfBrief = browsingUser && browsingUser.id == brief.user_id;
   const [error, setError] = useState<any>();
 
@@ -106,7 +107,10 @@ const BriefDetails = (): JSX.Element => {
   }, [id, browsingUser.username]);
 
   const redirectToApply = () => {
-    router.push(`/briefs/${brief.id}/apply`);
+    if (browsingUser?.id)
+      router.push(`/briefs/${brief.id}/apply`);
+    else
+      setShowLoginPopup({ open: true, redirectURL: `/briefs/${brief.id}/apply` });
   };
 
   const handleMessageBoxClick = async () => {
@@ -114,11 +118,14 @@ const BriefDetails = (): JSX.Element => {
       setShowMessageBox(true);
     } else {
       // redirect("login", `/dapp/briefs/${brief.id}/`);
-      setShowLoginPopup(true);
+      setShowLoginPopup({ open: true, redirectURL: `/briefs/${brief.id}` });
     }
   };
 
   const saveBrief = async () => {
+
+    if (!browsingUser?.id) return setShowLoginPopup({ open: true, redirectURL: `/briefs/${brief.id}`});
+
     const resp = await saveBriefData({
       ...brief,
       currentUserId: browsingUser?.id,
@@ -217,10 +224,12 @@ const BriefDetails = (): JSX.Element => {
       <div className='brief-info max-width-750px:!flex-col'>
         {/* TODO: Implement */}
         <BioPanel
+          browsingUser={browsingUser}
           brief={brief}
           targetUser={targetUser}
           isOwnerOfBrief={isOwnerOfBrief}
           projectCategories={projectCategories}
+          showLoginPopUp={setShowLoginPopup}
         />
         <BioInsights
           redirectToApply={redirectToApply}
@@ -269,11 +278,11 @@ const BriefDetails = (): JSX.Element => {
         </div>
       </SuccessScreen>
 
-      <LoginPopup
+      {/* <LoginPopup
         visible={showLoginPopup}
         setVisible={setShowLoginPopup}
         redirectUrl={`/briefs/${id}`}
-      />
+      /> */}
     </div>
   );
 };

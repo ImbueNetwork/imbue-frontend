@@ -394,7 +394,7 @@ const Freelancers = (): JSX.Element => {
           verified: freelancerInfo.verified,
         };
         if (search_value.length === 0) {
-          setFilterVisible(!filterVisble);
+          setFilterVisible(false);
         }
         const filteredFreelancers: any = await callSearchFreelancers(filter);
         setFreelancers(filteredFreelancers?.currentData);
@@ -431,6 +431,7 @@ const Freelancers = (): JSX.Element => {
     setSlectedFilterIds([]);
     setFreelancers(allFreelancers?.currentData);
     setFreelancersTotal(allFreelancers?.totalFreelancers);
+    setSearchInput("")
   };
 
   const cancelFilters = async () => {
@@ -451,7 +452,7 @@ const Freelancers = (): JSX.Element => {
   }
 
   if (loading) return <LoadingFreelancers />;
-  console.log(freelancers)
+
   return (
     <div>
       <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
@@ -518,14 +519,17 @@ const Freelancers = (): JSX.Element => {
               </div>
 
               <div className='flex items-center mt-[2rem] lg:mt-0'>
-                {selectedFilterIds?.length > 0 && (
-                  <button
-                    onClick={reset}
-                    className='h-[43px] mr-4 px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]'
-                  >
-                    Reset
-                  </button>
-                )}
+                {(
+                  selectedFilterIds?.length ||
+                  router?.query?.name?.length
+                ) && (
+                    <button
+                      onClick={reset}
+                      className='h-[43px] mr-4 px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]'
+                    >
+                      Reset
+                    </button>
+                  )}
 
                 <div
                   className='flex items-center cursor-pointer'
