@@ -90,7 +90,10 @@ const FilterModal = ({ open, handleClose, customDropdownConfigs, cancelFilters, 
                     </button>
 
                     <button
-                        onClick={onSearch}
+                        onClick={() => {
+                            handleClose()
+                            onSearch()
+                        }}
                         data-testid='Apply'
                         className='h-[39px] px-[20px] text-center justify-center w-[121px] rounded-[25px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 hover:bg-primary hover:text-content'
                     >

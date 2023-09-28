@@ -17,8 +17,8 @@ import Web3WalletModal from '../WalletModal/Web3WalletModal';
 
 interface LoginModalProps {
     visible: boolean;
-    redirectUrl: string;
-    setVisible: (_visible: boolean) => void;
+    redirectUrl?: string;
+    setVisible: (_visible: any) => void;
 }
 
 const LoginPopup = ({ visible, setVisible, redirectUrl }: LoginModalProps) => {
