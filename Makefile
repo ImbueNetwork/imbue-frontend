@@ -37,8 +37,7 @@ db_up: migrate
 
 db_down: migrate_reset
 
-cmd: yarn
-	yarn build
+cmd: clean_build
 	db_up
 	yarn start
 
