@@ -1,31 +1,34 @@
-import { Response } from "express";
-import formidable from "formidable";
-import { IncomingMessage } from "http";
-import { NextApiRequest, NextApiResponse } from "next";
+import { Response } from 'express';
+import formidable from 'formidable';
+import { createReadStream } from 'fs';
+import { IncomingMessage } from 'http';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-// import parseForm from "parseForm";
-import parseForm from "./promisify";
+import { createWriteStream } from './gcs';
+import parseForm from './promisify';
 
 export const method1 = async (
-    req: NextApiRequest | IncomingMessage,
-    res: NextApiResponse | Response
+  req: NextApiRequest | IncomingMessage,
+  res: NextApiResponse | Response
 ) => {
-    const form = formidable();
+  const form = formidable();
 
-    const { files } = await parseForm(form, req);
-    // console.log("🚀 ~ file: upload.ts:18 ~ files:", files.file)
+  const { files } = await parseForm(form, req);
 
-    const file = files.file as any;
-    console.log("🚀 ~ file: upload.ts:21 ~ file:", file)
-    // console.log("🚀 ~ file: upload.ts:19 ~ file:", file[0].filepath)
+  const file = files.file as any;
 
-    // createReadStream(file.path)
-    //     .pipe(createWriteStream(file.name, file.type))
-    //     .on("finish", () => {
-    //         res.status(200).json("File upload complete");
-    //     })
-    //     .on("error", (err) => {
-    //         console.error(err.message);
-    //         res.status(500).json("File upload error: " + err.message);
-    //     });
+  createReadStream(file[0].filepath)
+    .pipe(createWriteStream(file[0].originalFilename))
+    .on('finish', () => {
+      res
+        .status(200)
+        .json({
+          url: `https://storage.cloud.google.com/test_sani/${file[0].originalFilename}`,
+        });
+    })
+    .on('error', (err) => {
+      // eslint-disable-next-line no-console
+      console.error(err.message);
+      res.status(500).json('File upload error: ' + err.message);
+    });
 };

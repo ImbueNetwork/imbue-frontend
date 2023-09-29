@@ -501,9 +501,6 @@ function Project() {
     }
   };
 
-  console.log(project);
-  console.log(projectOwner);
-
   const renderPolkadotJSModal = (
     <div>
       <AccountChoice

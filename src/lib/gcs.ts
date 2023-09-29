@@ -1,19 +1,15 @@
 import { Storage } from '@google-cloud/storage';
 
 const storage = new Storage({
-  keyFilename: 'KEY_FILENAME.json',
+  keyFilename: './public/KEY_FILENAME.json',
 });
 
 export const bucket = storage.bucket('test_sani');
 
-export const createWriteStream = (filename: string, contentType?: string) => {
+export const createWriteStream = (filename: string) => {
   const ref = bucket.file(filename);
 
-  const stream = ref.createWriteStream({
-    gzip: true,
-    contentType: contentType,
-  });
+  const stream = ref.createWriteStream();
 
   return stream;
 };
-

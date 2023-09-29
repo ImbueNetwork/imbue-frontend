@@ -2,6 +2,7 @@ import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
+import axios from 'axios'
 import moment from 'moment';
 import React from 'react';
 import { LuTrash2 } from 'react-icons/lu';
@@ -18,6 +19,20 @@ interface ExpandableMilestonProps {
 }
 
 const ExpandableMilestone = ({ index, item, project, isApplicant, projectType, isProjectOwner }: ExpandableMilestonProps) => {
+
+    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const target = e.target as HTMLInputElement;
+        if (!target?.files?.length) return
+
+        const file = target?.files[0]
+        // const filename = encodeURIComponent(file.name);
+
+        const data = new FormData()
+        data.append('file', file)
+
+        await axios.post(`/api/upload`, data)
+    }
+
     return (
         <Accordion
             className='shadow-none mt-5 before:h-0 !rounded-xl py-5'
@@ -119,24 +134,7 @@ const ExpandableMilestone = ({ index, item, project, isApplicant, projectType, i
                         </div>
 
                         <input
-                            onInput={async (e) => {
-                                const target = e.target as HTMLInputElement;
-                                if (!target?.files?.length) return
-
-                                const file = target?.files[0]
-                                const filename = encodeURIComponent(file.name);
-
-                                const data = new FormData()
-                                data.append('file', file)
-
-                                const res = await fetch(`/api/upload?file=${filename}`, {
-                                    method: 'POST',
-                                    body: data
-                                })
-
-                                console.log(await res.json());
-
-                            }}
+                            onChange={(e) => handleUpload(e)}
                             type="file"
                         />
                         <div className='w-full mt-7 flex'>
