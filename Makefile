@@ -37,8 +37,8 @@ db_up: migrate
 
 db_down: migrate_reset
 
-cmd: clean_build
-	db_up
+cmd: db_up
+	npm run build
 	yarn start
 
 .PHONY: all clean clean_build clean_deps build \
