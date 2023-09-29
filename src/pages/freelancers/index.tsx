@@ -1,7 +1,24 @@
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
 import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
-import { Grid, TextField } from '@mui/material';
+import Grid from '@mui/material/Grid';
+const TextField = dynamic(() => import("@mui/material/TextField"), {
+  ssr: false,
+})
+const OutlinedInput = dynamic(() => import("@mui/material/OutlinedInput"), {
+  ssr: false,
+})
+const InputAdornment = dynamic(() => import("@mui/material/InputAdornment"), {
+  ssr: false,
+})
+const IconButton = dynamic(() => import("@mui/material/IconButton"), {
+  ssr: false,
+})
+// import ClearIcon from '@mui/icons-material/Clear';
+const ClearIcon = dynamic(() => import("@mui/icons-material/Clear"), {
+  ssr: false,
+})
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -47,7 +64,7 @@ const Freelancers = (): JSX.Element => {
   const [filterVisble, setFilterVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [itemsPerPage, setItemsPerPage] = useState<number>(12);
-  const [searhInput, setSearchInput] = useState<string>("")
+  const [searchInput, setSearchInput] = useState<string>("")
   const [pageInput, setPageInput] = useState<number>(1);
 
   const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
@@ -377,7 +394,7 @@ const Freelancers = (): JSX.Element => {
           verified: freelancerInfo.verified,
         };
         if (search_value.length === 0) {
-          setFilterVisible(!filterVisble);
+          setFilterVisible(false);
         }
         const filteredFreelancers: any = await callSearchFreelancers(filter);
         setFreelancers(filteredFreelancers?.currentData);
@@ -414,6 +431,7 @@ const Freelancers = (): JSX.Element => {
     setSlectedFilterIds([]);
     setFreelancers(allFreelancers?.currentData);
     setFreelancersTotal(allFreelancers?.totalFreelancers);
+    setSearchInput("")
   };
 
   const cancelFilters = async () => {
@@ -434,7 +452,6 @@ const Freelancers = (): JSX.Element => {
   }
 
   if (loading) return <LoadingFreelancers />;
-   console.log(freelancers)
   return (
     <div>
       <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
@@ -450,18 +467,44 @@ const Freelancers = (): JSX.Element => {
             <div className='flex justify-between lg:flex-row flex-col items-start'>
               <div>
                 <div className='flex items-center'>
-                  <input
+                  {/* <input
                     value={searhInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     id='search-input'
                     className='search-input px-[12px] !w-full lg:!w-[20rem] !h-[2.875rem] !rounded-tr-[0px] !rounded-br-[0px] !text-black'
                     placeholder='Search'
                     autoComplete='off'
+                  /> */}
+                  <OutlinedInput
+                    autoComplete='off'
+                    color='secondary'
+                    id='search-input'
+                    notched={false}
+                    className='!w-full lg:!w-[20rem] !h-[2.875rem] rounded-lg !rounded-tr-[0px] !rounded-br-[0px]'
+                    placeholder='Search'
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    onKeyUp={e => e.key === 'Enter' && onSearch()}
+                    endAdornment={
+                      searchInput?.length
+                        ? (
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={() => searchInput?.length && setSearchInput("")}
+                              onMouseDown={e => e.preventDefault()}
+                              edge="end"
+                            >
+                              <ClearIcon />
+                            </IconButton>
+                          </InputAdornment>)
+                        : ""
+                    }
                   />
                   <div
                     role='button'
                     onClick={onSearch}
-                    className='h-[2.975rem] w-[3.0625rem] rounded-tr-[8px] rounded-br-[8px] bg-imbue-purple flex justify-center items-center cursor-pointer'
+                    className='h-[2.9rem] w-[3.0625rem] rounded-tr-[8px] rounded-br-[8px] bg-imbue-purple flex justify-center items-center cursor-pointer'
                   >
                     <Image src={searchSvg} alt='Search' role='button' />
                   </div>
@@ -475,14 +518,17 @@ const Freelancers = (): JSX.Element => {
               </div>
 
               <div className='flex items-center mt-[2rem] lg:mt-0'>
-                {selectedFilterIds?.length > 0 && (
-                  <button
-                    onClick={reset}
-                    className='h-[43px] mr-4 px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]'
-                  >
-                    Reset
-                  </button>
-                )}
+                {(
+                  selectedFilterIds?.length ||
+                  router?.query?.name?.length
+                ) && (
+                    <button
+                      onClick={reset}
+                      className='h-[43px] mr-4 px-[20px] rounded-[10px] bg-imbue-purple flex items-center cursor-pointer hover:scale-105 ml-[44px]'
+                    >
+                      Reset
+                    </button>
+                  )}
 
                 <div
                   className='flex items-center cursor-pointer'
