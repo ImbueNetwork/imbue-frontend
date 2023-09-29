@@ -21,7 +21,7 @@ import { BsPeople } from 'react-icons/bs';
 import { IoIosArrowDown } from 'react-icons/io';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { appLogo, cancelIcon, hamburgerIcon } from '@/assets/svgs';
+import { appLogo } from '@/assets/svgs';
 import { fetchUserRedux } from '@/redux/reducers/userReducers';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { AppDispatch, RootState } from '@/redux/store/store';
@@ -89,9 +89,7 @@ function NewNavbar() {
   };
 
   const navPillclasses =
-    'text-imbue-purple h-[3rem] !bg-white rounded-[5.07319rem] !flex justify-center items-center px-7 hover:no-underline !text-[1rem] ';
-  const cancelClass =
-    'text-imbue-purple h-[2.9375rem] w-[2.9375rem] !bg-white rounded-[5.07319rem] !flex justify-center items-center px-7 hover:no-underline !text-[1.10975rem] ';
+    'text-imbue-purple-dark h-[3rem] bg-white  rounded-[5.07319rem] !flex justify-center items-center px-5 hover:no-underline !text-[1rem] ';
 
   return (
     <>
@@ -125,10 +123,10 @@ function NewNavbar() {
               </div>
             </div>
 
-            <div className='relative items-center bg-[#DFDDCD] ml-5 py-1 rounded-full lg:flex'>
+            <div className='relative  max-width-1100px:hidden items-center bg-[#DFDDCD] ml-5 py-1 rounded-full lg:flex'>
               <div className={`flex items-center ml-0.5  transition-all`}>
                 <div
-                  className={`mx-1 lg:text-sm relative  lg:inline-block cursor-pointer text-imbue-purple h-[3rem] !bg-white rounded-[5.07319rem] !flex justify-center items-center pl-5 pr-3 hover:no-underline !text-[1rem]`}
+                  className={`mx-1 group lg:text-sm relative  lg:inline-block cursor-pointer text-imbue-purple h-[3rem] bg-white hover:bg-imbue-lime-light rounded-[5.07319rem] !flex justify-center items-center pl-5 pr-3 hover:no-underline !text-[1rem]`}
                 >
                   <Image
                     src='/target.svg'
@@ -138,9 +136,17 @@ function NewNavbar() {
                     alt=''
                   />
                   <p>Discover</p>
-                  <IoIosArrowDown color='#A8A8A8' className='ml-3' size={20} />
-                  <div className='absolute shadow-lg space-y-3 pl-1  py-1 rounded-xl top-14 left-1 bg-white w-72'>
-                    <div className='flex gap-2 px-2 hover:bg-imbue-lime-light py-2 rounded-md '>
+                  <IoIosArrowDown
+                    className='ml-3 text-[#A8A8A8] group-hover:text-black'
+                    size={20}
+                  />
+                  <div className='absolute hidden  group-hover:block shadow-lg space-y-3 pl-1  py-1 rounded-xl top-[3.3rem] left-1 bg-white w-72'>
+                    <div
+                      onClick={() => {
+                        router.push('/briefs');
+                      }}
+                      className='flex gap-2 px-2 hover:bg-imbue-lime-light py-2 rounded-md '
+                    >
                       <div className='border p-1 rounded-xl'>
                         <BiBuildings color='black' size={23} />
                       </div>
@@ -151,7 +157,12 @@ function NewNavbar() {
                         </p>
                       </div>
                     </div>
-                    <div className='flex gap-2 px-2 hover:bg-imbue-lime-light py-2 rounded-md '>
+                    <div
+                      onClick={() => {
+                        router.push('/freelancers');
+                      }}
+                      className='flex gap-2 px-2 hover:bg-imbue-lime-light py-2 rounded-md '
+                    >
                       <div className='border p-1  rounded-xl'>
                         <BsPeople color='black' size={23} />
                       </div>
@@ -167,25 +178,60 @@ function NewNavbar() {
                 {user?.id && (
                   <Link
                     onClick={() => setExpanded(false)}
-                    className={`mx-1 lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
+                    className={`mx-1 hover:bg-imbue-lime-light  lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
                     href='/grants/new'
                   >
-                    Submit a Grant
+                    <Image
+                      className='mr-2'
+                      src={'/page.svg'}
+                      width={16}
+                      height={20}
+                      alt='page icon'
+                    />
+                    Submit Grant
                   </Link>
                 )}
                 <Link
                   onClick={() => setExpanded(false)}
-                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer ${navPillclasses} nav-item nav-item-2`}
-                  href='/briefs/'
+                  className={`mx-1 hover:bg-imbue-lime-light text-xs lg:text-sm hidden lg:inline-block cursor-pointer ${navPillclasses} nav-item nav-item-2`}
+                  href='#'
                 >
-                  Discover Briefs
+                  <Image
+                    src='/wallet-2.svg'
+                    alt='wallet icon'
+                    width={21}
+                    height={18}
+                    className='mr-2 mb-1'
+                  />
+                  Wallet
                 </Link>
                 <Link
                   onClick={() => setExpanded(false)}
-                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${navPillclasses}`}
-                  href='/freelancers'
+                  className={`mx-1 relative group text-xs hover:bg-imbue-lime-light lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${navPillclasses}`}
+                  href='#'
                 >
-                  Discover Freelancers
+                  <Image
+                    src='/user-edit.svg'
+                    className='mr-2 mb-0.5'
+                    width={20}
+                    height={20}
+                    alt=''
+                  />
+                  Switch Profile
+                  <IoIosArrowDown
+                    className='ml-3 text-[#A8A8A8] group-hover:text-black'
+                    size={20}
+                  />
+                  <div className='absolute hidden  group-hover:block shadow-lg space-y-3 pl-1  py-1 rounded-xl top-[3.3rem] left-1 bg-white w-72'>
+                    <div className='flex gap-2 items-center px-2 hover:bg-imbue-lime-light py-2 rounded-md '>
+                      <div className='border p-1 rounded-xl'>
+                        <BiBuildings color='black' size={23} />
+                      </div>
+                      <div className='ml-1'>
+                        <p className='text-sm'>Switch to Hiring</p>
+                      </div>
+                    </div>
+                  </div>
                 </Link>
               </div>
             </div>
@@ -200,8 +246,30 @@ function NewNavbar() {
           </div> */}
 
           <Box
-            sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}
+            sx={{
+              background: '#DFDDCD',
+              borderRadius: 10,
+              display: 'flex',
+              alignItems: 'center',
+              textAlign: 'center',
+              paddingLeft: 2,
+              paddingRight: 2,
+            }}
           >
+            <Image
+              src='/message-dots-square.svg'
+              width={23}
+              height={20}
+              alt='message'
+              className='mr-3'
+            />
+            <Image
+              src='/bell-01.svg'
+              width={23}
+              height={20}
+              className=''
+              alt='message'
+            />
             <Tooltip
               title='Account settings'
               className={`${!user?.username && !loading && 'lg:hidden'}`}
@@ -246,7 +314,6 @@ function NewNavbar() {
                 </IconButton>
               )}
             </Tooltip>
-
             {!loadingUser && !user.username && (
               <button
                 className='mx-1 text-xs lg:text-sm bg-theme-grey-dark hover:bg-primary hover:text-black transition-all px-6 py-2 rounded-full hidden lg:inline-block'
