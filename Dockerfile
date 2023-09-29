@@ -8,6 +8,17 @@ RUN apt-get install -y make
 WORKDIR /app
 COPY . .
 RUN yarn
+
+# Production image, copy all the files and run next
+FROM node:18-slim AS production
+ARG IMAGE_TAG
+ARG COMMIT_SHA
+ARG NEXT_PUBLIC_BASE_URL
+RUN apt-get update
+RUN apt-get install -y make
+WORKDIR /app
+COPY . .
+# RUN yarn
 # RUN yarn build
 ENV NODE_ENV production
 ENV IMAGE_TAG=$COMMIT_SHA
