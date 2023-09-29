@@ -117,6 +117,28 @@ const ExpandableMilestone = ({ index, item, project, isApplicant, projectType, i
                                 <LuTrash2 size={20} />
                             </div>
                         </div>
+
+                        <input
+                            onInput={async (e) => {
+                                const target = e.target as HTMLInputElement;
+                                if (!target?.files?.length) return
+
+                                const file = target?.files[0]
+                                const filename = encodeURIComponent(file.name);
+
+                                const data = new FormData()
+                                data.append('file', file)
+
+                                const res = await fetch(`/api/upload?file=${filename}`, {
+                                    method: 'POST',
+                                    body: data
+                                })
+
+                                console.log(await res.json());
+
+                            }}
+                            type="file"
+                        />
                         <div className='w-full mt-7 flex'>
 
                             {
