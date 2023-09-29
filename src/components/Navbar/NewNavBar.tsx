@@ -16,6 +16,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { BiBuildings } from 'react-icons/bi';
+import { BsPeople } from 'react-icons/bs';
+import { IoIosArrowDown } from 'react-icons/io';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { appLogo, cancelIcon, hamburgerIcon } from '@/assets/svgs';
@@ -29,7 +32,7 @@ const Login = dynamic(() => import('../Login'));
 import LoginPopup from '../LoginPopup/LoginPopup';
 import defaultProfile from '../../assets/images/profile-image.png';
 
-function Navbar() {
+function NewNavbar() {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [freelancerProfile, setFreelancerProfile] = useState<any>();
   const [loading, setLoading] = useState<boolean>(true);
@@ -86,9 +89,9 @@ function Navbar() {
   };
 
   const navPillclasses =
-    'text-imbue-purple h-[2.9375rem] !bg-white rounded-[5.07319rem] !flex justify-center items-center px-[3rem] hover:no-underline !text-[1.10975rem] ';
+    'text-imbue-purple h-[3rem] !bg-white rounded-[5.07319rem] !flex justify-center items-center px-7 hover:no-underline !text-[1rem] ';
   const cancelClass =
-    'text-imbue-purple h-[2.9375rem] w-[2.9375rem] !bg-white rounded-[5.07319rem] !flex justify-center items-center px-[0.9rem] hover:no-underline !text-[1.10975rem] ';
+    'text-imbue-purple h-[2.9375rem] w-[2.9375rem] !bg-white rounded-[5.07319rem] !flex justify-center items-center px-7 hover:no-underline !text-[1.10975rem] ';
 
   return (
     <>
@@ -111,33 +114,56 @@ function Navbar() {
           <div className={`flex items-center transition-all`}>
             <div
               onClick={() => router.push('/')}
-              className={`main-title  bg-white rounded-full  flex justify-center items-center cursor-pointer z-10 relative px-5 py-5 `}
+              className={`bg-white w-[12rem] rounded-full  flex justify-center items-center cursor-pointer z-10 relative px-9 py-3 `}
             >
               <div id='logo'>
                 <Image
                   src={appLogo}
                   alt={'app logo'}
-                  className='w-28 lg:w-full'
+                  className='w-[6.875rem]'
                 />
               </div>
             </div>
 
-            <div className='relative items-center z-0 hidden lg:flex'>
-              <div
-                className={`${
-                  expanded
-                    ? 'translate-x-0 opacity-100 duration-700'
-                    : '-translate-x-full opacity-0 duration-1000'
-                } flex items-center ml-1 transition-all`}
-              >
-                <Link
-                  onClick={() => setExpanded(false)}
-                  className={`mx-1 lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
-                  href='/briefs/new'
+            <div className='relative items-center bg-[#DFDDCD] ml-5 py-1 rounded-full lg:flex'>
+              <div className={`flex items-center ml-0.5  transition-all`}>
+                <div
+                  className={`mx-1 lg:text-sm relative  lg:inline-block cursor-pointer text-imbue-purple h-[3rem] !bg-white rounded-[5.07319rem] !flex justify-center items-center pl-5 pr-3 hover:no-underline !text-[1rem]`}
                 >
-                  Submit a Brief
-                </Link>
-
+                  <Image
+                    src='/target.svg'
+                    width={20}
+                    className='mr-1'
+                    height={20}
+                    alt=''
+                  />
+                  <p>Discover</p>
+                  <IoIosArrowDown color='#A8A8A8' className='ml-3' size={20} />
+                  <div className='absolute shadow-lg space-y-3 pl-1  py-1 rounded-xl top-14 left-1 bg-white w-72'>
+                    <div className='flex gap-2 px-2 hover:bg-imbue-lime-light py-2 rounded-md '>
+                      <div className='border p-1 rounded-xl'>
+                        <BiBuildings color='black' size={23} />
+                      </div>
+                      <div className='ml-1'>
+                        <p className='text-sm'>Discover Briefs</p>
+                        <p className='text-xs text-gray-400'>
+                          Apply for client work on imbue
+                        </p>
+                      </div>
+                    </div>
+                    <div className='flex gap-2 px-2 hover:bg-imbue-lime-light py-2 rounded-md '>
+                      <div className='border p-1  rounded-xl'>
+                        <BsPeople color='black' size={23} />
+                      </div>
+                      <div className='ml-1'>
+                        <p className='text-sm'>Discover Freelancers</p>
+                        <p className='text-xs text-gray-400'>
+                          Find and Hire Super Freelancers
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 {user?.id && (
                   <Link
                     onClick={() => setExpanded(false)}
@@ -147,7 +173,6 @@ function Navbar() {
                     Submit a Grant
                   </Link>
                 )}
-
                 <Link
                   onClick={() => setExpanded(false)}
                   className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer ${navPillclasses} nav-item nav-item-2`}
@@ -155,7 +180,6 @@ function Navbar() {
                 >
                   Discover Briefs
                 </Link>
-
                 <Link
                   onClick={() => setExpanded(false)}
                   className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${navPillclasses}`}
@@ -163,33 +187,6 @@ function Navbar() {
                 >
                   Discover Freelancers
                 </Link>
-
-                <div
-                  onClick={() => {
-                    setExpanded(!expanded);
-                  }}
-                  className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${cancelClass}`}
-                >
-                  <Image
-                    src={expanded ? cancelIcon : hamburgerIcon}
-                    alt={'cancel'}
-                    className='w-10 h-10'
-                  />
-                </div>
-              </div>
-              <div
-                onClick={() => {
-                  setExpanded(!expanded);
-                }}
-                className={`mx-1 text-xs lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${
-                  !expanded && cancelClass
-                } ${expanded ? 'lg:invisible' : 'visible delay-700'} absolute`}
-              >
-                <Image
-                  src={expanded ? cancelIcon : hamburgerIcon}
-                  alt={'cancel'}
-                  className='w-10 h-10'
-                />
               </div>
             </div>
           </div>
@@ -296,4 +293,4 @@ function Navbar() {
   );
 }
 
-export default Navbar;
+export default NewNavbar;

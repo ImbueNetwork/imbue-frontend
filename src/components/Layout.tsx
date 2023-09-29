@@ -16,7 +16,7 @@ import '@/styles/animation.css';
 
 import { Providers } from '@/redux/providers/userProviders';
 
-import Navbar from './Navbar/Navbar';
+import NewNavbar from './Navbar/NewNavBar';
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -49,14 +49,9 @@ function Layout({ children }: LayoutProps) {
         />
       )}
       <Providers>
-        {
-          !(
-            router.asPath === "/auth/sign-up" ||
-            router.asPath === "/auth/sign-in"
-          ) && (
-            <Navbar />
-          )
-        }
+        {!(
+          router.asPath === '/auth/sign-up' || router.asPath === '/auth/sign-in'
+        ) && <NewNavbar />}
 
         <main
           className={`padded lg:!px-[var(--hq-layout-padding)] !pt-[100px]`}
