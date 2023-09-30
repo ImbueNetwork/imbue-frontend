@@ -52,6 +52,7 @@ const VotingList = (props: VotingListProps) => {
             );
 
             setMilestoneVotes(milestoneVotes)
+            console.log("🚀 ~ file: VotingList.tsx:55 ~ syncVotes ~ milestoneVotes:", milestoneVotes)
 
             const votesArray = Object.keys(milestoneVotes)
 

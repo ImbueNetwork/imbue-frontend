@@ -1,14 +1,18 @@
 /* eslint-disable no-constant-condition */
-/* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { LinearProgress, Modal } from '@mui/material';
+import { LinearProgress } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+// const ExpandableDropDowns = dynamic(
+//   () => import('@/components/Project/ExpandableMilestone')
+// );
+// const ProjectHint = dynamic(() => import('@/components/Project/ProjectHint'));
+// import LoginPopup from '@/components/LoginPopup/LoginPopup';
+import { BsChatLeftDots } from 'react-icons/bs';
 import { TfiNewWindow } from 'react-icons/tfi';
 import { useSelector } from 'react-redux';
 
@@ -17,22 +21,16 @@ import * as utils from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import AccountChoice from '@/components/AccountChoice';
-
-const LoginPopup = dynamic(() => import('@/components/LoginPopup/LoginPopup'));
-const ExpandableDropDowns = dynamic(
-  () => import('@/components/Project/ExpandableMilestone')
-);
-
-import ProjectApprovers from '@/components/Project/ProjectApprovers';
-const ProjectHint = dynamic(() => import('@/components/Project/ProjectHint'));
-// import LoginPopup from '@/components/LoginPopup/LoginPopup';
-import { BsChatLeftDots } from 'react-icons/bs';
-
 import ChatPopup from '@/components/ChatPopup';
+import ErrorScreen from '@/components/ErrorScreen';
+import RefundScreen from '@/components/Grant/Refund';
+import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 import { MilestoneProgressBar } from '@/components/MilestoneProgressBar/MilestoneProgressBar';
+import ProjectApprovers from '@/components/Project/ProjectApprovers';
 import ExpandableMilestone from '@/components/Project/V2/ExpandableMilestone';
 import VotingList from '@/components/Project/VotingList/VotingList';
-import VoteModal from '@/components/ReviewModal/VoteModal';
+import SuccessScreen from '@/components/SuccessScreen';
+import WaitingScreen from '@/components/WaitingScreen';
 
 import {
   ImbueChainPollResult,
@@ -68,6 +66,7 @@ TimeAgo.addDefaultLocale(en);
 function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
+  console.log("🚀 ~ file: [id].tsx:69 ~ Project ~ project:", project)
   const [targetUser, setTargetUser] = useState<any>({});
   // const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
   const { user, loading: userLoading } = useSelector(
@@ -79,10 +78,9 @@ function Project() {
   const [raiseVoteOfNoConfidence, setRaiseVoteOfNoConfidence] =
     useState<boolean>(false);
 
-  const [chainLoading, setChainLoading] = useState<boolean>(true);
+  // const [chainLoading, setChainLoading] = useState<boolean>(true);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const [loginModal, setLoginModal] = useState<boolean>(false);
   const projectId: any = router?.query?.id;
   const [firstPendingMilestone, setFirstPendingMilestone] = useState<number>();
   const [isApplicant, setIsApplicant] = useState<boolean>(false);
@@ -91,6 +89,7 @@ function Project() {
   const [showRefundButton, setShowRefundButton] = useState<boolean>(false);
   // TODO: Create votes table
   const [milestoneVotes, setMilestoneVotes] = useState<any>({});
+  console.log("🚀 ~ file: [id].tsx:92 ~ Project ~ milestoneVotes:", milestoneVotes)
   const [milestonLoadingTitle, setMilestoneLoadingTitle] = useState<string>('');
 
   const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
@@ -142,12 +141,12 @@ function Project() {
     }
   }, [projectId, userLoading]);
 
-  const handlePopUpForUser = () => {
-    if (!localStorage.getItem('isShown')) {
-      localStorage.setItem('isShown', 'true');
-      setModalOpen(true);
-    }
-  };
+  // const handlePopUpForUser = () => {
+  //   if (!localStorage.getItem('isShown')) {
+  //     localStorage.setItem('isShown', 'true');
+  //     setModalOpen(true);
+  //   }
+  // };
 
   const getChainProject = async (project: Project, freelancer: any) => {
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
@@ -300,7 +299,7 @@ function Project() {
       // api  project response
       await getChainProject(projectRes, freelancerRes);
       setLoading(false);
-      setChainLoading(false);
+      // setChainLoading(false);
 
       if (
         projectRes.status_id !== OffchainProjectState.Completed &&
@@ -313,7 +312,7 @@ function Project() {
       setError({ message: 'can not find the project ' + error });
     } finally {
       setLoading(false);
-      setChainLoading(false);
+      // setChainLoading(false);
     }
   };
 
@@ -520,9 +519,6 @@ function Project() {
 
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
-      <Modal open={false} className='flex justify-center items-center'>
-        <VoteModal />
-      </Modal>
       <div className='w-full grid grid-cols-12 bg-white py-5 px-7 rounded-2xl'>
         <p className='text-black col-start-1 col-end-10 capitalize'>
           {projectType} information
@@ -621,7 +617,13 @@ function Project() {
                   index,
                   isApplicant,
                   projectType,
-                  isProjectOwner
+                  isProjectOwner,
+                  setLoading,
+                  setError,
+                  user,
+                  setSuccess,
+                  setSuccessTitle,
+                  setShowPolkadotAccounts,
                 }
                 }
                 key={index}
@@ -638,8 +640,8 @@ function Project() {
                 <p className='text-black mt-5'>Milestones</p>
                 <div className='w-48  mt-6'>
                   <MilestoneProgressBar
-                    currentValue={1}
-                    titleArray={['1', '2', '3', '4']}
+                    currentValue={firstPendingMilestone}
+                    titleArray={project?.milestones}
                   />
                 </div>
               </div>
@@ -783,6 +785,70 @@ function Project() {
         projectId={project.id}
         setMilestoneVotes={setMilestoneVotes}
       />
+
+      <BackDropLoader open={loading || userLoading} />
+
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
+      <SuccessScreen
+        noRetry={!(project?.status_id === OffchainProjectState.Completed)}
+        title={successTitle}
+        open={success}
+        setOpen={setSuccess}
+      >
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => {
+              setSuccess(false);
+              if (project?.status_id !== OffchainProjectState.Completed)
+                window.location.reload();
+            }}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Continue to Project
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to dashboard
+          </button>
+        </div>
+      </SuccessScreen>
+
+      <RefundScreen open={refunded} setOpen={setSuccess} />
+
+      <WaitingScreen title={waitMessage} open={wait} setOpen={setWait}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => window.location.reload()}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Refresh
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to dashboard
+          </button>
+        </div>
+      </WaitingScreen>
+
     </div>
   );
 }
