@@ -80,6 +80,12 @@
   border-color: var(--theme-purple);
 }
 
+@supports (-webkit-hyphens: none) {
+  .MuiOutlinedInput-notchedOutline legend {
+    display: none;
+  }
+}
+
 .applicationList .MuiFormControl-root {
   width: 140px;
   cursor: pointer;
@@ -123,7 +129,6 @@
   max-height: 100vh;
   max-width: fit-content;
   padding: 2rem 4rem;
-  
 }
 
 .freelancer .MuiSkeleton-root {

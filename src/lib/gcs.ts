@@ -1,8 +1,10 @@
 import { Storage } from '@google-cloud/storage';
 
-const storage = new Storage({
-  keyFilename: './public/KEY_FILENAME.json',
-});
+const storage = new Storage(
+//   {
+//   keyFilename: './public/KEY_FILENAME.json',
+// }
+);
 
 export const bucket = storage.bucket('test_sani');
 
