@@ -55,6 +55,7 @@ import { TextArea } from '@/components/Briefs/TextArea';
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
+import LoginPopup from '@/components/LoginPopup/LoginPopup';
 import Clients from '@/components/Profile/Clients';
 import CountrySelector from '@/components/Profile/CountrySelector';
 import Skills from '@/components/Profile/Skills';
@@ -121,6 +122,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
   const [copied, setCopied] = useState<string>('');
   const [userNameExist, setUserNameExist] = useState(false);
+  const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
 
   const [clients, setClients] = useState<any>(
     initFreelancer?.clients ? initFreelancer.clients : []
@@ -212,8 +214,11 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   };
 
   const handleMessageBoxClick = () => {
-    if (browsingUser) {
+    if (browsingUser.id) {
       setShowMessageBox(true);
+    }
+    else {
+      setShowLoginPopup(true);
     }
   };
 
@@ -235,7 +240,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     if (e.target.name === 'display_name') {
       if (newFreelancer.display_name.trim().length < 1 && newFreelancer.display_name.trim().length > 30) {
         setDisplayNameError('Display name must be between 1 to 30 characters long');
-      }  else if (isUrlExist(e.target.value)) {
+      } else if (isUrlExist(e.target.value)) {
         setDisplayNameError(
           'URL and special characters are not allowed in display name'
         );
@@ -515,7 +520,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                       color='secondary'
                       defaultValue={freelancer?.display_name || ""}
                       autoComplete='off'
-                      inputProps={{maxLength:30}}
+                      inputProps={{ maxLength: 30 }}
                     />
                     {displayError && (
                       <p
@@ -555,7 +560,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                         color='secondary'
                         defaultValue={freelancer?.username || ""}
                         autoComplete='off'
-                        inputProps={{maxLength:30}}
+                        inputProps={{ maxLength: 30 }}
                       />
                       {userNameError && (
                         <p
@@ -1350,6 +1355,13 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           </button>
         </div>
       </ErrorScreen>
+
+      <LoginPopup
+        visible={showLoginPopup}
+        setVisible={setShowLoginPopup}
+        redirectUrl={`/freelancers/${initFreelancer.username}`}
+      />
+
       <div
         className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
           }`}

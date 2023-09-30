@@ -12,7 +12,7 @@ clean_build: clean
 	
 migrate: migrate_latest
 
-migrate_latest: node_modules
+migrate_latest: 
 	yarn run knex --cwd "./src/db" migrate:latest
 
 migrate_up: node_modules

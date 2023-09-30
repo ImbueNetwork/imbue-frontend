@@ -5,7 +5,9 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { FiEdit } from 'react-icons/fi';
 
-import { Brief } from '@/model';
+import { Brief, User } from '@/model';
+
+import { LoginPopupStateType } from '../Layout';
 
 TimeAgo.addLocale(en);
 
@@ -16,6 +18,8 @@ type BioPanelData = {
   projectCategories: string[];
   isOwnerOfBrief?: boolean | null;
   targetUser: any;
+  browsingUser: User;
+  showLoginPopUp: (_value: LoginPopupStateType) => void;
 };
 
 const BioPanel = ({
@@ -23,6 +27,8 @@ const BioPanel = ({
   projectCategories,
   isOwnerOfBrief,
   targetUser,
+  browsingUser,
+  showLoginPopUp
 }: BioPanelData) => {
   const [expandBreifDesc, setExpandBreifDesc] = useState<number>(500);
   const timePosted = timeAgo.format(new Date(brief.created));
@@ -66,7 +72,11 @@ const BioPanel = ({
         <span className='text-sm primary-text !text-imbue-lemon'>
           Posted {timePosted} by{' '}
           <span
-            onClick={() => router.push(`/profile/${targetUser.username}`)}
+            onClick={() =>
+              browsingUser?.id
+                ? router.push(`/profile/${targetUser.username}`)
+                : showLoginPopUp({ open: true, redirectURL: `/profile/${targetUser.username}` })
+            }
             className='hover:underline cursor-pointer'
           >
             {brief.created_by}
@@ -181,7 +191,7 @@ const BioPanel = ({
           ${Number(brief.budget).toLocaleString()}
         </span>
       </div>
-    </div>
+    </div >
   );
 };
 

@@ -149,6 +149,7 @@ export default function SignIn() {
               id='outlined-adornment-password'
               color='secondary'
               className='h-[2.6rem] pl-[4px] text-[0.875rem]'
+              notched={false}
               inputProps={{
                 className: 'placeholder:text-[#D1D1D1] !text-black',
               }}
@@ -157,6 +158,7 @@ export default function SignIn() {
               placeholder='victorimbue@gmail.com'
               onChange={(e: any) => setUserOrEmail(e.target.value)}
               required
+              onKeyUp={(e) => (e.key === 'Enter') && document.getElementsByName('password')[0].focus()}
             />
           </div>
           <div className='flex flex-col justify-center pb-[10px] w-full mt-[1.2rem]'>
@@ -166,6 +168,7 @@ export default function SignIn() {
             <OutlinedInput
               id='outlined-adornment-password'
               color='secondary'
+              notched={false}
               className='h-[2.6rem] pl-1 text-[0.875rem]'
               inputProps={{
                 className: 'placeholder:text-[#D1D1D1] !text-black',
@@ -175,6 +178,7 @@ export default function SignIn() {
               name='password'
               required
               onChange={(e: any) => setPassword(e.target.value)}
+              onKeyUp={(e) => (e.key === 'Enter') && handleSubmit()}
               endAdornment={
                 <InputAdornment position='end'>
                   <IconButton

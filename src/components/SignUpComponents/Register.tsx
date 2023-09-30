@@ -285,7 +285,7 @@ const Register = ({ setShowSignup, redirectUrl }: any) => {
                                 // ref={googleParentRef}
                                 className='w-full flex justify-center'
                             >
-                                <GoogleSignIn sizeRef={walletRef} />
+                                <GoogleSignIn redirectUrl={redirectUrl} sizeRef={walletRef} />
                             </li>
                         </div>
                         <div ref={walletRef} className='login justify-center items-center w-full flex flex-col'>

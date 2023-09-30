@@ -17,8 +17,8 @@ import Web3WalletModal from '../WalletModal/Web3WalletModal';
 
 interface LoginModalProps {
     visible: boolean;
-    redirectUrl: string;
-    setVisible: (_visible: boolean) => void;
+    redirectUrl?: string;
+    setVisible: (_visible: any) => void;
 }
 
 const LoginPopup = ({ visible, setVisible, redirectUrl }: LoginModalProps) => {
@@ -92,7 +92,7 @@ const LoginPopup = ({ visible, setVisible, redirectUrl }: LoginModalProps) => {
         >
             <div className='relative'>
                 <CloselIcon onClick={() => setVisible(false)} className='text-imbue-purple cursor-pointer absolute top-7 right-7 rounded-full bg-[#EBEAE2] p-0.5 md:hidden' />
-                
+
                 {
                     showSignup
                         ? (
@@ -110,7 +110,7 @@ const LoginPopup = ({ visible, setVisible, redirectUrl }: LoginModalProps) => {
                                                     // ref={googleParentRef}
                                                     className='w-full flex justify-center'
                                                 >
-                                                    <GoogleSignIn sizeRef={walletRef} />
+                                                    <GoogleSignIn redirectUrl={redirectUrl} sizeRef={walletRef} />
                                                 </li>
                                             </div>
                                             <div ref={walletRef} className='login justify-center items-center w-full flex flex-col'>

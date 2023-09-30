@@ -1,9 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
-import { TextField } from '@mui/material';
+import { InputAdornment, OutlinedInput, TextField } from '@mui/material';
+const IconButton = dynamic(() => import("@mui/material/IconButton"), {
+  ssr: false,
+})
+// import ClearIcon from '@mui/icons-material/Clear';
+const ClearIcon = dynamic(() => import("@mui/icons-material/Clear"), {
+  ssr: false,
+})
+
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -339,7 +348,7 @@ const Briefs = (): JSX.Element => {
           }
 
           if (router.query.non_verified) {
-            filter.non_verified = true;
+            filter.non_verified = true
           }
 
           if (sizeProps) {
@@ -721,18 +730,46 @@ const Briefs = (): JSX.Element => {
             <div className='flex justify-between lg:flex-row flex-col items-start lg:py-[3rem]'>
               <div>
                 <div className='flex items-center'>
-                  <input
+                  {/* <input
                     autoComplete='off'
                     id='search-input'
                     className='search-input px-[12px] !w-full  lg:!w-[20rem] !h-[2.875rem] !rounded-tr-[0px] !rounded-br-[0px]'
                     placeholder='Search'
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
+                    onKeyUp={e => e.key === 'Enter' && !savedBriefsActive && onSearch()}
+                  /> */}
+                  <OutlinedInput
+                    autoComplete='off'
+                    color='secondary'
+                    id='search-input'
+                    notched={false}
+                    className='!w-full lg:!w-[20rem] !h-[2.875rem] rounded-lg !rounded-tr-[0px] !rounded-br-[0px]'
+                    placeholder='Search'
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    onKeyUp={e => e.key === 'Enter' && !savedBriefsActive && onSearch()}
+                    endAdornment={
+                      searchInput?.length
+                        ? (
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={() => searchInput?.length && setSearchInput("")}
+                              onMouseDown={e => e.preventDefault()}
+                              edge="end"
+                            >
+                              <ClearIcon />
+                            </IconButton>
+                          </InputAdornment>)
+                        : ""
+                    }
                   />
+
                   <div
                     role='button'
                     onClick={() => !savedBriefsActive && onSearch()}
-                    className='h-[2.975rem] w-[3.0625rem] rounded-tr-[8px] rounded-br-[8px] bg-imbue-purple flex justify-center items-center cursor-pointer'
+                    className='h-[2.9rem] w-[3.0625rem] rounded-tr-[8px] rounded-br-[8px] bg-imbue-purple flex justify-center items-center cursor-pointer'
                   >
                     <Image src={searchSvg} alt='Search' role='button' />
                   </div>
