@@ -40,7 +40,6 @@ const VotingList = (props: VotingListProps) => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-
         const syncVotes = async () => {
             if (!chainProjectId || !projectId || firstPendingMilestone === undefined) return
 
@@ -52,7 +51,6 @@ const VotingList = (props: VotingListProps) => {
             );
 
             setMilestoneVotes(milestoneVotes)
-            console.log("🚀 ~ file: VotingList.tsx:55 ~ syncVotes ~ milestoneVotes:", milestoneVotes)
 
             const votesArray = Object.keys(milestoneVotes)
 

@@ -222,23 +222,24 @@ const ExpandableMilestone = ({ index, item: milestone, project, isApplicant, pro
             // eslint-disable-next-line no-constant-condition
             while (true) {
                 if (result.status || result.txError) {
+                    console.log("🚀 ~ file: ExpandableMilestone.tsx:226 ~ withdraw ~ result:", result)
                     if (result.status) {
                         const haveAllMilestonesBeenApproved = projectMilestones
                             .map((m: any) => m.is_approved)
                             .every(Boolean);
+                        console.log("🚀 ~ file: ExpandableMilestone.tsx:229 ~ withdraw ~ haveAllMilestonesBeenApproved:", haveAllMilestonesBeenApproved)
 
                         if (haveAllMilestonesBeenApproved) {
                             project.status_id = OffchainProjectState.Completed;
                             project.completed = true;
                             await updateProject(Number(project?.id), project);
-
                         }
                         setLoading(false);
                         setSuccess(true);
                         setSuccessTitle('Withdraw successfull');
                     } else if (result.txError) {
                         setLoading(false);
-                        setError({ message: result.errorMessage });
+                        setError({ message: "Error : " + result.errorMessage });
                     }
                     break;
                 }
@@ -393,6 +394,7 @@ const ExpandableMilestone = ({ index, item: milestone, project, isApplicant, pro
                             <div className='w-full mt-7 flex'>
 
                                 {
+                                    user?.id &&
                                     !isApplicant &&
                                     project.first_pending_milestone === milestone.milestone_index &&
                                     project.project_in_milestone_voting && (

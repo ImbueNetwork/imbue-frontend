@@ -25,7 +25,7 @@ export default nextConnect()
               'Project not found. Please use valid project ID and milestone index',
           });
 
-        const pending = await getPendingVotes(projectId)(tx);
+        const pending = await getPendingVotes(projectId, milestoneIndex)(tx);
 
         const yes = await getYesOrNoVotes(projectId, milestoneIndex, true)(tx);
 

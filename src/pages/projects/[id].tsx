@@ -1,6 +1,5 @@
 /* eslint-disable no-constant-condition */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { LinearProgress } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -28,6 +27,7 @@ import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 import { MilestoneProgressBar } from '@/components/MilestoneProgressBar/MilestoneProgressBar';
 import ProjectApprovers from '@/components/Project/ProjectApprovers';
 import ExpandableMilestone from '@/components/Project/V2/ExpandableMilestone';
+import MilestoneVoteBox from '@/components/Project/V2/MilestoneVoteBox';
 import VotingList from '@/components/Project/VotingList/VotingList';
 import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
@@ -66,7 +66,6 @@ TimeAgo.addDefaultLocale(en);
 function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
-  console.log("🚀 ~ file: [id].tsx:69 ~ Project ~ project:", project)
   const [targetUser, setTargetUser] = useState<any>({});
   // const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
   const { user, loading: userLoading } = useSelector(
@@ -89,7 +88,6 @@ function Project() {
   const [showRefundButton, setShowRefundButton] = useState<boolean>(false);
   // TODO: Create votes table
   const [milestoneVotes, setMilestoneVotes] = useState<any>({});
-  console.log("🚀 ~ file: [id].tsx:92 ~ Project ~ milestoneVotes:", milestoneVotes)
   const [milestonLoadingTitle, setMilestoneLoadingTitle] = useState<string>('');
 
   const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
@@ -675,92 +673,13 @@ function Project() {
         {/* ending side bar for project details */}
         <div className='bg-white col-start-10  mx-10 row-start-3 mt-44 row-end-7 col-end-13 '>
           <div className='bg-white col-start-10 px-3 rounded-xl py-3 border border-light-grey'>
-            <div className='flex justify-between text-black'>
-              <p>Milestone Vote Results</p>
-              <p>1/6</p>
-            </div>
-            <div className='bg-light-grey mt-5 py-7 rounded-xl px-3'>
-              <div className='flex text-black items-center'>
-                <div className='bg-[#2400FF] rounded-md relative  w-5 h-6  flex justify-center items-center text-white'>
-                  <span className='relative text-sm z-10'>{1}</span>
-                  <div className='w-2 h-2 -rotate-45 bg-[#2400FF] absolute -bottom-0.5  '></div>
-                </div>
-                <p className='ml-2'>This is a milestone</p>
-                <button className='bg-white text-black text-sm rounded-full px-3 py-2 ml-auto'>
-                  Vote
-                </button>
-              </div>
-              <div className='flex mt-7 justify-between'>
-                <div>
-                  <div className='img-section flex'>
-                    <Image
-                      src={'/profile-image.png'}
-                      width={20}
-                      height={20}
-                      alt='team'
-                    />
-                    <Image
-                      className='-ml-1'
-                      src={'/profile-image.png'}
-                      width={20}
-                      height={20}
-                      alt='team'
-                    />
-                  </div>
-                  <p className='text-black text-sm'>
-                    No <span className='text-gray-400'>(1 votes/5%)</span>
-                  </p>
-                </div>
-                <div>
-                  <div className='img-section flex justify-end'>
-                    <Image
-                      src={'/profile-image.png'}
-                      width={20}
-                      height={20}
-                      alt='team'
-                    />
-                    <Image
-                      className='-ml-1'
-                      src={'/profile-image.png'}
-                      width={20}
-                      height={20}
-                      alt='team'
-                    />
-                    <Image
-                      className='-ml-1'
-                      src={'/profile-image.png'}
-                      width={20}
-                      height={20}
-                      alt='team'
-                    />
-                    <Image
-                      className='-ml-1'
-                      src={'/profile-image.png'}
-                      width={20}
-                      height={20}
-                      alt='team'
-                    />
-                  </div>
-                  <p className='text-black text-sm'>
-                    <span className='text-gray-400'>(12 Votes/95%)</span>Yes
-                  </p>
-                </div>
-              </div>
-              <div className='flex w-full relative mt-5'>
-                <LinearProgress
-                  className='w-[50%] text-imbue-coral rotate-180 before:bg-[#DDDCD6]    h-5 rounded-full'
-                  color='inherit'
-                  variant='determinate'
-                  value={20}
-                />
-                <div className='w-3 left-[47%] top-[20%] absolute z-10 bg-[#DDDCD6] rounded-full h-3'></div>
-                <LinearProgress
-                  className='w-[50%] h-5 -ml-3 rounded-full bg-[#DDDCD6]'
-                  variant='determinate'
-                  value={90}
-                />
-              </div>
-            </div>
+            <MilestoneVoteBox
+              firstPendingMilestone={firstPendingMilestone}
+              chainProjectId={project.chain_project_id}
+              projectId={project.id}
+              user={user}
+              approvers={approversPreview}
+            />
           </div>
         </div>
       </div>
