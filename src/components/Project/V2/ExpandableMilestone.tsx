@@ -1,3 +1,4 @@
+import { Tooltip } from '@mui/material';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -33,9 +34,12 @@ interface ExpandableMilestonProps {
     setError: (_value: any) => void;
     user: User;
     setShowPolkadotAccounts: (_value: boolean) => void;
+    canVote: boolean;
+    loading: boolean;
 }
 
-const ExpandableMilestone = ({ index, item: milestone, project, isApplicant, projectType, isProjectOwner, setLoading, setError, user, setSuccessTitle, setSuccess }: ExpandableMilestonProps) => {
+const ExpandableMilestone = (props: ExpandableMilestonProps) => {
+    const { index, item: milestone, project, isApplicant, projectType, isProjectOwner, setLoading, setError, user, setSuccessTitle, setSuccess } = props
     const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
     const [submittingMilestone, setSubmittingMilestone] = useState<boolean>(false);
     const [showPolkadotAccounts, setShowPolkadotAccounts] = useState<boolean>(false);
@@ -43,6 +47,11 @@ const ExpandableMilestone = ({ index, item: milestone, project, isApplicant, pro
     const [votingWalletAccount, setVotingWalletAccount] = useState<WalletAccount | any>({});
     const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
 
+    const showVoteButton =
+        user?.id &&
+        !isApplicant &&
+        project.first_pending_milestone === milestone.milestone_index &&
+        project.project_in_milestone_voting
 
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const target = e.target as HTMLInputElement;
@@ -56,7 +65,7 @@ const ExpandableMilestone = ({ index, item: milestone, project, isApplicant, pro
 
         await axios.post(`/api/upload`, data)
     }
-
+    
     // submitting a milestone
     const submitMilestone = async (account: WalletAccount) => {
         if (!project?.chain_project_id)
@@ -394,19 +403,28 @@ const ExpandableMilestone = ({ index, item: milestone, project, isApplicant, pro
                             <div className='w-full mt-7 flex'>
 
                                 {
-                                    user?.id &&
-                                    !isApplicant &&
-                                    project.first_pending_milestone === milestone.milestone_index &&
-                                    project.project_in_milestone_voting && (
-                                        <button
-                                            className='primary-btn  ml-auto in-dark w-button lg:w-1/5'
-                                            style={{ textAlign: 'center' }}
-                                            onClick={() => handleVoting(milestone.milestone_index)}
+                                    !props?.loading && showVoteButton && (
+                                        <Tooltip
+                                            followCursor
+                                            title={
+                                                !props?.canVote &&
+                                                `Only approvers are allowed to vote on a milestone and you cannot vote more than once.${user.web3_address &&
+                                                `You are currently on wallet: ${user.web3_address}`
+                                                }`
+                                            }
                                         >
-                                            Vote for Milestone
-                                        </button>
+                                            <button
+                                                className={`primary-btn  ml-auto in-dark w-button lg:w-1/5 text-center ${!props?.canVote && '!bg-gray-300 !text-gray-400'
+                                                    }`}
+                                                onClick={() => handleVoting(milestone.milestone_index)}
+                                            >
+                                                Vote for Milestone
+                                            </button>
+                                        </Tooltip>
                                     )
                                 }
+
+
 
                                 {
                                     (isApplicant || (projectType === 'grant' && isProjectOwner)) &&

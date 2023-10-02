@@ -15,7 +15,7 @@ export const MilestoneProgressBar = ({
   return (
     <div className='progressbar-container'>
       {titleArray?.map((milestone, index) => (
-        <div key={index} style={{ zIndex: 1 }}>
+        <div key={index}>
           {index === currentValue && (
             <div
               className={` mt-1.5 absolute  progress-step-circle-primary--milestone ${currentValue >= index ? 'active' : 'disabled'

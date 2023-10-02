@@ -51,33 +51,39 @@ export const getNoConfidenceVotersAddress =
 //         'project_votes.vote': null,
 //       });
 
+export const getAllVoteAddress =
+  (
+    projectId: string | string[] | number,
+    milestoneIndex: string | string[] | number
+  ) =>
+  (tx: Knex.Transaction) =>
+    tx('project_votes').select('voter_address').where({
+      project_id: projectId,
+      milestone_index: milestoneIndex,
+    });
+
 export const getPendingVotes =
   (
     projectId: string | string[] | number,
     milestoneIndex: string | string[] | number
   ) =>
   (tx: Knex.Transaction) =>
-    tx('project_votes')
-      .select('voter_address')
-      .where({
-        project_id: projectId,
-        milestone_index: milestoneIndex,
-      })
-      .then(async (addresses) => {
-        const addressArray = addresses.map((address) => address.voter_address);
+    getAllVoteAddress(
+      projectId,
+      milestoneIndex
+    )(tx).then(async (addresses: any) => {
+      const addressArray = addresses.map(
+        (address: any) => address.voter_address
+      );
 
-        return tx('project_approvers')
-          .select('*')
-          .where({
-            'project_approvers.project_id': projectId,
-          })
-          .whereNotIn('approver', addressArray)
-          .leftJoin(
-            'users',
-            'users.web3_address',
-            'project_approvers.approver'
-          );
-      });
+      return tx('project_approvers')
+        .select('*')
+        .where({
+          'project_approvers.project_id': projectId,
+        })
+        .whereNotIn('approver', addressArray)
+        .leftJoin('users', 'users.web3_address', 'project_approvers.approver');
+    });
 
 export const getYesOrNoVotes =
   (

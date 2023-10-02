@@ -81,7 +81,7 @@ function Project() {
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const projectId: any = router?.query?.id;
-  const [firstPendingMilestone, setFirstPendingMilestone] = useState<number>();
+  const [firstPendingMilestone, setFirstPendingMilestone] = useState<number>(0);
   const [isApplicant, setIsApplicant] = useState<boolean>(false);
   const [isProjectOwner, setIsProjectOwner] = useState<boolean>(false);
   const [projectOwner, setProjectOwner] = useState<User>();
@@ -119,8 +119,8 @@ function Project() {
   // TODO: Create votes table
   const canVote =
     (isApprover &&
-      user.web3_address &&
-      !Object.keys(milestoneVotes).includes(user.web3_address)) ||
+      user?.web3_address &&
+      (milestoneVotes?.length && !milestoneVotes?.includes(user.web3_address))) ||
     (projectType === 'brief' && isProjectOwner);
 
   const approvedMilestones = project?.milestones?.filter?.(
@@ -389,6 +389,7 @@ function Project() {
     }
   };
 
+
   const refund = async (account: WalletAccount) => {
     if (!project?.id || !project.chain_project_id)
       return setError({
@@ -465,7 +466,9 @@ function Project() {
           pollResult = (await chainService.pollChainMessage(
             ImbueChainEvent.RaiseNoConfidenceRound,
             account
-          )) as ImbueChainPollResult;
+          )) as ImbueChainPollResult; <button className='bg-white text-black text-sm rounded-full px-3 py-2 ml-auto'>
+            Vote
+          </button>
         }
 
         while (true) {
@@ -622,6 +625,10 @@ function Project() {
                   setSuccess,
                   setSuccessTitle,
                   setShowPolkadotAccounts,
+                  canVote,
+                  loading,
+                  setOpenVotingList,
+
                 }
                 }
                 key={index}
@@ -638,7 +645,11 @@ function Project() {
                 <p className='text-black mt-5'>Milestones</p>
                 <div className='w-48  mt-6'>
                   <MilestoneProgressBar
-                    currentValue={firstPendingMilestone}
+                    currentValue={
+                      (firstPendingMilestone > 0)
+                        ? firstPendingMilestone
+                        : (project?.milestones?.length - 1 || 0)
+                    }
                     titleArray={project?.milestones}
                   />
                 </div>
@@ -674,11 +685,21 @@ function Project() {
         <div className='bg-white col-start-10  mx-10 row-start-3 mt-44 row-end-7 col-end-13 '>
           <div className='bg-white col-start-10 px-3 rounded-xl py-3 border border-light-grey'>
             <MilestoneVoteBox
-              firstPendingMilestone={firstPendingMilestone}
               chainProjectId={project.chain_project_id}
               projectId={project.id}
-              user={user}
               approvers={approversPreview}
+              setLoadingMain={setLoading}
+              firstPendingMilestone={firstPendingMilestone || 0}
+              {
+              ...{
+                setSuccess,
+                setSuccessTitle,
+                setError,
+                project,
+                canVote,
+                user,
+                setOpenVotingList,
+              }}
             />
           </div>
         </div>
@@ -703,6 +724,7 @@ function Project() {
         chainProjectId={project.chain_project_id}
         projectId={project.id}
         setMilestoneVotes={setMilestoneVotes}
+        project={project}
       />
 
       <BackDropLoader open={loading || userLoading} />

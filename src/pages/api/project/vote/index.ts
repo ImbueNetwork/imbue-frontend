@@ -5,6 +5,7 @@ import passport from 'passport';
 import {
   addVoteToDB,
   checkExistingVote,
+  getAllVoteAddress,
   getPendingVotes,
   getYesOrNoVotes,
   updateVoteDB,
@@ -31,10 +32,17 @@ export default nextConnect()
 
         const no = await getYesOrNoVotes(projectId, milestoneIndex, false)(tx);
 
+        const allVotersRes = await getAllVoteAddress(
+          projectId,
+          milestoneIndex
+        )(tx);
+        const allVotesAddresses = allVotersRes.map((v) => v.voter_address);
+
         res.status(200).json({
           yes,
           no,
           pending,
+          allVoters: allVotesAddresses,
         });
       } catch (error) {
         // eslint-disable-next-line no-console

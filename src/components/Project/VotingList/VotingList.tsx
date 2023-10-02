@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import freelalncerPic from '@/assets/images/profile-image.png'
-import { User } from '@/model';
+import { Project, User } from '@/model';
 import ChainService from '@/redux/services/chainService';
 import { getMillestoneVotes, voteOnMilestone } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
@@ -16,12 +16,13 @@ import VotingListSkeleton from './VotingListSkeleton';
 
 type VotingListProps = {
     open: boolean;
-    firstPendingMilestone: number | undefined;
+    firstPendingMilestone: number;
     setOpenVotingList: (_value: boolean) => void;
     setMilestoneVotes: (_value: any) => void;
     approvers: User[];
     chainProjectId: number | undefined;
     projectId: number | undefined;
+    project: Project
 }
 
 type MilestoneVotes = {
@@ -30,7 +31,7 @@ type MilestoneVotes = {
 }
 
 const VotingList = (props: VotingListProps) => {
-    const { firstPendingMilestone, setOpenVotingList, approvers, chainProjectId, open, setMilestoneVotes, projectId } = props
+    const { setOpenVotingList, approvers, chainProjectId, open, setMilestoneVotes, projectId, project } = props
     const [value, setValue] = React.useState(0);
     const [list, setList] = useState<any[]>([]);
     const [votes, setVotes] = useState<any>([])
@@ -38,6 +39,8 @@ const VotingList = (props: VotingListProps) => {
         (state: RootState) => state.userState
     );
     const [loading, setLoading] = useState(false);
+
+    const firstPendingMilestone = props?.firstPendingMilestone > 0 ? props?.firstPendingMilestone : project?.milestones?.length - 1
 
     useEffect(() => {
         const syncVotes = async () => {
@@ -49,8 +52,6 @@ const VotingList = (props: VotingListProps) => {
                 chainProjectId,
                 firstPendingMilestone
             );
-
-            setMilestoneVotes(milestoneVotes)
 
             const votesArray = Object.keys(milestoneVotes)
 
@@ -75,6 +76,7 @@ const VotingList = (props: VotingListProps) => {
             try {
                 const voteResp = await getMillestoneVotes(projectId, firstPendingMilestone)
                 setVotes(voteResp)
+                setMilestoneVotes(voteResp?.allVoters)
                 // const votersAddressed = voteResp?.map((voter: any) => voter.web3_address)
                 syncVotes();
             } catch (error) {
