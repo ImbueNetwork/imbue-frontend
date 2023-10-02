@@ -18,12 +18,15 @@ export const MilestoneProgressBar = ({
         <div key={index}>
           {index === currentValue && (
             <div
-              className={` mt-1.5 absolute  progress-step-circle-primary--milestone ${currentValue >= index ? 'active' : 'disabled'
-                }`}
+              className={` mt-1.5 absolute  progress-step-circle-primary--milestone ${
+                currentValue >= index ? 'active' : 'disabled'
+              }`}
             ></div>
           )}
           <div className='bg-imbue-coral -mt-6 rounded-md relative  w-4 h-5  flex justify-center items-center text-white'>
-            <span className='relative text-xs z-10'>{milestone?.milestone_index + 1}</span>
+            <span className='relative text-xs z-10'>
+              {milestone?.milestone_index + 1}
+            </span>
             <div className='w-2 h-2 -rotate-45 bg-imbue-coral absolute -bottom-0.5  '></div>
           </div>
         </div>
@@ -32,8 +35,9 @@ export const MilestoneProgressBar = ({
       <div
         className='progress-bar-progress--milestone'
         style={{
-          width: `calc((100% - .5rem) * ${currentValue} / ${titleArray?.length - 1
-            })`,
+          width: `calc((100% - .5rem) * ${currentValue} / ${
+            titleArray?.length > 1 ? titleArray?.length - 1 : 1
+          })`,
         }}
       ></div>
     </div>

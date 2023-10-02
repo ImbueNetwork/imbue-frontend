@@ -120,7 +120,8 @@ function Project() {
   const canVote =
     (isApprover &&
       user?.web3_address &&
-      (milestoneVotes?.length && !milestoneVotes?.includes(user.web3_address))) ||
+      milestoneVotes?.length &&
+      !milestoneVotes?.includes(user.web3_address)) ||
     (projectType === 'brief' && isProjectOwner);
 
   const approvedMilestones = project?.milestones?.filter?.(
@@ -290,7 +291,7 @@ function Project() {
 
       const totalCost = Number(
         Number(projectRes?.total_cost_without_fee) +
-        Number(projectRes?.imbue_fee)
+          Number(projectRes?.imbue_fee)
       );
       setRequiredBalance(totalCost * 0.95);
 
@@ -338,9 +339,9 @@ function Project() {
         if (
           firstPendingMilestoneChain === project.first_pending_milestone &&
           project.project_in_milestone_voting ===
-          onChainProjectRes.projectInMilestoneVoting &&
+            onChainProjectRes.projectInMilestoneVoting &&
           project.project_in_voting_of_no_confidence ===
-          onChainProjectRes.projectInVotingOfNoConfidence
+            onChainProjectRes.projectInVotingOfNoConfidence
         )
           return;
 
@@ -388,7 +389,6 @@ function Project() {
       setLoading(false);
     }
   };
-
 
   const refund = async (account: WalletAccount) => {
     if (!project?.id || !project.chain_project_id)
@@ -466,9 +466,10 @@ function Project() {
           pollResult = (await chainService.pollChainMessage(
             ImbueChainEvent.RaiseNoConfidenceRound,
             account
-          )) as ImbueChainPollResult; <button className='bg-white text-black text-sm rounded-full px-3 py-2 ml-auto'>
+          )) as ImbueChainPollResult;
+          <button className='bg-white text-black text-sm rounded-full px-3 py-2 ml-auto'>
             Vote
-          </button>
+          </button>;
         }
 
         while (true) {
@@ -517,7 +518,6 @@ function Project() {
     </div>
   );
 
-
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
       <div className='w-full grid grid-cols-12 bg-white py-5 px-7 rounded-2xl'>
@@ -544,20 +544,18 @@ function Project() {
             <div className='bg-[#FFEBEA] flex flex-col justify-between rounded-md py-2 px-3 col-span-3'>
               <div className='flex justify-between items-center'>
                 <p className='text-sm text-[#8A5C5A]'>Shared by</p>
-                {
-                  user.id !== targetUser.id && (
-                    <p
-                      className='px-2 flex text-sm items-center rounded-xl py-1 bg-white text-black cursor-pointer'
-                      onClick={() => setShowMessageBox(true)}
-                    >
-                      <BsChatLeftDots
-                        className='text-imbue-purple-dark mr-1'
-                        size={16}
-                      />
-                      Chat
-                    </p>
-                  )
-                }
+                {user.id !== targetUser.id && (
+                  <p
+                    className='px-2 flex text-sm items-center rounded-xl py-1 bg-white text-black cursor-pointer'
+                    onClick={() => setShowMessageBox(true)}
+                  >
+                    <BsChatLeftDots
+                      className='text-imbue-purple-dark mr-1'
+                      size={16}
+                    />
+                    Chat
+                  </p>
+                )}
               </div>
               <div className='flex items-center space-x-2 mt-8'>
                 <Image
@@ -602,38 +600,32 @@ function Project() {
 
           <div className='grid grid-cols-12 gap-5 mt-16 ml-6'>
             <p className='col-start-1 col-end-7'>Title</p>
-            <p className='col-start-7 col-end-9 mr-10 '>
-              Milestone Funding
-            </p>
+            <p className='col-start-7 col-end-9 mr-10 '>Milestone Funding</p>
             <p className='col-start-9 col-end-11'>Milestone ends</p>
             <p className='col-start-11 col-end-13 pr-6 text-end'>Stage</p>
           </div>
-          {
-            project?.milestones?.map((item: Milestone, index: number) => (
-              <ExpandableMilestone
-                {
-                ...{
-                  project,
-                  item,
-                  index,
-                  isApplicant,
-                  projectType,
-                  isProjectOwner,
-                  setLoading,
-                  setError,
-                  user,
-                  setSuccess,
-                  setSuccessTitle,
-                  setShowPolkadotAccounts,
-                  canVote,
-                  loading,
-                  setOpenVotingList,
-
-                }
-                }
-                key={index}
-              />
-            ))}
+          {project?.milestones?.map((item: Milestone, index: number) => (
+            <ExpandableMilestone
+              {...{
+                project,
+                item,
+                index,
+                isApplicant,
+                projectType,
+                isProjectOwner,
+                setLoading,
+                setError,
+                user,
+                setSuccess,
+                setSuccessTitle,
+                setShowPolkadotAccounts,
+                canVote,
+                loading,
+                setOpenVotingList,
+              }}
+              key={index}
+            />
+          ))}
         </div>
         {/* Ending of milestone section */}
         {/* starting side bar for project details */}
@@ -646,9 +638,9 @@ function Project() {
                 <div className='w-48  mt-6'>
                   <MilestoneProgressBar
                     currentValue={
-                      (firstPendingMilestone > 0)
+                      firstPendingMilestone > 0
                         ? firstPendingMilestone
-                        : (project?.milestones?.length - 1 || 0)
+                        : project?.milestones?.length - 1 || 0
                     }
                     titleArray={project?.milestones}
                   />
@@ -690,8 +682,7 @@ function Project() {
               approvers={approversPreview}
               setLoadingMain={setLoading}
               firstPendingMilestone={firstPendingMilestone || 0}
-              {
-              ...{
+              {...{
                 setSuccess,
                 setSuccessTitle,
                 setError,
@@ -789,7 +780,6 @@ function Project() {
           </button>
         </div>
       </WaitingScreen>
-
     </div>
   );
 }
