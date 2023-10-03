@@ -6,7 +6,7 @@ const storage = new Storage(
 // }
 );
 
-export const bucket = storage.bucket('test_sani');
+export const bucket = storage.bucket('imbue-staging');
 
 export const createWriteStream = (filename: string) => {
   const ref = bucket.file(filename);
