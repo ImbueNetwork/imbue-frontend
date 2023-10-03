@@ -613,8 +613,7 @@ input[type='radio'] {
   height: 7px;
   border-radius: 100%;
   top: 1.5px;
-  right: 7px;
-  z-index: 100;
+  z-index: 9;
 }
 
 .css-1wqgwi1-MuiLinearProgress-bar1 {

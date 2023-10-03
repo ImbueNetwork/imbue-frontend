@@ -65,7 +65,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
 
         await axios.post(`/api/upload`, data)
     }
-    
+
     // submitting a milestone
     const submitMilestone = async (account: WalletAccount) => {
         if (!project?.chain_project_id)
@@ -236,7 +236,6 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                         const haveAllMilestonesBeenApproved = projectMilestones
                             .map((m: any) => m.is_approved)
                             .every(Boolean);
-                        console.log("🚀 ~ file: ExpandableMilestone.tsx:229 ~ withdraw ~ haveAllMilestonesBeenApproved:", haveAllMilestonesBeenApproved)
 
                         if (haveAllMilestonesBeenApproved) {
                             project.status_id = OffchainProjectState.Completed;
@@ -416,7 +415,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                                             <button
                                                 className={`primary-btn  ml-auto in-dark w-button lg:w-1/5 text-center ${!props?.canVote && '!bg-gray-300 !text-gray-400'
                                                     }`}
-                                                onClick={() => handleVoting(milestone.milestone_index)}
+                                                onClick={() => props?.canVote && handleVoting(milestone.milestone_index)}
                                             >
                                                 Vote for Milestone
                                             </button>

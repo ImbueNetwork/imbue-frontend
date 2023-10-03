@@ -1,3 +1,5 @@
+/* eslint-disable unused-imports/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-constant-condition */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -26,6 +28,7 @@ import RefundScreen from '@/components/Grant/Refund';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 import { MilestoneProgressBar } from '@/components/MilestoneProgressBar/MilestoneProgressBar';
 import ProjectApprovers from '@/components/Project/ProjectApprovers';
+import ProjectBalance from '@/components/Project/ProjectBalance';
 import ExpandableMilestone from '@/components/Project/V2/ExpandableMilestone';
 import MilestoneVoteBox from '@/components/Project/V2/MilestoneVoteBox';
 import VotingList from '@/components/Project/VotingList/VotingList';
@@ -39,6 +42,7 @@ import {
   Project,
   User,
 } from '@/model';
+import { Currency } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
 import { ImbueChainEvent } from '@/redux/services/chainService';
@@ -139,12 +143,12 @@ function Project() {
     }
   }, [projectId, userLoading]);
 
-  // const handlePopUpForUser = () => {
-  //   if (!localStorage.getItem('isShown')) {
-  //     localStorage.setItem('isShown', 'true');
-  //     setModalOpen(true);
-  //   }
-  // };
+  const handlePopUpForUser = () => {
+    if (!localStorage.getItem('isShown')) {
+      localStorage.setItem('isShown', 'true');
+      setModalOpen(true);
+    }
+  };
 
   const getChainProject = async (project: Project, freelancer: any) => {
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
@@ -646,7 +650,7 @@ function Project() {
                 <div className='w-48  mt-6'>
                   <MilestoneProgressBar
                     currentValue={
-                      (firstPendingMilestone > 0)
+                      (firstPendingMilestone > -1)
                         ? firstPendingMilestone
                         : (project?.milestones?.length - 1 || 0)
                     }
@@ -666,11 +670,22 @@ function Project() {
                     project?.escrow_address?.substr(-3)}
                 </p>
               </div>
-              <div className='flex bg-white justify-between px-5 py-3 rounded-xl'>
-                <p className='text-black mt-5'>Total Funding</p>
-                <p className='text-imbue-purple-dark mt-5 text-xl '>
-                  40,000 KSM
-                </p>
+              <div className='flex flex-col bg-white justify-between px-5 py-3 rounded-xl'>
+                <ProjectBalance
+                  {...{
+                    balance,
+                    project,
+                    user,
+                    handlePopUpForUser,
+                    setBalance,
+                  }}
+                />
+                <div className='flex justify-between mt-2'>
+                  <p className='text-black'>Total Funding</p>
+                  <p className='text-imbue-purple-dark text-xl'>
+                    {project.total_cost_without_fee} {Currency[project.currency_id || 0]}
+                  </p>
+                </div>
               </div>
               <div className='flex bg-white justify-between px-5 py-3 rounded-xl'>
                 <p className='text-black mt-5'>On-Chain Project ID</p>

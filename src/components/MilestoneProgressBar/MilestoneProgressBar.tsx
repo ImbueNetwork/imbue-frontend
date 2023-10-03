@@ -12,18 +12,19 @@ export const MilestoneProgressBar = ({
   titleArray,
   currentValue = 0,
 }: ProgressBarProps): JSX.Element => {
+  console.log("🚀 ~ file: MilestoneProgressBar.tsx:15 ~ currentValue:", currentValue)
   return (
     <div className='progressbar-container'>
       {titleArray?.map((milestone, index) => (
         <div key={index}>
-          {index === currentValue && (
+          {milestone?.milestone_index === currentValue && (
             <div
-              className={` mt-1.5 absolute  progress-step-circle-primary--milestone ${currentValue >= index ? 'active' : 'disabled'
+              className={`mx-[6px] mt-1.5 absolute  progress-step-circle-primary--milestone ${currentValue >= index ? 'active' : 'disabled'
                 }`}
             ></div>
           )}
           <div className='bg-imbue-coral -mt-6 rounded-md relative  w-4 h-5  flex justify-center items-center text-white'>
-            <span className='relative text-xs z-10'>{milestone?.milestone_index + 1}</span>
+            <span className='relative text-xs z-[9]'>{milestone?.milestone_index + 1}</span>
             <div className='w-2 h-2 -rotate-45 bg-imbue-coral absolute -bottom-0.5  '></div>
           </div>
         </div>
