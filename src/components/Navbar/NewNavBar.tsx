@@ -19,8 +19,8 @@ import React, { useEffect, useState } from 'react';
 import { BiBuildings } from 'react-icons/bi';
 import { BsPeople } from 'react-icons/bs';
 import { IoIosArrowDown } from 'react-icons/io';
-import { MdOutlineInsertDriveFile } from 'react-icons/md';
-import { MdOutlineFileCopy } from 'react-icons/md';
+import { MdOutlineAccountBalance } from 'react-icons/md';
+import { MdOutlineWork } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { appLogo } from '@/assets/svgs';
@@ -203,7 +203,7 @@ function NewNavbar() {
                         className='flex gap-2 px-2 hover:bg-imbue-lime-light items-center py-2 rounded-md '
                       >
                         <div className='border p-1 rounded-xl'>
-                          <MdOutlineInsertDriveFile color='black' size={22} />
+                          <MdOutlineAccountBalance color='black' size={20} />
                         </div>
                         <div className='ml-1'>
                           <p className='text-sm'>Submit Grant</p>
@@ -216,7 +216,7 @@ function NewNavbar() {
                         className='flex gap-2 px-2 items-center hover:bg-imbue-lime-light py-2 rounded-md '
                       >
                         <div className='border p-1  rounded-xl'>
-                          <MdOutlineFileCopy color='black' size={22} />
+                          <MdOutlineWork color='black' size={20} />
                         </div>
                         <div className='ml-1'>
                           <p className='text-sm'>Submit Brief</p>
