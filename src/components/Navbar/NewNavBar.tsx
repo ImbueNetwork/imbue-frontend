@@ -261,13 +261,13 @@ function NewNavbar() {
               width={23}
               height={20}
               alt='message'
-              className='mr-3'
+              className='mr-3 cursor-pointer'
             />
             <Image
               src='/bell-01.svg'
               width={23}
               height={20}
-              className=''
+              className='cursor-pointer'
               alt='message'
             />
             <Tooltip
