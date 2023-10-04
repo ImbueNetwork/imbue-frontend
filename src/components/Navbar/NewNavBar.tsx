@@ -19,6 +19,8 @@ import React, { useEffect, useState } from 'react';
 import { BiBuildings } from 'react-icons/bi';
 import { BsPeople } from 'react-icons/bs';
 import { IoIosArrowDown } from 'react-icons/io';
+import { MdOutlineInsertDriveFile } from 'react-icons/md';
+import { MdOutlineFileCopy } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { appLogo } from '@/assets/svgs';
@@ -176,20 +178,52 @@ function NewNavbar() {
                   </div>
                 </div>
                 {user?.id && (
-                  <Link
-                    onClick={() => setExpanded(false)}
-                    className={`mx-1 hover:bg-imbue-lime-light  lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
-                    href='/grants/new'
+                  <div
+                    className={`mx-1 hover:bg-imbue-lime-light relative group  lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
                   >
-                    <Image
-                      className='mr-2'
-                      src={'/page.svg'}
-                      width={16}
-                      height={20}
-                      alt='page icon'
-                    />
-                    Submit Grant
-                  </Link>
+                    <div className='flex'>
+                      <Image
+                        className='mr-2'
+                        src={'/page.svg'}
+                        width={16}
+                        height={20}
+                        alt='page icon'
+                      />
+                      Submit
+                      <IoIosArrowDown
+                        className='ml-3 text-[#A8A8A8] group-hover:text-black'
+                        size={20}
+                      />
+                    </div>
+                    <div className='absolute hidden  group-hover:block shadow-lg space-y-3 pl-1  py-1 rounded-xl top-[3.3rem] left-1 bg-white w-72'>
+                      <div
+                        onClick={() => {
+                          router.push('/grants/new');
+                        }}
+                        className='flex gap-2 px-2 hover:bg-imbue-lime-light items-center py-2 rounded-md '
+                      >
+                        <div className='border p-1 rounded-xl'>
+                          <MdOutlineInsertDriveFile color='black' size={22} />
+                        </div>
+                        <div className='ml-1'>
+                          <p className='text-sm'>Submit Grant</p>
+                        </div>
+                      </div>
+                      <div
+                        onClick={() => {
+                          router.push('/briefs/new');
+                        }}
+                        className='flex gap-2 px-2 items-center hover:bg-imbue-lime-light py-2 rounded-md '
+                      >
+                        <div className='border p-1  rounded-xl'>
+                          <MdOutlineFileCopy color='black' size={22} />
+                        </div>
+                        <div className='ml-1'>
+                          <p className='text-sm'>Submit Brief</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
                 <Link
                   onClick={() => setExpanded(false)}
