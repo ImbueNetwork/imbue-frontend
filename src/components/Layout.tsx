@@ -19,7 +19,7 @@ import '@/styles/animation.css';
 import { Providers } from '@/redux/providers/userProviders';
 
 import LoginPopup from './LoginPopup/LoginPopup';
-import Navbar from './Navbar/Navbar';
+import NewNavbar from './Navbar/NewNavBar';
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -35,13 +35,16 @@ export interface LoginPopupContextType {
   setShowLoginPopup: (_value: LoginPopupStateType) => void;
 }
 
-export const LoginPopupContext = createContext<LoginPopupContextType | null>(null);
+export const LoginPopupContext = createContext<LoginPopupContextType | null>(
+  null
+);
 
 function Layout({ children }: LayoutProps) {
   const [progress, setProgress] = useState(0);
-  const [showLoginPopUp, setShowLoginPopup] = useState<LoginPopupStateType>({ open: false });
+  const [showLoginPopUp, setShowLoginPopup] = useState<LoginPopupStateType>({
+    open: false,
+  });
   const router = useRouter();
-
 
   useEffect(() => {
     router.events.on('routeChangeStart', () => setProgress(35));
@@ -77,24 +80,21 @@ function Layout({ children }: LayoutProps) {
             />
           )}
           <Providers>
-            {
-              !(
-                router.asPath === "/join" ||
-                router.asPath === "/auth/sign-up" ||
-                router.asPath === "/auth/sign-in"
-              ) && (
-                <Navbar />
-              )
-            }
+            {!(
+              router.asPath === '/join' ||
+              router.asPath === '/auth/sign-up' ||
+              router.asPath === '/auth/sign-in'
+            ) && <NewNavbar />}
 
             <main
               className={`padded lg:!px-[var(--hq-layout-padding)] !pt-[100px]`}
               id='main-content'
             >
-              <LoginPopupContext.Provider value={{ showLoginPopUp, setShowLoginPopup }}>
+              <LoginPopupContext.Provider
+                value={{ showLoginPopUp, setShowLoginPopup }}
+              >
                 {children}
               </LoginPopupContext.Provider>
-
             </main>
             <LoginPopup
               visible={showLoginPopUp?.open}

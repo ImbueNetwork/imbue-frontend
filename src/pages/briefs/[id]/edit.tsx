@@ -184,7 +184,7 @@ export const EditProposal = (): JSX.Element => {
         budget,
         brief_id: briefId,
         verified_only,
-        user_id: brief.user_id
+        user_id: brief.user_id,
       });
 
       if (updateBriefResponse) {
@@ -227,7 +227,6 @@ export const EditProposal = (): JSX.Element => {
   };
 
   const handleSkillChange = (val: string[]) => {
-    setSkills(val);
     if (validateSkillsAndIndustry('skills', val, 3, 10)) {
       setInputError((val) => {
         return { ...val, skills: '' };
@@ -237,9 +236,11 @@ export const EditProposal = (): JSX.Element => {
         return { ...val, skills: 'Number of skills must be between 3 to 10' };
       });
     }
+    setSkills(val);
   };
 
   const searchSkill = async (name: string) => {
+    console.log(name);
     const skillRes = await searchSkills(name);
     if (!skillRes || !skillRes?.skills.length) return;
     setSuggestedSkills(skillRes?.skills.map((skill) => skill.name));
@@ -320,8 +321,7 @@ export const EditProposal = (): JSX.Element => {
           });
 
           setBudget(value);
-        }
-        else if (!Number.isInteger(Number(value))) {
+        } else if (!Number.isInteger(Number(value))) {
           setInputError((val) => {
             return {
               ...val,
@@ -330,8 +330,7 @@ export const EditProposal = (): JSX.Element => {
           });
 
           setBudget(value);
-        }
-        else {
+        } else {
           setInputError((val) => {
             return {
               ...val,
@@ -357,6 +356,7 @@ export const EditProposal = (): JSX.Element => {
         sx={{ width: '100%' }}
         onChange={(e, value) => handleSkillChange(value)}
         defaultValue={skills}
+        ListboxProps={{ className: 'max-h-[250px]' }}
         renderInput={(params) => (
           <TextField
             color='secondary'
@@ -499,7 +499,9 @@ export const EditProposal = (): JSX.Element => {
                 type='number'
                 min='0'
                 max={1000000000}
-                onWheel={(event: any) => { event.target.blur(); }}
+                onWheel={(event: any) => {
+                  event.target.blur();
+                }}
                 value={budget || ''}
                 onChange={handleChange}
                 name='budget'
