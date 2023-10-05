@@ -19,6 +19,7 @@ const Approvers = ({ setApprovers, approvers, user }: ApproverProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [input, setInput] = useState<string>('');
   const [validAddress, setValidAddress] = useState<boolean>(false);
+  const [maxLimit, setMaxLimitExcede] = useState<boolean>(false);
 
   const notUser = regUsers[0]?.web3_address !== input && input && validAddress;
   const notUserApprover = {
@@ -33,16 +34,17 @@ const Approvers = ({ setApprovers, approvers, user }: ApproverProps) => {
     setOpen(true);
     if (e.target.value === '') {
       try {
-        let allUsers = await searchUserByUsernameOrAddress('')
+        let allUsers = await searchUserByUsernameOrAddress('');
         if (user?.web3_address) {
-          allUsers = allUsers.filter((u: any) => u.web3_address !== user?.web3_address)
+          allUsers = allUsers.filter(
+            (u: any) => u.web3_address !== user?.web3_address
+          );
         }
 
         setRegUsers(allUsers);
       } catch (error) {
         console.log(error);
-      }
-      finally {
+      } finally {
         setLoading(false);
       }
     }
@@ -58,7 +60,9 @@ const Approvers = ({ setApprovers, approvers, user }: ApproverProps) => {
 
     let allUsers = await searchUserByUsernameOrAddress(input);
     if (user?.web3_address) {
-      allUsers = allUsers.filter((u: any) => u.web3_address !== user?.web3_address)
+      allUsers = allUsers.filter(
+        (u: any) => u.web3_address !== user?.web3_address
+      );
     }
 
     const isValid = isValidAddressPolkadotAddress(input);
@@ -68,6 +72,10 @@ const Approvers = ({ setApprovers, approvers, user }: ApproverProps) => {
 
   const addApprover = (newApprover: any) => {
     const newList = [...approversPreview, newApprover];
+    if (newList.length > 50) {
+      setMaxLimitExcede(true);
+      return;
+    } else setMaxLimitExcede(false);
     setApproversPreview(newList);
     setApprovers(newList.map((v: any) => v.web3_address));
     setInput('');
@@ -127,7 +135,11 @@ const Approvers = ({ setApprovers, approvers, user }: ApproverProps) => {
             value={input}
             onChange={(e) => handleInputChange(e)}
           />
-
+          {maxLimit && (
+            <p className='text-imbue-coral text-xs'>
+              Max 50 approvers can be added
+            </p>
+          )}
           {open && (
             <div className='flex flex-col bg-overlay border border-imbue-purple rounded-lg absolute top-full w-full z-[5] overflow-y-auto max-h-[350px]'>
               {loading ? (
@@ -148,9 +160,10 @@ const Approvers = ({ setApprovers, approvers, user }: ApproverProps) => {
                               web3_address: input,
                             })
                           }
-                          className={`px-4 py-2 flex justify-between items-center border-b border-b-imbue-light-purple ${notUser &&
+                          className={`px-4 py-2 flex justify-between items-center border-b border-b-imbue-light-purple ${
+                            notUser &&
                             'cursor-pointer hover:bg-imbue-light-purple'
-                            }`}
+                          }`}
                         >
                           <div className='flex gap-3 items-center'>
                             {notUser && (
@@ -188,62 +201,61 @@ const Approvers = ({ setApprovers, approvers, user }: ApproverProps) => {
                           </span>
                         </div>
                       )}
-                      {(regUsers.length > 0) && (
+                      {regUsers.length > 0 && (
                         <>
-                          <p className='ml-5 my-3 text-content text-sm font-semibold'>Suggested Results</p>
-                          {
-                            regUsers.map((user: any, index: number) => (
-                              <div
-                                key={index}
-                                onClick={() =>
-                                  !approvers.includes(user?.web3_address) &&
-                                  user?.web3_address &&
-                                  addApprover(user)
-                                }
-                                className='flex flex-col gap-4'
-                              >
-                                <div className='flex justify-between items-center w-full hover:bg-imbue-light-purple px-4 py-2'>
-                                  <div className='flex text-white gap-3 items-center cursor-pointer'>
-                                    <Image
-                                      height={40}
-                                      width={40}
-                                      src={
-                                        user?.profile_photo ??
-                                        'http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png'
-                                      }
-                                      alt=''
-                                      className='rounded-full'
-                                    />
-                                    <div className='flex flex-col'>
-                                      <span className='text-content'>
-                                        {user?.display_name}
-                                      </span>
-                                      <p className='text-xs mt-2 text-opacity-60 text-content-primary'>
-                                        {user?.web3_address ??
-                                          'No Web3 address found'}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  {user?.web3_address && (
-                                    <span className='text-sm'>
-                                      {approvers.includes(user?.web3_address) ? (
-                                        <span className='text-primary'>
-                                          Requested
-                                        </span>
-                                      ) : (
-                                        <span className='text-theme-secondary'>
-                                          Request
-                                        </span>
-                                      )}
+                          <p className='ml-5 my-3 text-content text-sm font-semibold'>
+                            Suggested Results
+                          </p>
+                          {regUsers.map((user: any, index: number) => (
+                            <div
+                              key={index}
+                              onClick={() =>
+                                !approvers.includes(user?.web3_address) &&
+                                user?.web3_address &&
+                                addApprover(user)
+                              }
+                              className='flex flex-col gap-4'
+                            >
+                              <div className='flex justify-between items-center w-full hover:bg-imbue-light-purple px-4 py-2'>
+                                <div className='flex text-white gap-3 items-center cursor-pointer'>
+                                  <Image
+                                    height={40}
+                                    width={40}
+                                    src={
+                                      user?.profile_photo ??
+                                      'http://res.cloudinary.com/imbue-dev/image/upload/v1688127641/pvi34o7vkqpuoc5cgz3f.png'
+                                    }
+                                    alt=''
+                                    className='rounded-full'
+                                  />
+                                  <div className='flex flex-col'>
+                                    <span className='text-content'>
+                                      {user?.display_name}
                                     </span>
-                                  )}
+                                    <p className='text-xs mt-2 text-opacity-60 text-content-primary'>
+                                      {user?.web3_address ??
+                                        'No Web3 address found'}
+                                    </p>
+                                  </div>
                                 </div>
+                                {user?.web3_address && (
+                                  <span className='text-sm'>
+                                    {approvers.includes(user?.web3_address) ? (
+                                      <span className='text-primary'>
+                                        Requested
+                                      </span>
+                                    ) : (
+                                      <span className='text-theme-secondary'>
+                                        Request
+                                      </span>
+                                    )}
+                                  </span>
+                                )}
                               </div>
-                            ))
-                          }
+                            </div>
+                          ))}
                         </>
-                      )
-                      }
+                      )}
                     </>
                   }
                 </>

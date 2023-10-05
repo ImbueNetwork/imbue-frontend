@@ -17,50 +17,49 @@ interface CustomDropDownProps {
   setOpenDropDown?: (_val: string) => void | undefined;
 }
 
-const CustomDropDown = (
-  ({
-    name,
-    filterType,
-    filterOptions,
-    setId,
-    ids,
-  }: CustomDropDownProps): JSX.Element => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [options, setOptions] = useState(filterOptions);
+const CustomDropDown = ({
+  name,
+  filterType,
+  filterOptions,
+  setId,
+  ids,
+}: CustomDropDownProps): JSX.Element => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [options, setOptions] = useState(filterOptions);
 
-    // useEffect(() => {
-    //   const storedState = localStorage.getItem(name);
+  // useEffect(() => {
+  //   const storedState = localStorage.getItem(name);
 
-    //   if (storedState === 'true') {
-    //     setIsOpen(true);
-    //   }
-    // }, [name]);
+  //   if (storedState === 'true') {
+  //     setIsOpen(true);
+  //   }
+  // }, [name]);
 
-    // const handleToggle = () => {
-    //   if (isOpen) {
-    //     localStorage.setItem(name, 'false');
-    //   } else {
-    //     localStorage.setItem(name, 'true');
-    //   }
-    //   setOpenDropDown && setOpenDropDown(name);
-    //   setIsOpen(!isOpen);
-    // };
+  // const handleToggle = () => {
+  //   if (isOpen) {
+  //     localStorage.setItem(name, 'false');
+  //   } else {
+  //     localStorage.setItem(name, 'true');
+  //   }
+  //   setOpenDropDown && setOpenDropDown(name);
+  //   setIsOpen(!isOpen);
+  // };
 
-
-    const handleChange = (e: any) => {
-      let newOptions = [...options]
-      if (e.target.value) {
-        newOptions = filterOptions.filter((o: any) => o.value.includes(`${e.target.value}`))
-      }
-      else {
-        newOptions = [...filterOptions]
-      }
-      setOptions(newOptions)
+  const handleChange = (e: any) => {
+    let newOptions = [...options];
+    if (e.target.value) {
+      newOptions = filterOptions.filter((o: any) =>
+        o.value.includes(`${e.target.value}`)
+      );
+    } else {
+      newOptions = [...filterOptions];
     }
+    setOptions(newOptions);
+  };
 
-    return (
-      <div className='relative md:mb-8 mb-4'>
-        {/* <div
+  return (
+    <div className='relative md:mb-8 mb-4'>
+      {/* <div
           onClick={handleToggle}
           typeof='button'
           data-testid={name}
@@ -74,37 +73,41 @@ const CustomDropDown = (
           />
         </div> */}
 
-        <TextField
-          onChange={handleChange}
-          onFocus={() => setIsOpen(true)}
-          sx={{ width: "100%" }}
-          label={name}
-          color='secondary'
-          autoComplete='off'
-          InputProps={{
-            endAdornment: <InputAdornment position="end">
-              <ArrowDropDownIcon className={`cursor-pointer ${isOpen && "rotate-180"}`} onClick={() => setIsOpen(!isOpen)} />
-            </InputAdornment>,
-          }}
-        />
-        {isOpen && (
-          <div
-            data-testid='filterOptions'
-            className={`w-full -mt-6 bg-white rounded-[10px] rounded-t-none absolute transition-all duration-300 ease-in-out shadow-sm shadow-slate-300 overflow-y-auto max-h-[170px]`}
-            style={{zIndex: 20 - filterType}}
-          >
-            <BriefFilter
-              label=''
-              filter_type={filterType}
-              filter_options={options}
-              setId={setId}
-              ids={ids}
-            />
-          </div>
-        )}
-      </div>
-    );
-  }
-);
+      <TextField
+        onChange={handleChange}
+        onFocus={() => setIsOpen(true)}
+        className=' min-w-[13.3rem] w-full'
+        label={name}
+        color='secondary'
+        autoComplete='off'
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position='end'>
+              <ArrowDropDownIcon
+                className={`cursor-pointer ${isOpen && 'rotate-180'}`}
+                onClick={() => setIsOpen(!isOpen)}
+              />
+            </InputAdornment>
+          ),
+        }}
+      />
+      {isOpen && (
+        <div
+          data-testid='filterOptions'
+          className={`w-full -mt-6 bg-white rounded-[10px] rounded-t-none absolute transition-all duration-300 ease-in-out shadow-sm shadow-slate-300 overflow-y-auto max-h-[170px]`}
+          style={{ zIndex: 20 - filterType }}
+        >
+          <BriefFilter
+            label=''
+            filter_type={filterType}
+            filter_options={options}
+            setId={setId}
+            ids={ids}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default CustomDropDown;
