@@ -36,6 +36,7 @@ export default nextConnect()
           projectId,
           milestoneIndex
         )(tx);
+        
         const allVotesAddresses = allVotersRes.map((v) => v.voter_address);
 
         res.status(200).json({

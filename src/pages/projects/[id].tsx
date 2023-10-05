@@ -2,12 +2,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-constant-condition */
 /* eslint-disable react-hooks/exhaustive-deps */
+import { Alert, IconButton } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import CopyToClipboard from 'react-copy-to-clipboard';
 // const ExpandableDropDowns = dynamic(
 //   () => import('@/components/Project/ExpandableMilestone')
 // );
@@ -35,6 +37,7 @@ import VotingList from '@/components/Project/VotingList/VotingList';
 import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
 
+import { timeData } from '@/config/briefs-data';
 import {
   ImbueChainPollResult,
   Milestone,
@@ -91,7 +94,7 @@ function Project() {
   const [projectOwner, setProjectOwner] = useState<User>();
   const [showRefundButton, setShowRefundButton] = useState<boolean>(false);
   // TODO: Create votes table
-  const [milestoneVotes, setMilestoneVotes] = useState<any>({});
+  const [milestoneVotes, setMilestoneVotes] = useState<string[]>([]);
   const [milestonLoadingTitle, setMilestoneLoadingTitle] = useState<string>('');
 
   const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
@@ -117,15 +120,16 @@ function Project() {
   );
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const [expandProjectDesc, setExpandProjectDesc] = useState<number>(500);
+  const [expandProjectDesc, setExpandProjectDesc] = useState<boolean>(false);
   const [openVotingList, setOpenVotingList] = useState<boolean>(false);
 
   // TODO: Create votes table
   const canVote =
     (isApprover &&
       user?.web3_address &&
-      (milestoneVotes?.length && !milestoneVotes?.includes(user.web3_address))) ||
-    (projectType === 'brief' && isProjectOwner);
+      !(milestoneVotes?.length && milestoneVotes?.includes(user.web3_address))) ||
+      (projectType === 'brief' && isProjectOwner);
+      
 
   const approvedMilestones = project?.milestones?.filter?.(
     (milstone: Milestone) => milstone?.is_approved === true
@@ -334,10 +338,6 @@ function Project() {
           await chainService.findFirstPendingMilestone(
             onChainProjectRes.milestones
           );
-        console.log(
-          '🚀 ~ file: [id].tsx:331 ~ syncProject ~ firstPendingMilestoneChain:',
-          firstPendingMilestoneChain
-        );
 
         if (
           firstPendingMilestoneChain === project.first_pending_milestone &&
@@ -385,6 +385,7 @@ function Project() {
       //   setProjectInVotingOfNoConfidence(project?.project_in_voting_of_no_confidence ?? false);
       // }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(error);
       setError({ message: 'Could not sync project. ', error });
     } finally {
@@ -392,7 +393,6 @@ function Project() {
       setLoading(false);
     }
   };
-
 
   const refund = async (account: WalletAccount) => {
     if (!project?.id || !project.chain_project_id)
@@ -470,9 +470,10 @@ function Project() {
           pollResult = (await chainService.pollChainMessage(
             ImbueChainEvent.RaiseNoConfidenceRound,
             account
-          )) as ImbueChainPollResult; <button className='bg-white text-black text-sm rounded-full px-3 py-2 ml-auto'>
+          )) as ImbueChainPollResult;
+          <button className='bg-white text-black text-sm rounded-full px-3 py-2 ml-auto'>
             Vote
-          </button>
+          </button>;
         }
 
         while (true) {
@@ -505,6 +506,16 @@ function Project() {
     }
   };
 
+  const [copied, setCopied] = useState<boolean>(false);
+
+  const copyAddress = () => {
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 3000);
+  };
+
   const renderPolkadotJSModal = (
     <div>
       <AccountChoice
@@ -521,7 +532,6 @@ function Project() {
     </div>
   );
 
-
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
       <div className='w-full grid grid-cols-12 bg-white py-5 px-7 rounded-2xl'>
@@ -532,13 +542,26 @@ function Project() {
         <div className='border-inherit col-start-1 col-end-10 mt-5 border rounded-xl py-4 px-5'>
           <div className='flex mb-4 items-center justify-between'>
             <p className='text-sm text-[#747474]'>Project Description</p>
-            <p className='px-3 flex items-center  py-1.5 rounded-full border border-inherit text-sm text-black'>
-              View full Description
+            <button
+              className='px-3 flex items-center  py-1.5 rounded-full border border-inherit text-sm text-black cursor-pointer'
+              onClick={() => setExpandProjectDesc((prev) => !prev)}
+            >
+              {
+                expandProjectDesc
+                  ? 'Hide'
+                  : 'View'
+              } full Description
               <TfiNewWindow className='ml-1.5 text-gray-500' size={14} />
-            </p>
+            </button>
           </div>
           <h4 className='text-imbue-purple-dark text-2xl'>{project.name}</h4>
-          <p className='text-black text-sm py-5'>{project.description}</p>
+          <p className='text-black text-sm py-5 whitespace-pre-wrap break-words'>
+            {
+              expandProjectDesc
+                ? project?.description
+                : project?.description?.substring(0, 500) + ' ...'
+            }
+          </p>
 
           <div className='grid grid-cols-12 gap-3 mt-5'>
             <div className='bg-[#F2F0FF] justify-between py-2 px-3 flex flex-col col-span-2 rounded-md'>
@@ -548,20 +571,18 @@ function Project() {
             <div className='bg-[#FFEBEA] flex flex-col justify-between rounded-md py-2 px-3 col-span-3'>
               <div className='flex justify-between items-center'>
                 <p className='text-sm text-[#8A5C5A]'>Shared by</p>
-                {
-                  user.id !== targetUser.id && (
-                    <p
-                      className='px-2 flex text-sm items-center rounded-xl py-1 bg-white text-black cursor-pointer'
-                      onClick={() => setShowMessageBox(true)}
-                    >
-                      <BsChatLeftDots
-                        className='text-imbue-purple-dark mr-1'
-                        size={16}
-                      />
-                      Chat
-                    </p>
-                  )
-                }
+                {user.id !== targetUser.id && (
+                  <p
+                    className='px-2 flex text-sm items-center rounded-xl py-1 bg-white text-black cursor-pointer'
+                    onClick={() => setShowMessageBox(true)}
+                  >
+                    <BsChatLeftDots
+                      className='text-imbue-purple-dark mr-1'
+                      size={16}
+                    />
+                    Chat
+                  </p>
+                )}
               </div>
               <div className='flex items-center space-x-2 mt-8'>
                 <Image
@@ -606,42 +627,36 @@ function Project() {
 
           <div className='grid grid-cols-12 gap-5 mt-16 ml-6'>
             <p className='col-start-1 col-end-7'>Title</p>
-            <p className='col-start-7 col-end-9 mr-10 '>
-              Milestone Funding
-            </p>
+            <p className='col-start-7 col-end-9 mr-10 '>Milestone Funding</p>
             <p className='col-start-9 col-end-11'>Milestone ends</p>
             <p className='col-start-11 col-end-13 pr-6 text-end'>Stage</p>
           </div>
-          {
-            project?.milestones?.map((item: Milestone, index: number) => (
-              <ExpandableMilestone
-                {
-                ...{
-                  project,
-                  item,
-                  index,
-                  isApplicant,
-                  projectType,
-                  isProjectOwner,
-                  setLoading,
-                  setError,
-                  user,
-                  setSuccess,
-                  setSuccessTitle,
-                  setShowPolkadotAccounts,
-                  canVote,
-                  loading,
-                  setOpenVotingList,
-
-                }
-                }
-                key={index}
-              />
-            ))}
+          {project?.milestones?.map((item: Milestone, index: number) => (
+            <ExpandableMilestone
+              {...{
+                project,
+                item,
+                index,
+                isApplicant,
+                projectType,
+                isProjectOwner,
+                setLoading,
+                setError,
+                user,
+                setSuccess,
+                setSuccessTitle,
+                setShowPolkadotAccounts,
+                canVote,
+                loading,
+                setOpenVotingList,
+              }}
+              key={index}
+            />
+          ))}
         </div>
         {/* Ending of milestone section */}
         {/* starting side bar for project details */}
-        <div className='col-start-10 mx-10  row-start-1 row-end-4 col-end-13'>
+        <div className='col-start-10 mx-10 row-start-1 row-end-4 col-end-13'>
           <div className='bg-light-grey mt-11 py-3 px-3 rounded-xl'>
             <p className='text-[#747474] text-sm mb-5'>Project Overview</p>
             <div className='space-y-2'>
@@ -652,7 +667,7 @@ function Project() {
                     currentValue={
                       (firstPendingMilestone > -1)
                         ? firstPendingMilestone
-                        : (project?.milestones?.length - 1 || 0)
+                        : project?.milestones?.length - 1 || 0
                     }
                     titleArray={project?.milestones}
                   />
@@ -660,15 +675,24 @@ function Project() {
               </div>
               <div className='flex bg-white justify-between px-5 py-3 rounded-xl'>
                 <p className='text-black mt-5'>Timeline</p>
-                <p className='text-imbue-purple-dark text-xl mt-5'>3 Months</p>
+                <p className='text-imbue-purple-dark text-xl mt-5'>{timeData[project?.duration_id || 0].label}</p>
               </div>
-              <div className='flex bg-white justify-between px-5 py-3 rounded-xl'>
-                <p className='text-black mt-5'>Grant Wallet</p>
-                <p className='text-imbue-purple-dark line-clamp-1  mt-5'>
-                  {project?.escrow_address?.slice(0, 6) +
-                    '...' +
-                    project?.escrow_address?.substr(-3)}
-                </p>
+              <div className='flex flex-col bg-white justify-between px-5 py-3 rounded-xl'>
+                <CopyToClipboard text={project?.escrow_address}>
+                  <div className='ml-auto'>
+                    <IconButton className='' onClick={() => copyAddress()}>
+                      <Image className='w-4' src={require('@/assets/svgs/copy.svg')} alt='copy button' />
+                    </IconButton>
+                  </div>
+                </CopyToClipboard>
+                <div className='w-full flex justify-between items-end'>
+                  <p className='text-black'>Grant Wallet</p>
+                  <p className='text-imbue-purple-dark text-xl line-clamp-1'>
+                    {project?.escrow_address?.slice(0, 6) +
+                      '...' +
+                      project?.escrow_address?.substr(-3)}
+                  </p>
+                </div>
               </div>
               <div className='flex flex-col bg-white justify-between px-5 py-3 rounded-xl'>
                 <ProjectBalance
@@ -695,29 +719,30 @@ function Project() {
               </div>
             </div>
           </div>
-        </div>
-        {/* ending side bar for project details */}
-        <div className='bg-white col-start-10  mx-10 row-start-3 mt-44 row-end-7 col-end-13 '>
-          <div className='bg-white col-start-10 px-3 rounded-xl py-3 border border-light-grey'>
-            <MilestoneVoteBox
-              chainProjectId={project.chain_project_id}
-              projectId={project.id}
-              approvers={approversPreview}
-              setLoadingMain={setLoading}
-              firstPendingMilestone={firstPendingMilestone || 0}
-              {
-              ...{
-                setSuccess,
-                setSuccessTitle,
-                setError,
-                project,
-                canVote,
-                user,
-                setOpenVotingList,
-              }}
-            />
+
+          {/* ending side bar for project details */}
+          <div className='bg-white mt-5'>
+            <div className='bg-white col-start-10 px-3 rounded-xl py-3 border border-light-grey'>
+              <MilestoneVoteBox
+                chainProjectId={project.chain_project_id}
+                projectId={project.id}
+                approvers={approversPreview}
+                setLoadingMain={setLoading}
+                firstPendingMilestone={firstPendingMilestone || 0}
+                {...{
+                  setSuccess,
+                  setSuccessTitle,
+                  setError,
+                  project,
+                  canVote,
+                  user,
+                  setOpenVotingList,
+                }}
+              />
+            </div>
           </div>
         </div>
+
       </div>
       {user && showMessageBox && (
         <ChatPopup
@@ -804,6 +829,13 @@ function Project() {
           </button>
         </div>
       </WaitingScreen>
+
+      <div
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
+          }`}
+      >
+        <Alert severity='success'>Grant Wallet Address Copied to clipboard</Alert>
+      </div>
 
     </div>
   );

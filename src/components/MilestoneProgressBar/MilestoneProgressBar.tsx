@@ -12,7 +12,6 @@ export const MilestoneProgressBar = ({
   titleArray,
   currentValue = 0,
 }: ProgressBarProps): JSX.Element => {
-  console.log("🚀 ~ file: MilestoneProgressBar.tsx:15 ~ currentValue:", currentValue)
   return (
     <div className='progressbar-container'>
       {titleArray?.map((milestone, index) => (
@@ -33,8 +32,9 @@ export const MilestoneProgressBar = ({
       <div
         className='progress-bar-progress--milestone'
         style={{
-          width: `calc((100% - .5rem) * ${currentValue} / ${titleArray?.length - 1
-            })`,
+          width: `calc((100% - .5rem) * ${currentValue} / ${
+            titleArray?.length > 1 ? titleArray?.length - 1 : 1
+          })`,
         }}
       ></div>
     </div>

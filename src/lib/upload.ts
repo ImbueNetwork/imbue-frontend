@@ -20,11 +20,9 @@ export const method1 = async (
   createReadStream(file[0].filepath)
     .pipe(createWriteStream(file[0].originalFilename))
     .on('finish', () => {
-      res
-        .status(200)
-        .json({
-          url: `https://storage.cloud.google.com/test_sani/${file[0].originalFilename}`,
-        });
+      res.status(200).json({
+        url: `https://storage.cloud.google.com/${process.env.BUCKET_NAME}/${file[0].originalFilename}`,
+      });
     })
     .on('error', (err) => {
       // eslint-disable-next-line no-console

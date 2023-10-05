@@ -39,6 +39,7 @@ type Votes = {
 
 const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
     const { chainProjectId, projectId, user, approvers, project, setError, setSuccess, setSuccessTitle } = props;
+    console.log("🚀 ~ file: MilestoneVoteBox.tsx:42 ~ MilestoneVoteBox ~ props:", props)
 
     const [votes, setVotes] = useState<Votes | null>(null)
     const [loading, setLoading] = useState(true)
@@ -56,6 +57,7 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
 
     const firstPendingMilestone = props?.firstPendingMilestone >= 0 ? props?.firstPendingMilestone : project?.milestones?.length - 1
     const currentMilestoneName = project?.milestones?.length ? project?.milestones?.[firstPendingMilestone]?.name || "" : ""
+    
 
     useEffect(() => {
         const syncVotes = async () => {
@@ -231,7 +233,7 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
                                     }
                                 </p>
                                 {
-                                    props?.canVote
+                                    props?.canVote && project.project_in_milestone_voting
                                         ? (
                                             <button
                                                 className='bg-white text-black text-sm rounded-full px-3 py-2 ml-auto'

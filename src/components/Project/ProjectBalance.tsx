@@ -33,15 +33,15 @@ const Currencies = [
 
 const ProjectBalance = (props: ProjectBalanceType) => {
     const { balance, project, user, handlePopUpForUser, setBalance } = props;
-    const [chainLoading, setChainLoading] = useState(true)
+    const [balanceLoading, setBalanceLoading] = useState(true)
     const [currency_id, setCurrency_id] = useState<number>(project?.currency_id || 0)
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const showOptions = Boolean(anchorEl);
-
+ 
     useEffect(() => {
         const getAndSetBalace = async () => {
-            setChainLoading(true)
+            setBalanceLoading(true)
             try {
                 const balance = await getBalance(
                     project?.escrow_address,
@@ -54,15 +54,17 @@ const ProjectBalance = (props: ProjectBalanceType) => {
                 }
                 setBalance(balance || 0);
             } catch (error) {
+                // eslint-disable-next-line no-console
                 console.error(error);
             } finally {
-                setChainLoading(false)
+                setBalanceLoading(false)
             }
         }
 
         getAndSetBalace()
 
-    }, [handlePopUpForUser, currency_id, project?.currency_id, project?.escrow_address, project.status_id, setBalance, user])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currency_id, project?.currency_id, project?.escrow_address, project.status_id, user])
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
@@ -77,7 +79,7 @@ const ProjectBalance = (props: ProjectBalanceType) => {
 
     return (
         <div className='text-sm text-[#868686] mt-2'>
-            {chainLoading
+            {balanceLoading
                 ? (
                     <p className='text-xs font-semibold'> Loading Balance...</p>)
                 : (

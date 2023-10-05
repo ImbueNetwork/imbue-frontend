@@ -40,7 +40,7 @@ const VotingList = (props: VotingListProps) => {
     );
     const [loading, setLoading] = useState(false);
 
-    const firstPendingMilestone = props?.firstPendingMilestone > 0 ? props?.firstPendingMilestone : project?.milestones?.length - 1
+    const firstPendingMilestone = props?.firstPendingMilestone >= 0 ? props?.firstPendingMilestone : project?.milestones?.length - 1
 
     useEffect(() => {
         const syncVotes = async () => {
@@ -65,6 +65,7 @@ const VotingList = (props: VotingListProps) => {
                 await Promise.all(promises)
                 const voteResp = await getMillestoneVotes(projectId, firstPendingMilestone)
                 setVotes(voteResp)
+                setMilestoneVotes(voteResp?.allVoters)
                 // const resp = await syncProjectVotes(projectId, firstPendingMilestone, votes)
             }
         }
