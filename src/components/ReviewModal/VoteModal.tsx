@@ -37,8 +37,6 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
   const [step, setStep] = useState<number>(0)
 
   const handleVoteOnMilestone = async (vote: boolean) => {
-    setLoading(true);
-
     if (!project?.id || !user.web3_address) return
 
     try {
@@ -72,51 +70,41 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
           await updateFirstPendingMilestone(Number(project.id), (Number(project.first_pending_milestone) + 1))
           await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
 
-          // setSuccess(true);
-          // setSuccessTitle('Your vote was successful. This milestone has been completed.');
-          setLoading(false);
-          setStep(4)
           setVisible(true);
+          setStep(4)
           break;
 
         } else if (result.status) {
           await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
 
-          // setSuccess(true);
-          // setSuccessTitle('Your vote was successful.');
-          setLoading(false);
-          setStep(4)
           setVisible(true);
+          setStep(4)
           break;
 
         } else if (result.txError) {
           setError({ message: result.errorMessage });
-          setLoading(false);
+
           setVisible(false);
           break;
 
         } else if (pollResult != ImbueChainPollResult.Pending) {
           await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
 
-          // setSuccess(true);
-          // setSuccessTitle('Request resolved successfully');
-          setLoading(false);
-          setStep(4)
           setVisible(true);
+          setStep(4)
           break;
         }
         await new Promise((f) => setTimeout(f, 1000));
       }
+
     } catch (error) {
       setError({ message: 'Could not vote. Please try again later' });
       // eslint-disable-next-line no-console
       console.error(error)
-      setLoading(false);
+      // setLoading(false);
     }
     // finally {
-    //     console.log("in finally");
-
-    //     setLoading(false);
+    //   setLoading(false);
     // }
   };
 
@@ -232,12 +220,24 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
     }
   };
 
+  const handleVote = async () => {
+    if (vote) {
+      setLoading(true)
+      setVisible(false);
+      await handleVoteOnMilestone(vote);
+      setLoading(false)
+    }
+    else {
+      setStep(3)
+    }
+  }
+
 
   return (
     <Modal
       open={visible}
       className='flex justify-center items-center'
-      onClose={() => setVisible(false)}
+      // onClose={() => {setVisible(false)}}
     >
       <div>
         {
@@ -292,15 +292,7 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
               <button
                 className='primary-btn  ml-auto in-dark w-button w-full '
                 style={{ textAlign: 'center' }}
-                onClick={() => {
-                  if (vote) {
-                    handleVoteOnMilestone(vote);
-                    setVisible(false);
-                  }
-                  else {
-                    setStep(3)
-                  }
-                }}
+                onClick={() => handleVote()}
               >
                 Vote
                 <BiArrowBack className='rotate-180 ml-3 text-imbue-lime ' size={18} />
@@ -327,7 +319,10 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
           )
 
         }
+
       </div>
+
+
 
     </Modal>
 

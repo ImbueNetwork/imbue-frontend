@@ -408,136 +408,138 @@ function Project() {
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
       <div className='w-full grid grid-cols-12 bg-white py-5 px-7 rounded-2xl'>
-        <p className='text-black col-start-1 col-end-10 capitalize'>
-          {projectType} information
-        </p>
-        {/* starting of project section */}
-        <div className='border-inherit col-start-1 col-end-10 mt-5 border rounded-xl py-4 px-5'>
-          <div className='flex mb-4 items-center justify-between'>
-            <p className='text-sm text-[#747474]'>Project Description</p>
-            <div className='flex items-center gap-2'>
-              {
-                project?.project_in_voting_of_no_confidence && (
-                  <button
-                    className='px-3 flex items-center gap-2  py-1.5 rounded-full border border-[#EBEAE2] text-sm text-imbue-coral bg-[#FFEBEA] cursor-pointer'
-                  >
-                    <Image src={require('@/assets/svgs/info-circle-red.svg')} alt='' />
-                    Refund Vote in Progress
-                  </button>
-                )
-              }
-              <button
-                className='px-3 flex items-center  py-1.5 rounded-full border border-inherit text-sm text-black cursor-pointer'
-                onClick={() => setExpandProjectDesc((prev) => !prev)}
-              >
-                {
-                  expandProjectDesc
-                    ? 'Hide'
-                    : 'View'
-                } full Description
-                <TfiNewWindow className='ml-1.5 text-gray-500' size={14} />
-              </button>
-            </div>
-          </div>
-          <h4 className='text-imbue-purple-dark text-2xl'>{project.name}</h4>
-          <p className='text-black text-sm py-5 whitespace-pre-wrap break-words'>
-            {
-              expandProjectDesc
-                ? project?.description
-                : project?.description?.substring(0, 500) + ' ...'
-            }
+        <div className='col-start-1 col-end-10'>
+          <p className='text-black capitalize'>
+            {projectType} information
           </p>
-
-          <div className='grid grid-cols-12 gap-3 mt-5'>
-            <div className='bg-[#F2F0FF] justify-between py-2 px-3 flex flex-col col-span-2 rounded-md'>
-              <p className='text-imbue-purple text-sm'>Posted</p>
-              <p className='text-imbue-purple-dark text-sm'>{timePosted}</p>
-            </div>
-            <div className='bg-[#FFEBEA] flex flex-col justify-between rounded-md py-2 px-3 col-span-3'>
-              <div className='flex justify-between items-center'>
-                <p className='text-sm text-[#8A5C5A]'>Shared by</p>
-                {user.id !== targetUser.id && (
-                  <p
-                    className='px-2 flex text-sm items-center rounded-xl py-1 bg-white text-black cursor-pointer'
-                    onClick={() => setShowMessageBox(true)}
-                  >
-                    <BsChatLeftDots
-                      className='text-imbue-purple-dark mr-1'
-                      size={16}
-                    />
-                    Chat
-                  </p>
-                )}
-              </div>
-              <div className='flex items-center space-x-2 mt-8'>
-                <Image
-                  src={projectOwner?.profile_photo || '/profile-image.png'}
-                  width={30}
-                  height={30}
-                  alt='image'
-                  className='rounded-full'
-                />
-                <p className='text-imbue-coral'>{projectOwner?.display_name}</p>
-              </div>
-            </div>
-
-            <div className='bg-light-grey flex flex-col justify-between px-4 py-3 rounded-md col-span-7'>
-              <div className='flex justify-between'>
-                <p className='text-[#8A5C5A] text-sm'>Approvers</p>
-                <p
-                  className='bg-white text-black px-2 py-1 rounded-full text-xs cursor-pointer'
-                  onClick={() => setOpenVotingList(true)}
+          {/* starting of project section */}
+          <div className='border-inherit mt-5 border rounded-xl py-4 px-5'>
+            <div className='flex mb-4 items-center justify-between'>
+              <p className='text-sm text-[#747474]'>Project Description</p>
+              <div className='flex items-center gap-2'>
+                {
+                  project?.project_in_voting_of_no_confidence && (
+                    <button
+                      className='px-3 flex items-center gap-2  py-1.5 rounded-full border border-[#EBEAE2] text-sm text-imbue-coral bg-[#FFEBEA] cursor-pointer'
+                    >
+                      <Image src={require('@/assets/svgs/info-circle-red.svg')} alt='' />
+                      Refund Vote in Progress
+                    </button>
+                  )
+                }
+                <button
+                  className='px-3 flex items-center  py-1.5 rounded-full border border-inherit text-sm text-black cursor-pointer'
+                  onClick={() => setExpandProjectDesc((prev) => !prev)}
                 >
-                  see all
-                </p>
-              </div>
-              <div className='mt-3'>
-                <ProjectApprovers
-                  {...{
-                    approversPreview,
-                    project,
-                    setIsApprover,
-                    setApproverPreview,
-                    projectOwner,
-                  }}
-                />
+                  {
+                    expandProjectDesc
+                      ? 'Hide'
+                      : 'View'
+                  } full Description
+                  <TfiNewWindow className='ml-1.5 text-gray-500' size={14} />
+                </button>
               </div>
             </div>
-          </div>
-          {/* Ending of project section */}
-        </div>
-        {/* Starting of milestone section */}
-        <div className='bg-light-grey col-start-1 col-end-10 text-[#747474] py-5 px-[10px] mt-5 rounded-xl'>
-          <p className='text-[#747474] ml-6 text-sm'>Project Milestones</p>
+            <h4 className='text-imbue-purple-dark text-2xl'>{project.name}</h4>
+            <p className='text-black text-sm py-5 whitespace-pre-wrap break-words'>
+              {
+                expandProjectDesc
+                  ? project?.description
+                  : project?.description?.substring(0, 500) + ' ...'
+              }
+            </p>
 
-          <div className='grid grid-cols-12 gap-5 mt-16 ml-6'>
-            <p className='col-start-1 col-end-7'>Title</p>
-            <p className='col-start-7 col-end-9 mr-10 '>Milestone Funding</p>
-            <p className='col-start-9 col-end-11'>Milestone ends</p>
-            <p className='col-start-11 col-end-13 pr-6 text-end'>Stage</p>
+            <div className='grid grid-cols-12 gap-3 mt-5'>
+              <div className='bg-[#F2F0FF] justify-between py-2 px-3 flex flex-col col-span-2 rounded-md'>
+                <p className='text-imbue-purple text-sm'>Posted</p>
+                <p className='text-imbue-purple-dark text-sm'>{timePosted}</p>
+              </div>
+              <div className='bg-[#FFEBEA] flex flex-col justify-between rounded-md py-2 px-3 col-span-3'>
+                <div className='flex justify-between items-center'>
+                  <p className='text-sm text-[#8A5C5A]'>Shared by</p>
+                  {user.id !== targetUser.id && (
+                    <p
+                      className='px-2 flex text-sm items-center rounded-xl py-1 bg-white text-black cursor-pointer'
+                      onClick={() => setShowMessageBox(true)}
+                    >
+                      <BsChatLeftDots
+                        className='text-imbue-purple-dark mr-1'
+                        size={16}
+                      />
+                      Chat
+                    </p>
+                  )}
+                </div>
+                <div className='flex items-center space-x-2 mt-8'>
+                  <Image
+                    src={projectOwner?.profile_photo || '/profile-image.png'}
+                    width={30}
+                    height={30}
+                    alt='image'
+                    className='rounded-full'
+                  />
+                  <p className='text-imbue-coral'>{projectOwner?.display_name}</p>
+                </div>
+              </div>
+
+              <div className='bg-light-grey flex flex-col justify-between px-4 py-3 rounded-md col-span-7'>
+                <div className='flex justify-between'>
+                  <p className='text-[#8A5C5A] text-sm'>Approvers</p>
+                  <p
+                    className='bg-white text-black px-2 py-1 rounded-full text-xs cursor-pointer'
+                    onClick={() => setOpenVotingList(true)}
+                  >
+                    see all
+                  </p>
+                </div>
+                <div className='mt-3'>
+                  <ProjectApprovers
+                    {...{
+                      approversPreview,
+                      project,
+                      setIsApprover,
+                      setApproverPreview,
+                      projectOwner,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+            {/* Ending of project section */}
           </div>
-          {project?.milestones?.map((item: Milestone, index: number) => (
-            <ExpandableMilestone
-              {...{
-                project,
-                item,
-                index,
-                isApplicant,
-                projectType,
-                isProjectOwner,
-                setLoading,
-                setError,
-                user,
-                setSuccess,
-                setSuccessTitle,
-                setShowPolkadotAccounts,
-                canVote,
-                loading,
-                setOpenVotingList,
-              }}
-              key={index}
-            />
-          ))}
+          {/* Starting of milestone section */}
+          <div className='bg-light-grey text-[#747474] py-5 px-[10px] mt-5 rounded-xl'>
+            <p className='text-[#747474] ml-6 text-sm'>Project Milestones</p>
+
+            <div className='grid grid-cols-12 gap-5 mt-16 ml-6'>
+              <p className='col-start-1 col-end-7'>Title</p>
+              <p className='col-start-7 col-end-9 mr-10 '>Milestone Funding</p>
+              <p className='col-start-9 col-end-11'>Milestone ends</p>
+              <p className='col-start-11 col-end-13 pr-6 text-end'>Stage</p>
+            </div>
+            {project?.milestones?.map((item: Milestone, index: number) => (
+              <ExpandableMilestone
+                {...{
+                  project,
+                  item,
+                  index,
+                  isApplicant,
+                  projectType,
+                  isProjectOwner,
+                  setLoading,
+                  setError,
+                  user,
+                  setSuccess,
+                  setSuccessTitle,
+                  setShowPolkadotAccounts,
+                  canVote,
+                  loading,
+                  setOpenVotingList,
+                }}
+                key={index}
+              />
+            ))}
+          </div>
         </div>
         {/* Ending of milestone section */}
         {/* starting side bar for project details */}
@@ -607,20 +609,25 @@ function Project() {
 
           {/* ending side bar for project details */}
           <div className='bg-white mt-5'>
-            <div className='bg-[#FFDAD8] col-start-10 px-5 rounded-xl py-3 border border-[#FF8C86]'>
-              <NoConfidenceBox
-                noConfidenceVoters={noConfidenceVoters}
-                setLoadingMain={setLoading}
-                approversCount={approversPreview?.length || 0}
-                {...{
-                  setError,
-                  project,
-                  canVote,
-                  user,
-                  setOpenVotingList: setOpenNoRefundList,
-                  approverVotedOnRefund
-                }} />
-            </div>
+            {
+              projectInVotingOfNoConfidence && (
+                <div className='bg-[#FFDAD8] col-start-10 px-5 rounded-xl py-3 border border-[#FF8C86] mb-4'>
+                  <NoConfidenceBox
+                    noConfidenceVoters={noConfidenceVoters}
+                    setLoadingMain={setLoading}
+                    approversCount={approversPreview?.length || 0}
+                    {...{
+                      setError,
+                      project,
+                      canVote,
+                      isApplicant,
+                      user,
+                      setOpenVotingList: setOpenNoRefundList,
+                      approverVotedOnRefund
+                    }} />
+                </div>
+              )
+            }
 
             <div className='bg-white col-start-10 px-3 rounded-xl py-3 border border-light-grey'>
               <MilestoneVoteBox
@@ -635,6 +642,7 @@ function Project() {
                   setError,
                   project,
                   canVote,
+                  isApplicant,
                   user,
                   setOpenVotingList,
                   approverVotedOnRefund

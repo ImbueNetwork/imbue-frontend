@@ -32,7 +32,7 @@ export const MilestoneProgressBar = ({
       <div
         className='progress-bar-progress--milestone'
         style={{
-          width: `calc((100% - .5rem) * ${currentValue} / ${
+          width: `calc((100%) * ${currentValue} / ${
             titleArray?.length > 1 ? titleArray?.length - 1 : 1
           })`,
         }}

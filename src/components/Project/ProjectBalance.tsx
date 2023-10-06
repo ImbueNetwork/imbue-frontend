@@ -38,9 +38,15 @@ const ProjectBalance = (props: ProjectBalanceType) => {
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const showOptions = Boolean(anchorEl);
- 
+
     useEffect(() => {
         const getAndSetBalace = async () => {
+            if (
+                !project?.escrow_address ||
+                currency_id === undefined ||
+                !user.id
+            ) return
+            
             setBalanceLoading(true)
             try {
                 const balance = await getBalance(
@@ -63,8 +69,8 @@ const ProjectBalance = (props: ProjectBalanceType) => {
 
         getAndSetBalace()
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currency_id, project?.currency_id, project?.escrow_address, project.status_id, user])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currency_id, project?.escrow_address, project.status_id, user.id])
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);

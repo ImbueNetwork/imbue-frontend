@@ -89,7 +89,7 @@ const NoConfidenceList = (props: VotingListProps) => {
                     ? <VotingListSkeleton />
                     : <>
                         <DialogTitle id="responsive-dialog-title">
-                            Voting List
+                            Refund Voting List
                         </DialogTitle>
                         <div className='mx-5'>
                             <BottomNavigation

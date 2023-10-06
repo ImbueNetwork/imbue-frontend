@@ -18,11 +18,13 @@ type ProjectApproversType = {
 
 const ProjectApprovers = (props: ProjectApproversType) => {
     const { approversPreview, project, setIsApprover, setApproverPreview, projectOwner } = props;
+    console.log("🚀 ~ file: ProjectApprovers.tsx:21 ~ ProjectApprovers ~ approversPreview:", approversPreview)
 
     const { user } = useSelector(
         (state: RootState) => state.userState
     );
 
+    console.log("🚀 ~ file: ProjectApprovers.tsx:24 ~ ProjectApprovers ~ user:", user)
     const [loading, setLoading] = useState(true);
 
     const router = useRouter()
@@ -134,12 +136,11 @@ const ProjectApprovers = (props: ProjectApproversType) => {
     return (
         <div>
             {approversPreview?.length > 0 && (
-                <div className='flex flex-row flex-wrap gap-8'>
+                <div className='flex flex-row flex-wrap'>
                     {approversPreview?.map((approver: any, index: number) => (
                         <div
                             key={index}
-                            className={`flex text-content gap-4 items-center ${approver?.display_name && 'cursor-pointer'
-                                }`}
+                            className={`flex text-content pr-4 pl-2 first:pl-0 py-2 rounded-xl gap-4 items-center ${approver?.display_name && 'cursor-pointer'} ${approver.id === user?.id && "bg-[#FFDAD8]"}`}
                             onClick={() =>
                                 approver.display_name &&
                                 router.push(`/profile/${approver.username}`)

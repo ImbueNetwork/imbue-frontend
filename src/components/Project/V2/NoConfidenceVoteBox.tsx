@@ -13,6 +13,7 @@ type MilestoneVoteBoxProps = {
     user: User;
     noConfidenceVoters: NoConfidenceVoter[];
     canVote: boolean;
+    isApplicant: boolean;
     project: Project;
     setError: (_value: any) => void;
     setOpenVotingList: (_value: boolean) => void;
@@ -51,7 +52,8 @@ const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
                         props?.canVote &&
                             project.project_in_milestone_voting &&
                             project?.first_pending_milestone !== undefined &&
-                            !props.approverVotedOnRefund
+                            !props.approverVotedOnRefund &&
+                            !props?.isApplicant
                             ? (
                                 <button
                                     className='bg-white text-black text-sm rounded-full px-3 py-2 ml-auto'
@@ -72,7 +74,10 @@ const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
             <div className='bg-white mt-5 py-7 rounded-xl px-3'>
 
                 <div className='flex justify-between gap-2'>
-                    <div className='mt-auto'>
+                    <div 
+                    className='mt-auto cursor-pointer'
+                    onClick={() => props?.setOpenVotingList(true)}
+                    >
                         {/* <AvatarGroup className='justify-end' max={3}>
                             {
                                 [1, 2, 3].map((v, index) => (
@@ -84,7 +89,10 @@ const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
                             No <span className='text-gray-400'>({0} votes/ {0}%)</span>
                         </p>
                     </div>
-                    <div className='mt-auto'>
+                    <div 
+                    className='mt-auto cursor-pointer'
+                    onClick={() => props?.setOpenVotingList(true)}
+                    >
                         <AvatarGroup max={3}>
                             {
                                 noConfidenceVoters.map((v, index) => (

@@ -12,6 +12,7 @@ import React, { useEffect, useState } from 'react';
 
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
+import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 import VoteModal from '@/components/ReviewModal/VoteModal';
 import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 
@@ -38,14 +39,15 @@ interface ExpandableMilestonProps {
 }
 
 const ExpandableMilestone = (props: ExpandableMilestonProps) => {
-  const { index, item: milestone, project, isApplicant, projectType, isProjectOwner, setLoading, setError, user, setSuccessTitle, setSuccess } = props
+  const { index, item: milestone, project, isApplicant, projectType, isProjectOwner, setError, user, setSuccessTitle, setSuccess } = props
   const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
   const [submittingMilestone, setSubmittingMilestone] = useState<boolean>(false);
   const [showPolkadotAccounts, setShowPolkadotAccounts] = useState<boolean>(false);
   const [withdrawMilestone, setWithdrawMilestone] = useState<boolean>(false);
   const [votingWalletAccount, setVotingWalletAccount] = useState<WalletAccount | any>({});
   const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
-
+  const [loading, setLoading] = useState<boolean>(false);
+  
   const showVoteButton =
     user?.id &&
     !isApplicant &&
@@ -164,8 +166,6 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
     setMilestoneKeyInView(milestone_index)
   }
 
-
-
   // voting on a mile stone
   const handleVoting = (milestone_index: number) => {
     // show polkadot account modal
@@ -200,7 +200,6 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
       // eslint-disable-next-line no-constant-condition
       while (true) {
         if (result.status || result.txError) {
-          console.log("🚀 ~ file: ExpandableMilestone.tsx:226 ~ withdraw ~ result:", result)
           if (result.status) {
             const haveAllMilestonesBeenApproved = projectMilestones
               .map((m: any) => m.is_approved)
@@ -211,17 +210,19 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
               project.completed = true;
               await updateProject(Number(project?.id), project);
             }
-            setLoading(false);
+            // setLoading(false);
             setSuccess(true);
             setSuccessTitle('Withdraw successfull');
           } else if (result.txError) {
-            setLoading(false);
+            // setLoading(false);
             setError({ message: "Error : " + result.errorMessage });
           }
           break;
         }
         await new Promise((f) => setTimeout(f, 1000));
       }
+      setLoading(false);
+
     } catch (error) {
       setError({ message: "Error" + error });
     }
@@ -254,25 +255,20 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
           />)
       }
 
-      {
-        showVotingModal && (
-          <VoteModal
-            {...{
-              setSuccessTitle,
-              setSuccess,
-              setError,
-              milestoneKeyInView
-            }}
-            visible={showVotingModal}
-            setVisible={setShowVotingModal}
-            setLoading={setLoading}
-            user={user}
-            project={project}
-            votingWalletAccount={votingWalletAccount}
-          />
-
-        )
-      }
+      <VoteModal
+        {...{
+          setSuccessTitle,
+          setSuccess,
+          setError,
+          milestoneKeyInView
+        }}
+        visible={showVotingModal}
+        setVisible={setShowVotingModal}
+        setLoading={setLoading}
+        user={user}
+        project={project}
+        votingWalletAccount={votingWalletAccount}
+      />
 
       <Accordion
         className='shadow-none mt-5 before:h-0 !rounded-xl py-5'
@@ -444,6 +440,8 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                   )
                 }
               </div>
+
+              <BackDropLoader open={loading} />
             </div>
           </Typography>
         </AccordionDetails>

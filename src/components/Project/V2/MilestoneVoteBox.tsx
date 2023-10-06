@@ -18,6 +18,7 @@ type MilestoneVoteBoxProps = {
     user: User;
     approvers: User[];
     canVote: boolean;
+    isApplicant: boolean;
     project: Project;
     setSuccess: (_value: boolean) => void;
     setSuccessTitle: (_value: string) => void;
@@ -154,7 +155,9 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
                                     }
                                 </p>
                                 {
-                                    props?.canVote && project.project_in_milestone_voting
+                                    props?.canVote &&
+                                        project.project_in_milestone_voting &&
+                                        !props?.isApplicant
                                         ? (
                                             <button
                                                 className='bg-white text-black text-sm rounded-full px-3 py-2 ml-auto'
@@ -187,7 +190,10 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
                                     <Skeleton variant="text" className='w-full' />
                                 </div>)
                             : (
-                                <div className='mt-auto'>
+                                <div
+                                    className='mt-auto cursor-pointer'
+                                    onClick={() => props?.setOpenVotingList(true)}
+                                >
                                     <AvatarGroup className='justify-end' max={3}>
                                         {
                                             votes?.no?.map((v, index) => (
@@ -213,7 +219,10 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
                                     <Skeleton variant="text" className='w-full' />
                                 </div>)
                             : (
-                                <div className='mt-auto'>
+                                <div
+                                    className='mt-auto cursor-pointer'
+                                    onClick={() => props?.setOpenVotingList(true)}
+                                >
                                     <AvatarGroup max={3}>
                                         {
                                             votes?.yes?.map((v, index) => (
@@ -223,7 +232,7 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
                                     </AvatarGroup>
                                     <p className='text-black text-sm'>
                                         <span className='text-gray-400'>
-                                            ({yesCount} Votes/ {yesPercent}%)</span>Yes
+                                            ({yesCount} Votes/ {yesPercent}%)</span> Yes
                                     </p>
                                 </div>
                             )
@@ -241,6 +250,7 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
                         className='w-[50%] h-5 -ml-3 rounded-full bg-[#DDDCD6]'
                         variant='determinate'
                         value={loading ? 0 : yesPercent}
+                        color='secondary'
                     />
                 </div>
             </div>
