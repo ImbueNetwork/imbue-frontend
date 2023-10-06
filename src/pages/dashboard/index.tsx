@@ -18,7 +18,7 @@ import MyClientBriefsView from '@/components/Dashboard/MyClientBriefsView';
 import MyFreelancerApplications from '@/components/Dashboard/MyFreelancerApplications';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
-const LoginPopup = dynamic(() => import("@/components/LoginPopup/LoginPopup"));
+const LoginPopup = dynamic(() => import('@/components/LoginPopup/LoginPopup'));
 
 // import LoginPopup from '@/components/LoginPopup/LoginPopup';
 
@@ -34,7 +34,7 @@ export type DashboardProps = {
   myApplicationsResponse: Project[];
 };
 
-const Dashboard = (): JSX.Element => {
+const Dashboard = ({ val }: { val?: string }): JSX.Element => {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [client, setClient] = useState<StreamChat>();
   const {
@@ -72,6 +72,10 @@ const Dashboard = (): JSX.Element => {
   };
 
   useEffect(() => {
+    if (val === 'message') setSelectedOption(2);
+  }, [val]);
+
+  useEffect(() => {
     const setupStreamChat = async () => {
       try {
         if (!user?.username && !loadingUser) return router.push('/');
@@ -87,10 +91,9 @@ const Dashboard = (): JSX.Element => {
     setupStreamChat();
   }, [user]);
 
-
   useEffect(() => {
     if (client && user?.username && !loadingStreamChat) {
-       client?.connectUser(
+      client?.connectUser(
         {
           id: String(user.id),
           username: user.username,
@@ -116,13 +119,15 @@ const Dashboard = (): JSX.Element => {
           showLabels
           value={selectedOption}
           onChange={(event, newValue) => {
+            router.push('/dashboard');
             setSelectedOption(newValue);
           }}
         >
           <BottomNavigationAction label='Client View' value={1} />
           <BottomNavigationAction
-            label={`Messages ${unreadMessages > 0 ? `(${unreadMessages})` : ''
-              }`}
+            label={`Messages ${
+              unreadMessages > 0 ? `(${unreadMessages})` : ''
+            }`}
             value={2}
           />
           <BottomNavigationAction label='Freelancer View' value={3} />
@@ -139,9 +144,7 @@ const Dashboard = (): JSX.Element => {
           }}
         />
       )}
-      {selectedOption === 2 && (
-        <DashboardChatBox client={client} />
-      )}
+      {selectedOption === 2 && <DashboardChatBox client={client} />}
       {selectedOption === 3 && (
         <MyFreelancerApplications
           user_id={user.id}
