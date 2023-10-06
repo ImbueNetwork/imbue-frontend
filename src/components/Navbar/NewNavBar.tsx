@@ -196,6 +196,7 @@ function NewNavbar() {
                         size={20}
                       />
                     </div>
+                    
                     <div className='absolute hidden bg-transparent group-hover:block  space-y-3  rounded-xl top-3 left-1 w-72'>
                       <div className='bg-white mt-10 rounded-lg pl-1 shadow-lg py-1'>
                         <div
