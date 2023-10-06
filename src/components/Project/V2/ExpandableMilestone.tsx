@@ -8,7 +8,7 @@ import { WalletAccount } from '@talismn/connect-wallets';
 import axios from 'axios'
 import moment from 'moment';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
@@ -17,7 +17,7 @@ import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 
 import { ImbueChainPollResult, Milestone, OffchainProjectState, Project, User } from '@/model';
 import ChainService, { ImbueChainEvent } from '@/redux/services/chainService';
-import { updateMilestone, updateProjectVotingState } from '@/redux/services/projectServices';
+import { getMilestoneAttachments, updateMilestone, updateProjectVotingState, uploadMilestoneAttachments } from '@/redux/services/projectServices';
 import { updateFirstPendingMilestone } from '@/redux/services/projectServices';
 import { voteOnMilestone } from '@/redux/services/projectServices';
 import { updateProject } from '@/redux/services/projectServices';
@@ -60,21 +60,38 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
     !project.project_in_milestone_voting &&
     !milestone?.is_approved
 
+  const [attachments, setAttachment] = useState<any>([])
+
+  useEffect(() => {
+    const getAttachments = async () => {
+      if (!project?.id || milestone?.milestone_index === undefined) return
+
+      const resp = await getMilestoneAttachments(project.id, milestone.milestone_index)
+      setAttachment(resp)
+    }
+
+    getAttachments()
+  }, [milestone.milestone_index, project.id])
+
   const [files, setFiles] = useState<File[]>()
 
-  const handleUpload = async () => {
-    if (!files?.length) return
-
-    const file = files[0]
-    // const filename = encodeURIComponent(file.name);
+  const handleUpload = async (): Promise<string[]> => {
+    if (!files?.length) return []
 
     const data = new FormData()
-    data.append('file', file)
 
-    const resp = await axios.post(`/api/upload`, data)
-    console.log(resp);
+    files.forEach((file) => {
+      data.append(`files`, file)
+    })
+
+    try {
+      const { data: fileURLs } = await axios.post(`/api/upload`, data)
+      return fileURLs.url as string[]
+
+    } catch (error) {
+      return []
+    }
   }
-
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -96,17 +113,12 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
 
   // submitting a milestone
   const submitMilestone = async (account: WalletAccount) => {
-    if (!project?.chain_project_id)
+    if (!project?.chain_project_id || !project.id)
       return setError({ message: "No project found" })
 
     setLoading(true);
 
-    const uploadResp = await handleUpload()
-    console.log("🚀 ~ file: ExpandableMilestone.tsx:97 ~ submitMilestone ~ uploadResp:", uploadResp)
-
-    setLoading(false);
-
-    return
+    const fileURLs = await handleUpload()
 
     try {
       const imbueApi = await initImbueAPIInfo();
@@ -121,6 +133,9 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
+            if (fileURLs?.length) {
+              await uploadMilestoneAttachments(project.id, milestone.milestone_index, fileURLs)
+            }
             const resp = await updateProjectVotingState(Number(project.id), true)
             if (resp) {
               setSuccess(true);
@@ -397,20 +412,22 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                     </p>
                     <div className='flex space-x-5'>
                       {
-                        files?.length && files.map((file, index) => (
-                          <div key={index} className='border rounded-lg mt-5 flex space-x-4 items-center px-3 text-xs py-3'>
-                            <div className='space-y-2'>
-                              <p>{file.name}</p>
-                              <p>{(file.size / 1048576).toFixed(2)} MB</p>
+                        files?.length
+                          ? files.map((file, index) => (
+                            <div key={index} className='border rounded-lg mt-5 flex space-x-4 items-center px-3 text-xs py-3'>
+                              <div className='space-y-2'>
+                                <p>{file.name}</p>
+                                <p>{(file.size / 1048576).toFixed(2)} MB</p>
+                              </div>
+                              <Image
+                                className='cursor-pointer ml-2'
+                                src={require('@/assets/svgs/trash.svg')}
+                                alt=""
+                                onClick={() => handleRemoveFile(index)}
+                              />
                             </div>
-                            <Image
-                              className='cursor-pointer ml-2'
-                              src={require('@/assets/svgs/trash.svg')}
-                              alt=""
-                              onClick={() => handleRemoveFile(index)}
-                            />
-                          </div>
-                        ))
+                          ))
+                          : ""
                       }
                     </div>
 
@@ -434,6 +451,22 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                   </div>
                 )
               }
+
+              <div className='grid grid-cols-6 gap-3'>
+                {
+                  (showVoteButton || showSubmitButton) && attachments.length
+                    ? attachments.map((attachment: any, index: number) => (
+                      <a className='col-span-1' key={index} href={attachment.fileURL} target='_blank'>
+                        <div className='border rounded-lg mt-5 px-3 text-xs py-3'>
+                          <div className='space-y-2'>
+                            <p>{attachment.fileURL?.split("$")[1] || "Attachment"}</p>
+                          </div>
+                        </div>
+                      </a>
+                    ))
+                    : ""
+                }
+              </div>
 
               <div className='w-full mt-7 flex'>
 

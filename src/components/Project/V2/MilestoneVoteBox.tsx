@@ -39,7 +39,6 @@ type Votes = {
 
 const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
     const { chainProjectId, projectId, user, approvers, project, setError, setSuccess, setSuccessTitle } = props;
-    console.log("🚀 ~ file: MilestoneVoteBox.tsx:42 ~ MilestoneVoteBox ~ props:", props)
 
     const [votes, setVotes] = useState<Votes | null>(null)
     const [loading, setLoading] = useState(true)

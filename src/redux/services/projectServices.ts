@@ -78,6 +78,27 @@ export const getApproverProfiles = async (walletAddresses: string[]) => {
   }
 };
 
+export const getMilestoneAttachments = async (
+  projectId: number | string,
+  milestoneIndex: number,
+) => {
+  const resp = await fetch(
+    `${config.apiBase}/project/submitMilestone?projectId=${projectId}&milestoneIndex=${milestoneIndex}`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'get',
+    }
+  );
+
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    return {
+      message: 'Failed to get milestone attachments. status:' + resp.status,
+    };
+  }
+};
+
 export const updateMilestone = async (
   projectId: number,
   milestoneIndex: number,
@@ -96,6 +117,29 @@ export const updateMilestone = async (
   } else {
     return {
       message: 'Failed to get all brief applications. status:' + resp.status,
+    };
+  }
+};
+
+export const uploadMilestoneAttachments = async (
+  projectId: number | string,
+  milestoneIndex: number,
+  fileURLs: string[]
+) => {
+  const resp = await fetch(
+    `${config.apiBase}/project/submitMilestone?projectId=${projectId}&milestoneIndex=${milestoneIndex}`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'post',
+      body: JSON.stringify(fileURLs),
+    }
+  );
+
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    return {
+      message: 'Failed to submit milestone attachments. status:' + resp.status,
     };
   }
 };

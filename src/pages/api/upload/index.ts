@@ -1,19 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import nextConnect from 'next-connect';
+import passport from 'passport';
 
 import { method1 } from '@/lib/upload';
 
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== 'POST') {
-    res.status(400).send(`Invalid method: ${req.method}`);
-    return;
-  }
-
-  method1(req, res);
-}
+export default nextConnect()
+  .use(passport.initialize())
+  .post(async (req: NextApiRequest, res: NextApiResponse) => {
+    method1(req, res);
+  });
 
 export const config = {
   api: {
