@@ -80,6 +80,10 @@
   border-color: var(--theme-purple);
 }
 
+.MuiLinearProgress-bar {
+  border-radius: 10px;
+}
+
 @supports (-webkit-hyphens: none) {
   .MuiOutlinedInput-notchedOutline legend {
     display: none;

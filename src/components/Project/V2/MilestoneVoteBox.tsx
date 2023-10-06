@@ -7,9 +7,9 @@ import { initImbueAPIInfo } from '@/utils/polkadot';
 import VoteModal from '@/components/ReviewModal/VoteModal';
 import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 
-import { ImbueChainPollResult, Project, User } from '@/model';
-import ChainService, { ImbueChainEvent } from '@/redux/services/chainService';
-import { getMillestoneVotes, updateFirstPendingMilestone, updateMilestone, updateProjectVotingState, voteOnMilestone } from '@/redux/services/projectServices';
+import { Project, User } from '@/model';
+import ChainService from '@/redux/services/chainService';
+import { getMillestoneVotes, voteOnMilestone } from '@/redux/services/projectServices';
 
 type MilestoneVoteBoxProps = {
     firstPendingMilestone: number;
@@ -38,7 +38,7 @@ type Votes = {
 }
 
 const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
-    const { chainProjectId, projectId, user, approvers, project, setError, setSuccess, setSuccessTitle } = props;
+    const { chainProjectId, projectId, user, approvers, project, setError, setLoadingMain } = props;
 
     const [votes, setVotes] = useState<Votes | null>(null)
     const [loading, setLoading] = useState(true)
@@ -56,7 +56,7 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
 
     const firstPendingMilestone = props?.firstPendingMilestone >= 0 ? props?.firstPendingMilestone : project?.milestones?.length - 1
     const currentMilestoneName = project?.milestones?.length ? project?.milestones?.[firstPendingMilestone]?.name || "" : ""
-    
+
 
     useEffect(() => {
         const syncVotes = async () => {
@@ -118,84 +118,6 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
         // setMile stone key in view
         setMilestoneKeyInView(milestone_index);
     }
-
-    const handleVoteOnMilestone = async (vote: boolean) => {
-        props?.setLoadingMain(true);
-
-        if (!project?.id || !user.web3_address) return
-
-        try {
-            const imbueApi = await initImbueAPIInfo();
-            // const userRes: User | any = await utils.getCurrentUser();
-            const chainService = new ChainService(imbueApi, user);
-
-            const result = await chainService.voteOnMilestone(
-                votingWalletAccount,
-                project.chain_project_id,
-                milestoneKeyInView,
-                vote
-            );
-
-            let pollResult = ImbueChainPollResult.Pending;
-
-            if (!result.txError) {
-                pollResult = (await chainService.pollChainMessage(
-                    ImbueChainEvent.ApproveMilestone,
-                    votingWalletAccount
-                )) as ImbueChainPollResult;
-            } else {
-                setError({ message: result.errorMessage });
-            }
-
-            // eslint-disable-next-line no-constant-condition
-            while (true) {
-                if (pollResult == ImbueChainPollResult.EventFound) {
-                    await updateMilestone(Number(project?.id), milestoneKeyInView, true);
-                    await updateProjectVotingState(Number(project.id), false)
-                    await updateFirstPendingMilestone(Number(project.id), (Number(project.first_pending_milestone) + 1))
-                    await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
-
-                    setSuccess(true);
-                    setSuccessTitle('Your vote was successful. This milestone has been completed.');
-                    props?.setLoadingMain(false);
-                    break;
-
-                } else if (result.status) {
-                    await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
-
-                    setSuccess(true);
-                    setSuccessTitle('Your vote was successful.');
-                    props?.setLoadingMain(false);
-                    break;
-
-                } else if (result.txError) {
-                    setError({ message: result.errorMessage });
-                    props?.setLoadingMain(false);
-                    break;
-
-                } else if (pollResult != ImbueChainPollResult.Pending) {
-                    await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
-
-                    setSuccess(true);
-                    setSuccessTitle('Request resolved successfully');
-                    props?.setLoadingMain(false);
-                    break;
-                }
-                await new Promise((f) => setTimeout(f, 1000));
-            }
-        } catch (error) {
-            setError({ message: 'Could not vote. Please try again later' });
-            // eslint-disable-next-line no-console
-            console.error(error)
-            props?.setLoadingMain(false);
-        }
-        // finally {
-        //     console.log("in finally");
-
-        //     setLoading(false);
-        // }
-    };
-
 
     return (
         <div>
@@ -343,7 +265,14 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
                     <VoteModal
                         visible={showVotingModal}
                         setVisible={setShowVotingModal}
-                        handleVote={handleVoteOnMilestone}
+                        {...{
+                            setLoading: setLoadingMain,
+                            project,
+                            user,
+                            setError,
+                            votingWalletAccount,
+                            milestoneKeyInView
+                        }}
                     />
 
                 )

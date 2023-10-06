@@ -15,11 +15,9 @@ import { initImbueAPIInfo } from '@/utils/polkadot';
 import VoteModal from '@/components/ReviewModal/VoteModal';
 import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 
-import { ImbueChainPollResult, Milestone, OffchainProjectState, Project, User } from '@/model';
-import ChainService, { ImbueChainEvent } from '@/redux/services/chainService';
-import { getMilestoneAttachments, updateMilestone, updateProjectVotingState, uploadMilestoneAttachments } from '@/redux/services/projectServices';
-import { updateFirstPendingMilestone } from '@/redux/services/projectServices';
-import { voteOnMilestone } from '@/redux/services/projectServices';
+import { Milestone, OffchainProjectState, Project, User } from '@/model';
+import ChainService from '@/redux/services/chainService';
+import { getMilestoneAttachments, updateProjectVotingState, uploadMilestoneAttachments } from '@/redux/services/projectServices';
 import { updateProject } from '@/redux/services/projectServices';
 
 interface ExpandableMilestonProps {
@@ -178,84 +176,6 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
     setMilestoneKeyInView(milestone_index);
   }
 
-  const handleVoteOnMilestone = async (vote: boolean) => {
-    setLoading(true);
-
-    if (!project?.id || !user.web3_address) return
-
-    try {
-      const imbueApi = await initImbueAPIInfo();
-      // const userRes: User | any = await utils.getCurrentUser();
-      const chainService = new ChainService(imbueApi, user);
-
-      const result = await chainService.voteOnMilestone(
-        votingWalletAccount,
-        project.chain_project_id,
-        milestoneKeyInView,
-        vote
-      );
-
-      let pollResult = ImbueChainPollResult.Pending;
-
-      if (!result.txError) {
-        pollResult = (await chainService.pollChainMessage(
-          ImbueChainEvent.ApproveMilestone,
-          votingWalletAccount
-        )) as ImbueChainPollResult;
-      } else {
-        setError({ message: result.errorMessage });
-      }
-
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        if (pollResult == ImbueChainPollResult.EventFound) {
-          await updateMilestone(milestone.project_id, milestoneKeyInView, true);
-          await updateProjectVotingState(Number(project.id), false)
-          await updateFirstPendingMilestone(Number(project.id), (Number(project.first_pending_milestone) + 1))
-          await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
-
-          setSuccess(true);
-          setSuccessTitle('Your vote was successful. This milestone has been completed.');
-          setLoading(false);
-          break;
-
-        } else if (result.status) {
-          await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
-
-          setSuccess(true);
-          setSuccessTitle('Your vote was successful.');
-          setLoading(false);
-          break;
-
-        } else if (result.txError) {
-          setError({ message: result.errorMessage });
-          setLoading(false);
-          break;
-
-        } else if (pollResult != ImbueChainPollResult.Pending) {
-          await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
-
-          setSuccess(true);
-          setSuccessTitle('Request resolved successfully');
-          setLoading(false);
-          break;
-        }
-        await new Promise((f) => setTimeout(f, 1000));
-      }
-    } catch (error) {
-      setError({ message: 'Could not vote. Please try again later' });
-      // eslint-disable-next-line no-console
-      console.error(error)
-      setLoading(false);
-    }
-    // finally {
-    //     console.log("in finally");
-
-    //     setLoading(false);
-    // }
-  };
-
-
   // voting on a mile stone
   const handleWithdraw = (milestone_index: number) => {
     // set submitting mile stone to true
@@ -265,7 +185,6 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
     // setMile stone key in view
     setMilestoneKeyInView(milestone_index);
   }
-
 
   // withdrawing funds
   const withdraw = async (account: WalletAccount) => {
@@ -338,9 +257,18 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
       {
         showVotingModal && (
           <VoteModal
+            {...{
+              setSuccessTitle,
+              setSuccess,
+              setError,
+              milestoneKeyInView
+            }}
             visible={showVotingModal}
             setVisible={setShowVotingModal}
-            handleVote={handleVoteOnMilestone}
+            setLoading={setLoading}
+            user={user}
+            project={project}
+            votingWalletAccount={votingWalletAccount}
           />
 
         )
@@ -403,7 +331,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
               <p className='text-black mt-10 font-semibold text-lg'>
                 Milestone description and expectation
               </p>
-              <p className='mt-5'>{milestone.description}</p>
+              <p className='mt-5 whitespace-pre-wrap break-words'>{milestone.description}</p>
               {
                 showSubmitButton && (
                   <div>

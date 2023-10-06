@@ -25,7 +25,8 @@ export const method1 = async (req: NextApiRequest, res: NextApiResponse) => {
   const promises: Promise<any>[] = [];
 
   fileList.forEach((file: any) => {
-    const fileName = userAuth.username+ "_" + Date.now() + file.originalFilename;
+    const fileName =
+      userAuth.username + Date.now() + '$' + file.originalFilename;
 
     const promise = new Promise<any>((resolve, reject) => {
       createReadStream(file.filepath)

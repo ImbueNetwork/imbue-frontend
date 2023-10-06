@@ -35,7 +35,6 @@ export default nextConnect()
           project_id: projectId,
           milestone_index: milestoneIndex,
         });
-        console.log("🚀 ~ file: index.ts:38 ~ constresp:any=awaittx ~ resp:", resp)
 
         return res.status(201).json(resp);
       } catch (cause) {

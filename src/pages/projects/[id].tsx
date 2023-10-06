@@ -3,7 +3,6 @@
 /* eslint-disable no-constant-condition */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Alert, IconButton } from '@mui/material';
-import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import Image from 'next/image';
@@ -23,7 +22,6 @@ import { NoConfidenceVoter } from '@/lib/queryServices/projectQueries';
 import * as utils from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
-import AccountChoice from '@/components/AccountChoice';
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
 import RefundScreen from '@/components/Grant/Refund';
@@ -33,13 +31,14 @@ import ProjectApprovers from '@/components/Project/ProjectApprovers';
 import ProjectBalance from '@/components/Project/ProjectBalance';
 import ExpandableMilestone from '@/components/Project/V2/ExpandableMilestone';
 import MilestoneVoteBox from '@/components/Project/V2/MilestoneVoteBox';
+import NoConfidenceBox from '@/components/Project/V2/NoConfidenceVoteBox';
+import NoConfidenceList from '@/components/Project/VotingList/NoConfidenceList';
 import VotingList from '@/components/Project/VotingList/VotingList';
 import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
 
 import { timeData } from '@/config/briefs-data';
 import {
-  ImbueChainPollResult,
   Milestone,
   OffchainProjectState,
   Project,
@@ -48,11 +47,9 @@ import {
 import { Currency } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
-import { ImbueChainEvent } from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import {
   getProjectNoConfidenceVoters,
-  insertNoConfidenceVoter,
   updateProject,
 } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
@@ -79,9 +76,6 @@ function Project() {
     (state: RootState) => state.userState
   );
   const [showPolkadotAccounts, setShowPolkadotAccounts] =
-    useState<boolean>(false);
-
-  const [raiseVoteOfNoConfidence, setRaiseVoteOfNoConfidence] =
     useState<boolean>(false);
 
   // const [chainLoading, setChainLoading] = useState<boolean>(true);
@@ -128,8 +122,8 @@ function Project() {
     (isApprover &&
       user?.web3_address &&
       !(milestoneVotes?.length && milestoneVotes?.includes(user.web3_address))) ||
-      (projectType === 'brief' && isProjectOwner);
-      
+    (projectType === 'brief' && isProjectOwner);
+
 
   const approvedMilestones = project?.milestones?.filter?.(
     (milstone: Milestone) => milstone?.is_approved === true
@@ -154,6 +148,8 @@ function Project() {
     }
   };
 
+  const [noConfidenceVoters, setNoConfidenceVoters] = useState<NoConfidenceVoter[]>([])
+
   const getChainProject = async (project: Project, freelancer: any) => {
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
     if (project?.chain_project_id && project?.id) {
@@ -169,6 +165,8 @@ function Project() {
         const voters: NoConfidenceVoter[] = await getProjectNoConfidenceVoters(
           project.id
         );
+
+        setNoConfidenceVoters(voters)
         const isApprover = voters?.find(
           (voter) => voter.web3_address === user.web3_address
         );
@@ -314,6 +312,7 @@ function Project() {
         await syncProject(projectRes);
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(error);
       setError({ message: 'can not find the project ' + error });
     } finally {
@@ -394,118 +393,6 @@ function Project() {
     }
   };
 
-  const refund = async (account: WalletAccount) => {
-    if (!project?.id || !project.chain_project_id)
-      return setError({
-        message: 'No project found. Please try reloading the page',
-      });
-
-    // TODO make this a popup value like vote on milestone
-    const vote = false;
-    setLoading(true);
-
-    try {
-      const imbueApi = await initImbueAPIInfo();
-      const chainService = new ChainService(imbueApi, user);
-      let pollResult = ImbueChainPollResult.Pending;
-      let noConfidencePoll = ImbueChainPollResult.Pending;
-
-      if (projectInVotingOfNoConfidence) {
-        const result = await chainService.voteOnNoConfidence(
-          account,
-          project.chain_project_id,
-          vote
-        );
-
-        if (!result.txError) {
-          pollResult = (await chainService.pollChainMessage(
-            ImbueChainEvent.NoConfidenceRoundFinalised,
-            account
-          )) as ImbueChainPollResult;
-          noConfidencePoll = (await chainService.pollChainMessage(
-            ImbueChainEvent.VoteOnNoConfidenceRound,
-            account
-          )) as ImbueChainPollResult;
-        }
-
-        while (true) {
-          if (result.status || result.txError) {
-            if (pollResult == ImbueChainPollResult.EventFound) {
-              project.status_id = OffchainProjectState.Refunded;
-              await updateProject(project?.id, project);
-              await insertNoConfidenceVoter(project?.id, user);
-
-              setSuccess(true);
-              setSuccessTitle(
-                'Your vote for refund was successful. Project has been refunded.'
-              );
-              break;
-            } else if (noConfidencePoll == ImbueChainPollResult.EventFound) {
-              await insertNoConfidenceVoter(project?.id, user);
-
-              setSuccess(true);
-              setSuccessTitle('Your vote for refund was successful');
-              break;
-            } else if (result.status) {
-              setSuccess(true);
-              setSuccessTitle('Request resolved successfully');
-              break;
-            } else if (result.txError) {
-              setError({ message: result.errorMessage });
-              break;
-            }
-            if (pollResult != ImbueChainPollResult.Pending) {
-              break;
-            }
-          }
-          await new Promise((f) => setTimeout(f, 1000));
-        }
-      } else {
-        const result = await chainService.raiseVoteOfNoConfidence(
-          account,
-          project.chain_project_id
-        );
-
-        if (!result.txError) {
-          pollResult = (await chainService.pollChainMessage(
-            ImbueChainEvent.RaiseNoConfidenceRound,
-            account
-          )) as ImbueChainPollResult;
-          <button className='bg-white text-black text-sm rounded-full px-3 py-2 ml-auto'>
-            Vote
-          </button>;
-        }
-
-        while (true) {
-          if (
-            result.status ||
-            result.txError ||
-            pollResult == ImbueChainPollResult.EventFound
-          ) {
-            if (pollResult == ImbueChainPollResult.EventFound) {
-              project.project_in_voting_of_no_confidence = true;
-              await updateProject(project?.id, project);
-              await insertNoConfidenceVoter(project?.id, user);
-              setSuccess(true);
-              setSuccessTitle('Vote of no confidence raised.');
-            } else if (result.status) {
-              setSuccess(true);
-              setSuccessTitle('Request resolved successfully.');
-            } else if (result.txError) {
-              setError({ message: result.errorMessage });
-            }
-            break;
-          }
-          await new Promise((f) => setTimeout(f, 1000));
-        }
-      }
-    } catch (error) {
-      setError({ message: 'Something went wrong. ', error });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const [copied, setCopied] = useState<boolean>(false);
 
   const copyAddress = () => {
@@ -516,21 +403,7 @@ function Project() {
     }, 3000);
   };
 
-  const renderPolkadotJSModal = (
-    <div>
-      <AccountChoice
-        accountSelected={async (account: WalletAccount) => {
-          if (raiseVoteOfNoConfidence) {
-            refund(account);
-          }
-        }}
-        visible={showPolkadotAccounts}
-        setVisible={setShowPolkadotAccounts}
-        initiatorAddress={user.web3_address}
-        filterByInitiator
-      />
-    </div>
-  );
+  const [openNoRefundList, setOpenNoRefundList] = useState<boolean>(false);
 
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
@@ -542,17 +415,29 @@ function Project() {
         <div className='border-inherit col-start-1 col-end-10 mt-5 border rounded-xl py-4 px-5'>
           <div className='flex mb-4 items-center justify-between'>
             <p className='text-sm text-[#747474]'>Project Description</p>
-            <button
-              className='px-3 flex items-center  py-1.5 rounded-full border border-inherit text-sm text-black cursor-pointer'
-              onClick={() => setExpandProjectDesc((prev) => !prev)}
-            >
+            <div className='flex items-center gap-2'>
               {
-                expandProjectDesc
-                  ? 'Hide'
-                  : 'View'
-              } full Description
-              <TfiNewWindow className='ml-1.5 text-gray-500' size={14} />
-            </button>
+                project?.project_in_voting_of_no_confidence && (
+                  <button
+                    className='px-3 flex items-center gap-2  py-1.5 rounded-full border border-[#EBEAE2] text-sm text-imbue-coral bg-[#FFEBEA] cursor-pointer'
+                  >
+                    <Image src={require('@/assets/svgs/info-circle-red.svg')} alt='' />
+                    Refund Vote in Progress
+                  </button>
+                )
+              }
+              <button
+                className='px-3 flex items-center  py-1.5 rounded-full border border-inherit text-sm text-black cursor-pointer'
+                onClick={() => setExpandProjectDesc((prev) => !prev)}
+              >
+                {
+                  expandProjectDesc
+                    ? 'Hide'
+                    : 'View'
+                } full Description
+                <TfiNewWindow className='ml-1.5 text-gray-500' size={14} />
+              </button>
+            </div>
           </div>
           <h4 className='text-imbue-purple-dark text-2xl'>{project.name}</h4>
           <p className='text-black text-sm py-5 whitespace-pre-wrap break-words'>
@@ -722,6 +607,21 @@ function Project() {
 
           {/* ending side bar for project details */}
           <div className='bg-white mt-5'>
+            <div className='bg-[#FFDAD8] col-start-10 px-5 rounded-xl py-3 border border-[#FF8C86]'>
+              <NoConfidenceBox
+                noConfidenceVoters={noConfidenceVoters}
+                setLoadingMain={setLoading}
+                approversCount={approversPreview?.length || 0}
+                {...{
+                  setError,
+                  project,
+                  canVote,
+                  user,
+                  setOpenVotingList: setOpenNoRefundList,
+                  approverVotedOnRefund
+                }} />
+            </div>
+
             <div className='bg-white col-start-10 px-3 rounded-xl py-3 border border-light-grey'>
               <MilestoneVoteBox
                 chainProjectId={project.chain_project_id}
@@ -737,6 +637,7 @@ function Project() {
                   canVote,
                   user,
                   setOpenVotingList,
+                  approverVotedOnRefund
                 }}
               />
             </div>
@@ -766,6 +667,20 @@ function Project() {
         setMilestoneVotes={setMilestoneVotes}
         project={project}
       />
+
+      {
+        openNoRefundList && (
+          <NoConfidenceList
+            {...{
+              open: openNoRefundList,
+              setMilestoneVotes,
+              approvers: approversPreview,
+              setOpenNoRefundList,
+              project
+            }}
+          />
+        )
+      }
 
       <BackDropLoader open={loading || userLoading} />
 

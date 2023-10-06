@@ -25,7 +25,7 @@ export const getNoConfidenceVotersByProjectId =
 
 export const getNoConfidenceVotersAddress =
   (id: string | number) => (tx: Knex.Transaction) =>
-    tx('no_confidence_voters').select('web3_address').where({ project_id: id });
+    tx('no_confidence_voters').select('*').where({ project_id: id });
 
 // votes
 
