@@ -74,9 +74,9 @@ const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
             <div className='bg-white mt-5 py-7 rounded-xl px-3'>
 
                 <div className='flex justify-between gap-2'>
-                    <div 
-                    className='mt-auto cursor-pointer'
-                    onClick={() => props?.setOpenVotingList(true)}
+                    <div
+                        className='mt-auto cursor-pointer'
+                        onClick={() => props?.setOpenVotingList(true)}
                     >
                         {/* <AvatarGroup className='justify-end' max={3}>
                             {
@@ -89,9 +89,9 @@ const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
                             No <span className='text-gray-400'>({0} votes/ {0}%)</span>
                         </p>
                     </div>
-                    <div 
-                    className='mt-auto cursor-pointer'
-                    onClick={() => props?.setOpenVotingList(true)}
+                    <div
+                        className='mt-auto cursor-pointer'
+                        onClick={() => props?.setOpenVotingList(true)}
                     >
                         <AvatarGroup max={3}>
                             {
@@ -106,20 +106,25 @@ const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
                         </p>
                     </div>
                 </div>
-                <div className='flex w-full relative mt-5'>
+                <div className='flex w-full items-center rounded-full relative mt-5 bg-[#DDDCD6]'>
                     <LinearProgress
-                        className='w-[50%] text-imbue-coral rotate-180 before:bg-[#DDDCD6]    h-5 rounded-full'
+                        className='w-[52%] text-imbue-coral rotate-180 before:bg-[#DDDCD6]    h-5 rounded-full'
                         color='inherit'
                         variant='determinate'
-                        value={10}
+                        value={0}
                     />
                     <div className='w-3 left-[47%] top-[20%] absolute z-10 bg-[#DDDCD6] rounded-full h-3'></div>
-                    <LinearProgress
-                        className='w-[50%] h-5 -ml-3 rounded-full bg-[#DDDCD6]'
-                        variant='determinate'
-                        color='secondary'
-                        value={(noConfidenceVoters.length / props.approversCount) * 100 || 0}
-                    />
+                    {
+                        noConfidenceVoters?.length
+                            ? (
+                                <LinearProgress
+                                    className='w-[55%] h-5 -ml-5 rounded-full bg-[#DDDCD6]'
+                                    variant='determinate'
+                                    value={(noConfidenceVoters.length / props.approversCount) * 100 || 0}
+                                    color='secondary'
+                                />)
+                            : ""
+                    }
                 </div>
             </div>
 

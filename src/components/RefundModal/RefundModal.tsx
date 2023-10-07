@@ -3,13 +3,25 @@ import { BiArrowBack } from 'react-icons/bi';
 
 interface VotingModalProps {
   setVisible: (_visible: boolean) => void;
+  setLoading: (_loading: boolean) => void;
   handleRefund: () => void;
+  handleVote: (_vote: boolean) => Promise<void>;
 }
 
 export default function RefundModal({
   setVisible,
   handleRefund,
+  handleVote,
+  setLoading
 }: VotingModalProps) {
+
+  const handleNoVote = async (): Promise<void> => {
+    setLoading(true)
+    setVisible(false);
+    await handleVote(false);
+    setLoading(false)
+  }
+
   return (
     <div className='bg-white  max-w-[31.938rem] px-12 text-left py-5 rounded-[18px]'>
       <div className='inline-block bg-light-grey pt-2 pb-4 mt-12 mb-8  px-4 rounded-lg'>
@@ -24,7 +36,7 @@ export default function RefundModal({
         </p>
         <div className='flex mb-5 space-x-3 w-full items-center mt-9'>
           <button
-            onClick={() => setVisible(false)}
+            onClick={handleNoVote}
             className='border px-5 py-2  border-imbue-purple text-imbue-purple rounded-full'
           >
             No

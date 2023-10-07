@@ -238,55 +238,50 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
                             )
                     }
                 </div>
-                <div className='flex w-full relative mt-5'>
+                <div className='flex w-full items-center rounded-full relative mt-5 bg-[#DDDCD6]'>
                     <LinearProgress
-                        className='w-[50%] text-imbue-coral rotate-180 before:bg-[#DDDCD6]    h-5 rounded-full'
+                        className='w-[52%] text-imbue-coral rotate-180 before:bg-[#DDDCD6]    h-5 rounded-full'
                         color='inherit'
                         variant='determinate'
                         value={loading ? 0 : noPercent}
                     />
                     <div className='w-3 left-[47%] top-[20%] absolute z-10 bg-[#DDDCD6] rounded-full h-3'></div>
-                    <LinearProgress
-                        className='w-[50%] h-5 -ml-3 rounded-full bg-[#DDDCD6]'
-                        variant='determinate'
-                        value={loading ? 0 : yesPercent}
-                        color='secondary'
-                    />
+                    {
+                        yesPercent
+                            ? (
+                                <LinearProgress
+                                    className='w-[55%] h-5 -ml-5 rounded-full bg-[#DDDCD6]'
+                                    variant='determinate'
+                                    value={loading ? 0 : yesPercent}
+                                    color='secondary'
+                                />)
+                            : ""
+                    }
                 </div>
             </div>
 
-            {
-                showPolkadotAccounts && (
-                    <Web3WalletModal
-                        accountSelected={async (account: WalletAccount) => {
-                            setVotingWalletAccount(account);
-                            setShowVotingModal(true);
-                            setShowPolkadotAccounts(false);
-                        }}
-                        polkadotAccountsVisible={showPolkadotAccounts}
-                        showPolkadotAccounts={setShowPolkadotAccounts}
-                    // initiatorAddress={project?.owner}
-                    // filterByInitiator
-                    />)
-            }
+            <Web3WalletModal
+                accountSelected={async (account: WalletAccount) => {
+                    setVotingWalletAccount(account);
+                    setShowVotingModal(true);
+                    setShowPolkadotAccounts(false);
+                }}
+                polkadotAccountsVisible={showPolkadotAccounts}
+                showPolkadotAccounts={setShowPolkadotAccounts}
+            />
 
-            {
-                showVotingModal && (
-                    <VoteModal
-                        visible={showVotingModal}
-                        setVisible={setShowVotingModal}
-                        {...{
-                            setLoading: setLoadingMain,
-                            project,
-                            user,
-                            setError,
-                            votingWalletAccount,
-                            milestoneKeyInView
-                        }}
-                    />
-
-                )
-            }
+            <VoteModal
+                visible={showVotingModal}
+                setVisible={setShowVotingModal}
+                {...{
+                    setLoading: setLoadingMain,
+                    project,
+                    user,
+                    setError,
+                    votingWalletAccount,
+                    milestoneKeyInView
+                }}
+            />
         </div>
     );
 };

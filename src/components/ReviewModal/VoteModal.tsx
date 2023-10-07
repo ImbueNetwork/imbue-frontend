@@ -34,6 +34,7 @@ interface VotingModalProps {
 
 export default function VoteModal({ visible, setVisible, setLoading, project, user, votingWalletAccount, milestoneKeyInView, setError }: VotingModalProps) {
   const [vote, setVote] = useState<boolean>(true);
+  const [voteRefund, setVoteRefund] = useState<boolean>(false);
   const [step, setStep] = useState<number>(0)
 
   const handleVoteOnMilestone = async (vote: boolean) => {
@@ -70,28 +71,28 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
           await updateFirstPendingMilestone(Number(project.id), (Number(project.first_pending_milestone) + 1))
           await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
 
-          setVisible(true);
           setStep(4)
+          setVisible(true);
           break;
 
         } else if (result.status) {
           await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
 
-          setVisible(true);
           setStep(4)
+          setVisible(true);
           break;
 
         } else if (result.txError) {
           setError({ message: result.errorMessage });
-
+          setStep(0)
           setVisible(false);
           break;
 
         } else if (pollResult != ImbueChainPollResult.Pending) {
           await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
 
-          setVisible(true);
           setStep(4)
+          setVisible(true);
           break;
         }
         await new Promise((f) => setTimeout(f, 1000));
@@ -99,13 +100,10 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
 
     } catch (error) {
       setError({ message: 'Could not vote. Please try again later' });
+      setStep(0)
       // eslint-disable-next-line no-console
       console.error(error)
-      // setLoading(false);
     }
-    // finally {
-    //   setLoading(false);
-    // }
   };
 
 
@@ -151,19 +149,20 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
               await insertNoConfidenceVoter(project?.id, user);
 
               setVisible(true);
+              setVoteRefund(true);
               setStep(4)
               break;
             } else if (noConfidencePoll == ImbueChainPollResult.EventFound) {
               await insertNoConfidenceVoter(project?.id, user);
 
               setVisible(true);
+              setVoteRefund(true);
               setStep(4)
-
               break;
             } else if (result.status) {
               setVisible(true);
               setStep(4)
-
+              setVoteRefund(true);
               break;
             } else if (result.txError) {
               setError({ message: result.errorMessage });
@@ -199,10 +198,12 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
               await updateProject(project?.id, project);
               await insertNoConfidenceVoter(project?.id, user);
               setStep(4)
+              setVoteRefund(true);
               setVisible(true);
 
             } else if (result.status) {
               setStep(4)
+              setVoteRefund(true);
               setVisible(true);
 
             } else if (result.txError) {
@@ -237,7 +238,7 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
     <Modal
       open={visible}
       className='flex justify-center items-center'
-      // onClose={() => {setVisible(false)}}
+    // onClose={() => {setVisible(false)}}
     >
       <div>
         {
@@ -303,7 +304,12 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
 
         {
           step === 3 && !vote && (
-            <RefundModal handleRefund={refund} setVisible={setVisible} />
+            <RefundModal
+              setLoading={setLoading}
+              handleVote={handleVoteOnMilestone}
+              handleRefund={refund}
+              setVisible={setVisible}
+            />
           )
         }
 
@@ -311,7 +317,7 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
           step === 4 && (
             <>
               {
-                vote
+                !voteRefund
                   ? <SuccessModal setVisible={setVisible} />
                   : <SuccessRefundModal setVisible={setVisible} />
               }
