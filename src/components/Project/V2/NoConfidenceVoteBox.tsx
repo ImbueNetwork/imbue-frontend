@@ -72,7 +72,6 @@ const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
                 </div>
             </div>
             <div className='bg-white mt-5 py-7 rounded-xl px-3'>
-
                 <div className='flex justify-between gap-2'>
                     <div
                         className='mt-auto cursor-pointer'
@@ -128,38 +127,28 @@ const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
                 </div>
             </div>
 
-            {
-                showPolkadotAccounts && (
-                    <Web3WalletModal
-                        accountSelected={async (account: WalletAccount) => {
-                            setVotingWalletAccount(account);
-                            setShowVotingModal(true);
-                            setShowPolkadotAccounts(false);
-                        }}
-                        polkadotAccountsVisible={showPolkadotAccounts}
-                        showPolkadotAccounts={setShowPolkadotAccounts}
-                    // initiatorAddress={project?.owner}
-                    // filterByInitiator
-                    />)
-            }
+            <Web3WalletModal
+                accountSelected={async (account: WalletAccount) => {
+                    setVotingWalletAccount(account);
+                    setShowVotingModal(true);
+                    setShowPolkadotAccounts(false);
+                }}
+                polkadotAccountsVisible={showPolkadotAccounts}
+                showPolkadotAccounts={setShowPolkadotAccounts}
+            />
 
-            {
-                showVotingModal && (
-                    <VoteModal
-                        visible={showVotingModal}
-                        setVisible={setShowVotingModal}
-                        {...{
-                            setLoading: setLoadingMain,
-                            project,
-                            user,
-                            setError,
-                            votingWalletAccount,
-                            milestoneKeyInView
-                        }}
-                    />
-
-                )
-            }
+            <VoteModal
+                visible={showVotingModal}
+                setVisible={setShowVotingModal}
+                {...{
+                    setLoading: setLoadingMain,
+                    project,
+                    user,
+                    setError,
+                    votingWalletAccount,
+                    milestoneKeyInView
+                }}
+            />
         </div>
     );
 };
