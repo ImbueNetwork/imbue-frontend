@@ -4,12 +4,117 @@ import {
   InputAdornment,
   InputLabel,
 } from '@mui/material';
+import { decodeAddress } from "@polkadot/util-crypto/address"
+import { WalletAccount } from '@talismn/connect-wallets';
+import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
+import { initImbueAPIInfo } from '@/utils/polkadot';
 import { getServerSideProps } from '@/utils/serverSideProps';
 
+import ErrorScreen from '@/components/ErrorScreen';
+import FullScreenLoader from '@/components/FullScreenLoader';
+import SuccessScreen from '@/components/SuccessScreen';
+import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
+
 const Relay = () => {
-  const [_value, setValue] = useState<any>();
+  const [transferAmount, setTransferAmount] = useState<number>(0);
+  const [showPolkadotAccounts, setShwoPolkadotAccounts] = useState<boolean>(false)
+
+  // screens
+  const [error, setError] = useState<any>()
+  const [success, setSuccess] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
+
+  const router = useRouter()
+
+  const transfetFromChain = async (account: WalletAccount) => {
+    setShwoPolkadotAccounts(false)
+    setLoading(true)
+    const relayApi = (await initImbueAPIInfo()).relayChain.api
+    const imbueApi = (await initImbueAPIInfo()).imbue.api
+
+    const transfetAmount = BigInt(parseFloat(transferAmount.toString()) * 1e12)
+
+    if (relayApi && transfetAmount) {
+      // Todo: loading screen
+
+      const { data: { free: freeBalance } } = await relayApi.query.system.account(account.address) as any
+      const userHasEnoughBalance = freeBalance.toBigInt() >= Number(transferAmount)
+
+      if (userHasEnoughBalance) {
+        const dest = { V0: { X1: { Parachain: 2121 } } };
+        const beneficiary = {
+          V1: {
+            parents: 0,
+            interior: {
+              X1: {
+                AccountId32: {
+                  network: "Any",
+                  id: decodeAddress(account.address)
+                }
+              }
+            }
+          }
+        };
+
+        const assets = {
+          V1: [{
+            id: { Concrete: { parents: 0, interior: "Here" } },
+            fun: { Fungible: transferAmount }
+          }]
+        };
+
+        const feeAssetItem = 0;
+        // const injector = await web3FromSource(account.source);
+        const extrinsic = relayApi?.tx.xcmPallet.reserveTransferAssets(dest, beneficiary, assets, feeAssetItem);
+
+        try {
+          const txHash = await extrinsic.signAndSend(
+            account.address,
+            // { signer: injector.signer },
+            {},
+            ({ status }) => {
+              imbueApi?.query.system.events((events: any) => {
+                if (events) {
+                  // Loop through the Vec<EventRecord>
+                  events.forEach((record: any) => {
+                    const { event, phase } = record;
+                    const currenciesDeposited = `${event.section}.${event.method}` == "ormlTokens.Deposited";
+                    if (currenciesDeposited) {
+                      const types = event.typeDef;
+                      const accountId = event.data[1];
+
+                      if (accountId == account.address) {
+                        setSuccess(true)
+                      }
+                    }
+                  });
+                }
+              });
+            });
+
+          console.log('txHash', txHash);
+        } catch (error: any) {
+          // eslint-disable-next-line no-console
+          console.error(error)
+          setError({ message: "Error occurred.  " + error })
+        } finally {
+          setLoading(false)
+        }
+      }
+      else {
+        const avilableBalance = Number(freeBalance.toBigInt() / BigInt(1e12))
+        const errorMessage = `Error: Insuffient balance to complete transfer. Available balance is ${avilableBalance.toFixed(2)}`
+
+        // eslint-disable-next-line no-console
+        console.error(errorMessage)
+        setError({ message: errorMessage })
+      }
+    }
+  }
+
+
   return (
     <div className='bg-background p-10 rounded-2xl'>
       <h1 className='fund-h1'>My funds</h1>
@@ -27,7 +132,8 @@ const Relay = () => {
           Amount to transfer*
         </InputLabel>
         <FilledInput
-          onChange={(e) => setValue(e.target.value)}
+          type='number'
+          onChange={(e) => setTransferAmount(Number(e.target.value))}
           className='pt-2 text-lg'
           id='filled-adornment-amount'
           startAdornment={
@@ -37,9 +143,63 @@ const Relay = () => {
           }
         />
       </FormControl>
-      <button className='rounded-xl transition-colors duration-300 bg-background  hover:bg-primary hover:border-primary text-content shadow-lg border border-imbue-light-purple w-full py-5 text-lg'>
+      <button
+        className={`rounded-xl transition-colors duration-300 ${transferAmount > 0 ? 'bg-background  hover:bg-primary hover:border-primary' : 'bg-light-grey'} text-content shadow-lg border border-imbue-light-purple w-full py-5 text-lg`}
+        onClick={() => setShwoPolkadotAccounts(true)}
+        disabled={!transferAmount}
+      >
         Transfer
       </button>
+
+      <Web3WalletModal
+        polkadotAccountsVisible={showPolkadotAccounts}
+        showPolkadotAccounts={setShwoPolkadotAccounts}
+        accountSelected={(account) => transfetFromChain(account)}
+
+      />
+
+      {loading && <FullScreenLoader />}
+
+      <SuccessScreen
+        title={'You have successfully transferred funds'}
+        open={success}
+        setOpen={setSuccess}
+      >
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => {
+              setSuccess(false);
+              setTransferAmount(0)
+            }}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Transfer Again
+          </button>
+          <button
+            onClick={() => (window.location.href = `/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to Dashboard
+          </button>
+        </div>
+      </SuccessScreen>
+
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
     </div>
   );
 };
