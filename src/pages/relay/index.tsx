@@ -16,10 +16,11 @@ import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 import SuccessScreen from '@/components/SuccessScreen';
 import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
+import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 
 const Relay = () => {
   const [transferAmount, setTransferAmount] = useState<number>(0);
-  const [showPolkadotAccounts, setShwoPolkadotAccounts] = useState<boolean>(false)
+  const [showPolkadotAccounts, setShowPolkadotAccounts] = useState<boolean>(false)
 
   // screens
   const [error, setError] = useState<any>()
@@ -28,29 +29,33 @@ const Relay = () => {
 
   const router = useRouter()
 
-  const transfetFromChain = async (account: WalletAccount) => {
-    setShwoPolkadotAccounts(false)
-    setLoading(true)
+  const transferFromChain = async (account: WalletAccount) => {
+    setShowPolkadotAccounts(false);
+    setLoading(true);
     const relayApi = (await initImbueAPIInfo()).relayChain.api
     const imbueApi = (await initImbueAPIInfo()).imbue.api
+    const transferAmountInt = BigInt(parseFloat(transferAmount.toString()) * 1e12);
 
-    const transfetAmount = BigInt(parseFloat(transferAmount.toString()) * 1e12)
-
-    if (relayApi && transfetAmount) {
+    if (relayApi && transferAmountInt) {
       // Todo: loading screen
 
       const { data: { free: freeBalance } } = await relayApi.query.system.account(account.address) as any
       const userHasEnoughBalance = freeBalance.toBigInt() >= Number(transferAmount)
-
       if (userHasEnoughBalance) {
-        const dest = { V0: { X1: { Parachain: 2121 } } };
+        const dest = {
+          V3: {
+            parents: 0,
+            interior: {
+              X1: { Parachain: 2121 },
+            },
+          },
+        };
         const beneficiary = {
-          V1: {
+          V3: {
             parents: 0,
             interior: {
               X1: {
                 AccountId32: {
-                  network: "Any",
                   id: decodeAddress(account.address)
                 }
               }
@@ -59,24 +64,28 @@ const Relay = () => {
         };
 
         const assets = {
-          V1: [{
+          V3: [{
             id: { Concrete: { parents: 0, interior: "Here" } },
-            fun: { Fungible: transferAmount }
+            fun: { Fungible: 1000000000000 }
           }]
         };
 
         const feeAssetItem = 0;
-        // const injector = await web3FromSource(account.source);
-        const extrinsic = relayApi?.tx.xcmPallet.reserveTransferAssets(dest, beneficiary, assets, feeAssetItem);
-
+        const weightLimit = 'Unlimited';
+        const extrinsic = await relayApi?.tx.xcmPallet.limitedReserveTransferAssets(dest, beneficiary, assets, feeAssetItem,weightLimit);
         try {
           const txHash = await extrinsic.signAndSend(
             account.address,
-            // { signer: injector.signer },
-            {},
-            ({ status }) => {
+            { signer: account.signer as Signer },
+            (result) => {
               imbueApi?.query.system.events((events: any) => {
                 if (events) {
+
+                  if (!result || !result.status || !events) {
+                    return;
+                  }
+
+
                   // Loop through the Vec<EventRecord>
                   events.forEach((record: any) => {
                     const { event, phase } = record;
@@ -84,7 +93,6 @@ const Relay = () => {
                     if (currenciesDeposited) {
                       const types = event.typeDef;
                       const accountId = event.data[1];
-
                       if (accountId == account.address) {
                         setSuccess(true)
                       }
@@ -145,7 +153,7 @@ const Relay = () => {
       </FormControl>
       <button
         className={`rounded-xl transition-colors duration-300 ${transferAmount > 0 ? 'bg-background  hover:bg-primary hover:border-primary' : 'bg-light-grey'} text-content shadow-lg border border-imbue-light-purple w-full py-5 text-lg`}
-        onClick={() => setShwoPolkadotAccounts(true)}
+        onClick={() => setShowPolkadotAccounts(true)}
         disabled={!transferAmount}
       >
         Transfer
@@ -153,9 +161,8 @@ const Relay = () => {
 
       <Web3WalletModal
         polkadotAccountsVisible={showPolkadotAccounts}
-        showPolkadotAccounts={setShwoPolkadotAccounts}
-        accountSelected={(account) => transfetFromChain(account)}
-
+        showPolkadotAccounts={setShowPolkadotAccounts}
+        accountSelected={(account) => transferFromChain(account)}
       />
 
       {loading && <FullScreenLoader />}
