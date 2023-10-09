@@ -4,6 +4,7 @@ import {
   InputAdornment,
   InputLabel,
 } from '@mui/material';
+import { Signer } from '@polkadot/api/types';
 import { decodeAddress } from "@polkadot/util-crypto/address"
 import { WalletAccount } from '@talismn/connect-wallets';
 import { useRouter } from 'next/router';
@@ -16,7 +17,6 @@ import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 import SuccessScreen from '@/components/SuccessScreen';
 import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
-import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 
 const Relay = () => {
   const [transferAmount, setTransferAmount] = useState<number>(0);
@@ -72,9 +72,9 @@ const Relay = () => {
 
         const feeAssetItem = 0;
         const weightLimit = 'Unlimited';
-        const extrinsic = await relayApi?.tx.xcmPallet.limitedReserveTransferAssets(dest, beneficiary, assets, feeAssetItem,weightLimit);
+        const extrinsic = await relayApi?.tx.xcmPallet.limitedReserveTransferAssets(dest, beneficiary, assets, feeAssetItem, weightLimit);
         try {
-          const txHash = await extrinsic.signAndSend(
+          await extrinsic.signAndSend(
             account.address,
             { signer: account.signer as Signer },
             (result) => {
@@ -88,10 +88,10 @@ const Relay = () => {
 
                   // Loop through the Vec<EventRecord>
                   events.forEach((record: any) => {
-                    const { event, phase } = record;
+                    const { event } = record;
                     const currenciesDeposited = `${event.section}.${event.method}` == "ormlTokens.Deposited";
                     if (currenciesDeposited) {
-                      const types = event.typeDef;
+                      // const types = event.typeDef;
                       const accountId = event.data[1];
                       if (accountId == account.address) {
                         setSuccess(true)
@@ -102,7 +102,6 @@ const Relay = () => {
               });
             });
 
-          console.log('txHash', txHash);
         } catch (error: any) {
           // eslint-disable-next-line no-console
           console.error(error)
@@ -122,7 +121,6 @@ const Relay = () => {
     }
   }
 
-
   return (
     <div className='bg-background p-10 rounded-2xl'>
       <h1 className='fund-h1'>My funds</h1>
@@ -141,12 +139,13 @@ const Relay = () => {
         </InputLabel>
         <FilledInput
           type='number'
+          value={transferAmount}
           onChange={(e) => setTransferAmount(Number(e.target.value))}
           className='pt-2 text-lg'
           id='filled-adornment-amount'
           startAdornment={
             <InputAdornment className='mr-' position='start'>
-              KSM
+              KSM :
             </InputAdornment>
           }
         />

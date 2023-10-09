@@ -22,23 +22,24 @@ import RefundModal from '../RefundModal/RefundModal';
 import SuccessRefundModal from '../RefundModal/SuccessRefundModal';
 
 interface VotingModalProps {
+  refundOnly?: boolean;
   visible: boolean;
   setVisible: (_visible: boolean) => void;
   setLoading: (_visible: boolean) => void;
   project: Project;
   user: User;
   votingWalletAccount: WalletAccount | any;
-  milestoneKeyInView: number;
   setError: (_value: any) => void;
 }
 
-export default function VoteModal({ visible, setVisible, setLoading, project, user, votingWalletAccount, milestoneKeyInView, setError }: VotingModalProps) {
+export default function VoteModal({ visible, setVisible, setLoading, project, user, votingWalletAccount, setError, refundOnly }: VotingModalProps) {
   const [vote, setVote] = useState<boolean>(true);
   const [voteRefund, setVoteRefund] = useState<boolean>(false);
   const [step, setStep] = useState<number>(0)
 
   const handleVoteOnMilestone = async (vote: boolean) => {
-    if (!project?.id || !user.web3_address) return
+    const milestoneKeyInView = project?.first_pending_milestone
+    if (!project?.id || !user.web3_address || milestoneKeyInView === undefined) return
 
     try {
       const imbueApi = await initImbueAPIInfo();
@@ -222,17 +223,23 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
   };
 
   const handleVote = async () => {
-    if (vote) {
+    if (project?.brief_id) {
       setLoading(true)
       setVisible(false);
       await handleVoteOnMilestone(vote);
       setLoading(false)
-    }
-    else {
-      setStep(3)
+    } else {
+      if (vote) {
+        setLoading(true)
+        setVisible(false);
+        await handleVoteOnMilestone(vote);
+        setLoading(false)
+      }
+      else {
+        setStep(3)
+      }
     }
   }
-
 
   return (
     <Modal
@@ -242,7 +249,7 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
     >
       <div>
         {
-          step === 0 && (
+          (step === 0 && !refundOnly) && (
             <ReviewModal
               {...{
                 setStep,
@@ -303,7 +310,10 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
         }
 
         {
-          step === 3 && !vote && (
+          (
+            (step === 3 && !vote) ||
+            (step === 0 && refundOnly)
+          ) && (
             <RefundModal
               setLoading={setLoading}
               handleVote={handleVoteOnMilestone}

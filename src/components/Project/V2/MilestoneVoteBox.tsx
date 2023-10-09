@@ -58,7 +58,6 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
     const firstPendingMilestone = props?.firstPendingMilestone >= 0 ? props?.firstPendingMilestone : project?.milestones?.length - 1
     const currentMilestoneName = project?.milestones?.length ? project?.milestones?.[firstPendingMilestone]?.name || "" : ""
 
-
     useEffect(() => {
         const syncVotes = async () => {
             if (!chainProjectId || !projectId || firstPendingMilestone === undefined) return
@@ -165,15 +164,15 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
                                             >
                                                 Vote
                                             </button>)
-                                        : (
+                                        : !project.brief_id && (
                                             <button
                                                 className='bg-white text-black text-sm rounded-full px-3 py-2 ml-auto nowrap'
                                                 onClick={() => props?.setOpenVotingList(true)}
                                             >
                                                 See All Votes
-                                            </button>)
+                                            </button>
+                                        )
                                 }
-
                             </div>
                         )
                 }
@@ -192,7 +191,7 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
                             : (
                                 <div
                                     className='mt-auto cursor-pointer'
-                                    onClick={() => props?.setOpenVotingList(true)}
+                                    onClick={() => !project.approvers && props?.setOpenVotingList(true)}
                                 >
                                     <AvatarGroup className='justify-end' max={3}>
                                         {
@@ -221,7 +220,7 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
                             : (
                                 <div
                                     className='mt-auto cursor-pointer'
-                                    onClick={() => props?.setOpenVotingList(true)}
+                                    onClick={() => !project.approvers && props?.setOpenVotingList(true)}
                                 >
                                     <AvatarGroup max={3}>
                                         {
