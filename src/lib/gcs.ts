@@ -1,7 +1,7 @@
 import { Storage } from '@google-cloud/storage';
 
 const storage = new Storage({
-  keyFilename: './public/KEY_FILENAME.json',
+  // keyFilename: './public/KEY_FILENAME.json',
 });
 //   {
 //   keyFilename: './public/KEY_FILENAME.json',

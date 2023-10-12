@@ -333,6 +333,7 @@ function Project() {
 
       if (onChainProjectRes?.projectInVotingOfNoConfidence) {
         const noConfidenceVotesChain = await chainService.getNoConfidenceVoters(project.chain_project_id);
+        // TODO: sync no cofidene vote list
       }
 
       if (onChainProjectRes?.id && project?.id) {
@@ -474,7 +475,7 @@ function Project() {
                 <div className='flex justify-between items-center'>
                   <p className='text-sm text-[#8A5C5A]'>
                     {
-                      user.id === projectOwner?.id
+                      user.id === projectOwner?.id && projectType === 'brief'
                         ? 'Freelancer'
                         : 'Shared by'
                     }

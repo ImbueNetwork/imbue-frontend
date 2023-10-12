@@ -8,7 +8,7 @@ interface ReviewModalProps {
 
 export default function ReviewModal({ setStep, setVisible }: ReviewModalProps) {
   return (
-    <div className='bg-white justify-center max-w-[31.938rem] px-12 text-center py-5 rounded-[18px]'>
+    <div className='bg-white justify-center max-w-[31.938rem] text-center rounded-[18px]'>
       <div className='inline-block  bg-light-grey pt-2 pb-4 mt-12 mb-8  px-4 rounded-lg'>
         <Image src={'/review-icon.svg'} width={70} height={70} alt='icon' />
       </div>
@@ -20,15 +20,15 @@ export default function ReviewModal({ setStep, setVisible }: ReviewModalProps) {
         provided by the grant owner and can now vote for or against this
         project.
       </p>
-      <div className='flex mb-5 space-x-3 w-full items-center mt-9'>
+      <div className='flex mb-5 space-x-3 w-full items-center justify-center mt-9'>
         <button
-          className='border px-5 py-2  border-imbue-purple text-imbue-purple rounded-full'
+          className='border px-5 py-2  border-imbue-purple text-imbue-purple rounded-full w-[25%]'
           onClick={() => setVisible(false)}
         >
           Go back
         </button>
         <button
-          className='primary-btn  ml-auto in-dark w-button w-[70%] '
+          className='primary-btn  ml-auto in-dark w-button w-[70%]'
           style={{ textAlign: 'center' }}
           onClick={() => setStep(1)}
         >

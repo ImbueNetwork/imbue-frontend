@@ -80,7 +80,7 @@ export const getApproverProfiles = async (walletAddresses: string[]) => {
 
 export const getMilestoneAttachments = async (
   projectId: number | string,
-  milestoneIndex: number,
+  milestoneIndex: number
 ) => {
   const resp = await fetch(
     `${config.apiBase}/project/submitMilestone?projectId=${projectId}&milestoneIndex=${milestoneIndex}`,
@@ -140,6 +140,24 @@ export const uploadMilestoneAttachments = async (
   } else {
     return {
       message: 'Failed to submit milestone attachments. status:' + resp.status,
+    };
+  }
+};
+
+export const subitMilestone = async (projectId: number) => {
+  const resp = await fetch(
+    `${config.apiBase}/project/submitMilestone?projectId=${projectId}`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'post',
+    }
+  );
+
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    return {
+      message: 'Failed to update voting state. status:' + resp.status,
     };
   }
 };

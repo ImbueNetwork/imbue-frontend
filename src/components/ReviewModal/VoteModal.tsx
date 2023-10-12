@@ -1,3 +1,5 @@
+import ArrowBackIcon from '@mui/icons-material/ChevronLeft';
+import CloseIcon from '@mui/icons-material/Close';
 import {
   FormControl,
   FormControlLabel,
@@ -85,7 +87,6 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
 
         } else if (result.txError) {
           setError({ message: result.errorMessage });
-          setStep(0)
           setVisible(false);
           break;
 
@@ -101,7 +102,6 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
 
     } catch (error) {
       setError({ message: 'Could not vote. Please try again later' });
-      setStep(0)
       // eslint-disable-next-line no-console
       console.error(error)
     }
@@ -236,7 +236,7 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
         setLoading(false)
       }
       else {
-        setStep(3)
+        setStep(2)
       }
     }
   }
@@ -245,9 +245,25 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
     <Modal
       open={visible}
       className='flex justify-center items-center'
-    // onClose={() => {setVisible(false)}}
+      onClose={() => { setVisible(false) }}
     >
-      <div>
+      <div className='bg-white rounded-xl px-12 py-5 relative'>
+        <div className='flex w-full justify-between px-5'>
+          {
+            step > 0 && (
+              <ArrowBackIcon
+                className='h-7 w-7 hover:bg-imbue-purple rounded-full hover:text-white cursor-pointer border absolute left-5'
+                color='secondary'
+                onClick={() => setStep((prev) => prev - 1)}
+              />
+            )
+          }
+          <CloseIcon
+            className='h-7 w-7 hover:bg-imbue-purple rounded-full hover:text-white cursor-pointer border p-1 absolute right-5'
+            color='secondary'
+            onClick={() => setVisible(false)}
+          />
+        </div>
         {
           (step === 0 && !refundOnly) && (
             <ReviewModal
@@ -260,7 +276,7 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
         }
         {
           step === 1 && (
-            <div className='bg-white justify-center max-w-[31.938rem] px-12 text-center py-5 rounded-[18px]'>
+            <div className='justify-center max-w-[31.938rem] text-center rounded-[18px]'>
               <div className='inline-block  bg-light-grey pt-2 pb-4 mt-12 mb-8  px-4 rounded-lg'>
                 <Image src={'/confirm-icon.svg'} width={70} height={70} alt='icon' />
               </div>
@@ -272,24 +288,27 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
                 was utilized judiciously.
               </p>
 
-              <FormControl className='mt-7'>
+              <FormControl className='mt-7 w-full'>
                 <RadioGroup
                   aria-labelledby='demo-radio-buttons-group-label'
                   defaultValue={'yes'}
                   name='radio-buttons-group'
                   onChange={(e) => setVote(e.target.value === 'yes')}
                   row
+                  className='w-full flex justify-center gap-2'
                 >
                   <FormControlLabel
-                    className='bg-[#F6F4FF] text-lg  rounded-xl pl-2 pr-12 '
+                    className='bg-[#F6F4FF] text-lg  rounded-xl pl-2 pr-12 w-[45%] mr-0'
                     value={'yes'}
                     // control={<Checkbox color='secondary' />}
                     control={<Radio color='secondary' />}
                     label='Yes,It Was'
+                    checked={vote}
                   />
                   <FormControlLabel
-                    className='bg-[#F6F4FF] ml-0.5 text-lg  rounded-xl pl-2 pr-12 py-2'
+                    className='bg-[#F6F4FF] ml-0.5 text-lg  rounded-xl pl-2 pr-12 py-2 w-[45%] mr-0'
                     value={'no'}
+                    checked={!vote}
                     // control={<Checkbox color='secondary' />}
                     control={<Radio color='secondary' />}
                     label="No,It wasn't"
@@ -311,7 +330,7 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
 
         {
           (
-            (step === 3 && !vote) ||
+            (step === 2 && !vote) ||
             (step === 0 && refundOnly)
           ) && (
             <RefundModal

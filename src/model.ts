@@ -178,6 +178,7 @@ export interface BasicTxResponse {
   transactionHash?: string;
   txError?: boolean;
   eventData?: any;
+  projectInMilestoneVoting?: boolean;
 }
 
 export type Freelancer = {

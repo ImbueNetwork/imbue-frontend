@@ -55,7 +55,11 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
     const yesPercent = (yesCount / totalVoters) * 100
     const noPercent = (noCount / totalVoters) * 100
 
-    const firstPendingMilestone = props?.firstPendingMilestone >= 0 ? props?.firstPendingMilestone : project?.milestones?.length - 1
+    const firstPendingMilestone =
+        (props?.firstPendingMilestone >= 0 && props.firstPendingMilestone < project?.milestones?.length)
+            ? props?.firstPendingMilestone
+            : project?.milestones?.length - 1
+            
     const currentMilestoneName = project?.milestones?.length ? project?.milestones?.[firstPendingMilestone]?.name || "" : ""
 
     useEffect(() => {

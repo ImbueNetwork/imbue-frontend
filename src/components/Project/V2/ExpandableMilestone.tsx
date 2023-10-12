@@ -18,7 +18,7 @@ import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 
 import { Milestone, OffchainProjectState, Project, User } from '@/model';
 import ChainService from '@/redux/services/chainService';
-import { getMilestoneAttachments, updateProjectVotingState, uploadMilestoneAttachments } from '@/redux/services/projectServices';
+import { getMilestoneAttachments, uploadMilestoneAttachments } from '@/redux/services/projectServices';
 import { updateProject } from '@/redux/services/projectServices';
 
 interface ExpandableMilestonProps {
@@ -47,7 +47,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
   const [votingWalletAccount, setVotingWalletAccount] = useState<WalletAccount | any>({});
   const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  
+
   const showVoteButton =
     user?.id &&
     !isApplicant &&
@@ -133,10 +133,11 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
-            if (fileURLs?.length) {
-              await uploadMilestoneAttachments(project.id, milestone.milestone_index, fileURLs)
-            }
-            const resp = await updateProjectVotingState(Number(project.id), true)
+            // if (fileURLs?.length) {
+            //   await uploadMilestoneAttachments(project.id, milestone.milestone_index, fileURLs)
+            // }
+            // const resp = await updateProjectVotingState(Number(project.id), true)
+            const resp = await uploadMilestoneAttachments(project.id, milestone.milestone_index, fileURLs)
             if (resp) {
               setSuccess(true);
               setSuccessTitle('Milestone Submitted Successfully');

@@ -23,11 +23,11 @@ export default function RefundModal({
   }
 
   return (
-    <div className='bg-white  max-w-[31.938rem] px-12 text-left py-5 rounded-[18px]'>
+    <div className='bg-white  max-w-[31.938rem] text-left rounded-[18px]'>
       <div className='inline-block bg-light-grey pt-2 pb-4 mt-12 mb-8  px-4 rounded-lg'>
         <Image src={'/wallet.svg'} width={70} height={70} alt='icon' />
       </div>
-      <div className='text-center'>
+      <div className='text-left'>
         <h4 className='text-[27px]'>Should a refund be initiated?</h4>
         <p className='text-base mt-4 '>
           A refund can be made when you vote against a milestone deliverables
@@ -37,7 +37,7 @@ export default function RefundModal({
         <div className='flex mb-5 space-x-3 w-full items-center mt-9'>
           <button
             onClick={handleNoVote}
-            className='border px-5 py-2  border-imbue-purple text-imbue-purple rounded-full'
+            className='border px-5 py-2  border-imbue-purple text-imbue-purple rounded-full w-[30%]'
           >
             No
           </button>

@@ -66,10 +66,10 @@
   color: #fff;
 } */
 
-.MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl:hover
+/* .MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl:hover
   .MuiOutlinedInput-notchedOutline {
   border: 1px solid white;
-}
+} */
 
 .MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation1.MuiPaper-root.MuiMenu-paper.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation8.MuiPopover-paper {
   background-color: var(--theme-grey-dark);
@@ -82,12 +82,6 @@
 
 .MuiLinearProgress-bar {
   border-radius: 10px;
-}
-
-@supports (-webkit-hyphens: none) {
-  .MuiOutlinedInput-notchedOutline legend {
-    display: none;
-  }
 }
 
 .applicationList .MuiFormControl-root {
