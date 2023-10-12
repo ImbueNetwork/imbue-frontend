@@ -25,13 +25,12 @@ import { postAPIHeaders } from '@/config';
 import * as config from '@/config';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 
-const SignUp = dynamic(() => import("./SignUp"));
+const SignUp = dynamic(() => import('./SignUp'));
 
 type LoginProps = {
   visible: boolean;
   redirectUrl: string;
   setVisible: (_visible: boolean) => void;
-  
 };
 
 const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
@@ -42,7 +41,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  const [formContent, setFormContent] = useState<string>(  'login');
+  const [formContent, setFormContent] = useState<string>('login');
 
   const imbueLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     setErrorMessage(undefined);
@@ -118,9 +117,7 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
       >
         {
           <div className='lg:min-w-[500px] m-auto'>
-            <p
-              className='text-center text-imbue-purple-dark text-[1.5rem] lg:text-[2rem] font-normal font-Aeonik'
-            >
+            <p className='text-center text-imbue-purple-dark text-[1.5rem] lg:text-[2rem] font-normal font-Aeonik'>
               {'You must be signed in to continue'}
             </p>
             <DialogContent className='mx-auto py-0'>
@@ -220,7 +217,11 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                                 onClick={() => setShowPassword(!showPassword)}
                                 edge='end'
                               >
-                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                {showPassword ? (
+                                  <VisibilityOff />
+                                ) : (
+                                  <Visibility />
+                                )}
                               </IconButton>
                             </InputAdornment>
                           }
@@ -276,7 +277,6 @@ const Login = ({ visible, setVisible, redirectUrl }: LoginProps) => {
                 ) : (
                   <SignUp {...{ setFormContent, redirectUrl }} />
                 )}
-
               </div>
             </DialogContent>
           </div>

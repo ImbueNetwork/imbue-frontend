@@ -1,7 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
-import { IconButton } from '@mui/material';
-import dynamic from 'next/dynamic';
+import { Avatar, Box, IconButton, Menu, Skeleton, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -14,17 +13,6 @@ import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { AppDispatch, RootState } from '@/redux/store/store';
 
 import MenuItems from './MenuItems';
-// const Login = dynamic(() => import("../Login"));
-const Avatar = dynamic(() => import("@mui/material/Avatar"));
-const Box = dynamic(() => import("@mui/material/Box"));
-const Menu = dynamic(() => import("@mui/material/Menu"), {
-  ssr: false,
-});
-const Skeleton = dynamic(() => import("@mui/material/Skeleton"));
-const Tooltip = dynamic(() => import("@mui/material/Tooltip"), {
-  ssr: false,
-});
-
 import LoginPopup from '../LoginPopup/LoginPopup';
 import defaultProfile from '../../assets/images/profile-image.png';
 
