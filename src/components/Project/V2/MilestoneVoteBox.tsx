@@ -84,6 +84,7 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
                 const promises = votes.map(async (v) => await voteOnMilestone(null, v.voterAddress, firstPendingMilestone, v.vote, projectId))
                 await Promise.all(promises)
                 const voteResp = await getMillestoneVotes(projectId, firstPendingMilestone)
+                console.log("🚀 ~ file: MilestoneVoteBox.tsx:87 ~ syncVotes ~ voteResp:", voteResp)
                 setVotes(voteResp)
                 // const resp = await syncProjectVotes(projectId, firstPendingMilestone, votes)
             }
@@ -95,6 +96,7 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
             setLoading(true)
             try {
                 const voteResp = await getMillestoneVotes(projectId, firstPendingMilestone)
+                console.log("🚀 ~ file: MilestoneVoteBox.tsx:99 ~ setVotingList ~ voteResp:", voteResp)
                 setVotes(voteResp)
                 setLoading(false)
                 // const votersAddressed = voteResp?.map((voter: any) => voter.web3_address)
