@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 import { StreamChat } from 'stream-chat';
 import 'stream-chat-react/dist/css/v2/index.css';
 
-import { fetchUser, getStreamChat } from '@/utils';
+import { fetchUser, getStreamChat, sendNotification } from '@/utils';
 
 import ChatPopup from '@/components/ChatPopup';
 import DashboardChatBox from '@/components/Dashboard/MyChatBox';
@@ -66,6 +66,12 @@ const Dashboard = ({ val }: { val?: string }): JSX.Element => {
       // redirect("login", `/dapp/freelancers/${freelancer?.username}/`);
     }
   };
+  const fun = async () => {
+    await sendNotification('6', 'wad', 'awda');
+  };
+  useEffect(() => {
+    fun();
+  }, []);
 
   const redirectToBriefApplications = (applicationId: string) => {
     router.push(`/briefs/${briefId}/applications/${applicationId}`);

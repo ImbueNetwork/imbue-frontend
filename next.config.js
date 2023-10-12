@@ -3,7 +3,6 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
 
-
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
@@ -13,6 +12,7 @@ const nextConfig = {
     RELAY_CHAIN_WEBSOCK_ADDR: process.env.RELAY_CHAIN_WEBSOCK_ADDR,
     GETSTREAM_API_KEY: process.env.GETSTREAM_API_KEY,
     GETSTREAM_SECRET_KEY: process.env.GETSTREAM_SECRET_KEY,
+    GETSTREAM_APP_ID: process.env.GETSTREAM_APP_ID,
     CLOUD_NAME: process.env.CLOUD_NAME,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     IMAGE_TAG: process.env.IMAGE_TAG,
@@ -58,12 +58,7 @@ const nextConfig = {
   },
 };
 
-
-
 // module.exports = withBundleAnalyzer({});
-
 
 module.exports = nextConfig;
 // module.exports = withBundleAnalyzer(nextConfig);
-
-

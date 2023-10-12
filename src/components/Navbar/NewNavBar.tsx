@@ -1,3 +1,4 @@
+'use client';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 /* eslint-disable unused-imports/no-unused-vars */
@@ -30,6 +31,7 @@ import { AppDispatch, RootState } from '@/redux/store/store';
 import MenuItems from './MenuItems';
 const Login = dynamic(() => import('../Login'));
 
+import NotificationIcon from './NotificationIcon';
 import LoginPopup from '../LoginPopup/LoginPopup';
 import defaultProfile from '../../assets/images/profile-image.png';
 
@@ -196,7 +198,7 @@ function NewNavbar() {
                         size={20}
                       />
                     </div>
-                    
+
                     <div className='absolute hidden bg-transparent group-hover:block  space-y-3  rounded-xl top-3 left-1 w-72'>
                       <div className='bg-white mt-10 rounded-lg pl-1 shadow-lg py-1'>
                         <div
@@ -302,13 +304,14 @@ function NewNavbar() {
               alt='message'
               className='mr-3 cursor-pointer'
             />
-            {/* <Image
-              src='/bell-01.svg'
-              width={23}
-              height={20}
-              className='cursor-pointer'
-              alt='message'
-            /> */}
+            <div className='relative'>
+              {/*  */}
+
+              <div>
+                {/* <NotificationDropdown feedGroup='user' right notify /> */}
+                <NotificationIcon />
+              </div>
+            </div>
             <Tooltip
               title='Account settings'
               className={`${!user?.username && !loading && 'lg:hidden'}`}
