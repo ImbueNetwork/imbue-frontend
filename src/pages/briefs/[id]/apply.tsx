@@ -232,7 +232,10 @@ export const SubmitProposal = (): JSX.Element => {
         await sendNotification(
           brief.user_id,
           'breif.test.applied',
-          'applied to your breif'
+          'Some one might have interested in your breif',
+          'Hi there some one has applied to your brief check your breif and get your ideal candidate',
+          briefId,
+          applicationId
         );
       } else {
         setError({ message: 'Could not submit applicaton' });

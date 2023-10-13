@@ -205,7 +205,10 @@ export const updateUser = async (user: User) => {
 export const sendNotification = async (
   target: string,
   type: string,
-  text: string
+  title: string,
+  text: string,
+  briefId?: number,
+  applicationId?: number
 ) => {
   const resp = { status: 401, message: 'User is not Authenticated' };
   try {
@@ -216,6 +219,9 @@ export const sendNotification = async (
         target,
         type,
         text,
+        title,
+        briefId,
+        applicationId,
       }),
     });
 
@@ -226,5 +232,41 @@ export const sendNotification = async (
     }
   } catch (error) {
     return resp;
+  }
+};
+
+export const getNotification = async () => {
+  const resp = {
+    status: 401,
+    message: 'User is not Authenticated',
+    new_notification: [],
+  };
+  try {
+    const update = await fetch(`${config.apiBase}getstream/getnotifications`, {
+      method: 'get',
+    });
+    if (update.status === 200) {
+      return update.json();
+    } else {
+      return {
+        status: update.status,
+        message: update.statusText,
+        new_notification: [],
+      };
+    }
+  } catch (error) {
+    return resp;
+  }
+};
+
+export const updateLastNotification = async (id: string) => {
+  try {
+    await fetch(`${config.apiBase}getstream/getnotifications`, {
+      headers: config.postAPIHeaders,
+      method: 'post',
+      body: JSON.stringify({ notificationId: id }),
+    });
+  } catch (error) {
+    console.error(error);
   }
 };

@@ -140,7 +140,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           </p>
           <div className='flex flex-col gap-2'>
             <p className='text-[1.25rem] font-normal capitalize text-imbue-purple'>
-              {briefOwner?.display_name}
+              {briefOwner?.display_name} 
             </p>
             <CountrySelector user={briefOwner} />
           </div>
@@ -163,8 +163,9 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
             </button>
           ) : (
             <button
-              className={`${applicationStatusId[application?.status_id]
-                }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
+              className={`${
+                applicationStatusId[application?.status_id]
+              }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
             >
               {applicationStatusId[application?.status_id]}
             </button>

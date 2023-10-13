@@ -13,6 +13,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { sendNotification } from '@/utils';
 import { getBalance } from '@/utils/helper';
 
 import { Currency, OffchainProjectState } from '@/model';
@@ -44,7 +45,9 @@ export const HirePopup = ({
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<any>();
   const router = useRouter();
-  const [freelancerBalance, setFreelancerBalance] = useState<number | string>(0)
+  const [freelancerBalance, setFreelancerBalance] = useState<number | string>(
+    0
+  );
 
   const { user } = useSelector((state: RootState) => state.userState);
 
@@ -65,7 +68,7 @@ export const HirePopup = ({
 
   useEffect(() => {
     const checkBalance = async () => {
-      setFreelancerBalance("Chekcing Balance")
+      setFreelancerBalance('Chekcing Balance');
       const balance = await getBalance(
         freelancer.web3_address,
         application?.currency_id || 0,
@@ -73,10 +76,10 @@ export const HirePopup = ({
       );
 
       setFreelancerBalance(balance);
-    }
+    };
 
-    openHirePopup && checkBalance()
-  }, [freelancer.web3_address, application?.currency_id, user, openHirePopup])
+    openHirePopup && checkBalance();
+  }, [freelancer.web3_address, application?.currency_id, user, openHirePopup]);
 
   const selectedAccount = async (account: WalletAccount) => {
     setLoading(true);
@@ -92,7 +95,6 @@ export const HirePopup = ({
     delete application.modified;
     const briefHash = blake2AsHex(JSON.stringify(application));
     const currencyId = application.currency_id;
-
     const milestones = application.milestones.map((m: any) => ({
       percentageToUnlock: parseInt(m.percentage_to_unlock),
     }));
@@ -106,7 +108,6 @@ export const HirePopup = ({
       currencyId,
       milestones
     );
-
     // eslint-disable-next-line no-constant-condition
     while (true) {
       if (result.status || result.txError) {
@@ -116,6 +117,14 @@ export const HirePopup = ({
             briefId!,
             application.id,
             OffchainProjectState.Accepted
+          );
+          await sendNotification(
+            application.user_id,
+            'application.accepted.testing',
+            'Congratulations your application has been accepted',
+            `${user.display_name} has accepted you as his/her freelancer best of luck`,
+            brief.id,
+            application.id
           );
           setSuccess(true);
         } else if (result.txError) {
@@ -153,27 +162,31 @@ export const HirePopup = ({
             <span className='text-xl text-secondary-dark-hover'>
               {freelancer?.display_name}
             </span>
-            {freelancerBalance !== "Chekcing Balance"
-              ? <>
-                {
-                  Number(freelancerBalance) < 500
-                    ? (
-                      <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-imbue-coral px-3 py-1 text-sm text-white'>
-                        <ErrorOutlineOutlinedIcon className='h-4 w-4 inline' />
-                        <p className='inline'>Freelance does not currently have the necessary deposit balance (500 $IMBU) to start the work</p>
-                      </div>
-                    )
-                    : (
-                      <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-primary px-3 py-1 text-sm text-black'>
-                        <CheckCircleOutlineIcon className='h-4 w-4 inline' />
-                        <p className='inline'>Freelance currently has the necessary deposit balance (500 $IMBU) to start the work</p>
-                      </div>
-                    )
-                }
+            {freelancerBalance !== 'Chekcing Balance' ? (
+              <>
+                {Number(freelancerBalance) < 500 ? (
+                  <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-imbue-coral px-3 py-1 text-sm text-white'>
+                    <ErrorOutlineOutlinedIcon className='h-4 w-4 inline' />
+                    <p className='inline'>
+                      Freelance does not currently have the necessary deposit
+                      balance (500 $IMBU) to start the work
+                    </p>
+                  </div>
+                ) : (
+                  <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-primary px-3 py-1 text-sm text-black'>
+                    <CheckCircleOutlineIcon className='h-4 w-4 inline' />
+                    <p className='inline'>
+                      Freelance currently has the necessary deposit balance (500
+                      $IMBU) to start the work
+                    </p>
+                  </div>
+                )}
               </>
-              : <p className='text-sm text-content-primary'>Checking Freelancer Wallet Balance</p>
-            }
-
+            ) : (
+              <p className='text-sm text-content-primary'>
+                Checking Freelancer Wallet Balance
+              </p>
+            )}
           </div>
         </div>
         <p className='absolute top-0 text-center w-full text-lg lg:text-xl text-imbue-purple-dark'>
@@ -190,7 +203,9 @@ export const HirePopup = ({
                 <div className='flex justify-between w-full'>
                   <div>
                     <p className='text-lg mb-1 text-content'>{m.name}</p>
-                    <p className='text-base'>{m.description.substring(0, 100) + "..."}</p>
+                    <p className='text-base'>
+                      {m.description.substring(0, 100) + '...'}
+                    </p>
                   </div>
                   <div className='budget-wrapper text-end'>
                     <p className='text-lg mb-1 text-content'>Amount</p>
@@ -298,7 +313,7 @@ export const HirePopup = ({
         }}
         closeAfterTransition
         slots={{ backdrop: Backdrop }}
-        sx={{ zIndex: 4, marginTop: "30px" }}
+        sx={{ zIndex: 4, marginTop: '30px' }}
         slotProps={{
           backdrop: {
             timeout: 500,

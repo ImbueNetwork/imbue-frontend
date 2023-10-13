@@ -1,13 +1,13 @@
 import { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
-  knex.schema.alterTable('users', (table) => {
-    table.string('last_notification_id', 128);
+  await knex.schema.alterTable('users', (table) => {
+    table.text('last_notification_id');
   });
 }
 
 export async function down(knex: Knex): Promise<void> {
-  knex.schema.alterTable('users', (table) => {
-    table.dropColumn('last_notification_id');
-  });
+  await knex.raw(
+    'ALTER TABLE users DROP COLUMN IF EXISTS last_notification_id'
+  );
 }

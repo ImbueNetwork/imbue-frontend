@@ -64,6 +64,7 @@ export type User = {
   about?: string;
   website?: string;
   industry?: string;
+  last_notification_id?: string;
 };
 
 export type ProposedMilestone = {
@@ -493,6 +494,15 @@ export const updateFederatedLoginUser =
         .returning('*')
     )[0];
 
+export const fetchUserLastNotificationId =
+  (id: number) => async (tx: Knex.Transaction) =>
+    (await tx<User>('users').select('last_notification_id').where({ id }))[0];
+export const updateUserLastNotificationId =
+  (id: number, notificationId: string) => async (tx: Knex.Transaction) =>
+    await tx<User>('users')
+      .where({ id })
+      .update({ last_notification_id: notificationId });
+
 export const getApproverProjects =
   (wallet: string | string[]) => async (tx: Knex.Transaction) =>
     await tx<Project>('project_approvers')
@@ -588,7 +598,6 @@ export const fetchAllProjects = () => (tx: Knex.Transaction) =>
 export const fetchUserProject =
   (id: string | number) => (tx: Knex.Transaction) =>
     fetchAllProjects()(tx).where({ id: id }).first();
-
 export const fetchUserProjects =
   (id: string | number) => (tx: Knex.Transaction) =>
     fetchAllProjects()(tx).where({ user_id: id }).orderBy('created', 'desc');
@@ -1629,16 +1638,16 @@ export const searchFreelancers =
           this.where('display_name', 'ilike', `%${filter.name}%`);
         }
       })
-      .distinct('freelancers.id')
-      // .modify(function (builder) {
-      //   if (Number(filter?.items_per_page) > 0) {
-      //     builder
-      //       .offset(
-      //         (Number(filter.page) - 1) * Number(filter.items_per_page) || 0
-      //       )
-      //       .limit(Number(filter.items_per_page) || 5);
-      //   }
-      // });
+      .distinct('freelancers.id');
+// .modify(function (builder) {
+//   if (Number(filter?.items_per_page) > 0) {
+//     builder
+//       .offset(
+//         (Number(filter.page) - 1) * Number(filter.items_per_page) || 0
+//       )
+//       .limit(Number(filter.items_per_page) || 5);
+//   }
+// });
 
 export const searchFreelancersCount = async (
   tx: Knex.Transaction,

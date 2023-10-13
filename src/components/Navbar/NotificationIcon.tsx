@@ -1,45 +1,55 @@
 import { Badge } from '@mui/material';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { useFeedContext } from 'react-activity-feed';
+
+import { getNotification, updateLastNotification } from '@/utils';
 
 import NotificationsModal from '../NotificationsModal/NotificationsModal';
-
-const Wrapper = (setNotificationCount: any) => {
-  return function NotifyComponent(val: any) {
-    const { hasDoneRequest, unread, unseen } = useFeedContext();
-    useEffect(() => {
-      if (!hasDoneRequest) return;
-      if (val.adds.length > 0) {
-        setNotificationCount(val.adds.length);
-      } else setNotificationCount(0);
-    }, [hasDoneRequest, unread, unseen, val]);
-    return null;
-  };
-};
 
 export default function NotificationIcon() {
   const [unreadNotification, setNotificationCount] = useState(0);
   const [isNotificationOn, setNotificationOn] = useState<boolean>(false);
   const [modal, setModal] = useState<boolean>(false);
+  const [lastNotification, setLastNotification] = useState<
+    string | undefined
+  >();
 
-  const showModalHandler = () => {
+  useEffect(() => {
+    const notifications = async () => {
+      const result = await getNotification();
+      setNotificationCount(result.new_notification.length);
+      if (result.new_notification.length > 0)
+        setLastNotification(result.new_notification[0].id);
+    };
+    notifications();
+    const timerId = setInterval(() => {
+      notifications();
+    }, 120000);
+
+    return () => clearInterval(timerId);
+  }, []);
+
+  const updateFun = async () => {
+    await updateLastNotification(lastNotification as string);
+  };
+
+  const handleOpenModal = () => {
     setModal((val) => !val);
-    setNotificationCount(0);
-    window.localStorage.removeItem('notification');
+    if (unreadNotification > 0) {
+      setNotificationCount(0);
+      if (lastNotification !== undefined) {
+        updateFun();
+      }
+    }
   };
 
-  const handleNotification = (num: number) => {
-    setNotificationCount(num);
-    window.localStorage.setItem('notification', unreadNotification.toString());
-  };
   return (
     <div>
       <Badge badgeContent={unreadNotification} color='primary'>
         <Image
           onClick={() => {
-            setNotificationOn((val) => true);
-            showModalHandler();
+            setNotificationOn(() => true);
+            handleOpenModal();
           }}
           src='/bell-01.svg'
           width={23}
@@ -49,12 +59,7 @@ export default function NotificationIcon() {
         />
       </Badge>
 
-      {isNotificationOn && (
-        <NotificationsModal
-          handleNotification={Wrapper(handleNotification)}
-          isShown={modal}
-        />
-      )}
+      {isNotificationOn && <NotificationsModal isShown={modal} />}
     </div>
   );
 }

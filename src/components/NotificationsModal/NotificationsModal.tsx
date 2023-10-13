@@ -1,17 +1,13 @@
 import classNames from 'classnames';
-import Image from 'next/image';
 import { FlatFeed, StreamApp } from 'react-activity-feed';
 import { useSelector } from 'react-redux';
 
 import { RootState } from '@/redux/store/store';
 
-export default function NotificationsModal({
-  isShown,
-  handleNotification,
-}: {
-  isShown: boolean;
-  handleNotification: any;
-}) {
+import ApplyBreifNotification from './ApplyBreifNotifications';
+import MilestoneVotingNotification from './MilestoneVotingNotification';
+
+export default function NotificationsModal({ isShown }: { isShown: boolean }) {
   const { user } = useSelector((state: RootState) => state.userState);
   return (
     <div
@@ -32,39 +28,20 @@ export default function NotificationsModal({
             notify
             feedGroup='user'
             options={{
-              limit: 7,
+              limit: 1,
               withOwnChildren: true,
               withRecentReactions: true,
             }}
-            Notifier={handleNotification}
             Activity={({ activity }) => (
-              <div className='flex  hover:bg-imbue-light-purple-three py-2 border-t border-b px-5'>
-                <div className='w-9 flex flex-shrink-0 h-9 mr-3'>
-                  <Image
-                    className='rounded-full w-9 h-9 object-cover'
-                    src={
-                      activity.data?.sender.profile_photo ||
-                      '/profile-image.png'
-                    }
-                    height={20}
-                    width={30}
-                    alt='user'
-                  />
-                </div>
-                <div className='text-left'>
-                  <p className='text-base font-semibold'>
-                    A New Milestone has been made
-                  </p>
-                  <p className='text-sm mt-3'>
-                    “Web design”, a milestone on the @dbranddr’s Entrypal app
-                    project just got marked as completed and needs your vote of
-                    approval.
-                  </p>
-                  <button className='bg-imbue-purple text-white text-sm mt-5 px-7 py-2 rounded-full'>
-                    Vote
-                  </button>
-                </div>
-              </div>
+              <>
+                {activity.object === 'Milestone.testing' && (
+                  <MilestoneVotingNotification {...activity} />
+                )}
+                {(activity.object === 'breif.test.applied' ||
+                  activity.object === 'application.accepted.testing') && (
+                    <ApplyBreifNotification {...activity} />
+                  )}
+              </>
             )}
           />
         </div>
