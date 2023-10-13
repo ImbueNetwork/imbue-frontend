@@ -7,7 +7,7 @@ import { initImbueAPIInfo } from '@/utils/polkadot';
 import VoteModal from '@/components/ReviewModal/VoteModal';
 import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 
-import { Project, User } from '@/model';
+import { Project, User, VotesResp } from '@/model';
 import ChainService from '@/redux/services/chainService';
 import { getMillestoneVotes, voteOnMilestone } from '@/redux/services/projectServices';
 
@@ -25,6 +25,9 @@ type MilestoneVoteBoxProps = {
     setError: (_value: any) => void;
     setOpenVotingList: (_value: boolean) => void;
     setLoadingMain: (_value: boolean) => void;
+    votes: VotesResp | null;
+    setVotes: (_vote: VotesResp) => void;
+    setMilestoneVotes: (_value: string[]) => void;
 }
 
 type MilestoneVotes = {
@@ -32,16 +35,9 @@ type MilestoneVotes = {
     vote: boolean;
 }
 
-type Votes = {
-    yes: User[];
-    no: User[];
-    pending: User[];
-}
-
 const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
-    const { chainProjectId, projectId, user, approvers, project, setError, setLoadingMain } = props;
+    const { chainProjectId, projectId, user, approvers, project, setError, setLoadingMain, votes, setVotes, setMilestoneVotes } = props;
 
-    const [votes, setVotes] = useState<Votes | null>(null)
     const [loading, setLoading] = useState(true)
 
     const [showPolkadotAccounts, setShowPolkadotAccounts] = useState<boolean>(false);
@@ -59,7 +55,7 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
         (props?.firstPendingMilestone >= 0 && props.firstPendingMilestone < project?.milestones?.length)
             ? props?.firstPendingMilestone
             : project?.milestones?.length - 1
-            
+
     const currentMilestoneName = project?.milestones?.length ? project?.milestones?.[firstPendingMilestone]?.name || "" : ""
 
     useEffect(() => {
@@ -98,6 +94,7 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
                 const voteResp = await getMillestoneVotes(projectId, firstPendingMilestone)
                 console.log("🚀 ~ file: MilestoneVoteBox.tsx:99 ~ setVotingList ~ voteResp:", voteResp)
                 setVotes(voteResp)
+                setMilestoneVotes(voteResp?.allVoters)
                 setLoading(false)
                 // const votersAddressed = voteResp?.map((voter: any) => voter.web3_address)
                 syncVotes();
@@ -110,8 +107,7 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
         }
 
         setVotingList()
-    }, [user, firstPendingMilestone, projectId, chainProjectId])
-
+    }, [user, firstPendingMilestone, projectId, chainProjectId, setVotes, setMilestoneVotes])
 
 
     const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);

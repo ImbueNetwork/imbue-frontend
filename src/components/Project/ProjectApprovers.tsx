@@ -11,13 +11,12 @@ import { RootState } from '@/redux/store/store';
 type ProjectApproversType = {
     approversPreview: User[];
     project: Project;
-    setIsApprover: (_value: boolean) => void;
     setApproverPreview: (_value: User[]) => void;
     projectOwner: User | undefined;
 }
 
 const ProjectApprovers = (props: ProjectApproversType) => {
-    const { approversPreview, project, setIsApprover, setApproverPreview, projectOwner } = props;
+    const { approversPreview, project, setApproverPreview, projectOwner } = props;
 
     const { user } = useSelector(
         (state: RootState) => state.userState
@@ -89,12 +88,6 @@ const ProjectApprovers = (props: ProjectApproversType) => {
                     ]
                 }
 
-                if (
-                    user.web3_address &&
-                    (project?.approvers?.includes(user.web3_address) || projectOwner?.web3_address === user.web3_address)
-                )
-                    setIsApprover(true)
-
                 setApproverPreview(approversPreviewList);
             } catch (error) {
                 // eslint-disable-next-line no-console
@@ -107,7 +100,7 @@ const ProjectApprovers = (props: ProjectApproversType) => {
         project?.id && getAndSetApprovers()
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [project.id, setApproverPreview, user?.web3_address, setIsApprover, projectOwner?.id, projectOwner?.display_name, projectOwner?.profile_photo, projectOwner?.username, projectOwner?.web3_address, projectOwner?.getstream_token])
+    }, [project.id, setApproverPreview, user?.web3_address, projectOwner?.id, projectOwner?.display_name, projectOwner?.profile_photo, projectOwner?.username, projectOwner?.web3_address, projectOwner?.getstream_token])
 
     if (loading || approversPreview?.length === 0) return (
         <div className='flex items-center gap-5'>

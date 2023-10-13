@@ -9,7 +9,7 @@ export default function SuccessRefundModal({
   setVisible,
 }: VotingModalProps) {
   return (
-    <div className='bg-white justify-center max-w-[31.938rem] px-10 text-center py-5 rounded-[18px]'>
+    <div className='bg-white justify-center max-w-[31.938rem] text-center rounded-[18px]'>
       <div className='inline-block  bg-light-grey pt-2 pb-4 mt-12 mb-8  px-4 rounded-lg'>
         <Image src={require('../../assets/svgs/refundInit.svg')} width={70} height={70} alt='icon' />
       </div>

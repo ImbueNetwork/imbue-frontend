@@ -30,6 +30,8 @@ import { AppDispatch, RootState } from '@/redux/store/store';
 import MenuItems from './MenuItems';
 const Login = dynamic(() => import('../Login'));
 
+import Link from 'next/link';
+
 import LoginPopup from '../LoginPopup/LoginPopup';
 import defaultProfile from '../../assets/images/profile-image.png';
 
@@ -229,10 +231,10 @@ function NewNavbar() {
                     </div>
                   </div>
                 )}
-                {/* <Link
+                <Link
                   onClick={() => setExpanded(false)}
                   className={`mx-1 hover:bg-imbue-lime-light text-xs lg:text-sm hidden lg:inline-block cursor-pointer ${navPillclasses} nav-item nav-item-2`}
-                  href='#'
+                  href='/relay'
                 >
                   <Image
                     src='/wallet-2.svg'
@@ -242,7 +244,7 @@ function NewNavbar() {
                     className='mr-2 mb-1'
                   />
                   Wallet
-                </Link> */}
+                </Link>
                 {/* <Link
                   onClick={() => setExpanded(false)}
                   className={`mx-1 relative group text-xs hover:bg-imbue-lime-light lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${navPillclasses}`}

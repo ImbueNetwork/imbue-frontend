@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-constant-condition */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Alert, IconButton } from '@mui/material';
+import { Alert, IconButton, Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -48,6 +48,7 @@ import {
   OffchainProjectState,
   Project,
   User,
+  VotesResp,
 } from '@/model';
 import { Currency } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
@@ -122,8 +123,6 @@ function Project() {
 
 
   const [isModalOpen, setModalOpen] = useState(false);
-  const [showRefundButton, setShowRefundButton] = useState<boolean>(false);
-  const [milestonLoadingTitle, setMilestoneLoadingTitle] = useState<string>('');
   const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
     useState<boolean>();
   const [requiredBalance, setRequiredBalance] = useState<any>(0);
@@ -133,7 +132,6 @@ function Project() {
 
   const [expandProjectDesc, setExpandProjectDesc] = useState<boolean>(false);
   const [openVotingList, setOpenVotingList] = useState<boolean>(false);
-
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -150,6 +148,8 @@ function Project() {
   };
 
   const [noConfidenceVoters, setNoConfidenceVoters] = useState<NoConfidenceVoter[]>([])
+  const [votes, setVotes] = useState<VotesResp | null>(null)
+
 
   const getChainProject = async (project: Project, freelancer: any) => {
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
@@ -158,7 +158,7 @@ function Project() {
       if (project?.approvers?.length && user.web3_address) {
         const userIsApprover = project.approvers?.includes(user.web3_address);
         if (userIsApprover) {
-          setShowRefundButton(true);
+          setIsApprover(true);
         }
       }
 
@@ -325,7 +325,6 @@ function Project() {
   const syncProject = async (project: Project) => {
     if (!project.chain_project_id) return
 
-    setMilestoneLoadingTitle('Loading Votes ...');
     try {
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);
@@ -392,7 +391,6 @@ function Project() {
       console.error(error);
       setError({ message: 'Could not sync project. ', error });
     } finally {
-      setMilestoneLoadingTitle('');
       setLoading(false);
     }
   };
@@ -510,7 +508,6 @@ function Project() {
                   {...{
                     approversPreview,
                     project,
-                    setIsApprover,
                     setApproverPreview,
                     projectOwner,
                   }}
@@ -525,15 +522,15 @@ function Project() {
               <p className='text-[#747474] text-sm'>Project Milestones</p>
 
               {
-                (projectType === 'grant' && canVote) && (
-                  <button
-                    className='px-5 py-2 border border-imbue-coral text-imbue-coral rounded-full bg-[#FFF0EF]'
-                    onClick={() => {
-                      setShowPolkadotAccounts(true)
-                    }}
-                  >
-                    Vote for Refund
-                  </button>
+                (projectType === 'grant' && isApprover) && (
+                  <Tooltip followCursor title="You cannot vote for refund more than once ">
+                    <button
+                      className={`px-5 py-2 ${approverVotedOnRefund ? "border border-gray-400 bg-light-white opacity-50" : "border border-imbue-coral text-imbue-coral bg-[#FFF0EF]"} rounded-full`}
+                      onClick={() => !approverVotedOnRefund && setShowPolkadotAccounts(true)}
+                    >
+                      Vote for Refund
+                    </button>
+                  </Tooltip>
                 )
               }
             </div>
@@ -678,7 +675,10 @@ function Project() {
                   isApplicant,
                   user,
                   setOpenVotingList,
-                  approverVotedOnRefund
+                  approverVotedOnRefund,
+                  votes,
+                  setVotes,
+                  setMilestoneVotes
                 }}
               />
             </div>
@@ -700,13 +700,15 @@ function Project() {
 
       <VotingList
         open={openVotingList}
-        firstPendingMilestone={firstPendingMilestone}
         setOpenVotingList={setOpenVotingList}
-        approvers={approversPreview}
-        chainProjectId={project.chain_project_id}
-        projectId={project.id}
-        setMilestoneVotes={setMilestoneVotes}
-        project={project}
+        loading={loading}
+        votes={votes}
+      // setMilestoneVotes={setMilestoneVotes}
+      // firstPendingMilestone={firstPendingMilestone}
+      // approvers={approversPreview}
+      // chainProjectId={project.chain_project_id}
+      // projectId={project.id}
+      // project={project}
       />
 
       {

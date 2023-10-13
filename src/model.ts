@@ -73,6 +73,12 @@ export enum ImbueChainPollResult {
   EventNotFound,
 }
 
+export type VotesResp = {
+    yes: User[];
+    no: User[];
+    pending: User[];
+}
+
 export type Project = {
   id?: string | number;
   name: string;

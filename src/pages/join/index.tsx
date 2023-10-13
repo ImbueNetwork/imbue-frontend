@@ -103,7 +103,7 @@ export default function SignIn() {
       });
 
       if (resp.ok) {
-        utils.redirect("/dashboard");
+        utils.redirect("dashboard");
       } else {
         const errorMessage = await resp.json();
 
@@ -125,7 +125,7 @@ export default function SignIn() {
         account
       );
       if (resp.ok) {
-        utils.redirect("/dashboard");
+        utils.redirect("dashboard");
       }
     } catch (error) {
       // FIXME: error handling
