@@ -203,7 +203,7 @@ export const updateUser = async (user: User) => {
 };
 
 export const sendNotification = async (
-  target: string,
+  target: string[],
   type: string,
   title: string,
   text: string,

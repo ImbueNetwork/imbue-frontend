@@ -119,7 +119,7 @@ export const HirePopup = ({
             OffchainProjectState.Accepted
           );
           await sendNotification(
-            application.user_id,
+            [application.user_id],
             'application.accepted.testing',
             'Congratulations your application has been accepted',
             `${user.display_name} has accepted you as his/her freelancer best of luck`,

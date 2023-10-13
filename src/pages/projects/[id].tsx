@@ -43,12 +43,7 @@ import WaitingScreen from '@/components/WaitingScreen';
 import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 
 import { timeData } from '@/config/briefs-data';
-import {
-  Milestone,
-  OffchainProjectState,
-  Project,
-  User,
-} from '@/model';
+import { Milestone, OffchainProjectState, Project, User } from '@/model';
 import { Currency } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
@@ -112,14 +107,15 @@ function Project() {
     (isApprover &&
       !isApplicant &&
       user?.web3_address &&
-      !(milestoneVotes?.length && milestoneVotes?.includes(user.web3_address))) ||
+      !(
+        milestoneVotes?.length && milestoneVotes?.includes(user.web3_address)
+      )) ||
     (projectType === 'brief' && isProjectOwner);
 
   const timeAgo = new TimeAgo('en-US');
   const timePosted = project?.created
     ? timeAgo.format(new Date(project?.created))
     : 0;
-
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [showRefundButton, setShowRefundButton] = useState<boolean>(false);
@@ -133,7 +129,6 @@ function Project() {
 
   const [expandProjectDesc, setExpandProjectDesc] = useState<boolean>(false);
   const [openVotingList, setOpenVotingList] = useState<boolean>(false);
-
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -149,7 +144,9 @@ function Project() {
     }
   };
 
-  const [noConfidenceVoters, setNoConfidenceVoters] = useState<NoConfidenceVoter[]>([])
+  const [noConfidenceVoters, setNoConfidenceVoters] = useState<
+    NoConfidenceVoter[]
+  >([]);
 
   const getChainProject = async (project: Project, freelancer: any) => {
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
@@ -165,7 +162,7 @@ function Project() {
       const voters: NoConfidenceVoter[] = await getProjectNoConfidenceVoters(
         project.id
       );
-      setNoConfidenceVoters(voters)
+      setNoConfidenceVoters(voters);
 
       if (user.web3_address && project.project_in_voting_of_no_confidence) {
         const isApprover = voters?.find(
@@ -297,7 +294,7 @@ function Project() {
 
       const totalCost = Number(
         Number(projectRes?.total_cost_without_fee) +
-        Number(projectRes?.imbue_fee)
+          Number(projectRes?.imbue_fee)
       );
       setRequiredBalance(totalCost * 0.95);
 
@@ -323,7 +320,7 @@ function Project() {
   };
 
   const syncProject = async (project: Project) => {
-    if (!project.chain_project_id) return
+    if (!project.chain_project_id) return;
 
     setMilestoneLoadingTitle('Loading Votes ...');
     try {
@@ -332,7 +329,9 @@ function Project() {
       const onChainProjectRes = await chainService.getProject(projectId);
 
       if (onChainProjectRes?.projectInVotingOfNoConfidence) {
-        const noConfidenceVotesChain = await chainService.getNoConfidenceVoters(project.chain_project_id);
+        const noConfidenceVotesChain = await chainService.getNoConfidenceVoters(
+          project.chain_project_id
+        );
         // TODO: sync no cofidene vote list
       }
 
@@ -345,9 +344,9 @@ function Project() {
         if (
           firstPendingMilestoneChain === project.first_pending_milestone &&
           project.project_in_milestone_voting ===
-          onChainProjectRes.projectInMilestoneVoting &&
+            onChainProjectRes.projectInMilestoneVoting &&
           project.project_in_voting_of_no_confidence ===
-          onChainProjectRes.projectInVotingOfNoConfidence
+            onChainProjectRes.projectInVotingOfNoConfidence
         )
           return;
 
@@ -409,61 +408,55 @@ function Project() {
 
   const [openNoRefundList, setOpenNoRefundList] = useState<boolean>(false);
   const [showVotingModal, setShowVotingModal] = useState<boolean>(false);
-  const [votingWalletAccount, setVotingWalletAccount] = useState<WalletAccount | null>(null);
+  const [votingWalletAccount, setVotingWalletAccount] =
+    useState<WalletAccount | null>(null);
 
-  const { setShowLoginPopup } = useContext(LoginPopupContext) as LoginPopupContextType
+  const { setShowLoginPopup } = useContext(
+    LoginPopupContext
+  ) as LoginPopupContextType;
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
 
   const handleMessageBoxClick = () => {
     if (user?.id) {
-      setShowMessageBox(true)
+      setShowMessageBox(true);
     } else {
-      setShowLoginPopup({ open: true, redirectURL: `/projects/${projectId}` })
+      setShowLoginPopup({ open: true, redirectURL: `/projects/${projectId}` });
     }
-  }
+  };
 
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
       <div className='w-full grid grid-cols-12 bg-white py-5 px-7 rounded-2xl'>
         <div className='col-start-1 col-end-10'>
-          <p className='text-black capitalize'>
-            {projectType} information
-          </p>
+          <p className='text-black capitalize'>{projectType} information</p>
           {/* starting of project section */}
           <div className='border-inherit mt-5 border rounded-xl py-4 px-5'>
             <div className='flex mb-4 items-center justify-between'>
               <p className='text-sm text-[#747474]'>Project Description</p>
               <div className='flex items-center gap-2'>
-                {
-                  project?.project_in_voting_of_no_confidence && (
-                    <button
-                      className='px-3 flex items-center gap-2  py-1.5 rounded-full border border-[#EBEAE2] text-sm text-imbue-coral bg-[#FFEBEA] cursor-pointer'
-                    >
-                      <Image src={require('@/assets/svgs/info-circle-red.svg')} alt='' />
-                      Refund Vote in Progress
-                    </button>
-                  )
-                }
+                {project?.project_in_voting_of_no_confidence && (
+                  <button className='px-3 flex items-center gap-2  py-1.5 rounded-full border border-[#EBEAE2] text-sm text-imbue-coral bg-[#FFEBEA] cursor-pointer'>
+                    <Image
+                      src={require('@/assets/svgs/info-circle-red.svg')}
+                      alt=''
+                    />
+                    Refund Vote in Progress
+                  </button>
+                )}
                 <button
                   className='px-3 flex items-center  py-1.5 rounded-full border border-inherit text-sm text-black cursor-pointer'
                   onClick={() => setExpandProjectDesc((prev) => !prev)}
                 >
-                  {
-                    expandProjectDesc
-                      ? 'Hide'
-                      : 'View'
-                  } full Description
+                  {expandProjectDesc ? 'Hide' : 'View'} full Description
                   <TfiNewWindow className='ml-1.5 text-gray-500' size={14} />
                 </button>
               </div>
             </div>
             <h4 className='text-imbue-purple-dark text-2xl'>{project.name}</h4>
             <p className='text-black text-sm py-5 whitespace-pre-wrap break-words'>
-              {
-                expandProjectDesc
-                  ? project?.description
-                  : project?.description?.substring(0, 500) + ' ...'
-              }
+              {expandProjectDesc
+                ? project?.description
+                : project?.description?.substring(0, 500) + ' ...'}
             </p>
 
             <div className='grid grid-cols-12 gap-3 mt-5'>
@@ -474,11 +467,9 @@ function Project() {
               <div className='bg-[#FFEBEA] flex flex-col justify-between rounded-md py-2 px-3 col-span-3'>
                 <div className='flex justify-between items-center'>
                   <p className='text-sm text-[#8A5C5A]'>
-                    {
-                      user.id === projectOwner?.id && projectType === 'brief'
-                        ? 'Freelancer'
-                        : 'Shared by'
-                    }
+                    {user.id === projectOwner?.id && projectType === 'brief'
+                      ? 'Freelancer'
+                      : 'Shared by'}
                   </p>
                   {user.getstream_token !== targetUser.getstream_token && (
                     <p
@@ -495,13 +486,19 @@ function Project() {
                 </div>
                 <div className='flex items-center space-x-2 mt-8'>
                   <Image
-                    src={targetUser.profile_photo || targetUser.profile_image || '/profile-image.png'}
+                    src={
+                      targetUser.profile_photo ||
+                      targetUser.profile_image ||
+                      '/profile-image.png'
+                    }
                     width={100}
                     height={100}
                     alt='image'
                     className='rounded-full w-10 h-10 object-cover'
                   />
-                  <p className='text-imbue-coral'>{projectOwner?.display_name}</p>
+                  <p className='text-imbue-coral'>
+                    {projectOwner?.display_name}
+                  </p>
                 </div>
               </div>
 
@@ -524,18 +521,16 @@ function Project() {
             <div className='flex items-center justify-between mx-6'>
               <p className='text-[#747474] text-sm'>Project Milestones</p>
 
-              {
-                (projectType === 'grant' && canVote) && (
-                  <button
-                    className='px-5 py-2 border border-imbue-coral text-imbue-coral rounded-full bg-[#FFF0EF]'
-                    onClick={() => {
-                      setShowPolkadotAccounts(true)
-                    }}
-                  >
-                    Vote for Refund
-                  </button>
-                )
-              }
+              {projectType === 'grant' && canVote && (
+                <button
+                  className='px-5 py-2 border border-imbue-coral text-imbue-coral rounded-full bg-[#FFF0EF]'
+                  onClick={() => {
+                    setShowPolkadotAccounts(true);
+                  }}
+                >
+                  Vote for Refund
+                </button>
+              )}
             </div>
 
             <div className='grid grid-cols-12 gap-5 mt-10 ml-6'>
@@ -562,6 +557,7 @@ function Project() {
                   canVote,
                   loading,
                   setOpenVotingList,
+                  targetUser,
                 }}
                 key={index}
               />
@@ -579,7 +575,7 @@ function Project() {
                 <div className='w-48  mt-6'>
                   <MilestoneProgressBar
                     currentValue={
-                      (firstPendingMilestone > -1)
+                      firstPendingMilestone > -1
                         ? firstPendingMilestone
                         : project?.milestones?.length - 1 || 0
                     }
@@ -589,29 +585,33 @@ function Project() {
               </div>
               <div className='flex bg-white justify-between px-5 py-3 rounded-xl'>
                 <p className='text-black mt-5'>Timeline</p>
-                <p className='text-imbue-purple-dark text-xl mt-5'>{timeData[project?.duration_id || 0].label}</p>
+                <p className='text-imbue-purple-dark text-xl mt-5'>
+                  {timeData[project?.duration_id || 0].label}
+                </p>
               </div>
-              {
-                projectType === 'grant' && (
-                  <div className='flex flex-col bg-white justify-between px-5 py-3 rounded-xl'>
-                    <CopyToClipboard text={project?.escrow_address}>
-                      <div className='ml-auto'>
-                        <IconButton className='' onClick={() => copyAddress()}>
-                          <Image className='w-4' src={require('@/assets/svgs/copy.svg')} alt='copy button' />
-                        </IconButton>
-                      </div>
-                    </CopyToClipboard>
-                    <div className='w-full flex justify-between items-end'>
-                      <p className='text-black'>Grant Wallet</p>
-                      <p className='text-imbue-purple-dark text-xl line-clamp-1'>
-                        {project?.escrow_address?.slice(0, 6) +
-                          '...' +
-                          project?.escrow_address?.substr(-3)}
-                      </p>
+              {projectType === 'grant' && (
+                <div className='flex flex-col bg-white justify-between px-5 py-3 rounded-xl'>
+                  <CopyToClipboard text={project?.escrow_address}>
+                    <div className='ml-auto'>
+                      <IconButton className='' onClick={() => copyAddress()}>
+                        <Image
+                          className='w-4'
+                          src={require('@/assets/svgs/copy.svg')}
+                          alt='copy button'
+                        />
+                      </IconButton>
                     </div>
+                  </CopyToClipboard>
+                  <div className='w-full flex justify-between items-end'>
+                    <p className='text-black'>Grant Wallet</p>
+                    <p className='text-imbue-purple-dark text-xl line-clamp-1'>
+                      {project?.escrow_address?.slice(0, 6) +
+                        '...' +
+                        project?.escrow_address?.substr(-3)}
+                    </p>
                   </div>
-                )
-              }
+                </div>
+              )}
               <div className='flex flex-col bg-white justify-between px-5 py-3 rounded-xl'>
                 <ProjectBalance
                   {...{
@@ -625,7 +625,8 @@ function Project() {
                 <div className='flex justify-between mt-2'>
                   <p className='text-black'>Total Funding</p>
                   <p className='text-imbue-purple-dark text-xl'>
-                    {project.total_cost_without_fee} {Currency[project.currency_id || 0]}
+                    {project.total_cost_without_fee}{' '}
+                    {Currency[project.currency_id || 0]}
                   </p>
                 </div>
               </div>
@@ -640,27 +641,24 @@ function Project() {
 
           {/* ending side bar for project details */}
           <div className='bg-white mt-5'>
-            {
-              projectInVotingOfNoConfidence &&
-              projectType === "grant" &&
-              (
-                <div className='col-start-10'>
-                  <NoConfidenceBox
-                    noConfidenceVoters={noConfidenceVoters}
-                    setLoadingMain={setLoading}
-                    approversCount={approversPreview?.length || 0}
-                    {...{
-                      setError,
-                      project,
-                      canVote,
-                      isApplicant,
-                      user,
-                      setOpenVotingList: setOpenNoRefundList,
-                      approverVotedOnRefund
-                    }} />
-                </div>
-              )
-            }
+            {projectInVotingOfNoConfidence && projectType === 'grant' && (
+              <div className='col-start-10'>
+                <NoConfidenceBox
+                  noConfidenceVoters={noConfidenceVoters}
+                  setLoadingMain={setLoading}
+                  approversCount={approversPreview?.length || 0}
+                  {...{
+                    setError,
+                    project,
+                    canVote,
+                    isApplicant,
+                    user,
+                    setOpenVotingList: setOpenNoRefundList,
+                    approverVotedOnRefund,
+                  }}
+                />
+              </div>
+            )}
 
             <div className='bg-white col-start-10 px-2 rounded-xl py-3 border border-light-grey'>
               <MilestoneVoteBox
@@ -678,13 +676,12 @@ function Project() {
                   isApplicant,
                   user,
                   setOpenVotingList,
-                  approverVotedOnRefund
+                  approverVotedOnRefund,
                 }}
               />
             </div>
           </div>
         </div>
-
       </div>
       {user && showMessageBox && (
         <ChatPopup
@@ -709,19 +706,17 @@ function Project() {
         project={project}
       />
 
-      {
-        openNoRefundList && (
-          <NoConfidenceList
-            {...{
-              open: openNoRefundList,
-              setMilestoneVotes,
-              approvers: approversPreview,
-              setOpenNoRefundList,
-              project
-            }}
-          />
-        )
-      }
+      {openNoRefundList && (
+        <NoConfidenceList
+          {...{
+            open: openNoRefundList,
+            setMilestoneVotes,
+            approvers: approversPreview,
+            setOpenNoRefundList,
+            project,
+          }}
+        />
+      )}
 
       <VoteModal
         visible={showVotingModal}
@@ -740,9 +735,9 @@ function Project() {
         polkadotAccountsVisible={showPolkadotAccounts}
         showPolkadotAccounts={setShowPolkadotAccounts}
         accountSelected={(account) => {
-          setVotingWalletAccount(account)
-          setShowVotingModal(true)
-          setShowPolkadotAccounts(false)
+          setVotingWalletAccount(account);
+          setShowVotingModal(true);
+          setShowPolkadotAccounts(false);
         }}
       />
 
@@ -810,12 +805,14 @@ function Project() {
       </WaitingScreen>
 
       <div
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
-          }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${
+          copied ? 'right-5' : '-right-full'
+        }`}
       >
-        <Alert severity='success'>Grant Wallet Address Copied to clipboard</Alert>
+        <Alert severity='success'>
+          Grant Wallet Address Copied to clipboard
+        </Alert>
       </div>
-
     </div>
   );
 }

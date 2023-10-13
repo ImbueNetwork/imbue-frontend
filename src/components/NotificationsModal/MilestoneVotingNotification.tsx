@@ -5,7 +5,7 @@ export default function MilestoneVotingNotification(activity: any) {
   const router = useRouter();
   return (
     <div
-      onClick={() => router.push('/briefs')}
+      onClick={() => router.push(`/projects/${activity.data.briefId}`)}
       className='flex  hover:bg-imbue-light-purple-three cursor-pointer py-2 border-t border-b px-5'
     >
       <div className='w-9 flex flex-shrink-0 h-9 mr-3'>
@@ -24,9 +24,6 @@ export default function MilestoneVotingNotification(activity: any) {
         <p className='text-sm mt-3'>
           {activity.data.text || 'descriptions....'}
         </p>
-        <button className='bg-imbue-purple text-white text-sm mt-5 px-7 py-2 rounded-full'>
-          Vote
-        </button>
       </div>
     </div>
   );

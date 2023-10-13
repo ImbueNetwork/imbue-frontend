@@ -24,7 +24,7 @@ export default function NotificationIcon() {
     notifications();
     const timerId = setInterval(() => {
       notifications();
-    }, 120000);
+    }, 20000);
 
     return () => clearInterval(timerId);
   }, []);

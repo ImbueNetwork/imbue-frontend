@@ -14,13 +14,15 @@ import {
 } from '@/utils/helper';
 
 import ApplicationOwnerHeader from '@/components/Application/ApplicationOwnerHeader';
-const BriefOwnerHeader = dynamic(() => import("@/components/Application/BriefOwnerHeader"));
+const BriefOwnerHeader = dynamic(
+  () => import('@/components/Application/BriefOwnerHeader')
+);
 
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
-const LoginPopup = dynamic(() => import("@/components/LoginPopup/LoginPopup"));
+const LoginPopup = dynamic(() => import('@/components/LoginPopup/LoginPopup'));
 
 // import LoginPopup from '@/components/LoginPopup/LoginPopup';
 import SuccessScreen from '@/components/SuccessScreen';
@@ -304,7 +306,7 @@ const ApplicationPreview = (): JSX.Element => {
                 ((m.amount ?? 0) / totalCostWithoutFee) *
                 100
               ).toFixed(0),
-              chain_project_id: chainProjectId
+              chain_project_id: chainProjectId,
             };
           }),
         required_funds: totalCost,
@@ -340,9 +342,7 @@ const ApplicationPreview = (): JSX.Element => {
       setLoading(false);
     }
   };
-
   // const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
-
   // if (loading) return <FullScreenLoader />;
 
   return (
@@ -397,7 +397,6 @@ const ApplicationPreview = (): JSX.Element => {
             />
           </div>
         )}
-
         {
           <div className='bg-white rounded-[20px]'>
             <h3 className='ml-4 lg:ml-[3rem] text-xl leading-[1.5] m-0 p-0  mt-[1.2rem] flex text-imbue-purple-dark font-normal'>
@@ -406,7 +405,6 @@ const ApplicationPreview = (): JSX.Element => {
             {brief && <BriefInsights brief={brief} />}
           </div>
         }
-
         <div>
           <div className='w-full flex flex-col bg-white border border-white rounded-2xl py-4 lg:py-5 '>
             <div className='flex flex-row justify-between mx-5 lg:mx-14'>
@@ -414,15 +412,19 @@ const ApplicationPreview = (): JSX.Element => {
                 Milestones
               </h3>
 
-              {application?.total_cost_without_fee && application?.imbue_fee && (
-                <h3 className='text-lg lg:text-[1.25rem] text-imbue-light-purple-two leading-[1.5] font-normal m-0 p-0'>
-                  Projects&apos;s budget:{' '}
-                  <span className=' text-imbue-purple-dark text-lg lg:text-[1.25rem]'>
-                    ${Number(Number(application.total_cost_without_fee) + Number(application.imbue_fee))?.toLocaleString()}
-                  </span>
-                </h3>
-              )}
-
+              {application?.total_cost_without_fee &&
+                application?.imbue_fee && (
+                  <h3 className='text-lg lg:text-[1.25rem] text-imbue-light-purple-two leading-[1.5] font-normal m-0 p-0'>
+                    Projects&apos;s budget:{' '}
+                    <span className=' text-imbue-purple-dark text-lg lg:text-[1.25rem]'>
+                      $
+                      {Number(
+                        Number(application.total_cost_without_fee) +
+                          Number(application.imbue_fee)
+                      )?.toLocaleString()}
+                    </span>
+                  </h3>
+                )}
             </div>
 
             <hr className='h-[1px] bg-[#E1DDFF] w-full' />
@@ -450,8 +452,9 @@ const ApplicationPreview = (): JSX.Element => {
                       {index + 1}.
                     </div>
                     <div
-                      className={`flex ${isEditingBio ? 'flex-col lg:flex-row' : 'flex-row'
-                        } justify-between w-full`}
+                      className={`flex ${
+                        isEditingBio ? 'flex-col lg:flex-row' : 'flex-row'
+                      } justify-between w-full`}
                     >
                       <div className='w-full lg:w-1/2 h-fit'>
                         {isEditingBio ? (
@@ -675,7 +678,7 @@ const ApplicationPreview = (): JSX.Element => {
                 </select>
               ) : (
                 <p className='text-content-primary mt-2 w-full'>
-                  {durationOptions[durationId || 0]?.label || ""}
+                  {durationOptions[durationId || 0]?.label || ''}
                 </p>
               )}
             </div>
@@ -739,9 +742,10 @@ const ApplicationPreview = (): JSX.Element => {
                 title={disableSubmit && 'Please fill all the input fields'}
               >
                 <button
-                  className={`primary-btn in-dark w-button ${disableSubmit &&
+                  className={`primary-btn in-dark w-button ${
+                    disableSubmit &&
                     '!bg-gray-400 !text-white !cursor-not-allowed'
-                    }`}
+                  }`}
                   onClick={() => !disableSubmit && handleUpdateProject()}
                 >
                   Update

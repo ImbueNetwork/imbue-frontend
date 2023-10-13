@@ -12,6 +12,7 @@ import { FaRegCopy } from 'react-icons/fa';
 import { FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 
+import { sendNotification } from '@/utils';
 import { showErrorMessage } from '@/utils/errorMessages';
 import {
   handleApplicationInput,
@@ -225,7 +226,9 @@ const GrantApplication = (): JSX.Element => {
       );
 
       if (result.txError) {
-        setError({ message: `Failed to submit a grant ${result.errorMessage}` });
+        setError({
+          message: `Failed to submit a grant ${result.errorMessage}`,
+        });
       }
 
       // eslint-disable-next-line no-constant-condition
@@ -261,6 +264,13 @@ const GrantApplication = (): JSX.Element => {
               const { grant_id } = (await resp.json()) as any;
               setProjectId(grant_id);
               setSuccess(true);
+              await sendNotification(
+                grant.approvers,
+                'AddApprovers.testing',
+                'You were invited as an Approver',
+                `${user.display_name} is building a Startup and wants to be funded, he needs your approval to be funded. please review first`,
+                grant_id
+              );
             } else {
               const errorBody = await resp.json();
               setError({ message: `Failed to submit a grant. (${errorBody})` });
@@ -315,9 +325,10 @@ const GrantApplication = (): JSX.Element => {
   useEffect(() => {
     setInputErrors((prev) => ({
       ...prev,
-      approvers: approvers?.length < 4
-        ? ''
-        : 'Please select atleast 4 valid grant approvers',
+      approvers:
+        approvers?.length < 4
+          ? ''
+          : 'Please select atleast 4 valid grant approvers',
     }));
   }, [approvers.length]);
 
@@ -625,8 +636,9 @@ const GrantApplication = (): JSX.Element => {
                                   ''}
                               </p>
                               <div className='text-imbue-purple text-sm ml-auto text-right'>
-                                {`${milestones[index].description?.length || 0
-                                  }/5000`}
+                                {`${
+                                  milestones[index].description?.length || 0
+                                }/5000`}
                               </div>
                             </div>
                           </div>
@@ -700,8 +712,9 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
-                  }`}
+                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${
+                  currencies[currencyId]
+                }`}
               </div>
             </div>
 
@@ -721,8 +734,9 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${currencies[currencyId]
-                  }`}
+                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${
+                  currencies[currencyId]
+                }`}
               </div>
             </div>
 
@@ -748,8 +762,9 @@ const GrantApplication = (): JSX.Element => {
         >
           <button
             // disabled={!formDataValid}
-            className={`primary-btn in-dark w-button ${disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
-              }`}
+            className={`primary-btn in-dark w-button ${
+              disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
+            }`}
             onClick={() => !disableSubmit && handleSubmit()}
           >
             Submit
@@ -802,8 +817,9 @@ const GrantApplication = (): JSX.Element => {
           </button>
         </div>
         <Alert
-          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${copied ? 'flex' : 'hidden'
-            }`}
+          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${
+            copied ? 'flex' : 'hidden'
+          }`}
           severity='success'
         >
           Grant Wallet Address Copied to clipboard

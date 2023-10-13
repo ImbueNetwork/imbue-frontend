@@ -4,6 +4,8 @@ import nextConnect from 'next-connect';
 import passport from 'passport';
 
 import * as models from '@/lib/models';
+import { fetchUserByList } from '@/lib/queryServices/userQueries';
+import { isValidAddressPolkadotAddress } from '@/utils/helper';
 
 import db from '@/db';
 
@@ -23,16 +25,13 @@ export default nextConnect()
         process.env.GETSTREAM_API_KEY as string,
         process.env.GETSTREAM_SECRET_KEY as string
       );
-      const targetUser = client.feed('user', target);
       const use = client.user(userAuth.id);
-
       db.transaction(async (tx) => {
         try {
           const user = (await models.fetchUser(userAuth.id)(tx)) as models.User;
           if (!user) {
             return res.status(404).end();
           }
-
           const activity = {
             actor: use,
             verb: 'pin',
@@ -48,14 +47,22 @@ export default nextConnect()
               applicationId,
             },
           };
-          await targetUser.addActivity(activity);
+          let userList;
+          if (isValidAddressPolkadotAddress(target[0])) {
+            const response = (await fetchUserByList(target)(
+              tx
+            )) as models.User[];
+            userList = response.map((user) => user.id);
+          } else userList = target;
+
+          userList.map(async (id: string) => {
+            const targetUser = client.feed('user', id);
+            await targetUser.addActivity(activity);
+          });
         } catch (err) {
           return res.status(404).end();
         }
       });
-
-      // console.log(sender);
-
       res.status(200).json({ message: 'successfully send notification' });
     } catch (err) {
       console.log(err);

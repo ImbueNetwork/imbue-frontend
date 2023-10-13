@@ -230,7 +230,7 @@ export const SubmitProposal = (): JSX.Element => {
         const applicationId = (await resp.json()).id;
         applicationId && setapplicationId(applicationId);
         await sendNotification(
-          brief.user_id,
+          [brief.user_id],
           'breif.test.applied',
           'Some one might have interested in your breif',
           'Hi there some one has applied to your brief check your breif and get your ideal candidate',

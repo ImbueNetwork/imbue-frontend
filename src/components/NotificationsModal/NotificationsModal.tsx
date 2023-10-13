@@ -34,13 +34,15 @@ export default function NotificationsModal({ isShown }: { isShown: boolean }) {
             }}
             Activity={({ activity }) => (
               <>
-                {activity.object === 'Milestone.testing' && (
+                {(activity.object === 'approved_Milestone.testing' ||
+                  activity.object === 'submit_Milestone.testing') && (
                   <MilestoneVotingNotification {...activity} />
                 )}
                 {(activity.object === 'breif.test.applied' ||
-                  activity.object === 'application.accepted.testing') && (
-                    <ApplyBreifNotification {...activity} />
-                  )}
+                  activity.object === 'application.accepted.testing' ||
+                  activity.object === 'AddApprovers.testing') && (
+                  <ApplyBreifNotification {...activity} />
+                )}
               </>
             )}
           />

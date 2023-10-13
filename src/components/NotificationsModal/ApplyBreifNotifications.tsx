@@ -2,12 +2,15 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 export default function ApplyBreifNotification(activity: any) {
   const router = useRouter();
+  console.log(activity);
   return (
     <div
       onClick={() =>
-        router.push(
-          `/briefs/${activity.data.briefId}/applications/${activity.data.applicationId}`
-        )
+        activity.object === 'AddApprovers.testing'
+          ? router.push(`/projects/${activity.data.briefId}`)
+          : router.push(
+              `/briefs/${activity.data.briefId}/applications/${activity.data.applicationId}`
+            )
       }
       className='flex hover:bg-imbue-light-purple-three cursor-pointer py-3 border-t border-b px-5'
     >
