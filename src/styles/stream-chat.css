@@ -143,11 +143,13 @@
   height: 65vh;
 }
 
-.str-chat ::-webkit-scrollbar {
+.str-chat ::-webkit-scrollbar,
+.custom-scroll ::-webkit-scrollbar {
   width: 3px;
 }
 
-.str-chat ::-webkit-scrollbar-track {
+.str-chat ::-webkit-scrollbar-track,
+.custom-scroll ::-webkit-scrollbar-track {
   background: var(--theme-light-grey);
   border-radius: 10px;
 }
@@ -157,12 +159,14 @@
   overflow: scroll;
 }
 
+.custom-scroll ::-webkit-scrollbar-thumb,
 .str-chat ::-webkit-scrollbar-thumb,
 .chat__list ::-webkit-scrollbar-thumb {
   background: var(--theme-purple-light);
   border-radius: 10px;
 }
 
+.custom-scroll ::-webkit-scrollbar-thumb:hover,
 .str-chat ::-webkit-scrollbar-thumb:hover {
   background: var(--theme-purple-light);
 }

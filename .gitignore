@@ -37,3 +37,4 @@ next-env.d.ts
 
 .gitconfig
 .env
+/public/KEY_FILENAME.json

@@ -93,7 +93,7 @@ export default nextConnect()
           status_id,
           project_in_voting_of_no_confidence,
           first_pending_milestone,
-          project_in_milestone_voting
+          project_in_milestone_voting,
         } = body;
 
         // ensure the project exists first
@@ -107,7 +107,7 @@ export default nextConnect()
           return res.status(403).end();
         }
 
-        const newProject : any = {
+        const newProject: any = {
           name,
           logo,
           description,
@@ -126,7 +126,7 @@ export default nextConnect()
           completed: status_id === OffchainProjectState.Completed,
           project_in_voting_of_no_confidence,
           first_pending_milestone,
-          project_in_milestone_voting
+          project_in_milestone_voting,
         };
 
         // if (first_pending_milestone)
@@ -164,10 +164,6 @@ export default nextConnect()
 
         return res.status(200).send(pkg);
       } catch (cause) {
-        console.log(
-          '🚀 ~ file: [...id].ts:152 ~ db.transaction ~ cause:',
-          cause
-        );
         return res.status(500).json({ error: cause });
       }
     });
