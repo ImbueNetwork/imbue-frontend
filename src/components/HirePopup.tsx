@@ -122,7 +122,7 @@ export const HirePopup = ({
             [application.user_id],
             'application.accepted.testing',
             'Congratulations your application has been accepted',
-            `${user.display_name} has accepted you as his/her freelancer best of luck`,
+            `${user.display_name} has accepted you as their freelancer best of luck`,
             brief.id,
             application.id
           );

@@ -28,7 +28,7 @@ export default function NotificationsModal({ isShown }: { isShown: boolean }) {
             notify
             feedGroup='user'
             options={{
-              limit: 1,
+              limit: 7,
               withOwnChildren: true,
               withRecentReactions: true,
             }}

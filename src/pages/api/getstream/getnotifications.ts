@@ -23,7 +23,6 @@ export default nextConnect()
         process.env.GETSTREAM_SECRET_KEY as string
       );
       const user = client.feed('user', userAuth.id);
-
       await db.transaction(async (tx) => {
         try {
           const { last_notification_id } =

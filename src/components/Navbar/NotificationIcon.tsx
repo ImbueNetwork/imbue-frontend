@@ -45,7 +45,7 @@ export default function NotificationIcon() {
 
   return (
     <div>
-      <Badge badgeContent={unreadNotification} color='primary'>
+      <Badge badgeContent={unreadNotification} color='error'>
         <Image
           onClick={() => {
             setNotificationOn(() => true);

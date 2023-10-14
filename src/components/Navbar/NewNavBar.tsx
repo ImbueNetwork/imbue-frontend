@@ -6,6 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
   Avatar,
+  Badge,
   Box,
   IconButton,
   Menu,
@@ -49,9 +50,11 @@ function NewNavbar() {
   const open = Boolean(anchorEl);
   const [openMenu, setOpenMenu] = useState(false);
 
-  const { user, loading: loadingUser } = useSelector(
-    (state: RootState) => state.userState
-  );
+  const {
+    user,
+    loading: loadingUser,
+    message,
+  } = useSelector((state: RootState) => state.userState);
   const dispatch = useDispatch<AppDispatch>();
 
   const [expanded, setExpanded] = useState(false);
@@ -296,14 +299,16 @@ function NewNavbar() {
               paddingRight: 2,
             }}
           >
-            <Image
-              src='/message-dots-square.svg'
-              width={23}
-              height={20}
-              onClick={() => router.push('/dashboard/message')}
-              alt='message'
-              className='mr-3 cursor-pointer'
-            />
+            <Badge className='mr-3' badgeContent={message} color='error'>
+              <Image
+                src='/message-dots-square.svg'
+                width={23}
+                height={20}
+                onClick={() => router.push('/dashboard/message')}
+                alt='message'
+                className='cursor-pointer'
+              />
+            </Badge>
             <div className='relative'>
               {/*  */}
 
