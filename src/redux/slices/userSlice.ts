@@ -28,7 +28,6 @@ export const userState = createSlice({
   initialState,
   reducers: {
     setUnreadMessage(state, action) {
-      console.log(action.payload);
       state.message = action.payload.message;
     },
   },

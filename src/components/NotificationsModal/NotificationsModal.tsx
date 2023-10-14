@@ -7,13 +7,12 @@ import { RootState } from '@/redux/store/store';
 import ApplyBreifNotification from './ApplyBreifNotifications';
 import MilestoneVotingNotification from './MilestoneVotingNotification';
 
-export default function NotificationsModal({ isShown }: { isShown: boolean }) {
+export default function NotificationsModal() {
   const { user } = useSelector((state: RootState) => state.userState);
   return (
     <div
       className={classNames(
-        'w-[29.375rem]  max-h-[85vh]  overflow-auto text-left bg-white -left-[28rem] top-10 rounded-3xl py-5 shadow-lg absolute',
-        isShown ? 'block' : 'hidden'
+        'w-[29.375rem]  max-h-[85vh]  overflow-auto text-left bg-white   py-5 '
       )}
     >
       <p className='text-xl text-black mb-3 mt-2 ml-6'>Notifications</p>

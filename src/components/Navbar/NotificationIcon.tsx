@@ -1,4 +1,4 @@
-import { Badge } from '@mui/material';
+import { Badge, Menu } from '@mui/material';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
@@ -8,8 +8,8 @@ import NotificationsModal from '../NotificationsModal/NotificationsModal';
 
 export default function NotificationIcon() {
   const [unreadNotification, setNotificationCount] = useState(0);
-  const [isNotificationOn, setNotificationOn] = useState<boolean>(false);
   const [modal, setModal] = useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [lastNotification, setLastNotification] = useState<
     string | undefined
   >();
@@ -33,8 +33,9 @@ export default function NotificationIcon() {
     await updateLastNotification(lastNotification as string);
   };
 
-  const handleOpenModal = () => {
+  const handleOpenModal = (e: any) => {
     setModal((val) => !val);
+    setAnchorEl(e.target);
     if (unreadNotification > 0) {
       setNotificationCount(0);
       if (lastNotification !== undefined) {
@@ -42,15 +43,15 @@ export default function NotificationIcon() {
       }
     }
   };
-
+  const handleCloseModal = () => {
+    setAnchorEl(null);
+    setModal(false);
+  };
   return (
     <div>
       <Badge badgeContent={unreadNotification} color='error'>
         <Image
-          onClick={() => {
-            setNotificationOn(() => true);
-            handleOpenModal();
-          }}
+          onClick={handleOpenModal}
           src='/bell-01.svg'
           width={23}
           height={20}
@@ -58,8 +59,16 @@ export default function NotificationIcon() {
           alt='notifications'
         />
       </Badge>
-
-      {isNotificationOn && <NotificationsModal isShown={modal} />}
+      <Menu
+        disableScrollLock={true}
+        id='basic-menu'
+        anchorEl={anchorEl}
+        open={modal}
+        onClose={handleCloseModal}
+        className='mt-7 '
+      >
+        <NotificationsModal />
+      </Menu>
     </div>
   );
 }

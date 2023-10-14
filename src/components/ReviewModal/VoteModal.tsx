@@ -121,7 +121,6 @@ export default function VoteModal({
               Number(project.id)
             );
           }
-
           setStep(4);
           setVisible(true);
           break;
