@@ -5,6 +5,7 @@ import { WalletAccount } from '@talismn/connect-wallets';
 // import ChainService from '@/redux/services/chainService';
 import Filter from 'bad-words';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
@@ -268,7 +269,16 @@ const GrantApplication = (): JSX.Element => {
                 grant.approvers,
                 'AddApprovers.testing',
                 'You were invited as an Approver',
-                `${user.display_name} is building a Startup and wants to be funded, he needs your approval to be funded. please review first`,
+                `${(
+                  <Link
+                    href={`/profile/${user.username}`}
+                    className='font-semibold'
+                  >
+                    {user.display_name.split(' ')[0] || 'Someone'}
+                  </Link>
+                )} has added you as an approver for their project ${(
+                  <Link href={`/projects/${projectId}`}>projectId</Link>
+                )}. Please review and provide your feedback.`,
                 grant_id
               );
             } else {

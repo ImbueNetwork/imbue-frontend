@@ -173,15 +173,15 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                   [String(targetUser.id)],
                   'submit_Milestone.testing',
                   'A New Milestone has been made',
-                  `${milestone.name} , a milestone on ${user.display_name}'s ${project.name} just got marked as completed and needs your vote of approval`,
+                  `Milestone Submitted Successfully`,
                   Number(project.id)
                 );
               } else {
                 await sendNotification(
-                  project.approvers,
+                  [String(targetUser.id)],
                   'submit_Milestone.testing',
                   'A New Milestone has been made',
-                  ` ${milestone.name} , a milestone on ${user.display_name}'s ${project.name} projects just got marked as completed and needs your vote of approval`,
+                  `Milestone Submitted Successfully`,
                   Number(project.id)
                 );
               }

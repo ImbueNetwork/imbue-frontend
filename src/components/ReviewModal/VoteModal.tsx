@@ -3,6 +3,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import {
   FormControl,
   FormControlLabel,
+  Link,
   Modal,
   Radio,
   RadioGroup,
@@ -113,11 +114,11 @@ export default function VoteModal({
               [String(targetUser.id)],
               'approved_Milestone.testing',
               'A Milestone has been approved',
-              `${
-                project.milestones[project.first_pending_milestone || 0].name
-              } , a milestone on ${user.display_name}'s ${
-                project.name
-              } just got marked as approved`,
+              `Great news! The milestone ${
+                (project.first_pending_milestone || 0) + 1
+              } has been succesfully completed for the project ${(
+                <Link href={`/projects/${project.id}`}>{project.id}</Link>
+              )} `,
               Number(project.id)
             );
           }

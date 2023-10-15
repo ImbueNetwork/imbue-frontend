@@ -4,8 +4,10 @@ import { useSelector } from 'react-redux';
 
 import { RootState } from '@/redux/store/store';
 
-import ApplyBreifNotification from './ApplyBreifNotifications';
 import MilestoneVotingNotification from './MilestoneVotingNotification';
+import AcceptBreifNotifications from './notificationComponents/AcceptBreifNotifications';
+import ApplyBreifNotification from './notificationComponents/ApplyBreifNotifications';
+import SubmitMilestoneNotification from './notificationComponents/SubmitMilestoneNotification';
 
 export default function NotificationsModal() {
   const { user } = useSelector((state: RootState) => state.userState);
@@ -33,13 +35,16 @@ export default function NotificationsModal() {
             }}
             Activity={({ activity }) => (
               <>
-                {(activity.object === 'approved_Milestone.testing' ||
-                  activity.object === 'submit_Milestone.testing') && (
+                {activity.object === 'approved_Milestone.testing' && (
                   <MilestoneVotingNotification {...activity} />
                 )}
-                {(activity.object === 'breif.test.applied' ||
-                  activity.object === 'application.accepted.testing' ||
-                  activity.object === 'AddApprovers.testing') && (
+                {activity.object === 'submit_Milestone.testing' && (
+                  <SubmitMilestoneNotification {...activity} />
+                )}
+                {activity.object === 'application.accepted.testing' && (
+                  <AcceptBreifNotifications {...activity} />
+                )}
+                {activity.object === 'breif.test.applied' && (
                   <ApplyBreifNotification {...activity} />
                 )}
               </>

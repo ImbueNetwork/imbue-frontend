@@ -4,6 +4,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Filter from 'bad-words';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
@@ -233,7 +234,9 @@ export const SubmitProposal = (): JSX.Element => {
           [brief.user_id],
           'breif.test.applied',
           'Some one might have interested in your breif',
-          'Hi there some one has applied to your brief check your breif and get your ideal candidate',
+          `You have a new applicant for your brief ${(
+            <Link href={`/briefs/${briefId}`}>{briefId}</Link>
+          )}.Take a moment to review their application and cosider their suitability for the role`,
           briefId,
           applicationId
         );
