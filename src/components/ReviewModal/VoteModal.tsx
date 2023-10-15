@@ -100,6 +100,7 @@ export default function VoteModal({
             Number(project.id),
             Number(project.first_pending_milestone) + 1
           );
+
           await voteOnMilestone(
             user.id,
             user.web3_address,
@@ -113,10 +114,8 @@ export default function VoteModal({
               [String(targetUser.id)],
               'approved_Milestone.testing',
               'A Milestone has been approved',
-              `${
-                project.milestones[project.first_pending_milestone || 0].name
-              } , a milestone on ${user.display_name}'s ${
-                project.name
+              `${project.milestones[project.first_pending_milestone || 0].name
+              } , a milestone on ${user.display_name}'s ${project.name
               } just got marked as approved`,
               Number(project.id)
             );
@@ -125,13 +124,25 @@ export default function VoteModal({
           setVisible(true);
           break;
         } else if (result.status) {
-          await voteOnMilestone(
+          const resp = await voteOnMilestone(
             user.id,
             user.web3_address,
             milestoneKeyInView,
             vote,
             project.id
           );
+
+          if (resp.milestoneApproved && targetUser?.id) {
+            await sendNotification(
+              [String(targetUser.id)],
+              'approved_Milestone.testing',
+              'A Milestone has been approved',
+              `${project.milestones[project.first_pending_milestone || 0].name
+              } , a milestone on ${user.display_name}'s ${project.name
+              } just got marked as approved`,
+              Number(project.id)
+            );
+          }
 
           setStep(4);
           setVisible(true);
@@ -141,13 +152,25 @@ export default function VoteModal({
           setVisible(false);
           break;
         } else if (pollResult != ImbueChainPollResult.Pending) {
-          await voteOnMilestone(
+          const resp = await voteOnMilestone(
             user.id,
             user.web3_address,
             milestoneKeyInView,
             vote,
             project.id
           );
+          
+          if (resp.milestoneApproved && targetUser?.id) {
+            await sendNotification(
+              [String(targetUser.id)],
+              'approved_Milestone.testing',
+              'A Milestone has been approved',
+              `${project.milestones[project.first_pending_milestone || 0].name
+              } , a milestone on ${user.display_name}'s ${project.name
+              } just got marked as approved`,
+              Number(project.id)
+            );
+          }
 
           setStep(4);
           setVisible(true);
