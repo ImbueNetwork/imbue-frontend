@@ -294,7 +294,7 @@ function Project() {
 
       const totalCost = Number(
         Number(projectRes?.total_cost_without_fee) +
-          Number(projectRes?.imbue_fee)
+        Number(projectRes?.imbue_fee)
       );
       setRequiredBalance(totalCost * 0.95);
 
@@ -327,6 +327,7 @@ function Project() {
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);
       const onChainProjectRes = await chainService.getProject(projectId);
+      console.log("🚀 ~ file: [id].tsx:330 ~ syncProject ~ onChainProjectRes:", onChainProjectRes)
 
       if (onChainProjectRes?.projectInVotingOfNoConfidence) {
         const noConfidenceVotesChain = await chainService.getNoConfidenceVoters(
@@ -341,12 +342,15 @@ function Project() {
             onChainProjectRes.milestones
           );
 
+        console.log("🚀 ~ file: [id].tsx:341 ~ syncProject ~ firstPendingMilestoneChain:", firstPendingMilestoneChain)
+
+
         if (
           firstPendingMilestoneChain === project.first_pending_milestone &&
           project.project_in_milestone_voting ===
-            onChainProjectRes.projectInMilestoneVoting &&
+          onChainProjectRes.projectInMilestoneVoting &&
           project.project_in_voting_of_no_confidence ===
-            onChainProjectRes.projectInVotingOfNoConfidence
+          onChainProjectRes.projectInVotingOfNoConfidence
         )
           return;
 
@@ -805,9 +809,8 @@ function Project() {
       </WaitingScreen>
 
       <div
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${
-          copied ? 'right-5' : '-right-full'
-        }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
+          }`}
       >
         <Alert severity='success'>
           Grant Wallet Address Copied to clipboard

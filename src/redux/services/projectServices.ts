@@ -249,6 +249,8 @@ export const voteOnMilestone = async (
 
     return await resp.json();
   } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
     return { message: 'Something went wrong' + error };
   }
 };
