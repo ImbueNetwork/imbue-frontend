@@ -23,9 +23,10 @@ export default nextConnect()
       );
       const client = connect(
         process.env.GETSTREAM_API_KEY as string,
-        process.env.GETSTREAM_SECRET_KEY as string
+        process.env.GETSTREAM_SECRET_KEY as string,
+        process.env.GETSTREAM_APP_ID as string
       );
-      const use = client.user(userAuth.id);
+
       db.transaction(async (tx) => {
         try {
           const user = (await models.fetchUser(userAuth.id)(tx)) as models.User;
@@ -33,13 +34,14 @@ export default nextConnect()
             return res.status(404).end();
           }
           const activity = {
-            actor: use,
+            actor: 'User:' + userAuth.id,
             verb: 'pin',
             object: type,
             data: {
               sender: {
                 display_name: user.display_name,
                 profile_photo: user.profile_photo,
+                username: user.username,
               },
               text,
               title,
@@ -47,16 +49,21 @@ export default nextConnect()
               applicationId,
             },
           };
-          let userList;
-          if (isValidAddressPolkadotAddress(target[0])) {
+          let userIdList;
+          if (isValidAddressPolkadotAddress(target)) {
             const response = (await fetchUserByList(target)(
               tx
             )) as models.User[];
-            userList = response.map((user) => user.id);
-          } else userList = target;
+            userIdList = response.map((user: models.User) => user.id);
+          } else userIdList = target;
 
-          userList.map(async (id: string) => {
-            const targetUser = client.feed('user', id);
+          userIdList.map(async (id: string) => {
+            const userId = client.user(String(id));
+            const targetUser = client.feed(
+              'user',
+              String(userId.id),
+              userId.token
+            );
             await targetUser.addActivity(activity);
           });
         } catch (err) {

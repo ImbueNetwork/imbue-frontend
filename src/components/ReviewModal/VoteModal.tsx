@@ -3,7 +3,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import {
   FormControl,
   FormControlLabel,
-  Link,
   Modal,
   Radio,
   RadioGroup,
@@ -115,10 +114,13 @@ export default function VoteModal({
               [String(targetUser.id)],
               'approved_Milestone.testing',
               'A Milestone has been approved',
-              `${project.milestones[project.first_pending_milestone || 0].name
-              } , a milestone on ${user.display_name}'s ${project.name
+              `${
+                project.milestones[project.first_pending_milestone || 0].name
+              } , a milestone on ${user.display_name}'s ${
+                project.name
               } just got marked as approved`,
-              Number(project.id)
+              Number(project.id),
+              Number(project.first_pending_milestone) + 1
             );
           }
           setStep(4);
@@ -138,10 +140,13 @@ export default function VoteModal({
               [String(targetUser.id)],
               'approved_Milestone.testing',
               'A Milestone has been approved',
-              `${project.milestones[project.first_pending_milestone || 0].name
-              } , a milestone on ${user.display_name}'s ${project.name
+              `${
+                project.milestones[project.first_pending_milestone || 0].name
+              } , a milestone on ${user.display_name}'s ${
+                project.name
               } just got marked as approved`,
-              Number(project.id)
+              Number(project.id),
+              Number(project.first_pending_milestone) + 1
             );
           }
 
@@ -160,16 +165,15 @@ export default function VoteModal({
             vote,
             project.id
           );
-          
+
           if (resp.milestoneApproved && targetUser?.id) {
             await sendNotification(
               [String(targetUser.id)],
               'approved_Milestone.testing',
               'A Milestone has been approved',
-              `${project.milestones[project.first_pending_milestone || 0].name
-              } , a milestone on ${user.display_name}'s ${project.name
-              } just got marked as approved`,
-              Number(project.id)
+              `approved milestone`,
+              Number(project.id),
+              Number(project.first_pending_milestone) + 1
             );
           }
 
