@@ -10,7 +10,6 @@ import moment from 'moment';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 
-import { sendNotification } from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
@@ -40,7 +39,6 @@ interface ExpandableMilestonProps {
   setShowPolkadotAccounts: (_value: boolean) => void;
   canVote: boolean;
   loading: boolean;
-  targetUser: User;
 }
 
 const ExpandableMilestone = (props: ExpandableMilestonProps) => {
@@ -55,7 +53,6 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
     user,
     setSuccessTitle,
     setSuccess,
-    targetUser,
   } = props;
   const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
   const [submittingMilestone, setSubmittingMilestone] =
@@ -80,12 +77,6 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
     milestone.milestone_index == project.first_pending_milestone &&
     !project.project_in_milestone_voting &&
     !milestone?.is_approved;
-
-  const milestoneCompleted =
-    milestone.is_approved ||
-    (project?.first_pending_milestone !== undefined &&
-      project?.first_pending_milestone > index) ||
-    project?.first_pending_milestone === -1;
 
   const [attachments, setAttachment] = useState<any>([]);
 
@@ -174,25 +165,6 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
             if (resp) {
               setSuccess(true);
               setSuccessTitle('Milestone Submitted Successfully');
-              if (projectType === 'brief') {
-                await sendNotification(
-                  [String(targetUser.id)],
-                  'submit_Milestone.testing',
-                  'A New Milestone has been made',
-                  `Milestone Submitted Successfully`,
-                  Number(project.id),
-                  milestone.milestone_index + 1
-                );
-              } else {
-                await sendNotification(
-                  [String(targetUser.id)],
-                  'submit_Milestone.testing',
-                  'A New Milestone has been made',
-                  `Milestone Submitted Successfully`,
-                  Number(project.id),
-                  milestone.milestone_index + 1
-                );
-              }
             } else {
               setError({
                 message:
@@ -314,7 +286,6 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
 
       <VoteModal
         {...{
-          targetUser,
           setSuccessTitle,
           setSuccess,
           setError,
@@ -422,65 +393,46 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
 
               {showSubmitButton && (
                 <div>
-                  <div>
-                    <p className='text-black mt-10 font-semibold text-lg'>
-                      Add Attachments for this project
-                    </p>
-                    <div className='flex space-x-5'>
-                      {files?.length
-                        ? files.map((file, index) => (
-                            <div
-                              key={index}
-                              className='border rounded-lg mt-5 flex space-x-4 items-center px-3 text-xs py-3'
-                            >
-                              <div className='space-y-2'>
-                                <p>{file.name}</p>
-                                <p>{(file.size / 1048576).toFixed(2)} MB</p>
-                              </div>
-                              <Image
-                                className='cursor-pointer ml-2'
-                                src={require('@/assets/svgs/trash.svg')}
-                                alt=''
-                                onClick={() => handleRemoveFile(index)}
-                              />
+                  <p className='text-black mt-10 font-semibold text-lg'>
+                    Add Attachments for this project
+                  </p>
+                  <div className='flex space-x-5'>
+                    {files?.length
+                      ? files.map((file, index) => (
+                          <div
+                            key={index}
+                            className='border rounded-lg mt-5 flex space-x-4 items-center px-3 text-xs py-3'
+                          >
+                            <div className='space-y-2'>
+                              <p>{file.name}</p>
+                              <p>{(file.size / 1048576).toFixed(2)} MB</p>
                             </div>
-                          ))
-                        : ''}
-                    </div>
+                            <Image
+                              className='cursor-pointer ml-2'
+                              src={require('@/assets/svgs/trash.svg')}
+                              alt=''
+                              onClick={() => handleRemoveFile(index)}
+                            />
+                          </div>
+                        ))
+                      : ''}
+                  </div>
 
-                    <Button
-                      component='label'
-                      variant='contained'
-                      startIcon={<CloudUploadIcon />}
-                      color='secondary'
-                      className='mt-5'
-                    >
-                      Upload file
-                      <input
-                        className='hidden'
-                        type='file'
-                        multiple
-                        onChange={(e) => handleFileSelect(e)}
-                      />
-                    </Button>
-                  </div>
-                  <div>
-                    <Button
-                      component='label'
-                      variant='contained'
-                      startIcon={<CloudUploadIcon />}
-                      color='secondary'
-                      className='mt-5'
-                    >
-                      Upload file
-                      <input
-                        className='hidden'
-                        type='file'
-                        multiple
-                        onChange={(e) => handleFileSelect(e)}
-                      />
-                    </Button>
-                  </div>
+                  <Button
+                    component='label'
+                    variant='contained'
+                    startIcon={<CloudUploadIcon />}
+                    color='secondary'
+                    className='mt-5'
+                  >
+                    Upload file
+                    <input
+                      className='hidden'
+                      type='file'
+                      multiple
+                      onChange={(e) => handleFileSelect(e)}
+                    />
+                  </Button>
                 </div>
               )}
 
