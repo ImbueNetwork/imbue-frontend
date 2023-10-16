@@ -11,13 +11,12 @@ import { RootState } from '@/redux/store/store';
 type ProjectApproversType = {
     approversPreview: User[];
     project: Project;
-    setIsApprover: (_value: boolean) => void;
     setApproverPreview: (_value: User[]) => void;
     projectOwner: User | undefined;
 }
 
 const ProjectApprovers = (props: ProjectApproversType) => {
-    const { approversPreview, project, setIsApprover, setApproverPreview, projectOwner } = props;
+    const { approversPreview, project, setApproverPreview, projectOwner } = props;
 
     const { user } = useSelector(
         (state: RootState) => state.userState
@@ -89,12 +88,6 @@ const ProjectApprovers = (props: ProjectApproversType) => {
                     ]
                 }
 
-                if (
-                    user.web3_address &&
-                    (project?.approvers?.includes(user.web3_address) || projectOwner?.web3_address === user.web3_address)
-                )
-                    setIsApprover(true)
-
                 setApproverPreview(approversPreviewList);
             } catch (error) {
                 // eslint-disable-next-line no-console
@@ -107,7 +100,7 @@ const ProjectApprovers = (props: ProjectApproversType) => {
         project?.id && getAndSetApprovers()
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [project.id, setApproverPreview, user?.web3_address, setIsApprover, projectOwner?.id, projectOwner?.display_name, projectOwner?.profile_photo, projectOwner?.username, projectOwner?.web3_address, projectOwner?.getstream_token])
+    }, [project.id, setApproverPreview, user?.web3_address, projectOwner?.id, projectOwner?.display_name, projectOwner?.profile_photo, projectOwner?.username, projectOwner?.web3_address, projectOwner?.getstream_token])
 
     if (loading || approversPreview?.length === 0) return (
         <div className='flex items-center gap-5'>
@@ -133,13 +126,13 @@ const ProjectApprovers = (props: ProjectApproversType) => {
 
 
     return (
-        <div className='h-full'>
+        <div className='h-full pl-1'>
             <div className='flex justify-between'>
-                <p className='text-[#8A5C5A] text-sm pl-2'>Approvers</p>
+                <p className='text-[#8A5C5A] text-sm pl-3'>Approvers</p>
                 {
                     !project.brief_id && (
                         <p
-                            className='bg-white text-black px-2 py-1 rounded-full text-xs cursor-pointer'
+                            className='bg-white text-black mr-4 px-2 py-1 rounded-full text-xs cursor-pointer'
                             onClick={() => setShowApproverList(true)}
                         >
                             see all
@@ -149,11 +142,11 @@ const ProjectApprovers = (props: ProjectApproversType) => {
             </div>
 
             {approversPreview?.length > 0 && (
-                <div className='flex flex-row flex-wrap gap-2 mt-4'>
+                <div className='grid grid-cols-12 flex-wrap gap-2 mt-4'>
                     {approversPreview?.slice(0, 4).map((approver: any, index: number) => (
                         <div
                             key={index}
-                            className={`flex text-content pr-4 pl-2 first:pl-3 py-2 rounded-xl gap-4 items-center ${approver?.display_name && 'cursor-pointer'} ${approver.id === user?.id && "bg-[#FFDAD8]"}`}
+                            className={`col-span-3 flex text-content px-3 py-2 rounded-xl gap-4 items-center ${approver?.display_name && 'cursor-pointer'} ${approver.id === user?.id && "bg-[#FFDAD8]"}`}
                             onClick={() =>
                                 approver.display_name &&
                                 router.push(`/profile/${approver.username}`)

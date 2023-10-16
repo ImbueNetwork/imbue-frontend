@@ -5,8 +5,6 @@ import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
 import React, { useRef, useState } from 'react';
 
-import * as utils from '@/utils';
-
 import * as config from '@/config';
 import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 
@@ -31,6 +29,10 @@ const LoginPopup = ({ visible, setVisible, redirectUrl }: LoginModalProps) => {
 
     const [showSignup, setShowSignup] = useState<boolean>(false);
 
+    const redirect = (path: string) => {
+        window.location.href = `${window.location.origin}/${path}`;
+    }
+
     const handleSubmit = async () => {
         setLoading(true);
         try {
@@ -48,7 +50,7 @@ const LoginPopup = ({ visible, setVisible, redirectUrl }: LoginModalProps) => {
             });
 
             if (resp.ok) {
-                utils.redirect(redirectUrl || "/dashboard");
+                redirect(redirectUrl || "/dashboard");
             } else {
                 setErrorMessage('incorrect username or password');
             }
@@ -69,7 +71,7 @@ const LoginPopup = ({ visible, setVisible, redirectUrl }: LoginModalProps) => {
                 account
             );
             if (resp.ok) {
-                utils.redirect(redirectUrl || "/dashboard");
+                redirect(redirectUrl || "/dashboard");
             }
         } catch (error) {
             // FIXME: error handling

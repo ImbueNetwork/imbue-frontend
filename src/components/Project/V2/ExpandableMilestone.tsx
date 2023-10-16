@@ -284,7 +284,11 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                 <span className='relative text-sm z-10'>{index + 1}</span>
                 <div className='w-2 h-2 -rotate-45 bg-[#2400FF] absolute -bottom-0.5  '></div>
               </div>
-              <p className='text-black ml-3 text-2xl'>{milestone.name}</p>
+              <p className='text-black ml-3 text-2xl'>{
+                milestone?.name?.length > 40
+                  ? milestone.name.substring(0, 40) + " ..."
+                  : milestone.name
+              }</p>
             </div>
             <p className='col-start-7 col-end-9 text-lg mr-10 ml-4'>
               ${milestone.amount}
@@ -305,7 +309,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                 project.project_in_milestone_voting
                 ? (
                   <p
-                    className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ml-auto ${milestone.is_approved
+                    className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ml-auto h-fit ${milestone.is_approved
                       ? 'bg-lime-100 text-lime-600'
                       : 'bg-red-100 text-red-500'}`}
                   >
@@ -313,7 +317,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                   </p>)
                 : (
                   <p
-                    className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ml-auto ${milestone.is_approved
+                    className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ml-auto h-fit ${milestone.is_approved
                       ? 'bg-lime-100 text-lime-600'
                       : 'bg-[#EBEAE2] text-[#949494]'}`}
                   >
@@ -330,10 +334,34 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
               </p>
               <p className='mt-5 whitespace-pre-wrap break-words'>{milestone.description}</p>
               {
-                showSubmitButton && (
+                attachments?.length ? (
                   <div>
                     <p className='text-black mt-10 font-semibold text-lg'>
                       Project Attachments
+                    </p>
+                    <div className='grid grid-cols-6 gap-3'>
+                      {
+                        attachments?.length
+                          ? attachments.map((attachment: any, index: number) => (
+                            <a className='col-span-1' key={index} href={attachment.fileURL} target='_blank'>
+                              <div className='border rounded-lg mt-5 px-3 text-xs py-3'>
+                                <div className='space-y-2'>
+                                  <p>{attachment.fileURL?.split("$")[1] || "Attachment"}</p>
+                                </div>
+                              </div>
+                            </a>
+                          ))
+                          : ""
+                      }
+                    </div>
+                  </div>) : ""
+              }
+
+              {
+                showSubmitButton && (
+                  <div>
+                    <p className='text-black mt-10 font-semibold text-lg'>
+                      Add Attachments for this project
                     </p>
                     <div className='flex space-x-5'>
                       {
@@ -356,42 +384,24 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                       }
                     </div>
 
-                    <div>
-                      <Button
-                        component="label"
-                        variant="contained"
-                        startIcon={<CloudUploadIcon />}
-                        color='secondary'
-                        className='mt-5'
-                      >
-                        Upload file
-                        <input
-                          className='hidden'
-                          type="file"
-                          multiple
-                          onChange={(e) => handleFileSelect(e)}
-                        />
-                      </Button>
-                    </div>
+                    <Button
+                      component="label"
+                      variant="contained"
+                      startIcon={<CloudUploadIcon />}
+                      color='secondary'
+                      className='mt-5'
+                    >
+                      Upload file
+                      <input
+                        className='hidden'
+                        type="file"
+                        multiple
+                        onChange={(e) => handleFileSelect(e)}
+                      />
+                    </Button>
                   </div>
                 )
               }
-
-              <div className='grid grid-cols-6 gap-3'>
-                {
-                  (showVoteButton || showSubmitButton) && attachments.length
-                    ? attachments.map((attachment: any, index: number) => (
-                      <a className='col-span-1' key={index} href={attachment.fileURL} target='_blank'>
-                        <div className='border rounded-lg mt-5 px-3 text-xs py-3'>
-                          <div className='space-y-2'>
-                            <p>{attachment.fileURL?.split("$")[1] || "Attachment"}</p>
-                          </div>
-                        </div>
-                      </a>
-                    ))
-                    : ""
-                }
-              </div>
 
               <div className='w-full mt-7 flex'>
 

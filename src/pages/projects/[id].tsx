@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-constant-condition */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Alert, IconButton } from '@mui/material';
+import { Alert, IconButton, Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -48,6 +48,7 @@ import {
   OffchainProjectState,
   Project,
   User,
+  VotesResp,
 } from '@/model';
 import { Currency } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
@@ -122,8 +123,6 @@ function Project() {
 
 
   const [isModalOpen, setModalOpen] = useState(false);
-  const [showRefundButton, setShowRefundButton] = useState<boolean>(false);
-  const [milestonLoadingTitle, setMilestoneLoadingTitle] = useState<string>('');
   const [projectInMilestoneVoting, setProjectInMilestoneVoting] =
     useState<boolean>();
   const [requiredBalance, setRequiredBalance] = useState<any>(0);
@@ -133,7 +132,6 @@ function Project() {
 
   const [expandProjectDesc, setExpandProjectDesc] = useState<boolean>(false);
   const [openVotingList, setOpenVotingList] = useState<boolean>(false);
-
 
   // fetching the project data from api and from chain
   useEffect(() => {
@@ -150,6 +148,8 @@ function Project() {
   };
 
   const [noConfidenceVoters, setNoConfidenceVoters] = useState<NoConfidenceVoter[]>([])
+  const [votes, setVotes] = useState<VotesResp | null>(null)
+
 
   const getChainProject = async (project: Project, freelancer: any) => {
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
@@ -158,7 +158,7 @@ function Project() {
       if (project?.approvers?.length && user.web3_address) {
         const userIsApprover = project.approvers?.includes(user.web3_address);
         if (userIsApprover) {
-          setShowRefundButton(true);
+          setIsApprover(true);
         }
       }
 
@@ -325,7 +325,6 @@ function Project() {
   const syncProject = async (project: Project) => {
     if (!project.chain_project_id) return
 
-    setMilestoneLoadingTitle('Loading Votes ...');
     try {
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);
@@ -392,7 +391,6 @@ function Project() {
       console.error(error);
       setError({ message: 'Could not sync project. ', error });
     } finally {
-      setMilestoneLoadingTitle('');
       setLoading(false);
     }
   };
@@ -467,11 +465,11 @@ function Project() {
             </p>
 
             <div className='grid grid-cols-12 gap-3 mt-5'>
-              <div className='bg-[#F2F0FF] justify-between py-2 px-3 flex flex-col col-span-2 rounded-md'>
+              <div className='bg-[#F2F0FF] justify-between py-2 px-3 flex flex-col col-span-4 xl:col-span-2 rounded-md'>
                 <p className='text-imbue-purple text-sm'>Posted</p>
                 <p className='text-imbue-purple-dark text-sm'>{timePosted}</p>
               </div>
-              <div className='bg-[#FFEBEA] flex flex-col justify-between rounded-md py-2 px-3 col-span-3'>
+              <div className='bg-[#FFEBEA] flex flex-col justify-between rounded-md py-2 px-3 col-span-8 xl:col-span-3'>
                 <div className='flex justify-between items-center'>
                   <p className='text-sm text-[#8A5C5A]'>
                     {
@@ -505,12 +503,11 @@ function Project() {
                 </div>
               </div>
 
-              <div className='bg-light-grey flex flex-col justify-between px-4 py-3 rounded-md col-span-7'>
+              <div className='bg-light-grey flex flex-col justify-between py-3 rounded-md col-span-12 xl:col-span-7'>
                 <ProjectApprovers
                   {...{
                     approversPreview,
                     project,
-                    setIsApprover,
                     setApproverPreview,
                     projectOwner,
                   }}
@@ -525,15 +522,15 @@ function Project() {
               <p className='text-[#747474] text-sm'>Project Milestones</p>
 
               {
-                (projectType === 'grant' && canVote) && (
-                  <button
-                    className='px-5 py-2 border border-imbue-coral text-imbue-coral rounded-full bg-[#FFF0EF]'
-                    onClick={() => {
-                      setShowPolkadotAccounts(true)
-                    }}
-                  >
-                    Vote for Refund
-                  </button>
+                (projectType === 'grant' && isApprover) && (
+                  <Tooltip followCursor title="You cannot vote for refund more than once ">
+                    <button
+                      className={`px-5 py-2 ${approverVotedOnRefund ? "border border-gray-400 bg-light-white opacity-50" : "border border-imbue-coral text-imbue-coral bg-[#FFF0EF]"} rounded-full`}
+                      onClick={() => !approverVotedOnRefund && setShowPolkadotAccounts(true)}
+                    >
+                      Vote for Refund
+                    </button>
+                  </Tooltip>
                 )
               }
             </div>
@@ -579,9 +576,9 @@ function Project() {
                 <div className='w-48  mt-6'>
                   <MilestoneProgressBar
                     currentValue={
-                      (firstPendingMilestone > -1)
+                      (projectInMilestoneVoting)
                         ? firstPendingMilestone
-                        : project?.milestones?.length - 1 || 0
+                        : firstPendingMilestone === -1 ? project?.milestones?.length : firstPendingMilestone - 1
                     }
                     titleArray={project?.milestones}
                   />
@@ -678,7 +675,10 @@ function Project() {
                   isApplicant,
                   user,
                   setOpenVotingList,
-                  approverVotedOnRefund
+                  approverVotedOnRefund,
+                  votes,
+                  setVotes,
+                  setMilestoneVotes
                 }}
               />
             </div>
@@ -700,13 +700,15 @@ function Project() {
 
       <VotingList
         open={openVotingList}
-        firstPendingMilestone={firstPendingMilestone}
         setOpenVotingList={setOpenVotingList}
-        approvers={approversPreview}
-        chainProjectId={project.chain_project_id}
-        projectId={project.id}
-        setMilestoneVotes={setMilestoneVotes}
-        project={project}
+        loading={loading}
+        votes={votes}
+      // setMilestoneVotes={setMilestoneVotes}
+      // firstPendingMilestone={firstPendingMilestone}
+      // approvers={approversPreview}
+      // chainProjectId={project.chain_project_id}
+      // projectId={project.id}
+      // project={project}
       />
 
       {

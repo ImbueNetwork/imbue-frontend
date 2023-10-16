@@ -453,7 +453,7 @@ const ApplicationPreview = (): JSX.Element => {
                       className={`flex ${isEditingBio ? 'flex-col lg:flex-row' : 'flex-row'
                         } justify-between w-full`}
                     >
-                      <div className='w-full lg:w-1/2 h-fit'>
+                      <div className='w-full lg:w-2/3 h-fit'>
                         {isEditingBio ? (
                           <>
                             <h3 className='text-base lg:text-xl mb-2 lg:mb-5 p-0 text-imbue-purple-dark font-normal'>
@@ -483,7 +483,7 @@ const ApplicationPreview = (): JSX.Element => {
                             </div>
                           </>
                         ) : (
-                          <h3 className='mb-2 lg:mb-5 text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0'>
+                          <h3 className='mb-2 lg:mb-5 text-base lg:text-[1.25rem] text-imbue-purple font-normal m-0 p-0 break-words'>
                             {name}
                           </h3>
                         )}
@@ -516,7 +516,7 @@ const ApplicationPreview = (): JSX.Element => {
                             </div>
                           </>
                         ) : (
-                          <p className='text-[1rem] text-[#3B27C180] m-0'>
+                          <p className='text-[1rem] text-[#3B27C180] m-0 break-words'>
                             {description}
                           </p>
                         )}

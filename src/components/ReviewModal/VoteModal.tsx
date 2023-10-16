@@ -250,7 +250,7 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
       <div className='bg-white rounded-xl px-12 py-5 relative'>
         <div className='flex w-full justify-between px-5'>
           {
-            step > 0 && (
+            step > 0 && step !== 4 && (
               <ArrowBackIcon
                 className='h-7 w-7 hover:bg-imbue-purple rounded-full hover:text-white cursor-pointer border absolute left-5'
                 color='secondary'
@@ -258,11 +258,16 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
               />
             )
           }
-          <CloseIcon
-            className='h-7 w-7 hover:bg-imbue-purple rounded-full hover:text-white cursor-pointer border p-1 absolute right-5'
-            color='secondary'
-            onClick={() => setVisible(false)}
-          />
+
+          {
+            step !== 4 && (
+              <CloseIcon
+                className='h-7 w-7 hover:bg-imbue-purple rounded-full hover:text-white cursor-pointer border p-1 absolute right-5'
+                color='secondary'
+                onClick={() => setVisible(false)}
+              />
+            )
+          }
         </div>
         {
           (step === 0 && !refundOnly) && (

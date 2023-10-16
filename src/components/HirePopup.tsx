@@ -189,8 +189,8 @@ export const HirePopup = ({
                 <p className='mr-3 lg:mr-9 text-lg'>{index + 1}.</p>
                 <div className='flex justify-between w-full'>
                   <div>
-                    <p className='text-lg mb-1 text-content'>{m.name}</p>
-                    <p className='text-base'>{m.description.substring(0, 100) + "..."}</p>
+                    <p className='text-lg mb-1 text-content break-words'>{m.name.substring(0, 70) + " ..."}</p>
+                    <p className='text-base'>{m.description.substring(0, 90) + "..."}</p>
                   </div>
                   <div className='budget-wrapper text-end'>
                     <p className='text-lg mb-1 text-content'>Amount</p>
