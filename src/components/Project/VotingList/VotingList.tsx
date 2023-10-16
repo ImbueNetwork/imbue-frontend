@@ -1,95 +1,91 @@
 import { BottomNavigation, BottomNavigationAction, Dialog, DialogTitle } from '@mui/material';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-
-import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import freelalncerPic from '@/assets/images/profile-image.png'
-import { Project, User } from '@/model';
-import ChainService from '@/redux/services/chainService';
-import { getMillestoneVotes, voteOnMilestone } from '@/redux/services/projectServices';
-import { RootState } from '@/redux/store/store';
+import { VotesResp } from '@/model';
 
 import VotingListSkeleton from './VotingListSkeleton';
 
 
 type VotingListProps = {
     open: boolean;
-    firstPendingMilestone: number;
+    loading: boolean;
     setOpenVotingList: (_value: boolean) => void;
-    setMilestoneVotes: (_value: any) => void;
-    approvers: User[];
-    chainProjectId: number | undefined;
-    projectId: number | undefined;
-    project: Project
+    votes: VotesResp | null;
+    // firstPendingMilestone: number;
+    // setMilestoneVotes: (_value: any) => void;
+    // approvers: User[];
+    // chainProjectId: number | undefined;
+    // projectId: number | undefined;
+    // project: Project;
 }
 
-type MilestoneVotes = {
-    voterAddress: any;
-    vote: boolean;
-}
+// type MilestoneVotes = {
+//     voterAddress: any;
+//     vote: boolean;
+// }
 
 const VotingList = (props: VotingListProps) => {
-    const { setOpenVotingList, approvers, chainProjectId, open, setMilestoneVotes, projectId, project } = props
+    const { setOpenVotingList, open, votes, loading } = props
     const [value, setValue] = React.useState(0);
     const [list, setList] = useState<any[]>([]);
-    const [votes, setVotes] = useState<any>([])
-    const { user, loading: userLoading } = useSelector(
-        (state: RootState) => state.userState
-    );
-    const [loading, setLoading] = useState(false);
+    // const [votes, setVotes] = useState<any>([])
+    // const { user, loading: userLoading } = useSelector(
+    //     (state: RootState) => state.userState
+    // );
+    // const [loading, setLoading] = useState(false);
 
-    const firstPendingMilestone = props?.firstPendingMilestone >= 0 ? props?.firstPendingMilestone : project?.milestones?.length - 1
+    // const firstPendingMilestone = props?.firstPendingMilestone >= 0 ? props?.firstPendingMilestone : project?.milestones?.length - 1
 
-    useEffect(() => {
-        const syncVotes = async () => {
-            if (!chainProjectId || !projectId || firstPendingMilestone === undefined) return
+    // useEffect(() => {
+    //     const syncVotes = async () => {
+    //         if (!chainProjectId || !projectId || firstPendingMilestone === undefined) return
 
-            const imbueApi = await initImbueAPIInfo();
-            const chainService = new ChainService(imbueApi, user);
-            const milestoneVotes: any = await chainService.getMilestoneVotes(
-                chainProjectId,
-                firstPendingMilestone
-            );
+    //         const imbueApi = await initImbueAPIInfo();
+    //         const chainService = new ChainService(imbueApi, user);
+    //         const milestoneVotes: any = await chainService.getMilestoneVotes(
+    //             chainProjectId,
+    //             firstPendingMilestone
+    //         );
 
-            const votesArray = Object.keys(milestoneVotes)
+    //         const votesArray = Object.keys(milestoneVotes)
 
-            if (votesArray.length > 0) {
-                const votes: MilestoneVotes[] = votesArray?.map((key: any) => ({
-                    voterAddress: key,
-                    vote: milestoneVotes[key],
-                })) || [];
+    //         if (votesArray.length > 0) {
+    //             const votes: MilestoneVotes[] = votesArray?.map((key: any) => ({
+    //                 voterAddress: key,
+    //                 vote: milestoneVotes[key],
+    //             })) || [];
 
-                const promises = votes.map(async (v) => await voteOnMilestone(null, v.voterAddress, firstPendingMilestone, v.vote, projectId))
-                await Promise.all(promises)
-                const voteResp = await getMillestoneVotes(projectId, firstPendingMilestone)
-                setVotes(voteResp)
-                setMilestoneVotes(voteResp?.allVoters)
-                // const resp = await syncProjectVotes(projectId, firstPendingMilestone, votes)
-            }
-        }
+    //             const promises = votes.map(async (v) => await voteOnMilestone(null, v.voterAddress, firstPendingMilestone, v.vote, projectId))
+    //             await Promise.all(promises)
+    //             const voteResp = await getMillestoneVotes(projectId, firstPendingMilestone)
+    //             setVotes(voteResp)
+    //             setMilestoneVotes(voteResp?.allVoters)
+    //             // const resp = await syncProjectVotes(projectId, firstPendingMilestone, votes)
+    //         }
+    //     }
 
-        const setVotingList = async () => {
-            if (!projectId || firstPendingMilestone === undefined) return
+    //     const setVotingList = async () => {
+    //         if (!projectId || firstPendingMilestone === undefined) return
 
-            setLoading(true)
-            try {
-                const voteResp = await getMillestoneVotes(projectId, firstPendingMilestone)
-                setVotes(voteResp)
-                setMilestoneVotes(voteResp?.allVoters)
-                // const votersAddressed = voteResp?.map((voter: any) => voter.web3_address)
-                syncVotes();
-            } catch (error) {
-                // eslint-disable-next-line no-console
-                console.error(error);
-            } finally {
-                setLoading(false)
-            }
-        }
+    //         setLoading(true)
+    //         try {
+    //             const voteResp = await getMillestoneVotes(projectId, firstPendingMilestone)
+    //             setVotes(voteResp)
+    //             setMilestoneVotes(voteResp?.allVoters)
+    //             // const votersAddressed = voteResp?.map((voter: any) => voter.web3_address)
+    //             syncVotes();
+    //         } catch (error) {
+    //             // eslint-disable-next-line no-console
+    //             console.error(error);
+    //         } finally {
+    //             setLoading(false)
+    //         }
+    //     }
 
-        setVotingList()
-    }, [user, firstPendingMilestone, setMilestoneVotes, projectId, approvers, chainProjectId])
+    //     setVotingList()
+    // }, [user, firstPendingMilestone, setMilestoneVotes, projectId, approvers, chainProjectId])
 
     // useEffect(() => {
     //     const votedYes: User[] = []
@@ -124,13 +120,13 @@ const VotingList = (props: VotingListProps) => {
     useEffect(() => {
         switch (value) {
             case 0:
-                setList(votes.yes)
+                setList(votes?.yes || [])
                 break;
             case 1:
-                setList(votes.no)
+                setList(votes?.no || [])
                 break;
             case 2:
-                setList(votes.pending)
+                setList(votes?.pending || [])
                 break;
         }
 
@@ -146,7 +142,7 @@ const VotingList = (props: VotingListProps) => {
             className='p-14 errorDialogue'
         >
             {
-                (loading || userLoading)
+                (loading)
                     ? <VotingListSkeleton />
                     : <>
                         <DialogTitle id="responsive-dialog-title">

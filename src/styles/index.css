@@ -677,7 +677,7 @@ input[type='radio'] {
 }
 
 .progress-bar-progress {
-  position: absolute;
+  /* position: absolute; */
   height: 6px;
   background: var(--theme-purple);
   left: 4px;
@@ -688,13 +688,14 @@ input[type='radio'] {
 }
 
 .progress-bar-progress--milestone {
-  position: absolute;
+  /* position: absolute; */
   height: 10px;
   background: var(--theme-purple);
-  left: 4px;
-  right: 4px;
-  top: 6px;
-  bottom: 6px;
+  /* left: 4px;
+  right: 4px; */
+  margin-top: 6px;
+  /* top: 6px;
+  bottom: 6px; */
   z-index: 1;
   border-radius: 10px;
 }

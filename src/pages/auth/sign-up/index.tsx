@@ -13,7 +13,6 @@ const PasswordStrengthBar = dynamic(() => import('react-password-strength-bar'),
 
 import dynamic from "next/dynamic";
 
-import * as utils from '@/utils';
 import { matchedByUserName, matchedByUserNameEmail } from "@/utils";
 import { isUrlAndSpecialCharacterExist, isValidEmail, validateInputLength } from "@/utils/helper";
 
@@ -84,6 +83,10 @@ export default function SignIn() {
 
   const salt = bcrypt.genSaltSync(10);
 
+  const redirect = (path: string) => {
+    window.location.href = `${window.location.origin}/${path}`;
+}
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setLoading(true);
@@ -103,7 +106,7 @@ export default function SignIn() {
       });
 
       if (resp.ok) {
-        utils.redirect("/dashboard");
+        redirect("/dashboard");
       } else {
         const errorMessage = await resp.json();
 
@@ -125,7 +128,7 @@ export default function SignIn() {
         account
       );
       if (resp.ok) {
-        utils.redirect("/dashboard");
+        redirect("/dashboard");
       }
     } catch (error) {
       // FIXME: error handling

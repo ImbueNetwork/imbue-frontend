@@ -1,6 +1,6 @@
-/* eslint-disable no-constant-condition */
-/* eslint-disable no-console */
-/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable unused-imports/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import { Skeleton, Tooltip, Typography } from '@mui/material';
@@ -33,7 +33,6 @@ import Impressions from '@/components/Project/Impressions';
 import ProjectApprovers from '@/components/Project/ProjectApprovers';
 import ProjectBalance from '@/components/Project/ProjectBalance';
 const ProjectHint = dynamic(() => import('@/components/Project/ProjectHint'));
-import VotingList from '@/components/Project/VotingList/VotingList';
 import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
 
@@ -998,7 +997,7 @@ function Project() {
         </div>
       </WaitingScreen>
 
-      <VotingList
+      {/* <VotingList
         open={openVotingList}
         firstPendingMilestone={firstPendingMilestone || 0}
         project={project}
@@ -1007,7 +1006,7 @@ function Project() {
         chainProjectId={project.chain_project_id}
         projectId={project.id}
         setMilestoneVotes={setMilestoneVotes}
-      />
+      /> */}
       <BackDropLoader open={loading || userLoading} />
     </div>
   );

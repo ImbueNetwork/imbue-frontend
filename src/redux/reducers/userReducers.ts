@@ -20,7 +20,7 @@ export const fetchUserRedux = createAsyncThunk(
         method: 'get',
       });
       googleLogout();
-      redirect('/auth/sign-in');
+      redirect('auth/sign-in');
       
       return {
         status: 'failed',
@@ -37,7 +37,7 @@ export const logout = createAsyncThunk('users/logout', async () => {
       method: 'get',
     });
     googleLogout();
-    redirect('/auth/sign-in');
+    redirect('auth/sign-in');
   } catch (error) {
     console.log(error);
   }

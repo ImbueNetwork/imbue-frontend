@@ -1,8 +1,6 @@
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import React, { useEffect, useState } from 'react';
 
-import * as utils from '@/utils';
-
 import * as config from '@/config';
 
 interface GoogleComponentProps {
@@ -29,6 +27,9 @@ const GoogleSignIn = ({ sizeRef: walletRef, redirectUrl }: GoogleComponentProps)
         return () => window.removeEventListener('resize', handleResize);
     }, [walletRef]);
 
+    const redirect = (path: string) => {
+        window.location.href = `${window.location.origin}/${path}`;
+    }
 
     const googleLogin = async (response: any) => {
         const resp = await fetch(`${config.apiBase}auth/google/`, {
@@ -38,7 +39,7 @@ const GoogleSignIn = ({ sizeRef: walletRef, redirectUrl }: GoogleComponentProps)
         });
 
         if (resp.ok) {
-            utils.redirect(redirectUrl || "/dashboard");
+            redirect(redirectUrl || "/dashboard");
         } else {
             alert('incorrect username or password');
         }

@@ -1,15 +1,20 @@
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import {
   FilledInput,
   FormControl,
   InputAdornment,
   InputLabel,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import { Signer } from '@polkadot/api/types';
 import { decodeAddress } from "@polkadot/util-crypto/address"
 import { WalletAccount } from '@talismn/connect-wallets';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
+import { getBalance } from '@/utils/helper';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 import { getServerSideProps } from '@/utils/serverSideProps';
 
@@ -17,6 +22,26 @@ import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 import SuccessScreen from '@/components/SuccessScreen';
 import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
+
+import { Currency } from '@/model';
+import { RootState } from '@/redux/store/store';
+
+const Currencies = [
+  {
+    name: "IMBU",
+    currencyId: 0
+  },
+  {
+    name: "KSM",
+    currencyId: 1
+  },
+  // {AUSD : 2},
+  // {KAR : 3},
+  {
+    name: "MGX",
+    currencyId: 4
+  },
+]
 
 const Relay = () => {
   const [transferAmount, setTransferAmount] = useState<number>(0);
@@ -121,11 +146,110 @@ const Relay = () => {
     }
   }
 
+  const { user, loading: loadingUser } = useSelector(
+    (state: RootState) => state.userState
+  );
+  const [balanceLoading, setBalanceLoading] = useState(true)
+  const [requestSent, setRequestSent] = useState(false)
+  const [currency_id, setCurrency_id] = useState<number>(0)
+  const [balance, setBalance] = useState<number>(0)
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const showOptions = Boolean(anchorEl);
+
+
+  // useEffect(() => {
+  //   getAndSetBalace()
+  // }, [currency_id, user.id])
+
+  useEffect(() => {
+    const getAndSetBalace = async () => {
+      if (!requestSent && !loadingUser && !user?.web3_address) return
+
+      setRequestSent(true)
+      try {
+        const balance = await getBalance(
+          user.web3_address as string,
+          currency_id,
+          user
+        );
+
+        setBalance(balance || 0);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error);
+      } finally {
+        setBalanceLoading(false)
+        setRequestSent(false)
+      }
+    }
+
+    const timer = setInterval(() => {
+      getAndSetBalace()
+    }, 5000);
+    return () => clearInterval(timer);
+
+  }, [balanceLoading, currency_id, loadingUser, requestSent, user]);
+
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const selectCurrency = (currencyID: number) => {
+    setCurrency_id(currencyID)
+    setAnchorEl(null);
+  };
+
   return (
     <div className='bg-background p-10 rounded-2xl'>
       <h1 className='fund-h1'>My funds</h1>
 
       <p className='my-5 text-content'>Transfer KSM to Imbue Network</p>
+
+      <div className='text-sm text-[#868686] my-3'>
+        {balanceLoading
+          ? (
+            <p className='text-xs font-semibold'> Loading Balance...</p>)
+          : (
+            <div className='flex items-center gap-5'>
+              <div>
+                <button
+                  className='border rounded-xl px-[10px] py-1 text-xs flex items-start gap-1'
+                  onClick={(e) => handleClick(e)}
+                >
+                  {Currency[currency_id || 0]}
+                  <KeyboardArrowDownIcon className='text-sm' />
+                </button>
+                <Menu
+                  id="basic-menu"
+                  anchorEl={anchorEl}
+                  open={showOptions}
+                  onClose={handleClose}
+                  MenuListProps={{
+                    'aria-labelledby': 'basic-button',
+                  }}
+                >
+                  {
+                    Currencies.map((currency) => (
+                      <MenuItem
+                        key={currency.currencyId}
+                        onClick={() => selectCurrency(currency.currencyId)}
+                      >
+                        {currency.name}
+                      </MenuItem>
+                    ))
+                  }
+                </Menu>
+              </div>
+              <p>
+                Balance : {balance} ${Currency[currency_id || 0]}
+              </p>
+            </div>
+          )
+        }
+      </div>
 
       <FormControl
         className='transferFund'
