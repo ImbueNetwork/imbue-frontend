@@ -6,7 +6,7 @@ import { StyledEngineProvider } from '@mui/material/styles';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { StreamChat } from 'stream-chat';
 import 'stream-chat-react/dist/css/v2/index.css';
 
@@ -25,6 +25,7 @@ const LoginPopup = dynamic(() => import('@/components/LoginPopup/LoginPopup'));
 import { Freelancer, Project, User } from '@/model';
 import { Brief } from '@/model';
 import { getFreelancerApplications } from '@/redux/services/freelancerService';
+import { setUnreadMessage } from '@/redux/slices/userSlice';
 import { RootState } from '@/redux/store/store';
 
 export type DashboardProps = {
@@ -53,6 +54,8 @@ const Dashboard = ({ val }: { val?: string }): JSX.Element => {
   const { briefId } = router.query;
 
   const [error, setError] = useState<any>(userError);
+
+  const dispatch = useDispatch();
 
   const handleMessageBoxClick = async (
     user_id: number,
@@ -101,9 +104,15 @@ const Dashboard = ({ val }: { val?: string }): JSX.Element => {
         },
         user.getstream_token
       );
-
+      const getUnreadMessageChannels = async () => {
+        const result = await client.getUnreadCount();
+        dispatch(setUnreadMessage({ message: result.channels.length }));
+      };
+      getUnreadMessageChannels();
       client.on((event) => {
+        console.log(event);
         if (event.total_unread_count !== undefined) {
+          dispatch(setUnreadMessage({ message: event.unread_channels }));
           setUnreadMsg(event.total_unread_count);
         }
       });

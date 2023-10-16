@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import passport from 'passport';
 
+import { fetchProjectById, updateMilestone } from '@/lib/models';
 import {
   addVoteToDB,
   checkExistingVote,
@@ -36,7 +37,7 @@ export default nextConnect()
           projectId,
           milestoneIndex
         )(tx);
-        
+
         const allVotesAddresses = allVotersRes.map((v) => v.voter_address);
 
         res.status(200).json({
@@ -72,6 +73,19 @@ export default nextConnect()
           voterAddress
         )(tx);
 
+        const project = await fetchProjectById(projectId)(tx);
+        let milestoneApproved = false;
+
+        if (project?.brief_id) {
+          const updatedMilestone = await updateMilestone(
+            Number(projectId),
+            Number(milestoneIndex),
+            { is_approved: vote }
+          )(tx);
+
+          milestoneApproved = updatedMilestone[0].is_approved;
+        }
+
         if (existingVote?.id && existingVote?.vote === vote)
           return res.status(500).json({ message: 'Nothing to update' });
 
@@ -84,7 +98,10 @@ export default nextConnect()
             vote
           )(tx);
 
-          if (resp?.length) return res.status(200).json({ status: 'success' });
+          if (resp?.length)
+            return res
+              .status(200)
+              .json({ status: 'success', milestoneApproved });
         } else {
           const resp = await updateVoteDB(
             projectId,
@@ -93,7 +110,10 @@ export default nextConnect()
             voterAddress
           )(tx);
 
-          if (resp) return res.status(200).json({ status: 'success' });
+          if (resp)
+            return res
+              .status(200)
+              .json({ status: 'success', milestoneApproved });
         }
       } catch (error) {
         // eslint-disable-next-line no-console

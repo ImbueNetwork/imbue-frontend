@@ -12,11 +12,24 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { BiArrowBack } from 'react-icons/bi';
 
+import { sendNotification } from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
-import { ImbueChainPollResult, OffchainProjectState, Project, User } from '@/model';
+import {
+  ImbueChainPollResult,
+  OffchainProjectState,
+  Project,
+  User,
+} from '@/model';
 import ChainService, { ImbueChainEvent } from '@/redux/services/chainService';
-import { insertNoConfidenceVoter, updateFirstPendingMilestone, updateMilestone, updateProject, updateProjectVotingState, voteOnMilestone } from '@/redux/services/projectServices';
+import {
+  insertNoConfidenceVoter,
+  updateFirstPendingMilestone,
+  updateMilestone,
+  updateProject,
+  updateProjectVotingState,
+  voteOnMilestone,
+} from '@/redux/services/projectServices';
 
 import ReviewModal from './ReviewModal';
 import SuccessModal from './SuccessModal';
@@ -32,16 +45,28 @@ interface VotingModalProps {
   user: User;
   votingWalletAccount: WalletAccount | any;
   setError: (_value: any) => void;
+  targetUser?: User;
 }
 
-export default function VoteModal({ visible, setVisible, setLoading, project, user, votingWalletAccount, setError, refundOnly }: VotingModalProps) {
+export default function VoteModal({
+  targetUser,
+  visible,
+  setVisible,
+  setLoading,
+  project,
+  user,
+  votingWalletAccount,
+  setError,
+  refundOnly,
+}: VotingModalProps) {
   const [vote, setVote] = useState<boolean>(true);
   const [voteRefund, setVoteRefund] = useState<boolean>(false);
-  const [step, setStep] = useState<number>(0)
+  const [step, setStep] = useState<number>(0);
 
   const handleVoteOnMilestone = async (vote: boolean) => {
-    const milestoneKeyInView = project?.first_pending_milestone
-    if (!project?.id || !user.web3_address || milestoneKeyInView === undefined) return
+    const milestoneKeyInView = project?.first_pending_milestone;
+    if (!project?.id || !user.web3_address || milestoneKeyInView === undefined)
+      return;
 
     try {
       const imbueApi = await initImbueAPIInfo();
@@ -70,43 +95,100 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
       while (true) {
         if (pollResult == ImbueChainPollResult.EventFound) {
           await updateMilestone(Number(project.id), milestoneKeyInView, true);
-          await updateProjectVotingState(Number(project.id), false)
-          await updateFirstPendingMilestone(Number(project.id), (Number(project.first_pending_milestone) + 1))
-          await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
+          await updateProjectVotingState(Number(project.id), false);
+          await updateFirstPendingMilestone(
+            Number(project.id),
+            Number(project.first_pending_milestone) + 1
+          );
 
-          setStep(4)
+          await voteOnMilestone(
+            user.id,
+            user.web3_address,
+            milestoneKeyInView,
+            vote,
+            project.id
+          );
+          ///// fire notifications //////////////////////////////////
+          if (targetUser) {
+            await sendNotification(
+              [String(targetUser.id)],
+              'approved_Milestone.testing',
+              'A Milestone has been approved',
+              `${
+                project.milestones[project.first_pending_milestone || 0].name
+              } , a milestone on ${user.display_name}'s ${
+                project.name
+              } just got marked as approved`,
+              Number(project.id),
+              Number(project.first_pending_milestone) + 1
+            );
+          }
+          setStep(4);
           setVisible(true);
           break;
-
         } else if (result.status) {
-          await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
+          const resp = await voteOnMilestone(
+            user.id,
+            user.web3_address,
+            milestoneKeyInView,
+            vote,
+            project.id
+          );
 
-          setStep(4)
+          if (resp.milestoneApproved && targetUser?.id) {
+            await sendNotification(
+              [String(targetUser.id)],
+              'approved_Milestone.testing',
+              'A Milestone has been approved',
+              `${
+                project.milestones[project.first_pending_milestone || 0].name
+              } , a milestone on ${user.display_name}'s ${
+                project.name
+              } just got marked as approved`,
+              Number(project.id),
+              Number(project.first_pending_milestone) + 1
+            );
+          }
+
+          setStep(4);
           setVisible(true);
           break;
-
         } else if (result.txError) {
           setError({ message: result.errorMessage });
           setVisible(false);
           break;
-
         } else if (pollResult != ImbueChainPollResult.Pending) {
-          await voteOnMilestone(user.id, user.web3_address, milestoneKeyInView, vote, project.id)
+          const resp = await voteOnMilestone(
+            user.id,
+            user.web3_address,
+            milestoneKeyInView,
+            vote,
+            project.id
+          );
 
-          setStep(4)
+          if (resp.milestoneApproved && targetUser?.id) {
+            await sendNotification(
+              [String(targetUser.id)],
+              'approved_Milestone.testing',
+              'A Milestone has been approved',
+              `approved milestone`,
+              Number(project.id),
+              Number(project.first_pending_milestone) + 1
+            );
+          }
+
+          setStep(4);
           setVisible(true);
           break;
         }
         await new Promise((f) => setTimeout(f, 1000));
       }
-
     } catch (error) {
       setError({ message: 'Could not vote. Please try again later' });
       // eslint-disable-next-line no-console
-      console.error(error)
+      console.error(error);
     }
   };
-
 
   const refund = async () => {
     if (!project?.id || !project.chain_project_id)
@@ -151,18 +233,18 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
 
               setVisible(true);
               setVoteRefund(true);
-              setStep(4)
+              setStep(4);
               break;
             } else if (noConfidencePoll == ImbueChainPollResult.EventFound) {
               await insertNoConfidenceVoter(project?.id, user);
 
               setVisible(true);
               setVoteRefund(true);
-              setStep(4)
+              setStep(4);
               break;
             } else if (result.status) {
               setVisible(true);
-              setStep(4)
+              setStep(4);
               setVoteRefund(true);
               break;
             } else if (result.txError) {
@@ -198,15 +280,13 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
               project.project_in_voting_of_no_confidence = true;
               await updateProject(project?.id, project);
               await insertNoConfidenceVoter(project?.id, user);
-              setStep(4)
+              setStep(4);
               setVoteRefund(true);
               setVisible(true);
-
             } else if (result.status) {
-              setStep(4)
+              setStep(4);
               setVoteRefund(true);
               setVisible(true);
-
             } else if (result.txError) {
               setError({ message: result.errorMessage });
             }
@@ -224,28 +304,29 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
 
   const handleVote = async () => {
     if (project?.brief_id) {
-      setLoading(true)
+      setLoading(true);
       setVisible(false);
       await handleVoteOnMilestone(vote);
-      setLoading(false)
+      setLoading(false);
     } else {
       if (vote) {
-        setLoading(true)
+        setLoading(true);
         setVisible(false);
         await handleVoteOnMilestone(vote);
-        setLoading(false)
-      }
-      else {
-        setStep(2)
+        setLoading(false);
+      } else {
+        setStep(2);
       }
     }
-  }
+  };
 
   return (
     <Modal
       open={visible}
       className='flex justify-center items-center'
-      onClose={() => { setVisible(false) }}
+      onClose={() => {
+        setVisible(false);
+      }}
     >
       <div className='bg-white rounded-xl px-12 py-5 relative'>
         <div className='flex w-full justify-between px-5'>
@@ -269,102 +350,93 @@ export default function VoteModal({ visible, setVisible, setLoading, project, us
             )
           }
         </div>
-        {
-          (step === 0 && !refundOnly) && (
-            <ReviewModal
-              {...{
-                setStep,
-                setVisible
-              }}
-            />
-          )
-        }
-        {
-          step === 1 && (
-            <div className='justify-center max-w-[31.938rem] text-center rounded-[18px]'>
-              <div className='inline-block  bg-light-grey pt-2 pb-4 mt-12 mb-8  px-4 rounded-lg'>
-                <Image src={'/confirm-icon.svg'} width={70} height={70} alt='icon' />
-              </div>
-              <h4 className='text-[27px]'>
-                Was the funding utilized to achieve the set milestone goals?
-              </h4>
-              <p className='text-base mt-4 '>
-                Vote in favour if you believe the milestones were achieved and funding
-                was utilized judiciously.
-              </p>
-
-              <FormControl className='mt-7 w-full'>
-                <RadioGroup
-                  aria-labelledby='demo-radio-buttons-group-label'
-                  defaultValue={'yes'}
-                  name='radio-buttons-group'
-                  onChange={(e) => setVote(e.target.value === 'yes')}
-                  row
-                  className='w-full flex justify-center gap-2'
-                >
-                  <FormControlLabel
-                    className='bg-[#F6F4FF] text-lg  rounded-xl pl-2 pr-12 w-[45%] mr-0'
-                    value={'yes'}
-                    // control={<Checkbox color='secondary' />}
-                    control={<Radio color='secondary' />}
-                    label='Yes,It Was'
-                    checked={vote}
-                  />
-                  <FormControlLabel
-                    className='bg-[#F6F4FF] ml-0.5 text-lg  rounded-xl pl-2 pr-12 py-2 w-[45%] mr-0'
-                    value={'no'}
-                    checked={!vote}
-                    // control={<Checkbox color='secondary' />}
-                    control={<Radio color='secondary' />}
-                    label="No,It wasn't"
-                  />
-                </RadioGroup>
-              </FormControl>
-
-              <button
-                className='primary-btn  ml-auto in-dark w-button w-full '
-                style={{ textAlign: 'center' }}
-                onClick={() => handleVote()}
-              >
-                Vote
-                <BiArrowBack className='rotate-180 ml-3 text-imbue-lime ' size={18} />
-              </button>
+        {step === 0 && !refundOnly && (
+          <ReviewModal
+            {...{
+              setStep,
+              setVisible,
+            }}
+          />
+        )}
+        {step === 1 && (
+          <div className='justify-center max-w-[31.938rem] text-center rounded-[18px]'>
+            <div className='inline-block  bg-light-grey pt-2 pb-4 mt-12 mb-8  px-4 rounded-lg'>
+              <Image
+                src={'/confirm-icon.svg'}
+                width={70}
+                height={70}
+                alt='icon'
+              />
             </div>
-          )
-        }
+            <h4 className='text-[27px]'>
+              Was the funding utilized to achieve the set milestone goals?
+            </h4>
+            <p className='text-base mt-4 '>
+              Vote in favour if you believe the milestones were achieved and
+              funding was utilized judiciously.
+            </p>
 
-        {
-          (
-            (step === 2 && !vote) ||
-            (step === 0 && refundOnly)
-          ) && (
-            <RefundModal
-              setLoading={setLoading}
-              handleVote={handleVoteOnMilestone}
-              handleRefund={refund}
-              setVisible={setVisible}
-            />
-          )
-        }
+            <FormControl className='mt-7 w-full'>
+              <RadioGroup
+                aria-labelledby='demo-radio-buttons-group-label'
+                defaultValue={'yes'}
+                name='radio-buttons-group'
+                onChange={(e) => setVote(e.target.value === 'yes')}
+                row
+                className='w-full flex justify-center gap-2'
+              >
+                <FormControlLabel
+                  className='bg-[#F6F4FF] text-lg  rounded-xl pl-2 pr-12 w-[45%] mr-0'
+                  value={'yes'}
+                  // control={<Checkbox color='secondary' />}
+                  control={<Radio color='secondary' />}
+                  label='Yes,It Was'
+                  checked={vote}
+                />
+                <FormControlLabel
+                  className='bg-[#F6F4FF] ml-0.5 text-lg  rounded-xl pl-2 pr-12 py-2 w-[45%] mr-0'
+                  value={'no'}
+                  checked={!vote}
+                  // control={<Checkbox color='secondary' />}
+                  control={<Radio color='secondary' />}
+                  label="No,It wasn't"
+                />
+              </RadioGroup>
+            </FormControl>
 
-        {
-          step === 4 && (
-            <>
-              {
-                !voteRefund
-                  ? <SuccessModal setVisible={setVisible} />
-                  : <SuccessRefundModal setVisible={setVisible} />
-              }
-            </>
-          )
+            <button
+              className='primary-btn  ml-auto in-dark w-button w-full '
+              style={{ textAlign: 'center' }}
+              onClick={() => handleVote()}
+            >
+              Vote
+              <BiArrowBack
+                className='rotate-180 ml-3 text-imbue-lime '
+                size={18}
+              />
+            </button>
+          </div>
+        )}
 
-        }
+        {((step === 2 && !vote) || (step === 0 && refundOnly)) && (
+          <RefundModal
+            setLoading={setLoading}
+            handleVote={handleVoteOnMilestone}
+            handleRefund={refund}
+            setVisible={setVisible}
+          />
+        )}
 
+        {step === 4 && (
+          <>
+            {!voteRefund ? (
+              <SuccessModal setVisible={setVisible} />
+            ) : (
+              <SuccessRefundModal setVisible={setVisible} />
+            )}
+          </>
+        )}
       </div>
-
-
-
     </Modal>
-
   );
 }

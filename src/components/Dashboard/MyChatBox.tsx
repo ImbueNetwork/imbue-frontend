@@ -19,11 +19,7 @@ import { DefaultStreamChatGenerics } from 'stream-chat-react/dist/types/types';
 
 import { CustomChannelHeader } from '../StreamChatComponents/CustomChannelHeader';
 
-function DashboardChatBox({
-  client,
-}: {
-  client: StreamChat;
-}) {
+function DashboardChatBox({ client }: { client: StreamChat }) {
   const mobileView = useMediaQuery('(max-width:500px)');
   const [channels, setChannels] = useState<any>([]);
   const [channel, setChannel] = useState<any>();
@@ -67,7 +63,7 @@ function DashboardChatBox({
 
       array?.forEach(function (key: any) {
         if (array.length === 2 && key.user_id !== client.userID) {
-          profile_photo = key?.user?.profile_photo
+          profile_photo = key?.user?.profile_photo;
         }
       });
       return profile_photo;
@@ -99,7 +95,6 @@ function DashboardChatBox({
 
     //   getUserInfo()
 
-
     // }, [loading, members, targetUserId, user.id])
 
     return channels.length ? (
@@ -109,10 +104,11 @@ function DashboardChatBox({
             <button
               key={mych.cid}
               onClick={() => handleChatClick(mych)}
-              className={`str-chat__channel-preview-messenger str-chat__channel-preview ${!mobileView &&
+              className={`str-chat__channel-preview-messenger str-chat__channel-preview ${
+                !mobileView &&
                 mych.cid === channelContext?.cid &&
                 'str-chat__channel-preview-messenger--active'
-                }`}
+              }`}
             >
               <div className='str-chat__channel-preview-messenger--left'>
                 <div className='str-chat__avatar str-chat__avatar--circle str-chat__message-sender-avatar'>
@@ -210,8 +206,17 @@ function DashboardChatBox({
 
                   <MessageList
                     closeReactionSelectorOnClick={true}
-                    messageActions={['edit', 'delete', 'flag', 'mute', 'pin', 'quote', 'react']}
+                    messageActions={[
+                      'edit',
+                      'delete',
+                      'flag',
+                      'mute',
+                      'pin',
+                      'quote',
+                      'react',
+                    ]}
                   />
+
                   <MessageInput />
                 </Window>
                 {/* <Thread /> */}
@@ -233,7 +238,15 @@ function DashboardChatBox({
                 <CustomChannelHeader showFreelancerProfile={false} />
                 <MessageList
                   closeReactionSelectorOnClick={true}
-                  messageActions={['edit', 'delete', 'flag', 'mute', 'pin', 'quote', 'react']}
+                  messageActions={[
+                    'edit',
+                    'delete',
+                    'flag',
+                    'mute',
+                    'pin',
+                    'quote',
+                    'react',
+                  ]}
                 />
                 <MessageInput />
               </Window>

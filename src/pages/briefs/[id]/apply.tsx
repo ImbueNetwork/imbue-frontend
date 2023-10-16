@@ -9,6 +9,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 
+import { sendNotification } from '@/utils';
 import {
   handleApplicationInput,
   validateApplicationInput,
@@ -228,24 +229,32 @@ export const SubmitProposal = (): JSX.Element => {
       if (resp.ok) {
         const applicationId = (await resp.json()).id;
         applicationId && setapplicationId(applicationId);
+
+        await sendNotification(
+          [brief.user_id],
+          'breif.test.applied',
+          'Some one might have interested in your breif',
+          `Submit a proposal`,
+          briefId,
+          applicationId
+        );
       } else {
-        setError({ message: "Could not submit applicaton" });
+        setError({ message: 'Could not submit applicaton' });
       }
     } catch (error) {
       console.log(error);
-      setError({ message: "Could not submit applicaton" });
+      setError({ message: 'Could not submit applicaton' });
     } finally {
       setLoading(false);
     }
   }
 
-  const totalPercent =
-    milestones.reduce((sum, { amount }) => {
-      const percent = Number(
-        ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
-      );
-      return sum + percent;
-    }, 0)
+  const totalPercent = milestones.reduce((sum, { amount }) => {
+    const percent = Number(
+      ((100 * (amount ?? 0)) / totalCostWithoutFee).toFixed(0)
+    );
+    return sum + percent;
+  }, 0);
 
   const handleMilestoneChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -545,8 +554,9 @@ export const SubmitProposal = (): JSX.Element => {
             title={disableSubmit && 'Please fill all the required input fields'}
           >
             <button
-              className={`primary-btn in-dark w-button ${disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
-                }`}
+              className={`primary-btn in-dark w-button ${
+                disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
+              }`}
               onClick={() => !disableSubmit && handleSubmit()}
             >
               Submit

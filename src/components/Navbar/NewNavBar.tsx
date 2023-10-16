@@ -1,3 +1,4 @@
+'use client';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 /* eslint-disable unused-imports/no-unused-vars */
@@ -5,6 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
   Avatar,
+  Badge,
   Box,
   IconButton,
   Menu,
@@ -32,6 +34,7 @@ const Login = dynamic(() => import('../Login'));
 
 import Link from 'next/link';
 
+import NotificationIcon from './NotificationIcon';
 import LoginPopup from '../LoginPopup/LoginPopup';
 import defaultProfile from '../../assets/images/profile-image.png';
 
@@ -49,9 +52,11 @@ function NewNavbar() {
   const open = Boolean(anchorEl);
   const [openMenu, setOpenMenu] = useState(false);
 
-  const { user, loading: loadingUser } = useSelector(
-    (state: RootState) => state.userState
-  );
+  const {
+    user,
+    loading: loadingUser,
+    message,
+  } = useSelector((state: RootState) => state.userState);
   const dispatch = useDispatch<AppDispatch>();
 
   const [expanded, setExpanded] = useState(false);
@@ -298,21 +303,24 @@ function NewNavbar() {
               paddingRight: 2,
             }}
           >
-            <Image
-              src='/message-dots-square.svg'
-              width={23}
-              height={20}
-              onClick={() => router.push('/dashboard/message')}
-              alt='message'
-              className='mr-3 cursor-pointer'
-            />
-            {/* <Image
-              src='/bell-01.svg'
-              width={23}
-              height={20}
-              className='cursor-pointer'
-              alt='message'
-            /> */}
+            <Badge className='mr-3' badgeContent={message} color='error'>
+              <Image
+                src='/message-dots-square.svg'
+                width={23}
+                height={20}
+                onClick={() => router.push('/dashboard/message')}
+                alt='message'
+                className='cursor-pointer'
+              />
+            </Badge>
+            <div className='relative'>
+              {/*  */}
+
+              <div>
+                {/* <NotificationDropdown feedGroup='user' right notify /> */}
+                <NotificationIcon />
+              </div>
+            </div>
             <Tooltip
               title='Account settings'
               className={`${!user?.username && !loading && 'lg:hidden'}`}
