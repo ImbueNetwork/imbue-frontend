@@ -465,11 +465,11 @@ function Project() {
             </p>
 
             <div className='grid grid-cols-12 gap-3 mt-5'>
-              <div className='bg-[#F2F0FF] justify-between py-2 px-3 flex flex-col col-span-2 rounded-md'>
+              <div className='bg-[#F2F0FF] justify-between py-2 px-3 flex flex-col col-span-4 xl:col-span-2 rounded-md'>
                 <p className='text-imbue-purple text-sm'>Posted</p>
                 <p className='text-imbue-purple-dark text-sm'>{timePosted}</p>
               </div>
-              <div className='bg-[#FFEBEA] flex flex-col justify-between rounded-md py-2 px-3 col-span-3'>
+              <div className='bg-[#FFEBEA] flex flex-col justify-between rounded-md py-2 px-3 col-span-8 xl:col-span-3'>
                 <div className='flex justify-between items-center'>
                   <p className='text-sm text-[#8A5C5A]'>
                     {
@@ -503,7 +503,7 @@ function Project() {
                 </div>
               </div>
 
-              <div className='bg-light-grey flex flex-col justify-between px-4 py-3 rounded-md col-span-7'>
+              <div className='bg-light-grey flex flex-col justify-between py-3 rounded-md col-span-12 xl:col-span-7'>
                 <ProjectApprovers
                   {...{
                     approversPreview,
@@ -576,9 +576,9 @@ function Project() {
                 <div className='w-48  mt-6'>
                   <MilestoneProgressBar
                     currentValue={
-                      (firstPendingMilestone > -1)
+                      (projectInMilestoneVoting)
                         ? firstPendingMilestone
-                        : project?.milestones?.length - 1 || 0
+                        : firstPendingMilestone === -1 ? project?.milestones?.length : firstPendingMilestone - 1
                     }
                     titleArray={project?.milestones}
                   />

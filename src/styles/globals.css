@@ -41,6 +41,10 @@ h3 {
   font-weight: normal;
 }
 
+.break-words{
+  word-break: break-word;
+}
+
 @font-face {
   font-family: 'Aeonik';
   src: url('AeonikTRIAL-Regular.otf') format('opentype');
