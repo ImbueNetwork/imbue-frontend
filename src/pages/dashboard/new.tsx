@@ -27,6 +27,8 @@ import { Brief } from '@/model';
 import { getFreelancerApplications } from '@/redux/services/freelancerService';
 import { setUnreadMessage } from '@/redux/slices/userSlice';
 import { RootState } from '@/redux/store/store';
+import { BiRightArrowAlt } from 'react-icons/bi';
+import { MdOutlineAttachMoney } from 'react-icons/md';
 
 export type DashboardProps = {
   user: User;
@@ -121,102 +123,50 @@ const Dashboard = ({ val }: { val?: string }): JSX.Element => {
   if (loadingStreamChat || loadingUser) return <FullScreenLoader />;
 
   return client ? (
-    <div className='px-[15px]'>
-      <StyledEngineProvider injectFirst>
-        <BottomNavigation
-          showLabels
-          value={selectedOption}
-          onChange={(event, newValue) => {
-            router.push('/dashboard');
-            setSelectedOption(newValue);
-          }}
-        >
-          <BottomNavigationAction label='Client View' value={1} />
-          <BottomNavigationAction
-            label={`Messages ${
-              unreadMessages > 0 ? `(${unreadMessages})` : ''
-            }`}
-            value={2}
-          />
-          <BottomNavigationAction label='Freelancer View' value={3} />
-        </BottomNavigation>
-      </StyledEngineProvider>
-
-      {selectedOption === 1 && (
-        <MyClientBriefsView
-          {...{
-            user,
-            briefId,
-            handleMessageBoxClick,
-            redirectToBriefApplications,
-          }}
-        />
-      )}
-      {selectedOption === 2 && <DashboardChatBox client={client} />}
-      {selectedOption === 3 && (
-        <MyFreelancerApplications
-          user_id={user.id}
-          myApplications={myApplications}
-        />
-      )}
-
-      {user && showMessageBox && (
-        <ChatPopup
-          showMessageBox={showMessageBox}
-          setShowMessageBox={setShowMessageBox}
-          targetUser={targetUser}
-          browsingUser={user}
-          showFreelancerProfile={true}
-        />
-      )}
-
-      <LoginPopup
-        visible={loginModal}
-        setVisible={setLoginModal}
-        redirectUrl='/dashboard'
-      />
-
-      <ErrorScreen error={error} setError={setError}>
-        <div className='flex flex-col gap-4 w-1/2'>
-          <button
-            onClick={() => router.push(`/`)}
-            className='primary-btn in-dark w-button w-full !m-0'
-          >
-            Log In
-          </button>
+    <div className='bg-white  mt-2 py-7 px-5 rounded-3xl'>
+      <>
+        <p className='text-black text-[27px]'>
+          Welcome , {user.display_name.split(' ')[0]} 👋
+        </p>
+        <p className='text-text-aux-colour text-sm'>
+          Glad to have you on imbue
+        </p>
+      </>
+      <div className='flex text-text-grey gap-7 mt-9'>
+        <div className=' py-5 px-5 rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full max-w-[28.25rem]'>
+          <div className='flex justify-between'>
+            <p>Projects</p>
+            <div className='flex  items-center gap-2  text-xs'>
+              <p className='px-2 flex-grow-0 py-1 bg-white rounded-full'>
+                ongoing
+              </p>
+              <p>Applied</p>
+            </div>
+          </div>
         </div>
-      </ErrorScreen>
+        <div className=' py-5 px-5 rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full max-w-[28.25rem]'>
+          <p>Grants</p>
+        </div>
+        <div className=' py-5 px-5 flex flex-col rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full max-w-[28.25rem]'>
+          <div className='flex justify-between'>
+            <p>Total Earnings</p>
+            <div className='px-3 py-0.5 border text-black border-text-aux-colour rounded-full'>
+              <BiRightArrowAlt size={22} className='-rotate-45' />
+            </div>
+          </div>
+          <div className='text-black mt-auto'>
+            <div className='flex'>
+              <MdOutlineAttachMoney size={23} />
+              <p className='text-4xl font-semibold'>32,975.00</p>
+            </div>
+            <p className='text-text-grey'>Payout Accounts</p>
+          </div>
+        </div>
+      </div>
     </div>
   ) : (
     <p>GETSTREAM_API_KEY not found</p>
   );
 };
-
-// export const getServerSideProps = async (context: any) => {
-//   const { req, res } = context;
-//   try {
-//     // const user: any = await authenticate('jwt', req, res);
-//     if (user) {
-//       const myBriefs = await getUserBriefs(user?.id);
-//       const myApplicationsResponse = await getFreelancerApplications(user?.id);
-//       return {
-//         props: {
-//           isAuthenticated: true,
-//           user,
-//           myBriefs,
-//           myApplicationsResponse,
-//         },
-//       };
-//     }
-//   } catch (error: any) {
-//     console.error(error);
-//   }
-//   return {
-//     redirect: {
-//       destination: '/',
-//       permanent: false,
-//     },
-//   };
-// };
 
 export default Dashboard;
