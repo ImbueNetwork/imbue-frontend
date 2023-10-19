@@ -45,8 +45,8 @@ interface VotingModalProps {
   user: User;
   votingWalletAccount: WalletAccount | any;
   setError: (_value: any) => void;
-  targetUser: any;
-  projectType: 'grant' | 'brief' | null;
+  targetUser?: any;
+  projectType?: 'grant' | 'brief' | null;
 }
 
 export default function VoteModal({
