@@ -327,7 +327,7 @@ function Project() {
     if (!project.chain_project_id) return;
     try {
       const imbueApi = await initImbueAPIInfo();
-      const allData = await imbueApi.imbue.api.rpc.proposals.getAllProjectData(project.chain_project_id);
+      const allData = await (imbueApi.imbue.api.rpc as any).proposals.getAllProjectData(project.chain_project_id);
       console.log(allData.toHuman());
       const test1= allData.toHuman()[0];
       const test2= allData.toHuman()[1];
