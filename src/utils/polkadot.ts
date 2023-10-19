@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import type { InjectedExtension } from '@polkadot/extension-inject/types';
 import type { DispatchError } from '@polkadot/types/interfaces';
 import { stringToHex } from '@polkadot/util';
 
 import * as config from '../config';
 export const imbueNetwork = 'Imbue Network';
 import { WalletAccount } from '@talismn/connect-wallets';
+
 import { typesBundle } from './typesBundle';
 
 export type PolkadotJsApiInfo = {
