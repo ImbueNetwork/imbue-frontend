@@ -2,10 +2,14 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 export default function AcceptBreifNotifications(activity: any) {
   const router = useRouter();
-  const handleClick = () => {
-    router.push(
-      `/briefs/${activity.data.briefId}/applications/${activity.data.applicationId}`
-    );
+  const handleClick = (e: any) => {
+    if (e.target.id === 'brief') {
+      router.push(`/briefs/${activity.data.briefId}`);
+    } else {
+      router.push(
+        `/briefs/${activity.data.briefId}/applications/${activity.data.applicationId}`
+      );
+    }
   };
   return (
     <div
@@ -26,9 +30,9 @@ export default function AcceptBreifNotifications(activity: any) {
           {activity.data.title || 'Title'}
         </p>
         <p className='text-sm mt-3'>
-          {`You're`} in! Your application for the project{' '}
-          <span className='text-lg text-imbue-purple underline'>
-            {activity.data.applicationId}
+          {`You're`} in! Your application for the{' '}
+          <span id='brief' className='text-lg text-imbue-purple underline'>
+            brief
           </span>{' '}
           has been accepted. {"Let's"} get started!
         </p>

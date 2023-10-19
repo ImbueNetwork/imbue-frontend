@@ -33,9 +33,9 @@ export default function SubmitMilestoneNotification(activity: any) {
           >
             {activity.data.sender.display_name?.split(' ')[0] || 'someone'}
           </span>{' '}
-          has added you as an approver for their project
+          has added you as an approver for their
           <span className='text-lg mx-0.5 underline text-imbue-purple'>
-            {activity.data.briefId}
+            project
           </span>
           . Please review and provide your feedback.
         </p>
