@@ -325,12 +325,20 @@ function Project() {
 
   const syncProject = async (project: Project) => {
     if (!project.chain_project_id) return;
-
     try {
       const imbueApi = await initImbueAPIInfo();
+      const allData = await imbueApi.imbue.api.rpc.proposals.getAllProjectData(project.chain_project_id);
+      console.log(allData.toHuman());
+      const test1= allData.toHuman()[0];
+      const test2= allData.toHuman()[1];
+      const blah1 = await imbueApi.imbue.api.createType('Project', test1).toString();
+      const blah2 = await imbueApi.imbue.api.createType('ImmutableIndividualVotes', test2).toString();
+      console.log("****** decoded is");
+      console.log(blah1);
+      console.log(blah2);
+
       const chainService = new ChainService(imbueApi, user);
       const onChainProjectRes = await chainService.getProject(projectId);
-      console.log("🚀 ~ file: [id].tsx:330 ~ syncProject ~ onChainProjectRes:", onChainProjectRes)
 
       if (onChainProjectRes?.projectInVotingOfNoConfidence) {
         const noConfidenceVotesChain = await chainService.getNoConfidenceVoters(

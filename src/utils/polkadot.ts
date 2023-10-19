@@ -7,6 +7,7 @@ import { stringToHex } from '@polkadot/util';
 import * as config from '../config';
 export const imbueNetwork = 'Imbue Network';
 import { WalletAccount } from '@talismn/connect-wallets';
+import { typesBundle } from './typesBundle';
 
 export type PolkadotJsApiInfo = {
   api: ApiPromise;
@@ -71,7 +72,11 @@ async function initPolkadotJSAPI(
   });
 
   try {
-    const api = await ApiPromise.create({ provider });
+    let api = await ApiPromise.create({ provider });
+
+    if(webSockAddr.includes("imbue")){
+      api = await ApiPromise.create({ provider,typesBundle });
+    }
     await api.isReady;
 
     return {
@@ -99,46 +104,46 @@ export function errorNotification(e: Error) {
   );
 }
 
-export const enableAppForExtension = async (
-  appName: string,
-  attempts = 10
-): Promise<InjectedExtension[]> => {
-  const { web3Enable } = await import('@polkadot/extension-dapp');
-  const extensions = await web3Enable(appName);
+// export const enableAppForExtension = async (
+//   appName: string,
+//   attempts = 10
+// ): Promise<InjectedExtension[]> => {
+//   const { web3Enable } = await import('@polkadot/extension-dapp');
+//   const extensions = await web3Enable(appName);
 
-  return new Promise((resolve, reject) => {
-    if (!extensions.length) {
-      // this.status("Error", web3Error("No extensions found."));
-      if (attempts > 0) {
-        setTimeout(() => {
-          resolve(enableAppForExtension(appName, attempts - 1));
-        }, 2000);
-      } else {
-        // this.dismissStatus();
-        reject(new Error('Unable to enable any web3 extension.'));
-      }
-    } else {
-      // this.dismissStatus();
-      resolve(extensions);
-    }
-  });
-};
+//   return new Promise((resolve, reject) => {
+//     if (!extensions.length) {
+//       // this.status("Error", web3Error("No extensions found."));
+//       if (attempts > 0) {
+//         setTimeout(() => {
+//           resolve(enableAppForExtension(appName, attempts - 1));
+//         }, 2000);
+//       } else {
+//         // this.dismissStatus();
+//         reject(new Error('Unable to enable any web3 extension.'));
+//       }
+//     } else {
+//       // this.dismissStatus();
+//       resolve(extensions);
+//     }
+//   });
+// };
 
-export const getWeb3Accounts = async () => {
-  const { web3Accounts } = await import('@polkadot/extension-dapp');
-  try {
-    const extensions = await enableAppForExtension(imbueNetwork);
-    if (!extensions.length) {
-      console.log('No extensions found.');
-      return [];
-    } else {
-      return web3Accounts();
-    }
-  } catch (e) {
-    console.warn(e);
-  }
-  return [];
-};
+// export const getWeb3Accounts = async () => {
+//   const { web3Accounts } = await import('@polkadot/extension-dapp');
+//   try {
+//     const extensions = await enableAppForExtension(imbueNetwork);
+//     if (!extensions.length) {
+//       console.log('No extensions found.');
+//       return [];
+//     } else {
+//       return web3Accounts();
+//     }
+//   } catch (e) {
+//     console.warn(e);
+//   }
+//   return [];
+// };
 
 export const signWeb3Challenge = async (
   account: WalletAccount,
