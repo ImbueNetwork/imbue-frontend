@@ -62,7 +62,7 @@ export const typesBundle = {
               "value": "Balance",
               "timestamp": "BlockNumber"
             },
-            "ImmutableIndividualVotes": { "inner": "BTreeMap<u32, BTreeMap<AccountId, bool>>" },
+            "ImmutableIndividualVotes": { "votes": "BTreeMap<u32, BTreeMap<AccountId, bool>>" },
           }
         }
       ]
