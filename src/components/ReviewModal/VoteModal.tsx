@@ -45,7 +45,8 @@ interface VotingModalProps {
   user: User;
   votingWalletAccount: WalletAccount | any;
   setError: (_value: any) => void;
-  targetUser?: User;
+  targetUser: any;
+  projectType: 'grant' | 'brief' | null;
 }
 
 export default function VoteModal({
@@ -58,6 +59,7 @@ export default function VoteModal({
   votingWalletAccount,
   setError,
   refundOnly,
+  projectType,
 }: VotingModalProps) {
   const [vote, setVote] = useState<boolean>(true);
   const [voteRefund, setVoteRefund] = useState<boolean>(false);
@@ -111,14 +113,14 @@ export default function VoteModal({
           ///// fire notifications //////////////////////////////////
           if (targetUser) {
             await sendNotification(
-              [String(targetUser.id)],
+              [
+                String(
+                  projectType === 'brief' ? targetUser.user_id : targetUser.id
+                ),
+              ],
               'approved_Milestone.testing',
               'A Milestone has been approved',
-              `${
-                project.milestones[project.first_pending_milestone || 0].name
-              } , a milestone on ${user.display_name}'s ${
-                project.name
-              } just got marked as approved`,
+              `great your milestone has been accepted`,
               Number(project.id),
               Number(project.first_pending_milestone) + 1
             );
@@ -134,10 +136,13 @@ export default function VoteModal({
             vote,
             project.id
           );
-
           if (resp.milestoneApproved && targetUser?.id) {
             await sendNotification(
-              [String(targetUser.id)],
+              [
+                String(
+                  projectType === 'brief' ? targetUser.user_id : targetUser.id
+                ),
+              ],
               'approved_Milestone.testing',
               'A Milestone has been approved',
               `${
@@ -168,7 +173,11 @@ export default function VoteModal({
 
           if (resp.milestoneApproved && targetUser?.id) {
             await sendNotification(
-              [String(targetUser.id)],
+              [
+                String(
+                  projectType === 'brief' ? targetUser.user_id : targetUser.id
+                ),
+              ],
               'approved_Milestone.testing',
               'A Milestone has been approved',
               `approved milestone`,
@@ -330,25 +339,21 @@ export default function VoteModal({
     >
       <div className='bg-white rounded-xl px-12 py-5 relative'>
         <div className='flex w-full justify-between px-5'>
-          {
-            step > 0 && step !== 4 && (
-              <ArrowBackIcon
-                className='h-7 w-7 hover:bg-imbue-purple rounded-full hover:text-white cursor-pointer border absolute left-5'
-                color='secondary'
-                onClick={() => setStep((prev) => prev - 1)}
-              />
-            )
-          }
+          {step > 0 && step !== 4 && (
+            <ArrowBackIcon
+              className='h-7 w-7 hover:bg-imbue-purple rounded-full hover:text-white cursor-pointer border absolute left-5'
+              color='secondary'
+              onClick={() => setStep((prev) => prev - 1)}
+            />
+          )}
 
-          {
-            step !== 4 && (
-              <CloseIcon
-                className='h-7 w-7 hover:bg-imbue-purple rounded-full hover:text-white cursor-pointer border p-1 absolute right-5'
-                color='secondary'
-                onClick={() => setVisible(false)}
-              />
-            )
-          }
+          {step !== 4 && (
+            <CloseIcon
+              className='h-7 w-7 hover:bg-imbue-purple rounded-full hover:text-white cursor-pointer border p-1 absolute right-5'
+              color='secondary'
+              onClick={() => setVisible(false)}
+            />
+          )}
         </div>
         {step === 0 && !refundOnly && (
           <ReviewModal

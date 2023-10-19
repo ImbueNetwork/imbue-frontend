@@ -72,7 +72,6 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
     isProjectOwner,
     balance,
     milestonLoadingTitle,
-    targetUser,
   } = props;
 
   const [expanded, setExpanded] = useState(false);
@@ -112,25 +111,14 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
               true
             );
             if (resp) {
-              if (projectType === 'brief')
-                await sendNotification(
-                  [String(targetUser.id)],
-                  'submit_Milestone.testing',
-                  'A New Milestone has been made',
-                  `Milestone Submitted Successfully`,
-                  Number(project.id),
-                  milestone.milestone_index + 1
-                );
-              else {
-                await sendNotification(
-                  project.approvers,
-                  'submit_Milestone.testing',
-                  'A New Milestone has been made',
-                  `Milestone Submitted Successfully`,
-                  Number(project.id),
-                  milestone.milestone_index + 1
-                );
-              }
+              await sendNotification(
+                project.approvers,
+                'submit_Milestone.testing',
+                'A New Milestone has been made',
+                `Milestone Submitted Successfully`,
+                Number(project.id),
+                milestone.milestone_index + 1
+              );
               setSuccess(true);
               setSuccessTitle('Milestone Submitted Successfully');
             } else {
@@ -221,6 +209,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
           );
 
           setSuccess(true);
+
           setSuccessTitle(
             'Your vote was successful. This milestone has been completed.'
           );
