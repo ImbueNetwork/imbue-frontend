@@ -210,7 +210,7 @@ const NewBrief = (): JSX.Element => {
           value={description}
           name='description'
           maxLength={5000}
-          className='text-black bg-white outline-none'
+          className='text-black bg-white outline-none p-3'
           onChange={handleChange}
         />
         <div className='flex flex-wrap flex-row justify-center relative top-4'>
