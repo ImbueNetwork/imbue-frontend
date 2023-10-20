@@ -90,7 +90,7 @@ export const HirePopup = ({
       : [''];
     const freelancerAddress: string = freelancer.web3_address;
     const budget = BigInt(totalCostWithoutFee * 1e12);
-    const initialContribution = BigInt(amountDue * 1e12);
+    const initialContribution = budget;
     application.status_id = OffchainProjectState.Accepted;
     delete application.modified;
     const briefHash = blake2AsHex(JSON.stringify(application));
