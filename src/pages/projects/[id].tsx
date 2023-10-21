@@ -682,6 +682,7 @@ function Project() {
                 />
               </div>
             )}
+            
 
             <div className='bg-white col-start-10 px-2 rounded-xl py-3 border border-light-grey'>
               <MilestoneVoteBox
