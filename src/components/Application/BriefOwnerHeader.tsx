@@ -45,7 +45,7 @@ type BriefOwnerHeaderProps = {
   milestones: MilestoneItem[];
   totalCostWithoutFee: number;
   imbueFee: number;
-  totalCost: number;
+  amountDue: number;
   setLoading: (_loading: boolean) => void;
   openAccountChoice: boolean;
   setOpenAccountChoice: (_loading: boolean) => void;
@@ -62,7 +62,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
     milestones,
     totalCostWithoutFee,
     imbueFee,
-    totalCost,
+    amountDue,
     setLoading,
     openAccountChoice,
     setOpenAccountChoice,
@@ -354,7 +354,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
           milestones,
           totalCostWithoutFee,
           imbueFee,
-          totalCost,
+          amountDue,
           setLoading,
         }}
       />

@@ -137,7 +137,7 @@ export const SubmitProposal = (): JSX.Element => {
     0
   );
   const imbueFee = (totalCostWithoutFee * imbueFeePercentage) / 100;
-  const totalCost = imbueFee + totalCostWithoutFee;
+  const totalCostMinusFee = totalCostWithoutFee - imbueFee;
 
   const onAddMilestone = () => {
     setMilestones([...milestones, { name: '', amount: 0, description: '' }]);
@@ -220,7 +220,7 @@ export const SubmitProposal = (): JSX.Element => {
                 ).toFixed(0),
               };
             }),
-          required_funds: totalCost,
+          required_funds: totalCostWithoutFee,
           duration_id: durationId,
           description: brief?.description,
           verified_only: brief.verified_only,
@@ -481,11 +481,11 @@ export const SubmitProposal = (): JSX.Element => {
           <div className='flex flex-row items-center mb-5'>
             <div className='flex flex-col flex-grow'>
               <h3 className='text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
-                Total
+                Amount Received
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-light-purple-two font-normal'>
-              ${Number(totalCost.toFixed(2)).toLocaleString()}
+              ${Number(totalCostMinusFee.toFixed(2)).toLocaleString()}
             </div>
           </div>
         </div>

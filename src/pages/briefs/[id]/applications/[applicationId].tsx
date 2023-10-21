@@ -186,7 +186,7 @@ const ApplicationPreview = (): JSX.Element => {
   );
 
   const imbueFee = (totalCostWithoutFee * imbueFeePercentage) / 100;
-  const totalCost = imbueFee + totalCostWithoutFee;
+  const amountDue = totalCostWithoutFee - imbueFee;
   const onAddMilestone = () => {
     setMilestones([
       ...milestones,
@@ -309,7 +309,7 @@ const ApplicationPreview = (): JSX.Element => {
               chain_project_id: chainProjectId,
             };
           }),
-        required_funds: totalCost,
+        required_funds: amountDue,
         owner: user.web3_address,
         chain_project_id: chainProjectId,
         escrow_address: escrow_address,
@@ -372,7 +372,7 @@ const ApplicationPreview = (): JSX.Element => {
                 milestones,
                 totalCostWithoutFee,
                 imbueFee,
-                totalCost,
+                amountDue: amountDue,
                 setLoading,
                 openAccountChoice,
                 setOpenAccountChoice,
@@ -418,10 +418,7 @@ const ApplicationPreview = (): JSX.Element => {
                     Projects&apos;s budget:{' '}
                     <span className=' text-imbue-purple-dark text-lg lg:text-[1.25rem]'>
                       $
-                      {Number(
-                        Number(application.total_cost_without_fee) +
-                          Number(application.imbue_fee)
-                      )?.toLocaleString()}
+                      {Number(application.total_cost_without_fee)?.toLocaleString()}
                     </span>
                   </h3>
                 )}
@@ -636,11 +633,11 @@ const ApplicationPreview = (): JSX.Element => {
           <div className='flex flex-row items-center mb-[20px] mx-5 lg:mx-14'>
             <div className='flex flex-col flex-grow'>
               <h3 className='text-base lg:text-xl m-0 p-0 text-imbue-purple-dark font-normal'>
-                Total
+                Amount Received
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-light-purple-two font-normal'>
-              ${Number(totalCost.toFixed(2))?.toLocaleString?.()}
+              ${Number(amountDue.toFixed(2))?.toLocaleString?.()}
             </div>
           </div>
         </div>
