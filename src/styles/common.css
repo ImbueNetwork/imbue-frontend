@@ -306,7 +306,7 @@ select.round {
 }
 
 .outlinedInput::placeholder {
-  color: #D1D1D1;
+  color: #d1d1d1;
 }
 
 /* Chrome, Safari, Edge, Opera */
@@ -340,6 +340,20 @@ input[type='number'] {
     width: 100%;
     font-size: 16px;
   }
+}
 
-  
+.apexcharts-yaxis {
+  visibility: hidden;
+}
+.apexcharts-toolbar {
+  visibility: hidden;
+}
+.apexcharts-xaxis {
+  visibility: hidden;
+}
+.apexcharts-gridline {
+  visibility: hidden;
+}
+.apexcharts-tooltip {
+  color: #000;
 }
