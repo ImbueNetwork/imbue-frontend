@@ -36,7 +36,7 @@ export default function NotificationsModal({ onClose }: { onClose: any }) {
             }}
             LoadingIndicator={NotificationsLoader}
             Activity={({ activity }) => (
-              <div onClick={() => onClose(false)}>
+              <div key={activity.time} onClick={() => onClose(false)}>
                 {activity.object === 'approved_Milestone.testing' && (
                   <MilestoneApprovedNotifications {...activity} />
                 )}
