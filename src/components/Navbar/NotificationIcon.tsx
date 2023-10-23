@@ -65,9 +65,9 @@ export default function NotificationIcon() {
         anchorEl={anchorEl}
         open={modal}
         onClose={handleCloseModal}
-        className='mt-7 '
+        className='mt-4 '
       >
-        <NotificationsModal />
+        <NotificationsModal onClose={setModal} />
       </Menu>
     </div>
   );

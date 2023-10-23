@@ -10,6 +10,7 @@ import moment from 'moment';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 
+import { sendNotification } from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
@@ -39,6 +40,7 @@ interface ExpandableMilestonProps {
   setShowPolkadotAccounts: (_value: boolean) => void;
   canVote: boolean;
   loading: boolean;
+  targetUser: any;
 }
 
 const ExpandableMilestone = (props: ExpandableMilestonProps) => {
@@ -53,6 +55,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
     user,
     setSuccessTitle,
     setSuccess,
+    targetUser,
   } = props;
   const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
   const [submittingMilestone, setSubmittingMilestone] =
@@ -163,6 +166,16 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
               fileURLs
             );
             if (resp) {
+              await sendNotification(
+                projectType === 'brief'
+                  ? [String(targetUser.id)]
+                  : project.approvers,
+                'submit_Milestone.testing',
+                'A New Milestone has been made',
+                `Milestone Submitted Successfully`,
+                Number(project.id),
+                milestone.milestone_index + 1
+              );
               setSuccess(true);
               setSuccessTitle('Milestone Submitted Successfully');
             } else {
@@ -290,6 +303,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
           setSuccess,
           setError,
           milestoneKeyInView,
+          targetUser,
         }}
         visible={showVotingModal}
         setVisible={setShowVotingModal}
@@ -297,6 +311,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
         user={user}
         project={project}
         votingWalletAccount={votingWalletAccount}
+        projectType={projectType}
       />
 
       <Accordion className='shadow-none mt-5 before:h-0 !rounded-xl py-5'>
