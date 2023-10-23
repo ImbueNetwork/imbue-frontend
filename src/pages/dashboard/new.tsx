@@ -17,26 +17,31 @@ import 'stream-chat-react/dist/css/v2/index.css';
 import { fetchUser, getStreamChat } from '@/utils';
 
 import ChatPopup from '@/components/ChatPopup';
-import DashboardChatBox from '@/components/Dashboard/MyChatBox';
-import MyClientBriefsView from '@/components/Dashboard/MyClientBriefsView';
-import MyFreelancerApplications from '@/components/Dashboard/MyFreelancerApplications';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 const LoginPopup = dynamic(() => import('@/components/LoginPopup/LoginPopup'));
 
 // import LoginPopup from '@/components/LoginPopup/LoginPopup';
 
+import { Badge } from '@mui/material';
 import { BiChevronDown, BiRightArrowAlt } from 'react-icons/bi';
 import { BsFilter } from 'react-icons/bs';
 import { FiBookmark } from 'react-icons/fi';
 import { MdOutlineAttachMoney } from 'react-icons/md';
 
+import { strToIntRange } from '@/utils/helper';
+
 import AreaGrah from '@/components/AreaGraph';
 import BriefComponent from '@/components/BriefComponent';
 import MessageComponent from '@/components/MessageComponent';
 
-import { Freelancer, Project, User } from '@/model';
+import { BriefSqlFilter, Freelancer, Project, User } from '@/model';
 import { Brief } from '@/model';
+import {
+  callSearchBriefs,
+  getAllBriefs,
+  getAllSavedBriefs,
+} from '@/redux/services/briefService';
 import { getFreelancerApplications } from '@/redux/services/freelancerService';
 import { setUnreadMessage } from '@/redux/slices/userSlice';
 import { RootState } from '@/redux/store/store';
@@ -48,7 +53,7 @@ export type DashboardProps = {
   myApplicationsResponse: Project[];
 };
 
-const Dashboard = ({ val }: { val?: string }): JSX.Element => {
+const Dashboard = (): JSX.Element => {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [client, setClient] = useState<StreamChat>();
   const {
@@ -56,7 +61,6 @@ const Dashboard = ({ val }: { val?: string }): JSX.Element => {
     loading: loadingUser,
     error: userError,
   } = useSelector((state: RootState) => state.userState);
-  const [selectedOption, setSelectedOption] = useState<number>(1);
   const [unreadMessages, setUnreadMsg] = useState<number>(0);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
@@ -92,10 +96,6 @@ const Dashboard = ({ val }: { val?: string }): JSX.Element => {
   };
 
   useEffect(() => {
-    if (val === 'message') setSelectedOption(2);
-  }, [val]);
-
-  useEffect(() => {
     const setupStreamChat = async () => {
       try {
         if (!user?.username && !loadingUser) return router.push('/');
@@ -110,6 +110,159 @@ const Dashboard = ({ val }: { val?: string }): JSX.Element => {
 
     setupStreamChat();
   }, [user]);
+
+  const [briefs, setBriefs] = useState<Brief[]>([]);
+  const [briefs_total, setBriefsTotal] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  // FIXME: setLoading
+  const [loading, setLoading] = useState<boolean>(true);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(6);
+  const [pageInput, setPageInput] = useState<number>(1);
+
+  useEffect(() => {
+    const fetchAndSetBriefs = async () => {
+      try {
+        if (!Object.keys(router?.query).length) {
+          const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
+          if (briefs_all.status === 200) {
+            setBriefs(briefs_all?.currentData);
+            setBriefsTotal(briefs_all?.totalBriefs);
+          } else {
+            setError({ message: 'Something went wrong. Please try again' });
+          }
+        } else {
+          let filter: BriefSqlFilter = {
+            experience_range: [],
+            submitted_range: [],
+            submitted_is_max: false,
+            length_range: [],
+            skills_range: [],
+            length_is_max: false,
+            search_input: '',
+            items_per_page: itemsPerPage,
+            page: currentPage,
+            verified_only: false,
+            non_verified: false,
+          };
+
+          const verifiedOnlyPropIndex = selectedFilterIds.indexOf('4-0');
+
+          if (router.query.page) {
+            const pageQuery = Number(router.query.page);
+            filter.page = pageQuery;
+            setCurrentPage(pageQuery);
+            setPageInput(pageQuery);
+          }
+
+          if (router.query.non_verified) {
+            filter.non_verified = true;
+          }
+
+          if (sizeProps) {
+            filter.items_per_page = Number(sizeProps);
+            setItemsPerPage(Number(sizeProps));
+          }
+
+          if (expRange) {
+            const range = strToIntRange(expRange);
+            range?.forEach?.((v: any) => {
+              if (!selectedFilterIds.includes(`0-${v - 1}`))
+                selectedFilterIds.push(`0-${v - 1}`);
+            });
+
+            filter = { ...filter, experience_range: strToIntRange(expRange) };
+          }
+
+          if (skillsProps) {
+            const range = strToIntRange(skillsProps);
+            range?.forEach?.((v: any) => {
+              if (!selectedFilterIds.includes(`3-${v}`))
+                selectedFilterIds.push(`3-${v}`);
+            });
+
+            filter = { ...filter, skills_range: range };
+          }
+
+          if (submitRange) {
+            const range = strToIntRange(submitRange);
+            range?.forEach?.((v: any) => {
+              if (v > 0 && v < 5) selectedFilterIds.push(`1-${0}`);
+
+              if (v >= 5 && v < 10) selectedFilterIds.push(`1-${1}`);
+
+              if (v >= 10 && v < 15) selectedFilterIds.push(`1-${2}`);
+
+              if (v > 15) selectedFilterIds.push(`1-${3}`);
+            });
+            filter = { ...filter, submitted_range: strToIntRange(submitRange) };
+          }
+          if (heading) {
+            filter = { ...filter, search_input: heading };
+            // const input = document.getElementById(
+            //   'search-input'
+            // ) as HTMLInputElement;
+            // if (input) input.value = heading.toString();
+            setSearchInput(heading.toString());
+          }
+
+          if (verifiedOnlyProp) {
+            if (!selectedFilterIds.includes(`4-0`))
+              selectedFilterIds.push(`4-0`);
+
+            filter = { ...filter, verified_only: true };
+          } else if (verifiedOnlyPropIndex !== -1) {
+            // const newFileter = [...selectedFilterIds].filter((f) => f !== '4-0')
+            // setSlectedFilterIds(newFileter)
+            selectedFilterIds.splice(verifiedOnlyPropIndex, 1);
+          }
+
+          if (lengthRange) {
+            const range = strToIntRange(lengthRange);
+            range?.forEach?.((v: any) => {
+              if (!selectedFilterIds.includes(`2-${v - 1}`))
+                selectedFilterIds.push(`2-${v - 1}`);
+            });
+            filter = { ...filter, length_range: strToIntRange(lengthRange) };
+          }
+
+          let result: any = [];
+
+          if (savedBriefsActive) {
+            result = await getAllSavedBriefs(
+              filter.items_per_page || itemsPerPage,
+              currentPage,
+              currentUser?.id
+            );
+          } else {
+            result = await callSearchBriefs(filter);
+          }
+
+          if (result.status === 200 || result.totalBriefs !== undefined) {
+            const totalPages = Math.ceil(
+              result?.totalBriefs / (filter?.items_per_page || 6)
+            );
+
+            if (totalPages < filter.page && totalPages > 0) {
+              router.query.page = totalPages.toString();
+              router.push(router, undefined, { shallow: true });
+              filter.page = totalPages;
+            }
+
+            setBriefs(result?.currentData);
+            setBriefsTotal(result?.totalBriefs);
+          } else {
+            setError({ message: 'Something went wrong. Please try again' });
+          }
+        }
+      } catch (error) {
+        setError({ message: 'Something went wrong. Please try again' + error });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    router.isReady && fetchAndSetBriefs();
+  }, [router.isReady, currentPage, itemsPerPage]);
 
   useEffect(() => {
     if (client && user?.username && !loadingStreamChat) {
@@ -155,7 +308,8 @@ const Dashboard = ({ val }: { val?: string }): JSX.Element => {
     }
   }, [client, user?.getstream_token, user?.username, loadingStreamChat]);
 
-  if (loadingStreamChat || loadingUser) return <FullScreenLoader />;
+  if (loadingStreamChat || loadingUser || loading) return <FullScreenLoader />;
+  console.log(briefs);
 
   return client ? (
     <div className='bg-white  mt-2 py-7 px-5 rounded-3xl'>
@@ -296,14 +450,9 @@ const Dashboard = ({ val }: { val?: string }): JSX.Element => {
           </div>
           {/* ending of header nav */}
           {/* starting of briefs */}
-          <div className=''>
-            <BriefComponent />
-            <BriefComponent />
-            <BriefComponent />
-            <BriefComponent />
-            <BriefComponent />
-            <BriefComponent />
-          </div>
+          {briefs.map((brief) => (
+            <BriefComponent key={brief.id} brief={brief} />
+          ))}
           {/* ends of briefs */}
         </div>
         <div className='max-w-[25%] w-full rounded-md '>
@@ -323,7 +472,9 @@ const Dashboard = ({ val }: { val?: string }): JSX.Element => {
           {/* End of graph */}
           <div className='bg-imbue-light-grey px-0.5 mt-14 rounded-3xl pb-0.5 '>
             <div className='flex justify-between items-center py-4 px-7'>
-              <p className='text-[#747474]'>Messaging</p>
+              <Badge badgeContent={unreadMessages} color='error'>
+                <p className='text-[#747474]'>Messaging</p>
+              </Badge>
               <BsFilter size={27} color='black' />
             </div>
             <div className='px-3 bg-white py-3 rounded-3xl'>

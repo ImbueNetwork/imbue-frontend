@@ -148,9 +148,10 @@ function Project() {
     }
   };
 
-  const [noConfidenceVoters, setNoConfidenceVoters] = useState<NoConfidenceVoter[]>([])
-  const [votes, setVotes] = useState<VotesResp | null>(null)
-
+  const [noConfidenceVoters, setNoConfidenceVoters] = useState<
+    NoConfidenceVoter[]
+  >([]);
+  const [votes, setVotes] = useState<VotesResp | null>(null);
 
   const getChainProject = async (project: Project, freelancer: any) => {
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
@@ -249,7 +250,6 @@ function Project() {
         const brief = await getBrief(projectRes.brief_id);
         owner = brief?.user_id ? await utils.fetchUser(brief?.user_id) : null;
         freelancerRes = await getFreelancerProfile(projectRes?.user_id);
-
         if (freelancerRes?.user_id === user?.id) setIsApplicant(true);
         if (owner?.id == user?.id) {
           setTargetUser(freelancerRes);
@@ -298,7 +298,7 @@ function Project() {
 
       const totalCost = Number(
         Number(projectRes?.total_cost_without_fee) +
-        Number(projectRes?.imbue_fee)
+          Number(projectRes?.imbue_fee)
       );
       setRequiredBalance(totalCost * 0.95);
 
@@ -330,7 +330,10 @@ function Project() {
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);
       const onChainProjectRes = await chainService.getProject(projectId);
-      console.log("🚀 ~ file: [id].tsx:330 ~ syncProject ~ onChainProjectRes:", onChainProjectRes)
+      console.log(
+        '🚀 ~ file: [id].tsx:330 ~ syncProject ~ onChainProjectRes:',
+        onChainProjectRes
+      );
 
       if (onChainProjectRes?.projectInVotingOfNoConfidence) {
         const noConfidenceVotesChain = await chainService.getNoConfidenceVoters(
@@ -345,15 +348,17 @@ function Project() {
             onChainProjectRes.milestones
           );
 
-        console.log("🚀 ~ file: [id].tsx:341 ~ syncProject ~ firstPendingMilestoneChain:", firstPendingMilestoneChain)
-
+        console.log(
+          '🚀 ~ file: [id].tsx:341 ~ syncProject ~ firstPendingMilestoneChain:',
+          firstPendingMilestoneChain
+        );
 
         if (
           firstPendingMilestoneChain === project.first_pending_milestone &&
           project.project_in_milestone_voting ===
-          onChainProjectRes.projectInMilestoneVoting &&
+            onChainProjectRes.projectInMilestoneVoting &&
           project.project_in_voting_of_no_confidence ===
-          onChainProjectRes.projectInVotingOfNoConfidence
+            onChainProjectRes.projectInVotingOfNoConfidence
         )
           return;
 
@@ -526,18 +531,25 @@ function Project() {
             <div className='flex items-center justify-between mx-6'>
               <p className='text-[#747474] text-sm'>Project Milestones</p>
 
-              {
-                (projectType === 'grant' && isApprover) && (
-                  <Tooltip followCursor title="You cannot vote for refund more than once ">
-                    <button
-                      className={`px-5 py-2 ${approverVotedOnRefund ? "border border-gray-400 bg-light-white opacity-50" : "border border-imbue-coral text-imbue-coral bg-[#FFF0EF]"} rounded-full`}
-                      onClick={() => !approverVotedOnRefund && setShowPolkadotAccounts(true)}
-                    >
-                      Vote for Refund
-                    </button>
-                  </Tooltip>
-                )
-              }
+              {projectType === 'grant' && isApprover && (
+                <Tooltip
+                  followCursor
+                  title='You cannot vote for refund more than once '
+                >
+                  <button
+                    className={`px-5 py-2 ${
+                      approverVotedOnRefund
+                        ? 'border border-gray-400 bg-light-white opacity-50'
+                        : 'border border-imbue-coral text-imbue-coral bg-[#FFF0EF]'
+                    } rounded-full`}
+                    onClick={() =>
+                      !approverVotedOnRefund && setShowPolkadotAccounts(true)
+                    }
+                  >
+                    Vote for Refund
+                  </button>
+                </Tooltip>
+              )}
             </div>
 
             <div className='grid grid-cols-12 gap-5 mt-10 ml-6'>
@@ -582,9 +594,11 @@ function Project() {
                 <div className='w-48  mt-6'>
                   <MilestoneProgressBar
                     currentValue={
-                      (projectInMilestoneVoting)
+                      projectInMilestoneVoting
                         ? firstPendingMilestone
-                        : firstPendingMilestone === -1 ? project?.milestones?.length : firstPendingMilestone - 1
+                        : firstPendingMilestone === -1
+                        ? project?.milestones?.length
+                        : firstPendingMilestone - 1
                     }
                     titleArray={project?.milestones}
                   />
@@ -686,7 +700,7 @@ function Project() {
                   approverVotedOnRefund,
                   votes,
                   setVotes,
-                  setMilestoneVotes
+                  setMilestoneVotes,
                 }}
               />
             </div>
@@ -710,12 +724,12 @@ function Project() {
         setOpenVotingList={setOpenVotingList}
         loading={loading}
         votes={votes}
-      // setMilestoneVotes={setMilestoneVotes}
-      // firstPendingMilestone={firstPendingMilestone}
-      // approvers={approversPreview}
-      // chainProjectId={project.chain_project_id}
-      // projectId={project.id}
-      // project={project}
+        // setMilestoneVotes={setMilestoneVotes}
+        // firstPendingMilestone={firstPendingMilestone}
+        // approvers={approversPreview}
+        // chainProjectId={project.chain_project_id}
+        // projectId={project.id}
+        // project={project}
       />
 
       {openNoRefundList && (
@@ -817,8 +831,9 @@ function Project() {
       </WaitingScreen>
 
       <div
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
-          }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${
+          copied ? 'right-5' : '-right-full'
+        }`}
       >
         <Alert severity='success'>
           Grant Wallet Address Copied to clipboard

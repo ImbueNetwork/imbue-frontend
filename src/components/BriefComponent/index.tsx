@@ -1,5 +1,7 @@
 import StarIcon from '@mui/icons-material/Star';
 import { Rating } from '@mui/material';
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en.json';
 import Image from 'next/image';
 import {
   AiOutlineCalendar,
@@ -12,25 +14,29 @@ import { TbUsers } from 'react-icons/tb';
 import { TfiEmail } from 'react-icons/tfi';
 import { VscVerified } from 'react-icons/vsc';
 
-export default function BriefComponent() {
+import { Brief } from '@/model';
+
+TimeAgo.addLocale(en);
+
+const timeAgo = new TimeAgo('en-US');
+
+export default function BriefComponent({ brief }: { brief: Brief }) {
   return (
     <div className='flex border-b'>
-      <div className='py-9 px-7'>
-        <p className='text-2xl text-imbue-purple-dark'>
-          Product Development Engineer
-        </p>
+      <div className='py-9 px-7 max-w-[70%] w-full'>
+        <p className='text-2xl text-imbue-purple-dark'>{brief.headline}</p>
         <div className='flex text-sm text-imbue-dark-coral gap-5 mt-5'>
           <p className='px-3 flex items-center gap-1 rounded-xl py-1 bg-imbue-light-coral '>
             <TbNorthStar size={18} />
-            Intermediate
+            {brief.experience_level}
           </p>
           <p className='px-3 rounded-xl flex gap-1 items-center py-1 bg-imbue-light-coral '>
             <AiOutlineCalendar size={18} />
-            Posted 3 hours ago
+            Posted {timeAgo.format(new Date(brief.created))}
           </p>
           <p className='px-3 flex items-center gap-1 rounded-xl py-1 bg-imbue-light-coral '>
             <AiOutlineClockCircle size={18} />
-            4-5 Weeks
+            {brief.duration}
           </p>
           <p className='px-3 flex items-center gap-1 rounded-xl py-1 bg-imbue-light-coral '>
             <HiOutlineCurrencyDollar size={20} />
@@ -39,30 +45,23 @@ export default function BriefComponent() {
         </div>
         <div className='mt-7'>
           <p className='text-black text-sm'>
-            The Digital Designer Intern is responsible for assisting the
-            creative team in the design and development of digital marketing
-            materials, including websites, social media graphics, and email
-            campaigns. The intern will work closely with the Creative Director
-            and other designers to...{' '}
+            {brief.description}
             <span className='text-imbue-purple underline'>more</span>
           </p>
         </div>
         <div className='flex gap-2 mt-5'>
-          <p className='text-imbue-purple flex items-center gap-1 bg-imbue-light-purple-three px-4 rounded-full py-1'>
-            Product Development
-            <AiOutlinePlus color='black' size={18} />
-          </p>
-          <p className='text-imbue-purple flex items-center gap-1 bg-imbue-light-purple-three px-4 rounded-full py-1'>
-            Health
-            <AiOutlinePlus color='black' size={18} />
-          </p>
-          <p className='text-imbue-purple flex items-center gap-1 bg-imbue-light-purple-three px-4 rounded-full py-1'>
-            Wellness
-            <AiOutlinePlus color='black' size={18} />
-          </p>
+          {brief.skills.map((item, index) => (
+            <p
+              key={'skills' + index}
+              className='text-imbue-purple flex items-center gap-1 bg-imbue-light-purple-three px-4 rounded-full py-1'
+            >
+              {item.name}
+              <AiOutlinePlus color='black' size={18} />
+            </p>
+          ))}
         </div>
       </div>
-      <div className='w-[45%] py-7 border-l'>
+      <div className='max-w-[30%] w-full py-7 border-l'>
         <div className='px-7 flex gap-2 pb-4 border-b'>
           <Image
             className='w-9 h-9 rounded-full'
@@ -72,7 +71,7 @@ export default function BriefComponent() {
             alt='profile'
           />
           <div>
-            <p className='text-black'>Ethereum Organization</p>
+            <p className='text-black'>{brief.created_by}</p>
             <p className='text-sm'>Company Hire</p>
           </div>
         </div>
@@ -87,7 +86,7 @@ export default function BriefComponent() {
             <span className='text-imbue-purple mr-2 ml-0.5'>
               <TfiEmail size={16} />
             </span>
-            20 Briefs posted
+            {brief.number_of_briefs_submitted}
           </p>
           <p className='flex items-center'>
             <span className='text-imbue-purple mr-1.5'>

@@ -2,13 +2,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
 import { InputAdornment, OutlinedInput, TextField } from '@mui/material';
-const IconButton = dynamic(() => import("@mui/material/IconButton"), {
+const IconButton = dynamic(() => import('@mui/material/IconButton'), {
   ssr: false,
-})
+});
 // import ClearIcon from '@mui/icons-material/Clear';
-const ClearIcon = dynamic(() => import("@mui/icons-material/Clear"), {
+const ClearIcon = dynamic(() => import('@mui/icons-material/Clear'), {
   ssr: false,
-})
+});
 
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -77,6 +77,7 @@ const Briefs = (): JSX.Element => {
   const [skills, setSkills] = useState<Item[]>([{ name: '', id: 0 }]);
   const [myApplications, _setMyApplications] = useState<Project[]>();
   const [error, setError] = useState<any>();
+  console.log(briefs);
   const {
     expRange,
     submitRange,
@@ -348,7 +349,7 @@ const Briefs = (): JSX.Element => {
           }
 
           if (router.query.non_verified) {
-            filter.non_verified = true
+            filter.non_verified = true;
           }
 
           if (sizeProps) {
@@ -748,21 +749,26 @@ const Briefs = (): JSX.Element => {
                     placeholder='Search'
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    onKeyUp={e => e.key === 'Enter' && !savedBriefsActive && onSearch()}
+                    onKeyUp={(e) =>
+                      e.key === 'Enter' && !savedBriefsActive && onSearch()
+                    }
                     endAdornment={
-                      searchInput?.length
-                        ? (
-                          <InputAdornment position="end">
-                            <IconButton
-                              aria-label="toggle password visibility"
-                              onClick={() => searchInput?.length && setSearchInput("")}
-                              onMouseDown={e => e.preventDefault()}
-                              edge="end"
-                            >
-                              <ClearIcon />
-                            </IconButton>
-                          </InputAdornment>)
-                        : ""
+                      searchInput?.length ? (
+                        <InputAdornment position='end'>
+                          <IconButton
+                            aria-label='toggle password visibility'
+                            onClick={() =>
+                              searchInput?.length && setSearchInput('')
+                            }
+                            onMouseDown={(e) => e.preventDefault()}
+                            edge='end'
+                          >
+                            <ClearIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      ) : (
+                        ''
+                      )
                     }
                   />
 
