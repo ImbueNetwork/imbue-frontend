@@ -110,7 +110,6 @@ const Dashboard = ({ val }: { val?: string }): JSX.Element => {
       };
       getUnreadMessageChannels();
       client.on((event) => {
-        console.log(event);
         if (event.total_unread_count !== undefined) {
           dispatch(setUnreadMessage({ message: event.unread_channels }));
           setUnreadMsg(event.total_unread_count);
