@@ -90,7 +90,6 @@ const Dashboard = ({ val }: { val?: string }): JSX.Element => {
         setLoadingStreamChat(false);
       }
     };
-
     setupStreamChat();
   }, [user]);
 
