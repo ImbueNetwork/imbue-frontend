@@ -38,6 +38,8 @@ import NotificationIcon from './NotificationIcon';
 import LoginPopup from '../LoginPopup/LoginPopup';
 import defaultProfile from '../../assets/images/profile-image.png';
 
+type ProfileMode = 'client' | 'freelancer';
+
 function NewNavbar() {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [freelancerProfile, setFreelancerProfile] = useState<any>();
@@ -95,6 +97,20 @@ function NewNavbar() {
       setLoginModal(true);
     }
   };
+
+  const [profileView, setProfileView] = useState<ProfileMode>('client')
+
+  useEffect(() => {
+    const profileView = localStorage.getItem("profileView") as ProfileMode
+
+    if (profileView) setProfileView(profileView)
+  }, [])
+
+  const setProfileMode = (mode: ProfileMode) => {
+    localStorage.setItem("profileView", mode)
+    setProfileView(mode)
+    router.push("/dashboard")
+  }
 
   const navPillclasses =
     'text-imbue-purple-dark h-[3rem] bg-white  rounded-[5.07319rem] !flex justify-center items-center px-5 hover:no-underline !text-[1rem] ';
@@ -252,10 +268,9 @@ function NewNavbar() {
                   />
                   Wallet
                 </Link>
-                {/* <Link
+                <div
                   onClick={() => setExpanded(false)}
                   className={`mx-1 relative group text-xs hover:bg-imbue-lime-light lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${navPillclasses}`}
-                  href='#'
                 >
                   <Image
                     src='/user-edit.svg'
@@ -269,17 +284,36 @@ function NewNavbar() {
                     className='ml-3 text-[#A8A8A8] group-hover:text-black'
                     size={20}
                   />
-                  <div className='absolute hidden  group-hover:block shadow-lg space-y-3 pl-1  py-1 rounded-xl top-[3.3rem] left-1 bg-white w-72'>
-                    <div className='flex gap-2 items-center px-2 hover:bg-imbue-lime-light py-2 rounded-md '>
-                      <div className='border p-1 rounded-xl'>
-                        <BiBuildings color='black' size={23} />
-                      </div>
-                      <div className='ml-1'>
-                        <p className='text-sm'>Switch to Hiring</p>
-                      </div>
-                    </div>
+                  <div className='absolute hidden group-hover:block shadow-lg space-y-3 pl-1  py-1 rounded-xl top-[3.3rem] left-1 bg-white w-72'>
+                    {
+                      profileView === "client"
+                        ? (
+                          <div
+                            className='flex gap-2 items-center px-2 hover:bg-imbue-lime-light py-2 rounded-md '
+                            onClick={() => setProfileMode("freelancer")}
+                          >
+                            <div className='border p-1 rounded-xl'>
+                              <BiBuildings color='black' size={23} />
+                            </div>
+                            <div className='ml-1'>
+                              <p className='text-sm'>Switch to Freelancer</p>
+                            </div>
+                          </div>)
+                        : (
+                          <div
+                            className='flex gap-2 items-center px-2 hover:bg-imbue-lime-light py-2 rounded-md '
+                            onClick={() => setProfileMode("client")}
+                          >
+                            <div className='border p-1 rounded-xl'>
+                              <BiBuildings color='black' size={23} />
+                            </div>
+                            <div className='ml-1'>
+                              <p className='text-sm'>Switch to Hiring</p>
+                            </div>
+                          </div>)
+                    }
                   </div>
-                </Link> */}
+                </div>
               </div>
             </div>
           </div>

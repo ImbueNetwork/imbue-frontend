@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
-
-import dynamic from 'next/dynamic';
+/* eslint-disable unused-imports/no-unused-vars */
+import { Badge } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { HiMagnifyingGlass } from 'react-icons/hi2';
+import { BiChevronDown, BiRightArrowAlt } from 'react-icons/bi';
+import { BsFilter } from 'react-icons/bs';
+import { MdOutlineAttachMoney } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   DefaultGenerics,
@@ -16,32 +16,13 @@ import 'stream-chat-react/dist/css/v2/index.css';
 
 import { fetchUser, getStreamChat } from '@/utils';
 
-import ChatPopup from '@/components/ChatPopup';
-import ErrorScreen from '@/components/ErrorScreen';
-import FullScreenLoader from '@/components/FullScreenLoader';
-const LoginPopup = dynamic(() => import('@/components/LoginPopup/LoginPopup'));
-
-// import LoginPopup from '@/components/LoginPopup/LoginPopup';
-
-import { Badge } from '@mui/material';
-import { BiChevronDown, BiRightArrowAlt } from 'react-icons/bi';
-import { BsFilter } from 'react-icons/bs';
-import { FiBookmark } from 'react-icons/fi';
-import { MdOutlineAttachMoney } from 'react-icons/md';
-
-import { strToIntRange } from '@/utils/helper';
-
 import AreaGrah from '@/components/AreaGraph';
-import BriefComponent from '@/components/BriefComponent';
+import BriefsView from '@/components/Dashboard/V2/BriefsView';
+import FullScreenLoader from '@/components/FullScreenLoader';
 import MessageComponent from '@/components/MessageComponent';
 
-import { BriefSqlFilter, Freelancer, Project, User } from '@/model';
+import { Freelancer, Project, User } from '@/model';
 import { Brief } from '@/model';
-import {
-  callSearchBriefs,
-  getAllBriefs,
-  getAllSavedBriefs,
-} from '@/redux/services/briefService';
 import { getFreelancerApplications } from '@/redux/services/freelancerService';
 import { setUnreadMessage } from '@/redux/slices/userSlice';
 import { RootState } from '@/redux/store/store';
@@ -109,160 +90,7 @@ const Dashboard = (): JSX.Element => {
     };
 
     setupStreamChat();
-  }, [user]);
-
-  const [briefs, setBriefs] = useState<Brief[]>([]);
-  const [briefs_total, setBriefsTotal] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  // FIXME: setLoading
-  const [loading, setLoading] = useState<boolean>(true);
-  const [itemsPerPage, setItemsPerPage] = useState<number>(6);
-  const [pageInput, setPageInput] = useState<number>(1);
-
-  useEffect(() => {
-    const fetchAndSetBriefs = async () => {
-      try {
-        if (!Object.keys(router?.query).length) {
-          const briefs_all: any = await getAllBriefs(itemsPerPage, currentPage);
-          if (briefs_all.status === 200) {
-            setBriefs(briefs_all?.currentData);
-            setBriefsTotal(briefs_all?.totalBriefs);
-          } else {
-            setError({ message: 'Something went wrong. Please try again' });
-          }
-        } else {
-          let filter: BriefSqlFilter = {
-            experience_range: [],
-            submitted_range: [],
-            submitted_is_max: false,
-            length_range: [],
-            skills_range: [],
-            length_is_max: false,
-            search_input: '',
-            items_per_page: itemsPerPage,
-            page: currentPage,
-            verified_only: false,
-            non_verified: false,
-          };
-
-          const verifiedOnlyPropIndex = selectedFilterIds.indexOf('4-0');
-
-          if (router.query.page) {
-            const pageQuery = Number(router.query.page);
-            filter.page = pageQuery;
-            setCurrentPage(pageQuery);
-            setPageInput(pageQuery);
-          }
-
-          if (router.query.non_verified) {
-            filter.non_verified = true;
-          }
-
-          if (sizeProps) {
-            filter.items_per_page = Number(sizeProps);
-            setItemsPerPage(Number(sizeProps));
-          }
-
-          if (expRange) {
-            const range = strToIntRange(expRange);
-            range?.forEach?.((v: any) => {
-              if (!selectedFilterIds.includes(`0-${v - 1}`))
-                selectedFilterIds.push(`0-${v - 1}`);
-            });
-
-            filter = { ...filter, experience_range: strToIntRange(expRange) };
-          }
-
-          if (skillsProps) {
-            const range = strToIntRange(skillsProps);
-            range?.forEach?.((v: any) => {
-              if (!selectedFilterIds.includes(`3-${v}`))
-                selectedFilterIds.push(`3-${v}`);
-            });
-
-            filter = { ...filter, skills_range: range };
-          }
-
-          if (submitRange) {
-            const range = strToIntRange(submitRange);
-            range?.forEach?.((v: any) => {
-              if (v > 0 && v < 5) selectedFilterIds.push(`1-${0}`);
-
-              if (v >= 5 && v < 10) selectedFilterIds.push(`1-${1}`);
-
-              if (v >= 10 && v < 15) selectedFilterIds.push(`1-${2}`);
-
-              if (v > 15) selectedFilterIds.push(`1-${3}`);
-            });
-            filter = { ...filter, submitted_range: strToIntRange(submitRange) };
-          }
-          if (heading) {
-            filter = { ...filter, search_input: heading };
-            // const input = document.getElementById(
-            //   'search-input'
-            // ) as HTMLInputElement;
-            // if (input) input.value = heading.toString();
-            setSearchInput(heading.toString());
-          }
-
-          if (verifiedOnlyProp) {
-            if (!selectedFilterIds.includes(`4-0`))
-              selectedFilterIds.push(`4-0`);
-
-            filter = { ...filter, verified_only: true };
-          } else if (verifiedOnlyPropIndex !== -1) {
-            // const newFileter = [...selectedFilterIds].filter((f) => f !== '4-0')
-            // setSlectedFilterIds(newFileter)
-            selectedFilterIds.splice(verifiedOnlyPropIndex, 1);
-          }
-
-          if (lengthRange) {
-            const range = strToIntRange(lengthRange);
-            range?.forEach?.((v: any) => {
-              if (!selectedFilterIds.includes(`2-${v - 1}`))
-                selectedFilterIds.push(`2-${v - 1}`);
-            });
-            filter = { ...filter, length_range: strToIntRange(lengthRange) };
-          }
-
-          let result: any = [];
-
-          if (savedBriefsActive) {
-            result = await getAllSavedBriefs(
-              filter.items_per_page || itemsPerPage,
-              currentPage,
-              currentUser?.id
-            );
-          } else {
-            result = await callSearchBriefs(filter);
-          }
-
-          if (result.status === 200 || result.totalBriefs !== undefined) {
-            const totalPages = Math.ceil(
-              result?.totalBriefs / (filter?.items_per_page || 6)
-            );
-
-            if (totalPages < filter.page && totalPages > 0) {
-              router.query.page = totalPages.toString();
-              router.push(router, undefined, { shallow: true });
-              filter.page = totalPages;
-            }
-
-            setBriefs(result?.currentData);
-            setBriefsTotal(result?.totalBriefs);
-          } else {
-            setError({ message: 'Something went wrong. Please try again' });
-          }
-        }
-      } catch (error) {
-        setError({ message: 'Something went wrong. Please try again' + error });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    router.isReady && fetchAndSetBriefs();
-  }, [router.isReady, currentPage, itemsPerPage]);
+  }, [loadingUser, router, user?.id, user?.username]);
 
   useEffect(() => {
     if (client && user?.username && !loadingStreamChat) {
@@ -308,8 +136,7 @@ const Dashboard = (): JSX.Element => {
     }
   }, [client, user?.getstream_token, user?.username, loadingStreamChat]);
 
-  if (loadingStreamChat || loadingUser || loading) return <FullScreenLoader />;
-  console.log(briefs);
+  if (loadingStreamChat || loadingUser) return <FullScreenLoader />;
 
   return client ? (
     <div className='bg-white  mt-2 py-7 px-5 rounded-3xl'>
@@ -427,34 +254,12 @@ const Dashboard = (): JSX.Element => {
       </div>
       {/* ending of the box sections */}
       <div className='mt-9 flex w-full gap-7'>
-        <div className='border-2 text-text-aux-colour max-w-[75%] rounded-2xl w-full border-imbue-light-grey'>
-          <div className='justify-between py-2 border-b b items-center flex px-7'>
-            <p className='text-[#747474]'>Recomended Briefs</p>
-            <div className='flex gap-5 items-center'>
-              <div className='flex group-focus:border-black active:border-black border border-imbue-light-grey py-2 px-3 rounded-full items-center'>
-                <HiMagnifyingGlass size={20} color='black' />
-                <input
-                  className='text-base group text-black ml-2 focus:outline-none h-7'
-                  type='text'
-                />
-              </div>
-              <div className='px-4 flex items-center gap-2 py-2 rounded-full border border-imbue-light-grey'>
-                <FiBookmark size={20} color='black' />
-                <p className='text-black'>Saved jobs</p>
-              </div>
-              <div className='px-4 flex items-center gap-2 py-2 rounded-full border bg-imbue-light-grey border-imbue-light-grey'>
-                <BsFilter size={20} color='black' />
-                <p className='text-black'>Filter</p>
-              </div>
-            </div>
-          </div>
-          {/* ending of header nav */}
-          {/* starting of briefs */}
-          {briefs.map((brief) => (
-            <BriefComponent key={brief.id} brief={brief} />
-          ))}
-          {/* ends of briefs */}
-        </div>
+        <BriefsView
+          {...{
+            setError,
+            currentUser: user
+          }}
+        />
         <div className='max-w-[25%] w-full rounded-md '>
           {/* Starting of graph */}
           <div className='bg-imbue-light-grey px-0.5 rounded-3xl pb-0.5 '>

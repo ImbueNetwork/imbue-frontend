@@ -77,7 +77,7 @@ const Briefs = (): JSX.Element => {
   const [skills, setSkills] = useState<Item[]>([{ name: '', id: 0 }]);
   const [myApplications, _setMyApplications] = useState<Project[]>();
   const [error, setError] = useState<any>();
-  console.log(briefs);
+  
   const {
     expRange,
     submitRange,

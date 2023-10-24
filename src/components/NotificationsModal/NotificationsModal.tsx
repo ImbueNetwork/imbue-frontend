@@ -9,8 +9,9 @@ import ApplyBreifNotification from './notificationComponents/ApplyBreifNotificat
 import GrantApproversNotifications from './notificationComponents/GrantApproversNotifications';
 import MilestoneApprovedNotifications from './notificationComponents/MilestoneApprovedNotifications';
 import SubmitMilestoneNotification from './notificationComponents/SubmitMilestoneNotification';
+import NotificationsLoader from './NotificationsLoader.tsx';
 
-export default function NotificationsModal() {
+export default function NotificationsModal({ onClose }: { onClose: any }) {
   const { user } = useSelector((state: RootState) => state.userState);
   return (
     <div
@@ -27,15 +28,15 @@ export default function NotificationsModal() {
       >
         <div className='bg-white text-center text-black'>
           <FlatFeed
-            notify
             feedGroup='user'
             options={{
               limit: 7,
               withOwnChildren: true,
               withRecentReactions: true,
             }}
+            LoadingIndicator={NotificationsLoader}
             Activity={({ activity }) => (
-              <>
+              <div onClick={() => onClose(false)}>
                 {activity.object === 'approved_Milestone.testing' && (
                   <MilestoneApprovedNotifications {...activity} />
                 )}
@@ -51,7 +52,7 @@ export default function NotificationsModal() {
                 {activity.object === 'AddApprovers.testing' && (
                   <GrantApproversNotifications {...activity} />
                 )}
-              </>
+              </div>
             )}
           />
         </div>

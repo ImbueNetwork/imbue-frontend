@@ -88,7 +88,7 @@ const NewBrief = (): JSX.Element => {
   };
 
   const handleIndustriesChange = (val: string[]) => {
-    if (val.length < 3 || val.length > 5) setIndustriesError(true);
+    if (val.length < 1 || val.length > 5) setIndustriesError(true);
     else setIndustriesError(false);
     setIndustries(val);
   };
@@ -193,7 +193,7 @@ const NewBrief = (): JSX.Element => {
       </div>
       <div className='flex flex-wrap flex-row  justify-center relative -top-4'>
         <span className={!industriesError ? 'hide' : 'error'}>
-          number of industries must be between 3 to 5
+          number of industries must be between 1 to 5
         </span>
       </div>
     </>
@@ -210,7 +210,7 @@ const NewBrief = (): JSX.Element => {
           value={description}
           name='description'
           maxLength={5000}
-          className='text-black bg-white outline-none'
+          className='text-black bg-white outline-none p-3'
           onChange={handleChange}
         />
         <div className='flex flex-wrap flex-row justify-center relative top-4'>
@@ -388,7 +388,7 @@ const NewBrief = (): JSX.Element => {
     }
     if (
       step === 1 &&
-      (!industries.length || industries.length < 3 || industries.length > 5)
+      (!industries.length || industries.length < 1 || industries.length > 5)
     ) {
       return false;
     }
