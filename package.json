@@ -28,6 +28,7 @@
     "@talismn/connect-ui": "1.1.2",
     "@talismn/connect-wallets": "1.2.3",
     "@testing-library/jest-dom": "^5.16.5",
+    "@trustwallet/wallet-core": "^4.0.1",
     "@types/bad-words": "^3.0.1",
     "@types/bcryptjs": "^2.4.2",
     "@types/node": "18.15.7",
