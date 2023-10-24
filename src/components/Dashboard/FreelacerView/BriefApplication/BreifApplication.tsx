@@ -1,5 +1,6 @@
 import { Divider } from '@mui/material';
 import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en.json';
 import router from 'next/router';
 import { useState } from 'react';
 
@@ -8,7 +9,7 @@ import { displayState, OffchainProjectState, Project } from '@/model';
 interface BreifApplicationProps {
   applications: any;
 }
-
+TimeAgo.addLocale(en);
 const timeAgo = new TimeAgo('en-US');
 
 const BreifApplication: React.FC<BreifApplicationProps> = ({
