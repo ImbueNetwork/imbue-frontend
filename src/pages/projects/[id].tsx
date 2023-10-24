@@ -251,7 +251,8 @@ function Project() {
         owner = brief?.user_id ? await utils.fetchUser(brief?.user_id) : null;
         freelancerRes = await getFreelancerProfile(projectRes?.user_id);
         if (freelancerRes?.user_id === user?.id) setIsApplicant(true);
-        if (owner?.id == user?.id) {
+
+        if (owner?.id === user?.id) {
           setTargetUser(freelancerRes);
         } else {
           setTargetUser(owner);
@@ -680,6 +681,7 @@ function Project() {
                 />
               </div>
             )}
+            
 
             <div className='bg-white col-start-10 px-2 rounded-xl py-3 border border-light-grey'>
               <MilestoneVoteBox
@@ -754,6 +756,8 @@ function Project() {
           user,
           setError,
           votingWalletAccount,
+          projectType,
+          targetUser,
         }}
       />
 

@@ -70,7 +70,7 @@ export const ProgressBar = ({
       ))}
       <div className='progress-bar-back'></div>
       <div
-        className='progress-bar-progress'
+        className='progress-bar-progress absolute'
         style={{
           width: `calc((100% - .5rem) * ${currentValue} / ${
             titleArray.length - 1
