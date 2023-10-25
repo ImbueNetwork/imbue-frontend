@@ -13,14 +13,15 @@ export default function Ongoing() {
     (state: RootState) => state.userState
   );
   const [projects, setProjects] = useState<Project[]>([]);
-  const getProjects = async () => {
-    const Briefs = await getFreelancerApplications(user.id);
-
-    const projectRes = Briefs.filter((item) => item.chain_project_id);
-    setProjects(projectRes);
-  };
 
   useEffect(() => {
+    const getProjects = async () => {
+      const Briefs = await getFreelancerApplications(user.id);
+
+      const projectRes = Briefs.filter((item) => item.chain_project_id);
+      setProjects(projectRes);
+    };
+
     if (user?.id) getProjects();
   }, [user.id]);
 
@@ -28,9 +29,9 @@ export default function Ongoing() {
     return <FullScreenLoader />;
   }
   return (
-    <div className='bg-white rounded-3xl pt-5'>
+    <div className='bg-white rounded-3xl overflow-hidden pt-5'>
       <div className=' mx-2 border px-7 py-5 rounded-3xl'>
-        <p className='text-2xl text-black'>ongoing projects</p>
+        <p className='text-2xl text-black'>Ongoing Projects</p>
       </div>
       <div className=''>
         <OngoingProject projects={projects} />

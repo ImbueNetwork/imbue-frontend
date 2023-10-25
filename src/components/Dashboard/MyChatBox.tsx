@@ -183,7 +183,7 @@ function DashboardChatBox({ client }: { client: StreamChat }) {
   };
 
   return (
-    <div className='custom-chat-container relative w-full rounded-2xl h-[75vh] bg---theme-grey-dark border border-white border-opacity-25 overflow-hidden -mt-2'>
+    <div className='custom-chat-container relative w-full rounded-2xl h-[85vh] bg---theme-grey-dark border border-white border-opacity-25 overflow-hidden -mt-2'>
       <Chat client={client} theme='str-chat__theme-light'>
         {mobileView ? (
           <>

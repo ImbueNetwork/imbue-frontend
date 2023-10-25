@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { StreamChat } from 'stream-chat';
+import 'stream-chat-react/dist/css/v2/index.css';
 
 import { getStreamChat } from '@/utils';
 
@@ -14,12 +15,12 @@ export default function Messages() {
   const {
     user,
     loading: loadingUser,
-    error: userError,
+    // error: userError,
   } = useSelector((state: RootState) => state.userState);
   const router = useRouter();
   const [client, setClient] = useState<StreamChat>();
   const [loadingStreamChat, setLoadingStreamChat] = useState<boolean>(true);
-  const [error, setError] = useState<any>(userError);
+  const [error, setError] = useState<any>();
 
   useEffect(() => {
     const setupStreamChat = async () => {
@@ -46,7 +47,7 @@ export default function Messages() {
         user.getstream_token
       );
     }
-  }, [user, client]);
+  }, [user.username, client, user.id, user.display_name, user.getstream_token, loadingStreamChat]);
 
   if (loadingStreamChat || loadingUser || !client) {
     return <FullScreenLoader />;
@@ -57,8 +58,8 @@ export default function Messages() {
   }
 
   return (
-    <>
+    <div className='mt-5'>
       <DashboardChatBox client={client} />
-    </>
+    </div>
   );
 }

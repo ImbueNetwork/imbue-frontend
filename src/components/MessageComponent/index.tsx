@@ -28,7 +28,7 @@ export default function MessageComponent(
           <p className='text-text-aux-colour'>{props.text}</p>
         </div>
         <p className='min-w-fit text-text-aux-colour'>
-          {timeAgo.format(new Date(props.created_at))}
+          {props.created_at && timeAgo.format(new Date(props.created_at))}
         </p>
       </div>
     </div>

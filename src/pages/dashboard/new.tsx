@@ -23,6 +23,7 @@ import MessageComponent from '@/components/MessageComponent';
 
 import { Freelancer, Project, User } from '@/model';
 import { Brief } from '@/model';
+import { getAllSavedBriefs } from '@/redux/services/briefService';
 import { getFreelancerApplications } from '@/redux/services/freelancerService';
 import { setUnreadMessage } from '@/redux/slices/userSlice';
 import { RootState } from '@/redux/store/store';
@@ -136,6 +137,29 @@ const Dashboard = (): JSX.Element => {
     }
   }, [client, user?.getstream_token, user?.username, loadingStreamChat]);
 
+  const [applications, setApplciations] = useState<Project[]>([])
+  const [savedProjectsCount, setSavedProjectsCnt] = useState<number>(0)
+
+  const completedProjects = applications.filter((app) => app.completed === true)
+  const activeProjects = applications.filter((app) => app.completed === false && app.chain_project_id)
+  const pendingProjects = applications.filter((app) => app.status_id === 1)
+
+  useEffect(() => {
+    const getProjects = async () => {
+      const applications = await getFreelancerApplications(user.id);
+      const savedBriefs: any = await getAllSavedBriefs(
+        0,
+        0,
+        user?.id
+      );
+
+      setApplciations(applications);
+      setSavedProjectsCnt(savedBriefs.totalBriefs);
+    };
+
+    if (user?.id) getProjects();
+  }, [user.id]);
+
   if (loadingStreamChat || loadingUser) return <FullScreenLoader />;
 
   return client ? (
@@ -154,7 +178,10 @@ const Dashboard = (): JSX.Element => {
           <div className='flex justify-between'>
             <p>Projects</p>
 
-            <p className='bg-imbue-purple px-7 py-2 text-white text-sm rounded-full'>
+            <p
+              className='bg-imbue-purple px-7 py-2 text-white text-sm rounded-full cursor-pointer'
+              onClick={() => router.push('/projects/ongoing')}
+            >
               View all
             </p>
           </div>
@@ -163,7 +190,7 @@ const Dashboard = (): JSX.Element => {
               <div className='w-1.5 h-1  rounded-full bg-imbue-coral' />
               <p className='text-sm min-w-fit '>Completed Projects</p>
               <hr className='w-full border-dashed mt-3  border-imbue-coral ' />
-              <p className='text-[22px] font-semibold text-black'>12</p>
+              <p className='text-[22px] font-semibold text-black'>{completedProjects?.length || 0}</p>
             </div>
           </div>
           <div className='mt-0.5'>
@@ -171,7 +198,7 @@ const Dashboard = (): JSX.Element => {
               <div className='w-1.5 h-1 rounded-full bg-imbue-purple' />
               <p className='text-sm min-w-fit '>Active Projects</p>
               <hr className='w-full border-dashed mt-3  border-imbue-purple ' />
-              <p className='text-[22px] font-semibold text-black'>2</p>
+              <p className='text-[22px] font-semibold text-black'>{activeProjects?.length || 0}</p>
             </div>
           </div>
           <div className='mt-0.5'>
@@ -179,7 +206,7 @@ const Dashboard = (): JSX.Element => {
               <div className='w-1.5 h-1 rounded-full bg-imbue-coral' />
               <p className='text-sm min-w-fit'>Pending Projects</p>
               <hr className='w-full border-dashed mt-3  border-t-imbue-coral ' />
-              <p className='text-[22px] font-semibold text-black'>4</p>
+              <p className='text-[22px] font-semibold text-black'>{pendingProjects?.length || 0}</p>
             </div>
           </div>
           <div className='mt-0.5'>
@@ -187,15 +214,18 @@ const Dashboard = (): JSX.Element => {
               <div className='w-1.5 h-1 rounded-full bg-imbue-lemon' />
               <p className='text-sm min-w-fit '>Saved Projects</p>
               <hr className='w-full border-dashed mt-3  border-imbue-lemon ' />
-              <p className='text-[22px] font-semibold text-black'>36</p>
+              <p className='text-[22px] font-semibold text-black'>{savedProjectsCount || 0}</p>
             </div>
           </div>
         </div>
         <div className=' py-5 px-5 flex flex-col justify-between rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full '>
           <div className='flex justify-between'>
             <p>Brief</p>
-            <p className='text-white bg-imbue-purple px-7 py-2 rounded-full text-sm'>
-              Open Brief
+            <p
+              className='text-white bg-imbue-purple px-7 py-2 rounded-full text-sm cursor-pointer'
+              onClick={() => router.push('/projects/applications')}
+            >
+              Open Briefs
             </p>
           </div>
           <div>
@@ -280,7 +310,12 @@ const Dashboard = (): JSX.Element => {
               <Badge badgeContent={unreadMessages} color='error'>
                 <p className='text-[#747474]'>Messaging</p>
               </Badge>
-              <BsFilter size={27} color='black' />
+              <div
+                className='px-3 py-0.5 border text-black border-text-aux-colour rounded-full cursor-pointer'
+                onClick={() => router.push('/dashboard/messages')}
+              >
+                <BiRightArrowAlt size={22} className='-rotate-45' />
+              </div>
             </div>
             <div className='px-3 bg-white py-3 rounded-3xl'>
               {messageList?.map((item, index) => (
