@@ -30,14 +30,28 @@ export interface LoginPopupStateType {
   redirectURL?: string;
 }
 
+type ProfileMode = 'client' | 'freelancer';
+
 export interface LoginPopupContextType {
   showLoginPopUp?: LoginPopupStateType;
   setShowLoginPopup: (_value: LoginPopupStateType) => void;
 }
 
+export interface AppContextType {
+  profileView?: ProfileMode;
+  setProfileView: (_value: ProfileMode) => void;
+  setProfileMode: (_mode: ProfileMode) => void;
+}
+
 export const LoginPopupContext = createContext<LoginPopupContextType | null>(
   null
 );
+
+// TODO: Include screens to this context
+export const AppContext = createContext<AppContextType | null>(
+  null
+);
+
 
 function Layout({ children }: LayoutProps) {
   const [progress, setProgress] = useState(0);
@@ -57,6 +71,7 @@ function Layout({ children }: LayoutProps) {
       router.events.off('routeChangeError', () => setProgress(100));
     };
   }, [router]);
+
   const theme = createTheme({
     palette: {
       primary: {
@@ -67,6 +82,23 @@ function Layout({ children }: LayoutProps) {
       },
     },
   });
+
+  // Profile switching 
+  const [profileView, setProfileView] = useState<ProfileMode>('client');
+
+  useEffect(() => {
+    const profileView = localStorage.getItem('profileView') as ProfileMode;
+
+    if (profileView) setProfileView(profileView);
+  }, []);
+
+  const setProfileMode = (mode: ProfileMode) => {
+    localStorage.setItem('profileView', mode);
+    setProfileView(mode);
+    if (mode === 'freelancer') router.push('/dashboard/new');
+    else router.push('/dashboard');
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <StyledEngineProvider injectFirst>
@@ -80,27 +112,35 @@ function Layout({ children }: LayoutProps) {
             />
           )}
           <Providers>
-            {!(
-              router.asPath === '/join' ||
-              router.asPath === '/auth/sign-up' ||
-              router.asPath === '/auth/sign-in'
-            ) && <NewNavbar />}
-
-            <main
-              className={`padded lg:!px-[var(--hq-layout-padding)] !pt-[100px]`}
-              id='main-content'
+            <AppContext.Provider
+              value={{
+                profileView,
+                setProfileView,
+                setProfileMode
+              }}
             >
-              <LoginPopupContext.Provider
-                value={{ showLoginPopUp, setShowLoginPopup }}
+              {!(
+                router.asPath === '/join' ||
+                router.asPath === '/auth/sign-up' ||
+                router.asPath === '/auth/sign-in'
+              ) && <NewNavbar />}
+
+              <main
+                className={`padded lg:!px-[var(--hq-layout-padding)] !pt-[100px]`}
+                id='main-content'
               >
-                {children}
-              </LoginPopupContext.Provider>
-            </main>
-            <LoginPopup
-              visible={showLoginPopUp?.open}
-              setVisible={setShowLoginPopup}
-              redirectUrl={showLoginPopUp.redirectURL}
-            />
+                <LoginPopupContext.Provider
+                  value={{ showLoginPopUp, setShowLoginPopup }}
+                >
+                  {children}
+                </LoginPopupContext.Provider>
+              </main>
+              <LoginPopup
+                visible={showLoginPopUp?.open}
+                setVisible={setShowLoginPopup}
+                redirectUrl={showLoginPopUp.redirectURL}
+              />
+            </AppContext.Provider>
           </Providers>
         </React.Fragment>
       </StyledEngineProvider>

@@ -1,6 +1,5 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import { Badge } from '@mui/material';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { BiChevronDown, BiRightArrowAlt } from 'react-icons/bi';
@@ -160,6 +159,16 @@ const Dashboard = (): JSX.Element => {
     if (user?.id) getProjects();
   }, [user.id]);
 
+  const options = [
+    { name: 'Approved', bg: "bg-[#90DB00]", status_id: 4 },
+    { name: 'Pending', bg: "bg-[#FF7A00]", status_id: 1 },
+    { name: 'Changes Required', bg: "bg-[#3B27C1]", status_id: 2 },
+    { name: 'Rejected', bg: "bg-[#FF7A00]", status_id: 3 },
+  ];
+
+  const [selectedOption, setSelectedOption] = useState<typeof options[0]>(options[0]);
+  const [openedOption, setOpenedOption] = useState<boolean>(false);
+
   if (loadingStreamChat || loadingUser) return <FullScreenLoader />;
 
   return client ? (
@@ -218,20 +227,42 @@ const Dashboard = (): JSX.Element => {
             </div>
           </div>
         </div>
-        <div className=' py-5 px-5 flex flex-col justify-between rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full '>
+        <div className='py-5 px-5 flex flex-col justify-between rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full '>
           <div className='flex justify-between'>
-            <p>Brief</p>
-            <p
-              className='text-white bg-imbue-purple px-7 py-2 rounded-full text-sm cursor-pointer'
-              onClick={() => router.push('/projects/applications')}
-            >
-              Open Briefs
-            </p>
+            <p>Briefs</p>
+            <div className='relative w-44 select-none'>
+              <div
+                className='flex bg-white p-2 rounded-md gap-1.5 items-center cursor-pointer'
+                onClick={() => setOpenedOption((prev) => !prev)}
+              >
+                <div className={`${selectedOption.bg} w-1 h-1 rounded-full`} />{' '}
+                <p className='text-black text-sm'>{selectedOption.name}</p>
+                <BiChevronDown className={`ml-auto ${openedOption && "rotate-180"} `} color='black' size={18} />
+              </div>
+
+              <div className={`${!openedOption && "hidden"} bg-white absolute w-full rounded-md`}>
+                {
+                  options.map((option, index) => (
+                    <div
+                      key={index}
+                      className='flex items-center gap-2 p-2 cursor-pointer hover:bg-imbue-light-purple'
+                      onClick={() => {
+                        setSelectedOption(option)
+                        setOpenedOption(false)
+                      }}
+                    >
+                      <div className={`${option.bg} w-1 h-1 rounded-full`}></div>
+                      <p className='text-sm'>{option.name}</p>
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
           </div>
           <div>
             <div className='mb-2 flex'>
               <p className='text-4xl font-semibold text-black'>3</p>
-              <div className='flex ml-3'>
+              {/* <div className='flex ml-3'>
                 <Image
                   className='rounded-full  w-9 h-9 object-cover'
                   src={'/slide_1.png'}
@@ -254,14 +285,15 @@ const Dashboard = (): JSX.Element => {
                   height={30}
                   alt='image'
                 />
-              </div>
+              </div> */}
             </div>
             <div className='flex  justify-between'>
               <p>Approved brief</p>
-              <div className='flex bg-white px-2 py-1.5 rounded-md gap-1.5 items-center'>
-                <div className='w-1 h-1 rounded-full bg-imbue-coral' />{' '}
-                <p className='text-black text-sm'>Approved</p>
-                <BiChevronDown color='black' size={18} />
+              <div
+                className='px-3 py-0.5 border text-black border-text-aux-colour rounded-full cursor-pointer'
+                onClick={() => router.push(`/projects/applications?status_id=${selectedOption.status_id}`)}
+              >
+                <BiRightArrowAlt size={22} className='-rotate-45' />
               </div>
             </div>
           </div>

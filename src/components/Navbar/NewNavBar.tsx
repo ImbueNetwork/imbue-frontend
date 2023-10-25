@@ -16,7 +16,7 @@ import {
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { BiBuildings } from 'react-icons/bi';
 import { BsPeople } from 'react-icons/bs';
 import { IoIosArrowDown } from 'react-icons/io';
@@ -35,10 +35,9 @@ const Login = dynamic(() => import('../Login'));
 import Link from 'next/link';
 
 import NotificationIcon from './NotificationIcon';
+import { AppContext, AppContextType } from '../Layout';
 import LoginPopup from '../LoginPopup/LoginPopup';
 import defaultProfile from '../../assets/images/profile-image.png';
-
-type ProfileMode = 'client' | 'freelancer';
 
 function NewNavbar() {
   const [loginModal, setLoginModal] = useState<boolean>(false);
@@ -98,22 +97,10 @@ function NewNavbar() {
     }
   };
 
-  const [profileView, setProfileView] = useState<ProfileMode>('client');
-
-  useEffect(() => {
-    const profileView = localStorage.getItem('profileView') as ProfileMode;
-
-    if (profileView) setProfileView(profileView);
-  }, []);
-
-  const setProfileMode = (mode: ProfileMode) => {
-    localStorage.setItem('profileView', mode);
-    setProfileView(mode);
-    router.push('/dashboard');
-  };
-
   const navPillclasses =
     'text-imbue-purple-dark h-[3rem] bg-white  rounded-[5.07319rem] !flex justify-center items-center px-5 hover:no-underline !text-[1rem] ';
+
+  const { setProfileView, profileView, setProfileMode } = useContext(AppContext) as AppContextType
 
   return (
     <>
