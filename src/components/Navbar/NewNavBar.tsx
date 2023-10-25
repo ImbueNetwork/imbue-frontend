@@ -98,19 +98,19 @@ function NewNavbar() {
     }
   };
 
-  const [profileView, setProfileView] = useState<ProfileMode>('client')
+  const [profileView, setProfileView] = useState<ProfileMode>('client');
 
   useEffect(() => {
-    const profileView = localStorage.getItem("profileView") as ProfileMode
+    const profileView = localStorage.getItem('profileView') as ProfileMode;
 
-    if (profileView) setProfileView(profileView)
-  }, [])
+    if (profileView) setProfileView(profileView);
+  }, []);
 
   const setProfileMode = (mode: ProfileMode) => {
-    localStorage.setItem("profileView", mode)
-    setProfileView(mode)
-    router.push("/dashboard")
-  }
+    localStorage.setItem('profileView', mode);
+    setProfileView(mode);
+    router.push('/dashboard');
+  };
 
   const navPillclasses =
     'text-imbue-purple-dark h-[3rem] bg-white  rounded-[5.07319rem] !flex justify-center items-center px-5 hover:no-underline !text-[1rem] ';
@@ -201,59 +201,59 @@ function NewNavbar() {
                     </div>
                   </div>
                 </div>
-                {user?.id
-                  ? (
-                    <div
-                      className={`mx-1 hover:bg-imbue-lime-light relative group  lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
-                    >
-                      <div className='flex'>
-                        <Image
-                          className='mr-2'
-                          src={'/page.svg'}
-                          width={16}
-                          height={20}
-                          alt='page icon'
-                        />
-                        Submit
-                        <IoIosArrowDown
-                          className='ml-3 text-[#A8A8A8] group-hover:text-black'
-                          size={20}
-                        />
-                      </div>
+                {user?.id ? (
+                  <div
+                    className={`mx-1 hover:bg-imbue-lime-light relative group  lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
+                  >
+                    <div className='flex'>
+                      <Image
+                        className='mr-2'
+                        src={'/page.svg'}
+                        width={16}
+                        height={20}
+                        alt='page icon'
+                      />
+                      Submit
+                      <IoIosArrowDown
+                        className='ml-3 text-[#A8A8A8] group-hover:text-black'
+                        size={20}
+                      />
+                    </div>
 
-                      <div className='absolute hidden bg-transparent group-hover:block  space-y-3  rounded-xl top-3 left-1 w-72'>
-                        <div className='bg-white mt-10 rounded-lg pl-1 shadow-lg py-1'>
-                          <div
-                            onClick={() => {
-                              router.push('/grants/new');
-                            }}
-                            className='flex gap-2 px-2 hover:bg-imbue-lime-light items-center py-2 rounded-md '
-                          >
-                            <div className='border p-1 rounded-xl'>
-                              <MdOutlineAccountBalance color='black' size={20} />
-                            </div>
-                            <div className='ml-1'>
-                              <p className='text-sm'>Submit Grant</p>
-                            </div>
+                    <div className='absolute hidden bg-transparent group-hover:block  space-y-3  rounded-xl top-3 left-1 w-72'>
+                      <div className='bg-white mt-10 rounded-lg pl-1 shadow-lg py-1'>
+                        <div
+                          onClick={() => {
+                            router.push('/grants/new');
+                          }}
+                          className='flex gap-2 px-2 hover:bg-imbue-lime-light items-center py-2 rounded-md '
+                        >
+                          <div className='border p-1 rounded-xl'>
+                            <MdOutlineAccountBalance color='black' size={20} />
                           </div>
-                          <div
-                            onClick={() => {
-                              router.push('/briefs/new');
-                            }}
-                            className='flex gap-2 px-2 items-center hover:bg-imbue-lime-light py-2 rounded-md '
-                          >
-                            <div className='border p-1  rounded-xl'>
-                              <MdOutlineWork color='black' size={20} />
-                            </div>
-                            <div className='ml-1'>
-                              <p className='text-sm'>Submit Brief</p>
-                            </div>
+                          <div className='ml-1'>
+                            <p className='text-sm'>Submit Grant</p>
+                          </div>
+                        </div>
+                        <div
+                          onClick={() => {
+                            router.push('/briefs/new');
+                          }}
+                          className='flex gap-2 px-2 items-center hover:bg-imbue-lime-light py-2 rounded-md '
+                        >
+                          <div className='border p-1  rounded-xl'>
+                            <MdOutlineWork color='black' size={20} />
+                          </div>
+                          <div className='ml-1'>
+                            <p className='text-sm'>Submit Brief</p>
                           </div>
                         </div>
                       </div>
-                    </div>)
-                  : ""
-                }
+                    </div>
+                  </div>
+                ) : (
+                  ''
+                )}
                 <Link
                   onClick={() => setExpanded(false)}
                   className={`mx-1 hover:bg-imbue-lime-light text-xs lg:text-sm hidden lg:inline-block cursor-pointer ${navPillclasses} nav-item nav-item-2`}
@@ -284,34 +284,34 @@ function NewNavbar() {
                     className='ml-3 text-[#A8A8A8] group-hover:text-black'
                     size={20}
                   />
-                  <div className='absolute hidden group-hover:block shadow-lg space-y-3 pl-1  py-1 rounded-xl top-[3.3rem] left-1 bg-white w-72'>
-                    {
-                      profileView === "client"
-                        ? (
-                          <div
-                            className='flex gap-2 items-center px-2 hover:bg-imbue-lime-light py-2 rounded-md '
-                            onClick={() => setProfileMode("freelancer")}
-                          >
-                            <div className='border p-1 rounded-xl'>
-                              <BiBuildings color='black' size={23} />
-                            </div>
-                            <div className='ml-1'>
-                              <p className='text-sm'>Switch to Freelancer</p>
-                            </div>
-                          </div>)
-                        : (
-                          <div
-                            className='flex gap-2 items-center px-2 hover:bg-imbue-lime-light py-2 rounded-md '
-                            onClick={() => setProfileMode("client")}
-                          >
-                            <div className='border p-1 rounded-xl'>
-                              <BiBuildings color='black' size={23} />
-                            </div>
-                            <div className='ml-1'>
-                              <p className='text-sm'>Switch to Hiring</p>
-                            </div>
-                          </div>)
-                    }
+                  <div className='absolute hidden bg-transparent  group-hover:block  space-y-3  rounded-xl top-3 left-1  w-72'>
+                    <div className='bg-white mt-10 rounded-lg pl-1 shadow-lg py-1'>
+                      {profileView === 'client' ? (
+                        <div
+                          className='flex gap-2 items-center px-2 hover:bg-imbue-lime-light py-2 rounded-md '
+                          onClick={() => setProfileMode('freelancer')}
+                        >
+                          <div className='border p-1 rounded-xl'>
+                            <BiBuildings color='black' size={23} />
+                          </div>
+                          <div className='ml-1'>
+                            <p className='text-sm'>Switch to Freelancer</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          className='flex gap-2 items-center px-2 hover:bg-imbue-lime-light py-2 rounded-md '
+                          onClick={() => setProfileMode('client')}
+                        >
+                          <div className='border p-1 rounded-xl'>
+                            <BiBuildings color='black' size={23} />
+                          </div>
+                          <div className='ml-1'>
+                            <p className='text-sm'>Switch to Hiring</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
