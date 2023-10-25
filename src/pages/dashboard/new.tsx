@@ -168,6 +168,27 @@ const Dashboard = (): JSX.Element => {
 
   const [selectedOption, setSelectedOption] = useState<typeof options[0]>(options[0]);
   const [openedOption, setOpenedOption] = useState<boolean>(false);
+  const [filteredApplications, setFilteredApplications] = useState<Project[]>()
+
+  useEffect(() => {
+    const getProjects = async () => {
+      // setLoading(true)
+
+      try {
+        const Briefs = await getFreelancerApplications(user.id);
+
+        const projectRes = Briefs.filter((item) => item.status_id == selectedOption.status_id);
+        setFilteredApplications(projectRes);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.log(error)
+      } finally {
+        // setLoading(false)
+      }
+    };
+
+    if (user?.id) getProjects();
+  }, [selectedOption.status_id, user.id]);
 
   if (loadingStreamChat || loadingUser) return <FullScreenLoader />;
 
@@ -189,7 +210,7 @@ const Dashboard = (): JSX.Element => {
 
             <p
               className='bg-imbue-purple px-7 py-2 text-white text-sm rounded-full cursor-pointer'
-              onClick={() => router.push('/projects/ongoing')}
+              onClick={() => router.push('/projects/myprojects')}
             >
               View all
             </p>
@@ -261,7 +282,7 @@ const Dashboard = (): JSX.Element => {
           </div>
           <div>
             <div className='mb-2 flex'>
-              <p className='text-4xl font-semibold text-black'>3</p>
+              <p className='text-4xl font-semibold text-black'>{filteredApplications?.length}</p>
               {/* <div className='flex ml-3'>
                 <Image
                   className='rounded-full  w-9 h-9 object-cover'

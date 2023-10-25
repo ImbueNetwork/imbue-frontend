@@ -1,10 +1,11 @@
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import BreifApplication from '@/components/Dashboard/FreelacerView/BriefApplication/BreifApplication';
 import FullScreenLoader from '@/components/FullScreenLoader';
 
-import { Project } from '@/model';
+import { applicationStatusId,Project } from '@/model';
 import { getFreelancerApplications } from '@/redux/services/freelancerService';
 import { RootState } from '@/redux/store/store';
 
@@ -13,26 +14,40 @@ export default function Applications() {
     (state: RootState) => state.userState
   );
   const [projects, setProjects] = useState<Project[]>([]);
-  const getProjects = async () => {
-    const Briefs = await getFreelancerApplications(user.id);
+  const [loading, setLoading] = useState<boolean>(false);
 
-    const projectRes = Briefs.filter((item) => !item.chain_project_id);
-    setProjects(projectRes);
-  };
+  const router = useRouter()
+  const { status_id } = router.query
 
   useEffect(() => {
-    if (user?.id) getProjects();
-  }, [user.id]);
+    const getProjects = async () => {
+      setLoading(true)
 
-  if (loadingUser) {
+      try {
+        const Briefs = await getFreelancerApplications(user.id);
+
+        const projectRes = Briefs.filter((item) => item.status_id == status_id);
+        setProjects(projectRes);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.log(error)
+      } finally {
+        setLoading(false)
+      }
+    };
+
+    if (user?.id) getProjects();
+  }, [status_id, user.id]);
+
+  if (loadingUser || loading) {
     return <FullScreenLoader />;
   }
   return (
-    <div className='bg-white rounded-3xl pt-5'>
+    <div className='bg-white rounded-3xl pt-5 overflow-hidden'>
       <div className=' mx-2 border px-7 py-5 rounded-3xl'>
-        <p className='text-2xl text-black'>ongoing projects</p>
+        <p className='text-2xl text-black'>{applicationStatusId[Number(status_id)]} Projects</p>
       </div>
-      <div className=''>
+      <div className='mt-5'>
         <BreifApplication applications={projects} />
       </div>
     </div>

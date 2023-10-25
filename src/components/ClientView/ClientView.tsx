@@ -41,7 +41,7 @@ export default function ClientView({
               : 'text-imbue-light-purple-two'
           )}
         >
-          Briefs ({briefs?.briefsUnderReview.length})
+          Briefs ({briefs?.briefsUnderReview?.length})
         </p>
         <p
           onClick={() => setSwitcher('projects')}
