@@ -5,7 +5,7 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import { StyledEngineProvider } from '@mui/material/styles';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { StreamChat } from 'stream-chat';
 import 'stream-chat-react/dist/css/v2/index.css';
@@ -22,11 +22,15 @@ const LoginPopup = dynamic(() => import('@/components/LoginPopup/LoginPopup'));
 
 // import LoginPopup from '@/components/LoginPopup/LoginPopup';
 
+import { AppContext, AppContextType } from '@/components/Layout';
+
 import { Freelancer, Project, User } from '@/model';
 import { Brief } from '@/model';
 import { getFreelancerApplications } from '@/redux/services/freelancerService';
 import { setUnreadMessage } from '@/redux/slices/userSlice';
 import { RootState } from '@/redux/store/store';
+
+import FreelancerDashboard from './new';
 
 export type DashboardProps = {
   user: User;
@@ -118,7 +122,12 @@ const Dashboard = ({ val }: { val?: string }): JSX.Element => {
     }
   }, [client, user?.getstream_token, user?.username, loadingStreamChat]);
 
+  const { profileView } = useContext(AppContext) as AppContextType
+
+
   if (loadingStreamChat || loadingUser) return <FullScreenLoader />;
+
+  if (profileView === 'freelancer') return <FreelancerDashboard />
 
   return client ? (
     <div className='px-[15px]'>
@@ -133,9 +142,8 @@ const Dashboard = ({ val }: { val?: string }): JSX.Element => {
         >
           <BottomNavigationAction label='Client View' value={1} />
           <BottomNavigationAction
-            label={`Messages ${
-              unreadMessages > 0 ? `(${unreadMessages})` : ''
-            }`}
+            label={`Messages ${unreadMessages > 0 ? `(${unreadMessages})` : ''
+              }`}
             value={2}
           />
           <BottomNavigationAction label='Freelancer View' value={3} />

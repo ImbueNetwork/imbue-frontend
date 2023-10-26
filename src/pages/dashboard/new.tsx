@@ -22,7 +22,6 @@ import MessageComponent from '@/components/MessageComponent';
 
 import { Freelancer, Project, User } from '@/model';
 import { Brief } from '@/model';
-import { getAllSavedBriefs } from '@/redux/services/briefService';
 import { getFreelancerApplications } from '@/redux/services/freelancerService';
 import { setUnreadMessage } from '@/redux/slices/userSlice';
 import { RootState } from '@/redux/store/store';
@@ -34,7 +33,7 @@ export type DashboardProps = {
   myApplicationsResponse: Project[];
 };
 
-const Dashboard = (): JSX.Element => {
+const FreelancerDashboard = (): JSX.Element => {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [client, setClient] = useState<StreamChat>();
   const {
@@ -137,23 +136,17 @@ const Dashboard = (): JSX.Element => {
   }, [client, user?.getstream_token, user?.username, loadingStreamChat]);
 
   const [applications, setApplciations] = useState<Project[]>([])
-  const [savedProjectsCount, setSavedProjectsCnt] = useState<number>(0)
 
   const completedProjects = applications.filter((app) => app.completed === true)
-  const activeProjects = applications.filter((app) => app.completed === false && app.chain_project_id)
+  const activeProjects = applications.filter((app) => app.completed === false && app.chain_project_id && app.brief_id )
   const pendingProjects = applications.filter((app) => app.status_id === 1)
+  const grants = applications.filter((app) => !app.brief_id && app.chain_project_id)
 
   useEffect(() => {
     const getProjects = async () => {
       const applications = await getFreelancerApplications(user.id);
-      const savedBriefs: any = await getAllSavedBriefs(
-        0,
-        0,
-        user?.id
-      );
 
       setApplciations(applications);
-      setSavedProjectsCnt(savedBriefs.totalBriefs);
     };
 
     if (user?.id) getProjects();
@@ -196,7 +189,7 @@ const Dashboard = (): JSX.Element => {
     <div className='bg-white  mt-2 py-7 px-5 rounded-3xl'>
       <>
         <p className='text-black text-[27px]'>
-          Welcome , {user.display_name.split(' ')[0]} 👋
+          Welcome, {user?.display_name?.split(' ')[0]} 👋
         </p>
         <p className='text-text-aux-colour text-sm'>
           Glad to have you on imbue
@@ -242,9 +235,9 @@ const Dashboard = (): JSX.Element => {
           <div className='mt-0.5'>
             <div className='flex items-center gap-2'>
               <div className='w-1.5 h-1 rounded-full bg-imbue-lemon' />
-              <p className='text-sm min-w-fit '>Saved Projects</p>
+              <p className='text-sm min-w-fit '>Grants</p>
               <hr className='w-full border-dashed mt-3  border-imbue-lemon ' />
-              <p className='text-[22px] font-semibold text-black'>{savedProjectsCount || 0}</p>
+              <p className='text-[22px] font-semibold text-black'>{grants?.length || 0}</p>
             </div>
           </div>
         </div>
@@ -384,4 +377,4 @@ const Dashboard = (): JSX.Element => {
   );
 };
 
-export default Dashboard;
+export default FreelancerDashboard;

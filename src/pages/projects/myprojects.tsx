@@ -1,3 +1,4 @@
+import ArrowBackIcon from '@mui/icons-material/ChevronLeft';
 import { Divider } from '@mui/material';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -37,7 +38,7 @@ export default function Myprojects() {
           }
           case 'active': {
             const projects = await getFreelancerApplications(user.id);
-            const projectRes = projects.filter((item) => item.chain_project_id && !item.completed);
+            const projectRes = projects.filter((item) => item.chain_project_id && !item.completed && item.brief_id);
             setProjects(projectRes);
             break;
           }
@@ -47,20 +48,17 @@ export default function Myprojects() {
             setProjects(projectRes);
             break;
           }
-          // case 'saved': {
-          //   const projectRes = await getAllSavedBriefs(
-          //     itemsPerPage,
-          //     currentPage,
-          //     user?.id
-          //   ) as any
-          //   setProjects(projectRes);
-          //   break;
-          // }
+          case 'grants': {
+            const projects = await getFreelancerApplications(user.id);
+            const projectRes = projects.filter((item) => !item.brief_id && item.status_id === 4);
+            setProjects(projectRes);
+            break;
+          }
         }
       } catch (error) {
         // eslint-disable-next-line no-console
         console.log(error);
-      }finally {
+      } finally {
         setLoading(false);
       }
     };
@@ -75,7 +73,14 @@ export default function Myprojects() {
   };
 
   return (
-    <div className='bg-white rounded-3xl overflow-hidden pt-5'>
+    <div className='bg-white rounded-3xl overflow-hidden pt-5 relative'>
+      <div
+        onClick={() => router.back()}
+        className='border border-content group hover:bg-content rounded-full flex items-center justify-center cursor-pointer absolute left-5 top-10'
+      >
+        <ArrowBackIcon className='h-7 w-7 group-hover:text-white' color='secondary' />
+      </div>
+
       <div className='mx-2 border justify-between rounded-3xl flex cursor-pointer'>
         <p
           onClick={() => setSwitcher('completed')}
@@ -91,16 +96,16 @@ export default function Myprojects() {
         </p>
         <p
           onClick={() => setSwitcher('pending')}
-          className='text-2xl text-black py-5 text-center border-r w-full'
+          className='text-2xl text-black border-r py-5 text-center w-full'
         >
           Pending Projects
         </p>
-        {/* <p
-          onClick={() => setSwitcher('saved')}
-          className='text-2xl text-black border-r py-5 text-center w-full'
+        <p
+          onClick={() => setSwitcher('grants')}
+          className='text-2xl text-black py-5 text-center w-full'
         >
-          Saved Projects
-        </p> */}
+          Grants
+        </p>
       </div>
       <div className='mt-5 min-h-[300px]'>
         {
