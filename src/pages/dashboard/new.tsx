@@ -1,7 +1,7 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import { Badge } from '@mui/material';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { BiChevronDown, BiRightArrowAlt } from 'react-icons/bi';
 import { BsFilter } from 'react-icons/bs';
 import { MdOutlineAttachMoney } from 'react-icons/md';
@@ -18,11 +18,12 @@ import { fetchUser, getStreamChat } from '@/utils';
 import AreaGrah from '@/components/AreaGraph';
 import BriefsView from '@/components/Dashboard/V2/BriefsView';
 import FullScreenLoader from '@/components/FullScreenLoader';
+import { AppContext, AppContextType } from '@/components/Layout';
 import MessageComponent from '@/components/MessageComponent';
 
 import { Freelancer, Project, User } from '@/model';
 import { Brief } from '@/model';
-import { getFreelancerApplications } from '@/redux/services/freelancerService';
+import { getFreelancerApplications, getFreelancerProfile } from '@/redux/services/freelancerService';
 import { setUnreadMessage } from '@/redux/slices/userSlice';
 import { RootState } from '@/redux/store/store';
 
@@ -74,6 +75,28 @@ const FreelancerDashboard = (): JSX.Element => {
   const redirectToBriefApplications = (applicationId: string) => {
     router.push(`/briefs/${briefId}/applications/${applicationId}`);
   };
+
+  const { setProfileMode } = useContext(AppContext) as AppContextType
+
+  useEffect(() => {
+    setLoadingStreamChat(true)
+
+    const checkFreelancerProfile = async () => {
+      try {
+        const freelancer = await getFreelancerProfile(user?.username);
+        if (!freelancer?.id) {
+          setProfileMode('client')
+          router.push('/freelancers/new')
+        }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.log(error);
+      } finally {
+        setLoadingStreamChat(false);
+      }
+    }
+    checkFreelancerProfile()
+  }, [loadingUser, router, setProfileMode, user?.username]);
 
   useEffect(() => {
     const setupStreamChat = async () => {
@@ -138,7 +161,7 @@ const FreelancerDashboard = (): JSX.Element => {
   const [applications, setApplciations] = useState<Project[]>([])
 
   const completedProjects = applications.filter((app) => app.completed === true)
-  const activeProjects = applications.filter((app) => app.completed === false && app.chain_project_id && app.brief_id )
+  const activeProjects = applications.filter((app) => app.completed === false && app.chain_project_id && app.brief_id)
   const pendingProjects = applications.filter((app) => app.status_id === 1)
   const grants = applications.filter((app) => !app.brief_id && app.chain_project_id)
 

@@ -276,7 +276,10 @@ function NewNavbar() {
                       {profileView === 'client' ? (
                         <div
                           className='flex gap-2 items-center px-2 hover:bg-imbue-lime-light py-2 rounded-md '
-                          onClick={() => setProfileMode('freelancer')}
+                          onClick={() => {
+                            setProfileMode('freelancer')
+                            router.push('/dashboard')
+                          }}
                         >
                           <div className='border p-1 rounded-xl'>
                             <BiBuildings color='black' size={23} />
@@ -288,7 +291,10 @@ function NewNavbar() {
                       ) : (
                         <div
                           className='flex gap-2 items-center px-2 hover:bg-imbue-lime-light py-2 rounded-md '
-                          onClick={() => setProfileMode('client')}
+                          onClick={() => {
+                            setProfileMode('client')
+                            router.push('/dashboard')
+                          }}
                         >
                           <div className='border p-1 rounded-xl'>
                             <BiBuildings color='black' size={23} />

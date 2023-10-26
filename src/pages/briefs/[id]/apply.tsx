@@ -70,6 +70,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
+  const { profileView } = useContext(AppContext) as AppContextType
 
   const [applicationId, setapplicationId] = useState();
   const [error, setError] = useState<any>();
@@ -83,23 +84,23 @@ export const SubmitProposal = (): JSX.Element => {
   }, [applicationId]);
 
   useEffect(() => {
+    const getUserAndFreelancer = async () => {
+      const freelancer = await getFreelancerProfile(user?.username);
+      // if (!freelancer?.id) router.push(`/freelancers/new`);
+      setFreelancer(freelancer);
+
+      const userApplication: any = await getFreelancerBrief(user?.id, briefId);
+      if (userApplication && profileView === 'freelancer') {
+        router.push(`/briefs/${briefId}/applications/${userApplication?.id}/`);
+      }
+    };
+
     !loadingUser && getUserAndFreelancer();
-  }, [briefId, user?.username, loadingUser]);
+  }, [briefId, user?.username, loadingUser, profileView]);
 
   useEffect(() => {
     router?.isReady && getCurrentUserBrief();
   }, [user, router.isReady]);
-
-  const getUserAndFreelancer = async () => {
-    const freelancer = await getFreelancerProfile(user?.username);
-    if (!freelancer?.id) router.push(`/freelancers/new`);
-    setFreelancer(freelancer);
-
-    const userApplication: any = await getFreelancerBrief(user?.id, briefId);
-    if (userApplication) {
-      router.push(`/briefs/${briefId}/applications/${userApplication?.id}/`);
-    }
-  };
 
   const getCurrentUserBrief = async () => {
     if (briefId && user) {
@@ -276,7 +277,6 @@ export const SubmitProposal = (): JSX.Element => {
 
   // const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
 
-  const { profileView } = useContext(AppContext) as AppContextType
 
   if (loadingUser || loading) <FullScreenLoader />;
 

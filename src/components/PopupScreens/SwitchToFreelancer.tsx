@@ -53,7 +53,7 @@ const SwitchToFreelancer = () => {
             className='p-14 errorDialogue'
         >
             {
-                isFreelancer
+                !isFreelancer
                     ? (
                         <div className='my-auto flex flex-col gap-3 items-center p-8 text-content'>
                             <div className='f-modal-icon f-modal-error animate'>
