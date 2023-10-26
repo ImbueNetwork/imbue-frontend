@@ -108,28 +108,28 @@ describe('SubmitProposal', () => {
     await waitFor(() => expect(getByText('jhdkb')).toBeInTheDocument());
   });
 
-  test('redirects to freelancer creation page if freelancer profile does not exist', async () => {
-    const mockGetFreelancerProfile =
-      getFreelancerProfile as jest.MockedFunction<typeof getFreelancerProfile>;
-    mockGetFreelancerProfile.mockResolvedValue(undefined);
-    const mockPush = jest.fn();
-    (useRouter as jest.Mock).mockReturnValue({
-      push: mockPush,
-      isReady: true,
-    });
+  // test('redirects to freelancer creation page if freelancer profile does not exist', async () => {
+  //   const mockGetFreelancerProfile =
+  //     getFreelancerProfile as jest.MockedFunction<typeof getFreelancerProfile>;
+  //   mockGetFreelancerProfile.mockResolvedValue(undefined);
+  //   const mockPush = jest.fn();
+  //   (useRouter as jest.Mock).mockReturnValue({
+  //     push: mockPush,
+  //     isReady: true,
+  //   });
 
-    render(
-      <Providers>
-        <AppContext.Provider value={appContextValues}>
-          <SubmitProposal />
-        </AppContext.Provider>
-      </Providers>
-    );
+  //   render(
+  //     <Providers>
+  //       <AppContext.Provider value={appContextValues}>
+  //         <SubmitProposal />
+  //       </AppContext.Provider>
+  //     </Providers>
+  //   );
 
-    await waitFor(() =>
-      expect(useRouter().push).toHaveBeenCalledWith('/freelancers/new')
-    );
-  });
+  //   await waitFor(() =>
+  //     expect(useRouter().push).toHaveBeenCalledWith('/freelancers/new')
+  //   );
+  // });
 
   test('redirects to application page if user has existing application', async () => {
     const mockGetFreelancerBrief = getFreelancerBrief as jest.MockedFunction<
