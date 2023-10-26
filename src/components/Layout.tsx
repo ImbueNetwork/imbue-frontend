@@ -39,7 +39,7 @@ export interface LoginPopupContextType {
 
 export interface AppContextType {
   profileView?: ProfileMode;
-  setProfileView: (_value: ProfileMode) => void;
+  // setProfileView: (_value: ProfileMode) => void;
   setProfileMode: (_mode: ProfileMode) => void;
 }
 
@@ -95,8 +95,6 @@ function Layout({ children }: LayoutProps) {
   const setProfileMode = (mode: ProfileMode) => {
     localStorage.setItem('profileView', mode);
     setProfileView(mode);
-    if (mode === 'freelancer') router.push('/dashboard/new');
-    else router.push('/dashboard');
   };
 
   return (
@@ -115,7 +113,7 @@ function Layout({ children }: LayoutProps) {
             <AppContext.Provider
               value={{
                 profileView,
-                setProfileView,
+                // setProfileView,
                 setProfileMode
               }}
             >

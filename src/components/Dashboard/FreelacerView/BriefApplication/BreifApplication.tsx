@@ -19,9 +19,15 @@ const BreifApplication: React.FC<BreifApplicationProps> = ({
   const loadBrefApplicationValue = 10;
   const [loadValue, setValue] = useState(loadBrefApplicationValue);
   const redirectToApplication = (application: Project) => {
-    router.push(
-      `/briefs/${application.brief_id}/applications/${application.id}/`
-    );
+    if (application.chain_project_id)
+      router.push(
+        `/projects/${application.id}/`
+      );
+      
+    else
+      router.push(
+        `/briefs/${application.brief_id}/applications/${application.id}/`
+      );
   };
 
   const redirectToDiscoverBriefs = () => {
@@ -48,10 +54,10 @@ const BreifApplication: React.FC<BreifApplicationProps> = ({
       {applications?.map(
         (item: any, index: number) =>
           index <
-            Math.min(
-              applications.length,
-              Math.max(loadValue, loadBrefApplicationValue)
-            ) && (
+          Math.min(
+            applications.length,
+            Math.max(loadValue, loadBrefApplicationValue)
+          ) && (
             <>
               <div
                 key={item.id}
@@ -73,9 +79,8 @@ const BreifApplication: React.FC<BreifApplicationProps> = ({
                 </div>
                 <div className='flex pb-9 flex-row-reverse justify-between'>
                   <div
-                    className={`px-4 py-1 lg:py-2 w-fit rounded-full text-xs lg:text-base text-center ${
-                      OffchainProjectState[item?.status_id || 0]
-                    }-button `}
+                    className={`px-4 py-1 lg:py-2 w-fit rounded-full text-xs lg:text-base text-center ${OffchainProjectState[item?.status_id || 0]
+                      }-button `}
                   >
                     {displayState(item?.status_id || 0)}
                   </div>

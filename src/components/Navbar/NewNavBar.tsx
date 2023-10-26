@@ -100,7 +100,7 @@ function NewNavbar() {
   const navPillclasses =
     'text-imbue-purple-dark h-[3rem] bg-white  rounded-[5.07319rem] !flex justify-center items-center px-5 hover:no-underline !text-[1rem] ';
 
-  const { setProfileView, profileView, setProfileMode } = useContext(AppContext) as AppContextType
+  const { profileView, setProfileMode } = useContext(AppContext) as AppContextType
 
   return (
     <>

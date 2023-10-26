@@ -5,7 +5,7 @@ import { Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Filter from 'bad-words';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 
@@ -19,6 +19,8 @@ import AccountChoice from '@/components/AccountChoice';
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
+import { AppContext, AppContextType } from '@/components/Layout';
+import SwitchToFreelancer from '@/components/PopupScreens/SwitchToFreelancer';
 import SuccessScreen from '@/components/SuccessScreen';
 
 import * as config from '@/config';
@@ -273,6 +275,8 @@ export const SubmitProposal = (): JSX.Element => {
   };
 
   // const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
+
+  const { profileView } = useContext(AppContext) as AppContextType
 
   if (loadingUser || loading) <FullScreenLoader />;
 
@@ -554,9 +558,8 @@ export const SubmitProposal = (): JSX.Element => {
             title={disableSubmit && 'Please fill all the required input fields'}
           >
             <button
-              className={`primary-btn in-dark w-button ${
-                disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
-              }`}
+              className={`primary-btn in-dark w-button ${disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
+                }`}
               onClick={() => !disableSubmit && handleSubmit()}
             >
               Submit
@@ -615,6 +618,13 @@ export const SubmitProposal = (): JSX.Element => {
           </button>
         </div>
       </ErrorScreen>
+
+      {
+        profileView === 'client' && (
+          <SwitchToFreelancer />
+        )
+      }
+
     </div>
   );
 };
