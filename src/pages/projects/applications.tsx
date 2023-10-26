@@ -27,7 +27,7 @@ export default function Applications() {
       try {
         const Briefs = await getFreelancerApplications(user.id);
 
-        const projectRes = Briefs.filter((item) => item.status_id == status_id);
+        const projectRes = Briefs.filter((item) => item.status_id == status_id && !item.chain_project_id);
         setProjects(projectRes);
       } catch (error) {
         // eslint-disable-next-line no-console

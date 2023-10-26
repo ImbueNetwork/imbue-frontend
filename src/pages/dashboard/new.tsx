@@ -170,7 +170,7 @@ const FreelancerDashboard = (): JSX.Element => {
       try {
         const Briefs = await getFreelancerApplications(user.id);
 
-        const projectRes = Briefs.filter((item) => item.status_id == selectedOption.status_id);
+        const projectRes = Briefs.filter((item) => item.status_id == selectedOption.status_id && !item.chain_project_id);
         setFilteredApplications(projectRes);
       } catch (error) {
         // eslint-disable-next-line no-console
