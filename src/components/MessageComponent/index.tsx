@@ -1,6 +1,7 @@
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en.json';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import { DefaultGenerics, FormatMessageResponse } from 'stream-chat';
 
 TimeAgo.addLocale(en);
@@ -10,8 +11,18 @@ const timeAgo = new TimeAgo('en-US');
 export default function MessageComponent(
   props: FormatMessageResponse<DefaultGenerics>
 ) {
+  const router = useRouter();
+  const handleClick = () => {
+    router.push({
+      pathname: `/dashboard/messages`,
+      query: `chat=${props.cid?.split(':')[1]}`,
+    });
+  };
   return (
-    <div className='flex items-center text-black gap-5 text-sm'>
+    <div
+      onClick={handleClick}
+      className='flex items-center hover:bg-imbue-light-purple-three px-4 py-1 rounded-sm cursor-pointer text-black gap-5 text-sm'
+    >
       <Image
         className='w-14 h-14 mb-2 rounded-full'
         src={

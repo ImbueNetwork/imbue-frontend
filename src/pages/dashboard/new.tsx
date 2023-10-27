@@ -23,7 +23,10 @@ import MessageComponent from '@/components/MessageComponent';
 
 import { Freelancer, Project, User } from '@/model';
 import { Brief } from '@/model';
-import { getFreelancerApplications, getFreelancerProfile } from '@/redux/services/freelancerService';
+import {
+  getFreelancerApplications,
+  getFreelancerProfile,
+} from '@/redux/services/freelancerService';
 import { setUnreadMessage } from '@/redux/slices/userSlice';
 import { RootState } from '@/redux/store/store';
 
@@ -76,17 +79,17 @@ const FreelancerDashboard = (): JSX.Element => {
     router.push(`/briefs/${briefId}/applications/${applicationId}`);
   };
 
-  const { setProfileMode } = useContext(AppContext) as AppContextType
+  const { setProfileMode } = useContext(AppContext) as AppContextType;
 
   useEffect(() => {
-    setLoadingStreamChat(true)
+    setLoadingStreamChat(true);
 
     const checkFreelancerProfile = async () => {
       try {
         const freelancer = await getFreelancerProfile(user?.username);
         if (!freelancer?.id) {
-          setProfileMode('client')
-          router.push('/freelancers/new')
+          setProfileMode('client');
+          router.push('/freelancers/new');
         }
       } catch (error) {
         // eslint-disable-next-line no-console
@@ -94,8 +97,8 @@ const FreelancerDashboard = (): JSX.Element => {
       } finally {
         setLoadingStreamChat(false);
       }
-    }
-    checkFreelancerProfile()
+    };
+    checkFreelancerProfile();
   }, [loadingUser, router, setProfileMode, user?.username]);
 
   useEffect(() => {
@@ -158,12 +161,18 @@ const FreelancerDashboard = (): JSX.Element => {
     }
   }, [client, user?.getstream_token, user?.username, loadingStreamChat]);
 
-  const [applications, setApplciations] = useState<Project[]>([])
+  const [applications, setApplciations] = useState<Project[]>([]);
 
-  const completedProjects = applications.filter((app) => app.completed === true)
-  const activeProjects = applications.filter((app) => app.completed === false && app.chain_project_id && app.brief_id)
-  const pendingProjects = applications.filter((app) => app.status_id === 1)
-  const grants = applications.filter((app) => !app.brief_id && app.chain_project_id)
+  const completedProjects = applications.filter(
+    (app) => app.completed === true
+  );
+  const activeProjects = applications.filter(
+    (app) => app.completed === false && app.chain_project_id && app.brief_id
+  );
+  const pendingProjects = applications.filter((app) => app.status_id === 1);
+  const grants = applications.filter(
+    (app) => !app.brief_id && app.chain_project_id
+  );
 
   useEffect(() => {
     const getProjects = async () => {
@@ -176,15 +185,17 @@ const FreelancerDashboard = (): JSX.Element => {
   }, [user.id]);
 
   const options = [
-    { name: 'Approved', bg: "bg-[#90DB00]", status_id: 4 },
-    { name: 'Pending', bg: "bg-[#FF7A00]", status_id: 1 },
-    { name: 'Changes Required', bg: "bg-[#3B27C1]", status_id: 2 },
-    { name: 'Rejected', bg: "bg-[#FF7A00]", status_id: 3 },
+    { name: 'Approved', bg: 'bg-[#90DB00]', status_id: 4 },
+    { name: 'Pending', bg: 'bg-[#FF7A00]', status_id: 1 },
+    { name: 'Changes Required', bg: 'bg-[#3B27C1]', status_id: 2 },
+    { name: 'Rejected', bg: 'bg-[#FF7A00]', status_id: 3 },
   ];
 
-  const [selectedOption, setSelectedOption] = useState<typeof options[0]>(options[0]);
+  const [selectedOption, setSelectedOption] = useState<(typeof options)[0]>(
+    options[0]
+  );
   const [openedOption, setOpenedOption] = useState<boolean>(false);
-  const [filteredApplications, setFilteredApplications] = useState<Project[]>()
+  const [filteredApplications, setFilteredApplications] = useState<Project[]>();
 
   useEffect(() => {
     const getProjects = async () => {
@@ -193,11 +204,14 @@ const FreelancerDashboard = (): JSX.Element => {
       try {
         const Briefs = await getFreelancerApplications(user.id);
 
-        const projectRes = Briefs.filter((item) => item.status_id == selectedOption.status_id && !item.chain_project_id);
+        const projectRes = Briefs.filter(
+          (item) =>
+            item.status_id == selectedOption.status_id && !item.chain_project_id
+        );
         setFilteredApplications(projectRes);
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.log(error)
+        console.log(error);
       } finally {
         // setLoading(false)
       }
@@ -236,7 +250,9 @@ const FreelancerDashboard = (): JSX.Element => {
               <div className='w-1.5 h-1  rounded-full bg-imbue-coral' />
               <p className='text-sm min-w-fit '>Completed Projects</p>
               <hr className='w-full border-dashed mt-3  border-imbue-coral ' />
-              <p className='text-[22px] font-semibold text-black'>{completedProjects?.length || 0}</p>
+              <p className='text-[22px] font-semibold text-black'>
+                {completedProjects?.length || 0}
+              </p>
             </div>
           </div>
           <div className='mt-0.5'>
@@ -244,7 +260,9 @@ const FreelancerDashboard = (): JSX.Element => {
               <div className='w-1.5 h-1 rounded-full bg-imbue-purple' />
               <p className='text-sm min-w-fit '>Active Projects</p>
               <hr className='w-full border-dashed mt-3  border-imbue-purple ' />
-              <p className='text-[22px] font-semibold text-black'>{activeProjects?.length || 0}</p>
+              <p className='text-[22px] font-semibold text-black'>
+                {activeProjects?.length || 0}
+              </p>
             </div>
           </div>
           <div className='mt-0.5'>
@@ -252,7 +270,9 @@ const FreelancerDashboard = (): JSX.Element => {
               <div className='w-1.5 h-1 rounded-full bg-imbue-coral' />
               <p className='text-sm min-w-fit'>Pending Projects</p>
               <hr className='w-full border-dashed mt-3  border-t-imbue-coral ' />
-              <p className='text-[22px] font-semibold text-black'>{pendingProjects?.length || 0}</p>
+              <p className='text-[22px] font-semibold text-black'>
+                {pendingProjects?.length || 0}
+              </p>
             </div>
           </div>
           <div className='mt-0.5'>
@@ -260,7 +280,9 @@ const FreelancerDashboard = (): JSX.Element => {
               <div className='w-1.5 h-1 rounded-full bg-imbue-lemon' />
               <p className='text-sm min-w-fit '>Grants</p>
               <hr className='w-full border-dashed mt-3  border-imbue-lemon ' />
-              <p className='text-[22px] font-semibold text-black'>{grants?.length || 0}</p>
+              <p className='text-[22px] font-semibold text-black'>
+                {grants?.length || 0}
+              </p>
             </div>
           </div>
         </div>
@@ -274,31 +296,39 @@ const FreelancerDashboard = (): JSX.Element => {
               >
                 <div className={`${selectedOption.bg} w-1 h-1 rounded-full`} />{' '}
                 <p className='text-black text-sm'>{selectedOption.name}</p>
-                <BiChevronDown className={`ml-auto ${openedOption && "rotate-180"} `} color='black' size={18} />
+                <BiChevronDown
+                  className={`ml-auto ${openedOption && 'rotate-180'} `}
+                  color='black'
+                  size={18}
+                />
               </div>
 
-              <div className={`${!openedOption && "hidden"} bg-white absolute w-full rounded-md`}>
-                {
-                  options.map((option, index) => (
-                    <div
-                      key={index}
-                      className='flex items-center gap-2 p-2 cursor-pointer hover:bg-imbue-light-purple'
-                      onClick={() => {
-                        setSelectedOption(option)
-                        setOpenedOption(false)
-                      }}
-                    >
-                      <div className={`${option.bg} w-1 h-1 rounded-full`}></div>
-                      <p className='text-sm'>{option.name}</p>
-                    </div>
-                  ))
-                }
+              <div
+                className={`${
+                  !openedOption && 'hidden'
+                } bg-white absolute w-full rounded-md`}
+              >
+                {options.map((option, index) => (
+                  <div
+                    key={index}
+                    className='flex items-center gap-2 p-2 cursor-pointer hover:bg-imbue-light-purple'
+                    onClick={() => {
+                      setSelectedOption(option);
+                      setOpenedOption(false);
+                    }}
+                  >
+                    <div className={`${option.bg} w-1 h-1 rounded-full`}></div>
+                    <p className='text-sm'>{option.name}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
           <div>
             <div className='mb-2 flex'>
-              <p className='text-4xl font-semibold text-black'>{filteredApplications?.length}</p>
+              <p className='text-4xl font-semibold text-black'>
+                {filteredApplications?.length}
+              </p>
               {/* <div className='flex ml-3'>
                 <Image
                   className='rounded-full  w-9 h-9 object-cover'
@@ -328,7 +358,11 @@ const FreelancerDashboard = (): JSX.Element => {
               <p>Approved brief</p>
               <div
                 className='px-3 py-0.5 border text-black border-text-aux-colour rounded-full cursor-pointer'
-                onClick={() => router.push(`/projects/applications?status_id=${selectedOption.status_id}`)}
+                onClick={() =>
+                  router.push(
+                    `/projects/applications?status_id=${selectedOption.status_id}`
+                  )
+                }
               >
                 <BiRightArrowAlt size={22} className='-rotate-45' />
               </div>
@@ -356,7 +390,7 @@ const FreelancerDashboard = (): JSX.Element => {
         <BriefsView
           {...{
             setError,
-            currentUser: user
+            currentUser: user,
           }}
         />
         <div className='max-w-[25%] w-full rounded-md '>
@@ -386,7 +420,7 @@ const FreelancerDashboard = (): JSX.Element => {
                 <BiRightArrowAlt size={22} className='-rotate-45' />
               </div>
             </div>
-            <div className='px-3 bg-white py-3 rounded-3xl'>
+            <div className=' bg-white py-3 rounded-3xl'>
               {messageList?.map((item, index) => (
                 <MessageComponent key={'message-component' + index} {...item} />
               ))}

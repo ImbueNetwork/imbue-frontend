@@ -26,12 +26,12 @@ function DashboardChatBox({ client }: { client: StreamChat }) {
   const filters = client && { members: { $in: [String(client.user?.id)] } };
   const router = useRouter();
 
-  useEffect(() => {
-    if (router.query.chat && !channel) {
-      router.query.chat = [];
-      router.replace(router, undefined, { shallow: true });
-    }
-  }, [router.query.chat, channel, router]);
+  // useEffect(() => {
+  //   if (router.query.chat && !channel) {
+  //     router.query.chat = [];
+  //     router.replace(router, undefined, { shallow: true });
+  //   }
+  // }, [router.query.chat, channel, router]);
 
   const closeChat = () => {
     //for navigating back and front
@@ -57,6 +57,19 @@ function DashboardChatBox({ client }: { client: StreamChat }) {
       return username;
     };
 
+    useEffect(() => {
+      if (router.query.chat) {
+        const channleId = router.query.chat;
+        const targetChannle = channels.filter(
+          (item: any) => item.id === channleId
+        );
+        if (targetChannle.length) {
+          setChannel(targetChannle[0]);
+          setActiveChannel(targetChannle[0]);
+        }
+      }
+    }, []);
+
     const getUserPhoto = (index: string) => {
       const array: any = Object.values(channels[index]?.state?.members);
       let profile_photo = 'Not Found';
@@ -79,7 +92,6 @@ function DashboardChatBox({ client }: { client: StreamChat }) {
     const handleChatClick = (selectedChannel: any) => {
       setChannel(selectedChannel);
       setActiveChannel(selectedChannel);
-
       //for navigating back and front
       router.query.chat = selectedChannel.id;
       router.push(router, undefined, { shallow: true });

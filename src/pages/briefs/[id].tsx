@@ -53,7 +53,8 @@ const BriefDetails = (): JSX.Element => {
     experience_id: 0,
     number_of_briefs_submitted: 0,
     user_id: 0,
-    verified_only: false
+    verified_only: false,
+    owner_name: '',
   });
 
   // const [browsingUser, setBrowsingUser] = useState<User | null>(null);
@@ -65,7 +66,9 @@ const BriefDetails = (): JSX.Element => {
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   // const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
-  const { setShowLoginPopup } = useContext(LoginPopupContext) as LoginPopupContextType
+  const { setShowLoginPopup } = useContext(
+    LoginPopupContext
+  ) as LoginPopupContextType;
   const isOwnerOfBrief = browsingUser && browsingUser.id == brief.user_id;
   const [error, setError] = useState<any>();
 
@@ -107,10 +110,12 @@ const BriefDetails = (): JSX.Element => {
   }, [id, browsingUser.username]);
 
   const redirectToApply = () => {
-    if (browsingUser?.id)
-      router.push(`/briefs/${brief.id}/apply`);
+    if (browsingUser?.id) router.push(`/briefs/${brief.id}/apply`);
     else
-      setShowLoginPopup({ open: true, redirectURL: `/briefs/${brief.id}/apply` });
+      setShowLoginPopup({
+        open: true,
+        redirectURL: `/briefs/${brief.id}/apply`,
+      });
   };
 
   const handleMessageBoxClick = async () => {
@@ -123,8 +128,11 @@ const BriefDetails = (): JSX.Element => {
   };
 
   const saveBrief = async () => {
-
-    if (!browsingUser?.id) return setShowLoginPopup({ open: true, redirectURL: `/briefs/${brief.id}`});
+    if (!browsingUser?.id)
+      return setShowLoginPopup({
+        open: true,
+        redirectURL: `/briefs/${brief.id}`,
+      });
 
     const resp = await saveBriefData({
       ...brief,
@@ -160,14 +168,16 @@ const BriefDetails = (): JSX.Element => {
 
     return (
       <div
-        className={`transparent-conatainer !bg-imbue-light-purple-three relative ${showSimilarBrief ? '!pb-[3rem]' : ''
-          } `}
+        className={`transparent-conatainer !bg-imbue-light-purple-three relative ${
+          showSimilarBrief ? '!pb-[3rem]' : ''
+        } `}
       >
         <div className='flex justify-between w-full lg:px-[4rem] px-[1rem]'>
           <h3 className='text-imbue-purple-dark'>Similar projects on Imbue</h3>
           <div
-            className={`transition transform ease-in-out duration-600 ${showSimilarBrief && 'rotate-180'
-              } cursor-pointer`}
+            className={`transition transform ease-in-out duration-600 ${
+              showSimilarBrief && 'rotate-180'
+            } cursor-pointer`}
           >
             <ArrowIcon
               onClick={() => setShowSimilarBrief(!showSimilarBrief)}

@@ -3,6 +3,7 @@ import { Rating } from '@mui/material';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en.json';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import {
   AiOutlineCalendar,
   AiOutlineClockCircle,
@@ -17,13 +18,17 @@ import { VscVerified } from 'react-icons/vsc';
 import { Brief } from '@/model';
 
 TimeAgo.addLocale(en);
-
 const timeAgo = new TimeAgo('en-US');
 
 export default function BriefComponent({ brief }: { brief: Brief }) {
+  const router = useRouter();
+
   return (
-    <div className='flex border-b last:border-b-0'>
-      <div className='py-9 px-7 max-w-[70%] w-full'>
+    <div className='flex border-b hover:bg-imbue-light-purple-three cursor-pointer last:border-b-0'>
+      <div
+        onClick={() => router.push(`/briefs/${brief.id}`)}
+        className='py-9 px-7 max-w-[70%] w-full'
+      >
         <p className='text-2xl text-imbue-purple-dark'>{brief.headline}</p>
         <div className='flex text-sm text-imbue-dark-coral gap-5 mt-5'>
           <p className='px-3 flex items-center gap-1 rounded-xl py-1 bg-imbue-light-coral '>
@@ -45,20 +50,34 @@ export default function BriefComponent({ brief }: { brief: Brief }) {
         </div>
         <div className='mt-7'>
           <p className='text-black text-sm'>
-            {brief.description}
-            <span className='text-imbue-purple underline'>more</span>
+            {brief.description.length > 500
+              ? brief.description.substring(0, 500)
+              : brief.description}
+            {brief.description.length > 500 && (
+              <span className='text-imbue-purple ml-1 cursor-pointer underline'>
+                more
+              </span>
+            )}
           </p>
         </div>
         <div className='flex gap-2 mt-5'>
-          {brief.skills.map((item, index) => (
-            <p
-              key={'skills' + index}
-              className='text-imbue-purple flex items-center gap-1 bg-imbue-light-purple-three px-4 rounded-full py-1'
-            >
-              {item.name}
-              <AiOutlinePlus color='black' size={18} />
+          {[0, 1, 2, 3].map(
+            (item) =>
+              brief.skills.at(item) && (
+                <p
+                  key={'skills' + item}
+                  className='text-imbue-purple flex items-center gap-1 bg-imbue-light-purple-three px-4 rounded-full py-1'
+                >
+                  {brief.skills.at(item)?.name}
+                  <AiOutlinePlus color='black' size={18} />
+                </p>
+              )
+          )}
+          {brief.skills.length - 4 > 0 && (
+            <p className='text-imbue-purple flex items-center gap-1 bg-imbue-light-purple-three px-4 rounded-full py-1'>
+              {brief.skills.length - 4} more
             </p>
-          ))}
+          )}
         </div>
       </div>
       <div className='max-w-[30%] w-full py-7 border-l'>
@@ -71,7 +90,14 @@ export default function BriefComponent({ brief }: { brief: Brief }) {
             alt='profile'
           />
           <div>
-            <p className='text-black'>{brief.created_by}</p>
+            <p
+              onClick={() => {
+                router.push(`/profile/${brief.owner_name}`);
+              }}
+              className='text-black'
+            >
+              {brief.created_by}
+            </p>
             <p className='text-sm'>Company Hire</p>
           </div>
         </div>

@@ -740,6 +740,7 @@ export const fetchAllBriefs = () => (tx: Knex.Transaction) =>
       'briefs.duration_id',
       'budget',
       'users.display_name as created_by',
+      'users.username as owner_name',
       'experience_level',
       'briefs.experience_id',
       'briefs.created',
@@ -768,7 +769,8 @@ export const fetchAllBriefs = () => (tx: Knex.Transaction) =>
     .groupBy('users.display_name')
     .groupBy('briefs.experience_id')
     .groupBy('experience.experience_level')
-    .groupBy('users.id');
+    .groupBy('users.id')
+    .groupBy('users.username');
 
 export const fetchAllGrants = () => (tx: Knex.Transaction) =>
   tx
