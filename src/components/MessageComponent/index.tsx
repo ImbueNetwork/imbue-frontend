@@ -1,23 +1,27 @@
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en.json';
 import Image from 'next/image';
-import { useRouter } from 'next/router';
 import { DefaultGenerics, FormatMessageResponse } from 'stream-chat';
 
 TimeAgo.addLocale(en);
 
 const timeAgo = new TimeAgo('en-US');
 
-export default function MessageComponent(
-  props: FormatMessageResponse<DefaultGenerics>
-) {
-  const router = useRouter();
+export default function MessageComponent({
+  handleMessageClick,
+  props,
+}: {
+  props: FormatMessageResponse<DefaultGenerics>;
+  handleMessageClick: any;
+}) {
   const handleClick = () => {
-    router.push({
-      pathname: `/dashboard/messages`,
-      query: `chat=${props.cid?.split(':')[1]}`,
-    });
+    // router.push({
+    //   pathname: `/dashboard/messages`,
+    //   query: `chat=${props.cid?.split(':')[1]}`,
+    // });
+    handleMessageClick(props?.user?.id);
   };
+
   return (
     <div
       onClick={handleClick}

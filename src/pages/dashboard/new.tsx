@@ -16,12 +16,13 @@ import 'stream-chat-react/dist/css/v2/index.css';
 import { fetchUser, getStreamChat } from '@/utils';
 
 import AreaGrah from '@/components/AreaGraph';
+import ChatPopup from '@/components/ChatPopup';
 import BriefsView from '@/components/Dashboard/V2/BriefsView';
 import FullScreenLoader from '@/components/FullScreenLoader';
 import { AppContext, AppContextType } from '@/components/Layout';
 import MessageComponent from '@/components/MessageComponent';
 
-import { Freelancer, Project, User } from '@/model';
+import { Project, User } from '@/model';
 import { Brief } from '@/model';
 import {
   getFreelancerApplications,
@@ -62,10 +63,7 @@ const FreelancerDashboard = (): JSX.Element => {
 
   const dispatch = useDispatch();
 
-  const handleMessageBoxClick = async (
-    user_id: number,
-    _freelancer: Freelancer
-  ) => {
+  const handleMessageBoxClick = async (user_id: number) => {
     if (user_id) {
       setShowMessageBox(true);
       setTargetUser(await fetchUser(user_id));
@@ -422,12 +420,27 @@ const FreelancerDashboard = (): JSX.Element => {
             </div>
             <div className=' bg-white py-3 rounded-3xl'>
               {messageList?.map((item, index) => (
-                <MessageComponent key={'message-component' + index} {...item} />
+                <MessageComponent
+                  handleMessageClick={handleMessageBoxClick}
+                  key={'message-component' + index}
+                  props={item}
+                />
               ))}
             </div>
           </div>
         </div>
       </div>
+      {user && showMessageBox && (
+        <ChatPopup
+          {...{
+            showMessageBox,
+            setShowMessageBox,
+            browsingUser: user,
+            targetUser,
+          }}
+          showFreelancerProfile={false}
+        />
+      )}
     </div>
   ) : (
     <p>GETSTREAM_API_KEY not found</p>
