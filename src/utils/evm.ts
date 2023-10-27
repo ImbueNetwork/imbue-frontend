@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
+import { initWasm } from '@trustwallet/wallet-core';
+
 import { EVMContract } from '@/model';
-import { initWasm, TW, KeyStore } from '@trustwallet/wallet-core';
-import { ethers } from "ethers";
 
 export const getCoinType = async (currency: string) => {
   const core = await initWasm();
-  const { CoinType, HDWallet, AnySigner, HexCoding, Ethereum, AnyAddress } = core;
+  const { CoinType } = core;
 
   const currencyLookup: Record<string, any> = {
     "eth": CoinType.ethereum,
