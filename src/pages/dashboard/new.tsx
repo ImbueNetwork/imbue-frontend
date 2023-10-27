@@ -55,6 +55,7 @@ const FreelancerDashboard = (): JSX.Element => {
   const [messageList, setMessageList] = useState<
     FormatMessageResponse<DefaultGenerics>[] | null
   >();
+  
 
   const router = useRouter();
   const { briefId } = router.query;
