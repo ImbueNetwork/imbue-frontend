@@ -180,7 +180,7 @@ const FreelancerDashboard = (): JSX.Element => {
     };
 
     if (user?.id) getProjects();
-  }, [user.id]);
+  }, [user?.id]);
 
   const options = [
     { name: 'Approved', bg: 'bg-[#90DB00]', status_id: 4 },
@@ -216,7 +216,7 @@ const FreelancerDashboard = (): JSX.Element => {
     };
 
     if (user?.id) getProjects();
-  }, [selectedOption.status_id, user.id]);
+  }, [selectedOption.status_id, user?.id]);
 
   if (loadingStreamChat || loadingUser) return <FullScreenLoader />;
 
