@@ -6,6 +6,7 @@ import nextConnect from 'next-connect';
 import passport from 'passport';
 import { initWasm, TW, KeyStore } from '@trustwallet/wallet-core';
 import { ethers } from "ethers";
+import { getCoinType, getEVMContract } from '@/utils/evm';
 
 const WALLET_MNEMONIC = process.env.WALLET_MNEMONIC;
 const RPC_URL = process.env.ETH_RPC_URL;
@@ -16,22 +17,16 @@ export const generateAddress = async (projectId: number, targetCurrency: string)
   const core = await initWasm();
   const { CoinType, HDWallet, AnySigner, HexCoding, Ethereum, AnyAddress } = core;
 
-  const CURRENCY_COINTYPE_LOOKUP: Record<string, any> = {
-    "eth": CoinType.ethereum,
-    "usdt": CoinType.ethereum,
-    "atom": CoinType.cosmos,
-    "sol": CoinType.solana,
-    "matic": CoinType.polygon,
-    "dot": CoinType.polkadot,
-  };
+
   const wallet = HDWallet.createWithMnemonic(WALLET_MNEMONIC!, "");
-  const coinType = CURRENCY_COINTYPE_LOOKUP[targetCurrency.toLowerCase()];
+  const coinType = await getCoinType(targetCurrency);
   const key = wallet.getDerivedKey(coinType, projectId, 0, projectId);
   const pubKey = key.getPublicKey(coinType);
   const fromAddress = AnyAddress.createWithPublicKey(pubKey, coinType);
   // await transfer(projectId, "0x6aA5d09d205F1e283Fb3D04d89F51E33F6B22582", 0.005);
   // await transfer(projectId, targetCurrency, "0xF8aC9023D84a597Ea796AC7ca5C6032315Fc14dD", 0.005);
-  await transfer(projectId, targetCurrency, "0x2A6771f180F34E50A0b3301Bcb0A6CbF3804c037", 10);
+  const transferAmount = 10;
+  await transfer(projectId, targetCurrency, "0x2A6771f180F34E50A0b3301Bcb0A6CbF3804c037", transferAmount);
   return fromAddress.description();
 };
 
@@ -64,29 +59,82 @@ export const transfer = async (projectId: number, currency: string, destinationA
   const privateKeyHex = HexCoding.encode(key.data());
   const sender = new ethers.Wallet(privateKeyHex, provider);
   const fromAddress = address.description();
-  const balanceBefore = await provider.getBalance(fromAddress);
-  const balanceBefore2 = await provider.getBalance(destinationAddress);
 
+  console.log("**** from address is ");
+  console.log(fromAddress);
+
+  console.log("**** To address is ");
+  console.log(destinationAddress);
+
+
+  console.log("***** currency is ");
+  console.log(currency.toLowerCase());
+
+  console.log("***** amount is ");
+  console.log(amount);
 
   let tx: ethers.TransactionResponse;
-
-  switch (currency) {
+  switch (currency.toLowerCase()) {
     case "eth":
-      tx = await sender.sendTransaction({ to: destinationAddress, value: ethers.parseEther("0.002") });
+      console.log("**** running eth transaction");
+      tx = await sender.sendTransaction({ to: destinationAddress, value: ethers.parseEther(amount.toString()) });
+      console.log("**** tx now is ");
+      console.log(tx);
       break;
-    case "usdt":
-      tx = await sender.sendTransaction({ to: destinationAddress, value: ethers.parseEther("0.002") });
+    case "usdt": {
+      const contract = await getEVMContract(currency);
+
+      const transferABI = [
+        {
+          name: "transfer",
+          type: "function",
+          inputs: [
+            {
+              name: "_to",
+              type: "address",
+            },
+            {
+              type: "uint256",
+              name: "_tokens",
+            },
+          ],
+          constant: false,
+          outputs: [],
+          payable: false,
+        },
+      ];
+
+      const signer = await provider.getSigner();
+      const token = new ethers.Contract(contract.address, transferABI, signer);
+      console.log("**** token is ");
+      console.log(token);
+
+      const transferAmount = ethers.parseUnits(amount.toString(), contract.decimals);
+      console.log(`numberOfTokens: ${transferAmount}`)
+
+      await token
+        .transfer(destinationAddress, transferAmount)
+        .then((transferResult: any) => {
+          console.log("transferResult", transferResult);
+        })
+        .catch((error: any) => {
+          console.error("Error", error);
+        });
+      tx = await sender.sendTransaction({ to: destinationAddress, value: ethers.parseEther(amount.toString()) });
       break;
+    }
+
   }
 
-  console.log("**** destination address is ");
-  console.log(destinationAddress);
-  console.log(currency);
+
+
+
   if (tx) {
     console.log("Sent! 🎉");
     console.log(`TX hash: ${tx.hash}`);
     console.log("Waiting for receipt...");
     await provider.waitForTransaction(tx.hash, 1, 150000).then(() => { });
+    const txReceipt = await provider.getTransaction(tx.hash);
     console.log(`TX details: https://dashboard.tenderly.co/tx/sepolia/${tx.hash}\n`);
   }
 
@@ -101,7 +149,7 @@ export default nextConnect()
     if (!projectId || !WALLET_MNEMONIC) {
       return res.status(404);
     }
-    const targetCurrency = "eth";
+    const targetCurrency = "usdt";
     const address = await generateAddress(projectId, targetCurrency);
     return res.status(200).json(address);
   });

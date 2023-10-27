@@ -17,6 +17,11 @@ export enum OffchainProjectState {
   Completed = 6,
 }
 
+export type EVMContract = {
+  address: string,
+  decimals: number
+}
+
 export const applicationStatusId = [
   'Draft',
   'Pending Review',
