@@ -3,8 +3,6 @@ import { Badge } from '@mui/material';
 import { useRouter } from 'next/router';
 import React, { useContext, useEffect, useState } from 'react';
 import { BiChevronDown, BiRightArrowAlt } from 'react-icons/bi';
-import { BsFilter } from 'react-icons/bs';
-import { MdOutlineAttachMoney } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   DefaultGenerics,
@@ -15,7 +13,6 @@ import 'stream-chat-react/dist/css/v2/index.css';
 
 import { fetchUser, getStreamChat } from '@/utils';
 
-import AreaGrah from '@/components/AreaGraph';
 import ChatPopup from '@/components/ChatPopup';
 import BriefsView from '@/components/Dashboard/V2/BriefsView';
 import FullScreenLoader from '@/components/FullScreenLoader';
@@ -55,7 +52,6 @@ const FreelancerDashboard = (): JSX.Element => {
   const [messageList, setMessageList] = useState<
     FormatMessageResponse<DefaultGenerics>[] | null
   >();
-  
 
   const router = useRouter();
   const { briefId } = router.query;
@@ -368,7 +364,7 @@ const FreelancerDashboard = (): JSX.Element => {
             </div>
           </div>
         </div>
-        <div className=' py-5 px-5 flex flex-col rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full '>
+        {/* <div className=' py-5 px-5 flex flex-col rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full '>
           <div className='flex justify-between'>
             <p>Total Earnings</p>
             <div className='px-3 py-0.5 border text-black border-text-aux-colour rounded-full'>
@@ -382,7 +378,7 @@ const FreelancerDashboard = (): JSX.Element => {
             </div>
             <p className='text-text-grey'>Payout Accounts</p>
           </div>
-        </div>
+        </div> */}
       </div>
       {/* ending of the box sections */}
       <div className='mt-9 flex w-full gap-7'>
@@ -394,7 +390,7 @@ const FreelancerDashboard = (): JSX.Element => {
         />
         <div className='max-w-[25%] w-full rounded-md '>
           {/* Starting of graph */}
-          <div className='bg-imbue-light-grey px-0.5 rounded-3xl pb-0.5 '>
+          {/* <div className='bg-imbue-light-grey px-0.5 rounded-3xl pb-0.5 '>
             <div className='flex justify-between items-center py-7 px-7'>
               <p className='text-[#747474]'>Analytics</p>
               <BsFilter size={27} color='black' />
@@ -405,9 +401,9 @@ const FreelancerDashboard = (): JSX.Element => {
               </p>
               <AreaGrah />
             </div>
-          </div>
+          </div> */}
           {/* End of graph */}
-          <div className='bg-imbue-light-grey px-0.5 mt-14 rounded-3xl pb-0.5 '>
+          <div className='bg-imbue-light-grey px-0.5  rounded-3xl pb-0.5 '>
             <div className='flex justify-between items-center py-4 px-7'>
               <Badge badgeContent={unreadMessages} color='error'>
                 <p className='text-[#747474]'>Messaging</p>
