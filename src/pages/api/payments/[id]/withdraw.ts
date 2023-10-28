@@ -12,15 +12,16 @@ import { fetchProjectById, fetchProjectMilestones } from '@/lib/models';
 import { getEVMContract } from '@/utils/evm';
 
 import db from '@/db';
+import { Currency } from '@/model';
 
 const WALLET_MNEMONIC = process.env.WALLET_MNEMONIC;
 const RPC_URL = process.env.ETH_RPC_URL;
 
-export const transfer = async (projectId: number, currency: string, destinationAddress:string, amount: number) => {
+export const transfer = async (projectId: number, currency: string, destinationAddress: string, amount: number) => {
   const provider = new ethers.JsonRpcProvider(RPC_URL);
   const core = await initWasm();
   const { CoinType, HDWallet, HexCoding } = core;
-  if(!WALLET_MNEMONIC) {
+  if (!WALLET_MNEMONIC) {
     return new Error(`Wallet Mnemonic not populated`);
   }
 
@@ -97,22 +98,22 @@ export default nextConnect()
     await db.transaction(async (tx: any) => {
       try {
         project = await fetchProjectById(Number(projectId))(tx);
-        const milestones = await fetchProjectMilestones(projectId)(tx);
 
-        const freelancerAddress = "0x2A6771f180F34E50A0b3301Bcb0A6CbF3804c037";
-        const targetCurrency = "usdt";
-
-        // TODO: Check on chain for approved milestones 
-        // TODO: Check off chain for non withdrawn milestones and calculate sum
-        const withdrawnAmount = milestones.filter(milestone => milestone.is_approved)
-                        .reduce((sum, milestone) => sum + Number(milestone.amount), 0);
-
-        transfer(projectId,targetCurrency,freelancerAddress,withdrawnAmount);
         if (!project || !WALLET_MNEMONIC) {
           return res.status(404).end();
         }
 
+        const milestones = await fetchProjectMilestones(projectId)(tx);
 
+        const freelancerAddress = "0x2A6771f180F34E50A0b3301Bcb0A6CbF3804c037";
+        const targetCurrency = Currency[project?.currency_id];
+
+        // TODO: Check on chain for approved milestones 
+        // TODO: Check off chain for non withdrawn milestones and calculate sum
+        const withdrawnAmount = milestones.filter(milestone => milestone.is_approved && !milestone.withdrawn)
+          .reduce((sum, milestone) => sum + Number(milestone.amount), 0);
+
+        transfer(projectId, targetCurrency, freelancerAddress, withdrawnAmount);
       } catch (e) {
         res.status(401).json({
           status: 'Failed',

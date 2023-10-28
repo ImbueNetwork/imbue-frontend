@@ -99,6 +99,8 @@ export type Milestone = ProposedMilestone & {
   milestone_index: number;
   project_id: number | string;
   is_approved: boolean;
+  withdrawn: boolean;
+  withdrawn_transaction_hash: string;
 };
 
 export type MilestoneDetails = {

@@ -97,13 +97,14 @@ class ChainService {
     currencyId: number,
     milestones: any[]
   ): Promise<BasicTxResponse> {
+    const currency = currencyId < 100 ? currencyId : {ForeignAsset: currencyId };
     const extrinsic = this.imbueApi.imbue.api.tx.imbueBriefs.createBrief(
       briefOwners,
       freelancerAddress,
       budget,
       initialContribution,
       briefHash,
-      currencyId,
+      currency,
       milestones
     );
     return await this.submitImbueExtrinsic(
