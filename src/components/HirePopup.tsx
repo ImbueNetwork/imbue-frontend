@@ -242,7 +242,7 @@ export const HirePopup = ({
               <p className='text-lg'>Amount Received</p>
             </div>
             <div className='budget-value'>
-              ${Number?.(amountDue?.toFixed?.(2))?.toLocaleString?.()}
+              {Number?.(amountDue?.toFixed?.(2))?.toLocaleString?.()} ${Currency[application.currencyId]}
             </div>
           </div>
         </div>

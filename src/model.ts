@@ -4,6 +4,9 @@ export enum Currency {
   // AUSD = 2,
   // KAR = 3,
   MGX = 4,
+  // Anything over 100 should be multichain 
+  ETH = 100,
+  USDT = 101,
 }
 
 // ONCHAIN PROJECT STATE
@@ -79,9 +82,9 @@ export enum ImbueChainPollResult {
 }
 
 export type VotesResp = {
-    yes: User[];
-    no: User[];
-    pending: User[];
+  yes: User[];
+  no: User[];
+  pending: User[];
 }
 
 export type Project = {

@@ -485,7 +485,7 @@ export const SubmitProposal = (): JSX.Element => {
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-light-purple-two font-normal'>
-              ${Number(totalCostMinusFee.toFixed(2)).toLocaleString()}
+              {Number(totalCostMinusFee.toFixed(2)).toLocaleString()} ${Currency[currencyId]}
             </div>
           </div>
         </div>

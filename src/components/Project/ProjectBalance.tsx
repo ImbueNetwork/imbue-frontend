@@ -23,11 +23,19 @@ const Currencies = [
         name: "KSM",
         currencyId: 1
     },
-    // {AUSD : 2},
-    // {KAR : 3},
     {
         name: "MGX",
         currencyId: 4
+    },
+
+    // Anything over 100 should be multichain 
+    {
+        name: "ETH",
+        currencyId: 100
+    },
+    {
+        name: "USDT",
+        currencyId: 101
     },
 ]
 

@@ -90,6 +90,15 @@ const GrantApplication = (): JSX.Element => {
     !user.id && !userLoading && router.push('/');
   }, [user.id, userLoading, router]);
 
+
+  useEffect(() => {
+    console.log("***** blah");
+    console.log(currencies);
+    console.log(currencyId);
+    console.log(Currency[currencyId])
+  });
+
+
   const durationOptions = timeData.sort((a, b) =>
     a.value > b.value ? 1 : a.value < b.value ? -1 : 0
   );
@@ -307,6 +316,7 @@ const GrantApplication = (): JSX.Element => {
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     milestoneIndex: number | undefined = undefined
   ) => {
+
     const { titleRes, descriptionRes, milestonesRes, errors } =
       handleApplicationInput(
         event,
@@ -450,7 +460,7 @@ const GrantApplication = (): JSX.Element => {
       <div className='rounded-[20px] bg-background'>
         <div className='flex justify-between text-[20px] text-content px-6 lg:px-12 py-5 border-b border-imbue-light-purple'>
           <p>Approvers</p>
-          <div>{`Total grant: ${amountDue} ${currencies[currencyId]}`}</div>
+          <div>{`Total grant: ${amountDue} ${Currency[currencyId]}`}</div>
         </div>
         <div className='flex flex-col lg:flex-row justify-between px-6 lg:px-12 py-8 text-base leading-[1.2] border-b border-b-imbue-light-purple items-start'>
           <div className='flex flex-col gap-8 w-full lg:w-1/2'>
@@ -712,8 +722,8 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${
-                  currencies[currencyId]
+                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} $${
+                  Currency[currencyId]
                 }`}
               </div>
             </div>
@@ -734,8 +744,8 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${
-                  currencies[currencyId]
+                {`${Number(imbueFee.toFixed(2)).toLocaleString()} $${
+                  Currency[currencyId]
                 }`}
               </div>
             </div>
@@ -747,7 +757,9 @@ const GrantApplication = (): JSX.Element => {
                 <p className='text-lg lg:text-xl text-content m-0 p-0'>Amount Received</p>
               </div>
               <div className='text-content-primary'>
-                ${Number(amountDue.toFixed(2)).toLocaleString()}
+                {Number(amountDue.toFixed(2)).toLocaleString()} ${
+                  Currency[currencyId]
+                }
               </div>
             </div>
           </div>
