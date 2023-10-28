@@ -90,15 +90,6 @@ const GrantApplication = (): JSX.Element => {
     !user.id && !userLoading && router.push('/');
   }, [user.id, userLoading, router]);
 
-
-  useEffect(() => {
-    console.log("***** blah");
-    console.log(currencies);
-    console.log(currencyId);
-    console.log(Currency[currencyId])
-  });
-
-
   const durationOptions = timeData.sort((a, b) =>
     a.value > b.value ? 1 : a.value < b.value ? -1 : 0
   );
@@ -106,12 +97,6 @@ const GrantApplication = (): JSX.Element => {
   const currencies = Object.keys(Currency).filter(
     (key: any) => !isNaN(Number(Currency[key]))
   );
-
-  // const onAddApprover = () => {
-  //   if (!newApprover) return;
-  //   setApprovers([...approvers, newApprover]);
-  //   setNewApprover('');
-  // };
 
   const imbueFeePercentage = 5;
   const totalCostWithoutFee = milestones.reduce(

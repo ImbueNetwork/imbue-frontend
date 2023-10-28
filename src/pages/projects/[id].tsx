@@ -649,7 +649,7 @@ function Project() {
                   <p className='text-black'>Total Funding</p>
                   <p className='text-imbue-purple-dark text-xl'>
                     {project.total_cost_without_fee}{' '}
-                    {Currency[project.currency_id || 0]}
+                    ${Currency[project.currency_id || 0]}
                   </p>
                 </div>
               </div>

@@ -148,6 +148,8 @@ export type Milestone = {
   is_approved: boolean;
   amount: number;
   description: string;
+  withdrawn: boolean;
+  withdrawn_transaction_hash: string;
 };
 
 export type Contribution = {

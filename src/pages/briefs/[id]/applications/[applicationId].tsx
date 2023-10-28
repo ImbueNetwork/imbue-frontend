@@ -637,7 +637,7 @@ const ApplicationPreview = (): JSX.Element => {
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-light-purple-two font-normal'>
-              ${Number(amountDue.toFixed(2))?.toLocaleString?.()}
+              {Number(amountDue.toFixed(2))?.toLocaleString?.()} ${Currency[currencyId]}
             </div>
           </div>
         </div>

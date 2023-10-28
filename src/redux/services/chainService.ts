@@ -71,10 +71,11 @@ class ChainService {
     teasury: string,
     grantID: string
   ): Promise<BasicTxResponse> {
+    const currency = currencyId < 100 ? currencyId : {ForeignAsset: currencyId };
     const extrinsic = this.imbueApi.imbue.api.tx.imbueGrants.createAndConvert(
       milestones,
       approvers,
-      currencyId,
+      currency,
       amount * 1e12,
       teasury,
       grantID
