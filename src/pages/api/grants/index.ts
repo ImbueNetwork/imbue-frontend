@@ -43,7 +43,6 @@ export default nextConnect()
   })
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
     const grant: Grant = req.body as Grant;
-
     const filter = new Filter();
     const userAuth: Partial<User> | any = await authenticate('jwt', req, res);
     verifyUserIdFromJwt(req, res, [userAuth.id]);

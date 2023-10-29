@@ -60,6 +60,7 @@ const GrantApplication = (): JSX.Element => {
   });
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
+  const [paymentAddress, setPaymentAddress] = useState<string>('');
   const [escrowAddress, setEscrowAddress] = useState<string>('');
   const [approvers, setApprovers] = useState<string[]>([]);
   // const [newApprover, setNewApprover] = useState<string>();
@@ -190,6 +191,7 @@ const GrantApplication = (): JSX.Element => {
         total_cost_without_fee: totalCostWithoutFee,
         imbue_fee: imbueFee,
         chain_project_id: projectId,
+        payment_address: paymentAddress,
         milestones: milestones.map((milestone) => ({
           ...milestone,
           name: filter.clean(milestone.name),
@@ -230,7 +232,7 @@ const GrantApplication = (): JSX.Element => {
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
-   
+
             const resp = await fetch(`${config.apiBase}grants`, {
               headers: config.postAPIHeaders,
               method: 'post',
@@ -312,17 +314,19 @@ const GrantApplication = (): JSX.Element => {
     milestoneIndex: number | undefined = undefined
   ) => {
 
-    const { titleRes, descriptionRes, milestonesRes, errors } =
+    const { titleRes, descriptionRes, milestonesRes, paymentAddressRes, errors } =
       handleApplicationInput(
         event,
         milestoneIndex,
         inputErrors,
         milestones,
         title,
-        description
+        description,
+        paymentAddress
       );
     setTitle(titleRes);
     setDescription(descriptionRes);
+    setPaymentAddress(paymentAddressRes);
     setMilestones(milestonesRes);
     setInputErrors(errors);
   };
@@ -556,6 +560,20 @@ const GrantApplication = (): JSX.Element => {
                     </option>
                   ))}
                 </select>
+              </div>
+            </div>
+            <div>
+              <p className='text-lg text-content m-0 p-0'>Payment Address:</p>
+              <div>
+                <input
+                  autoComplete='off'
+                  value={paymentAddress}
+                  maxLength={50}
+                  placeholder='Address to receive payment'
+                  onChange={handleChange}
+                  name='mainPaymentAddress'
+                  className='bg-transparent border border-imbue-purple rounded-md p-4 placeholder:text-imbue-light-purple text-imbue-purple outline-content-primary mt-4'
+                />
               </div>
             </div>
           </div>

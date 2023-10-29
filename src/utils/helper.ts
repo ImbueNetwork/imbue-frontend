@@ -21,6 +21,7 @@ export interface MilestoneError {
 interface InputErrorType {
   title?: string;
   description?: string;
+  paymentAddress?: string;
   approvers?: string;
   milestones: Array<{ name?: string; amount?: string; description?: string }>;
 }
@@ -282,7 +283,8 @@ export const handleApplicationInput = (
   inputErrors: InputErrorType,
   milestones: any,
   title: string,
-  description: string
+  description: string,
+  paymentAddress: string
 ) => {
   const { name, value } = event.target;
 
@@ -305,6 +307,19 @@ export const handleApplicationInput = (
       description = value;
       if (validateInputLength(value, 50, 5000)) {
         newInputErrors = { ...inputErrors, description: '' };
+      } else {
+        newInputErrors = {
+          ...inputErrors,
+          description:
+            'Grant description should be between 50 - 5000 characters',
+        };
+      }
+      break;
+    case 'mainPaymentAddress':
+      // TODO: Validate address based on currency id 
+      paymentAddress = value;
+      if (validateInputLength(value, 10, 5000)) {
+        newInputErrors = { ...inputErrors, paymentAddress: '' };
       } else {
         newInputErrors = {
           ...inputErrors,
@@ -390,6 +405,7 @@ export const handleApplicationInput = (
     titleRes: title,
     descriptionRes: description,
     milestonesRes: milestones,
+    paymentAddressRes: paymentAddress,
     errors,
   };
 };

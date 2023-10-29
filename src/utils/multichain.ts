@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 /* eslint-disable no-console */
 import { initWasm } from '@trustwallet/wallet-core';
 import { CoinType } from '@trustwallet/wallet-core/dist/src/wallet-core';
@@ -110,7 +111,7 @@ export const generateAddress = async (projectId: number, currencyId: number) => 
   return projectAddress.description();
 };
 
-export const transfer = async (projectId: number, currencyId: number, destinationAddress: string, amount: number) => {
+export const withdraw = async (projectId: number, currencyId: number, destinationAddress: string, amount: number) => {
   const ethProvider = new ethers.JsonRpcProvider(RPC_URL);
   const core = await initWasm();
   const { CoinType, HDWallet, HexCoding } = core;
@@ -118,6 +119,7 @@ export const transfer = async (projectId: number, currencyId: number, destinatio
     return new Error(`Wallet Mnemonic not populated`);
   }
   const currency = Currency[currencyId];
+  const treasuryAddress = generateAddress(0,currencyId);
   const CURRENCY_COINTYPE_LOOKUP: Record<string, any> = {
     "eth": CoinType.ethereum,
     "usdt": CoinType.ethereum,
@@ -132,15 +134,30 @@ export const transfer = async (projectId: number, currencyId: number, destinatio
   const privateKeyHex = HexCoding.encode(key.data());
   const sender = new ethers.Wallet(privateKeyHex, ethProvider);
   let tx: any;
+  let fee_transaction_hash: any;
   switch (currency.toLowerCase()) {
     case "eth":
-      tx = await sender.sendTransaction({ to: destinationAddress, value: ethers.parseEther(amount.toString()) });
+      const imbueFee = (amount * 0.05 * 1e18);
+      const transferAmount = (amount * 1e18) - imbueFee;
+      fee_transaction_hash = await sender.sendTransaction({ to: treasuryAddress, value: imbueFee });
+      tx = await sender.sendTransaction({ to: destinationAddress, value: transferAmount });
       break;
     case "usdt": {
       const contract = await getEVMContract(currencyId);
       const signer = await ethProvider.getSigner();
       const token = new ethers.Contract(contract.address, ERC_20_ABI, signer);
-      const transferAmount = ethers.parseUnits(amount.toString(), contract.decimals);
+      const imbueFee = amount * 0.05 * contract.decimals;
+      const transferAmount = (amount * contract.decimals) - imbueFee;
+
+      await token
+        .transfer(treasuryAddress, imbueFee)
+        .then(async (transferResult: any) => {
+          fee_transaction_hash = await transferResult;
+        })
+        .catch((error: any) => {
+          console.error("Error", error);
+        });
+
       await token
         .transfer(destinationAddress, transferAmount)
         .then(async (transferResult: any) => {
@@ -158,5 +175,6 @@ export const transfer = async (projectId: number, currencyId: number, destinatio
   await ethProvider.waitForTransaction(tx.hash, 1, 150000);
 
   //TODO: UPDATE MILESTONE TO HIGHLIGHT WITHDRAWN HASH
+  console.log(`imbue fee TX details: https://dashboard.tenderly.co/tx/sepolia/${fee_transaction_hash.hash}\n`);
   console.log(`TX details: https://dashboard.tenderly.co/tx/sepolia/${tx.hash}\n`);
 }

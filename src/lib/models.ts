@@ -93,6 +93,7 @@ export type Grant = {
   approvers: GrantApprover[];
   chain_project_id: number;
   escrow_address: string;
+  payment_address: string;
 };
 
 export type Milestone = ProposedMilestone & {
@@ -131,6 +132,7 @@ export type Project = {
   completed?: boolean;
   first_pending_milestone?: number;
   project_in_voting_of_no_confidence?: boolean;
+  payment_address: string;
 };
 
 export type ProjectProperties = {
@@ -1694,6 +1696,7 @@ export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
     user_id,
     escrow_address,
     duration_id,
+    payment_address
   } = grant;
   const project = await insertProject({
     name: title,
@@ -1711,6 +1714,7 @@ export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
     imbue_fee,
     duration_id,
     status_id: ProjectStatus.Accepted,
+    payment_address
     // project_type: project_type ?? models.ProjectType.Brief
   })(tx);
 

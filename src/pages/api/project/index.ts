@@ -33,6 +33,7 @@ export default nextConnect()
       imbue_fee,
       duration_id,
       verified_only,
+      payment_address,
       // project_type,
     } = req.body;
 
@@ -71,6 +72,7 @@ export default nextConnect()
           total_cost_without_fee,
           imbue_fee,
           duration_id,
+          payment_address
           // project_type: project_type ?? models.ProjectType.Brief
         })(tx);
 
