@@ -204,7 +204,7 @@ export default function ClientDashboard() {
           <div className='pb-16 '>
             <Controller />
           </div>
-          {recomdedFreelancer.map((item) => (
+          {recomdedFreelancer?.map((item) => (
             <SwiperSlide key={'freelancer' + item.id}>
               <FreelancerCard
                 freelancer={item}
