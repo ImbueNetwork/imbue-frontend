@@ -94,6 +94,7 @@ const Dashboard = (): JSX.Element => {
 
   return client ? (
     <div className='px-[15px]'>
+      
       <ClientDashboard />
       <LoginPopup
         visible={loginModal}
