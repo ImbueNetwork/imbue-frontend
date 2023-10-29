@@ -26,14 +26,14 @@ export default function FreelancerCard({
         />
         <div
           className='cursor-pointer'
-          onClick={() => router.push(`/freelancers/${freelancer.username}`)}
+          onClick={() => router.push(`/freelancers/${freelancer?.username}`)}
         >
           <p className='text-imbue-purple-dark  text-2xl'>
-            {freelancer.display_name.substring(0, 15)}.
+            {freelancer?.display_name?.substring(0, 15)}.
           </p>
           <p className='text-sm text-[#494949]'>
-            {freelancer.title.substring(0, 20)}
-            {freelancer.title.length > 20 && '...'}
+            {freelancer?.title?.substring(0, 20)}
+            {freelancer?.title?.length > 20 && '...'}
           </p>
         </div>
         <p className='flex ml-auto bg-imbue-lime-light text-imbue-purple px-3 py-1 text-sm rounded-full gap-1 items-center'>
@@ -52,7 +52,7 @@ export default function FreelancerCard({
       <div className='flex text-xs gap-5'>
         {[1, 2, 3, 4].map(
           (item: number, index: number) =>
-            index < freelancer.skills.length && (
+            index < freelancer?.skills?.length && (
               <p
                 key={item}
                 className='bg-imbue-light-grey gap-0.5 flex items-center text-black px-2 py-1 rounded-full'
@@ -61,13 +61,13 @@ export default function FreelancerCard({
                   size={16}
                   className='rotate-180 text-[#404040]'
                 />
-                {freelancer.skills.at(index)?.name}
+                {freelancer?.skills?.at(index)?.name}
               </p>
             )
         )}
-        {freelancer.skills.length > 4 && (
+        {freelancer?.skills?.length > 4 && (
           <p className='border px-2 py-1  rounded-full'>
-            + {freelancer.skills.length - 4}
+            + {freelancer?.skills?.length - 4}
           </p>
         )}
       </div>
@@ -81,7 +81,7 @@ export default function FreelancerCard({
           />
         </p>
         <p
-          onClick={() => handleMessage(freelancer.user_id)}
+          onClick={() => handleMessage(freelancer?.user_id)}
           className='bg-imbue-purple flex items-center gap-1 justify-center  px-7 py-2 w-full text-white text-sm rounded-full cursor-pointer'
         >
           Connect Freelancer
