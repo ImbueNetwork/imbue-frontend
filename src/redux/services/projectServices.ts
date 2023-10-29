@@ -335,3 +335,24 @@ export const getProjectBalance = async (
     };
   }
 };
+
+
+export const getProjectEscrowAddress = async (
+  projectId: number,
+) => {
+  try {
+    const resp = await fetch(
+      `${config.apiBase}/payments/${projectId}/address`,
+      {
+        headers: config.postAPIHeaders,
+        method: 'get',
+      }
+    );
+
+    return resp.json();
+  } catch (error) {
+    return {
+      message: 'Failed to get voters. status:' + error,
+    };
+  }
+};

@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 import ChainService from '@/redux/services/chainService';
+import { getProjectBalance } from '@/redux/services/projectServices';
 
 import { initImbueAPIInfo } from './polkadot';
-import { getProjectBalance } from '@/redux/services/projectServices';
 const { decodeAddress, encodeAddress } = require('@polkadot/keyring');
 const { hexToU8a, isHex } = require('@polkadot/util');
 
@@ -82,8 +82,7 @@ export const getBalance = async (
   projectId?: number
 ) => {
   try {
-
-    if(currency_id < 100 || !projectId) {
+    if(!projectId) {
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);
   

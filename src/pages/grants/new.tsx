@@ -30,6 +30,7 @@ import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
 import { Currency, OffchainProjectState } from '@/model';
 import ChainService from '@/redux/services/chainService';
+import { getProjectEscrowAddress } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 interface MilestoneItem {
@@ -104,7 +105,7 @@ const GrantApplication = (): JSX.Element => {
     0
   );
   const imbueFee = (totalCostWithoutFee * imbueFeePercentage) / 100;
-  const amountDue =  totalCostWithoutFee - imbueFee;
+  const amountDue = totalCostWithoutFee - imbueFee;
 
   const onAddMilestone = () => {
     setMilestones([
@@ -229,7 +230,7 @@ const GrantApplication = (): JSX.Element => {
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
-            setEscrowAddress(result?.eventData[5]);
+   
             const resp = await fetch(`${config.apiBase}grants`, {
               headers: config.postAPIHeaders,
               method: 'post',
@@ -255,15 +256,24 @@ const GrantApplication = (): JSX.Element => {
             });
 
             if (resp.status === 200 || resp.status === 201) {
-              const { grant_id } = (await resp.json()) as any;
-              setProjectId(grant_id);
+              const { grant_id: grantId } = (await resp.json()) as any;
+              setProjectId(grantId);
+
+
+              if (currencyId < 100) {
+                setEscrowAddress(result?.eventData[5]);
+              } else {
+                const offchainProjectAddress = await getProjectEscrowAddress(grantId);
+                setEscrowAddress(offchainProjectAddress);
+              }
+
               setSuccess(true);
               await sendNotification(
                 grant.approvers,
                 'AddApprovers.testing',
                 'You were invited as an Approver',
                 `Please review and provide your feedback.`,
-                grant_id
+                grantId
               );
             } else {
               const errorBody = await resp.json();
@@ -631,9 +641,8 @@ const GrantApplication = (): JSX.Element => {
                                   ''}
                               </p>
                               <div className='text-imbue-purple text-sm ml-auto text-right'>
-                                {`${
-                                  milestones[index].description?.length || 0
-                                }/5000`}
+                                {`${milestones[index].description?.length || 0
+                                  }/5000`}
                               </div>
                             </div>
                           </div>
@@ -707,9 +716,8 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} $${
-                  Currency[currencyId]
-                }`}
+                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} $${Currency[currencyId]
+                  }`}
               </div>
             </div>
 
@@ -729,9 +737,8 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(imbueFee.toFixed(2)).toLocaleString()} $${
-                  Currency[currencyId]
-                }`}
+                {`${Number(imbueFee.toFixed(2)).toLocaleString()} $${Currency[currencyId]
+                  }`}
               </div>
             </div>
 
@@ -759,9 +766,8 @@ const GrantApplication = (): JSX.Element => {
         >
           <button
             // disabled={!formDataValid}
-            className={`primary-btn in-dark w-button ${
-              disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
-            }`}
+            className={`primary-btn in-dark w-button ${disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
+              }`}
             onClick={() => !disableSubmit && handleSubmit()}
           >
             Submit
@@ -814,9 +820,8 @@ const GrantApplication = (): JSX.Element => {
           </button>
         </div>
         <Alert
-          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${
-            copied ? 'flex' : 'hidden'
-          }`}
+          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${copied ? 'flex' : 'hidden'
+            }`}
           severity='success'
         >
           Grant Wallet Address Copied to clipboard

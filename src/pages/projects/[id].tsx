@@ -332,11 +332,6 @@ function Project() {
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);
       const onChainProjectRes = await chainService.getProject(projectId);
-      console.log(
-        '🚀 ~ file: [id].tsx:330 ~ syncProject ~ onChainProjectRes:',
-        onChainProjectRes
-      );
-
       if (onChainProjectRes?.projectInVotingOfNoConfidence) {
         const noConfidenceVotesChain = await chainService.getNoConfidenceVoters(
           project.chain_project_id
@@ -349,11 +344,6 @@ function Project() {
           await chainService.findFirstPendingMilestone(
             onChainProjectRes.milestones
           );
-
-        console.log(
-          '🚀 ~ file: [id].tsx:341 ~ syncProject ~ firstPendingMilestoneChain:',
-          firstPendingMilestoneChain
-        );
 
         if (
           firstPendingMilestoneChain === project.first_pending_milestone &&
@@ -649,7 +639,7 @@ function Project() {
                   <p className='text-black'>Total Funding</p>
                   <p className='text-imbue-purple-dark text-xl'>
                     {project.total_cost_without_fee}{' '}
-                    ${Currency[project.currency_id || 0]}
+                    {Currency[project.currency_id || 0]}
                   </p>
                 </div>
               </div>

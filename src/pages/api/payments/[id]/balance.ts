@@ -23,7 +23,7 @@ export default nextConnect()
         if (!project) {
           return res.status(404).end();
         }
-        projectBalance = await getBalance(projectId, project.currency_id);
+        projectBalance = await getBalance(projectId, project.currency_id, project.escrow_address);
       } catch (e) {
         res.status(401).json({
           status: 'Failed',
@@ -37,3 +37,5 @@ export default nextConnect()
     }
     return res.status(200).json(projectBalance);
   });
+
+

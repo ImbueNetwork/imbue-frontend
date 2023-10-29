@@ -53,7 +53,7 @@ function hideLoading(): void {
   }
 }
 
-async function initPolkadotJSAPI(
+export async function initPolkadotJSAPI(
   webSockAddr: string
 ): Promise<PolkadotJsApiInfo> {
   const provider = new WsProvider(webSockAddr);

@@ -137,7 +137,6 @@ class ChainService {
     projectId: number | string,
     milestoneKey: number
   ): Promise<BasicTxResponse> {
-    // const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic = this.imbueApi.imbue.api.tx.imbueProposals.submitMilestone(
       projectId,
       milestoneKey

@@ -24,7 +24,13 @@ export default nextConnect()
         if (!project) {
           return res.status(404).end();
         }
-        address = await generateAddress(projectId, project.currency_id);
+
+        if (project.currency_id < 100) {
+          address = project.escrow_address;
+        } else {
+          address = await generateAddress(projectId, project.currency_id);
+        }
+
       } catch (e) {
         res.status(401).json({
           status: 'Failed',
