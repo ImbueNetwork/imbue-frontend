@@ -1,5 +1,4 @@
-import classNames from 'classnames';
-import { useState } from 'react';
+ import { useState } from 'react';
 
 import { Freelancer, Project } from '@/model';
 
@@ -31,7 +30,27 @@ export default function ClientView({
   const [switcher, setSwitcher] = useState('application');
   return (
     <div className='bg-white rounded-2xl overflow-hidden'>
-      <div className='text-imbue-purple py-7 px-9 flex text-sm space-x-9 border-b border-b-imbue-light-purple'>
+      <div className='mx-2 border justify-between rounded-3xl flex cursor-pointer'>
+        <p
+          onClick={() => setSwitcher('application')}
+          className='text-2xl text-black py-5 border-r text-center w-full  '
+        >
+          Briefs ({briefs?.briefsUnderReview?.length})
+        </p>
+        <p
+          onClick={() => setSwitcher('projects')}
+          className='text-2xl text-black py-5 border-r text-center w-full'
+        >
+          Projects({briefs?.acceptedBriefs.length})
+        </p>
+        <p
+          onClick={() => setSwitcher('grants')}
+          className='text-2xl text-black border-r py-5 text-center w-full'
+        >
+          Grants({ongoingGrants.length})
+        </p>
+      </div>
+      {/* <div className='text-imbue-purple py-7 px-9 flex text-sm space-x-9 border-b border-b-imbue-light-purple'>
         <p
           onClick={() => setSwitcher('application')}
           className={classNames(
@@ -65,7 +84,7 @@ export default function ClientView({
         >
           Grants({ongoingGrants.length})
         </p>
-      </div>
+      </div> */}
       {/* <Divider className='mb-5' /> */}
 
       {switcher === 'application' && (
