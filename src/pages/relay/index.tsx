@@ -244,7 +244,7 @@ const Relay = () => {
                 </Menu>
               </div>
               <p>
-                Balance : {balance} ${Currency[currency_id || 0]}
+                Balance: {balance} ${Currency[currency_id || 0]}
               </p>
             </div>
           )

@@ -2,6 +2,7 @@
 import ChainService from '@/redux/services/chainService';
 
 import { initImbueAPIInfo } from './polkadot';
+import { getProjectBalance } from '@/redux/services/projectServices';
 const { decodeAddress, encodeAddress } = require('@polkadot/keyring');
 const { hexToU8a, isHex } = require('@polkadot/util');
 
@@ -77,18 +78,25 @@ export function findObjectsByName(
 export const getBalance = async (
   walletAddress: string,
   currency_id: number,
-  user: any
+  user: any,
+  projectId?: number
 ) => {
   try {
-    const imbueApi = await initImbueAPIInfo();
-    const chainService = new ChainService(imbueApi, user);
 
-    if (!walletAddress) return;
-    const balance: any = await chainService.getBalance(
-      walletAddress,
-      currency_id
-    );
-    return balance;
+    if(currency_id < 100 || !projectId) {
+      const imbueApi = await initImbueAPIInfo();
+      const chainService = new ChainService(imbueApi, user);
+  
+      if (!walletAddress) return;
+      const balance: any = await chainService.getBalance(
+        walletAddress,
+        currency_id
+      );
+      return balance;
+    } else {
+      return getProjectBalance(projectId);
+    }
+
   } catch (error) {
     return {
       status: 'failed',

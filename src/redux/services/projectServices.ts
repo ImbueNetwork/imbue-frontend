@@ -144,7 +144,7 @@ export const uploadMilestoneAttachments = async (
   }
 };
 
-export const subitMilestone = async (projectId: number) => {
+export const submitMilestone = async (projectId: number) => {
   const resp = await fetch(
     `${config.apiBase}/project/submitMilestone?projectId=${projectId}`,
     {
@@ -206,7 +206,7 @@ export const updateFirstPendingMilestone = async (
 
 // Voting
 
-export const getMillestoneVotes = async (
+export const getMilestoneVotes = async (
   projectId: number,
   milestoneIndex: number
 ) => {
@@ -311,6 +311,27 @@ export const insertNoConfidenceVoter = async (
   } else {
     return {
       message: 'Failed to update voting state. status:' + resp.status,
+    };
+  }
+};
+
+// Multichain
+export const getProjectBalance = async (
+  projectId: number,
+) => {
+  try {
+    const resp = await fetch(
+      `${config.apiBase}/payments/${projectId}/balance`,
+      {
+        headers: config.postAPIHeaders,
+        method: 'get',
+      }
+    );
+
+    return resp.json();
+  } catch (error) {
+    return {
+      message: 'Failed to get voters. status:' + error,
     };
   }
 };
