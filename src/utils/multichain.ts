@@ -4,7 +4,7 @@ import { initWasm } from '@trustwallet/wallet-core';
 import { CoinType } from '@trustwallet/wallet-core/dist/src/wallet-core';
 import { ethers } from "ethers";
 
-import { fetchProjectById, fetchProjectMilestones } from '@/lib/models';
+import { fetchProjectById, fetchProjectMilestones, updateMilestoneWithdrawHashs } from '@/lib/models';
 
 import db from '@/db';
 import { EVMContract } from '@/model';
@@ -84,19 +84,19 @@ export const getBalance = async (projectId: number, currencyId: number, escrowAd
     const key = wallet.getDerivedKey(coinType, projectId, 0, projectId);
     const pubKey = key.getPublicKey(coinType);
     const projectAddress = AnyAddress.createWithPublicKey(pubKey, coinType);
+
+    const ethBalance = Number(await ethProvider.getBalance(projectAddress.description())) / 1e18;
+
     switch (currencyId) {
       case (Currency.ETH): {
-        const projectBalance = Number(await ethProvider.getBalance(projectAddress.description())) / 1e18;
-        return Number(projectBalance);
+        return {eth_balance: ethBalance};
       }
       case (Currency.USDT): {
         const contract = await getEVMContract(currencyId);
         const signer = await ethProvider.getSigner();
         const token = new ethers.Contract(contract.address, ERC_20_ABI, signer);
         const projectBalance = ethers.formatUnits(await token.balanceOf(projectAddress.description()), await token.decimals());
-        console.log("**** project balance is ");
-        console.log(projectBalance);
-        return Number(projectBalance);
+        return {usdt_balance: projectBalance, eth_balance: ethBalance};
       }
       default:
         return
@@ -115,7 +115,7 @@ export const generateAddress = async (projectId: number, currencyId: number) => 
   return projectAddress.description();
 };
 
-export const transfer = async (projectId: number, currencyId: number, destinationAddress: string, amount: number) => {
+const transfer = async (projectId: number, currencyId: number, destinationAddress: string, amount: number, approvedMilestones: number[]) => {
   let withdrawnAmount = 0;
   try {
     const ethProvider = new ethers.JsonRpcProvider(RPC_URL);
@@ -139,28 +139,27 @@ export const transfer = async (projectId: number, currencyId: number, destinatio
     const coinType = CURRENCY_COINTYPE_LOOKUP[currency.toLowerCase()];
     const key = wallet.getDerivedKey(coinType, projectId, 0, projectId);
     const privateKeyHex = HexCoding.encode(key.data());
+    const signer = new ethers.Wallet(privateKeyHex, ethProvider);
     const sender = new ethers.Wallet(privateKeyHex, ethProvider);
-    let tx: any;
-    let fee_transaction_hash: any;
-
+    let withdrawal_transaction: any;
+    let imbue_fee_transaction: any;
 
     switch (currency.toLowerCase()) {
       case "eth":
-        const imbueFee = (amount * 0.05 * 1e18);
-        const transferAmount = (amount * 1e18) - imbueFee;
-        fee_transaction_hash = await sender.sendTransaction({ to: treasuryAddress, value: imbueFee });
-        tx = await sender.sendTransaction({ to: destinationAddress, value: transferAmount });
+        const imbueFee = ethers.parseEther((amount * 0.05).toPrecision(5).toString());
+        const transferAmount =  ethers.parseEther((amount).toPrecision(5).toString()) - imbueFee;
+        imbue_fee_transaction = await sender.sendTransaction({ to: treasuryAddress, value: imbueFee });
+        withdrawal_transaction = await sender.sendTransaction({ to: destinationAddress, value: transferAmount });
         break;
       case "usdt": {
         const contract = await getEVMContract(currencyId);
-        const signer = await ethProvider.getSigner();
         const token = new ethers.Contract(contract.address, ERC_20_ABI, signer);
         const imbueFee = ethers.parseUnits((amount * 0.05).toPrecision(5).toString(),contract.decimals);
         const transferAmount =  ethers.parseUnits((amount).toPrecision(5).toString(),contract.decimals) - imbueFee;
         await token
           .transfer(treasuryAddress, imbueFee)
           .then(async (transferResult: any) => {
-            fee_transaction_hash = await transferResult;
+            imbue_fee_transaction = await transferResult;
           })
           .catch((error: any) => {
             console.error("Error", error);
@@ -169,7 +168,7 @@ export const transfer = async (projectId: number, currencyId: number, destinatio
         await token
           .transfer(destinationAddress, transferAmount)
           .then(async (transferResult: any) => {
-            tx = await transferResult;
+            withdrawal_transaction = await transferResult;
           })
           .catch((error: any) => {
             console.error("Error", error);
@@ -177,21 +176,18 @@ export const transfer = async (projectId: number, currencyId: number, destinatio
         break;
       }
     }
-    console.log("Sent! 🎉");
-    console.log(`TX hash: ${tx.hash}`);
-    console.log("Waiting for receipt...");
-    await ethProvider.waitForTransaction(fee_transaction_hash.hash, 1, 150000);
-    await ethProvider.waitForTransaction(tx.hash, 1, 150000);
+    await ethProvider.waitForTransaction(imbue_fee_transaction.hash, 1, 150000);
+    await ethProvider.waitForTransaction(withdrawal_transaction.hash, 1, 150000);
+    await db.transaction(async (tx: any) => {
+      await updateMilestoneWithdrawHashs(projectId, approvedMilestones, withdrawal_transaction.hash, imbue_fee_transaction.hash)(tx);
+    });
 
-    //TODO: UPDATE MILESTONE TO HIGHLIGHT WITHDRAWN HASH
-    console.log(`imbue fee TX details: https://dashboard.tenderly.co/tx/sepolia/${fee_transaction_hash.hash}\n`);
-    console.log(`TX details: https://dashboard.tenderly.co/tx/sepolia/${tx.hash}\n`);
     withdrawnAmount = amount;
     return withdrawnAmount;
   } catch (e) {
+    new Error(`Failed to withdraw funds. ${e}`);
     return withdrawnAmount;
   }
-  return withdrawnAmount;
 }
 
 export const withdraw = async (projectId: number) => {
@@ -228,15 +224,15 @@ export const withdraw = async (projectId: number) => {
           approvedFundsTotal = offchainApprovedMilestones.filter(milestone => !milestone.withdrawn)
             .reduce((sum, milestone) => sum + Number(milestone.amount), 0);
 
-          approvedFundsTotal = Number(await transfer(projectId, project.currency_id, project.payment_address, approvedFundsTotal));
+          if(approvedFundsTotal > 0) {
+            approvedFundsTotal = Number(await transfer(projectId, project.currency_id, project.payment_address, approvedFundsTotal, onchainApprovedMilestoneIds));
+          }
           keepCalling = false;
           break;
         }
       }
-
     } catch (e) {
-      console.log("**** error is ");
-      console.log(e);
+      new Error(`Failed to withdraw funds. ${e}`);
       return approvedFundsTotal;
     }
   });

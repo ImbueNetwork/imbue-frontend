@@ -6,6 +6,7 @@ import { Knex } from 'knex';
 import { StreamChat } from 'stream-chat';
 
 import db from '@/db';
+import project from '@/pages/api/project';
 
 export type FederatedCredential = {
   id: number;
@@ -101,7 +102,8 @@ export type Milestone = ProposedMilestone & {
   project_id: number | string;
   is_approved: boolean;
   withdrawn: boolean;
-  withdrawn_transaction_hash: string;
+  withdrawal_transaction_hash: string;
+  imbue_fee_transaction_hash: string;
 };
 
 export type MilestoneDetails = {
@@ -690,7 +692,21 @@ export const updateMilestone =
     tx<Milestone>('milestones')
       .where({ project_id: id })
       .where('milestone_index', '=', milestoneId)
-      .update(details)
+      .update('project_in_milestone_voting', voting)
+      .returning('*');
+
+
+export const updateMilestoneWithdrawHashs =
+  (projectId:number, milestoneIds: number[], tx_hash: string, imbue_fee_tx_hash: string) =>
+  (tx: Knex.Transaction) =>
+    tx<Milestone>('milestones')
+      .where(`project_id`, projectId)
+      .whereIn(`milestone_index`, milestoneIds)
+      .update({
+        withdrawal_transaction_hash: tx_hash,
+        imbue_fee_transaction_hash: imbue_fee_tx_hash,
+        withdrawn: true
+      })
       .returning('*');
 
 export const insertMilestoneDetails =
