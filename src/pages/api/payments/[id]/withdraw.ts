@@ -6,33 +6,18 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import passport from 'passport';
 
-import { fetchProjectById, fetchProjectMilestones } from '@/lib/models';
 import { withdraw } from '@/utils/multichain';
 
-import db from '@/db';
 
 export default nextConnect()
   .use(passport.initialize())
-  .post(async (req: NextApiRequest, res: NextApiResponse) => {
+  .get(async (req: NextApiRequest, res: NextApiResponse) => {
     const { id } = req.query;
     const projectId = Number(id);
-
-    await db.transaction(async (tx: any) => {
-      try {
-        const project = await fetchProjectById(Number(projectId))(tx);
-        if (!project) {
-          return res.status(404).end();
-        }
-        const milestones = await fetchProjectMilestones(projectId)(tx);
-        const approvedFundsTotal = milestones.filter(milestone => milestone.is_approved && !milestone.withdrawn)
-          .reduce((sum, milestone) => sum + Number(milestone.amount), 0);
-        withdraw(projectId, project.currency_id, project.payment_address, approvedFundsTotal);
-      } catch (e) {
-        res.status(401).json({
-          status: 'Failed',
-          message: `Failed to withdraw funds for project id ${id}. Cause ${e}`,
-        });
-      }
-    });
-    return res.status(200).json("withdrawn");
+    const withdrawnAmount = await withdraw(projectId);
+    if(withdrawnAmount > 0) {
+      return res.status(200).json({WithdrawnAmount:withdrawnAmount});
+    } else {
+      return res.status(501).json({WithdrawnAmount:0});
+    }
   });

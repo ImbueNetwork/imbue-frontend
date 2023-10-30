@@ -26,11 +26,7 @@ export default nextConnect()
           req,
           res
         );
-        const projectApproverIds = await models.fetchProjectApproverUserIds(
-          Number(projectId)
-        )(tx);
-        verifyUserIdFromJwt(req, res, [userAuth.id, ...projectApproverIds]);
-
+        
         const resp: any = await tx('milestone_attachments').select('*').where({
           project_id: projectId,
           milestone_index: milestoneIndex,

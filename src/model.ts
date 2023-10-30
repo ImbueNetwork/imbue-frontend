@@ -113,6 +113,7 @@ export type Project = {
   project_in_voting_of_no_confidence?: boolean;
   project_in_milestone_voting?: boolean;
   first_pending_milestone?: number;
+  payment_address: string;
 };
 
 export type ProjectOnChain = {

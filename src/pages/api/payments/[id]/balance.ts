@@ -25,7 +25,7 @@ export default nextConnect()
         }
         projectBalance = await getBalance(projectId, project.currency_id, project.escrow_address);
       } catch (e) {
-        res.status(401).json({
+        return res.status(401).json({
           status: 'Failed',
           message: `Failed to retreive balance project id ${id}. Cause ${e}`,
         });

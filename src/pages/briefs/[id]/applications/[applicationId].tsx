@@ -247,7 +247,8 @@ const ApplicationPreview = (): JSX.Element => {
       inputErrors,
       milestones,
       brief?.headline,
-      brief?.description
+      brief?.description,
+      application.paymentAddress
     );
     setMilestones(milestonesRes);
     setInputErrors(errors);

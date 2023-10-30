@@ -4,6 +4,9 @@ import { initWasm } from '@trustwallet/wallet-core';
 import { CoinType } from '@trustwallet/wallet-core/dist/src/wallet-core';
 import { ethers } from "ethers";
 
+import { fetchProjectById, fetchProjectMilestones } from '@/lib/models';
+
+import db from '@/db';
 import { EVMContract } from '@/model';
 import { Currency } from '@/model';
 
@@ -81,7 +84,6 @@ export const getBalance = async (projectId: number, currencyId: number, escrowAd
     const key = wallet.getDerivedKey(coinType, projectId, 0, projectId);
     const pubKey = key.getPublicKey(coinType);
     const projectAddress = AnyAddress.createWithPublicKey(pubKey, coinType);
-
     switch (currencyId) {
       case (Currency.ETH): {
         const projectBalance = Number(await ethProvider.getBalance(projectAddress.description())) / 1e18;
@@ -92,6 +94,8 @@ export const getBalance = async (projectId: number, currencyId: number, escrowAd
         const signer = await ethProvider.getSigner();
         const token = new ethers.Contract(contract.address, ERC_20_ABI, signer);
         const projectBalance = ethers.formatUnits(await token.balanceOf(projectAddress.description()), await token.decimals());
+        console.log("**** project balance is ");
+        console.log(projectBalance);
         return Number(projectBalance);
       }
       default:
@@ -111,70 +115,131 @@ export const generateAddress = async (projectId: number, currencyId: number) => 
   return projectAddress.description();
 };
 
-export const withdraw = async (projectId: number, currencyId: number, destinationAddress: string, amount: number) => {
-  const ethProvider = new ethers.JsonRpcProvider(RPC_URL);
-  const core = await initWasm();
-  const { CoinType, HDWallet, HexCoding } = core;
-  if (!WALLET_MNEMONIC) {
-    return new Error(`Wallet Mnemonic not populated`);
-  }
-  const currency = Currency[currencyId];
-  const treasuryAddress = generateAddress(0,currencyId);
-  const CURRENCY_COINTYPE_LOOKUP: Record<string, any> = {
-    "eth": CoinType.ethereum,
-    "usdt": CoinType.ethereum,
-    "atom": CoinType.cosmos,
-    "sol": CoinType.solana,
-    "matic": CoinType.polygon,
-    "dot": CoinType.polkadot,
-  };
-  const wallet = HDWallet.createWithMnemonic(WALLET_MNEMONIC, "");
-  const coinType = CURRENCY_COINTYPE_LOOKUP[currency];
-  const key = wallet.getDerivedKey(coinType, projectId, 0, projectId);
-  const privateKeyHex = HexCoding.encode(key.data());
-  const sender = new ethers.Wallet(privateKeyHex, ethProvider);
-  let tx: any;
-  let fee_transaction_hash: any;
-  switch (currency.toLowerCase()) {
-    case "eth":
-      const imbueFee = (amount * 0.05 * 1e18);
-      const transferAmount = (amount * 1e18) - imbueFee;
-      fee_transaction_hash = await sender.sendTransaction({ to: treasuryAddress, value: imbueFee });
-      tx = await sender.sendTransaction({ to: destinationAddress, value: transferAmount });
-      break;
-    case "usdt": {
-      const contract = await getEVMContract(currencyId);
-      const signer = await ethProvider.getSigner();
-      const token = new ethers.Contract(contract.address, ERC_20_ABI, signer);
-      const imbueFee = amount * 0.05 * contract.decimals;
-      const transferAmount = (amount * contract.decimals) - imbueFee;
-
-      await token
-        .transfer(treasuryAddress, imbueFee)
-        .then(async (transferResult: any) => {
-          fee_transaction_hash = await transferResult;
-        })
-        .catch((error: any) => {
-          console.error("Error", error);
-        });
-
-      await token
-        .transfer(destinationAddress, transferAmount)
-        .then(async (transferResult: any) => {
-          tx = await transferResult;
-        })
-        .catch((error: any) => {
-          console.error("Error", error);
-        });
-      break;
+export const transfer = async (projectId: number, currencyId: number, destinationAddress: string, amount: number) => {
+  let withdrawnAmount = 0;
+  try {
+    const ethProvider = new ethers.JsonRpcProvider(RPC_URL);
+    const core = await initWasm();
+    const { CoinType, HDWallet, HexCoding } = core;
+    if (!WALLET_MNEMONIC) {
+      return new Error(`Wallet Mnemonic not populated`);
     }
-  }
-  console.log("Sent! 🎉");
-  console.log(`TX hash: ${tx.hash}`);
-  console.log("Waiting for receipt...");
-  await ethProvider.waitForTransaction(tx.hash, 1, 150000);
+    const currency = Currency[currencyId];
+    const treasuryAddress = await generateAddress(0, currencyId);
 
-  //TODO: UPDATE MILESTONE TO HIGHLIGHT WITHDRAWN HASH
-  console.log(`imbue fee TX details: https://dashboard.tenderly.co/tx/sepolia/${fee_transaction_hash.hash}\n`);
-  console.log(`TX details: https://dashboard.tenderly.co/tx/sepolia/${tx.hash}\n`);
+    const CURRENCY_COINTYPE_LOOKUP: Record<string, any> = {
+      "eth": CoinType.ethereum,
+      "usdt": CoinType.ethereum,
+      "atom": CoinType.cosmos,
+      "sol": CoinType.solana,
+      "matic": CoinType.polygon,
+      "dot": CoinType.polkadot,
+    };
+    const wallet = HDWallet.createWithMnemonic(WALLET_MNEMONIC, "");
+    const coinType = CURRENCY_COINTYPE_LOOKUP[currency.toLowerCase()];
+    const key = wallet.getDerivedKey(coinType, projectId, 0, projectId);
+    const privateKeyHex = HexCoding.encode(key.data());
+    const sender = new ethers.Wallet(privateKeyHex, ethProvider);
+    let tx: any;
+    let fee_transaction_hash: any;
+
+
+    switch (currency.toLowerCase()) {
+      case "eth":
+        const imbueFee = (amount * 0.05 * 1e18);
+        const transferAmount = (amount * 1e18) - imbueFee;
+        fee_transaction_hash = await sender.sendTransaction({ to: treasuryAddress, value: imbueFee });
+        tx = await sender.sendTransaction({ to: destinationAddress, value: transferAmount });
+        break;
+      case "usdt": {
+        const contract = await getEVMContract(currencyId);
+        const signer = await ethProvider.getSigner();
+        const token = new ethers.Contract(contract.address, ERC_20_ABI, signer);
+        const imbueFee = ethers.parseUnits((amount * 0.05).toPrecision(5).toString(),contract.decimals);
+        const transferAmount =  ethers.parseUnits((amount).toPrecision(5).toString(),contract.decimals) - imbueFee;
+        await token
+          .transfer(treasuryAddress, imbueFee)
+          .then(async (transferResult: any) => {
+            fee_transaction_hash = await transferResult;
+          })
+          .catch((error: any) => {
+            console.error("Error", error);
+          });
+
+        await token
+          .transfer(destinationAddress, transferAmount)
+          .then(async (transferResult: any) => {
+            tx = await transferResult;
+          })
+          .catch((error: any) => {
+            console.error("Error", error);
+          });
+        break;
+      }
+    }
+    console.log("Sent! 🎉");
+    console.log(`TX hash: ${tx.hash}`);
+    console.log("Waiting for receipt...");
+    await ethProvider.waitForTransaction(fee_transaction_hash.hash, 1, 150000);
+    await ethProvider.waitForTransaction(tx.hash, 1, 150000);
+
+    //TODO: UPDATE MILESTONE TO HIGHLIGHT WITHDRAWN HASH
+    console.log(`imbue fee TX details: https://dashboard.tenderly.co/tx/sepolia/${fee_transaction_hash.hash}\n`);
+    console.log(`TX details: https://dashboard.tenderly.co/tx/sepolia/${tx.hash}\n`);
+    withdrawnAmount = amount;
+    return withdrawnAmount;
+  } catch (e) {
+    return withdrawnAmount;
+  }
+  return withdrawnAmount;
+}
+
+export const withdraw = async (projectId: number) => {
+  let approvedFundsTotal = 0;
+  await db.transaction(async (tx: any) => {
+    try {
+      const project = await fetchProjectById(Number(projectId))(tx);
+      if (!project) {
+        return false;
+      }
+      let keepCalling = true;
+      setTimeout(function () {
+        keepCalling = false;
+      }, 30000);
+
+      while (keepCalling) {
+        const imbueApi = await initPolkadotJSAPI(process.env.IMBUE_NETWORK_WEBSOCK_ADDR!);
+        const projectOnChain: any = (
+          await imbueApi.api.query.imbueProposals.projects(
+            project.chain_project_id
+          )
+        ).toHuman();
+        const onchainApprovedMilestoneIds: any[] = Object.keys(projectOnChain.milestones)
+          .map((milestoneItem: any) => projectOnChain.milestones[milestoneItem])
+          .filter((milestone: any) => milestone.isApproved)
+          .map((milestone: any) => Number(milestone.milestoneKey));
+
+        const milestones = await fetchProjectMilestones(projectId)(tx);
+        const offchainApprovedMilestones = milestones.filter(milestone => milestone.is_approved);
+
+        const milestonesMatch = JSON.stringify(offchainApprovedMilestones.map(milestone => Number(milestone.milestone_index))) == JSON.stringify(onchainApprovedMilestoneIds);
+
+        if (milestonesMatch) {
+          approvedFundsTotal = offchainApprovedMilestones.filter(milestone => !milestone.withdrawn)
+            .reduce((sum, milestone) => sum + Number(milestone.amount), 0);
+
+          approvedFundsTotal = Number(await transfer(projectId, project.currency_id, project.payment_address, approvedFundsTotal));
+          keepCalling = false;
+          break;
+        }
+      }
+
+    } catch (e) {
+      console.log("**** error is ");
+      console.log(e);
+      return approvedFundsTotal;
+    }
+  });
+
+  return approvedFundsTotal
 }
