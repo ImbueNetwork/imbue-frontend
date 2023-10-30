@@ -300,7 +300,7 @@ function Project() {
 
       const totalCost = Number(
         Number(projectRes?.total_cost_without_fee) +
-          Number(projectRes?.imbue_fee)
+        Number(projectRes?.imbue_fee)
       );
       setRequiredBalance(totalCost * 0.95);
 
@@ -327,6 +327,7 @@ function Project() {
 
   const syncProject = async (project: Project) => {
     if (!project.chain_project_id) return;
+    let requireSync = false;
 
     try {
       const imbueApi = await initImbueAPIInfo();
@@ -339,6 +340,17 @@ function Project() {
         // TODO: sync no cofidene vote list
       }
 
+      const onchainApprovedMilestones = onChainProjectRes?.milestones.map((milestone) => milestone.is_approved);
+      const offchainApprovedMilestones = project.milestones.map((milestone) => milestone.is_approved);
+
+      if (onChainProjectRes && JSON.stringify(onchainApprovedMilestones) != JSON.stringify(offchainApprovedMilestones)) {
+        onChainProjectRes.milestones.map((milestone, index) => {
+          project.milestones[index].is_approved = milestone.is_approved;
+        });
+        requireSync = true;
+      }
+ 
+
       if (onChainProjectRes?.id && project?.id) {
         const firstPendingMilestoneChain =
           await chainService.findFirstPendingMilestone(
@@ -348,9 +360,10 @@ function Project() {
         if (
           firstPendingMilestoneChain === project.first_pending_milestone &&
           project.project_in_milestone_voting ===
-            onChainProjectRes.projectInMilestoneVoting &&
+          onChainProjectRes.projectInMilestoneVoting &&
           project.project_in_voting_of_no_confidence ===
-            onChainProjectRes.projectInVotingOfNoConfidence
+          onChainProjectRes.projectInVotingOfNoConfidence
+          && !requireSync
         )
           return;
 
@@ -529,11 +542,10 @@ function Project() {
                   title='You cannot vote for refund more than once '
                 >
                   <button
-                    className={`px-5 py-2 ${
-                      approverVotedOnRefund
+                    className={`px-5 py-2 ${approverVotedOnRefund
                         ? 'border border-gray-400 bg-light-white opacity-50'
                         : 'border border-imbue-coral text-imbue-coral bg-[#FFF0EF]'
-                    } rounded-full`}
+                      } rounded-full`}
                     onClick={() =>
                       !approverVotedOnRefund && setShowPolkadotAccounts(true)
                     }
@@ -589,8 +601,8 @@ function Project() {
                       projectInMilestoneVoting
                         ? firstPendingMilestone
                         : firstPendingMilestone === -1
-                        ? project?.milestones?.length
-                        : firstPendingMilestone - 1
+                          ? project?.milestones?.length
+                          : firstPendingMilestone - 1
                     }
                     titleArray={project?.milestones}
                   />
@@ -672,7 +684,7 @@ function Project() {
                 />
               </div>
             )}
-            
+
 
             <div className='bg-white col-start-10 px-2 rounded-xl py-3 border border-light-grey'>
               <MilestoneVoteBox
@@ -717,12 +729,12 @@ function Project() {
         setOpenVotingList={setOpenVotingList}
         loading={loading}
         votes={votes}
-        // setMilestoneVotes={setMilestoneVotes}
-        // firstPendingMilestone={firstPendingMilestone}
-        // approvers={approversPreview}
-        // chainProjectId={project.chain_project_id}
-        // projectId={project.id}
-        // project={project}
+      // setMilestoneVotes={setMilestoneVotes}
+      // firstPendingMilestone={firstPendingMilestone}
+      // approvers={approversPreview}
+      // chainProjectId={project.chain_project_id}
+      // projectId={project.id}
+      // project={project}
       />
 
       {openNoRefundList && (
@@ -826,9 +838,8 @@ function Project() {
       </WaitingScreen>
 
       <div
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${
-          copied ? 'right-5' : '-right-full'
-        }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
+          }`}
       >
         <Alert severity='success'>
           Grant Wallet Address Copied to clipboard
