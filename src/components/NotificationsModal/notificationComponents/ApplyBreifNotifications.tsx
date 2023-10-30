@@ -30,9 +30,9 @@ export default function ApplyBreifNotification(activity: any) {
           {activity.data.title || 'Title'}
         </p>
         <p className='text-sm mt-3'>
-          You have a new applicant for your brief{' '}
+          You have a new applicant for your{' '}
           <span id='link' className='text-lg underline text-imbue-purple'>
-            {activity.data.briefId}
+            brief
           </span>{' '}
           . Take a moment to review their application and consider their
           suitability for the role.

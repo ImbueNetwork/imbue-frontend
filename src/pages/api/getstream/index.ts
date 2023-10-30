@@ -50,7 +50,7 @@ export default nextConnect()
             },
           };
           let userIdList;
-          if (isValidAddressPolkadotAddress(target)) {
+          if (isValidAddressPolkadotAddress(target[0])) {
             const response = (await fetchUserByList(target)(
               tx
             )) as models.User[];
@@ -72,7 +72,6 @@ export default nextConnect()
       });
       res.status(200).json({ message: 'successfully send notification' });
     } catch (err) {
-      console.log(err);
       res.status(500).send('unable to send notification: ');
     }
   });

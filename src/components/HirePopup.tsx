@@ -36,7 +36,7 @@ export const HirePopup = ({
   milestones,
   totalCostWithoutFee,
   imbueFee,
-  totalCost,
+  amountDue,
   setLoading,
 }: any) => {
   const [popupStage, setstage] = useState<number>(0);
@@ -89,8 +89,8 @@ export const HirePopup = ({
       ? [user?.web3_address]
       : [''];
     const freelancerAddress: string = freelancer.web3_address;
-    const budget = BigInt(totalCost * 1e12);
-    const initialContribution = BigInt(totalCost * 1e12);
+    const budget = BigInt(totalCostWithoutFee * 1e12);
+    const initialContribution = budget;
     application.status_id = OffchainProjectState.Accepted;
     delete application.modified;
     const briefHash = blake2AsHex(JSON.stringify(application));
@@ -239,10 +239,10 @@ export const HirePopup = ({
           </div>
           <div className={`${styles.budgetInfo} mx-5 !mb-3`}>
             <div className={styles.budgetDescription}>
-              <p className='text-lg'>Total</p>
+              <p className='text-lg'>Amount Received</p>
             </div>
             <div className='budget-value'>
-              ${Number?.(totalCost?.toFixed?.(2))?.toLocaleString?.()}
+              ${Number?.(amountDue?.toFixed?.(2))?.toLocaleString?.()}
             </div>
           </div>
         </div>
@@ -261,7 +261,7 @@ export const HirePopup = ({
     return (
       <div className='flex flex-col justify-center items-center modal-container px-5 lg:px-0 lg:w-2/3 mx-auto my-auto text-content'>
         <p className='text-center w-full text-lg lg:text-xl my-4 text-content-primary'>
-          Deposit Fuds
+          Deposit Funds
         </p>
         <p className='text-center w-full text-lg lg:text-xl my-4'>
           Deposit the funds required for the project, these funds will be taken
@@ -273,7 +273,7 @@ export const HirePopup = ({
         </p>
         <p className='mb-10'>
           <span className='text-lg lg:text-xl text-imbue-lemon mr-1'>
-            {Number(totalCost.toFixed(2)).toLocaleString()}
+            {Number(totalCostWithoutFee.toFixed(2)).toLocaleString()}
           </span>
           ${Currency[application.currency_id]}
         </p>

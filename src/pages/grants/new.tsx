@@ -5,7 +5,6 @@ import { WalletAccount } from '@talismn/connect-wallets';
 // import ChainService from '@/redux/services/chainService';
 import Filter from 'bad-words';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
@@ -111,7 +110,7 @@ const GrantApplication = (): JSX.Element => {
     0
   );
   const imbueFee = (totalCostWithoutFee * imbueFeePercentage) / 100;
-  const totalCost = imbueFee + totalCostWithoutFee;
+  const amountDue =  totalCostWithoutFee - imbueFee;
 
   const onAddMilestone = () => {
     setMilestones([
@@ -189,7 +188,7 @@ const GrantApplication = (): JSX.Element => {
         title: filter.clean(title),
         description: filter.clean(description),
         duration_id: durationId, // TODO:
-        required_funds: totalCost,
+        required_funds: amountDue,
         currency_id: currencyId,
         user_id: user.id,
         owner: account.address,
@@ -221,7 +220,7 @@ const GrantApplication = (): JSX.Element => {
         grantMilestones,
         approvers,
         currencyId,
-        totalCost,
+        totalCostWithoutFee,
         'kusama',
         grant_id
       );
@@ -269,16 +268,7 @@ const GrantApplication = (): JSX.Element => {
                 grant.approvers,
                 'AddApprovers.testing',
                 'You were invited as an Approver',
-                `${(
-                  <Link
-                    href={`/profile/${user.username}`}
-                    className='font-semibold'
-                  >
-                    {user.display_name.split(' ')[0] || 'Someone'}
-                  </Link>
-                )} has added you as an approver for their project ${(
-                  <Link href={`/projects/${projectId}`}>projectId</Link>
-                )}. Please review and provide your feedback.`,
+                `Please review and provide your feedback.`,
                 grant_id
               );
             } else {
@@ -460,7 +450,7 @@ const GrantApplication = (): JSX.Element => {
       <div className='rounded-[20px] bg-background'>
         <div className='flex justify-between text-[20px] text-content px-6 lg:px-12 py-5 border-b border-imbue-light-purple'>
           <p>Approvers</p>
-          <div>{`Total grant: ${totalCost} ${currencies[currencyId]}`}</div>
+          <div>{`Total grant: ${amountDue} ${currencies[currencyId]}`}</div>
         </div>
         <div className='flex flex-col lg:flex-row justify-between px-6 lg:px-12 py-8 text-base leading-[1.2] border-b border-b-imbue-light-purple items-start'>
           <div className='flex flex-col gap-8 w-full lg:w-1/2'>
@@ -754,10 +744,10 @@ const GrantApplication = (): JSX.Element => {
 
             <div className='flex flex-row items-center mb-5'>
               <div className='flex flex-col flex-grow'>
-                <p className='text-lg lg:text-xl text-content m-0 p-0'>Total</p>
+                <p className='text-lg lg:text-xl text-content m-0 p-0'>Amount Received</p>
               </div>
               <div className='text-content-primary'>
-                ${Number(totalCost.toFixed(2)).toLocaleString()}
+                ${Number(amountDue.toFixed(2)).toLocaleString()}
               </div>
             </div>
           </div>
