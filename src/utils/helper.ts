@@ -3,6 +3,7 @@ import ChainService from '@/redux/services/chainService';
 import { getProjectBalance } from '@/redux/services/projectServices';
 
 import { initImbueAPIInfo } from './polkadot';
+import { Currency } from '@/model';
 const { decodeAddress, encodeAddress } = require('@polkadot/keyring');
 const { hexToU8a, isHex } = require('@polkadot/util');
 
@@ -94,7 +95,9 @@ export const getBalance = async (
       );
       return balance;
     } else {
-      return getProjectBalance(projectId);
+      const allBalances = await getProjectBalance(projectId);
+      const currency = Currency[currency_id].toLowerCase();
+      return allBalances[currency];
     }
 
   } catch (error) {

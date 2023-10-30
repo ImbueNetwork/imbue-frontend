@@ -89,14 +89,14 @@ export const getBalance = async (projectId: number, currencyId: number, escrowAd
 
     switch (currencyId) {
       case (Currency.ETH): {
-        return {eth_balance: ethBalance};
+        return {eth: ethBalance};
       }
       case (Currency.USDT): {
         const contract = await getEVMContract(currencyId);
         const signer = await ethProvider.getSigner();
         const token = new ethers.Contract(contract.address, ERC_20_ABI, signer);
-        const projectBalance = ethers.formatUnits(await token.balanceOf(projectAddress.description()), await token.decimals());
-        return {usdt_balance: projectBalance, eth_balance: ethBalance};
+        const projectBalance = Number(ethers.formatUnits(await token.balanceOf(projectAddress.description()), await token.decimals()));
+        return {usdt: projectBalance, eth: ethBalance};
       }
       default:
         return
@@ -139,7 +139,6 @@ const transfer = async (projectId: number, currencyId: number, destinationAddres
     const coinType = CURRENCY_COINTYPE_LOOKUP[currency.toLowerCase()];
     const key = wallet.getDerivedKey(coinType, projectId, 0, projectId);
     const privateKeyHex = HexCoding.encode(key.data());
-    const signer = new ethers.Wallet(privateKeyHex, ethProvider);
     const sender = new ethers.Wallet(privateKeyHex, ethProvider);
     let withdrawal_transaction: any;
     let imbue_fee_transaction: any;
@@ -153,7 +152,7 @@ const transfer = async (projectId: number, currencyId: number, destinationAddres
         break;
       case "usdt": {
         const contract = await getEVMContract(currencyId);
-        const token = new ethers.Contract(contract.address, ERC_20_ABI, signer);
+        const token = new ethers.Contract(contract.address, ERC_20_ABI, sender);
         const imbueFee = ethers.parseUnits((amount * 0.05).toPrecision(5).toString(),contract.decimals);
         const transferAmount =  ethers.parseUnits((amount).toPrecision(5).toString(),contract.decimals) - imbueFee;
         await token
