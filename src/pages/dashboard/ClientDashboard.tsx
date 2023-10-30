@@ -1,8 +1,6 @@
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Menu, MenuItem } from '@mui/material';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { BiChevronDown } from 'react-icons/bi';
 import { BsFilter } from 'react-icons/bs';
 import { IoIosArrowBack } from 'react-icons/io';
@@ -15,14 +13,12 @@ import { Swiper, SwiperSlide, useSwiper } from 'swiper/react';
 import 'swiper/css';
 
 import { fetchUser } from '@/utils';
-import { getBalance } from '@/utils/helper';
 
 import ChatPopup from '@/components/ChatPopup';
 import FreelancerCard from '@/components/FreelancerCard/FreelancerCard';
 import FullScreenLoader from '@/components/FullScreenLoader';
 
 import { Freelancer, User } from '@/model';
-import { Currency } from '@/model';
 import { getUserBriefs } from '@/redux/services/briefService';
 import { getAllFreelancers } from '@/redux/services/freelancerService';
 import { getUsersOngoingGrants } from '@/redux/services/projectServices';
@@ -66,23 +62,6 @@ export function Controller() {
   );
 }
 
-const Currencies = [
-  {
-    name: 'IMBU',
-    currencyId: 0,
-  },
-  {
-    name: 'KSM',
-    currencyId: 1,
-  },
-  // {AUSD : 2},
-  // {KAR : 3},
-  {
-    name: 'MGX',
-    currencyId: 4,
-  },
-];
-
 const options = [
   { name: 'Accepted', bg: 'bg-[#90DB00]', status_id: 4 },
   { name: 'Pending', bg: 'bg-[#FF7A00]', status_id: 1 },
@@ -102,14 +81,9 @@ export default function ClientDashboard() {
   );
   const [Briefs, _setBriefs] = useState<any>();
   const [Grants, setOngoingGrants] = useState<any[]>();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const showOptions = Boolean(anchorEl);
   const [filteredGrants, setFilteredGrants] = useState<any[]>([]);
   const [filterGrantoptions, setFilterGrantoptions] = useState<any>(options[0]);
-  const [balanceLoading, setBalanceLoading] = useState(true);
-  const [requestSent, setRequestSent] = useState(false);
-  const [currency_id, setCurrency_id] = useState<number>(0);
-  const [balance, setBalance] = useState<number>(0);
+
   const router = useRouter();
 
   const handleMessageBoxClick = async (user_id: number) => {
@@ -121,34 +95,6 @@ export default function ClientDashboard() {
       // redirect("login", `/dapp/freelancers/${freelancer?.username}/`);
     }
   };
-
-  useEffect(() => {
-    const getAndSetBalace = async () => {
-      if (!requestSent && !loadingUser && !user?.web3_address) return;
-
-      setRequestSent(true);
-      try {
-        const balance = await getBalance(
-          user.web3_address as string,
-          currency_id,
-          user
-        );
-
-        setBalance(balance || 0);
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error(error);
-      } finally {
-        setBalanceLoading(false);
-        setRequestSent(false);
-      }
-    };
-
-    const timer = setInterval(() => {
-      getAndSetBalace();
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [balanceLoading, currency_id, loadingUser, requestSent, user]);
 
   useEffect(() => {
     try {
@@ -172,16 +118,6 @@ export default function ClientDashboard() {
     }
   }, [Grants, filterGrantoptions]);
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-  const selectCurrency = (currencyID: number) => {
-    setCurrency_id(currencyID);
-    setAnchorEl(null);
-  };
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
   useEffect(() => {
     const setUserBriefs = async () => {
       if (user?.id) _setBriefs(await getUserBriefs(user?.id));
@@ -191,6 +127,15 @@ export default function ClientDashboard() {
     };
     setUserBriefs();
   }, [user, user?.id, user?.web3_address]);
+
+  const totalSpent = useMemo(() => {
+    const total = Briefs?.acceptedBriefs?.reduce(
+      (acc: number, item: any) =>
+        acc + Number(item.project.total_cost_without_fee),
+      0
+    );
+    return total;
+  }, [Briefs]);
 
   const handleGrantRedirect = () => {
     router.push({
@@ -322,42 +267,13 @@ export default function ClientDashboard() {
         </div>
         <div className=' py-5 px-5 flex flex-col rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full '>
           <div className='flex justify-between'>
-            <p>Wallet</p>
-            <div className='px-3 py-0.5  border text-black border-text-aux-colour rounded-full'>
-              <button
-                className='border rounded-xl items-center  py-1 text-xs flex gap-1'
-                onClick={(e) => handleClick(e)}
-              >
-                {Currency[currency_id || 0]}
-                <KeyboardArrowDownIcon />
-              </button>
-              <Menu
-                id='basic-menu'
-                anchorEl={anchorEl}
-                open={showOptions}
-                onClose={handleClose}
-                MenuListProps={{
-                  'aria-labelledby': 'basic-button',
-                }}
-              >
-                {Currencies.map((currency) => (
-                  <MenuItem
-                    key={currency.currencyId}
-                    onClick={() => selectCurrency(currency.currencyId)}
-                  >
-                    {currency.name}
-                  </MenuItem>
-                ))}
-              </Menu>
-            </div>
+            <p>Total Spent</p>
           </div>
           <div className='text-black flex items-center justify-between mt-auto'>
             <div>
               <div className='flex'>
                 <MdOutlineAttachMoney size={23} />
-                <p className='text-4xl font-semibold'>
-                  {balanceLoading ? 'loading ...' : balance}
-                </p>
+                <p className='text-4xl font-semibold'>{totalSpent} </p>
               </div>
               <p className='text-text-grey'>Payout Accounts</p>
             </div>
@@ -378,13 +294,6 @@ export default function ClientDashboard() {
           slidesPerView={3}
           className=' !flex !flex-col-reverse   relative'
         >
-          <div
-            className='px-4 flex items-center gap-2 py-2 ml-auto mb-3 rounded-full border bg-imbue-light-grey border-imbue-light-grey cursor-pointer'
-            onClick={() => router.push('/freelancers')}
-          >
-            <BsFilter size={20} color='black' />
-            <p className='text-black'>view all</p>
-          </div>
           <div className='pb-12 '>
             <Controller />
           </div>
@@ -398,6 +307,15 @@ export default function ClientDashboard() {
             </SwiperSlide>
           ))}
         </Swiper>
+        <div className='flex mt-3'>
+          <div
+            className='px-4 flex items-center gap-2 py-2 ml-auto mb-3 rounded-full border bg-imbue-light-grey border-imbue-light-grey cursor-pointer'
+            onClick={() => router.push('/freelancers')}
+          >
+            <BsFilter size={20} color='black' />
+            <p className='text-black'>view all</p>
+          </div>
+        </div>
       </div>
       {user && showMessageBox && (
         <ChatPopup

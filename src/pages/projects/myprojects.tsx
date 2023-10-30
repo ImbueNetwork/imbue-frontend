@@ -3,7 +3,7 @@ import { Divider } from '@mui/material';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { ProgressBar } from '@/components/ProgressBar';
@@ -23,35 +23,51 @@ export default function Myprojects() {
   );
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [allProject, setAllProjects] = useState<Project[]>([]);
+
+  const completedProject = useMemo(() => {
+    return allProject.filter((item) => item.completed);
+  }, [allProject]);
+
+  const activeProject = useMemo(() => {
+    return allProject.filter(
+      (item) => item.chain_project_id && !item.completed && item.brief_id
+    );
+  }, [allProject]);
+
+  const pendingProject = useMemo(() => {
+    return allProject.filter(
+      (item) => !item.chain_project_id && item.status_id === 4
+    );
+  }, [allProject]);
+
+  const GrantProject = useMemo(() => {
+    return allProject.filter((item) => !item.brief_id && item.status_id === 4);
+  }, [allProject]);
 
   useEffect(() => {
     const getProjects = async () => {
       setLoading(true);
 
       try {
+        const projects = await getFreelancerApplications(user.id);
+        setAllProjects(projects);
+
         switch (switcher) {
           case 'completed': {
-            const projects = await getFreelancerApplications(user.id);
-            const projectRes = projects.filter((item) => item.completed);
-            setProjects(projectRes);
+            setProjects(completedProject);
             break;
           }
           case 'active': {
-            const projects = await getFreelancerApplications(user.id);
-            const projectRes = projects.filter((item) => item.chain_project_id && !item.completed && item.brief_id);
-            setProjects(projectRes);
+            setProjects(activeProject);
             break;
           }
           case 'pending': {
-            const projects = await getFreelancerApplications(user.id);
-            const projectRes = projects.filter((item) => !item.chain_project_id && item.status_id === 4);
-            setProjects(projectRes);
+            setProjects(pendingProject);
             break;
           }
           case 'grants': {
-            const projects = await getFreelancerApplications(user.id);
-            const projectRes = projects.filter((item) => !item.brief_id && item.status_id === 4);
-            setProjects(projectRes);
+            setProjects(GrantProject);
             break;
           }
         }
@@ -66,7 +82,7 @@ export default function Myprojects() {
     if (user?.id) getProjects();
   }, [switcher, user.id]);
 
-  const router = useRouter()
+  const router = useRouter();
 
   const redirectToApplication = (project: Project) => {
     router.push(`/projects/${project.id}`);
@@ -78,7 +94,10 @@ export default function Myprojects() {
         onClick={() => router.back()}
         className='border border-content group hover:bg-content rounded-full flex items-center justify-center cursor-pointer absolute left-5 top-10'
       >
-        <ArrowBackIcon className='h-7 w-7 group-hover:text-white' color='secondary' />
+        <ArrowBackIcon
+          className='h-7 w-7 group-hover:text-white'
+          color='secondary'
+        />
       </div>
 
       <div className='mx-2 border justify-between rounded-3xl flex cursor-pointer'>
@@ -86,33 +105,33 @@ export default function Myprojects() {
           onClick={() => setSwitcher('completed')}
           className='text-2xl text-black py-5 border-r text-center w-full  '
         >
-          Completed Projects
+          Completed Projects({completedProject?.length || 0})
         </p>
         <p
           onClick={() => setSwitcher('active')}
           className='text-2xl text-black py-5 border-r text-center w-full'
         >
-          Active Projects
+          Active Projects ({activeProject?.length || 0})
         </p>
         <p
           onClick={() => setSwitcher('pending')}
           className='text-2xl text-black border-r py-5 text-center w-full'
         >
-          Pending Projects
+          Pending Projects ({pendingProject?.length || 0})
         </p>
         <p
           onClick={() => setSwitcher('grants')}
           className='text-2xl text-black py-5 text-center w-full'
         >
-          Grants
+          Grants ({GrantProject?.length || 0})
         </p>
       </div>
       <div className='mt-5 min-h-[300px]'>
-        {
-          (loadingUser || loading) && <p className='p-10 text-black'>Loading...</p>
-        }
-        {
-          !(loadingUser || loading) && projects.map((project, index) => (
+        {(loadingUser || loading) && (
+          <p className='p-10 text-black'>Loading...</p>
+        )}
+        {!(loadingUser || loading) &&
+          projects.map((project, index) => (
             <>
               <div
                 key={project.id}
@@ -146,15 +165,15 @@ export default function Myprojects() {
                         </p>
                       </>
                     )}
-                    {
-                      project.status_id && (<button
-                        className={`${applicationStatusId[project.status_id]
-                          }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[10px]`}
+                    {project.status_id && (
+                      <button
+                        className={`${
+                          applicationStatusId[project.status_id]
+                        }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[10px]`}
                       >
                         {applicationStatusId[project.status_id]}
-                      </button>)
-                    }
-
+                      </button>
+                    )}
                   </div>
                   <p className='text-imbue-purple-dark text-sm sm:text-lg'>
                     {project.name}
@@ -177,8 +196,7 @@ export default function Myprojects() {
               </div>
               {index !== projects.length - 1 && <Divider />}
             </>
-          ))
-        }
+          ))}
       </div>
     </div>
   );

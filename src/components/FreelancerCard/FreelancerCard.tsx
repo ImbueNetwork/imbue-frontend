@@ -21,7 +21,7 @@ export default function FreelancerCard({
           className='w-14 h-14 object-cover rounded-full'
           alt='freelancer profile'
           src={
-            freelancer.profile_image ||
+            freelancer?.profile_image ||
             require('@/assets/images/profile-image.png')
           }
           width={40}
@@ -44,15 +44,15 @@ export default function FreelancerCard({
           <div className='w-2 h-2 rounded-full bg-lime-900' />
         </p>
       </div>
-      <div className='my-5 items-center flex justify-between'>
+      {/* <div className='my-5 items-center flex justify-between'>
         <p className='text-lg text-imbue-purple-dark'>
           $50-$75 <span className='text-xs'>hr</span>
         </p>
         <p className='text-xs'>
           Job Success rate <span className='text-imbue-purple'>99.2%</span>
         </p>
-      </div>
-      <div className='flex text-xs gap-5'>
+      </div> */}
+      <div className='flex mt-10 text-xs gap-5'>
         {[1, 2, 3, 4].map(
           (item: number, index: number) =>
             index < freelancer?.skills?.length && (

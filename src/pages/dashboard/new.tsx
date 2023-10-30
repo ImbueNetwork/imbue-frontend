@@ -37,7 +37,6 @@ export type DashboardProps = {
 };
 
 const FreelancerDashboard = (): JSX.Element => {
-  const [loginModal, setLoginModal] = useState<boolean>(false);
   const [client, setClient] = useState<StreamChat>();
   const {
     user,
@@ -47,7 +46,6 @@ const FreelancerDashboard = (): JSX.Element => {
   const [unreadMessages, setUnreadMsg] = useState<number>(0);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
-  const [myApplications, _setMyApplications] = useState<Project[]>();
   const [loadingStreamChat, setLoadingStreamChat] = useState<boolean>(true);
 
   const [messageList, setMessageList] = useState<
@@ -55,7 +53,6 @@ const FreelancerDashboard = (): JSX.Element => {
   >();
 
   const router = useRouter();
-  const { briefId } = router.query;
 
   const [error, setError] = useState<any>(userError);
 
@@ -69,10 +66,6 @@ const FreelancerDashboard = (): JSX.Element => {
       //TODO: check if user is logged in
       // redirect("login", `/dapp/freelancers/${freelancer?.username}/`);
     }
-  };
-
-  const redirectToBriefApplications = (applicationId: string) => {
-    router.push(`/briefs/${briefId}/applications/${applicationId}`);
   };
 
   const { setProfileMode } = useContext(AppContext) as AppContextType;
@@ -102,7 +95,6 @@ const FreelancerDashboard = (): JSX.Element => {
       try {
         if (!user?.username && !loadingUser) return router.push('/');
         setClient(await getStreamChat());
-        _setMyApplications(await getFreelancerApplications(user?.id));
       } catch (error) {
         setError({ message: error });
       } finally {
@@ -335,30 +327,6 @@ const FreelancerDashboard = (): JSX.Element => {
               <p className='text-4xl font-semibold text-black'>
                 {filteredApplications?.length}
               </p>
-              {/* <div className='flex ml-3'>
-                <Image
-                  className='rounded-full  w-9 h-9 object-cover'
-                  src={'/slide_1.png'}
-                  width={30}
-                  height={20}
-                  alt='image'
-                />
-
-                <Image
-                  className='rounded-full -ml-2 w-9 h-9 object-cover'
-                  src={'/slide_2.png'}
-                  width={30}
-                  height={30}
-                  alt='image'
-                />
-                <Image
-                  className='rounded-full -ml-2 w-9 h-9 object-cover'
-                  src={'/slide_3.png'}
-                  width={30}
-                  height={30}
-                  alt='image'
-                />
-              </div> */}
             </div>
             <div className='flex  justify-between'>
               <p>{selectedOption.name} brief</p>
