@@ -22,7 +22,6 @@ const timeAgo = new TimeAgo('en-US');
 
 export default function BriefComponent({ brief }: { brief: Brief }) {
   const router = useRouter();
-
   return (
     <div className='flex border-b hover:bg-imbue-light-purple-three cursor-pointer last:border-b-0'>
       <div
@@ -84,7 +83,9 @@ export default function BriefComponent({ brief }: { brief: Brief }) {
         <div className='px-7 flex gap-2 pb-4 border-b'>
           <Image
             className='w-9 h-9 rounded-full'
-            src='/profile-image.png'
+            src={
+              brief.owner_photo || require('@/assets/images/profile-image.png')
+            }
             width={40}
             height={40}
             alt='profile'

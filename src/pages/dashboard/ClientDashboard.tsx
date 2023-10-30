@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { BiChevronDown } from 'react-icons/bi';
+import { BsFilter } from 'react-icons/bs';
 import { IoIosArrowBack } from 'react-icons/io';
 import { MdOutlineAttachMoney } from 'react-icons/md';
 import { VscNewFile } from 'react-icons/vsc';
@@ -303,10 +304,13 @@ export default function ClientDashboard() {
             </div>
           </div>
           <div>
-            <div className='mb-2 flex justify-between'>
-              <p className='text-4xl font-semibold text-black'>
-                {filteredGrants.length}
-              </p>
+            <div className='mb-2 flex items-center justify-between'>
+              <div>
+                <p className='text-4xl font-semibold  text-black'>
+                  {filteredGrants.length}
+                </p>
+                <p>{filterGrantoptions.name} Grants</p>
+              </div>
               <p
                 onClick={handleGrantRedirect}
                 className='bg-imbue-purple px-7 items-center py-2 text-white text-sm rounded-full cursor-pointer'
@@ -374,9 +378,17 @@ export default function ClientDashboard() {
           slidesPerView={3}
           className=' !flex !flex-col-reverse   relative'
         >
-          <div className='pb-16 '>
+          <div
+            className='px-4 flex items-center gap-2 py-2 ml-auto mb-3 rounded-full border bg-imbue-light-grey border-imbue-light-grey cursor-pointer'
+            onClick={() => router.push('/freelancers')}
+          >
+            <BsFilter size={20} color='black' />
+            <p className='text-black'>view all</p>
+          </div>
+          <div className='pb-12 '>
             <Controller />
           </div>
+
           {recomdedFreelancer?.map((item) => (
             <SwiperSlide key={'freelancer' + item.id}>
               <FreelancerCard

@@ -740,6 +740,7 @@ export const fetchAllBriefs = () => (tx: Knex.Transaction) =>
       'briefs.duration_id',
       'budget',
       'users.display_name as created_by',
+      'users.profile_photo as owner_photo',
       'users.username as owner_name',
       'experience_level',
       'briefs.experience_id',

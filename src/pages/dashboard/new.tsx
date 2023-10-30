@@ -361,7 +361,7 @@ const FreelancerDashboard = (): JSX.Element => {
               </div> */}
             </div>
             <div className='flex  justify-between'>
-              <p>Approved brief</p>
+              <p>{selectedOption.name} brief</p>
               <div
                 className='px-3 py-0.5 border text-black border-text-aux-colour rounded-full cursor-pointer'
                 onClick={() =>

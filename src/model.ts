@@ -276,6 +276,7 @@ export type Brief = {
   currentUserId?: number;
   verified_only: boolean;
   owner_name: string;
+  owner_photo: string;
 };
 
 export type BriefSqlFilter = {

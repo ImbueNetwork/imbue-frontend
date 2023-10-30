@@ -55,6 +55,7 @@ const BriefDetails = (): JSX.Element => {
     user_id: 0,
     verified_only: false,
     owner_name: '',
+    owner_photo: '',
   });
 
   // const [browsingUser, setBrowsingUser] = useState<User | null>(null);

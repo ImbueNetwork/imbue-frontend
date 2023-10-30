@@ -18,9 +18,12 @@ export default function FreelancerCard({
     <div className='border min-w-[28.75rem]  px-5 py-5 rounded-2xl '>
       <div className='flex items-center gap-2'>
         <Image
-          className='w-14 h-14 rounded-full'
+          className='w-14 h-14 object-cover rounded-full'
           alt='freelancer profile'
-          src={'/profile-image.png'}
+          src={
+            freelancer.profile_image ||
+            require('@/assets/images/profile-image.png')
+          }
           width={40}
           height={40}
         />
@@ -37,7 +40,7 @@ export default function FreelancerCard({
           </p>
         </div>
         <p className='flex ml-auto bg-imbue-lime-light text-imbue-purple px-3 py-1 text-sm rounded-full gap-1 items-center'>
-          Avilable
+          Available
           <div className='w-2 h-2 rounded-full bg-lime-900' />
         </p>
       </div>
