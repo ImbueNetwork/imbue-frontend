@@ -1,8 +1,9 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import { Badge } from '@mui/material';
 import { useRouter } from 'next/router';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { BiChevronDown, BiRightArrowAlt } from 'react-icons/bi';
+import { MdOutlineAttachMoney } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   DefaultGenerics,
@@ -161,6 +162,16 @@ const FreelancerDashboard = (): JSX.Element => {
   const completedProjects = applications.filter(
     (app) => app.completed === true
   );
+
+  const totalEarnings = useMemo(() => {
+    const initValue = 0;
+    const total = completedProjects.reduce(
+      (acc, curr) => acc + Number(curr.total_cost_without_fee),
+      initValue
+    );
+    return total;
+  }, [completedProjects]);
+
   const activeProjects = applications.filter(
     (app) => app.completed === false && app.chain_project_id && app.brief_id
   );
@@ -364,21 +375,24 @@ const FreelancerDashboard = (): JSX.Element => {
             </div>
           </div>
         </div>
-        {/* <div className=' py-5 px-5 flex flex-col rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full '>
+        <div className=' py-5 px-5 flex flex-col rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full '>
           <div className='flex justify-between'>
             <p>Total Earnings</p>
-            <div className='px-3 py-0.5 border text-black border-text-aux-colour rounded-full'>
+            <div
+              onClick={() => router.push('/relay')}
+              className='px-3 py-0.5 border cursor-pointer text-black border-text-aux-colour rounded-full'
+            >
               <BiRightArrowAlt size={22} className='-rotate-45' />
             </div>
           </div>
           <div className='text-black mt-auto'>
             <div className='flex'>
               <MdOutlineAttachMoney size={23} />
-              <p className='text-4xl font-semibold'>32,975.00</p>
+              <p className='text-4xl font-semibold'>{totalEarnings}</p>
             </div>
             <p className='text-text-grey'>Payout Accounts</p>
           </div>
-        </div> */}
+        </div>
       </div>
       {/* ending of the box sections */}
       <div className='mt-9 flex w-full gap-7'>
