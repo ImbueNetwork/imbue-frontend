@@ -11,12 +11,12 @@ import { withdraw } from '@/utils/multichain';
 
 export default nextConnect()
   .use(passport.initialize())
-  .get(async (req: NextApiRequest, res: NextApiResponse) => {
+  .post(async (req: NextApiRequest, res: NextApiResponse) => {
     const { id } = req.query;
     const projectId = Number(id);
     const withdrawnAmount = await withdraw(projectId);
     if(withdrawnAmount > 0) {
-      return res.status(200).json({WithdrawnAmount:withdrawnAmount});
+      return res.status(200).json({WithdrawnAmount: withdrawnAmount});
     } else {
       return res.status(501).json({WithdrawnAmount:0});
     }

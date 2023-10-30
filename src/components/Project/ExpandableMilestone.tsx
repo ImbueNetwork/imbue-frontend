@@ -19,6 +19,7 @@ import {
   updateMilestone,
   updateProject,
   updateProjectVotingState,
+  withdrawOffchain,
 } from '@/redux/services/projectServices';
 import { voteOnMilestone } from '@/redux/services/projectServices';
 
@@ -274,6 +275,9 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
 
   // withdrawing funds
   const withdraw = async (account: WalletAccount) => {
+    if(!project) {
+      return
+    }
     setLoading(true);
     const imbueApi = await initImbueAPIInfo();
     const projectMilestones = project.milestones;
@@ -295,10 +299,12 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
           if (haveAllMilestonesBeenApproved) {
             project.status_id = OffchainProjectState.Completed;
             project.completed = true;
-
             await updateProject(Number(project?.id), project);
           }
           setLoading(false);
+          if(project.currency_id >= 100 && project.id) {
+            await withdrawOffchain(project.id);
+          }
           setSuccess(true);
           setSuccessTitle('Withdraw successfull');
         } else if (result.txError) {

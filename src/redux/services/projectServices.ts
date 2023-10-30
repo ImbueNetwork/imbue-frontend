@@ -356,3 +356,23 @@ export const getProjectEscrowAddress = async (
     };
   }
 };
+
+export const withdrawOffchain = async (
+  projectId: number | string,
+) => {
+  try {
+    const resp = await fetch(
+      `${config.apiBase}/payments/${projectId}/withdraw`,
+      {
+        headers: config.postAPIHeaders,
+        method: 'POST',
+      }
+    );
+
+    return resp.json();
+  } catch (error) {
+    return {
+      message: 'Failed to get voters. status:' + error,
+    };
+  }
+};
