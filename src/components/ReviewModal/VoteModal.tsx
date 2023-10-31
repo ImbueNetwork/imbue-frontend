@@ -24,10 +24,7 @@ import {
 import ChainService, { ImbueChainEvent } from '@/redux/services/chainService';
 import {
   insertNoConfidenceVoter,
-  updateFirstPendingMilestone,
-  updateMilestone,
   updateProject,
-  updateProjectVotingState,
   voteOnMilestone,
   watchChain,
 } from '@/redux/services/projectServices';

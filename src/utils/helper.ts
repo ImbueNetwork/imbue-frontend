@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-vars */
+import { Currency } from '@/model';
 import ChainService from '@/redux/services/chainService';
 import { getProjectBalance } from '@/redux/services/projectServices';
 
 import { initImbueAPIInfo } from './polkadot';
-import { Currency } from '@/model';
 const { decodeAddress, encodeAddress } = require('@polkadot/keyring');
 const { hexToU8a, isHex } = require('@polkadot/util');
 

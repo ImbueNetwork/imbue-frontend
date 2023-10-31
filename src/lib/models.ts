@@ -6,7 +6,6 @@ import { Knex } from 'knex';
 import { StreamChat } from 'stream-chat';
 
 import db from '@/db';
-import project from '@/pages/api/project';
 
 export type FederatedCredential = {
   id: number;

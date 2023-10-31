@@ -22,7 +22,6 @@ import { useSelector } from 'react-redux';
 
 import { NoConfidenceVoter } from '@/lib/queryServices/projectQueries';
 import * as utils from '@/utils';
-import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
@@ -53,11 +52,9 @@ import {
 } from '@/model';
 import { Currency } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
-import ChainService from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import {
   getProjectNoConfidenceVoters,
-  updateProject,
 } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 

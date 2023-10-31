@@ -20,13 +20,6 @@ export default nextConnect()
             .status(401)
             .json({ message: 'No project found for update' });
         }
-
-        const userAuth: Partial<models.User> | any = await authenticate(
-          'jwt',
-          req,
-          res
-        );
-        
         const resp: any = await tx('milestone_attachments').select('*').where({
           project_id: projectId,
           milestone_index: milestoneIndex,

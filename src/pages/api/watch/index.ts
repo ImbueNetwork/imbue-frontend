@@ -2,11 +2,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
-import { initChainApis, initPolkadotJSAPI } from '@/utils/polkadot';
-import ChainService, { ImbueChainEvent } from '@/redux/services/chainService';
-import { ImbueChainPollResult } from '@/model';
-import { deleteMilestones, fetchProjectMilestones, insertMilestones, updateMilestoneWithdrawStatus } from '@/lib/models';
+import { deleteMilestones, fetchProjectMilestones, insertMilestones } from '@/lib/models';
+import { initPolkadotJSAPI } from '@/utils/polkadot';
+
 import db from '@/db';
+import { ImbueChainPollResult } from '@/model';
+import ChainService, { ImbueChainEvent } from '@/redux/services/chainService';
 
 export default nextConnect()
     .post(async (req: NextApiRequest, res: NextApiResponse) => {

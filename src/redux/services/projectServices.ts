@@ -1,5 +1,6 @@
 import * as config from '@/config';
 import { User } from '@/model';
+
 import { ImbueChainEvent } from './chainService';
 
 export const createProject = async (project: any) => {

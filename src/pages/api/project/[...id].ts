@@ -4,13 +4,13 @@ import nextConnect from 'next-connect';
 import passport from 'passport';
 
 import * as models from '@/lib/models';
+import { initPolkadotJSAPI } from '@/utils/polkadot';
 
 import db from '@/db';
 import { OffchainProjectState } from '@/model';
+import ChainService from '@/redux/services/chainService';
 
 import { authenticate, verifyUserIdFromJwt } from '../auth/common';
-import { initImbueAPIInfo, initPolkadotJSAPI } from '@/utils/polkadot';
-import ChainService from '@/redux/services/chainService';
 
 type ProjectPkg = models.Project & {
   milestones: models.Milestone[];
@@ -55,7 +55,6 @@ export default nextConnect()
     });
   })
   .put(async (req: NextApiRequest, res: NextApiResponse) => {
-    const filter = new Filter();
     const { query, body } = req;
     const projectId = query?.id ? query.id[0] : null;
     // const brief_id: any = query.brief_id as string[];
