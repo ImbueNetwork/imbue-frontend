@@ -15,8 +15,8 @@ export async function up(knex: Knex): Promise<void> {
 export async function down(knex: Knex): Promise<void> {
   const tableName = 'milestones';
   await knex.schema.alterTable(tableName, (builder) => {
-    table.boolean('withdrawn_offchain');
-    table.boolean('withdrawn_onchain');
+    builder.boolean('withdrawn_offchain');
+    builder.boolean('withdrawn_onchain');
     builder.dropColumn('withdrawal_transaction_hash');
     builder.dropColumn('imbue_fee_transaction_hash');
   });
