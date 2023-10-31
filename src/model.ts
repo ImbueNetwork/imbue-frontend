@@ -85,7 +85,7 @@ export type VotesResp = {
   yes: User[];
   no: User[];
   pending: User[];
-}
+};
 
 export type Project = {
   id?: string | number;
@@ -288,6 +288,8 @@ export type Brief = {
   project_id?: number;
   currentUserId?: number;
   verified_only: boolean;
+  owner_name: string;
+  owner_photo: string;
 };
 
 export type BriefSqlFilter = {

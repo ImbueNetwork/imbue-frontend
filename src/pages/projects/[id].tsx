@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-constant-condition */
 /* eslint-disable react-hooks/exhaustive-deps */
+import ArrowBackIcon from '@mui/icons-material/ChevronLeft';
 import { Alert, IconButton, Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
@@ -250,7 +251,6 @@ function Project() {
         const brief = await getBrief(projectRes.brief_id);
         owner = brief?.user_id ? await utils.fetchUser(brief?.user_id) : null;
         freelancerRes = await getFreelancerProfile(projectRes?.user_id);
-
         if (freelancerRes?.user_id === user?.id) setIsApplicant(true);
 
         if (owner?.id === user?.id) {
@@ -351,9 +351,16 @@ function Project() {
 
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
+      <div
+        onClick={() => router.back()}
+        className='border border-content group hover:bg-content rounded-full flex items-center justify-center cursor-pointer absolute left-5 top-5'
+      >
+        <ArrowBackIcon className='h-7 w-7 group-hover:text-white' color='secondary' />
+      </div>
+
       <div className='w-full grid grid-cols-12 bg-white py-5 px-7 rounded-2xl'>
         <div className='col-start-1 col-end-10'>
-          <p className='text-black capitalize'>{projectType} information</p>
+          <p className='text-black capitalize ml-8'>{projectType} information</p>
           {/* starting of project section */}
           <div className='border-inherit mt-5 border rounded-xl py-4 px-5'>
             <div className='flex mb-4 items-center justify-between'>

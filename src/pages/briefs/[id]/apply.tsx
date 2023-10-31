@@ -5,7 +5,7 @@ import { Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Filter from 'bad-words';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 
@@ -19,6 +19,8 @@ import AccountChoice from '@/components/AccountChoice';
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
+import { AppContext, AppContextType } from '@/components/Layout';
+import SwitchToFreelancer from '@/components/PopupScreens/SwitchToFreelancer';
 import SuccessScreen from '@/components/SuccessScreen';
 
 import * as config from '@/config';
@@ -69,6 +71,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
+  const { profileView } = useContext(AppContext) as AppContextType
 
   const [applicationId, setapplicationId] = useState();
   const [error, setError] = useState<any>();
@@ -82,23 +85,23 @@ export const SubmitProposal = (): JSX.Element => {
   }, [applicationId]);
 
   useEffect(() => {
+    const getUserAndFreelancer = async () => {
+      const freelancer = await getFreelancerProfile(user?.username);
+      // if (!freelancer?.id) router.push(`/freelancers/new`);
+      setFreelancer(freelancer);
+
+      const userApplication: any = await getFreelancerBrief(user?.id, briefId);
+      if (userApplication && profileView === 'freelancer') {
+        router.push(`/briefs/${briefId}/applications/${userApplication?.id}/`);
+      }
+    };
+
     !loadingUser && getUserAndFreelancer();
-  }, [briefId, user?.username, loadingUser]);
+  }, [briefId, user?.username, loadingUser, profileView]);
 
   useEffect(() => {
     router?.isReady && getCurrentUserBrief();
   }, [user, router.isReady]);
-
-  const getUserAndFreelancer = async () => {
-    const freelancer = await getFreelancerProfile(user?.username);
-    if (!freelancer?.id) router.push(`/freelancers/new`);
-    setFreelancer(freelancer);
-
-    const userApplication: any = await getFreelancerBrief(user?.id, briefId);
-    if (userApplication) {
-      router.push(`/briefs/${briefId}/applications/${userApplication?.id}/`);
-    }
-  };
 
   const getCurrentUserBrief = async () => {
     if (briefId && user) {
@@ -276,6 +279,7 @@ export const SubmitProposal = (): JSX.Element => {
   };
 
   // const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
+
 
   if (loadingUser || loading) <FullScreenLoader />;
 
@@ -575,9 +579,8 @@ export const SubmitProposal = (): JSX.Element => {
             title={disableSubmit && 'Please fill all the required input fields'}
           >
             <button
-              className={`primary-btn in-dark w-button ${
-                disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
-              }`}
+              className={`primary-btn in-dark w-button ${disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
+                }`}
               onClick={() => !disableSubmit && handleSubmit()}
             >
               Submit
@@ -636,6 +639,13 @@ export const SubmitProposal = (): JSX.Element => {
           </button>
         </div>
       </ErrorScreen>
+
+      {
+        profileView === 'client' && (
+          <SwitchToFreelancer />
+        )
+      }
+
     </div>
   );
 };
