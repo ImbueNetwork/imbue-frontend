@@ -233,27 +233,21 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
 
   // withdrawing funds
   const withdraw = async (account: WalletAccount) => {
-    if(!project.id)
-    return
+    if (!project.id)
+      return
     setLoading(true);
 
     try {
-      const imbueApi = await initImbueAPIInfo();
       const projectMilestones = project.milestones;
       // const user: User | any = await utils.getCurrentUser();
-      const chainService = new ChainService(imbueApi, user);
+      const approvedMilestones = project.milestones.filter((milestone: Milestone) => milestone.is_approved).map(milestone => milestone.milestone_index);
+      const withdrawnMilestones = project.milestones.filter((milestone: Milestone) => milestone.withdrawn_onchain).map(milestone => milestone.milestone_index);
+      const onChainWithdrawalRequired = JSON.stringify(approvedMilestones) != JSON.stringify(withdrawnMilestones);
       watchChain(ImbueChainEvent.Withraw, account.address, project.id);
 
-
-
-      const allApprovedMilestoneIds = project.milestones.filter((milestone: Milestone) => milestone.is_approved).map(milestone => milestone.milestone_index);
-      const allOnchainWithdrawnMilestones = project.milestones.filter((milestone: Milestone) => milestone.withdrawn_onchain).map(milestone => milestone.milestone_index);;
-
-      const onChainWithdrawalRequired = JSON.stringify(allApprovedMilestoneIds) != JSON.stringify(allOnchainWithdrawnMilestones);
-
-
-      if(onChainWithdrawalRequired) {
-
+      if (onChainWithdrawalRequired) {
+        const imbueApi = await initImbueAPIInfo();
+        const chainService = new ChainService(imbueApi, user);
         const result = await chainService.withdraw(
           account,
           project.chain_project_id
@@ -265,19 +259,19 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
               const haveAllMilestonesBeenApproved = projectMilestones
                 .map((m: any) => m.is_approved)
                 .every(Boolean);
-  
+
               if (haveAllMilestonesBeenApproved) {
                 project.status_id = OffchainProjectState.Completed;
                 project.completed = true;
                 await updateProject(Number(project?.id), project);
               }
-  
+
               if (project.currency_id < 100) {
                 setSuccess(true);
                 setSuccessTitle('Withdraw successfull');
               }
-  
-  
+
+
             } else if (result.txError) {
               // setLoading(false);
               setError({ message: 'Error : ' + result.errorMessage });
