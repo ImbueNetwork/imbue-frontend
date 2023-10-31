@@ -288,10 +288,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
         console.log("**** withdraw result is ");
         console.log(withdrawResult);
         if (withdrawResult.txError) {
-          // setLoading(false);
           setSuccess(false);
-          console.log("**** withdraw result error message is ");
-          console.log(withdrawResult.errorMessage);
           setError({ message: withdrawResult.errorMessage });
         } else {
           setSuccess(true);

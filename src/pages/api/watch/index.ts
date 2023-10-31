@@ -19,6 +19,12 @@ export default nextConnect()
             relayChain: relayChainApi,
         };
 
+        console.log("**** posting");
+        console.log(address);
+        console.log(imbueChainEvent);
+        console.log(projectId);
+        console.log(milestoneId);
+
         const chainService = new ChainService(allApis);
         const pollResult: ImbueChainPollResult = await chainService.pollChainMessage(
             imbueChainEvent,
@@ -26,6 +32,8 @@ export default nextConnect()
         ) as ImbueChainPollResult;
 
         while (pollResult == ImbueChainPollResult.Pending) {
+            console.log("***** poll result is ");
+            console.log(pollResult);
             await new Promise((f) => setTimeout(f, 1000));
         }
 
@@ -43,6 +51,7 @@ export default nextConnect()
 
                 case ImbueChainEvent.ApproveMilestone: {
                     if (milestoneId) {
+                        console.log("***** updating approve milestone");
                         db.transaction(async (tx) => {
                             const milestones = await fetchProjectMilestones(projectId)(tx);
                             const updatedMilestones = milestones.map((item) => {
@@ -55,6 +64,8 @@ export default nextConnect()
                                     return item
                                 }
                             });
+                            console.log("***** updatedMilestones is");
+                            console.log(updatedMilestones);
                             await deleteMilestones(projectId)(tx);
                             await insertMilestones(
                                 updatedMilestones,
@@ -68,8 +79,11 @@ export default nextConnect()
 
                 case ImbueChainEvent.Withraw: {
                     db.transaction(async (tx) => {
+                        console.log("***** updating withdraw milestone");
                         const milestones = await fetchProjectMilestones(projectId)(tx);
                         const allApprovedMilestoneIds: number[] = milestones.filter((milestone) => milestone.is_approved).map(milestone => milestone.milestone_index);
+                        console.log("***** allApprovedMilestoneIds is");
+                        console.log(allApprovedMilestoneIds);
                         const updatedMilestones = milestones.map((item) => {
                             if (allApprovedMilestoneIds.includes(item.milestone_index)) {
                                 return {
@@ -81,6 +95,10 @@ export default nextConnect()
                             }
 
                         });
+
+
+                        console.log("***** updatedMilestones is");
+                        console.log(updatedMilestones);
                         await deleteMilestones(projectId)(tx);
                         await insertMilestones(
                             updatedMilestones,

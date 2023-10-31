@@ -179,12 +179,12 @@ export default nextConnect()
 
 
 const syncProject = async (project: any, tx: any) => {
-  if (!project.chain_project_id) return;
-  let requireSync = false;
-  const filter = new Filter();
-  const projectId = project.id;
+  if (!project.chain_project_id) return project;
+  let milestonesRequiresSync = false;
+ 
   try {
-
+    const filter = new Filter();
+    const projectId = project.id;
     const imbueApi = await initPolkadotJSAPI(process.env.IMBUE_NETWORK_WEBSOCK_ADDR!);
     const relayChainApi = await initPolkadotJSAPI(process.env.RELAY_CHAIN_WEBSOCK_ADDR!);
     const allApis = {
@@ -194,15 +194,11 @@ const syncProject = async (project: any, tx: any) => {
 
     const chainService = new ChainService(allApis);
     const onChainProjectRes = await chainService.convertToOnChainProject(project);
-
-    const onchainApprovedMilestones = onChainProjectRes?.milestones.map((milestone) => milestone.is_approved);
-    const offchainApprovedMilestones = project.milestones.map((milestone: any) => milestone.is_approved);
-
-    if (onChainProjectRes && JSON.stringify(onchainApprovedMilestones) != JSON.stringify(offchainApprovedMilestones)) {
+    if (onChainProjectRes) {
       onChainProjectRes.milestones.map((milestone, index) => {
         project.milestones[index].is_approved = milestone.is_approved;
       });
-      requireSync = true;
+      milestonesRequiresSync = true;
     }
 
     if (onChainProjectRes?.id && project?.id) {
@@ -217,13 +213,9 @@ const syncProject = async (project: any, tx: any) => {
         onChainProjectRes.projectInMilestoneVoting &&
         project.project_in_voting_of_no_confidence ===
         onChainProjectRes.projectInVotingOfNoConfidence
-        && !requireSync
+        && !milestonesRequiresSync
       )
         return project;
-
-      // setWaitMessage("Syncing project with chain")
-      // setWait(true)
-      // setMilestoneLoadingTitle("Getting milestone data from chain...")
 
       const newProject = {
         ...project,
@@ -232,7 +224,6 @@ const syncProject = async (project: any, tx: any) => {
         first_pending_milestone: firstPendingMilestoneChain,
         project_in_voting_of_no_confidence:
           onChainProjectRes.projectInVotingOfNoConfidence,
-        // milestones: onChainProjectRes.milestones
       };
 
       project.project_in_milestone_voting =
@@ -240,7 +231,6 @@ const syncProject = async (project: any, tx: any) => {
       project.first_pending_milestone = firstPendingMilestoneChain;
       project.project_in_voting_of_no_confidence =
         onChainProjectRes.projectInVotingOfNoConfidence;
-      // project.milestones = onChainProjectRes.milestones
 
       const updatedProject = await models.updateProject(projectId, newProject)(tx);
 
@@ -270,16 +260,8 @@ const syncProject = async (project: any, tx: any) => {
 
       return pkg;
 
-      // await updateProject(project.id, newProject);
     }
-    // else {
-    //   setProject(project);
-    //   setFirstPendingMilestone(project.first_pending_milestone ?? -1);
-    //   setProjectInMilestoneVoting(project.project_in_milestone_voting);
-    //   setProjectInVotingOfNoConfidence(project?.project_in_voting_of_no_confidence ?? false);
-    // }
   } catch (error) {
-    // eslint-disable-next-line no-console
     return project
   }
 };

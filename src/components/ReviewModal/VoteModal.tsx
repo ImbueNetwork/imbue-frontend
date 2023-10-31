@@ -76,7 +76,6 @@ export default function VoteModal({
       // const userRes: User | any = await utils.getCurrentUser();
       const chainService = new ChainService(imbueApi, user);
       watchChain(ImbueChainEvent.ApproveMilestone, votingWalletAccount.address, project.id, milestoneKeyInView);
-
       const result = await chainService.voteOnMilestone(
         votingWalletAccount,
         project.chain_project_id,
@@ -84,53 +83,13 @@ export default function VoteModal({
         vote
       );
 
-      let pollResult = ImbueChainPollResult.Pending;
-
-      if (!result.txError) {
-        pollResult = (await chainService.pollChainMessage(
-          ImbueChainEvent.ApproveMilestone,
-          votingWalletAccount
-        )) as ImbueChainPollResult;
-      } else {
+      if (result.txError) {
         setError({ message: result.errorMessage });
       }
 
       // eslint-disable-next-line no-constant-condition
       while (true) {
-        if (pollResult == ImbueChainPollResult.EventFound) {
-          await updateMilestone(Number(project.id), milestoneKeyInView, true);
-          await updateProjectVotingState(Number(project.id), false);
-          await updateFirstPendingMilestone(
-            Number(project.id),
-            Number(project.first_pending_milestone) + 1
-          );
-
-          await voteOnMilestone(
-            user.id,
-            user.web3_address,
-            milestoneKeyInView,
-            vote,
-            project.id
-          );
-          ///// fire notifications //////////////////////////////////
-          if (targetUser) {
-            await sendNotification(
-              [
-                String(
-                  projectType === 'brief' ? targetUser.user_id : targetUser.id
-                ),
-              ],
-              'approved_Milestone.testing',
-              'A Milestone has been approved',
-              `great your milestone has been accepted`,
-              Number(project.id),
-              Number(project.first_pending_milestone) + 1
-            );
-          }
-          setStep(4);
-          setVisible(true);
-          break;
-        } else if (result.status) {
+        if (result.status) {
           const resp = await voteOnMilestone(
             user.id,
             user.web3_address,
@@ -164,34 +123,7 @@ export default function VoteModal({
           setError({ message: result.errorMessage });
           setVisible(false);
           break;
-        } else if (pollResult != ImbueChainPollResult.Pending) {
-          const resp = await voteOnMilestone(
-            user.id,
-            user.web3_address,
-            milestoneKeyInView,
-            vote,
-            project.id
-          );
-
-          if (resp.milestoneApproved && targetUser?.id) {
-            await sendNotification(
-              [
-                String(
-                  projectType === 'brief' ? targetUser.user_id : targetUser.id
-                ),
-              ],
-              'approved_Milestone.testing',
-              'A Milestone has been approved',
-              `approved milestone`,
-              Number(project.id),
-              Number(project.first_pending_milestone) + 1
-            );
-          }
-
-          setStep(4);
-          setVisible(true);
-          break;
-        }
+        } 
         await new Promise((f) => setTimeout(f, 1000));
       }
     } catch (error) {
