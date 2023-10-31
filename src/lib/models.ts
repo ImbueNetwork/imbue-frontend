@@ -101,7 +101,8 @@ export type Milestone = ProposedMilestone & {
   milestone_index: number;
   project_id: number | string;
   is_approved: boolean;
-  withdrawn: boolean;
+  withdrawn_onchain: boolean;
+  withdrawn_offchain: boolean;
   withdrawal_transaction_hash: string;
   imbue_fee_transaction_hash: string;
 };
@@ -705,7 +706,7 @@ export const updateMilestoneWithdrawHashs =
       .update({
         withdrawal_transaction_hash: tx_hash,
         imbue_fee_transaction_hash: imbue_fee_tx_hash,
-        withdrawn: true
+        withdrawn_offchain: true
       })
       .returning('*');
 

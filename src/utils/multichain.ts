@@ -89,14 +89,14 @@ export const getBalance = async (projectId: number, currencyId: number, escrowAd
 
     switch (currencyId) {
       case (Currency.ETH): {
-        return {eth: ethBalance};
+        return { eth: ethBalance };
       }
       case (Currency.USDT): {
         const contract = await getEVMContract(currencyId);
         const signer = await ethProvider.getSigner();
         const token = new ethers.Contract(contract.address, ERC_20_ABI, signer);
         const projectBalance = Number(ethers.formatUnits(await token.balanceOf(projectAddress.description()), await token.decimals()));
-        return {usdt: projectBalance, eth: ethBalance};
+        return { usdt: projectBalance, eth: ethBalance };
       }
       default:
         return
@@ -146,37 +146,26 @@ const transfer = async (projectId: number, currencyId: number, destinationAddres
     switch (currency.toLowerCase()) {
       case "eth":
         const imbueFee = ethers.parseEther((amount * 0.05).toPrecision(5).toString());
-        const transferAmount =  ethers.parseEther((amount).toPrecision(5).toString()) - imbueFee;
+        const transferAmount = ethers.parseEther((amount).toPrecision(5).toString()) - imbueFee;
         imbue_fee_transaction = await sender.sendTransaction({ to: treasuryAddress, value: imbueFee });
         withdrawal_transaction = await sender.sendTransaction({ to: destinationAddress, value: transferAmount });
         break;
       case "usdt": {
         const contract = await getEVMContract(currencyId);
         const token = new ethers.Contract(contract.address, ERC_20_ABI, sender);
-        const imbueFee = ethers.parseUnits((amount * 0.05).toPrecision(5).toString(),contract.decimals);
-        const transferAmount =  ethers.parseUnits((amount).toPrecision(5).toString(),contract.decimals) - imbueFee;
-        await token
-          .transfer(treasuryAddress, imbueFee)
-          .then(async (transferResult: any) => {
-            imbue_fee_transaction = await transferResult;
-          })
-          .catch((error: any) => {
-            console.error("Error", error);
-          });
+        const imbueFee = ethers.parseUnits((amount * 0.05).toPrecision(5).toString(), contract.decimals);
+        const transferAmount = ethers.parseUnits((amount).toPrecision(5).toString(), contract.decimals) - imbueFee;
+        imbue_fee_transaction = await token
+          .transfer(treasuryAddress, imbueFee);
 
-        await token
-          .transfer(destinationAddress, transferAmount)
-          .then(async (transferResult: any) => {
-            withdrawal_transaction = await transferResult;
-          })
-          .catch((error: any) => {
-            console.error("Error", error);
-          });
+        withdrawal_transaction = await token
+          .transfer(destinationAddress, transferAmount);
         break;
       }
     }
     await ethProvider.waitForTransaction(imbue_fee_transaction.hash, 1, 150000);
     await ethProvider.waitForTransaction(withdrawal_transaction.hash, 1, 150000);
+
     await db.transaction(async (tx: any) => {
       await updateMilestoneWithdrawHashs(projectId, approvedMilestones, withdrawal_transaction.hash, imbue_fee_transaction.hash)(tx);
     });
@@ -184,8 +173,7 @@ const transfer = async (projectId: number, currencyId: number, destinationAddres
     withdrawnAmount = amount;
     return withdrawnAmount;
   } catch (e) {
-    new Error(`Failed to withdraw funds. ${e}`);
-    return withdrawnAmount;
+    throw new Error(`Failed to withdraw funds. ${e}`);
   }
 }
 
@@ -223,7 +211,7 @@ export const withdraw = async (projectId: number) => {
           approvedFundsTotal = offchainApprovedMilestones.filter(milestone => !milestone.withdrawn)
             .reduce((sum, milestone) => sum + Number(milestone.amount), 0);
 
-          if(approvedFundsTotal > 0) {
+          if (approvedFundsTotal > 0) {
             approvedFundsTotal = Number(await transfer(projectId, project.currency_id, project.payment_address, approvedFundsTotal, onchainApprovedMilestoneIds));
           }
           keepCalling = false;
@@ -231,8 +219,7 @@ export const withdraw = async (projectId: number) => {
         }
       }
     } catch (e) {
-      new Error(`Failed to withdraw funds. ${e}`);
-      return approvedFundsTotal;
+      throw new Error(`Failed to withdraw funds. ${e}`);
     }
   });
 

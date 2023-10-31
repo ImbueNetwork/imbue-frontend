@@ -43,8 +43,8 @@ export enum ImbueChainEvent {
 
 class ChainService {
   imbueApi: ImbueApiInfo;
-  user: User;
-  constructor(imbueApi: ImbueApiInfo, user: User) {
+  user?: User;
+  constructor(imbueApi: ImbueApiInfo, user?: User) {
     this.imbueApi = imbueApi;
     this.user = user;
   }
@@ -527,7 +527,7 @@ class ChainService {
       project.chain_project_id
     );
 
-    if (!projectOnChain) {
+    if (!projectOnChain || !this.user) {
       return;
     }
 

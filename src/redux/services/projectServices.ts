@@ -369,10 +369,21 @@ export const withdrawOffchain = async (
       }
     );
 
-    return resp.json();
+    if (resp.ok) {
+      return {
+        txError: false,
+        withdrawn: await resp.json(),
+      };
+    } else {
+      return {
+        txError: true,
+        errorMessage: await resp.json(),
+      };
+    }
   } catch (error) {
     return {
-      message: 'Failed to get voters. status:' + error,
+      txError: true,
+      errorMessage: 'Failed to withdraw chains offchain' + error,
     };
   }
 };

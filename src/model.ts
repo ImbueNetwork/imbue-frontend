@@ -150,7 +150,10 @@ export type Milestone = {
   amount: number;
   description: string;
   withdrawn: boolean;
-  withdrawn_transaction_hash: string;
+  withdrawn_onchain: boolean;
+  withdrawn_offchain: boolean;
+  withdrawal_transaction_hash: string;
+  imbue_fee_transaction_hash: string;
 };
 
 export type Contribution = {

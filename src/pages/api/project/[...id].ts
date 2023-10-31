@@ -9,6 +9,8 @@ import db from '@/db';
 import { OffchainProjectState } from '@/model';
 
 import { authenticate, verifyUserIdFromJwt } from '../auth/common';
+import { initImbueAPIInfo } from '@/utils/polkadot';
+import ChainService from '@/redux/services/chainService';
 
 type ProjectPkg = models.Project & {
   milestones: models.Milestone[];
@@ -45,7 +47,12 @@ export default nextConnect()
           approvers: approvers.map(({ approver }: any) => approver),
         };
 
-        return res.send(pkg);
+
+
+        const updatedProject = await syncProject(pkg, tx);
+
+
+        return res.send(updatedProject);
       } catch (e) {
         return res.status(404).end();
         new Error(`Failed to fetch project by id: ${id}`, {
@@ -136,6 +143,7 @@ export default nextConnect()
         //   newProject.project_in_milestone_voting = project_in_milestone_voting;
 
         const project = await models.updateProject(projectId, newProject)(tx);
+        const filter = new Filter();
 
         if (!project.id) {
           return new Error('Cannot update milestones: `project_id` missing.');
@@ -168,3 +176,113 @@ export default nextConnect()
       }
     });
   });
+
+
+const syncProject = async (project: any, tx: any) => {
+  if (!project.chain_project_id) return;
+  let requireSync = false;
+  const filter = new Filter();
+  const projectId = project.id;
+  try {
+    const imbueApi = await initImbueAPIInfo();
+    const chainService = new ChainService(imbueApi);
+    const onChainProjectRes = await chainService.getProject(project.id);
+    if (onChainProjectRes?.projectInVotingOfNoConfidence) {
+      const noConfidenceVotesChain = await chainService.getNoConfidenceVoters(
+        project.chain_project_id
+      );
+      // TODO: sync no confidene vote list
+    }
+
+    const onchainApprovedMilestones = onChainProjectRes?.milestones.map((milestone) => milestone.is_approved);
+    const offchainApprovedMilestones = project.milestones.map((milestone: any) => milestone.is_approved);
+    if (onChainProjectRes && JSON.stringify(onchainApprovedMilestones) != JSON.stringify(offchainApprovedMilestones)) {
+      onChainProjectRes.milestones.map((milestone, index) => {
+        project.milestones[index].is_approved = milestone.is_approved;
+      });
+      requireSync = true;
+    }
+
+    if (onChainProjectRes?.id && project?.id) {
+      const firstPendingMilestoneChain =
+        await chainService.findFirstPendingMilestone(
+          onChainProjectRes.milestones
+        );
+
+      if (
+        firstPendingMilestoneChain === project.first_pending_milestone &&
+        project.project_in_milestone_voting ===
+        onChainProjectRes.projectInMilestoneVoting &&
+        project.project_in_voting_of_no_confidence ===
+        onChainProjectRes.projectInVotingOfNoConfidence
+        && !requireSync
+      )
+        return project;
+
+      // setWaitMessage("Syncing project with chain")
+      // setWait(true)
+      // setMilestoneLoadingTitle("Getting milestone data from chain...")
+
+      const newProject = {
+        ...project,
+        project_in_milestone_voting:
+          onChainProjectRes.projectInMilestoneVoting,
+        first_pending_milestone: firstPendingMilestoneChain,
+        project_in_voting_of_no_confidence:
+          onChainProjectRes.projectInVotingOfNoConfidence,
+        // milestones: onChainProjectRes.milestones
+      };
+
+      project.project_in_milestone_voting =
+        onChainProjectRes.projectInMilestoneVoting;
+      project.first_pending_milestone = firstPendingMilestoneChain;
+      project.project_in_voting_of_no_confidence =
+        onChainProjectRes.projectInVotingOfNoConfidence;
+      // project.milestones = onChainProjectRes.milestones
+
+      const projectApproverIds = await models.fetchProjectApproverUserIds(
+        projectId
+      )(tx);
+
+
+      const updatedProject = await models.updateProject(projectId, newProject)(tx);
+
+      if (!updatedProject.id) {
+        return new Error('Cannot update milestones: `project_id` missing.');
+      }
+
+      // drop then recreate
+      await models.deleteMilestones(projectId)(tx);
+
+      //filtering milestones in back-end
+      const filterdMileStone = project.milestones.map((item: any) => {
+        return {
+          ...item,
+          name: filter.clean(item.name),
+          description: filter.clean(item.description),
+        };
+      });
+
+      const pkg: ProjectPkg = {
+        ...project,
+        milestones: await models.insertMilestones(
+          filterdMileStone,
+          project.id
+        )(tx),
+      };
+
+      return pkg;
+
+      // await updateProject(project.id, newProject);
+    }
+    // else {
+    //   setProject(project);
+    //   setFirstPendingMilestone(project.first_pending_milestone ?? -1);
+    //   setProjectInMilestoneVoting(project.project_in_milestone_voting);
+    //   setProjectInVotingOfNoConfidence(project?.project_in_voting_of_no_confidence ?? false);
+    // }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    return project
+  }
+};

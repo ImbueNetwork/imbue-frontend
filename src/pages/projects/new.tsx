@@ -309,12 +309,7 @@ function Project() {
       setLoading(false);
       setChainLoading(false);
 
-      if (
-        projectRes.status_id !== OffchainProjectState.Completed &&
-        projectRes.status_id !== OffchainProjectState.Refunded
-      ) {
-        await syncProject(projectRes);
-      }
+
     } catch (error) {
       console.error(error);
       setError({ message: 'can not find the project ' + error });
