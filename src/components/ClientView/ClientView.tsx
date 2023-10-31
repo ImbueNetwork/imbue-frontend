@@ -1,4 +1,5 @@
-import classNames from 'classnames';
+import ArrowBackIcon from '@mui/icons-material/ChevronLeft';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import { Freelancer, Project } from '@/model';
@@ -29,9 +30,41 @@ export default function ClientView({
   loadingApplications,
 }: ClientViewProps) {
   const [switcher, setSwitcher] = useState('application');
+  const router = useRouter();
   return (
     <div className='bg-white rounded-2xl overflow-hidden'>
-      <div className='text-imbue-purple py-7 px-9 flex text-sm space-x-9 border-b border-b-imbue-light-purple'>
+      <div className='flex items-center w-full'>
+        <div
+          onClick={() => router.back()}
+          className='border border-content ml-2 group hover:bg-content rounded-full flex items-center justify-center cursor-pointer  left-5 top-10'
+        >
+          <ArrowBackIcon
+            className='h-7 w-7 group-hover:text-white'
+            color='secondary'
+          />
+        </div>
+        <div className='mx-2 border w-full justify-between rounded-3xl flex cursor-pointer'>
+          <p
+            onClick={() => setSwitcher('application')}
+            className='text-2xl text-black py-5 border-r text-center w-full  '
+          >
+            Briefs ({briefs?.briefsUnderReview?.length})
+          </p>
+          <p
+            onClick={() => setSwitcher('projects')}
+            className='text-2xl text-black py-5 border-r text-center w-full'
+          >
+            Projects({briefs?.acceptedBriefs.length})
+          </p>
+          <p
+            onClick={() => setSwitcher('grants')}
+            className='text-2xl text-black border-r py-5 text-center w-full'
+          >
+            Grants({ongoingGrants.length})
+          </p>
+        </div>
+      </div>
+      {/* <div className='text-imbue-purple py-7 px-9 flex text-sm space-x-9 border-b border-b-imbue-light-purple'>
         <p
           onClick={() => setSwitcher('application')}
           className={classNames(
@@ -41,7 +74,7 @@ export default function ClientView({
               : 'text-imbue-light-purple-two'
           )}
         >
-          Briefs ({briefs?.briefsUnderReview.length})
+          Briefs ({briefs?.briefsUnderReview?.length})
         </p>
         <p
           onClick={() => setSwitcher('projects')}
@@ -65,7 +98,7 @@ export default function ClientView({
         >
           Grants({ongoingGrants.length})
         </p>
-      </div>
+      </div> */}
       {/* <Divider className='mb-5' /> */}
 
       {switcher === 'application' && (
