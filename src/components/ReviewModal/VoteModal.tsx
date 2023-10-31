@@ -29,6 +29,7 @@ import {
   updateProject,
   updateProjectVotingState,
   voteOnMilestone,
+  watchChain,
 } from '@/redux/services/projectServices';
 
 import ReviewModal from './ReviewModal';
@@ -74,6 +75,7 @@ export default function VoteModal({
       const imbueApi = await initImbueAPIInfo();
       // const userRes: User | any = await utils.getCurrentUser();
       const chainService = new ChainService(imbueApi, user);
+      watchChain(ImbueChainEvent.ApproveMilestone, votingWalletAccount.address, project.id, milestoneKeyInView);
 
       const result = await chainService.voteOnMilestone(
         votingWalletAccount,

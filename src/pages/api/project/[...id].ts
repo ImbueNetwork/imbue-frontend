@@ -9,7 +9,7 @@ import db from '@/db';
 import { OffchainProjectState } from '@/model';
 
 import { authenticate, verifyUserIdFromJwt } from '../auth/common';
-import { initImbueAPIInfo } from '@/utils/polkadot';
+import { initImbueAPIInfo, initPolkadotJSAPI } from '@/utils/polkadot';
 import ChainService from '@/redux/services/chainService';
 
 type ProjectPkg = models.Project & {
@@ -184,18 +184,20 @@ const syncProject = async (project: any, tx: any) => {
   const filter = new Filter();
   const projectId = project.id;
   try {
-    const imbueApi = await initImbueAPIInfo();
-    const chainService = new ChainService(imbueApi);
-    const onChainProjectRes = await chainService.getProject(project.id);
-    if (onChainProjectRes?.projectInVotingOfNoConfidence) {
-      const noConfidenceVotesChain = await chainService.getNoConfidenceVoters(
-        project.chain_project_id
-      );
-      // TODO: sync no confidene vote list
-    }
+
+    const imbueApi = await initPolkadotJSAPI(process.env.IMBUE_NETWORK_WEBSOCK_ADDR!);
+    const relayChainApi = await initPolkadotJSAPI(process.env.RELAY_CHAIN_WEBSOCK_ADDR!);
+    const allApis = {
+        imbue: imbueApi,
+        relayChain: relayChainApi,
+    };
+
+    const chainService = new ChainService(allApis);
+    const onChainProjectRes = await chainService.convertToOnChainProject(project);
 
     const onchainApprovedMilestones = onChainProjectRes?.milestones.map((milestone) => milestone.is_approved);
     const offchainApprovedMilestones = project.milestones.map((milestone: any) => milestone.is_approved);
+
     if (onChainProjectRes && JSON.stringify(onchainApprovedMilestones) != JSON.stringify(offchainApprovedMilestones)) {
       onChainProjectRes.milestones.map((milestone, index) => {
         project.milestones[index].is_approved = milestone.is_approved;
@@ -239,11 +241,6 @@ const syncProject = async (project: any, tx: any) => {
       project.project_in_voting_of_no_confidence =
         onChainProjectRes.projectInVotingOfNoConfidence;
       // project.milestones = onChainProjectRes.milestones
-
-      const projectApproverIds = await models.fetchProjectApproverUserIds(
-        projectId
-      )(tx);
-
 
       const updatedProject = await models.updateProject(projectId, newProject)(tx);
 

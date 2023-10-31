@@ -521,13 +521,13 @@ class ChainService {
     return offChainProject;
   }
 
-  async convertToOnChainProject(project: Project) {
+  public async convertToOnChainProject(project: Project) {
     if (!project?.chain_project_id) return;
     const projectOnChain: any = await this.getProjectOnChain(
       project.chain_project_id
     );
 
-    if (!projectOnChain || !this.user) {
+    if (!projectOnChain) {
       return;
     }
 
@@ -539,8 +539,8 @@ class ChainService {
     // get project state
     let projectState = OnchainProjectState.PendingProjectApproval;
     const userIsInitiator = await this.isUserInitiator(
+      projectOnChain,
       this.user,
-      projectOnChain
     );
     let projectInContributionRound = false;
     let projectInMilestoneVoting = false;
@@ -696,12 +696,12 @@ class ChainService {
   }
 
   public async isUserInitiator(
-    user: User,
-    projectOnChain: ProjectOnChain
+    projectOnChain: ProjectOnChain,
+    user?: User,
   ): Promise<boolean> {
     let userIsInitiator = false;
     const isLoggedIn = user && user.web3Accounts != null;
-    if (isLoggedIn) {
+    if (user && isLoggedIn) {
       user?.web3Accounts?.forEach((web3Account) => {
         if (web3Account.address == projectOnChain.initiator) {
           userIsInitiator = true;

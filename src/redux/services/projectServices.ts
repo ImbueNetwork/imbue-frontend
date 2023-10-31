@@ -1,5 +1,6 @@
 import * as config from '@/config';
 import { User } from '@/model';
+import { ImbueChainEvent } from './chainService';
 
 export const createProject = async (project: any) => {
   try {
@@ -386,4 +387,21 @@ export const withdrawOffchain = async (
       errorMessage: 'Failed to withdraw chains offchain' + error,
     };
   }
+};
+
+export const watchChain = async (
+  imbueChainEvent: ImbueChainEvent,
+  address: string,
+  projectId: number | string,
+  milestoneId?: number | string,
+) => {
+    const resp = await fetch(
+      `${config.apiBase}/watch`,
+      {
+        headers: config.postAPIHeaders,
+        method: 'POST',
+        body: JSON.stringify({ imbueChainEvent, address, projectId, milestoneId }),
+      }
+    );
+    return await resp.json();
 };

@@ -710,6 +710,17 @@ export const updateMilestoneWithdrawHashs =
       })
       .returning('*');
 
+export const updateMilestoneWithdrawStatus =
+  (projectId:number, milestoneIds: number[]) =>
+  (tx: Knex.Transaction) =>
+    tx<Milestone>('milestones')
+      .where(`project_id`, projectId)
+      .whereIn(`milestone_index`, milestoneIds)
+      .update({
+        withdrawn_onchain: true
+      })
+      .returning('*');
+
 export const insertMilestoneDetails =
   (value: MilestoneDetails) => async (tx: Knex.Transaction) =>
     (
