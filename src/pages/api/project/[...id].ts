@@ -94,6 +94,7 @@ export default nextConnect()
           project_in_voting_of_no_confidence,
           first_pending_milestone,
           project_in_milestone_voting,
+          payment_address
         } = body;
 
         // ensure the project exists first
@@ -127,6 +128,7 @@ export default nextConnect()
           project_in_voting_of_no_confidence,
           first_pending_milestone,
           project_in_milestone_voting,
+          payment_address
         };
 
         // if (first_pending_milestone)
@@ -184,6 +186,8 @@ const syncProject = async (project: any, tx: any) => {
       imbue: imbueApi,
       relayChain: relayChainApi,
     };
+
+    console.log("**** syncing project");
 
     const chainService = new ChainService(allApis);
     const onChainProjectRes = await chainService.convertToOnChainProject(project);
@@ -253,6 +257,8 @@ const syncProject = async (project: any, tx: any) => {
         )(tx),
       };
       return pkg;
+    } else {
+      return project
     }
   } catch (error) {
     console.log("**** error is ");

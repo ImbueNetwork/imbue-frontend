@@ -225,6 +225,7 @@ export const SubmitProposal = (): JSX.Element => {
           duration_id: durationId,
           description: brief?.description,
           verified_only: brief.verified_only,
+          payment_address: paymentAddress
         }),
       });
       if (resp.ok) {
