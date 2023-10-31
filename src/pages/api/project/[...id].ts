@@ -200,9 +200,6 @@ const syncProject = async (project: any, tx: any) => {
           onChainProjectRes.milestones
         );
 
-
-
-
       if (
         firstPendingMilestoneChain === project.first_pending_milestone &&
         project.project_in_milestone_voting ===
@@ -228,8 +225,6 @@ const syncProject = async (project: any, tx: any) => {
       project.project_in_voting_of_no_confidence =
         onChainProjectRes.projectInVotingOfNoConfidence;
 
-
-
       delete newProject.milestones;
       delete newProject.approvers;
       const updatedProject = await models.updateProject(projectId, newProject)(tx);
@@ -251,6 +246,7 @@ const syncProject = async (project: any, tx: any) => {
 
       const pkg: ProjectPkg = {
         ...updatedProject,
+        approvers: project.approvers,
         milestones: await models.insertMilestones(
           filterdMileStone,
           project.id

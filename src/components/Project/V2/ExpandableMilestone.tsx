@@ -239,10 +239,24 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
 
     try {
       const projectMilestones = project.milestones;
+
+      
       // const user: User | any = await utils.getCurrentUser();
       const approvedMilestones = project.milestones.filter((milestone: Milestone) => milestone.is_approved).map(milestone => milestone.milestone_index);
       const withdrawnMilestones = project.milestones.filter((milestone: Milestone) => milestone.withdrawn_onchain).map(milestone => milestone.milestone_index);
       const onChainWithdrawalRequired = JSON.stringify(approvedMilestones) != JSON.stringify(withdrawnMilestones);
+      console.log("***** projectMilestones is ");
+      console.log(projectMilestones);
+
+      console.log("***** approvedMilestones is ");
+     console.log(approvedMilestones);
+
+     console.log("***** withdrawnMilestones is ");
+     console.log(withdrawnMilestones);
+
+     console.log("***** onChainWithdrawalRequired is ");
+     console.log(onChainWithdrawalRequired);
+     
       watchChain(ImbueChainEvent.Withraw, account.address, project.id);
 
       if (onChainWithdrawalRequired) {

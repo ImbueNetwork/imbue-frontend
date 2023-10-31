@@ -24,7 +24,7 @@ import {
 } from '@/model';
 
 import { updateMilestone, updateProject } from './projectServices';
-const WAIT_FOR_EVENT_IN_MS = 60_000; // WAIT FOR 5 MIN
+const WAIT_FOR_EVENT_IN_MS = 15_000; // WAIT FOR 15 seconds
 
 /* eslint-disable no-unused-vars */
 export enum ImbueChainEvent {

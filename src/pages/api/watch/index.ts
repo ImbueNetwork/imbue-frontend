@@ -2,7 +2,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
-import config from '@/lib/config';
 import { initChainApis, initPolkadotJSAPI } from '@/utils/polkadot';
 import ChainService, { ImbueChainEvent } from '@/redux/services/chainService';
 import { ImbueChainPollResult } from '@/model';
@@ -18,22 +17,11 @@ export default nextConnect()
             imbue: imbueApi,
             relayChain: relayChainApi,
         };
-
-        console.log("**** posting");
-        console.log(address);
-        console.log(imbueChainEvent);
-        console.log(projectId);
-        console.log(milestoneId);
-
         const chainService = new ChainService(allApis);
-        console.log("**** chain service is ");
-        console.log(chainService)
         const pollResult: any = await chainService.pollChainMessage(
             imbueChainEvent as ImbueChainEvent,
             address
         );
-        console.log("***** poll result is ");
-        console.log(pollResult);
 
         if (pollResult == ImbueChainPollResult.EventFound) {
             switch (imbueChainEvent) {
@@ -49,7 +37,6 @@ export default nextConnect()
 
                 case ImbueChainEvent.ApproveMilestone: {
                     if (milestoneId) {
-                        console.log("***** updating approve milestone");
                         db.transaction(async (tx) => {
                             const milestones = await fetchProjectMilestones(projectId)(tx);
                             const updatedMilestones = milestones.map((item) => {
@@ -62,8 +49,6 @@ export default nextConnect()
                                     return item
                                 }
                             });
-                            console.log("***** updatedMilestones is");
-                            console.log(updatedMilestones);
                             await deleteMilestones(projectId)(tx);
                             await insertMilestones(
                                 updatedMilestones,
@@ -73,15 +58,10 @@ export default nextConnect()
                     }
                     break;
                 }
-
-
                 case ImbueChainEvent.Withraw: {
                     db.transaction(async (tx) => {
-                        console.log("***** updating withdraw milestone");
                         const milestones = await fetchProjectMilestones(projectId)(tx);
                         const allApprovedMilestoneIds: number[] = milestones.filter((milestone) => milestone.is_approved).map(milestone => milestone.milestone_index);
-                        console.log("***** allApprovedMilestoneIds is");
-                        console.log(allApprovedMilestoneIds);
                         const updatedMilestones = milestones.map((item) => {
                             if (allApprovedMilestoneIds.includes(item.milestone_index)) {
                                 return {
@@ -93,10 +73,6 @@ export default nextConnect()
                             }
 
                         });
-
-
-                        console.log("***** updatedMilestones is");
-                        console.log(updatedMilestones);
                         await deleteMilestones(projectId)(tx);
                         await insertMilestones(
                             updatedMilestones,
@@ -108,6 +84,5 @@ export default nextConnect()
                 }
             }
         }
-
         return res.status(200);
     });
