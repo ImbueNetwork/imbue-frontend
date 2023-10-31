@@ -187,8 +187,6 @@ const syncProject = async (project: any, tx: any) => {
       relayChain: relayChainApi,
     };
 
-    console.log("**** syncing project");
-
     const chainService = new ChainService(allApis);
     const onChainProjectRes = await chainService.convertToOnChainProject(project);
     if (onChainProjectRes) {
