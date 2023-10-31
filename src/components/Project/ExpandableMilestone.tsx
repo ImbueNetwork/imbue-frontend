@@ -186,7 +186,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
       if (!result.txError) {
         pollResult = (await chainService.pollChainMessage(
           ImbueChainEvent.ApproveMilestone,
-          account
+          account.address
         )) as ImbueChainPollResult;
       } else {
         setError({ message: result.errorMessage });

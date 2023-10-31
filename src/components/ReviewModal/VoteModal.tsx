@@ -159,11 +159,11 @@ export default function VoteModal({
         if (!result.txError) {
           pollResult = (await chainService.pollChainMessage(
             ImbueChainEvent.NoConfidenceRoundFinalised,
-            votingWalletAccount
+            votingWalletAccount.address
           )) as ImbueChainPollResult;
           noConfidencePoll = (await chainService.pollChainMessage(
             ImbueChainEvent.VoteOnNoConfidenceRound,
-            votingWalletAccount
+            votingWalletAccount.address
           )) as ImbueChainPollResult;
         }
 
@@ -209,7 +209,7 @@ export default function VoteModal({
         if (!result.txError) {
           pollResult = (await chainService.pollChainMessage(
             ImbueChainEvent.RaiseNoConfidenceRound,
-            votingWalletAccount
+            votingWalletAccount.address
           )) as ImbueChainPollResult;
         }
 

@@ -23,9 +23,7 @@ export default nextConnect()
     const { id } = req.query;
     const projectId = id ? id[0] : '';
     const briefId = id ? id[1] : '';
-
     if (!projectId) return res.status(404).end();
-
     db.transaction(async (tx) => {
       try {
         let project;
@@ -40,18 +38,13 @@ export default nextConnect()
 
         const milestones = await models.fetchProjectMilestones(projectId)(tx);
         const approvers = await models.fetchProjectApprovers(projectId)(tx);
-
         const pkg: ProjectPkg = {
           ...project,
           milestones,
           approvers: approvers.map(({ approver }: any) => approver),
         };
 
-
-
         const updatedProject = await syncProject(pkg, tx);
-
-
         return res.send(updatedProject);
       } catch (e) {
         return res.status(404).end();
@@ -181,15 +174,15 @@ export default nextConnect()
 const syncProject = async (project: any, tx: any) => {
   if (!project.chain_project_id) return project;
   let milestonesRequiresSync = false;
- 
+
   try {
     const filter = new Filter();
     const projectId = project.id;
     const imbueApi = await initPolkadotJSAPI(process.env.IMBUE_NETWORK_WEBSOCK_ADDR!);
     const relayChainApi = await initPolkadotJSAPI(process.env.RELAY_CHAIN_WEBSOCK_ADDR!);
     const allApis = {
-        imbue: imbueApi,
-        relayChain: relayChainApi,
+      imbue: imbueApi,
+      relayChain: relayChainApi,
     };
 
     const chainService = new ChainService(allApis);
@@ -206,6 +199,9 @@ const syncProject = async (project: any, tx: any) => {
         await chainService.findFirstPendingMilestone(
           onChainProjectRes.milestones
         );
+
+
+
 
       if (
         firstPendingMilestoneChain === project.first_pending_milestone &&
@@ -232,8 +228,11 @@ const syncProject = async (project: any, tx: any) => {
       project.project_in_voting_of_no_confidence =
         onChainProjectRes.projectInVotingOfNoConfidence;
 
-      const updatedProject = await models.updateProject(projectId, newProject)(tx);
 
+
+      delete newProject.milestones;
+      delete newProject.approvers;
+      const updatedProject = await models.updateProject(projectId, newProject)(tx);
       if (!updatedProject.id) {
         return new Error('Cannot update milestones: `project_id` missing.');
       }
@@ -251,17 +250,17 @@ const syncProject = async (project: any, tx: any) => {
       });
 
       const pkg: ProjectPkg = {
-        ...project,
+        ...updatedProject,
         milestones: await models.insertMilestones(
           filterdMileStone,
           project.id
         )(tx),
       };
-
       return pkg;
-
     }
   } catch (error) {
+    console.log("**** error is ");
+    console.log(error);
     return project
   }
 };

@@ -420,11 +420,11 @@ function Project() {
         if (!result.txError) {
           pollResult = (await chainService.pollChainMessage(
             ImbueChainEvent.NoConfidenceRoundFinalised,
-            account
+            account.address
           )) as ImbueChainPollResult;
           noConfidencePoll = (await chainService.pollChainMessage(
             ImbueChainEvent.VoteOnNoConfidenceRound,
-            account
+            account.address
           )) as ImbueChainPollResult;
         }
 
@@ -469,7 +469,7 @@ function Project() {
         if (!result.txError) {
           pollResult = (await chainService.pollChainMessage(
             ImbueChainEvent.RaiseNoConfidenceRound,
-            account
+            account.address
           )) as ImbueChainPollResult;
         }
 

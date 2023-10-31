@@ -26,16 +26,14 @@ export default nextConnect()
         console.log(milestoneId);
 
         const chainService = new ChainService(allApis);
-        const pollResult: ImbueChainPollResult = await chainService.pollChainMessage(
-            imbueChainEvent,
+        console.log("**** chain service is ");
+        console.log(chainService)
+        const pollResult: any = await chainService.pollChainMessage(
+            imbueChainEvent as ImbueChainEvent,
             address
-        ) as ImbueChainPollResult;
-
-        while (pollResult == ImbueChainPollResult.Pending) {
-            console.log("***** poll result is ");
-            console.log(pollResult);
-            await new Promise((f) => setTimeout(f, 1000));
-        }
+        );
+        console.log("***** poll result is ");
+        console.log(pollResult);
 
         if (pollResult == ImbueChainPollResult.EventFound) {
             switch (imbueChainEvent) {

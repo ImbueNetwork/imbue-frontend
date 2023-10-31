@@ -24,7 +24,7 @@ import {
 } from '@/model';
 
 import { updateMilestone, updateProject } from './projectServices';
-const WAIT_FOR_EVENT_IN_MS = 300_000; // WAIT FOR 5 MIN
+const WAIT_FOR_EVENT_IN_MS = 60_000; // WAIT FOR 5 MIN
 
 /* eslint-disable no-unused-vars */
 export enum ImbueChainEvent {
@@ -218,8 +218,8 @@ class ChainService {
     );
   }
 
-  public async pollChainMessage(eventName: string, account: WalletAccount) {
-    const asyncTimeout = (imbueApi: any, account: WalletAccount) => {
+  public async pollChainMessage(eventName: string, address: string) {
+    const asyncTimeout = (imbueApi: any, address: string) => {
       const timeoutPromise = new Promise((resolve, _) => {
         setTimeout(
           () => resolve(ImbueChainPollResult.EventNotFound),
@@ -241,7 +241,7 @@ class ChainService {
                 if (
                   eventName &&
                   method === eventName &&
-                  data[0].toHuman() === account.address
+                  data[0].toHuman() === address
                 ) {
                   resolve(ImbueChainPollResult.EventFound);
                 }
@@ -256,7 +256,7 @@ class ChainService {
     };
     return (async (imbueApi) => {
       try {
-        const result = await asyncTimeout(imbueApi, account);
+        const result = await asyncTimeout(imbueApi, address);
         return result;
       } catch (ex) {
         return false;
