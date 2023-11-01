@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
-import { BasicTxResponse, Currency } from '@/model';
+
+import { Currency } from '@/model';
 import ChainService from '@/redux/services/chainService';
 import { getProjectBalance } from '@/redux/services/projectServices';
-import type { DispatchError } from '@polkadot/types/interfaces';
 
 import { initImbueAPIInfo } from './polkadot';
 const { decodeAddress, encodeAddress } = require('@polkadot/keyring');

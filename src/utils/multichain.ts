@@ -1,22 +1,20 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable no-console */
+import { Keyring } from '@polkadot/api';
+import type { EventRecord } from '@polkadot/types/interfaces';
+import type { DispatchError } from '@polkadot/types/interfaces';
 import { initWasm } from '@trustwallet/wallet-core';
 import { CoinType } from '@trustwallet/wallet-core/dist/src/wallet-core';
-import { Mnemonic, ethers } from "ethers";
-import type { EventRecord } from '@polkadot/types/interfaces';
+import { ethers } from "ethers";
 
 import { fetchProjectById, fetchProjectMilestones, updateMilestoneWithdrawHashs } from '@/lib/models';
 
 import db from '@/db';
 import { BasicTxResponse, EVMContract } from '@/model';
 import { Currency } from '@/model';
+import { ImbueChainEvent } from '@/redux/services/chainService';
 
 import { handleError, initPolkadotJSAPI } from './polkadot';
-import { Keyring } from '@polkadot/api';
-import { Signer } from '@polkadot/api/types';
-import { hash } from 'bcryptjs';
-import { stat } from 'fs';
-import type { DispatchError } from '@polkadot/types/interfaces';
 
 const WALLET_MNEMONIC = process.env.WALLET_MNEMONIC;
 const RPC_URL = process.env.ETH_RPC_URL;
@@ -257,7 +255,7 @@ export const withdraw = async (projectId: number) => {
   return approvedFundsTotal
 }
 
-export const mintTokens = async (projectId: number, beneficiary:string) => {
+export const mintTokens = async (projectId: number, beneficiary: string) => {
   const offchainEscrowBalance: any = await getBalance(projectId);
   const imbueApi = await initPolkadotJSAPI(process.env.IMBUE_NETWORK_WEBSOCK_ADDR!);
   const core = await initWasm();
@@ -267,6 +265,7 @@ export const mintTokens = async (projectId: number, beneficiary:string) => {
   const key = wallet.getDerivedKey(coinType, 0, 0, 0);
   const keyring = new Keyring({ type: "sr25519" });
   const sender = keyring.addFromSeed(key.data());
+  const eventName = ImbueChainEvent.MintAsset;
   return await db.transaction(async (tx: any) => {
     try {
       const project = await fetchProjectById(Number(projectId))(tx);
@@ -282,6 +281,7 @@ export const mintTokens = async (projectId: number, beneficiary:string) => {
       const currency = currencyId < 100 ? currencyId : { ForeignAsset: Number(currencyId) };
       const mintAmount = BigInt(project.total_cost_without_fee! * 1e12);
       let transactionState: BasicTxResponse = {} as BasicTxResponse;
+      transactionState.status = false;
       const extrinsic = imbueApi.api.tx.imbueProposals
         .mintOffchainAssets(
           beneficiary,
@@ -290,20 +290,37 @@ export const mintTokens = async (projectId: number, beneficiary:string) => {
         );
       extrinsic
         .signAndSend(sender, ((result: any) => {
-          result.events.forEach(
-            ({ event: { method, data, index } }: EventRecord) => {
-              transactionState.transactionHash = extrinsic.hash.toHex();
-              const [dispatchError] = data as unknown as ITuple<
-                [DispatchError]
-              >;
-              if (dispatchError.isModule) {
-                transactionState = handleError(transactionState, dispatchError);
-                return transactionState
+          imbueApi.api.query.system.events(
+            (events: EventRecord[]) => {
+              if (!result || !result.status || !events) {
+                return;
               }
-              transactionState.status = true;
-              transactionState.txError = method === 'ExtrinsicFailed';
+              events.forEach(
+                ({ event: { method, data } }: EventRecord) => {
+                  transactionState.transactionHash = extrinsic.hash.toHex();
+                  const [dispatchError] = data as unknown as ITuple<
+                    [DispatchError]
+                  >;
+                  if (dispatchError.isModule) {
+                    transactionState = handleError(transactionState, dispatchError);
+                    transactionState.status = true;
+                    return transactionState
+                  }
+                  if (
+                    method === eventName &&
+                    data[0].toHuman() === sender.address
+                  ) {
+                    transactionState.status = true;
+                    transactionState.eventData = data.toHuman();
+                    return transactionState;
+                  }
+                });
             });
         }));
+
+      while (!transactionState.status) {
+        await new Promise((f) => setTimeout(f, 1000));
+      }
 
       return transactionState;
     } catch (e) {

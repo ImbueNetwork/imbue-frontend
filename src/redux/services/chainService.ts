@@ -5,8 +5,7 @@ import type { ITuple } from '@polkadot/types/types';
 import { WalletAccount } from '@talismn/connect-wallets';
 
 import * as utils from '@/utils';
-import { ImbueApiInfo, handleError } from '@/utils/polkadot';
-import * as polkadot from '@/utils/polkadot';
+import { handleError,ImbueApiInfo } from '@/utils/polkadot';
 
 import {
   BasicTxResponse,
@@ -39,6 +38,7 @@ export enum ImbueChainEvent {
   CreateBrief = 'BriefSubmitted',
   CommenceWork = 'ProjectCreated',
   SubmitInitialGrant = 'ProjectCreated',
+  MintAsset = 'ForeignAssetMinted'
 }
 
 class ChainService {

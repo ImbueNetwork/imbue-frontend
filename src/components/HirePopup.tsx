@@ -19,6 +19,7 @@ import { getBalance } from '@/utils/helper';
 import { Currency, OffchainProjectState } from '@/model';
 import { changeBriefApplicationStatus } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
+import { getOffchainEscrowAddress, getOffchainEscrowBalance, mintTokens } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 import AccountChoice from './AccountChoice';
@@ -26,7 +27,6 @@ import ErrorScreen from './ErrorScreen';
 import SuccessScreen from './SuccessScreen';
 import styles from '../styles/modules/hire-modal.module.css';
 import { initImbueAPIInfo } from '../utils/polkadot';
-import { getOffchainEscrowAddress, getOffchainEscrowBalance, mintTokens } from '@/redux/services/projectServices';
 
 export const HirePopup = ({
   openPopup: openHirePopup,
@@ -47,7 +47,6 @@ export const HirePopup = ({
   const [error, setError] = useState<any>();
   const [escrowAddress, setEscrowAddress] = useState<string>('');
   const [escrowBalance, setEscrowBalance] = useState<number>(0);
-  const [hireEnabled, setHireEnabled] = useState<boolean>();
   const router = useRouter();
   const [freelancerBalance, setFreelancerBalance] = useState<number | string>(
     0
@@ -90,7 +89,6 @@ export const HirePopup = ({
       const currency = Currency[application.currency_id].toString().toLowerCase();
       const escrowBalance = Number(allBalances[currency]) ?? 0;
       setEscrowBalance(escrowBalance)
-      setHireEnabled(escrowBalance >0);
     };
     updateEscrowInfo();
     openHirePopup && checkBalance();
@@ -100,7 +98,7 @@ export const HirePopup = ({
     setLoading(true);
 
     const mintResult = await mintTokens(application.id, account.address);
-    if(mintResult.txError) {
+    if (mintResult.txError) {
       setError({ message: mintResult.errorMessage });
     }
 

@@ -7,6 +7,7 @@ import { stringToHex } from '@polkadot/util';
 import * as config from '../config';
 export const imbueNetwork = 'Imbue Network';
 import { WalletAccount } from '@talismn/connect-wallets';
+
 import { BasicTxResponse } from '@/model';
 
 export type PolkadotJsApiInfo = {

@@ -7,6 +7,7 @@ import nextConnect from 'next-connect';
 import passport from 'passport';
 
 import { mintTokens } from '@/utils/multichain';
+
 import { BasicTxResponse } from '@/model';
 
 
@@ -18,9 +19,6 @@ export default nextConnect()
     const { beneficiary } = req.body;
     try {
       const result: BasicTxResponse = await mintTokens(projectId, beneficiary);
-      while (!result.status) {
-        await new Promise((f) => setTimeout(f, 3000));
-      }
       if (!result.txError) {
         return res.status(200).json(result);
       }
