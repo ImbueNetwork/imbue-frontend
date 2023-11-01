@@ -1,10 +1,9 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable no-console */
 import { Keyring } from '@polkadot/api';
-import type { EventRecord } from '@polkadot/types/interfaces';
-import type { DispatchError } from '@polkadot/types/interfaces';
+import type { DispatchError,EventRecord } from '@polkadot/types/interfaces';
+import type { ITuple } from '@polkadot/types/types';
 import { initWasm } from '@trustwallet/wallet-core';
-import { CoinType } from '@trustwallet/wallet-core/dist/src/wallet-core';
 import { ethers } from "ethers";
 
 import { fetchProjectById, fetchProjectMilestones, updateMilestoneWithdrawHashs } from '@/lib/models';
@@ -26,7 +25,7 @@ export const getCoinType = async (currencyId: number) => {
 
   const currency = Currency[currencyId];
 
-  const currencyLookup: Record<string, CoinType> = {
+  const currencyLookup: Record<string, any> = {
     "eth": CoinType.ethereum,
     "usdt": CoinType.ethereum,
     "atom": CoinType.cosmos,
@@ -93,7 +92,7 @@ export const getBalance = async (projectId: number) => {
         const ethProvider = new ethers.JsonRpcProvider(RPC_URL);
         const { HDWallet, AnyAddress } = core;
         const wallet = HDWallet.createWithMnemonic(WALLET_MNEMONIC!, "");
-        const coinType: CoinType = await getCoinType(currencyId);
+        const coinType = await getCoinType(currencyId);
 
         const key = wallet.getDerivedKey(coinType, projectId, 0, projectId);
         const pubKey = key.getPublicKey(coinType);
