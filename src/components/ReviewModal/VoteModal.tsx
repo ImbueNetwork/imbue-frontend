@@ -23,11 +23,9 @@ import {
 } from '@/model';
 import ChainService, { ImbueChainEvent } from '@/redux/services/chainService';
 import {
+  completeMilestone,
   insertNoConfidenceVoter,
-  updateFirstPendingMilestone,
-  updateMilestone,
   updateProject,
-  updateProjectVotingState,
   voteOnMilestone,
 } from '@/redux/services/projectServices';
 
@@ -72,7 +70,6 @@ export default function VoteModal({
 
     try {
       const imbueApi = await initImbueAPIInfo();
-      // const userRes: User | any = await utils.getCurrentUser();
       const chainService = new ChainService(imbueApi, user);
 
       const result = await chainService.voteOnMilestone(
@@ -96,12 +93,7 @@ export default function VoteModal({
       // eslint-disable-next-line no-constant-condition
       while (true) {
         if (pollResult == ImbueChainPollResult.EventFound) {
-          await updateMilestone(Number(project.id), milestoneKeyInView, true);
-          await updateProjectVotingState(Number(project.id), false);
-          await updateFirstPendingMilestone(
-            Number(project.id),
-            Number(project.first_pending_milestone) + 1
-          );
+          await completeMilestone(Number(project.id), milestoneKeyInView);
 
           await voteOnMilestone(
             user.id,
@@ -110,7 +102,7 @@ export default function VoteModal({
             vote,
             project.id
           );
-          ///// fire notifications //////////////////////////////////
+          
           if (targetUser) {
             await sendNotification(
               [
