@@ -5,12 +5,6 @@ import Grid from '@mui/material/Grid';
 const TextField = dynamic(() => import("@mui/material/TextField"), {
   ssr: false,
 })
-const OutlinedInput = dynamic(() => import("@mui/material/OutlinedInput"), {
-  ssr: false,
-})
-const InputAdornment = dynamic(() => import("@mui/material/InputAdornment"), {
-  ssr: false,
-})
 const IconButton = dynamic(() => import("@mui/material/IconButton"), {
   ssr: false,
 })
@@ -467,15 +461,7 @@ const Freelancers = (): JSX.Element => {
             <div className='flex justify-between lg:flex-row flex-col items-start'>
               <div>
                 <div className='flex items-center'>
-                  {/* <input
-                    value={searhInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    id='search-input'
-                    className='search-input px-[12px] !w-full lg:!w-[20rem] !h-[2.875rem] !rounded-tr-[0px] !rounded-br-[0px] !text-black'
-                    placeholder='Search'
-                    autoComplete='off'
-                  /> */}
-                  <OutlinedInput
+                  {/* <OutlinedInput
                     autoComplete='off'
                     color='secondary'
                     id='search-input'
@@ -500,7 +486,40 @@ const Freelancers = (): JSX.Element => {
                           </InputAdornment>)
                         : ""
                     }
-                  />
+                  /> */}
+
+                  <div className="px-[6px] text-[0.875rem] border border-[#BCBCBC] focus-within:border-imbue-purple flex items-center !w-[20rem] !h-[2.875rem] rounded-lg !rounded-r-none">
+                    <input
+                      id='search-input'
+                      autoComplete='off'
+                      placeholder='Search'
+                      type='text'
+                      name='password'
+                      required
+                      onChange={(e) => setSearchInput(e.target.value)}
+                      onKeyUp={e => e.key === 'Enter' && onSearch()}
+                      value={searchInput}
+                      className="outline-none w-full text-black pl-3"
+                    />
+
+                    {
+                      searchInput.length
+                        ? (
+                          <IconButton
+                            aria-label='toggle password visibility'
+                            onClick={() =>
+                              searchInput?.length && setSearchInput('')
+                            }
+                            onMouseDown={(e) => e.preventDefault()}
+                            edge='end'
+                          >
+                            <ClearIcon />
+                          </IconButton>
+                        )
+                        : ''
+                    }
+                  </div>
+
                   <div
                     role='button'
                     onClick={onSearch}

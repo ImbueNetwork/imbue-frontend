@@ -1,8 +1,5 @@
 import {
-  CircularProgress,
-  IconButton,
-  InputAdornment,
-  OutlinedInput,
+  CircularProgress, IconButton,
 } from '@mui/material';
 import { SignerResult } from '@polkadot/api/types';
 import { WalletAccount } from '@talismn/connect-wallets';
@@ -35,7 +32,7 @@ export default function SignIn() {
 
   const redirect = (path: string) => {
     window.location.href = `${window.location.origin}/${path}`;
-}
+  }
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -147,7 +144,7 @@ export default function SignIn() {
             <label className='font-Aeonik text-base lg:text-[1rem] text-imbue-purple-dark font-normal mb-2'>
               Email or Username
             </label>
-            <OutlinedInput
+            {/* <OutlinedInput
               id='outlined-adornment-password'
               color='secondary'
               className='h-[2.6rem] pl-[4px] text-[0.875rem]'
@@ -161,13 +158,26 @@ export default function SignIn() {
               onChange={(e: any) => setUserOrEmail(e.target.value)}
               required
               onKeyUp={(e) => (e.key === 'Enter') && document.getElementsByName('password')[0].focus()}
-            />
+            /> */}
+
+            <div className="h-[2.6rem] px-[6px] text-[0.875rem] border border-[#BCBCBC] evenShadow focus-within:outline focus-within:outline-1 focus-within:outline-imbue-purple rounded-[4px] flex items-center w-full">
+              <input
+                type='text'
+                name='emailorUsername'
+                placeholder='victorimbue@gmail.com'
+                onChange={(e: any) => setUserOrEmail(e.target.value)}
+                required
+                onKeyUp={(e) => (e.key === 'Enter') && document.getElementsByName('password')[0].focus()}
+                className="outline-none w-full text-black pl-3"
+              />
+            </div>
+
           </div>
           <div className='flex flex-col justify-center pb-[10px] w-full mt-[1.2rem]'>
             <label className='font-Aeonik text-base lg:text-[1rem] text-imbue-purple-dark font-normal mb-2'>
               Password
             </label>
-            <OutlinedInput
+            {/* <OutlinedInput
               id='outlined-adornment-password'
               color='secondary'
               notched={false}
@@ -205,7 +215,29 @@ export default function SignIn() {
                   </IconButton>
                 </InputAdornment>
               }
-            />
+            /> */}
+
+            <div className="h-[2.6rem] px-[6px] text-[0.875rem] border border-[#BCBCBC] evenShadow focus-within:outline focus-within:outline-1 focus-within:outline-imbue-purple rounded-[4px] flex items-center w-full">
+              <input
+                placeholder='*********'
+                type={showPassword ? 'text' : 'password'}
+                name='password'
+                required
+                onChange={(e: any) => setPassword(e.target.value)}
+                onKeyUp={(e) => (e.key === 'Enter') && handleSubmit()}
+                className="outline-none w-full text-black pl-3"
+              />
+
+              <IconButton
+                aria-label='toggle password visibility'
+                onClick={() => setShowPassword(!showPassword)}
+                edge='end'
+                className="mr-0"
+              >
+                {showPassword ? <Image className="h-5 w-5" src={require("../../../assets/svgs/eye.svg")} alt="" /> : <Image className="w-5 h-5" src={require("../../../assets/svgs/eyeClosed.svg")} alt="" />}
+              </IconButton>
+            </div>
+
           </div>
           <div className='flex justify-center my-2 w-full cursor-pointer'>
             <button
