@@ -17,21 +17,7 @@ export default nextConnect()
     const { id } = req.query;
     let projectBalance;
     const projectId = Number(id);
-    await db.transaction(async (tx: any) => {
-      try {
-        const project = await fetchProjectById(Number(projectId))(tx);
-        if (!project) {
-          return res.status(404).end();
-        }
-        projectBalance = await getBalance(projectId, project.currency_id, project.escrow_address);
-      } catch (e) {
-        return res.status(401).json({
-          status: 'Failed',
-          message: `Failed to retreive balance project id ${id}. Cause ${e}`,
-        });
-      }
-    });
-
+    projectBalance = await getBalance(projectId);
     if (projectBalance == undefined) {
       return res.status(404).end();
     }

@@ -396,13 +396,55 @@ export const watchChain = async (
   projectId: number | string,
   milestoneId?: number | string,
 ) => {
-    const resp = await fetch(
-      `${config.apiBase}/watch`,
-      {
-        headers: config.postAPIHeaders,
-        method: 'POST',
-        body: JSON.stringify({ imbueChainEvent, address, projectId, milestoneId }),
-      }
-    );
-    return await resp.json();
+  const resp = await fetch(
+    `${config.apiBase}/watch`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'POST',
+      body: JSON.stringify({ imbueChainEvent, address, projectId, milestoneId }),
+    }
+  );
+  return await resp.json();
+};
+
+
+export const getOffchainEscrowAddress = async (
+  projectId: string | number,
+) => {
+  const resp = await fetch(
+    `${config.apiBase}/payments/${projectId}/address`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'GET',
+    }
+  );
+  return await resp.json();
+};
+
+export const getOffchainEscrowBalance = async (
+  projectId: string | number,
+) => {
+  const resp = await fetch(
+    `${config.apiBase}/payments/${projectId}/balance`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'GET',
+    }
+  );
+  return await resp.json();
+};
+
+export const mintTokens = async (
+  projectId: string | number,
+  beneficiary: string,
+) => {
+  const resp = await fetch(
+    `${config.apiBase}/payments/${projectId}/mint`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'POST',
+      body: JSON.stringify({ beneficiary }),
+    }
+  );
+  return await resp.json();
 };

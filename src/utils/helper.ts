@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-vars */
-import { Currency } from '@/model';
+import { BasicTxResponse, Currency } from '@/model';
 import ChainService from '@/redux/services/chainService';
 import { getProjectBalance } from '@/redux/services/projectServices';
+import type { DispatchError } from '@polkadot/types/interfaces';
 
 import { initImbueAPIInfo } from './polkadot';
 const { decodeAddress, encodeAddress } = require('@polkadot/keyring');
@@ -423,6 +424,6 @@ export const isNumOrSpecialCharacter = (character: string) => {
   return /[^A-Za-z]/g.test(character);
 };
 
-export  const isValidEmail = (val: string) => {
+export const isValidEmail = (val: string) => {
   return /\S+@\S+\.\S+/.test(val);
 };

@@ -5,7 +5,7 @@ import type { ITuple } from '@polkadot/types/types';
 import { WalletAccount } from '@talismn/connect-wallets';
 
 import * as utils from '@/utils';
-import { ImbueApiInfo } from '@/utils/polkadot';
+import { ImbueApiInfo, handleError } from '@/utils/polkadot';
 import * as polkadot from '@/utils/polkadot';
 
 import {
@@ -355,7 +355,7 @@ class ChainService {
                       [DispatchError]
                     >;
                     if (dispatchError.isModule) {
-                      return this.handleError(transactionState, dispatchError);
+                      return handleError(transactionState, dispatchError);
                     }
 
                     if (
@@ -452,23 +452,6 @@ class ChainService {
       }
       transactionState.txError = true;
       return transactionState;
-    }
-    return transactionState;
-  }
-
-  handleError(
-    transactionState: BasicTxResponse,
-    dispatchError: DispatchError
-  ): BasicTxResponse {
-    try {
-      const errorMessage = polkadot.getDispatchError(dispatchError);
-      transactionState.errorMessage = errorMessage;
-      transactionState.txError = true;
-    } catch (error) {
-      if (error instanceof Error) {
-        transactionState.errorMessage = error.message;
-      }
-      transactionState.txError = true;
     }
     return transactionState;
   }

@@ -7,6 +7,7 @@ import { stringToHex } from '@polkadot/util';
 import * as config from '../config';
 export const imbueNetwork = 'Imbue Network';
 import { WalletAccount } from '@talismn/connect-wallets';
+import { BasicTxResponse } from '@/model';
 
 export type PolkadotJsApiInfo = {
   api: ApiPromise;
@@ -170,4 +171,21 @@ export function getDispatchError(dispatchError: DispatchError): string {
   }
 
   return message;
+}
+
+export function handleError(
+  transactionState: BasicTxResponse,
+  dispatchError: DispatchError
+): BasicTxResponse {
+  try {
+    const errorMessage = getDispatchError(dispatchError);
+    transactionState.errorMessage = errorMessage;
+    transactionState.txError = true;
+  } catch (error) {
+    if (error instanceof Error) {
+      transactionState.errorMessage = error.message;
+    }
+    transactionState.txError = true;
+  }
+  return transactionState;
 }
