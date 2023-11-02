@@ -56,6 +56,7 @@ export const getBalance = async (projectId: number) => {
       }
       const currencyId = project.currency_id;
       const escrowAddress = project.escrow_address;
+      const cost = await estimateGasCostsInEth(projectId,currencyId,project.payment_address,20);
       if (currencyId < 100) {
         const imbueApi = await initPolkadotJSAPI(process.env.IMBUE_NETWORK_WEBSOCK_ADDR!);
         switch (currencyId) {
@@ -96,8 +97,8 @@ export const getBalance = async (projectId: number) => {
         const key = wallet.getDerivedKey(coinType, projectId, 0, projectId);
         const pubKey = key.getPublicKey(coinType);
         const projectAddress = AnyAddress.createWithPublicKey(pubKey, coinType);
-        const ethBalance = (Number(await ethProvider.getBalance(projectAddress.description())) / 1e12) ?? 0;
-
+        const ethBalanceInWei = await ethProvider.getBalance(projectAddress.description());
+        const ethBalance = Number(ethers.formatEther(ethBalanceInWei));
         switch (currencyId) {
           case (Currency.ETH): {
             return { eth: ethBalance };
@@ -314,17 +315,16 @@ const transfer = async (projectId: number, currencyId: number, destinationAddres
         const contract = await getEVMContract(currencyId);
         const token = new ethers.Contract(contract.address, ERC_20_ABI, sender);
         let imbueFee = ethers.parseUnits((amount * 0.05).toPrecision(5).toString(), contract.decimals);
-
         if (coverFees) {
-          const intialTransferCost = await estimateGasCostsInEth(projectId, currencyId, destinationAddress, amount);
+          const initialTransferCost = await estimateGasCostsInEth(projectId, currencyId, destinationAddress, amount);
           const additionalFees = await estimateGasCostsInEth(projectId, currencyId, destinationAddress, amount, true);
           const escrowEthBalance:any = (await getBalance(projectId));
-
-          if (Number(escrowEthBalance.eth) < intialTransferCost) {
+          const accountTopupRequired = Number(escrowEthBalance.eth) < initialTransferCost;
+          if (accountTopupRequired) {
             const treasuryKey = wallet.getDerivedKey(CoinType.ethereum, 0, 0, 0);
             const treasuryKeyHex = HexCoding.encode(treasuryKey.data());
             const treasurySender = new ethers.Wallet(treasuryKeyHex, ethProvider);
-            const treasuryTransferAmount = ethers.parseEther((intialTransferCost).toPrecision(5).toString());
+            const treasuryTransferAmount = ethers.parseEther((initialTransferCost).toPrecision(5).toString());
             const escrowAddress = await generateAddress(projectId, currencyId);
             const treasuryTx = await treasurySender.sendTransaction({ to: escrowAddress, value: treasuryTransferAmount });
             await ethProvider.waitForTransaction(treasuryTx.hash, 1, 150000);
@@ -358,6 +358,7 @@ const estimateGasCostsInEth = async (projectId: number, currencyId: number, dest
   let withdrawal_gas_cost: any;
   let imbue_fee_gas_cost: any;
   let totalGasCost = 0;
+  let bufferCost = 1.1;
   try {
     const ethProvider = new ethers.JsonRpcProvider(RPC_URL);
     const gasPrice = (await ethProvider.getFeeData()).gasPrice;
@@ -386,7 +387,7 @@ const estimateGasCostsInEth = async (projectId: number, currencyId: number, dest
         const gasAmount = includeTreasuryCover ? BigInt(imbue_fee_gas_cost + imbue_fee_gas_cost + withdrawal_gas_cost) : BigInt(imbue_fee_gas_cost + withdrawal_gas_cost);
         const gasFeeInWei = gasAmount * gasPrice;
         const gasFeeInETH = ethers.formatEther(gasFeeInWei);
-        totalGasCost = Number((Number(gasFeeInETH)).toPrecision(3));
+        totalGasCost = Number((Number(gasFeeInETH) * bufferCost).toPrecision(3));
         break;
       }
     }
