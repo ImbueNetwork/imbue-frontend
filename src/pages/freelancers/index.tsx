@@ -206,79 +206,80 @@ const Freelancers = (): JSX.Element => {
 
   useEffect(() => {
     const fetchAndSetFreelancers = async () => {
-      if (Object.keys(router?.query).length) {
-        setLoading(true)
-        let filter: FreelancerSqlFilter = {
-          skills_range: [],
-          services_range: [],
-          languages_range: [],
-          name: '',
-          page: currentPage,
-          items_per_page: itemsPerPage
-        };
-
-
-        if (sizeProp) {
-          filter = { ...filter, items_per_page: Number(sizeProp) || 12 };
-          setItemsPerPage(Number(sizeProp))
-        }
-
-        if (Number(pageProp)) {
-          filter = { ...filter, page: Number(pageProp) || 1 };
-        }
-
-        if (name) {
-          filter = { ...filter, name: name };
-          // const input = document.getElementById(
-          //   'search-input'
-          // ) as HTMLInputElement;
-          // if (input) input.value = name.toString();
-          setSearchInput(name.toString())
-        }
-
-        if (skillsRangeProps) {
-          const range = strToIntRange(skillsRangeProps);
-          range?.forEach?.((v: any) => {
-            if (!selectedFilterIds.includes(`0-${v}`))
-              setSlectedFilterIds([...selectedFilterIds, `0-${v}`]);
-          });
-          filter = { ...filter, skills_range: range };
-        }
-
-        if (servicesRangeProps) {
-          const range = strToIntRange(servicesRangeProps);
-
-          range?.forEach?.((v: any) => {
-            if (!selectedFilterIds.includes(`1-${v}`))
-              setSlectedFilterIds([...selectedFilterIds, `1-${v}`]);
-          });
-          filter = {
-            ...filter,
-            services_range: range,
+      setLoading(true)
+      try {
+        if (Object.keys(router?.query).length) {
+          let filter: FreelancerSqlFilter = {
+            skills_range: [],
+            services_range: [],
+            languages_range: [],
+            name: '',
+            page: currentPage,
+            items_per_page: itemsPerPage
           };
-        }
 
-        if (languagesRangeProps) {
-          const range = strToIntRange(languagesRangeProps);
-          range?.forEach?.((v: any) => {
-            if (!selectedFilterIds.includes(`2-${v}`))
-              setSlectedFilterIds([...selectedFilterIds, `2-${v}`]);
-          });
-          filter = {
-            ...filter,
-            languages_range: strToIntRange(languagesRangeProps),
-          };
-        }
 
-        if (freelancerInfoProps) {
-          const data = JSON.parse(freelancerInfoProps as string);
-          const { verified } = data;
-          if (verified) {
-            filter = { ...filter, verified: true };
-            setSlectedFilterIds([...selectedFilterIds, '3-0']); // FIXME:
+          if (sizeProp) {
+            filter = { ...filter, items_per_page: Number(sizeProp) || 12 };
+            setItemsPerPage(Number(sizeProp))
           }
-        }
-        try {
+
+          if (Number(pageProp)) {
+            filter = { ...filter, page: Number(pageProp) || 1 };
+          }
+
+          if (name) {
+            filter = { ...filter, name: name };
+            // const input = document.getElementById(
+            //   'search-input'
+            // ) as HTMLInputElement;
+            // if (input) input.value = name.toString();
+            setSearchInput(name.toString())
+          }
+
+          if (skillsRangeProps) {
+            const range = strToIntRange(skillsRangeProps);
+            range?.forEach?.((v: any) => {
+              if (!selectedFilterIds.includes(`0-${v}`))
+                setSlectedFilterIds([...selectedFilterIds, `0-${v}`]);
+            });
+            filter = { ...filter, skills_range: range };
+          }
+
+          if (servicesRangeProps) {
+            const range = strToIntRange(servicesRangeProps);
+
+            range?.forEach?.((v: any) => {
+              if (!selectedFilterIds.includes(`1-${v}`))
+                setSlectedFilterIds([...selectedFilterIds, `1-${v}`]);
+            });
+            filter = {
+              ...filter,
+              services_range: range,
+            };
+          }
+
+          if (languagesRangeProps) {
+            const range = strToIntRange(languagesRangeProps);
+            range?.forEach?.((v: any) => {
+              if (!selectedFilterIds.includes(`2-${v}`))
+                setSlectedFilterIds([...selectedFilterIds, `2-${v}`]);
+            });
+            filter = {
+              ...filter,
+              languages_range: strToIntRange(languagesRangeProps),
+            };
+          }
+
+          if (freelancerInfoProps) {
+            const data = JSON.parse(freelancerInfoProps as string);
+            const { verified } = data;
+            if (verified) {
+              filter = { ...filter, verified: true };
+              setSlectedFilterIds([...selectedFilterIds, '3-0']); // FIXME:
+            }
+          }
+
           const { currentData, totalFreelancers } = await callSearchFreelancers(
             filter
           );
@@ -295,16 +296,26 @@ const Freelancers = (): JSX.Element => {
           setPageInput(filter.page)
           setFreelancers(currentData);
           setFreelancersTotal(totalFreelancers);
-        } catch (error) {
-          setError({ message: "Could not get the results. Please try again" })
-        } finally {
-          setLoading(false)
+
+        } else {
+          const data: FreelancerResponse = await getAllFreelancers(
+            itemsPerPage,
+            currentPage
+          );
+          setSlectedFilterIds([]);
+          setSearchInput("")
+          setFreelancers(data.currentData);
+          setFreelancersTotal(data.totalFreelancers);
         }
+      } catch (error) {
+        setError({ message: "Could not get the results. Please try again" })
+      } finally {
+        setLoading(false)
       }
     };
 
     router.isReady && fetchAndSetFreelancers();
-  }, [router.isReady, currentPage, itemsPerPage]);
+  }, [router.isReady, router?.query, currentPage, itemsPerPage]);
 
 
   const onSearch = async () => {
@@ -423,9 +434,9 @@ const Freelancers = (): JSX.Element => {
       currentPage
     );
     setSlectedFilterIds([]);
+    setSearchInput("")
     setFreelancers(allFreelancers?.currentData);
     setFreelancersTotal(allFreelancers?.totalFreelancers);
-    setSearchInput("")
   };
 
   const cancelFilters = async () => {
