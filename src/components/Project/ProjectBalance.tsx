@@ -23,11 +23,19 @@ const Currencies = [
         name: "KSM",
         currencyId: 1
     },
-    // {AUSD : 2},
-    // {KAR : 3},
     {
         name: "MGX",
         currencyId: 4
+    },
+
+    // Anything over 100 should be multichain 
+    {
+        name: "ETH",
+        currencyId: 100
+    },
+    {
+        name: "USDT",
+        currencyId: 101
     },
 ]
 
@@ -46,13 +54,13 @@ const ProjectBalance = (props: ProjectBalanceType) => {
                 currency_id === undefined ||
                 !user.id
             ) return
-            
             setBalanceLoading(true)
             try {
                 const balance = await getBalance(
                     project?.escrow_address,
                     currency_id,
-                    user
+                    user,
+                    Number(project.id)
                 );
 
                 if (!balance && project.status_id !== OffchainProjectState.Completed) {
@@ -68,6 +76,7 @@ const ProjectBalance = (props: ProjectBalanceType) => {
         }
 
         getAndSetBalace()
+        setCurrency_id(project.currency_id);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currency_id, project?.escrow_address, project.status_id, user.id])
@@ -120,7 +129,7 @@ const ProjectBalance = (props: ProjectBalanceType) => {
                             </Menu>
                         </div>
                         <p>
-                            Balance : {balance} ${Currency[currency_id || 0]}
+                            Balance: {balance} ${Currency[currency_id || 0]}
                         </p>
                     </div>
                 )

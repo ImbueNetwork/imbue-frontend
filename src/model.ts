@@ -4,6 +4,9 @@ export enum Currency {
   // AUSD = 2,
   // KAR = 3,
   MGX = 4,
+  // Anything over 100 should be multichain 
+  ETH = 100,
+  USDT = 101,
 }
 
 // ONCHAIN PROJECT STATE
@@ -15,6 +18,11 @@ export enum OffchainProjectState {
   Accepted = 4,
   Refunded = 5,
   Completed = 6,
+}
+
+export type EVMContract = {
+  address: string,
+  decimals: number
 }
 
 export const applicationStatusId = [
@@ -105,6 +113,7 @@ export type Project = {
   project_in_voting_of_no_confidence?: boolean;
   project_in_milestone_voting?: boolean;
   first_pending_milestone?: number;
+  payment_address: string;
 };
 
 export type ProjectOnChain = {
@@ -140,6 +149,10 @@ export type Milestone = {
   is_approved: boolean;
   amount: number;
   description: string;
+  withdrawn_onchain: boolean;
+  withdrawn_offchain: boolean;
+  withdrawal_transaction_hash: string;
+  imbue_fee_transaction_hash: string;
 };
 
 export type Contribution = {

@@ -22,7 +22,6 @@ import { useSelector } from 'react-redux';
 
 import { NoConfidenceVoter } from '@/lib/queryServices/projectQueries';
 import * as utils from '@/utils';
-import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
@@ -53,11 +52,9 @@ import {
 } from '@/model';
 import { Currency } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
-import ChainService from '@/redux/services/chainService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import {
   getProjectNoConfidenceVoters,
-  updateProject,
 } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
@@ -308,13 +305,7 @@ function Project() {
       await getChainProject(projectRes, freelancerRes);
       setLoading(false);
       // setChainLoading(false);
-
-      if (
-        projectRes.status_id !== OffchainProjectState.Completed &&
-        projectRes.status_id !== OffchainProjectState.Refunded
-      ) {
-        await syncProject(projectRes);
-      }
+    
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error);
@@ -325,89 +316,7 @@ function Project() {
     }
   };
 
-  const syncProject = async (project: Project) => {
-    if (!project.chain_project_id) return;
 
-    try {
-      const imbueApi = await initImbueAPIInfo();
-      const chainService = new ChainService(imbueApi, user);
-      const onChainProjectRes = await chainService.getProject(projectId);
-      console.log(
-        '🚀 ~ file: [id].tsx:330 ~ syncProject ~ onChainProjectRes:',
-        onChainProjectRes
-      );
-
-      if (onChainProjectRes?.projectInVotingOfNoConfidence) {
-        const noConfidenceVotesChain = await chainService.getNoConfidenceVoters(
-          project.chain_project_id
-        );
-        // TODO: sync no cofidene vote list
-      }
-
-      if (onChainProjectRes?.id && project?.id) {
-        const firstPendingMilestoneChain =
-          await chainService.findFirstPendingMilestone(
-            onChainProjectRes.milestones
-          );
-
-        console.log(
-          '🚀 ~ file: [id].tsx:341 ~ syncProject ~ firstPendingMilestoneChain:',
-          firstPendingMilestoneChain
-        );
-
-        if (
-          firstPendingMilestoneChain === project.first_pending_milestone &&
-          project.project_in_milestone_voting ===
-          onChainProjectRes.projectInMilestoneVoting &&
-          project.project_in_voting_of_no_confidence ===
-          onChainProjectRes.projectInVotingOfNoConfidence
-        )
-          return;
-
-        // setWaitMessage("Syncing project with chain")
-        // setWait(true)
-        // setMilestoneLoadingTitle("Getting milestone data from chain...")
-
-        const newProject = {
-          ...project,
-          project_in_milestone_voting:
-            onChainProjectRes.projectInMilestoneVoting,
-          first_pending_milestone: firstPendingMilestoneChain,
-          project_in_voting_of_no_confidence:
-            onChainProjectRes.projectInVotingOfNoConfidence,
-          // milestones: onChainProjectRes.milestones
-        };
-
-        project.project_in_milestone_voting =
-          onChainProjectRes.projectInMilestoneVoting;
-        project.first_pending_milestone = firstPendingMilestoneChain;
-        project.project_in_voting_of_no_confidence =
-          onChainProjectRes.projectInVotingOfNoConfidence;
-        // project.milestones = onChainProjectRes.milestones
-
-        await updateProject(project.id, newProject);
-        setWait(false);
-        setProject(newProject);
-        setFirstPendingMilestone(firstPendingMilestoneChain);
-        setProjectInMilestoneVoting(onChainProjectRes.projectInMilestoneVoting);
-        setProjectInVotingOfNoConfidence(
-          onChainProjectRes.projectInVotingOfNoConfidence
-        );
-      }
-      // else {
-      //   setProject(project);
-      //   setFirstPendingMilestone(project.first_pending_milestone ?? -1);
-      //   setProjectInMilestoneVoting(project.project_in_milestone_voting);
-      //   setProjectInVotingOfNoConfidence(project?.project_in_voting_of_no_confidence ?? false);
-      // }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error);
-      setError({ message: 'Could not sync project. ', error });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const [copied, setCopied] = useState<boolean>(false);
 

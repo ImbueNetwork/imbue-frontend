@@ -119,7 +119,8 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         const balance = await getBalance(
           user?.web3_address,
           application?.currency_id ?? Currency.IMBU,
-          user
+          user,
+          application.id
         );
         const imbueBalance = await getBalance(
           user?.web3_address,
