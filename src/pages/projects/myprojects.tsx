@@ -17,7 +17,6 @@ TimeAgo.addLocale(en);
 const timeAgo = new TimeAgo('en-US');
 
 export default function Myprojects() {
-  const [switcher, setSwitcher] = useState('completed');
   const { user, loading: loadingUser } = useSelector(
     (state: RootState) => state.userState
   );
@@ -45,32 +44,33 @@ export default function Myprojects() {
     return allProject.filter((item) => !item.brief_id && item.status_id === 4);
   }, [allProject]);
 
+  const SwitchWindow = (switcher = 'completed') => {
+    switch (switcher) {
+      case 'completed': {
+        setProjects(completedProject);
+        break;
+      }
+      case 'active': {
+        setProjects(activeProject);
+        break;
+      }
+      case 'pending': {
+        setProjects(pendingProject);
+        break;
+      }
+      case 'grants': {
+        setProjects(GrantProject);
+        break;
+      }
+    }
+  };
+
   useEffect(() => {
     const getProjects = async () => {
       setLoading(true);
-
       try {
         const projects = await getFreelancerApplications(user.id);
         setAllProjects(projects);
-
-        switch (switcher) {
-          case 'completed': {
-            setProjects(completedProject);
-            break;
-          }
-          case 'active': {
-            setProjects(activeProject);
-            break;
-          }
-          case 'pending': {
-            setProjects(pendingProject);
-            break;
-          }
-          case 'grants': {
-            setProjects(GrantProject);
-            break;
-          }
-        }
       } catch (error) {
         // eslint-disable-next-line no-console
         console.log(error);
@@ -79,14 +79,7 @@ export default function Myprojects() {
       }
     };
     if (user?.id) getProjects();
-  }, [
-    GrantProject,
-    activeProject,
-    completedProject,
-    pendingProject,
-    switcher,
-    user.id,
-  ]);
+  }, [user.id]);
 
   const router = useRouter();
 
@@ -108,25 +101,25 @@ export default function Myprojects() {
 
       <div className='mx-2 border justify-between rounded-3xl flex cursor-pointer'>
         <p
-          onClick={() => setSwitcher('completed')}
+          onClick={() => SwitchWindow('completed')}
           className='text-2xl text-black py-5 border-r text-center w-full  '
         >
           Completed Projects({completedProject?.length || 0})
         </p>
         <p
-          onClick={() => setSwitcher('active')}
+          onClick={() => SwitchWindow('active')}
           className='text-2xl text-black py-5 border-r text-center w-full'
         >
           Active Projects ({activeProject?.length || 0})
         </p>
         <p
-          onClick={() => setSwitcher('pending')}
+          onClick={() => SwitchWindow('pending')}
           className='text-2xl text-black border-r py-5 text-center w-full'
         >
           Pending Projects ({pendingProject?.length || 0})
         </p>
         <p
-          onClick={() => setSwitcher('grants')}
+          onClick={() => SwitchWindow('grants')}
           className='text-2xl text-black py-5 text-center w-full'
         >
           Grants ({GrantProject?.length || 0})

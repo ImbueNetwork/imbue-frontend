@@ -1142,6 +1142,7 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
       'telegram_link',
       'discord_link',
       'title',
+      'hour_per_rate',
       // 'bio',
       'freelancers.user_id',
       'username',
@@ -1251,6 +1252,10 @@ export const fetchFreelancerClients =
           return await fetchClients(ids, `clients`)(tx);
         }
       });
+
+export const freelancerProjects =
+  (freelancer_id: number) => async (tx: Knex.Transaction) =>
+    tx.select().where({ user_id: freelancer_id }).from('projects');
 
 export const fetchItems =
   (ids: number[], tableName: string) => async (tx: Knex.Transaction) =>

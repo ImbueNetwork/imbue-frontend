@@ -131,7 +131,9 @@ export default function ClientDashboard() {
   const totalSpent = useMemo(() => {
     const total = Briefs?.acceptedBriefs?.reduce(
       (acc: number, item: any) =>
-        acc + Number(item.project.total_cost_without_fee),
+        item.project.status_id === 6
+          ? acc + Number(item.project.total_cost_without_fee)
+          : acc + 0,
       0
     );
     return total;
