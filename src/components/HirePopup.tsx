@@ -96,12 +96,7 @@ export const HirePopup = ({
 
   const selectedAccount = async (account: WalletAccount) => {
     setLoading(true);
-
-    const mintResult = await mintTokens(application.id, account.address);
-    if (mintResult.txError) {
-      setError({ message: mintResult.errorMessage });
-    }
-
+    mintTokens(application.id, account.address);
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
     const briefOwners: string[] = user?.web3_address

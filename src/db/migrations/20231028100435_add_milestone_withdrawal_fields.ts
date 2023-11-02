@@ -2,8 +2,8 @@ import { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.alterTable('milestones', (table) => {
-    table.boolean('withdrawn_offchain');
-    table.boolean('withdrawn_onchain');
+    table.boolean('withdrawn_offchain').defaultTo(false);
+    table.boolean('withdrawn_onchain').defaultTo(false);
     table.string('withdrawal_transaction_hash').nullable();
     table.string('imbue_fee_transaction_hash').nullable();
   });

@@ -285,8 +285,6 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
 
       if (project.currency_id >= 100 && project.id) {
         const withdrawResult = await withdrawOffchain(project.id);
-        console.log("**** withdraw result is ");
-        console.log(withdrawResult);
         if (withdrawResult.txError) {
           setSuccess(false);
           setError({ message: withdrawResult.errorMessage });

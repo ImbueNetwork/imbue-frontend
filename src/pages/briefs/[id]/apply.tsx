@@ -559,7 +559,7 @@ export const SubmitProposal = (): JSX.Element => {
             <input
                         type='string'
                         data-testid={`payment address`}
-                        placeholder='Add an amount'
+                        placeholder='Add a payment address'
                         className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
                         value={paymentAddress || ''}
                         onChange={(e) => setPaymentAddress(e.target.value)}
