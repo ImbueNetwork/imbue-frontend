@@ -56,7 +56,6 @@ export const getBalance = async (projectId: number) => {
       }
       const currencyId = project.currency_id;
       const escrowAddress = project.escrow_address;
-      const cost = await estimateGasCostsInEth(projectId,currencyId,project.payment_address,20);
       if (currencyId < 100) {
         const imbueApi = await initPolkadotJSAPI(process.env.IMBUE_NETWORK_WEBSOCK_ADDR!);
         switch (currencyId) {
