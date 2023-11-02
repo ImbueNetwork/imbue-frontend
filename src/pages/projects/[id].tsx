@@ -75,6 +75,8 @@ function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
   const [targetUser, setTargetUser] = useState<any>({});
+  const [projectHasAttachments, setProjectHasAttachments] = useState<boolean>(false);
+  
   // const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
   const { user, loading: userLoading } = useSelector(
     (state: RootState) => state.userState
@@ -494,6 +496,7 @@ function Project() {
                   loading,
                   setOpenVotingList,
                   targetUser,
+                  hasMilestoneAttachments: projectHasAttachments
                 }}
                 key={index}
               />

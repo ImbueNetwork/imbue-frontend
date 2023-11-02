@@ -318,7 +318,8 @@ const transfer = async (projectId: number, currencyId: number, destinationAddres
         if (coverFees) {
           const intialTransferCost = await estimateGasCostsInEth(projectId, currencyId, destinationAddress, amount);
           const additionalFees = await estimateGasCostsInEth(projectId, currencyId, destinationAddress, amount, true);
-          const escrowEthBalance = (await getBalance(projectId));
+          const escrowEthBalance:any = (await getBalance(projectId));
+
           if (Number(escrowEthBalance.eth) < intialTransferCost) {
             const treasuryKey = wallet.getDerivedKey(CoinType.ethereum, 0, 0, 0);
             const treasuryKeyHex = HexCoding.encode(treasuryKey.data());
