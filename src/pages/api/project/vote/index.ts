@@ -2,7 +2,12 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import passport from 'passport';
 
-import { fetchProjectById, updateMilestone } from '@/lib/models';
+import {
+  fetchProjectById,
+  updateMilestone,
+  updateProjectVoting,
+} from '@/lib/models';
+import { fetchProjectApprovers } from '@/lib/models';
 import {
   addVoteToDB,
   checkExistingVote,
@@ -99,9 +104,7 @@ export default nextConnect()
           )(tx);
 
           if (resp?.length)
-            return res
-              .status(200)
-              .json({ status: 'success', milestoneApproved });
+            res.status(200).json({ status: 'success', milestoneApproved });
         } else {
           const resp = await updateVoteDB(
             projectId,
@@ -111,9 +114,20 @@ export default nextConnect()
           )(tx);
 
           if (resp)
-            return res
-              .status(200)
-              .json({ status: 'success', milestoneApproved });
+            res.status(200).json({ status: 'success', milestoneApproved });
+        }
+
+        const yes = await getYesOrNoVotes(projectId, milestoneIndex, true)(tx);
+
+        const no = await getYesOrNoVotes(projectId, milestoneIndex, false)(tx);
+
+        const allVotersRes = await fetchProjectApprovers(projectId)(tx);
+
+        if (
+          yes.length / allVotersRes.length >= 0.75 ||
+          no.length / allVotersRes.length >= 0.75
+        ) {
+          await updateProjectVoting(Number(projectId), false)(tx);
         }
       } catch (error) {
         // eslint-disable-next-line no-console

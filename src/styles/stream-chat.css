@@ -10,7 +10,7 @@
 
 .custom-chat-container {
   background: var(--theme-background);
-  height: 75vh;
+  /* height: 75vh; */
 }
 
 .str-chat__edit-message-form-options {

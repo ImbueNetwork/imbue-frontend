@@ -2,15 +2,17 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import * as reactRedux from 'react-redux';
 
+import { AppContext } from '@/components/Layout';
+
 import Freelancers from '@/pages/freelancers/new';
 import { Providers } from '@/redux/providers/userProviders';
-import { searchLanguageByName,searchSkills } from '@/redux/services/briefService';
+import { searchLanguageByName, searchSkills } from '@/redux/services/briefService';
 
 import { dummyUser } from './__mocks__/userData';
 
 jest.mock('@/redux/services/briefService', () => ({
   searchSkills: jest.fn(),
-  searchLanguageByName:jest.fn(),
+  searchLanguageByName: jest.fn(),
 }));
 
 jest.mock('react-redux', () => ({
@@ -32,19 +34,21 @@ function setUp() {
   // };
   render(
     <Providers>
-      <Freelancers />
+      <AppContext.Provider value={{ profileView: "client", setProfileMode: (_value: string) => null }}>
+        <Freelancers />
+      </AppContext.Provider>
     </Providers>
   );
 }
 
 const skills = [{ name: 'java' }, { name: 'c++' }, { name: 'python' }];
-const languages = [{name:"German"}, { name: 'English'}]
+const languages = [{ name: "German" }, { name: 'English' }]
 beforeEach(() => {
   const useSelectorMock = jest.spyOn(reactRedux, 'useSelector');
   const mockgetAllSkills = searchSkills as jest.MockedFunction<
     typeof searchSkills
   >;
-  const mocksearchLanguageByName = searchLanguageByName as jest.MockedFunction< typeof searchLanguageByName>
+  const mocksearchLanguageByName = searchLanguageByName as jest.MockedFunction<typeof searchLanguageByName>
   mockgetAllSkills.mockResolvedValue({ skills });
   mocksearchLanguageByName.mockResolvedValue({ languages });
 
@@ -57,9 +61,11 @@ afterEach(() => {
 
 test('test Freelancer rendering', async () => {
   expect(
-     render(
+    render(
       <Providers>
-        <Freelancers />
+        <AppContext.Provider value={{ profileView: "client", setProfileMode: (_value: string) => null }}>
+          <Freelancers />
+        </AppContext.Provider>
       </Providers>
     )
   ).toBeTruthy();
@@ -67,12 +73,12 @@ test('test Freelancer rendering', async () => {
 
 
 test('test Freelancer rendering and matching the snapshot', async () => {
-  await waitFor(()=> setUp());
+  await waitFor(() => setUp());
   expect(screen.getByText('Get Started!')).toMatchSnapshot();
 });
 
 test('test freelancer onclick next snapshot matching', async () => {
-  await waitFor(()=> setUp());
+  await waitFor(() => setUp());
   expect(screen.getByText('Get Started!')).toMatchSnapshot();
   fireEvent.click(screen.getByTestId('get-started-button'));
 
@@ -82,15 +88,15 @@ test('test freelancer onclick next snapshot matching', async () => {
 });
 
 test('test freelancer validation failure not proceeding the next step', async () => {
-  await waitFor(()=> setUp());
+  await waitFor(() => setUp());
   fireEvent.click(screen.getByTestId('get-started-button'));
   fireEvent.click(screen.getByTestId('next-button'));
 
   expect(screen.getByTestId('heading')).toMatchSnapshot();
 });
 
-test('test freelancer validation passing if the value is being entered ',async () => {
-  await waitFor(()=> setUp());
+test('test freelancer validation passing if the value is being entered ', async () => {
+  await waitFor(() => setUp());
   fireEvent.click(screen.getByTestId('get-started-button'));
   fireEvent.click(screen.getByTestId('next-button'));
   fireEvent.click(screen.getByTestId('freelance-xp-1'));
@@ -100,8 +106,8 @@ test('test freelancer validation passing if the value is being entered ',async (
   ).toMatchSnapshot();
 });
 
-test('test freelancer capturing the input textbox value', async() => {
-  await waitFor(()=> setUp());
+test('test freelancer capturing the input textbox value', async () => {
+  await waitFor(() => setUp());
   fireEvent.click(screen.getByTestId('get-started-button'));
   fireEvent.click(screen.getByTestId('next-button'));
   fireEvent.click(screen.getByTestId('freelance-xp-1'));
@@ -118,7 +124,7 @@ test('test freelancer capturing the input textbox value', async() => {
 });
 
 test('test freelancer capturing the multiselect languages', async () => {
-  await waitFor(()=> setUp());
+  await waitFor(() => setUp());
   fireEvent.click(screen.getByTestId('get-started-button'));
   fireEvent.click(screen.getByTestId('next-button'));
   fireEvent.click(screen.getByTestId('freelance-xp-1'));

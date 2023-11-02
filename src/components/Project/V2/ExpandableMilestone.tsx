@@ -292,8 +292,8 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
           }}
           polkadotAccountsVisible={showPolkadotAccounts}
           showPolkadotAccounts={setShowPolkadotAccounts}
-          // initiatorAddress={project?.owner}
-          // filterByInitiator
+        // initiatorAddress={project?.owner}
+        // filterByInitiator
         />
       )}
 
@@ -322,10 +322,8 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                 <span className='relative text-sm z-10'>{index + 1}</span>
                 <div className='w-2 h-2 -rotate-45 bg-[#2400FF] absolute -bottom-0.5  '></div>
               </div>
-              <p className='text-black ml-3 text-2xl'>
-                {milestone?.name?.length > 40
-                  ? milestone.name.substring(0, 40) + ' ...'
-                  : milestone.name}
+              <p className='text-black ml-3 text-2xl break-words w-11/12'>
+                {milestone?.name}
               </p>
             </div>
             <p className='col-start-7 col-end-9 text-lg mr-10 ml-4'>
@@ -343,23 +341,21 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                         {item.is_approved ? 'Completed' : 'Open for voting'}
                     </p> */}
             {project.first_pending_milestone === milestone.milestone_index &&
-            project.project_in_milestone_voting ? (
+              project.project_in_milestone_voting ? (
               <p
-                className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ml-auto h-fit ${
-                  milestone.is_approved
+                className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ml-auto h-fit ${milestone.is_approved
                     ? 'bg-lime-100 text-lime-600'
                     : 'bg-red-100 text-red-500'
-                }`}
+                  }`}
               >
                 {milestone.is_approved ? 'Completed' : 'Open for voting'}
               </p>
             ) : (
               <p
-                className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ml-auto h-fit ${
-                  milestone.is_approved
+                className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ml-auto h-fit ${milestone.is_approved
                     ? 'bg-lime-100 text-lime-600'
                     : 'bg-[#EBEAE2] text-[#949494]'
-                }`}
+                  }`}
               >
                 {milestone.is_approved ? 'Completed' : 'Pending'}
               </p>
@@ -383,22 +379,22 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                   <div className='grid grid-cols-6 gap-3'>
                     {attachments?.length
                       ? attachments.map((attachment: any, index: number) => (
-                          <a
-                            className='col-span-1'
-                            key={index}
-                            href={attachment.fileURL}
-                            target='_blank'
-                          >
-                            <div className='border rounded-lg mt-5 px-3 text-xs py-3'>
-                              <div className='space-y-2'>
-                                <p>
-                                  {attachment.fileURL?.split('$')[1] ||
-                                    'Attachment'}
-                                </p>
-                              </div>
+                        <a
+                          className='col-span-1'
+                          key={index}
+                          href={attachment.fileURL}
+                          target='_blank'
+                        >
+                          <div className='border rounded-lg mt-5 px-3 text-xs py-3'>
+                            <div className='space-y-2'>
+                              <p>
+                                {attachment.fileURL?.split('$')[1] ||
+                                  'Attachment'}
+                              </p>
                             </div>
-                          </a>
-                        ))
+                          </div>
+                        </a>
+                      ))
                       : ''}
                   </div>
                 </div>
@@ -414,22 +410,22 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                   <div className='flex space-x-5'>
                     {files?.length
                       ? files.map((file, index) => (
-                          <div
-                            key={index}
-                            className='border rounded-lg mt-5 flex space-x-4 items-center px-3 text-xs py-3'
-                          >
-                            <div className='space-y-2'>
-                              <p>{file.name}</p>
-                              <p>{(file.size / 1048576).toFixed(2)} MB</p>
-                            </div>
-                            <Image
-                              className='cursor-pointer ml-2'
-                              src={require('@/assets/svgs/trash.svg')}
-                              alt=''
-                              onClick={() => handleRemoveFile(index)}
-                            />
+                        <div
+                          key={index}
+                          className='border rounded-lg mt-5 flex space-x-4 items-center px-3 text-xs py-3'
+                        >
+                          <div className='space-y-2'>
+                            <p>{file.name}</p>
+                            <p>{(file.size / 1048576).toFixed(2)} MB</p>
                           </div>
-                        ))
+                          <Image
+                            className='cursor-pointer ml-2'
+                            src={require('@/assets/svgs/trash.svg')}
+                            alt=''
+                            onClick={() => handleRemoveFile(index)}
+                          />
+                        </div>
+                      ))
                       : ''}
                   </div>
 
@@ -457,16 +453,14 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                     followCursor
                     title={
                       !props?.canVote &&
-                      `Only approvers are allowed to vote on a milestone and you cannot vote more than once.${
-                        user.web3_address &&
-                        `You are currently on wallet: ${user.web3_address}`
+                      `Only approvers are allowed to vote on a milestone and you cannot vote more than once.${user.web3_address &&
+                      `You are currently on wallet: ${user.web3_address}`
                       }`
                     }
                   >
                     <button
-                      className={`primary-btn  ml-auto in-dark w-button lg:w-1/5 text-center ${
-                        !props?.canVote && '!bg-gray-300 !text-gray-400'
-                      }`}
+                      className={`primary-btn  ml-auto in-dark w-button lg:w-1/5 text-center ${!props?.canVote && '!bg-gray-300 !text-gray-400'
+                        }`}
                       onClick={() =>
                         props?.canVote &&
                         handleVoting(milestone.milestone_index)

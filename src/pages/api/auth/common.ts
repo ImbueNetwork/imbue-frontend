@@ -37,7 +37,6 @@ export const authenticate = (
     )(req, res);
   });
 
-
 export function verifyUserIdFromJwt(req: any, res: any, user_ids: number[]) {
   const token = getTokenCookie(req);
   if (!token) {
