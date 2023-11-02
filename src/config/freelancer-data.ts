@@ -39,10 +39,10 @@ export const stepData = [
   //     progress: 6,
   // },
   {
-      heading: "Clients like to know what you know - add your education here.",
-      content: `You don’t have to have a degree. Adding any relevant education helps \n
+    heading: 'Clients like to know what you know - add your education here.',
+    content: `You don’t have to have a degree. Adding any relevant education helps \n
       make your profile more visible.`,
-      progress: 7,
+    progress: 7,
   },
   {
     heading: 'Looking good. Next, tell us which languages you speak.',
@@ -71,9 +71,16 @@ export const stepData = [
     progress: 11,
   },
   {
+    heading: 'What is your expected payment per hour?',
+    content: `Choose at least 1 service that best describes the type of work you do. This \n
+        helps us match you with clients who need your unique expertise.\n
+        Search for a service`,
+    progress: 12,
+  },
+  {
     heading: "That's It. All done!",
     content: `Once you submit your profile you will be able to search and apply for briefs`,
-    progress: 12,
+    progress: 13,
   },
 ];
 

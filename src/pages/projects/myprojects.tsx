@@ -78,9 +78,15 @@ export default function Myprojects() {
         setLoading(false);
       }
     };
-
     if (user?.id) getProjects();
-  }, [switcher, user.id]);
+  }, [
+    GrantProject,
+    activeProject,
+    completedProject,
+    pendingProject,
+    switcher,
+    user.id,
+  ]);
 
   const router = useRouter();
 

@@ -4,6 +4,7 @@ import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en.json';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import {
   AiOutlineCalendar,
   AiOutlineClockCircle,
@@ -15,13 +16,28 @@ import { TbUsers } from 'react-icons/tb';
 import { TfiEmail } from 'react-icons/tfi';
 import { VscVerified } from 'react-icons/vsc';
 
-import { Brief } from '@/model';
-
 TimeAgo.addLocale(en);
 const timeAgo = new TimeAgo('en-US');
 
-export default function BriefComponent({ brief }: { brief: Brief }) {
+export default function BriefComponent({ brief }: { brief: any }) {
   const router = useRouter();
+  const [user_Activites, setUserActivites] = useState({
+    totalSpent: 0,
+    totalHire: 0,
+    activeHire: 0,
+  });
+  useEffect(() => {
+    let totalSpent = 0;
+    let totalHire = 0;
+    let activeHire = 0;
+    for (const project of brief.user_hire_history) {
+      if (project.project_status === 6) totalSpent += Number(project.cost);
+      if (project.project_status === 4 || project.status === 5) activeHire++;
+      if (project.project_status !== 0) totalHire++;
+    }
+    setUserActivites({ totalSpent, activeHire, totalHire });
+  }, [brief]);
+
   return (
     <div className='flex border-b hover:bg-imbue-light-purple-three cursor-pointer last:border-b-0'>
       <div
@@ -119,13 +135,13 @@ export default function BriefComponent({ brief }: { brief: Brief }) {
             <span className='text-imbue-purple mr-1.5'>
               <HiOutlineCurrencyDollar size={20} />
             </span>
-            $19k total spent
+            ${user_Activites.totalSpent} total spent
           </p>
           <p className='flex items-center'>
             <span className='text-imbue-purple mr-2'>
               <TbUsers size={18} />
             </span>
-            59 hires,6 active
+            {user_Activites.totalHire} hires,{user_Activites.activeHire} active
           </p>
         </div>
         <div className='text-xs pt-3 px-7 text-black'>
@@ -141,7 +157,7 @@ export default function BriefComponent({ brief }: { brief: Brief }) {
           />
           <div className='flex mt-1 justify-between'>
             <p>4.68 of 40 reviews</p>
-            <p>Member since: Aug 17,2023</p>
+            <p>Member since: {timeAgo.format(new Date(brief.joined))}</p>
           </div>
         </div>
       </div>

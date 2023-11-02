@@ -186,6 +186,7 @@ export type Freelancer = {
   country?: string;
   region?: string;
   profile_image?: string;
+  hour_per_rate: number;
 };
 
 export type BriefSqlFilter = {
@@ -742,6 +743,7 @@ export const fetchAllBriefs = () => (tx: Knex.Transaction) =>
       'users.display_name as created_by',
       'users.profile_photo as owner_photo',
       'users.username as owner_name',
+      'users.created as joined',
       'experience_level',
       'briefs.experience_id',
       'briefs.created',
@@ -1281,6 +1283,7 @@ export const insertFreelancerDetails =
         telegram_link: f.telegram_link,
         discord_link: f.discord_link,
         user_id: f.user_id,
+        hour_per_rate: f.hour_per_rate,
       })
 
       .returning('id')
