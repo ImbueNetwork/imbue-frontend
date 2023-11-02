@@ -10,7 +10,7 @@ import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 import { Project, User, VotesResp } from '@/model';
 import ChainService from '@/redux/services/chainService';
 import {
-  getMillestoneVotes,
+  getMilestoneVotes,
   voteOnMilestone,
 } from '@/redux/services/projectServices';
 
@@ -110,7 +110,7 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
             )
         );
         await Promise.all(promises);
-        const voteResp = await getMillestoneVotes(
+        const voteResp = await getMilestoneVotes(
           projectId,
           firstPendingMilestone
         );
@@ -128,7 +128,7 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
 
       setLoading(true);
       try {
-        const voteResp = await getMillestoneVotes(
+        const voteResp = await getMilestoneVotes(
           projectId,
           firstPendingMilestone
         );

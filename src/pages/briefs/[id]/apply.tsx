@@ -50,6 +50,7 @@ export const SubmitProposal = (): JSX.Element => {
   const filter = new Filter();
   const [currencyId, setCurrencyId] = useState(0);
   const [durationId, setDurationId] = useState(0);
+  const [paymentAddress, setPaymentAddress] = useState<string>('');
   const [brief, setBrief] = useState<Brief | any>();
   // const [user, setUser] = useState<User>();
   const { user, loading: loadingUser } = useSelector(
@@ -227,6 +228,7 @@ export const SubmitProposal = (): JSX.Element => {
           duration_id: durationId,
           description: brief?.description,
           verified_only: brief.verified_only,
+          payment_address: paymentAddress
         }),
       });
       if (resp.ok) {
@@ -269,7 +271,8 @@ export const SubmitProposal = (): JSX.Element => {
       inputErrors,
       milestones,
       brief?.headline,
-      brief?.description
+      brief?.description,
+      paymentAddress
     );
     setMilestones(milestonesRes);
     setInputErrors(errors);
@@ -489,7 +492,7 @@ export const SubmitProposal = (): JSX.Element => {
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-light-purple-two font-normal'>
-              ${Number(totalCostMinusFee.toFixed(2)).toLocaleString()}
+              {Number(totalCostMinusFee.toFixed(2)).toLocaleString()} ${Currency[currencyId]}
             </div>
           </div>
         </div>
@@ -545,6 +548,24 @@ export const SubmitProposal = (): JSX.Element => {
                   </option>
                 ))}
               </select>
+            </div>
+          </div>
+          <div className='payment-options'>
+            <h3 className='text-lg lg:text-[1.25rem] font-normal m-0 p-0 text-imbue-purple-dark'>
+              Payment Address
+            </h3>
+
+            <div className='network-amount'>
+            <input
+                        type='string'
+                        data-testid={`payment address`}
+                        placeholder='Add an amount'
+                        className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
+                        value={paymentAddress || ''}
+                        onChange={(e) => setPaymentAddress(e.target.value)}
+                        name='paymentAddress'
+                      />
+
             </div>
           </div>
         </div>

@@ -18,10 +18,12 @@ import VoteModal from '@/components/ReviewModal/VoteModal';
 import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 
 import { Milestone, OffchainProjectState, Project, User } from '@/model';
-import ChainService from '@/redux/services/chainService';
+import ChainService, { ImbueChainEvent } from '@/redux/services/chainService';
 import {
   getMilestoneAttachments,
   uploadMilestoneAttachments,
+  watchChain,
+  withdrawOffchain,
 } from '@/redux/services/projectServices';
 import { updateProject } from '@/redux/services/projectServices';
 
@@ -152,6 +154,8 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
         milestoneKeyInView
       );
 
+      watchChain(ImbueChainEvent.SubmitMilestone, account.address, project.id);
+
       // eslint-disable-next-line no-constant-condition
       while (true) {
         if (result.status || result.txError) {
@@ -229,43 +233,70 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
 
   // withdrawing funds
   const withdraw = async (account: WalletAccount) => {
+    if (!project.id)
+      return
     setLoading(true);
 
     try {
-      const imbueApi = await initImbueAPIInfo();
       const projectMilestones = project.milestones;
       // const user: User | any = await utils.getCurrentUser();
-      const chainService = new ChainService(imbueApi, user);
-      const result = await chainService.withdraw(
-        account,
-        project.chain_project_id
-      );
+      const approvedMilestones = project.milestones.filter((milestone: Milestone) => milestone.is_approved).map(milestone => milestone.milestone_index);
+      const withdrawnMilestones = project.milestones.filter((milestone: Milestone) => milestone.withdrawn_onchain).map(milestone => milestone.milestone_index);
+      const onChainWithdrawalRequired = JSON.stringify(approvedMilestones) != JSON.stringify(withdrawnMilestones);
+      watchChain(ImbueChainEvent.Withraw, account.address, project.id);
 
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        if (result.status || result.txError) {
-          if (result.status) {
-            const haveAllMilestonesBeenApproved = projectMilestones
-              .map((m: any) => m.is_approved)
-              .every(Boolean);
+      if (onChainWithdrawalRequired) {
+        const imbueApi = await initImbueAPIInfo();
+        const chainService = new ChainService(imbueApi, user);
+        const result = await chainService.withdraw(
+          account,
+          project.chain_project_id
+        );
 
-            if (haveAllMilestonesBeenApproved) {
-              project.status_id = OffchainProjectState.Completed;
-              project.completed = true;
-              await updateProject(Number(project?.id), project);
+        while (onChainWithdrawalRequired) {
+          if (result.status || result.txError) {
+            if (result.status) {
+              const haveAllMilestonesBeenApproved = projectMilestones
+                .map((m: any) => m.is_approved)
+                .every(Boolean);
+
+              if (haveAllMilestonesBeenApproved) {
+                project.status_id = OffchainProjectState.Completed;
+                project.completed = true;
+                await updateProject(Number(project?.id), project);
+              }
+
+              if (project.currency_id < 100) {
+                setSuccess(true);
+                setSuccessTitle('Withdraw successfull');
+              }
+
+
+            } else if (result.txError) {
+              // setLoading(false);
+              setError({ message: 'Error : ' + result.errorMessage });
             }
-            // setLoading(false);
-            setSuccess(true);
-            setSuccessTitle('Withdraw successfull');
-          } else if (result.txError) {
-            // setLoading(false);
-            setError({ message: 'Error : ' + result.errorMessage });
+            break;
           }
-          break;
+          await new Promise((f) => setTimeout(f, 1000));
         }
-        await new Promise((f) => setTimeout(f, 1000));
+
       }
-      setLoading(false);
+
+      if (project.currency_id >= 100 && project.id) {
+        const withdrawResult = await withdrawOffchain(project.id);
+        console.log("**** withdraw result is ");
+        console.log(withdrawResult);
+        if (withdrawResult.txError) {
+          setSuccess(false);
+          setError({ message: withdrawResult.errorMessage });
+        } else {
+          setSuccess(true);
+          setSuccessTitle('Withdraw successfull');
+        }
+        setLoading(false);
+      }
+
     } catch (error) {
       setError({ message: 'Error' + error });
     }
@@ -344,8 +375,8 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
               project.project_in_milestone_voting ? (
               <p
                 className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ml-auto h-fit ${milestone.is_approved
-                    ? 'bg-lime-100 text-lime-600'
-                    : 'bg-red-100 text-red-500'
+                  ? 'bg-lime-100 text-lime-600'
+                  : 'bg-red-100 text-red-500'
                   }`}
               >
                 {milestone.is_approved ? 'Completed' : 'Open for voting'}
@@ -353,8 +384,8 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
             ) : (
               <p
                 className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ml-auto h-fit ${milestone.is_approved
-                    ? 'bg-lime-100 text-lime-600'
-                    : 'bg-[#EBEAE2] text-[#949494]'
+                  ? 'bg-lime-100 text-lime-600'
+                  : 'bg-[#EBEAE2] text-[#949494]'
                   }`}
               >
                 {milestone.is_approved ? 'Completed' : 'Pending'}
