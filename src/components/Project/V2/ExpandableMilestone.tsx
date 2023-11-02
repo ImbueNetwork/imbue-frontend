@@ -43,6 +43,7 @@ interface ExpandableMilestonProps {
   canVote: boolean;
   loading: boolean;
   targetUser: any;
+  hasMilestoneAttachments: boolean;
 }
 
 const ExpandableMilestone = (props: ExpandableMilestonProps) => {
@@ -58,6 +59,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
     setSuccessTitle,
     setSuccess,
     targetUser,
+    hasMilestoneAttachments = false
   } = props;
   const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
   const [submittingMilestone, setSubmittingMilestone] =
@@ -96,7 +98,9 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
       setAttachment(resp);
     };
 
-    getAttachments();
+    if(hasMilestoneAttachments){ 
+      getAttachments();
+    }
   }, [milestone.milestone_index, project.id]);
 
   const [files, setFiles] = useState<File[]>();
