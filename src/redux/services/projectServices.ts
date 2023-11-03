@@ -85,7 +85,7 @@ export const getMilestoneAttachments = async (
   milestoneIndex: number
 ) => {
   const resp = await fetch(
-    `${config.apiBase}/project/submitMilestone?projectId=${projectId}&milestoneIndex=${milestoneIndex}`,
+    `${config.apiBase}project/submitMilestone?projectId=${projectId}&milestoneIndex=${milestoneIndex}`,
     {
       headers: config.postAPIHeaders,
       method: 'get',

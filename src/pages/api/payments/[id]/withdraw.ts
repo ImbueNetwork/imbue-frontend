@@ -15,7 +15,8 @@ export default nextConnect()
     const { id } = req.query;
     const projectId = Number(id);
     try {
-      const withdrawnAmount = await withdraw(projectId);
+      const coverFees = true;
+      const withdrawnAmount = await withdraw(projectId, coverFees);
       if (withdrawnAmount > 0) {
         return res.status(200).json({ WithdrawnAmount: withdrawnAmount });
       } else {

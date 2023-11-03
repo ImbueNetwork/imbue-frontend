@@ -335,7 +335,7 @@ function NewNavbar() {
                 src='/message-dots-square.svg'
                 width={23}
                 height={20}
-                onClick={() => router.push('/dashboard/message')}
+                onClick={() => router.push('/dashboard/messages')}
                 alt='message'
                 className='cursor-pointer'
               />

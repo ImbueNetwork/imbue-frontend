@@ -19,9 +19,10 @@ export default nextConnect()
         res
       );
 
-      if (!userAuth) {
+      if(!userAuth) {
         return res.status(404).send('unable to fetch notifications');
       }
+      
       const client = connect(
         process.env.GETSTREAM_API_KEY as string,
         process.env.GETSTREAM_SECRET_KEY as string
@@ -57,8 +58,7 @@ export default nextConnect()
         }
       });
     } catch (err) {
-      console.log(err);
-      return res.status(500).send('unable to send notification: ');
+      return res.status(404).end('unable to fetch notifications');
     }
   })
   .post(async (req: NextApiRequest, res: NextApiResponse) => {

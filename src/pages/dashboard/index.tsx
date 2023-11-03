@@ -48,43 +48,39 @@ const Dashboard = (): JSX.Element => {
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const setupStreamChat = async () => {
-      try {
-        if (!user?.username && !loadingUser) return router.push('/');
-        setClient(await getStreamChat());
-      } catch (error) {
-        setError({ message: error });
-      } finally {
-        setLoadingStreamChat(false);
+
+  const setup = async () => {
+    try {
+      if (!user?.username && !loadingUser) return router.push('/');
+      const client = await getStreamChat();
+      setClient(client);
+      if(client && user.getstream_token) {
+        client?.connectUser(
+          {
+            id: String(user.id),
+            username: user.username,
+            name: user.display_name,
+          },
+          user.getstream_token
+        );
+          const result = await client.getUnreadCount();
+          dispatch(setUnreadMessage({ message: result.channels.length }));
+        client.on((event) => {
+          if (event.total_unread_count !== undefined) {
+            dispatch(setUnreadMessage({ message: event.unread_channels }));
+          }
+        });
       }
-    };
+      setLoadingStreamChat(false);
 
-    setupStreamChat();
-  }, [user]);
+    } catch (error) {
+      setError({ message: error });
+    }
+  };
 
   useEffect(() => {
-    if (client && user?.username && !loadingStreamChat) {
-      client?.connectUser(
-        {
-          id: String(user.id),
-          username: user.username,
-          name: user.display_name,
-        },
-        user.getstream_token
-      );
-      const getUnreadMessageChannels = async () => {
-        const result = await client.getUnreadCount();
-        dispatch(setUnreadMessage({ message: result.channels.length }));
-      };
-      getUnreadMessageChannels();
-      client.on((event) => {
-        if (event.total_unread_count !== undefined) {
-          dispatch(setUnreadMessage({ message: event.unread_channels }));
-        }
-      });
-    }
-  }, [client, user?.getstream_token, user?.username, loadingStreamChat]);
+    setup();
+  }, [user]);
 
   const { profileView } = useContext(AppContext) as AppContextType;
 
@@ -94,7 +90,7 @@ const Dashboard = (): JSX.Element => {
 
   return client ? (
     <div className='px-[15px]'>
-      
+
       <ClientDashboard />
       <LoginPopup
         visible={loginModal}
