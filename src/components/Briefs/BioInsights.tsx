@@ -17,7 +17,6 @@ import { copyIcon } from '@/assets/svgs';
 import { Brief, Project, User } from '@/model';
 import {
   getBriefApplications,
-  getUserBriefs,
 } from '@/redux/services/briefService';
 
 import CountrySelector from '../Profile/CountrySelector';
