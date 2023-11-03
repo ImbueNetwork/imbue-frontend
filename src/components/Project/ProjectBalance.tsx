@@ -42,7 +42,7 @@ const Currencies = [
 const ProjectBalance = (props: ProjectBalanceType) => {
     const { balance, project, user, handlePopUpForUser, setBalance } = props;
     const [balanceLoading, setBalanceLoading] = useState(true)
-    const [currency_id, setCurrency_id] = useState<number>(project?.currency_id || 0)
+    const [currency_id, setCurrency_id] = useState<number>();
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const showOptions = Boolean(anchorEl);
@@ -75,8 +75,10 @@ const ProjectBalance = (props: ProjectBalanceType) => {
             }
         }
 
-        getAndSetBalace()
-        setCurrency_id(project.currency_id);
+        getAndSetBalace();
+        if (!currency_id) {
+            setCurrency_id(project.currency_id);
+        }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currency_id, project?.escrow_address, project.status_id, user.id])

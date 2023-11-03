@@ -17,7 +17,6 @@ import { copyIcon } from '@/assets/svgs';
 import { Brief, Project, User } from '@/model';
 import {
   getBriefApplications,
-  getUserBriefs,
 } from '@/redux/services/briefService';
 
 import CountrySelector from '../Profile/CountrySelector';
@@ -35,6 +34,7 @@ type BioInsightsProps = {
   canSubmitProposal: boolean | undefined;
   isSavedBrief?: boolean;
   unsaveBrief?: () => Promise<void>;
+  allClientBriefs: any;
 };
 
 const BioInsights = ({
@@ -50,6 +50,7 @@ const BioInsights = ({
   saveBrief,
   unsaveBrief,
   isSavedBrief,
+  allClientBriefs,
 }: BioInsightsProps) => {
   const router = useRouter();
   const [copied, setCopied] = useState(false);
@@ -71,12 +72,10 @@ const BioInsights = ({
 
   useEffect(() => {
     const setUp = async () => {
-      if (!targetUser?.id) return;
-      const res = await getUserBriefs(targetUser?.id);
-      const allBriefs = [...res.acceptedBriefs, ...res.briefsUnderReview];
-
+      if (!targetUser?.id || !allClientBriefs) return;
+      const allBriefs = [...allClientBriefs.acceptedBriefs, ...allClientBriefs.briefsUnderReview];
       setClientBrief(allBriefs);
-      setIOpenBriefs(res?.briefsUnderReview || []);
+      setIOpenBriefs(allClientBriefs.briefsUnderReview || []);
       setBriefApplications(await getBriefApplications(brief?.id));
     };
 
