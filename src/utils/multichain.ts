@@ -357,7 +357,7 @@ const estimateGasCostsInEth = async (projectId: number, currencyId: number, dest
   let withdrawal_gas_cost: any;
   let imbue_fee_gas_cost: any;
   let totalGasCost = 0;
-  let bufferCost = 1.1;
+  const bufferCost = 1.1;
   try {
     const ethProvider = new ethers.JsonRpcProvider(RPC_URL);
     const gasPrice = (await ethProvider.getFeeData()).gasPrice;
