@@ -45,7 +45,7 @@ export default nextConnect()
         };
 
         const updatedProject = await syncProject(pkg, tx);
-        return res.send(updatedProject);
+        return res.status(200).send(updatedProject);
       } catch (e) {
         return res.status(404).end();
         new Error(`Failed to fetch project by id: ${id}`, {

@@ -234,6 +234,7 @@ function Project() {
 
     try {
       const projectRes: Project = await getProjectById(projectId);
+      console.log("🚀 ~ file: [id].tsx:237 ~ getProject ~ projectRes:", projectRes)
 
       if (!projectRes) {
         setError({ message: 'No project found!' });

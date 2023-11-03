@@ -123,10 +123,18 @@ export default nextConnect()
 
         const allVotersRes = await fetchProjectApprovers(projectId)(tx);
 
-        if (
-          yes.length / allVotersRes.length >= 0.75 ||
-          no.length / allVotersRes.length >= 0.75
+        if (yes.length / allVotersRes.length >= 0.75) {
+          // closing voting round and approving milestone if treshold reached
+          await updateProjectVoting(Number(projectId), false)(tx);
+          await updateMilestone(projectId, milestoneIndex, {
+            is_approved: true,
+          })(tx);
+
+        } else if (
+          no.length / allVotersRes.length >= 0.75 ||
+          allVotersRes.length === yes.length + no.length
         ) {
+          // closing voting round if all votes are done without approval
           await updateProjectVoting(Number(projectId), false)(tx);
         }
       } catch (error) {
