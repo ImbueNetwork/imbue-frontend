@@ -8,7 +8,7 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-  await knex.schema.alterTable('briefs', (builder) => {
+  await knex.schema.alterTable(table_freelancers, (builder) => {
     builder.dropColumn('hour_per_rate');
   });
 }

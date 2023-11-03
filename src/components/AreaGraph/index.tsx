@@ -1,10 +1,16 @@
 import dynamic from 'next/dynamic';
 
+import { userAnalyticsType } from '@/pages/dashboard/new';
+
 const Chart = dynamic(() => import('react-apexcharts'), {
   ssr: false,
 });
 
-export default function AreaGrah() {
+export default function AreaGrah({
+  userInfo,
+}: {
+  userInfo: userAnalyticsType[];
+}) {
   const options = {
     fill: {
       colors: ['#3B27C1'],
@@ -21,14 +27,14 @@ export default function AreaGrah() {
       show: false,
     },
     xaxis: {
-      categories: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+      categories: userInfo?.map((item) => item.label.substring(0, 3)),
     },
   };
 
   const series = [
     {
       name: 'profile views',
-      data: [0, 0, 3, 5, 2, 6, 0],
+      data: userInfo?.map((item) => item.value),
     },
   ];
 

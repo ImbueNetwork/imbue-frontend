@@ -64,6 +64,7 @@ import SuccessScreen from '@/components/SuccessScreen';
 
 import { Currency, Freelancer, Project, User } from '@/model';
 import { fetchUserRedux } from '@/redux/reducers/userReducers';
+import { setUserAnalytics } from '@/redux/services/briefService';
 import {
   getFreelancerApplications,
   getFreelancerProfile,
@@ -108,7 +109,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     )
   );
 
-  const { user: browsingUser } = useSelector(
+  const { user: browsingUser, loading: browsingUserLoading } = useSelector(
     (state: RootState) => state.userState
   );
   const dispatch = useDispatch<AppDispatch>();
@@ -203,7 +204,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           setSuccess(true);
           setprevUserName(data.username);
         } else {
-          setError({ message: 'Someting went wrong' + JSON.stringify(resp.message) });
+          setError({
+            message: 'Someting went wrong' + JSON.stringify(resp.message),
+          });
         }
       }
     } catch (error) {
@@ -213,11 +216,19 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     }
   };
 
+  useEffect(() => {
+    const updateFreelancerAnalytics = async () => {
+      await setUserAnalytics(browsingUser.id, freelancer.user_id);
+    };
+    if (!browsingUserLoading && browsingUser.id !== freelancer.user_id) {
+      updateFreelancerAnalytics();
+    }
+  }, [browsingUser]);
+
   const handleMessageBoxClick = () => {
     if (browsingUser.id) {
       setShowMessageBox(true);
-    }
-    else {
+    } else {
       setShowLoginPopup(true);
     }
   };
@@ -238,8 +249,13 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
       else settitleError(null);
     }
     if (e.target.name === 'display_name') {
-      if (newFreelancer.display_name.trim().length < 1 && newFreelancer.display_name.trim().length > 30) {
-        setDisplayNameError('Display name must be between 1 to 30 characters long');
+      if (
+        newFreelancer.display_name.trim().length < 1 &&
+        newFreelancer.display_name.trim().length > 30
+      ) {
+        setDisplayNameError(
+          'Display name must be between 1 to 30 characters long'
+        );
       } else if (isUrlExist(e.target.value)) {
         setDisplayNameError(
           'URL and special characters are not allowed in display name'
@@ -499,7 +515,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   ...initFreelancer,
                   skills: freelancer?.skills?.map(
                     (skill: { id: number; name: string }) =>
-                      skill?.name?.charAt(0).toUpperCase() + skill?.name?.slice(1)
+                      skill?.name?.charAt(0).toUpperCase() +
+                      skill?.name?.slice(1)
                   ),
                   logged_in_user: browsingUser,
                 }}
@@ -518,7 +535,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                       label='Name'
                       variant='outlined'
                       color='secondary'
-                      defaultValue={freelancer?.display_name || ""}
+                      defaultValue={freelancer?.display_name || ''}
                       autoComplete='off'
                       inputProps={{ maxLength: 30 }}
                     />
@@ -558,7 +575,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                         label='Username'
                         variant='outlined'
                         color='secondary'
-                        defaultValue={freelancer?.username || ""}
+                        defaultValue={freelancer?.username || ''}
                         autoComplete='off'
                         inputProps={{ maxLength: 30 }}
                       />
@@ -596,7 +613,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                           name='title'
                           label='Tittle'
                           variant='outlined'
-                          defaultValue={freelancer?.title || ""}
+                          defaultValue={freelancer?.title || ''}
                           autoComplete='off'
                         />
                         {titleError && (
@@ -866,7 +883,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                                     <TextField
                                       color='secondary'
                                       autoComplete='off'
-                                      value={freelancer && freelancer[key] || ""}
+                                      value={
+                                        (freelancer && freelancer[key]) || ''
+                                      }
                                       onChange={(e) => {
                                         if (freelancer) {
                                           setFreelancer({
@@ -1030,7 +1049,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
               <>
                 <TextArea
                   maxLength={1000}
-                  value={freelancer?.about || ""}
+                  value={freelancer?.about || ''}
                   onChange={(e) => {
                     if (freelancer) {
                       setFreelancer({
@@ -1058,7 +1077,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
               <>
                 <TextArea
                   maxLength={1000}
-                  value={freelancer?.education || ""}
+                  value={freelancer?.education || ''}
                   onChange={(e) => {
                     if (freelancer) {
                       setFreelancer({
@@ -1363,8 +1382,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
       />
 
       <div
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
-          }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${
+          copied ? 'right-5' : '-right-full'
+        }`}
       >
         <Alert severity='success'>{`${copied} Copied to clipboard`}</Alert>
       </div>

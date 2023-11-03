@@ -516,6 +516,22 @@ export const insertProject =
   (project: Project) => async (tx: Knex.Transaction) =>
     (await tx<Project>('projects').insert(project).returning('*'))[0];
 
+export const insertUserAnalytics =
+  (user_analytics: any) => async (tx: Knex.Transaction) =>
+    (await tx('user_analytic').insert(user_analytics).returning('*'))[0];
+export const updateUserAnalytics =
+  (user_id: number, analytics: any) => async (tx: Knex.Transaction) =>
+    (
+      await tx('user_analytic')
+        .where({ user_id })
+        .update(analytics)
+        .returning('*')
+    )[0];
+
+export const getUserAnalytics =
+  (user_id: number) => async (tx: Knex.Transaction) =>
+    (await tx('user_analytic').where({ user_id }))[0];
+
 export const updateProject =
   (id: string | number, project: Project) => async (tx: Knex.Transaction) =>
     (

@@ -5,15 +5,12 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { BiChevronDown, BiRightArrowAlt } from 'react-icons/bi';
 import { MdOutlineAttachMoney } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  DefaultGenerics,
-  FormatMessageResponse,
-  StreamChat,
-} from 'stream-chat';
+import { Channel, DefaultGenerics, StreamChat } from 'stream-chat';
 import 'stream-chat-react/dist/css/v2/index.css';
 
 import { fetchUser, getStreamChat } from '@/utils';
 
+import AreaGrah from '@/components/AreaGraph';
 import ChatPopup from '@/components/ChatPopup';
 import BriefsView from '@/components/Dashboard/V2/BriefsView';
 import FullScreenLoader from '@/components/FullScreenLoader';
@@ -22,6 +19,7 @@ import MessageComponent from '@/components/MessageComponent';
 
 import { Project, User } from '@/model';
 import { Brief } from '@/model';
+import { getUserAnalytics } from '@/redux/services/briefService';
 import {
   getFreelancerApplications,
   getFreelancerProfile,
@@ -36,6 +34,11 @@ export type DashboardProps = {
   myApplicationsResponse: Project[];
 };
 
+export type userAnalyticsType = {
+  label: string;
+  value: number;
+};
+
 const FreelancerDashboard = (): JSX.Element => {
   const [client, setClient] = useState<StreamChat>();
   const {
@@ -47,9 +50,10 @@ const FreelancerDashboard = (): JSX.Element => {
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [loadingStreamChat, setLoadingStreamChat] = useState<boolean>(true);
-
+  const [userAnalytics, setUserAnalytics] = useState<userAnalyticsType[]>([]);
+  const [totalViews, setTotalViews] = useState(0);
   const [messageList, setMessageList] = useState<
-    FormatMessageResponse<DefaultGenerics>[] | null
+    Channel<DefaultGenerics>[] | null
   >();
 
   const router = useRouter();
@@ -106,6 +110,34 @@ const FreelancerDashboard = (): JSX.Element => {
   }, [loadingUser, router, user?.id, user?.username]);
 
   useEffect(() => {
+    const getUserAnalyt = async () => {
+      const resp = await getUserAnalytics(user.id);
+      const key = [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday',
+      ];
+      let totalViews = 0;
+      const data = key.map((item: string) => {
+        totalViews += resp?.analytics[item]?.count;
+        return {
+          label: item,
+          value: resp?.analytics[item]?.count,
+        };
+      });
+      setTotalViews(totalViews);
+      setUserAnalytics(data);
+    };
+    if (user && user.id) {
+      getUserAnalyt();
+    }
+  }, [user]);
+
+  useEffect(() => {
     if (client && user?.username && !loadingStreamChat) {
       client?.connectUser(
         {
@@ -131,9 +163,9 @@ const FreelancerDashboard = (): JSX.Element => {
           watch: true, // this is the default
           state: true,
         });
-        const lastMessages: FormatMessageResponse<DefaultGenerics>[] = [];
+        const lastMessages: Channel<DefaultGenerics>[] = [];
         channels.map((channel) => {
-          lastMessages.push(channel.lastMessage());
+          lastMessages.push(channel);
         });
         setMessageList(lastMessages);
       };
@@ -370,22 +402,19 @@ const FreelancerDashboard = (): JSX.Element => {
             currentUser: user,
           }}
         />
-        <div className='max-w-[25%] w-full rounded-md '>
+        <div className='max-w-[25%] w-full rounded-md  '>
           {/* Starting of graph */}
-          {/* <div className='bg-imbue-light-grey px-0.5 rounded-3xl pb-0.5 '>
+          <div className='bg-imbue-light-grey px-0.5 rounded-3xl pb-0.5 '>
             <div className='flex justify-between items-center py-7 px-7'>
               <p className='text-[#747474]'>Analytics</p>
-              <BsFilter size={27} color='black' />
+              <p className='text-[#747474]'>{totalViews} views</p>
             </div>
             <div className='bg-white rounded-3xl relative '>
-              <p className='text-black text-4xl font-semibold absolute bottom-28 left-6'>
-                124
-              </p>
-              <AreaGrah />
+              <AreaGrah userInfo={userAnalytics} />
             </div>
-          </div> */}
+          </div>
           {/* End of graph */}
-          <div className='bg-imbue-light-grey px-0.5  rounded-3xl pb-0.5 '>
+          <div className='bg-imbue-light-grey px-0.5 mt-20  rounded-3xl pb-0.5 '>
             <div className='flex justify-between items-center py-4 px-7'>
               <Badge badgeContent={unreadMessages} color='error'>
                 <p className='text-[#747474]'>Messaging</p>
