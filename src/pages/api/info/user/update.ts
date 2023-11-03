@@ -61,7 +61,6 @@ export default nextConnect()
               );
 
               if (existingEmail?.id !== user?.id) {
-                console.log('***** email already exists');
                 return res.status(400).json({
                   status: 'Failed',
                   message: 'Email already exists.',

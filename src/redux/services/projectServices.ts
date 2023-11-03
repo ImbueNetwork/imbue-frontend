@@ -1,6 +1,8 @@
 import * as config from '@/config';
 import { User } from '@/model';
 
+import { ImbueChainEvent } from './chainService';
+
 export const createProject = async (project: any) => {
   try {
     const resp = await fetch(`${config.apiBase}/project`, {
@@ -83,7 +85,7 @@ export const getMilestoneAttachments = async (
   milestoneIndex: number
 ) => {
   const resp = await fetch(
-    `${config.apiBase}/project/submitMilestone?projectId=${projectId}&milestoneIndex=${milestoneIndex}`,
+    `${config.apiBase}project/submitMilestone?projectId=${projectId}&milestoneIndex=${milestoneIndex}`,
     {
       headers: config.postAPIHeaders,
       method: 'get',
@@ -144,7 +146,7 @@ export const uploadMilestoneAttachments = async (
   }
 };
 
-export const subitMilestone = async (projectId: number) => {
+export const submitMilestone = async (projectId: number) => {
   const resp = await fetch(
     `${config.apiBase}/project/submitMilestone?projectId=${projectId}`,
     {
@@ -206,7 +208,7 @@ export const updateFirstPendingMilestone = async (
 
 // Voting
 
-export const getMillestoneVotes = async (
+export const getMilestoneVotes = async (
   projectId: number,
   milestoneIndex: number
 ) => {
@@ -313,4 +315,136 @@ export const insertNoConfidenceVoter = async (
       message: 'Failed to update voting state. status:' + resp.status,
     };
   }
+};
+
+// Multichain
+export const getProjectBalance = async (
+  projectId: number,
+) => {
+  try {
+    const resp = await fetch(
+      `${config.apiBase}/payments/${projectId}/balance`,
+      {
+        headers: config.postAPIHeaders,
+        method: 'get',
+      }
+    );
+
+    return resp.json();
+  } catch (error) {
+    return {
+      message: 'Failed to get voters. status:' + error,
+    };
+  }
+};
+
+
+export const getProjectEscrowAddress = async (
+  projectId: number,
+) => {
+  try {
+    const resp = await fetch(
+      `${config.apiBase}/payments/${projectId}/address`,
+      {
+        headers: config.postAPIHeaders,
+        method: 'get',
+      }
+    );
+
+    return resp.json();
+  } catch (error) {
+    return {
+      message: 'Failed to get voters. status:' + error,
+    };
+  }
+};
+
+export const withdrawOffchain = async (
+  projectId: number | string,
+) => {
+  try {
+    const resp = await fetch(
+      `${config.apiBase}/payments/${projectId}/withdraw`,
+      {
+        headers: config.postAPIHeaders,
+        method: 'POST',
+      }
+    );
+
+    if (resp.ok) {
+      return {
+        txError: false,
+        withdrawn: await resp.json(),
+      };
+    } else {
+      return {
+        txError: true,
+        errorMessage: await resp.json(),
+      };
+    }
+  } catch (error) {
+    return {
+      txError: true,
+      errorMessage: 'Failed to withdraw chains offchain' + error,
+    };
+  }
+};
+
+export const watchChain = async (
+  imbueChainEvent: ImbueChainEvent,
+  address: string,
+  projectId: number | string,
+  milestoneId?: number | string,
+) => {
+  const resp = await fetch(
+    `${config.apiBase}/watch`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'POST',
+      body: JSON.stringify({ imbueChainEvent, address, projectId, milestoneId }),
+    }
+  );
+  return await resp.json();
+};
+
+
+export const getOffchainEscrowAddress = async (
+  projectId: string | number,
+) => {
+  const resp = await fetch(
+    `${config.apiBase}/payments/${projectId}/address`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'GET',
+    }
+  );
+  return await resp.json();
+};
+
+export const getOffchainEscrowBalance = async (
+  projectId: string | number,
+) => {
+  const resp = await fetch(
+    `${config.apiBase}/payments/${projectId}/balance`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'GET',
+    }
+  );
+  return await resp.json();
+};
+
+export const mintTokens = async (
+  projectId: string | number,
+  beneficiary: string,
+) => {
+  const resp = await fetch(
+    `${config.apiBase}/payments/${projectId}/mint`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'POST',
+      body: JSON.stringify({ beneficiary }),
+    }
+  );
+  return await resp.json();
 };

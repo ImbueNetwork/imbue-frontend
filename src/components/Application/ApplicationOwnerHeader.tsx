@@ -65,7 +65,8 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         const balance = await getBalance(
           user?.web3_address,
           application?.currency_id ?? Currency.IMBU,
-          user
+          user,
+          application.id
         );
         setBalance(balance.toLocaleString());
       } catch (error) {

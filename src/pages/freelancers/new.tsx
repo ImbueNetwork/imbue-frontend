@@ -134,9 +134,8 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-xp-${index}`}
-            className={`${styles.freelanceXpItem} ${
-              freelancingBefore === value ? styles.active : ''
-            }`}
+            className={`${styles.freelanceXpItem} ${freelancingBefore === value ? styles.active : ''
+              }`}
             onClick={() => setFreelancingBefore(value)}
           >
             {label}
@@ -182,9 +181,8 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-goal-${index}`}
-            className={`${styles.freelanceXpItem} ${
-              goal === value ? styles.active : ''
-            }`}
+            className={`${styles.freelanceXpItem} ${goal === value ? styles.active : ''
+              }`}
             onClick={() => setGoal(value)}
           >
             {label}
@@ -563,10 +561,9 @@ const Freelancer = (): JSX.Element => {
                 }
               >
                 <button
-                  className={`primary-btn in-dark w-button !mt-0 ${
-                    disableSubmit &&
+                  className={`primary-btn in-dark w-button !mt-0 ${disableSubmit &&
                     '!bg-gray-400 !text-white !cursor-not-allowed'
-                  }`}
+                    }`}
                   data-testid='submit-button'
                   onClick={() => !disableSubmit && createProfile()}
                 >
@@ -582,10 +579,9 @@ const Freelancer = (): JSX.Element => {
                 }
               >
                 <button
-                  className={`primary-btn in-dark w-button !mt-0 ${
-                    disableSubmit &&
+                  className={`primary-btn in-dark w-button !mt-0 ${disableSubmit &&
                     '!bg-gray-400 !text-white !cursor-not-allowed'
-                  }`}
+                    }`}
                   data-testid='next-button'
                   onClick={() => !disableSubmit && setStep(step + 1)}
                 >

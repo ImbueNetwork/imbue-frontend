@@ -40,7 +40,7 @@ export default nextConnect()
 
         const allVotesAddresses = allVotersRes.map((v) => v.voter_address);
 
-        res.status(200).json({
+        return res.status(200).json({
           yes,
           no,
           pending,
@@ -49,7 +49,7 @@ export default nextConnect()
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error(error);
-        res.status(404).json({ message: `Internal Error: ${error}` });
+        return res.status(404).json({ message: `Internal Error: ${error}` });
       }
     });
   })

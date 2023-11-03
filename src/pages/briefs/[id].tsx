@@ -19,6 +19,7 @@ import {
   deleteSavedBrief,
   getAllBriefs,
   getBrief,
+  getUserBriefs,
   saveBriefData,
 } from '@/redux/services/briefService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
@@ -66,6 +67,9 @@ const BriefDetails = (): JSX.Element => {
   const [freelancer, setFreelancer] = useState<Freelancer>();
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
+  const [similarBriefs, setSimilarBriefs] = useState<Brief[]>([]);
+  const [allClientBriefs, setAllClientBriefs] = useState<any>();
+
   // const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
   const { setShowLoginPopup } = useContext(
     LoginPopupContext
@@ -94,6 +98,13 @@ const BriefDetails = (): JSX.Element => {
             briefData?.id,
             browsingUser?.id
           );
+
+          const allClientBriefsRes = await getUserBriefs(briefData.user_id);
+          setAllClientBriefs(allClientBriefsRes)
+
+          const briefs_all: any = await getAllBriefs(4, 1);
+          setSimilarBriefs(briefs_all?.currentData);
+
           setIsSavedBrief(briefIsSaved.isSaved);
           setFreelancer(_freelancer);
         } else {
@@ -108,7 +119,7 @@ const BriefDetails = (): JSX.Element => {
 
   useEffect(() => {
     fetchData();
-  }, [id, browsingUser.username]);
+  }, [id]);
 
   const redirectToApply = () => {
     if (browsingUser?.id) router.push(`/briefs/${brief.id}/apply`);
@@ -155,17 +166,14 @@ const BriefDetails = (): JSX.Element => {
     setSuccessTitle('Brief Unsaved Successfully');
   };
 
-  const SimilarProjects = () => {
-    const [showSimilarBrief, setShowSimilarBrief] = useState<boolean>(false);
-    const [similarBriefs, setSimilarBriefs] = useState<Brief[]>([]);
 
-    useEffect(() => {
-      const setUpBriefs = async () => {
-        const briefs_all: any = await getAllBriefs(4, 1);
-        setSimilarBriefs(briefs_all?.currentData);
-      };
-      setUpBriefs();
-    }, []);
+  type SimilarBriefsType = {
+    similarBriefs: Brief[];
+}
+
+
+  const SimilarProjects = ({ similarBriefs }: SimilarBriefsType) => {
+    const [showSimilarBrief, setShowSimilarBrief] = useState<boolean>(false);
 
     return (
       <div
@@ -255,10 +263,11 @@ const BriefDetails = (): JSX.Element => {
           targetUser={targetUser}
           browsingUser={browsingUser}
           canSubmitProposal={brief.verified_only ? freelancer?.verified : true}
+          allClientBriefs = {allClientBriefs}
         />
       </div>
-      <ClientsHistory briefId={id} client={targetUser} />
-      <SimilarProjects />
+      <ClientsHistory briefId={id} client={targetUser} allClientBriefs={allClientBriefs} />
+      <SimilarProjects similarBriefs={similarBriefs} />
       <ErrorScreen {...{ error, setError }}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button

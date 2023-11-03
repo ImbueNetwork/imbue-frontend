@@ -309,12 +309,7 @@ function Project() {
       setLoading(false);
       setChainLoading(false);
 
-      if (
-        projectRes.status_id !== OffchainProjectState.Completed &&
-        projectRes.status_id !== OffchainProjectState.Refunded
-      ) {
-        await syncProject(projectRes);
-      }
+
     } catch (error) {
       console.error(error);
       setError({ message: 'can not find the project ' + error });
@@ -425,11 +420,11 @@ function Project() {
         if (!result.txError) {
           pollResult = (await chainService.pollChainMessage(
             ImbueChainEvent.NoConfidenceRoundFinalised,
-            account
+            account.address
           )) as ImbueChainPollResult;
           noConfidencePoll = (await chainService.pollChainMessage(
             ImbueChainEvent.VoteOnNoConfidenceRound,
-            account
+            account.address
           )) as ImbueChainPollResult;
         }
 
@@ -474,7 +469,7 @@ function Project() {
         if (!result.txError) {
           pollResult = (await chainService.pollChainMessage(
             ImbueChainEvent.RaiseNoConfidenceRound,
-            account
+            account.address
           )) as ImbueChainPollResult;
         }
 
