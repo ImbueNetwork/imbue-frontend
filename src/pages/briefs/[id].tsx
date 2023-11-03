@@ -66,6 +66,7 @@ const BriefDetails = (): JSX.Element => {
   const [freelancer, setFreelancer] = useState<Freelancer>();
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
+  const [similarBriefs, setSimilarBriefs] = useState<Brief[]>([]);
   // const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
   const { setShowLoginPopup } = useContext(
     LoginPopupContext
@@ -94,6 +95,10 @@ const BriefDetails = (): JSX.Element => {
             briefData?.id,
             browsingUser?.id
           );
+
+          const briefs_all: any = await getAllBriefs(4, 1);
+          setSimilarBriefs(briefs_all?.currentData);
+
           setIsSavedBrief(briefIsSaved.isSaved);
           setFreelancer(_freelancer);
         } else {
@@ -155,30 +160,25 @@ const BriefDetails = (): JSX.Element => {
     setSuccessTitle('Brief Unsaved Successfully');
   };
 
-  const SimilarProjects = () => {
-    const [showSimilarBrief, setShowSimilarBrief] = useState<boolean>(false);
-    const [similarBriefs, setSimilarBriefs] = useState<Brief[]>([]);
 
-    useEffect(() => {
-      const setUpBriefs = async () => {
-        const briefs_all: any = await getAllBriefs(4, 1);
-        setSimilarBriefs(briefs_all?.currentData);
-      };
-      setUpBriefs();
-    }, []);
+  type SimilarBriefsType = {
+    similarBriefs: Brief[];
+}
+
+
+  const SimilarProjects = ({ similarBriefs }: SimilarBriefsType) => {
+    const [showSimilarBrief, setShowSimilarBrief] = useState<boolean>(false);
 
     return (
       <div
-        className={`transparent-conatainer !bg-imbue-light-purple-three relative ${
-          showSimilarBrief ? '!pb-[3rem]' : ''
-        } `}
+        className={`transparent-conatainer !bg-imbue-light-purple-three relative ${showSimilarBrief ? '!pb-[3rem]' : ''
+          } `}
       >
         <div className='flex justify-between w-full lg:px-[4rem] px-[1rem]'>
           <h3 className='text-imbue-purple-dark'>Similar projects on Imbue</h3>
           <div
-            className={`transition transform ease-in-out duration-600 ${
-              showSimilarBrief && 'rotate-180'
-            } cursor-pointer`}
+            className={`transition transform ease-in-out duration-600 ${showSimilarBrief && 'rotate-180'
+              } cursor-pointer`}
           >
             <ArrowIcon
               onClick={() => setShowSimilarBrief(!showSimilarBrief)}
@@ -254,11 +254,12 @@ const BriefDetails = (): JSX.Element => {
           setShowMessageBox={setShowMessageBox}
           targetUser={targetUser}
           browsingUser={browsingUser}
-          canSubmitProposal={brief.verified_only ? freelancer?.verified : true}
+          canSubmitProposal={brief.verified_only ? freelancer?.verified : true},
+          clientBriefs = {clientBriefs}
         />
       </div>
       <ClientsHistory briefId={id} client={targetUser} />
-      <SimilarProjects />
+      <SimilarProjects similarBriefs={similarBriefs} />
       <ErrorScreen {...{ error, setError }}>
         <div className='flex flex-col gap-4 w-1/2'>
           <button
