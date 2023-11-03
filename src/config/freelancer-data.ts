@@ -72,9 +72,8 @@ export const stepData = [
   },
   {
     heading: 'What is your expected payment per hour?',
-    content: `Choose at least 1 service that best describes the type of work you do. This \n
-        helps us match you with clients who need your unique expertise.\n
-        Search for a service`,
+    content: `Choose how much you would like to charge for your service per hour rate. This \n
+    will clarify the clients about how much they should pay you for your services\n`,
     progress: 12,
   },
   {
