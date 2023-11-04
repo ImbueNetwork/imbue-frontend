@@ -19,6 +19,7 @@ import {
   User,
 } from '@/model';
 import ChainService from '@/redux/services/chainService';
+import { getProjectEscrowAddress } from '@/redux/services/projectServices';
 
 import AccountChoice from '../AccountChoice';
 import BackButton from '../BackButton';
@@ -90,10 +91,9 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
+            const escrowAddress = application.currency_id < 100 ? result?.eventData[5] : await getProjectEscrowAddress(application.id)
             const projectId = parseInt(result.eventData[2]);
-            const escrow_address = result.eventData[5];
-            // setProjectId(applicationId);
-            await updateProject(projectId, escrow_address);
+            await updateProject(projectId, escrowAddress);
             setSuccess(true);
           } else if (result.txError) {
             let errorMessage = showErrorMessage(result.errorMessage);
