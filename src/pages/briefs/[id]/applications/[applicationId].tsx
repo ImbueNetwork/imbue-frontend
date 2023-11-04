@@ -714,29 +714,31 @@ const ApplicationPreview = (): JSX.Element => {
                 )}
               </div>
             </div>
-            <div className='payment-options'>
-              <h3 className='text-lg lg:text-[1.25rem] font-normal m-0 p-0 text-imbue-purple-dark'>
-                Payment Address
-              </h3>
+            {currencyId >= 100 && (
+              <div className='payment-options'>
+                <h3 className='text-lg lg:text-[1.25rem] font-normal m-0 p-0 text-imbue-purple-dark'>
+                  Payment Address
+                </h3>
 
-              <div className='network-amount'>
+                <div className='network-amount'>
 
-                {isApplicationOwner && isEditingBio ? (
-                  <input
-                    type='string'
-                    placeholder='Add a payment address'
-                    className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
-                    value={paymentAddress || ''}
-                    onChange={(e) => setPaymentAddress(e.target.value)}
-                    name='paymentAddress'
-                  />
-                ) : (
-                  <p className='text-content-primary mt-2 w-full lg:text-end'>
-                    {paymentAddress}
-                  </p>
-                )}
+                  {isApplicationOwner && isEditingBio ? (
+                    <input
+                      type='string'
+                      placeholder='Add a payment address'
+                      className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
+                      value={paymentAddress || ''}
+                      onChange={(e) => setPaymentAddress(e.target.value)}
+                      name='paymentAddress'
+                    />
+                  ) : (
+                    <p className='text-content-primary mt-2 w-full lg:text-end'>
+                      {paymentAddress}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 

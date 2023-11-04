@@ -85,17 +85,16 @@ export const getBalance = async (
   projectId?: number
 ) => {
   try {
-    if(!projectId) {
+    if(currency_id < 100) {
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);
-  
       if (!walletAddress) return;
       const balance: any = await chainService.getBalance(
         walletAddress,
         currency_id
       );
       return balance;
-    } else {
+    } else if(projectId) {
       const allBalances = await getProjectBalance(projectId);
       const currency = Currency[currency_id].toLowerCase();
       return allBalances[currency];

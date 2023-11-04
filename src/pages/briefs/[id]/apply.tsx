@@ -550,6 +550,7 @@ export const SubmitProposal = (): JSX.Element => {
               </select>
             </div>
           </div>
+          {currencyId >= 100 && (
           <div className='payment-options'>
             <h3 className='text-lg lg:text-[1.25rem] font-normal m-0 p-0 text-imbue-purple-dark'>
               Payment Address
@@ -568,6 +569,7 @@ export const SubmitProposal = (): JSX.Element => {
 
             </div>
           </div>
+          )}
         </div>
       </div>
 
