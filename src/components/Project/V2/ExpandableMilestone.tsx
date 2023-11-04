@@ -1,4 +1,5 @@
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { Button, Tooltip } from '@mui/material';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -42,6 +43,8 @@ interface ExpandableMilestonProps {
   canVote: boolean;
   loading: boolean;
   targetUser: any;
+  balance: number;
+  balanceLoading: boolean;
   // hasMilestoneAttachments: boolean;
 }
 
@@ -58,6 +61,8 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
     setSuccessTitle,
     setSuccess,
     targetUser,
+    balance,
+    balanceLoading,
     // hasMilestoneAttachments = false
   } = props;
   const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
@@ -172,8 +177,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
               milestone.milestone_index,
               fileURLs
             );
-            console.log("🚀 ~ file: ExpandableMilestone.tsx:176 ~ submitMilestone ~ resp:", resp)
-            
+
             if (resp) {
               await sendNotification(
                 projectType === 'brief'
@@ -481,7 +485,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                 </div>
               )}
 
-              <div className='w-full mt-7 flex'>
+              <div className='w-full mt-7'>
                 {!props?.loading && showVoteButton && (
                   <Tooltip
                     followCursor
@@ -505,17 +509,36 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                   </Tooltip>
                 )}
 
-                {showSubmitButton && (
-                  <button
-                    className='primary-btn  ml-auto in-dark w-button lg:w-1/5'
-                    style={{ textAlign: 'center' }}
-                    onClick={() =>
-                      handleSubmitMilestone(milestone.milestone_index)
-                    }
-                  >
-                    Submit Milestone
-                  </button>
-                )}
+                {
+                  showSubmitButton && (
+                    <div>
+                      <div className='w-full flex'>
+                        <button
+                          className='primary-btn  ml-auto in-dark w-button lg:w-1/5'
+                          style={{ textAlign: 'center' }}
+                          onClick={() =>
+                            handleSubmitMilestone(milestone.milestone_index)
+                          }
+                        >
+                          Submit Milestone
+                        </button>
+                      </div>
+
+
+                      {
+                        balance === 0 && !balanceLoading && project?.brief_id && (
+                          <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-imbue-coral px-3 py-1 text-sm text-white w-fit ml-auto mt-3 '>
+                            <ErrorOutlineOutlinedIcon className='h-4 w-4 inline' />
+                            <p className='inline'>
+                              No funds have been deposited to the escrow address. If you still want to submit your work the risks are upto you.
+                            </p>
+                          </div>
+                        )
+                      }
+                    </div>
+
+                  )
+                }
 
                 {isApplicant && milestone.is_approved && (
                   <button

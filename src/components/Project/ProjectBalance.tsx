@@ -12,6 +12,8 @@ type ProjectBalanceType = {
     user: User;
     handlePopUpForUser: () => void;
     setBalance: (_balance: number) => void;
+    setBalanceLoading: (_loading: boolean) => void;
+    balanceLoading: boolean;
 }
 
 const Currencies = [
@@ -40,8 +42,7 @@ const Currencies = [
 ]
 
 const ProjectBalance = (props: ProjectBalanceType) => {
-    const { balance, project, user, handlePopUpForUser, setBalance } = props;
-    const [balanceLoading, setBalanceLoading] = useState(true)
+    const { balance, project, user, handlePopUpForUser, setBalance, balanceLoading, setBalanceLoading } = props;
     const [currency_id, setCurrency_id] = useState<number>();
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);

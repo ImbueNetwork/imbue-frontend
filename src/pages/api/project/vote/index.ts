@@ -95,7 +95,7 @@ export default nextConnect()
           return res.status(500).json({ message: 'Nothing to update' });
 
         if (!existingVote?.id) {
-          const resp = await addVoteToDB(
+          await addVoteToDB(
             projectId,
             milestoneIndex,
             voterAddress,
@@ -103,18 +103,13 @@ export default nextConnect()
             vote
           )(tx);
 
-          if (resp?.length)
-            res.status(200).json({ status: 'success', milestoneApproved });
+          // if (resp?.length)
+          //   res.status(200).json({ status: 'success', milestoneApproved });
         } else {
-          const resp = await updateVoteDB(
-            projectId,
-            milestoneIndex,
-            vote,
-            voterAddress
-          )(tx);
+          await updateVoteDB(projectId, milestoneIndex, vote, voterAddress)(tx);
 
-          if (resp)
-            res.status(200).json({ status: 'success', milestoneApproved });
+          // if (resp)
+          //   res.status(200).json({ status: 'success', milestoneApproved });
         }
 
         const yes = await getYesOrNoVotes(projectId, milestoneIndex, true)(tx);
@@ -129,7 +124,6 @@ export default nextConnect()
           await updateMilestone(projectId, milestoneIndex, {
             is_approved: true,
           })(tx);
-
         } else if (
           no.length / allVotersRes.length >= 0.75 ||
           allVotersRes.length === yes.length + no.length
@@ -137,6 +131,9 @@ export default nextConnect()
           // closing voting round if all votes are done without approval
           await updateProjectVoting(Number(projectId), false)(tx);
         }
+
+        res.status(200).json({ status: 'success', milestoneApproved });
+        
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error(error);

@@ -76,7 +76,7 @@ function Project() {
   const [project, setProject] = useState<Project | any>({});
   const [targetUser, setTargetUser] = useState<any>({});
   // const [projectHasAttachments, setProjectHasAttachments] = useState<boolean>(false);
-  
+
   // const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
   const { user, loading: userLoading } = useSelector(
     (state: RootState) => state.userState
@@ -100,6 +100,7 @@ function Project() {
   const [successTitle, setSuccessTitle] = useState<string>('');
   const [error, setError] = useState<any>();
   const [balance, setBalance] = useState<any>(0);
+  const [balanceLoading, setBalanceLoading] = useState(true)
   const [approversPreview, setApproverPreview] = useState<User[]>([]);
   const [isApprover, setIsApprover] = useState<boolean>(false);
   const [approverVotedOnRefund, setApproverVotedOnRefund] =
@@ -156,20 +157,22 @@ function Project() {
   const getChainProject = async (project: Project, freelancer: any) => {
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
     if (project?.chain_project_id && project?.id) {
-      // TODO Enable refunds first
-      if (project?.approvers?.length && user.web3_address) {
-        const userIsApprover = project.approvers?.includes(user.web3_address);
-        if (userIsApprover) {
-          setIsApprover(true);
-        }
-      }
 
       const voters: NoConfidenceVoter[] = await getProjectNoConfidenceVoters(
         project.id
       );
       setNoConfidenceVoters(voters);
 
-      if (user.web3_address && project.project_in_voting_of_no_confidence) {
+      if (!user.id || !user.web3_address) return
+
+      if (project?.approvers?.length && user?.web3_address) {
+        const userIsApprover = project.approvers?.includes(user.web3_address);
+        if (userIsApprover) {
+          setIsApprover(true);
+        }
+      }
+
+      if (user?.web3_address && project.project_in_voting_of_no_confidence) {
         const isApprover = voters?.find(
           (voter) => voter.web3_address === user.web3_address
         );
@@ -179,7 +182,12 @@ function Project() {
       }
     }
 
-    if (project.owner) {
+    const shouldSeePopup =
+      (user?.web3_address && project.approvers?.includes(user.web3_address)) ||
+      (freelancer?.id && user?.id === freelancer?.id) ||
+      project?.user_id === user?.id
+
+    if (project?.owner && shouldSeePopup) {
       switch (project.status_id) {
         case OffchainProjectState.PendingReview:
           setWait(true);
@@ -193,13 +201,12 @@ function Project() {
           setWait(false);
           setRefunded(true);
           break;
-        case OffchainProjectState.Completed:
-          if (user.id) {
-            setWait(false);
-            setSuccess(true);
-            setSuccessTitle('This project has been successfully delivered!');
-          }
+        case OffchainProjectState.Completed: {
+          setWait(false);
+          setSuccess(true);
+          setSuccessTitle('This project has been successfully delivered!');
           break;
+        }
         case OffchainProjectState.Accepted:
           if (!project.chain_project_id) {
             setWaitMessage(
@@ -236,11 +243,11 @@ function Project() {
 
     try {
       const projectRes: Project = await getProjectById(projectId);
-      
+
       if (!projectRes) {
         setError({ message: 'No project found!' });
         setLoading(false);
-        router.push('/error');
+        // router.push('/error');
       }
 
       // showing owner profile if the current user if the applicant freelancer
@@ -309,7 +316,7 @@ function Project() {
       await getChainProject(projectRes, freelancerRes);
       setLoading(false);
       // setChainLoading(false);
-    
+
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error);
@@ -498,6 +505,8 @@ function Project() {
                   loading,
                   setOpenVotingList,
                   targetUser,
+                  balance,
+                  balanceLoading,
                   // hasMilestoneAttachments: projectHasAttachments
                 }}
                 key={index}
@@ -563,6 +572,8 @@ function Project() {
                     user,
                     handlePopUpForUser,
                     setBalance,
+                    balanceLoading,
+                    setBalanceLoading
                   }}
                 />
                 <div className='flex justify-between mt-2'>
