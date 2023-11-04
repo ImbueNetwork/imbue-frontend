@@ -4,7 +4,7 @@ export enum Currency {
   // AUSD = 2,
   // KAR = 3,
   MGX = 4,
-  // Anything over 100 should be multichain 
+  // Anything over 100 should be multichain
   ETH = 100,
   USDT = 101,
 }
@@ -21,9 +21,9 @@ export enum OffchainProjectState {
 }
 
 export type EVMContract = {
-  address: string,
-  decimals: number
-}
+  address: string;
+  decimals: number;
+};
 
 export const applicationStatusId = [
   'Draft',
@@ -153,6 +153,7 @@ export type Milestone = {
   withdrawn_offchain: boolean;
   withdrawal_transaction_hash: string;
   imbue_fee_transaction_hash: string;
+  attachments: any;
 };
 
 export type Contribution = {

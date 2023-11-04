@@ -38,14 +38,32 @@ export default nextConnect()
 
         const milestones = await models.fetchProjectMilestones(projectId)(tx);
         const approvers = await models.fetchProjectApprovers(projectId)(tx);
+
+        const attachmentPromises: Promise<any>[] = [];
+
+        milestones.forEach((milestone) => {
+          attachmentPromises.push(
+            tx('milestone_attachments').select('*').where({
+              project_id: projectId,
+              milestone_index: milestone.milestone_index,
+            })
+          );
+        });
+
+        const attachments = await Promise.all(attachmentPromises);
+
         const pkg: ProjectPkg = {
           ...project,
-          milestones,
+          milestones: milestones.map((milestone, index) => ({
+            ...milestone,
+            attachments: attachments[index],
+          })),
           approvers: approvers.map(({ approver }: any) => approver),
         };
 
         const updatedProject = await syncProject(pkg, tx);
         return res.status(200).send(updatedProject);
+        // return res.status(200).send(pkg);
       } catch (e) {
         return res.status(404).end();
         new Error(`Failed to fetch project by id: ${id}`, {
@@ -93,7 +111,7 @@ export default nextConnect()
           project_in_voting_of_no_confidence,
           first_pending_milestone,
           project_in_milestone_voting,
-          payment_address
+          payment_address,
         } = body;
 
         // ensure the project exists first
@@ -127,7 +145,7 @@ export default nextConnect()
           project_in_voting_of_no_confidence,
           first_pending_milestone,
           project_in_milestone_voting,
-          payment_address
+          payment_address,
         };
 
         // if (first_pending_milestone)
@@ -171,23 +189,28 @@ export default nextConnect()
     });
   });
 
-
 const syncProject = async (project: any, tx: any) => {
   if (!project.chain_project_id) return project;
   let milestonesRequiresSync = false;
 
   try {
-    const filter = new Filter();
+    // const filter = new Filter();
     const projectId = project.id;
-    const imbueApi = await initPolkadotJSAPI(process.env.IMBUE_NETWORK_WEBSOCK_ADDR!);
-    const relayChainApi = await initPolkadotJSAPI(process.env.RELAY_CHAIN_WEBSOCK_ADDR!);
+    const imbueApi = await initPolkadotJSAPI(
+      process.env.IMBUE_NETWORK_WEBSOCK_ADDR!
+    );
+    const relayChainApi = await initPolkadotJSAPI(
+      process.env.RELAY_CHAIN_WEBSOCK_ADDR!
+    );
     const allApis = {
       imbue: imbueApi,
       relayChain: relayChainApi,
     };
 
     const chainService = new ChainService(allApis);
-    const onChainProjectRes = await chainService.convertToOnChainProject(project);
+    const onChainProjectRes = await chainService.convertToOnChainProject(
+      project
+    );
     if (onChainProjectRes) {
       onChainProjectRes.milestones.map((milestone, index) => {
         project.milestones[index].is_approved = milestone.is_approved;
@@ -204,17 +227,16 @@ const syncProject = async (project: any, tx: any) => {
       if (
         firstPendingMilestoneChain === project.first_pending_milestone &&
         project.project_in_milestone_voting ===
-        onChainProjectRes.projectInMilestoneVoting &&
+          onChainProjectRes.projectInMilestoneVoting &&
         project.project_in_voting_of_no_confidence ===
-        onChainProjectRes.projectInVotingOfNoConfidence
-        && !milestonesRequiresSync
+          onChainProjectRes.projectInVotingOfNoConfidence &&
+        !milestonesRequiresSync
       )
         return project;
 
       const newProject = {
         ...project,
-        project_in_milestone_voting:
-          onChainProjectRes.projectInMilestoneVoting,
+        project_in_milestone_voting: onChainProjectRes.projectInMilestoneVoting,
         first_pending_milestone: firstPendingMilestoneChain,
         project_in_voting_of_no_confidence:
           onChainProjectRes.projectInVotingOfNoConfidence,
@@ -228,38 +250,41 @@ const syncProject = async (project: any, tx: any) => {
 
       delete newProject.milestones;
       delete newProject.approvers;
-      const updatedProject = await models.updateProject(projectId, newProject)(tx);
+      const updatedProject = await models.updateProject(
+        projectId,
+        newProject
+      )(tx);
       if (!updatedProject.id) {
         return new Error('Cannot update milestones: `project_id` missing.');
       }
 
-      // drop then recreate
-      await models.deleteMilestones(projectId)(tx);
+      // // drop then recreate
+      // await models.deleteMilestones(projectId)(tx);
 
-      //filtering milestones in back-end
-      const filterdMileStone = project.milestones.map((item: any) => {
-        return {
-          ...item,
-          name: filter.clean(item.name),
-          description: filter.clean(item.description),
-        };
-      });
-
+      // //filtering milestones in back-end
+      // const filterdMileStone = project.milestones.map((item: any) => {
+      //   return {
+      //     ...item,
+      //     name: filter.clean(item.name),
+      //     description: filter.clean(item.description),
+      //   };
+      // });
+      
+      // await models.insertMilestones(filterdMileStone, project.id)(tx);
+      
       const pkg: ProjectPkg = {
         ...updatedProject,
         approvers: project.approvers,
-        milestones: await models.insertMilestones(
-          filterdMileStone,
-          project.id
-        )(tx),
+        milestones: project.milestones,
       };
+      
       return pkg;
     } else {
-      return project
+      return project;
     }
   } catch (error) {
-    console.log("**** error is ");
+    console.log('**** error is ');
     console.log(error);
-    return project
+    return project;
   }
 };

@@ -8,7 +8,7 @@ import { WalletAccount } from '@talismn/connect-wallets';
 import axios from 'axios';
 import moment from 'moment';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { sendNotification } from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
@@ -20,7 +20,6 @@ import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 import { Milestone, OffchainProjectState, Project, User } from '@/model';
 import ChainService, { ImbueChainEvent } from '@/redux/services/chainService';
 import {
-  getMilestoneAttachments,
   uploadMilestoneAttachments,
   watchChain,
   withdrawOffchain,
@@ -43,7 +42,7 @@ interface ExpandableMilestonProps {
   canVote: boolean;
   loading: boolean;
   targetUser: any;
-  hasMilestoneAttachments: boolean;
+  // hasMilestoneAttachments: boolean;
 }
 
 const ExpandableMilestone = (props: ExpandableMilestonProps) => {
@@ -59,7 +58,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
     setSuccessTitle,
     setSuccess,
     targetUser,
-    hasMilestoneAttachments = false
+    // hasMilestoneAttachments = false
   } = props;
   const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
   const [submittingMilestone, setSubmittingMilestone] =
@@ -85,23 +84,23 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
     !project.project_in_milestone_voting &&
     !milestone?.is_approved;
 
-  const [attachments, setAttachment] = useState<any>([]);
+  // const [attachments, setAttachment] = useState<any>([]);
 
-  useEffect(() => {
-    const getAttachments = async () => {
-      if (!project?.id || milestone?.milestone_index === undefined) return;
+  // useEffect(() => {
+  //   const getAttachments = async () => {
+  //     if (!project?.id || milestone?.milestone_index === undefined) return;
 
-      const resp = await getMilestoneAttachments(
-        project.id,
-        milestone.milestone_index
-      );
-      setAttachment(resp);
-    };
+  //     const resp = await getMilestoneAttachments(
+  //       project.id,
+  //       milestone.milestone_index
+  //     );
+  //     setAttachment(resp);
+  //   };
 
-    if(hasMilestoneAttachments){ 
-      getAttachments();
-    }
-  }, [milestone.milestone_index, project.id]);
+  //   if(hasMilestoneAttachments){ 
+  //     getAttachments();
+  //   }
+  // }, [milestone.milestone_index, project.id]);
 
   const [files, setFiles] = useState<File[]>();
 
@@ -173,6 +172,8 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
               milestone.milestone_index,
               fileURLs
             );
+            console.log("🚀 ~ file: ExpandableMilestone.tsx:176 ~ submitMilestone ~ resp:", resp)
+            
             if (resp) {
               await sendNotification(
                 projectType === 'brief'
@@ -404,14 +405,14 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
               <p className='mt-5 whitespace-pre-wrap break-words'>
                 {milestone.description}
               </p>
-              {attachments?.length ? (
+              {milestone.attachments?.length ? (
                 <div>
                   <p className='text-black mt-10 font-semibold text-lg'>
                     Project Attachments
                   </p>
                   <div className='grid grid-cols-6 gap-3'>
-                    {attachments?.length
-                      ? attachments.map((attachment: any, index: number) => (
+                    {milestone.attachments?.length
+                      ? milestone.attachments.map((attachment: any, index: number) => (
                         <a
                           className='col-span-1'
                           key={index}

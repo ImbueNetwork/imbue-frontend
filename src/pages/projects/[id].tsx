@@ -75,7 +75,7 @@ function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
   const [targetUser, setTargetUser] = useState<any>({});
-  const [projectHasAttachments, setProjectHasAttachments] = useState<boolean>(false);
+  // const [projectHasAttachments, setProjectHasAttachments] = useState<boolean>(false);
   
   // const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
   const { user, loading: userLoading } = useSelector(
@@ -236,8 +236,7 @@ function Project() {
 
     try {
       const projectRes: Project = await getProjectById(projectId);
-      console.log("🚀 ~ file: [id].tsx:237 ~ getProject ~ projectRes:", projectRes)
-
+      
       if (!projectRes) {
         setError({ message: 'No project found!' });
         setLoading(false);
@@ -499,7 +498,7 @@ function Project() {
                   loading,
                   setOpenVotingList,
                   targetUser,
-                  hasMilestoneAttachments: projectHasAttachments
+                  // hasMilestoneAttachments: projectHasAttachments
                 }}
                 key={index}
               />
