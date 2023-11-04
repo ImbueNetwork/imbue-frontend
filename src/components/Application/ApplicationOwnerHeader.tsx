@@ -54,7 +54,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<any>();
   const [loadingWallet, setLoadingWallet] = useState<string>('');
-  const [balance, setBalance] = useState<string>();
+  const [imbueBalance, setImbueBalance] = useState<string>();
 
   const router = useRouter();
 
@@ -64,11 +64,10 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         setLoadingWallet('loading');
         const balance = await getBalance(
           user?.web3_address,
-          application?.currency_id ?? Currency.IMBU,
+          Currency.IMBU,
           user,
-          application.id
         );
-        setBalance(balance.toLocaleString());
+        setImbueBalance(balance.toLocaleString());
       } catch (error) {
         setError({ message: error });
       } finally {
@@ -177,11 +176,11 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
             {loadingWallet === 'loading' && 'Loading Wallet...'}
             {loadingWallet === 'connecting' && 'Connecting Wallet...'}
             {!loadingWallet &&
-              (balance === undefined
+              (imbueBalance === undefined
                 ? 'No wallet found'
-                : `Your Balance: ${balance} $${Currency[Currency.IMBU]}`)}
+                : `Your Balance: ${imbueBalance} $${Currency[Currency.IMBU]}`)}
           </p>
-          {Number(balance) < 500 && (
+          {Number(imbueBalance) < 500 && (
             <div className='flex rounded-2xl gap-2 bg-imbue-coral px-2 py-1'>
               <ErrorOutlineOutlinedIcon />
               <p>the imbu balance is less than 500 $IMBU</p>

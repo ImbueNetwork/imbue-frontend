@@ -88,7 +88,6 @@ export const getBalance = async (
     if(!projectId) {
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);
-  
       if (!walletAddress) return;
       const balance: any = await chainService.getBalance(
         walletAddress,
