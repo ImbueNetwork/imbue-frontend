@@ -26,12 +26,14 @@ const SwitchToFreelancer = () => {
     const [isFreelancer, setIsFreelancer] = useState<boolean>(false)
 
     useEffect(() => {
-        setloading(true)
 
         const checkFreelancerProfile = async () => {
+            if (!user?.username) return;
+
+            setloading(true)
             try {
                 const freelancer = await getFreelancerProfile(user?.username);
-                if (!freelancer?.id) setIsFreelancer(false);
+                if (freelancer?.id) setIsFreelancer(true);
             } catch (error) {
                 // eslint-disable-next-line no-console
                 console.log(error);
@@ -39,8 +41,8 @@ const SwitchToFreelancer = () => {
                 setloading(false);
             }
         }
-        checkFreelancerProfile()
-    }, [loadingUser, router, user?.username]);
+        !loadingUser && checkFreelancerProfile()
+    }, [loadingUser, user?.username]);
 
     if (loadingUser || loading) return <FullScreenLoader />
 
