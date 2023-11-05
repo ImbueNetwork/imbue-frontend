@@ -87,7 +87,6 @@ export default nextConnect()
 
         return res.status(201).json(pkg);
       } catch (cause) {
-        console.log(cause);
         return res.status(401).json(cause);
       }
     });

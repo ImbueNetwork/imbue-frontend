@@ -3,7 +3,7 @@ import { Divider } from '@mui/material';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { ProgressBar } from '@/components/ProgressBar';
@@ -22,55 +22,72 @@ export default function Myprojects() {
   );
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [allProject, setAllProjects] = useState<Project[]>([]);
-
-  const completedProject = useMemo(() => {
-    return allProject.filter((item) => item.completed);
-  }, [allProject]);
-
-  const activeProject = useMemo(() => {
-    return allProject.filter(
-      (item) => item.chain_project_id && !item.completed && item.brief_id
-    );
-  }, [allProject]);
-
-  const pendingProject = useMemo(() => {
-    return allProject.filter(
-      (item) => !item.chain_project_id && item.status_id === 4
-    );
-  }, [allProject]);
-
-  const GrantProject = useMemo(() => {
-    return allProject.filter((item) => !item.brief_id && item.status_id === 4);
-  }, [allProject]);
-
-  const SwitchWindow = (switcher = 'completed') => {
-    switch (switcher) {
-      case 'completed': {
-        setProjects(completedProject);
-        break;
-      }
-      case 'active': {
-        setProjects(activeProject);
-        break;
-      }
-      case 'pending': {
-        setProjects(pendingProject);
-        break;
-      }
-      case 'grants': {
-        setProjects(GrantProject);
-        break;
-      }
-    }
-  };
+  const [allProject, setAllProjects] = useState({
+    completed: 0,
+    active: 0,
+    pending: 0,
+    grants: 0,
+  });
+  const [switcher, SwitchWindow] = useState('completed');
 
   useEffect(() => {
     const getProjects = async () => {
       setLoading(true);
       try {
         const projects = await getFreelancerApplications(user.id);
-        setAllProjects(projects);
+        const completedProject = projects.filter((item) => item.completed);
+        setAllProjects((val) => {
+          return {
+            ...val,
+            completed: completedProject.length,
+          };
+        });
+        const activeProject = projects.filter(
+          (item) => item.chain_project_id && !item.completed && item.brief_id
+        );
+        setAllProjects((val) => {
+          return {
+            ...val,
+            active: activeProject.length,
+          };
+        });
+        const pendingProject = projects.filter(
+          (item) => !item.chain_project_id && item.status_id === 4
+        );
+        setAllProjects((val) => {
+          return {
+            ...val,
+            pending: pendingProject.length,
+          };
+        });
+        const GrantProject = projects.filter(
+          (item) => !item.brief_id && item.status_id === 4
+        );
+        setAllProjects((val) => {
+          return {
+            ...val,
+            grants: GrantProject.length,
+          };
+        });
+
+        switch (switcher) {
+          case 'completed': {
+            setProjects(completedProject);
+            break;
+          }
+          case 'active': {
+            setProjects(activeProject);
+            break;
+          }
+          case 'pending': {
+            setProjects(pendingProject);
+            break;
+          }
+          case 'grants': {
+            setProjects(GrantProject);
+            break;
+          }
+        }
       } catch (error) {
         // eslint-disable-next-line no-console
         console.log(error);
@@ -79,7 +96,7 @@ export default function Myprojects() {
       }
     };
     if (user?.id) getProjects();
-  }, [user.id]);
+  }, [user.id, switcher]);
 
   const router = useRouter();
 
@@ -104,25 +121,25 @@ export default function Myprojects() {
           onClick={() => SwitchWindow('completed')}
           className='text-2xl text-black py-5 border-r text-center w-full  '
         >
-          Completed Projects({completedProject?.length || 0})
+          Completed Projects({allProject?.completed || 0})
         </p>
         <p
           onClick={() => SwitchWindow('active')}
           className='text-2xl text-black py-5 border-r text-center w-full'
         >
-          Active Projects ({activeProject?.length || 0})
+          Active Projects ({allProject.active || 0})
         </p>
         <p
           onClick={() => SwitchWindow('pending')}
           className='text-2xl text-black border-r py-5 text-center w-full'
         >
-          Pending Projects ({pendingProject?.length || 0})
+          Pending Projects ({allProject.pending || 0})
         </p>
         <p
           onClick={() => SwitchWindow('grants')}
           className='text-2xl text-black py-5 text-center w-full'
         >
-          Grants ({GrantProject?.length || 0})
+          Grants ({allProject.grants || 0})
         </p>
       </div>
       <div className='mt-5 min-h-[300px]'>
