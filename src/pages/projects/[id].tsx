@@ -532,7 +532,6 @@ function Project() {
                   {timeData[project?.duration_id || 0].label}
                 </p>
               </div>
-              {projectType === 'grant' && (
                 <div className='flex flex-col bg-white justify-between px-5 py-3 rounded-xl'>
                   <CopyToClipboard text={project?.escrow_address}>
                     <div className='ml-auto'>
@@ -546,7 +545,7 @@ function Project() {
                     </div>
                   </CopyToClipboard>
                   <div className='w-full flex justify-between items-end'>
-                    <p className='text-black'>Grant Wallet</p>
+                    <p className='text-black'>Escrow Address</p>
                     <p className='text-imbue-purple-dark text-xl line-clamp-1'>
                       {project?.escrow_address?.slice(0, 6) +
                         '...' +
@@ -554,7 +553,6 @@ function Project() {
                     </p>
                   </div>
                 </div>
-              )}
               <div className='flex flex-col bg-white justify-between px-5 py-3 rounded-xl'>
                 <ProjectBalance
                   {...{
