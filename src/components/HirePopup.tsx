@@ -19,6 +19,7 @@ import { getBalance } from '@/utils/helper';
 import { Currency, OffchainProjectState } from '@/model';
 import { changeBriefApplicationStatus } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
+import { getOffchainEscrowAddress, getOffchainEscrowBalance, mintTokens } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 import AccountChoice from './AccountChoice';
@@ -44,8 +45,10 @@ export const HirePopup = ({
 
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<any>();
+  const [escrowAddress, setEscrowAddress] = useState<string>('');
+  const [escrowBalance, setEscrowBalance] = useState<number>(0);
   const router = useRouter();
-  const [freelancerBalance, setFreelancerBalance] = useState<number | string>(
+  const [freelancerImbueBalance, setFreelancerImbueBalance] = useState<number | string>(
     0
   );
 
@@ -68,21 +71,32 @@ export const HirePopup = ({
 
   useEffect(() => {
     const checkBalance = async () => {
-      setFreelancerBalance('Chekcing Balance');
+      setFreelancerImbueBalance('Checking Imbue Balance');
       const balance = await getBalance(
         freelancer.web3_address,
-        application?.currency_id || 0,
+        Currency.IMBU,
         user
       );
 
-      setFreelancerBalance(balance);
+      setFreelancerImbueBalance(balance);
     };
 
+
+    const updateEscrowInfo = async () => {
+      const escrowAddress = await getOffchainEscrowAddress(application.id);
+      setEscrowAddress(escrowAddress);
+      const allBalances = await getOffchainEscrowBalance(application.id);
+      const currency = Currency[application.currency_id].toString().toLowerCase();
+      const escrowBalance = Number(allBalances[currency]) ?? 0;
+      setEscrowBalance(escrowBalance)
+    };
+    updateEscrowInfo();
     openHirePopup && checkBalance();
   }, [freelancer.web3_address, application?.currency_id, user, openHirePopup]);
 
   const selectedAccount = async (account: WalletAccount) => {
     setLoading(true);
+    mintTokens(application.id, account.address);
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
     const briefOwners: string[] = user?.web3_address
@@ -162,9 +176,9 @@ export const HirePopup = ({
             <span className='text-xl text-secondary-dark-hover'>
               {freelancer?.display_name}
             </span>
-            {freelancerBalance !== 'Chekcing Balance' ? (
+            {freelancerImbueBalance !== 'Checking Imbue Balance' ? (
               <>
-                {Number(freelancerBalance) < 500 ? (
+                {Number(freelancerImbueBalance) < 500 ? (
                   <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-imbue-coral px-3 py-1 text-sm text-white'>
                     <ErrorOutlineOutlinedIcon className='h-4 w-4 inline' />
                     <p className='inline'>
@@ -242,7 +256,7 @@ export const HirePopup = ({
               <p className='text-lg'>Amount Received</p>
             </div>
             <div className='budget-value'>
-              ${Number?.(amountDue?.toFixed?.(2))?.toLocaleString?.()}
+              {Number?.(amountDue?.toFixed?.(2))?.toLocaleString?.()} ${Currency[application.currencyId]}
             </div>
           </div>
         </div>
@@ -258,36 +272,84 @@ export const HirePopup = ({
   };
 
   const SecondContent = () => {
-    return (
-      <div className='flex flex-col justify-center items-center modal-container px-5 lg:px-0 lg:w-2/3 mx-auto my-auto text-content'>
-        <p className='text-center w-full text-lg lg:text-xl my-4 text-content-primary'>
-          Deposit Funds
-        </p>
-        <p className='text-center w-full text-lg lg:text-xl my-4'>
-          Deposit the funds required for the project, these funds will be taken
-          from your account once the freelancer starts the project.
-        </p>
-        <p className='text-center w-full text-lg lg:text-xl my-4'>
-          The funds are then paid to the freelancer in stages only when you
-          approve the completion of each milestone
-        </p>
-        <p className='mb-10'>
-          <span className='text-lg lg:text-xl text-imbue-lemon mr-1'>
-            {Number(totalCostWithoutFee.toFixed(2)).toLocaleString()}
-          </span>
-          ${Currency[application.currency_id]}
-        </p>
-        <button
-          onClick={() => {
-            setstage(2);
-          }}
-          className='primary-btn in-dark w-button lg:w-1/3 lg:mx-16'
-          style={{ textAlign: 'center' }}
-        >
-          Deposit Funds
-        </button>
-      </div>
-    );
+    if (application.currency < 100) {
+      return (
+        <div className='flex flex-col justify-center items-center modal-container px-5 lg:px-0 lg:w-2/3 mx-auto my-auto text-content'>
+          <p className='text-center w-full text-lg lg:text-xl my-4 text-content-primary'>
+            Deposit Funds
+          </p>
+          <p className='text-center w-full text-lg lg:text-xl my-4'>
+            Deposit the funds required for the project, these funds will be taken
+            from your account once the freelancer starts the project.
+          </p>
+          <p className='text-center w-full text-lg lg:text-xl my-4'>
+            The funds are then paid to the freelancer in stages only when you
+            approve the completion of each milestone
+          </p>
+          <p className='mb-10'>
+            <span className='text-lg lg:text-xl text-imbue-lemon mr-1'>
+              {Number(totalCostWithoutFee.toFixed(2)).toLocaleString()}
+            </span>
+            ${Currency[application.currency_id]}
+          </p>
+          <button
+            onClick={() => {
+              setstage(2);
+            }}
+            className='primary-btn in-dark w-button lg:w-1/3 lg:mx-16'
+            style={{ textAlign: 'center' }}
+          >
+            Deposit Funds
+          </button>
+        </div>
+      );
+    } else {
+      // Imbue Multichain
+      return (
+        <div className='flex flex-col justify-center items-center modal-container px-5 lg:px-0 lg:w-2/3 mx-auto my-auto text-content'>
+          <p className='text-center w-full text-lg lg:text-xl my-4 text-content-primary'>
+            Deposit Funds
+          </p>
+          <p className='text-center w-full text-lg lg:text-xl my-4'>
+            To Hire {freelancer.display_name}, please deposit the funds required for the project.
+          </p>
+          <p className='text-center w-full text-lg lg:text-xl my-4'>
+            The funds are then paid to the freelancer in stages only when you
+            approve the completion of each milestone
+          </p>
+          <p className='mb-10'>
+            <span className='text-lg lg:text-xl text-imbue-lemon mr-1'>
+              {Number(totalCostWithoutFee.toFixed(2)).toLocaleString()}
+            </span>
+            ${Currency[application.currency_id]}
+          </p>
+          <p className='mb-10'>
+            <span>Escrow Address:</span>
+            <span className='text-lg lg:text-xl text-imbue-lemon mr-1'>
+              {escrowAddress}
+            </span>
+          </p>
+          <p className='mb-10'>
+            <span>Escrow Balance: </span>
+            <span className='text-lg lg:text-xl text-imbue-lemon mr-1'>
+              {escrowBalance}
+            </span>
+            ${Currency[application.currency_id]}
+          </p>
+          <button
+            onClick={() => {
+              setstage(2);
+            }}
+            disabled={escrowBalance == 0}
+            className='primary-btn in-dark w-button lg:w-1/3 lg:mx-16 disabled'
+            style={{ textAlign: 'center' }}
+          >
+            Hire
+          </button>
+        </div>
+      );
+    }
+
   };
 
   if (popupStage === 2 && openHirePopup)

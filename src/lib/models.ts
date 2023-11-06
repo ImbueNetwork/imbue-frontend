@@ -73,6 +73,7 @@ export type ProposedMilestone = {
   amount: number;
   description: string;
   chain_project_id?: string;
+  attachments: any;
 };
 
 export type GrantApprover = string;
@@ -93,12 +94,18 @@ export type Grant = {
   approvers: GrantApprover[];
   chain_project_id: number;
   escrow_address: string;
+  payment_address: string;
 };
 
 export type Milestone = ProposedMilestone & {
   milestone_index: number;
   project_id: number | string;
   is_approved: boolean;
+  withdrawn_onchain: boolean;
+  withdrawn_offchain: boolean;
+  withdrawal_transaction_hash: string;
+  imbue_fee_transaction_hash: string;
+  attachments: any;
 };
 
 export type MilestoneDetails = {
@@ -129,6 +136,7 @@ export type Project = {
   completed?: boolean;
   first_pending_milestone?: number;
   project_in_voting_of_no_confidence?: boolean;
+  payment_address: string;
 };
 
 export type ProjectProperties = {
@@ -615,11 +623,16 @@ export const insertMilestones = (
   milestones: ProposedMilestone[],
   project_id: string | number
 ) => {
-  const values = milestones.map((m, idx) => ({
-    ...m,
-    project_id,
-    milestone_index: idx,
-  }));
+  const values = milestones.map((m, idx) => {
+    const mileston = m;
+    delete mileston.attachments;
+
+    return {
+      ...mileston,
+      project_id,
+      milestone_index: idx,
+    };
+  });
 
   return (tx: Knex.Transaction) =>
     tx<Milestone>('milestones').insert(values).returning('*');
@@ -689,6 +702,34 @@ export const updateMilestone =
       .update(details)
       .returning('*');
 
+export const updateMilestoneWithdrawHashs =
+  (
+    projectId: number,
+    milestoneIds: number[],
+    tx_hash: string,
+    imbue_fee_tx_hash: string
+  ) =>
+  (tx: Knex.Transaction) =>
+    tx<Milestone>('milestones')
+      .where(`project_id`, projectId)
+      .whereIn(`milestone_index`, milestoneIds)
+      .update({
+        withdrawal_transaction_hash: tx_hash,
+        imbue_fee_transaction_hash: imbue_fee_tx_hash,
+        withdrawn_offchain: true,
+      })
+      .returning('*');
+
+export const updateMilestoneWithdrawStatus =
+  (projectId: number, milestoneIds: number[]) => (tx: Knex.Transaction) =>
+    tx<Milestone>('milestones')
+      .where(`project_id`, projectId)
+      .whereIn(`milestone_index`, milestoneIds)
+      .update({
+        withdrawn_onchain: true,
+      })
+      .returning('*');
+
 export const insertMilestoneDetails =
   (value: MilestoneDetails) => async (tx: Knex.Transaction) =>
     (
@@ -740,6 +781,8 @@ export const fetchAllBriefs = () => (tx: Knex.Transaction) =>
       'briefs.duration_id',
       'budget',
       'users.display_name as created_by',
+      'users.profile_photo as owner_photo',
+      'users.username as owner_name',
       'experience_level',
       'briefs.experience_id',
       'briefs.created',
@@ -768,7 +811,8 @@ export const fetchAllBriefs = () => (tx: Knex.Transaction) =>
     .groupBy('users.display_name')
     .groupBy('briefs.experience_id')
     .groupBy('experience.experience_level')
-    .groupBy('users.id');
+    .groupBy('users.id')
+    .groupBy('users.username');
 
 export const fetchAllGrants = () => (tx: Knex.Transaction) =>
   tx
@@ -1692,6 +1736,7 @@ export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
     user_id,
     escrow_address,
     duration_id,
+    payment_address,
   } = grant;
   const project = await insertProject({
     name: title,
@@ -1709,6 +1754,7 @@ export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
     imbue_fee,
     duration_id,
     status_id: ProjectStatus.Accepted,
+    payment_address,
     // project_type: project_type ?? models.ProjectType.Brief
   })(tx);
 

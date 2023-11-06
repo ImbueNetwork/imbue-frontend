@@ -94,7 +94,7 @@ const NewBrief = (): JSX.Element => {
   };
 
   const handleSkillsChange = (val: string[]) => {
-    if (val.length < 3 || val.length > 10) setSkillError(true);
+    if (val.length < 1 || val.length > 10) setSkillError(true);
     else setSkillError(false);
     setSkills(val);
   };
@@ -256,7 +256,7 @@ const NewBrief = (): JSX.Element => {
       </div>
       <div className='flex flex-wrap flex-row  justify-center relative -top-8'>
         <span className={!skillError ? 'hide' : 'error'}>
-          number of skills must be between 3 to 10
+          number of skills must be between 1 to 10
         </span>
       </div>
 
@@ -398,7 +398,7 @@ const NewBrief = (): JSX.Element => {
     }
     if (
       step === 3 &&
-      (!skills.length || skills.length < 3 || skills.length > 10)
+      (!skills.length || skills.length < 1 || skills.length > 10)
     ) {
       return false;
     }

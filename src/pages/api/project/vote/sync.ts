@@ -27,11 +27,6 @@ export default nextConnect()
         //   .select('voter_address')
         //   .where({ project_id: projectID, milestone_index: milestoneIndex });
 
-        // console.log(
-        //   '🚀 ~ file: sync.ts:27 ~ db.transaction ~ projectVotes:',
-        //   projectVotes
-        // );
-
         chainVotes.map(async (vote: any) => {
           const existingVote = await checkExistingVote(
             projectID,
@@ -71,7 +66,6 @@ export default nextConnect()
         //   }
         });
 
-        // console.log('🚀 ~ file: sync.ts:75 ~ votes ~ votes:', votes);
 
         // const existingVote = await checkExistingVote(
         //   projectId,

@@ -1,32 +1,30 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
-import BottomNavigation from '@mui/material/BottomNavigation';
-import BottomNavigationAction from '@mui/material/BottomNavigationAction';
-import { StyledEngineProvider } from '@mui/material/styles';
+
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { StreamChat } from 'stream-chat';
 import 'stream-chat-react/dist/css/v2/index.css';
 
-import { fetchUser, getStreamChat } from '@/utils';
+import { getStreamChat } from '@/utils';
 
-import ChatPopup from '@/components/ChatPopup';
-import DashboardChatBox from '@/components/Dashboard/MyChatBox';
-import MyClientBriefsView from '@/components/Dashboard/MyClientBriefsView';
-import MyFreelancerApplications from '@/components/Dashboard/MyFreelancerApplications';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 const LoginPopup = dynamic(() => import('@/components/LoginPopup/LoginPopup'));
 
 // import LoginPopup from '@/components/LoginPopup/LoginPopup';
 
-import { Freelancer, Project, User } from '@/model';
+import { AppContext, AppContextType } from '@/components/Layout';
+
+import { Project, User } from '@/model';
 import { Brief } from '@/model';
-import { getFreelancerApplications } from '@/redux/services/freelancerService';
 import { setUnreadMessage } from '@/redux/slices/userSlice';
 import { RootState } from '@/redux/store/store';
+
+import ClientDashboard from './ClientDashboard';
+import FreelancerDashboard from './new';
 
 export type DashboardProps = {
   user: User;
@@ -35,7 +33,7 @@ export type DashboardProps = {
   myApplicationsResponse: Project[];
 };
 
-const Dashboard = ({ val }: { val?: string }): JSX.Element => {
+const Dashboard = (): JSX.Element => {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [client, setClient] = useState<StreamChat>();
   const {
@@ -43,134 +41,57 @@ const Dashboard = ({ val }: { val?: string }): JSX.Element => {
     loading: loadingUser,
     error: userError,
   } = useSelector((state: RootState) => state.userState);
-  const [selectedOption, setSelectedOption] = useState<number>(1);
-  const [unreadMessages, setUnreadMsg] = useState<number>(0);
-  const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
-  const [targetUser, setTargetUser] = useState<User | null>(null);
-  const [myApplications, _setMyApplications] = useState<Project[]>();
   const [loadingStreamChat, setLoadingStreamChat] = useState<boolean>(true);
-
   const router = useRouter();
-  const { briefId } = router.query;
 
   const [error, setError] = useState<any>(userError);
 
   const dispatch = useDispatch();
 
-  const handleMessageBoxClick = async (
-    user_id: number,
-    _freelancer: Freelancer
-  ) => {
-    if (user_id) {
-      setShowMessageBox(true);
-      setTargetUser(await fetchUser(user_id));
-    } else {
-      //TODO: check if user is logged in
-      // redirect("login", `/dapp/freelancers/${freelancer?.username}/`);
+
+  const setup = async () => {
+    try {
+      if (!user?.username && !loadingUser) return router.push('/');
+      const client = await getStreamChat();
+      setClient(client);
+      if(client && user.getstream_token) {
+        client?.connectUser(
+          {
+            id: String(user.id),
+            username: user.username,
+            name: user.display_name,
+          },
+          user.getstream_token
+        );
+          const result = await client.getUnreadCount();
+          dispatch(setUnreadMessage({ message: result.channels.length }));
+        client.on((event) => {
+          if (event.total_unread_count !== undefined) {
+            dispatch(setUnreadMessage({ message: event.unread_channels }));
+          }
+        });
+      }
+      setLoadingStreamChat(false);
+
+    } catch (error) {
+      setError({ message: error });
     }
   };
 
-  const redirectToBriefApplications = (applicationId: string) => {
-    router.push(`/briefs/${briefId}/applications/${applicationId}`);
-  };
-
   useEffect(() => {
-    if (val === 'message') setSelectedOption(2);
-  }, [val]);
-
-  useEffect(() => {
-    const setupStreamChat = async () => {
-      try {
-        if (!user?.username && !loadingUser) return router.push('/');
-        setClient(await getStreamChat());
-        _setMyApplications(await getFreelancerApplications(user?.id));
-      } catch (error) {
-        setError({ message: error });
-      } finally {
-        setLoadingStreamChat(false);
-      }
-    };
-
-    setupStreamChat();
+    setup();
   }, [user]);
 
-  useEffect(() => {
-    if (client && user?.username && !loadingStreamChat) {
-      client?.connectUser(
-        {
-          id: String(user.id),
-          username: user.username,
-          name: user.display_name,
-        },
-        user.getstream_token
-      );
-      const getUnreadMessageChannels = async () => {
-        const result = await client.getUnreadCount();
-        dispatch(setUnreadMessage({ message: result.channels.length }));
-      };
-      getUnreadMessageChannels();
-      client.on((event) => {
-        console.log(event);
-        if (event.total_unread_count !== undefined) {
-          dispatch(setUnreadMessage({ message: event.unread_channels }));
-          setUnreadMsg(event.total_unread_count);
-        }
-      });
-    }
-  }, [client, user?.getstream_token, user?.username, loadingStreamChat]);
+  const { profileView } = useContext(AppContext) as AppContextType;
 
   if (loadingStreamChat || loadingUser) return <FullScreenLoader />;
 
+  if (profileView === 'freelancer') return <FreelancerDashboard />;
+
   return client ? (
     <div className='px-[15px]'>
-      <StyledEngineProvider injectFirst>
-        <BottomNavigation
-          showLabels
-          value={selectedOption}
-          onChange={(event, newValue) => {
-            router.push('/dashboard');
-            setSelectedOption(newValue);
-          }}
-        >
-          <BottomNavigationAction label='Client View' value={1} />
-          <BottomNavigationAction
-            label={`Messages ${
-              unreadMessages > 0 ? `(${unreadMessages})` : ''
-            }`}
-            value={2}
-          />
-          <BottomNavigationAction label='Freelancer View' value={3} />
-        </BottomNavigation>
-      </StyledEngineProvider>
 
-      {selectedOption === 1 && (
-        <MyClientBriefsView
-          {...{
-            user,
-            briefId,
-            handleMessageBoxClick,
-            redirectToBriefApplications,
-          }}
-        />
-      )}
-      {selectedOption === 2 && <DashboardChatBox client={client} />}
-      {selectedOption === 3 && (
-        <MyFreelancerApplications
-          user_id={user.id}
-          myApplications={myApplications}
-        />
-      )}
-
-      {user && showMessageBox && (
-        <ChatPopup
-          showMessageBox={showMessageBox}
-          setShowMessageBox={setShowMessageBox}
-          targetUser={targetUser}
-          browsingUser={user}
-          showFreelancerProfile={true}
-        />
-      )}
-
+      <ClientDashboard />
       <LoginPopup
         visible={loginModal}
         setVisible={setLoginModal}

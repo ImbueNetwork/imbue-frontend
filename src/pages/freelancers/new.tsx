@@ -2,7 +2,7 @@
 import { Autocomplete, TextField, Tooltip } from '@mui/material';
 import Filter from 'bad-words';
 import { useRouter } from 'next/router';
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import * as utils from '@/utils';
@@ -10,6 +10,7 @@ import { isUrlExist, validateInputLength } from '@/utils/helper';
 
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
+import { AppContext, AppContextType } from '@/components/Layout';
 import ValidatableInput from '@/components/ValidatableInput';
 
 import {
@@ -55,6 +56,7 @@ const Freelancer = (): JSX.Element => {
   );
   const [suggestedLanguages, setSuggestedLanguages] = useState<string[]>([]);
   const dispatch = useDispatch<AppDispatch>();
+  const { setProfileMode } = useContext(AppContext) as AppContextType
 
   useEffect(() => {
     if (!userLoading && (!user || !user?.id)) {
@@ -126,9 +128,8 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-xp-${index}`}
-            className={`${styles.freelanceXpItem} ${
-              freelancingBefore === value ? styles.active : ''
-            }`}
+            className={`${styles.freelanceXpItem} ${freelancingBefore === value ? styles.active : ''
+              }`}
             onClick={() => setFreelancingBefore(value)}
           >
             {label}
@@ -150,9 +151,8 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-goal-${index}`}
-            className={`${styles.freelanceXpItem} ${
-              goal === value ? styles.active : ''
-            }`}
+            className={`${styles.freelanceXpItem} ${goal === value ? styles.active : ''
+              }`}
             onClick={() => setGoal(value)}
           >
             {label}
@@ -466,6 +466,7 @@ const Freelancer = (): JSX.Element => {
 
       if (response.status === 201) {
         dispatch(fetchUserRedux());
+        setProfileMode('freelancer')
         setStep(step + 1);
       } else {
         setError({
@@ -525,10 +526,9 @@ const Freelancer = (): JSX.Element => {
                 }
               >
                 <button
-                  className={`primary-btn in-dark w-button !mt-0 ${
-                    disableSubmit &&
+                  className={`primary-btn in-dark w-button !mt-0 ${disableSubmit &&
                     '!bg-gray-400 !text-white !cursor-not-allowed'
-                  }`}
+                    }`}
                   data-testid='submit-button'
                   onClick={() => !disableSubmit && createProfile()}
                 >
@@ -544,10 +544,9 @@ const Freelancer = (): JSX.Element => {
                 }
               >
                 <button
-                  className={`primary-btn in-dark w-button !mt-0 ${
-                    disableSubmit &&
+                  className={`primary-btn in-dark w-button !mt-0 ${disableSubmit &&
                     '!bg-gray-400 !text-white !cursor-not-allowed'
-                  }`}
+                    }`}
                   data-testid='next-button'
                   onClick={() => !disableSubmit && setStep(step + 1)}
                 >

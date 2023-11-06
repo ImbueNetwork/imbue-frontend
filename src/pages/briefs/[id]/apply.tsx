@@ -5,7 +5,7 @@ import { Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Filter from 'bad-words';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 
@@ -19,6 +19,8 @@ import AccountChoice from '@/components/AccountChoice';
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
+import { AppContext, AppContextType } from '@/components/Layout';
+import SwitchToFreelancer from '@/components/PopupScreens/SwitchToFreelancer';
 import SuccessScreen from '@/components/SuccessScreen';
 
 import * as config from '@/config';
@@ -48,6 +50,7 @@ export const SubmitProposal = (): JSX.Element => {
   const filter = new Filter();
   const [currencyId, setCurrencyId] = useState(0);
   const [durationId, setDurationId] = useState(0);
+  const [paymentAddress, setPaymentAddress] = useState<string>('');
   const [brief, setBrief] = useState<Brief | any>();
   // const [user, setUser] = useState<User>();
   const { user, loading: loadingUser } = useSelector(
@@ -68,6 +71,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
+  const { profileView } = useContext(AppContext) as AppContextType
 
   const [applicationId, setapplicationId] = useState();
   const [error, setError] = useState<any>();
@@ -81,23 +85,23 @@ export const SubmitProposal = (): JSX.Element => {
   }, [applicationId]);
 
   useEffect(() => {
+    const getUserAndFreelancer = async () => {
+      const freelancer = await getFreelancerProfile(user?.username);
+      // if (!freelancer?.id) router.push(`/freelancers/new`);
+      setFreelancer(freelancer);
+
+      const userApplication: any = await getFreelancerBrief(user?.id, briefId);
+      if (userApplication && profileView === 'freelancer') {
+        router.push(`/briefs/${briefId}/applications/${userApplication?.id}/`);
+      }
+    };
+
     !loadingUser && getUserAndFreelancer();
-  }, [briefId, user?.username, loadingUser]);
+  }, [briefId, user?.username, loadingUser, profileView]);
 
   useEffect(() => {
     router?.isReady && getCurrentUserBrief();
   }, [user, router.isReady]);
-
-  const getUserAndFreelancer = async () => {
-    const freelancer = await getFreelancerProfile(user?.username);
-    if (!freelancer?.id) router.push(`/freelancers/new`);
-    setFreelancer(freelancer);
-
-    const userApplication: any = await getFreelancerBrief(user?.id, briefId);
-    if (userApplication) {
-      router.push(`/briefs/${briefId}/applications/${userApplication?.id}/`);
-    }
-  };
 
   const getCurrentUserBrief = async () => {
     if (briefId && user) {
@@ -224,6 +228,7 @@ export const SubmitProposal = (): JSX.Element => {
           duration_id: durationId,
           description: brief?.description,
           verified_only: brief.verified_only,
+          payment_address: paymentAddress
         }),
       });
       if (resp.ok) {
@@ -266,13 +271,15 @@ export const SubmitProposal = (): JSX.Element => {
       inputErrors,
       milestones,
       brief?.headline,
-      brief?.description
+      brief?.description,
+      paymentAddress
     );
     setMilestones(milestonesRes);
     setInputErrors(errors);
   };
 
   // const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
+
 
   if (loadingUser || loading) <FullScreenLoader />;
 
@@ -485,7 +492,7 @@ export const SubmitProposal = (): JSX.Element => {
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-light-purple-two font-normal'>
-              ${Number(totalCostMinusFee.toFixed(2)).toLocaleString()}
+              {Number(totalCostMinusFee.toFixed(2)).toLocaleString()} ${Currency[currencyId]}
             </div>
           </div>
         </div>
@@ -543,6 +550,26 @@ export const SubmitProposal = (): JSX.Element => {
               </select>
             </div>
           </div>
+          {currencyId >= 100 && (
+          <div className='payment-options'>
+            <h3 className='text-lg lg:text-[1.25rem] font-normal m-0 p-0 text-imbue-purple-dark'>
+              Payment Address
+            </h3>
+
+            <div className='network-amount'>
+            <input
+                        type='string'
+                        data-testid={`payment address`}
+                        placeholder='Add a payment address'
+                        className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
+                        value={paymentAddress || ''}
+                        onChange={(e) => setPaymentAddress(e.target.value)}
+                        name='paymentAddress'
+                      />
+
+            </div>
+          </div>
+          )}
         </div>
       </div>
 
@@ -554,9 +581,8 @@ export const SubmitProposal = (): JSX.Element => {
             title={disableSubmit && 'Please fill all the required input fields'}
           >
             <button
-              className={`primary-btn in-dark w-button ${
-                disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
-              }`}
+              className={`primary-btn in-dark w-button ${disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
+                }`}
               onClick={() => !disableSubmit && handleSubmit()}
             >
               Submit
@@ -615,6 +641,13 @@ export const SubmitProposal = (): JSX.Element => {
           </button>
         </div>
       </ErrorScreen>
+
+      {
+        profileView === 'client' && (
+          <SwitchToFreelancer />
+        )
+      }
+
     </div>
   );
 };

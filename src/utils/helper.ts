@@ -1,5 +1,8 @@
 /* eslint-disable no-unused-vars */
+
+import { Currency } from '@/model';
 import ChainService from '@/redux/services/chainService';
+import { getProjectBalance } from '@/redux/services/projectServices';
 
 import { initImbueAPIInfo } from './polkadot';
 const { decodeAddress, encodeAddress } = require('@polkadot/keyring');
@@ -20,6 +23,7 @@ export interface MilestoneError {
 interface InputErrorType {
   title?: string;
   description?: string;
+  paymentAddress?: string;
   approvers?: string;
   milestones: Array<{ name?: string; amount?: string; description?: string }>;
 }
@@ -77,18 +81,25 @@ export function findObjectsByName(
 export const getBalance = async (
   walletAddress: string,
   currency_id: number,
-  user: any
+  user: any,
+  projectId?: number
 ) => {
   try {
-    const imbueApi = await initImbueAPIInfo();
-    const chainService = new ChainService(imbueApi, user);
+    if(currency_id < 100) {
+      const imbueApi = await initImbueAPIInfo();
+      const chainService = new ChainService(imbueApi, user);
+      if (!walletAddress) return;
+      const balance: any = await chainService.getBalance(
+        walletAddress,
+        currency_id
+      );
+      return balance;
+    } else if(projectId) {
+      const allBalances = await getProjectBalance(projectId);
+      const currency = Currency[currency_id].toLowerCase();
+      return allBalances[currency];
+    }
 
-    if (!walletAddress) return;
-    const balance: any = await chainService.getBalance(
-      walletAddress,
-      currency_id
-    );
-    return balance;
   } catch (error) {
     return {
       status: 'failed',
@@ -275,7 +286,8 @@ export const handleApplicationInput = (
   inputErrors: InputErrorType,
   milestones: any,
   title: string,
-  description: string
+  description: string,
+  paymentAddress: string
 ) => {
   const { name, value } = event.target;
 
@@ -298,6 +310,19 @@ export const handleApplicationInput = (
       description = value;
       if (validateInputLength(value, 50, 5000)) {
         newInputErrors = { ...inputErrors, description: '' };
+      } else {
+        newInputErrors = {
+          ...inputErrors,
+          description:
+            'Grant description should be between 50 - 5000 characters',
+        };
+      }
+      break;
+    case 'mainPaymentAddress':
+      // TODO: Validate address based on currency id 
+      paymentAddress = value;
+      if (validateInputLength(value, 10, 5000)) {
+        newInputErrors = { ...inputErrors, paymentAddress: '' };
       } else {
         newInputErrors = {
           ...inputErrors,
@@ -383,6 +408,7 @@ export const handleApplicationInput = (
     titleRes: title,
     descriptionRes: description,
     milestonesRes: milestones,
+    paymentAddressRes: paymentAddress,
     errors,
   };
 };
@@ -397,6 +423,6 @@ export const isNumOrSpecialCharacter = (character: string) => {
   return /[^A-Za-z]/g.test(character);
 };
 
-export  const isValidEmail = (val: string) => {
+export const isValidEmail = (val: string) => {
   return /\S+@\S+\.\S+/.test(val);
 };

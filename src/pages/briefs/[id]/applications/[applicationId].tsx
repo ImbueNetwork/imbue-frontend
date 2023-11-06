@@ -87,6 +87,7 @@ const ApplicationPreview = (): JSX.Element => {
     milestones: [],
   });
   const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
+  const [paymentAddress, setPaymentAddress] = useState<string>('');
 
   const isApplicationOwner =
     user && application && user?.id == application?.user_id;
@@ -123,6 +124,7 @@ const ApplicationPreview = (): JSX.Element => {
         setFreelancer(freelancerResponse);
         setCurrencyId(applicationResponse?.currency_id);
         setDurationId(applicationResponse?.duration_id);
+        setPaymentAddress(applicationResponse.payment_address);
       } catch (error) {
         setError({ message: 'Could not find application' });
       } finally {
@@ -247,7 +249,8 @@ const ApplicationPreview = (): JSX.Element => {
       inputErrors,
       milestones,
       brief?.headline,
-      brief?.description
+      brief?.description,
+      paymentAddress
     );
     setMilestones(milestonesRes);
     setInputErrors(errors);
@@ -314,6 +317,7 @@ const ApplicationPreview = (): JSX.Element => {
         chain_project_id: chainProjectId,
         escrow_address: escrow_address,
         duration_id: durationId,
+        payment_address: paymentAddress
       });
 
       if (resp.id) {
@@ -449,9 +453,8 @@ const ApplicationPreview = (): JSX.Element => {
                       {index + 1}.
                     </div>
                     <div
-                      className={`flex ${
-                        isEditingBio ? 'flex-col lg:flex-row' : 'flex-row'
-                      } justify-between w-full`}
+                      className={`flex ${isEditingBio ? 'flex-col lg:flex-row' : 'flex-row'
+                        } justify-between w-full`}
                     >
                       <div className='w-full lg:w-2/3 h-fit'>
                         {isEditingBio ? (
@@ -637,7 +640,7 @@ const ApplicationPreview = (): JSX.Element => {
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-light-purple-two font-normal'>
-              ${Number(amountDue.toFixed(2))?.toLocaleString?.()}
+              {Number(amountDue.toFixed(2))?.toLocaleString?.()} ${Currency[currencyId]}
             </div>
           </div>
         </div>
@@ -711,6 +714,31 @@ const ApplicationPreview = (): JSX.Element => {
                 )}
               </div>
             </div>
+            {currencyId >= 100 && (
+              <div className='payment-options'>
+                <h3 className='text-lg lg:text-[1.25rem] font-normal m-0 p-0 text-imbue-purple-dark'>
+                  Payment Address
+                </h3>
+
+                <div className='network-amount'>
+
+                  {isApplicationOwner && isEditingBio ? (
+                    <input
+                      type='string'
+                      placeholder='Add a payment address'
+                      className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
+                      value={paymentAddress || ''}
+                      onChange={(e) => setPaymentAddress(e.target.value)}
+                      name='paymentAddress'
+                    />
+                  ) : (
+                    <p className='text-content-primary mt-2 w-full lg:text-end'>
+                      {paymentAddress}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -739,10 +767,9 @@ const ApplicationPreview = (): JSX.Element => {
                 title={disableSubmit && 'Please fill all the input fields'}
               >
                 <button
-                  className={`primary-btn in-dark w-button ${
-                    disableSubmit &&
+                  className={`primary-btn in-dark w-button ${disableSubmit &&
                     '!bg-gray-400 !text-white !cursor-not-allowed'
-                  }`}
+                    }`}
                   onClick={() => !disableSubmit && handleUpdateProject()}
                 >
                   Update

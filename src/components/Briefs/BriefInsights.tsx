@@ -27,9 +27,9 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
 
   return (
     <div className='flex mt-[1.5rem] flex-col lg:flex-row gap-4 lg:gap-2 bg-white rounded-bl-[20px] rounded-br-[20px] border-t border-t-[rgba(3, 17, 106, 0.12)] p-7 lg:px-[50px] lg:py-[2rem]'>
-      <div className='flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] mr-[5%] relative'>
+      <div className='flex flex-col gap-[20px] flex-grow flex-shrink-0 basis-[75%] mr-[5%] relative break-all'>
         <div className='brief-title'>
-          <h3 className='text-[1.25rem] text-imbue-purple-dark leading-[1.5] font-normal m-0 p-0'>
+          <h3 className='text-[1.25rem] text-imbue-purple-dark leading-[1.5] font-normal m-0 p-0 max-w-[89%]'>
             {brief?.headline}
           </h3>
           <span
