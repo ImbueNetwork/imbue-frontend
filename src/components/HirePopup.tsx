@@ -277,12 +277,13 @@ export const HirePopup = ({
 
   const SecondContent = () => {
     const depositIntoEscrow = async () => {
+
       switch (application.currency_id) {
         case Currency.ETH: {
           const provider = new ethers.BrowserProvider(window.ethereum);
           const signer = await provider.getSigner();
           const transferAmount = ethers.parseEther((totalCostWithoutFee - escrowBalance).toPrecision(5).toString());
-          const depositTx = await signer.sendTransaction({ to: application.escrow_address, value: transferAmount });
+          const depositTx = await signer.sendTransaction({ to: escrowAddress, value: transferAmount });
           setDepositSuccess(true);
           await provider.waitForTransaction(depositTx.hash, 1, 150000);
           setDepositCompleted(true);
@@ -290,9 +291,14 @@ export const HirePopup = ({
           break;
         }
         case Currency.USDT: {
+
+          console.log("***** escrow address is ");
+          console.log(escrowAddress);
           const provider = new ethers.BrowserProvider(window.ethereum);
           const signer = await provider.getSigner();
           const contract = await getEVMContract(application.currency_id);
+          console.log("***** contract is ");
+          console.log(contract);
           if (!contract) {
             break;
           }
@@ -354,9 +360,6 @@ export const HirePopup = ({
           <p className='text-center w-full text-lg lg:text-xl my-4'>
             The funds are then paid to the freelancer in stages only when you
             approve the completion of each milestone
-          </p>
-          <p className='text-center w-full text-lg lg:text-xl my-4'>
-            Transfers usually take 5 mins or so to confirm, so if you have sent funds please wait and refresh the screen after a few moments
           </p>
           <p className='mb-10'>
             <span className='text-lg lg:text-xl text-imbue-lemon mr-1'>
@@ -475,7 +478,9 @@ export const HirePopup = ({
 
 
       <SuccessScreen
-        title={`Your transfer has been sent, you can hire ${freelancer?.display_name} as soon as the funds appear in the escrow account!`}
+        title={`Your transfer has been sent.
+
+        Please do not navigate away from this page until your transfer completes`}
         open={depositSuccess}
         setOpen={setDepositSuccess}
       >
@@ -485,7 +490,9 @@ export const HirePopup = ({
             onClick={() =>{setDepositSuccess(false); setstage(0)}} 
             className='primary-btn in-dark w-button w-full !m-0'
           >
-            Continue
+
+
+            {depositCompleted ? "Continue" : "Waiting for deposit confirmation......." }
           </button>
         </div>
       </SuccessScreen>

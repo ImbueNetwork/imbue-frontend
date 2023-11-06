@@ -138,12 +138,13 @@ const GrantApplication = (): JSX.Element => {
       const connection = await web3Modal.connect();
       const provider = new ethers.BrowserProvider(connection);
       const accounts = (await provider.listAccounts()).map(jsonProvider => jsonProvider.address);
+      setPaymentAddress(accounts[0]);
       setAccounts(accounts)
     } catch (err) {
       console.log('error:', err)
     }
   }
-  
+
   const onRemoveMilestone = (index: number) => {
     if (milestones.length <= 1) return;
 
