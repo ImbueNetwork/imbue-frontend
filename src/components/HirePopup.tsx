@@ -46,6 +46,7 @@ export const HirePopup = ({
 
   const [success, setSuccess] = useState<boolean>(false);
   const [depositSuccess, setDepositSuccess] = useState<boolean>(false);
+  const [depositCompleted, setDepositCompleted] = useState<boolean>(false);
   const [error, setError] = useState<any>();
   const [escrowAddress, setEscrowAddress] = useState<string>('');
   const [escrowBalance, setEscrowBalance] = useState<number>(0);
@@ -281,8 +282,11 @@ export const HirePopup = ({
           const provider = new ethers.BrowserProvider(window.ethereum);
           const signer = await provider.getSigner();
           const transferAmount = ethers.parseEther((totalCostWithoutFee - escrowBalance).toPrecision(5).toString());
-          await signer.sendTransaction({ to: application.escrow_address, value: transferAmount });
-          setLoading(true);
+          const depositTx = await signer.sendTransaction({ to: application.escrow_address, value: transferAmount });
+          setDepositSuccess(true);
+          await provider.waitForTransaction(depositTx.hash, 1, 150000);
+          setDepositCompleted(true);
+          await updateEscrowInfo();
           break;
         }
         case Currency.USDT: {
@@ -294,14 +298,16 @@ export const HirePopup = ({
           }
           const token = new ethers.Contract(contract.address, ERC_20_ABI, signer);
           const transferAmount = ethers.parseUnits((totalCostWithoutFee - escrowBalance).toPrecision(5).toString(), contract.decimals);
-          await token
+          const depositTx = await token
             .transfer(escrowAddress, transferAmount);
-          setLoading(true);
+          setDepositSuccess(true);
+          await provider.waitForTransaction(depositTx.hash, 1, 150000);
+          setDepositCompleted(true);
+          await updateEscrowInfo();
           break;
         }
       }
-      setLoading(false);
-      setDepositSuccess(true)
+
     }
 
     if (application.currency < 100) {
@@ -348,6 +354,9 @@ export const HirePopup = ({
           <p className='text-center w-full text-lg lg:text-xl my-4'>
             The funds are then paid to the freelancer in stages only when you
             approve the completion of each milestone
+          </p>
+          <p className='text-center w-full text-lg lg:text-xl my-4'>
+            Transfers usually take 5 mins or so to confirm, so if you have sent funds please wait and refresh the screen after a few moments
           </p>
           <p className='mb-10'>
             <span className='text-lg lg:text-xl text-imbue-lemon mr-1'>
@@ -472,6 +481,7 @@ export const HirePopup = ({
       >
         <div className='flex flex-col gap-4 w-1/2'>
           <button
+          disabled={!depositCompleted}
             onClick={() =>{setDepositSuccess(false); setstage(0)}} 
             className='primary-btn in-dark w-button w-full !m-0'
           >
