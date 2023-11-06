@@ -1,6 +1,6 @@
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-
+// needs to be deleted
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import { Skeleton, Tooltip, Typography } from '@mui/material';
@@ -111,6 +111,7 @@ function Project() {
   const [successTitle, setSuccessTitle] = useState<string>('');
   const [error, setError] = useState<any>();
   const [balance, setBalance] = useState<any>(0);
+  const [balanceLoading, setBalanceLoading] = useState(true)
   const [requiredBalance, setRequiredBalance] = useState<any>(0);
   const [approversPreview, setApproverPreview] = useState<User[]>([]);
   const [isApprover, setIsApprover] = useState<boolean>(false);
@@ -300,7 +301,7 @@ function Project() {
 
       const totalCost = Number(
         Number(projectRes?.total_cost_without_fee) +
-          Number(projectRes?.imbue_fee)
+        Number(projectRes?.imbue_fee)
       );
       setRequiredBalance(totalCost * 0.95);
 
@@ -585,10 +586,9 @@ function Project() {
                   className='cursor-pointer'
                 >
                   <button
-                    className={`border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors ${
-                      approverVotedOnRefund &&
+                    className={`border border-imbue-purple-dark px-6 h-[2.6rem] rounded-full hover:bg-white text-imbue-purple-dark transition-colors ${approverVotedOnRefund &&
                       '!bg-gray-300 !text-gray-400 !border-gray-400 !cursor-not-allowed'
-                    }`}
+                      }`}
                     onClick={async () => {
                       if (!approverVotedOnRefund) {
                         // set submitting mile stone to true
@@ -662,13 +662,12 @@ function Project() {
                 <div className='w-full bg-[#E1DDFF] mt-5 h-1 relative my-auto'>
                   <div
                     style={{
-                      width: `${
-                        (project?.milestones?.filter?.(
-                          (m: any) => m?.is_approved
-                        )?.length /
+                      width: `${(project?.milestones?.filter?.(
+                        (m: any) => m?.is_approved
+                      )?.length /
                           project?.milestones?.length) *
                         100
-                      }%`,
+                        }%`,
                     }}
                     className='h-full rounded-xl bg-content-primary absolute'
                   ></div>
@@ -676,9 +675,8 @@ function Project() {
                     {project?.milestones?.map((m: any, i: number) => (
                       <div
                         key={i}
-                        className={`h-4 w-4 ${
-                          m.is_approved ? 'bg-content-primary' : 'bg-[#E1DDFF]'
-                        } rounded-full -mt-1.5`}
+                        className={`h-4 w-4 ${m.is_approved ? 'bg-content-primary' : 'bg-[#E1DDFF]'
+                          } rounded-full -mt-1.5`}
                       ></div>
                     ))}
                   </div>
@@ -700,7 +698,7 @@ function Project() {
                 <h3 className='text-xl leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0'>
                   {Number(
                     Number(project?.total_cost_without_fee) +
-                      Number(project?.imbue_fee)
+                    Number(project?.imbue_fee)
                   )?.toLocaleString()}{' '}
                   ${Currency[project?.currency_id || 0]}
                 </h3>
@@ -754,6 +752,8 @@ function Project() {
                         user,
                         handlePopUpForUser,
                         setBalance,
+                        balanceLoading,
+                        setBalanceLoading
                       }}
                     />
                   </div>

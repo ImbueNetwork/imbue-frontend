@@ -56,7 +56,7 @@ export default function VoteModal({
   user,
   votingWalletAccount,
   setError,
-  refundOnly,
+  refundOnly = false,
   projectType,
 }: VotingModalProps) {
   const [vote, setVote] = useState<boolean>(true);
@@ -70,7 +70,6 @@ export default function VoteModal({
 
     try {
       const imbueApi = await initImbueAPIInfo();
-      // const userRes: User | any = await utils.getCurrentUser();
       const chainService = new ChainService(imbueApi, user);
       watchChain(ImbueChainEvent.ApproveMilestone, votingWalletAccount.address, project.id, milestoneKeyInView);
       const result = await chainService.voteOnMilestone(
@@ -103,10 +102,8 @@ export default function VoteModal({
               ],
               'approved_Milestone.testing',
               'A Milestone has been approved',
-              `${
-                project.milestones[project.first_pending_milestone || 0].name
-              } , a milestone on ${user.display_name}'s ${
-                project.name
+              `${project.milestones[project.first_pending_milestone || 0].name
+              } , a milestone on ${user.display_name}'s ${project.name
               } just got marked as approved`,
               Number(project.id),
               Number(project.first_pending_milestone) + 1
@@ -120,7 +117,7 @@ export default function VoteModal({
           setError({ message: result.errorMessage });
           setVisible(false);
           break;
-        } 
+        }
         await new Promise((f) => setTimeout(f, 1000));
       }
     } catch (error) {
@@ -130,14 +127,14 @@ export default function VoteModal({
     }
   };
 
-  const refund = async () => {
+  const refund = async (vote: boolean) => {
     if (!project?.id || !project.chain_project_id)
       return setError({
         message: 'No project found. Please try reloading the page',
       });
 
     // TODO make this a popup value like vote on milestone
-    const vote = false;
+    // const vote = false;
     setLoading(true);
 
     try {
@@ -360,6 +357,7 @@ export default function VoteModal({
             handleVote={handleVoteOnMilestone}
             handleRefund={refund}
             setVisible={setVisible}
+            refundOnly={refundOnly}
           />
         )}
 

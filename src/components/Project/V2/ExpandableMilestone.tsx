@@ -1,4 +1,5 @@
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { Button, Tooltip } from '@mui/material';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -8,7 +9,7 @@ import { WalletAccount } from '@talismn/connect-wallets';
 import axios from 'axios';
 import moment from 'moment';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { sendNotification } from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
@@ -20,7 +21,6 @@ import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 import { Milestone, OffchainProjectState, Project, User } from '@/model';
 import ChainService, { ImbueChainEvent } from '@/redux/services/chainService';
 import {
-  getMilestoneAttachments,
   uploadMilestoneAttachments,
   watchChain,
   withdrawOffchain,
@@ -43,7 +43,9 @@ interface ExpandableMilestonProps {
   canVote: boolean;
   loading: boolean;
   targetUser: any;
-  hasMilestoneAttachments: boolean;
+  balance: number;
+  balanceLoading: boolean;
+  // hasMilestoneAttachments: boolean;
 }
 
 const ExpandableMilestone = (props: ExpandableMilestonProps) => {
@@ -59,7 +61,9 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
     setSuccessTitle,
     setSuccess,
     targetUser,
-    hasMilestoneAttachments = false
+    balance,
+    balanceLoading,
+    // hasMilestoneAttachments = false
   } = props;
   const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
   const [submittingMilestone, setSubmittingMilestone] =
@@ -85,23 +89,23 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
     !project.project_in_milestone_voting &&
     !milestone?.is_approved;
 
-  const [attachments, setAttachment] = useState<any>([]);
+  // const [attachments, setAttachment] = useState<any>([]);
 
-  useEffect(() => {
-    const getAttachments = async () => {
-      if (!project?.id || milestone?.milestone_index === undefined) return;
+  // useEffect(() => {
+  //   const getAttachments = async () => {
+  //     if (!project?.id || milestone?.milestone_index === undefined) return;
 
-      const resp = await getMilestoneAttachments(
-        project.id,
-        milestone.milestone_index
-      );
-      setAttachment(resp);
-    };
+  //     const resp = await getMilestoneAttachments(
+  //       project.id,
+  //       milestone.milestone_index
+  //     );
+  //     setAttachment(resp);
+  //   };
 
-    if(hasMilestoneAttachments){ 
-      getAttachments();
-    }
-  }, [milestone.milestone_index, project.id]);
+  //   if(hasMilestoneAttachments){ 
+  //     getAttachments();
+  //   }
+  // }, [milestone.milestone_index, project.id]);
 
   const [files, setFiles] = useState<File[]>();
 
@@ -173,6 +177,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
               milestone.milestone_index,
               fileURLs
             );
+
             if (resp) {
               await sendNotification(
                 projectType === 'brief'
@@ -355,10 +360,8 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                 <span className='relative text-sm z-10'>{index + 1}</span>
                 <div className='w-2 h-2 -rotate-45 bg-[#2400FF] absolute -bottom-0.5  '></div>
               </div>
-              <p className='text-black ml-3 text-2xl'>
-                {milestone?.name?.length > 40
-                  ? milestone.name.substring(0, 40) + ' ...'
-                  : milestone.name}
+              <p className='text-black ml-3 text-2xl break-words w-11/12'>
+                {milestone?.name}
               </p>
             </div>
             <p className='col-start-7 col-end-9 text-lg mr-10 ml-4'>
@@ -406,14 +409,14 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
               <p className='mt-5 whitespace-pre-wrap break-words'>
                 {milestone.description}
               </p>
-              {attachments?.length ? (
+              {milestone.attachments?.length ? (
                 <div>
                   <p className='text-black mt-10 font-semibold text-lg'>
                     Project Attachments
                   </p>
                   <div className='grid grid-cols-6 gap-3'>
-                    {attachments?.length
-                      ? attachments.map((attachment: any, index: number) => (
+                    {milestone.attachments?.length
+                      ? milestone.attachments.map((attachment: any, index: number) => (
                         <a
                           className='col-span-1'
                           key={index}
@@ -482,7 +485,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                 </div>
               )}
 
-              <div className='w-full mt-7 flex'>
+              <div className='w-full mt-7'>
                 {!props?.loading && showVoteButton && (
                   <Tooltip
                     followCursor
@@ -506,17 +509,36 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                   </Tooltip>
                 )}
 
-                {showSubmitButton && (
-                  <button
-                    className='primary-btn  ml-auto in-dark w-button lg:w-1/5'
-                    style={{ textAlign: 'center' }}
-                    onClick={() =>
-                      handleSubmitMilestone(milestone.milestone_index)
-                    }
-                  >
-                    Submit Milestone
-                  </button>
-                )}
+                {
+                  showSubmitButton && (
+                    <div>
+                      <div className='w-full flex'>
+                        <button
+                          className='primary-btn  ml-auto in-dark w-button lg:w-1/5'
+                          style={{ textAlign: 'center' }}
+                          onClick={() =>
+                            handleSubmitMilestone(milestone.milestone_index)
+                          }
+                        >
+                          Submit Milestone
+                        </button>
+                      </div>
+
+
+                      {
+                        balance === 0 && !balanceLoading && project?.brief_id && (
+                          <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-imbue-coral px-3 py-1 text-sm text-white w-fit ml-auto mt-3 '>
+                            <ErrorOutlineOutlinedIcon className='h-4 w-4 inline' />
+                            <p className='inline'>
+                              No funds have been deposited to the escrow address. If you still want to submit your work the risks are upto you.
+                            </p>
+                          </div>
+                        )
+                      }
+                    </div>
+
+                  )
+                }
 
                 {isApplicant && milestone.is_approved && (
                   <button

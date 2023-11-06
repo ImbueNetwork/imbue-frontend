@@ -30,6 +30,10 @@ textarea {
   resize: none;
 }
 
+.evenShadow:focus-within {
+  box-shadow: 1px 1px 5px #3500fc;
+}
+
 .font-inter {
   font-family: 'Inter', sans-serif;
 }
@@ -671,7 +675,7 @@ input[type='radio'] {
   background: #d2d2d2;
   left: 4px;
   right: 4px;
-  top: 6px;
+  top: 4px;
   bottom: 6px;
   border-radius: 10px;
 }
@@ -693,7 +697,7 @@ input[type='radio'] {
   background: var(--theme-purple);
   /* left: 4px;
   right: 4px; */
-  margin-top: 6px;
+  margin-top: 4px;
   /* top: 6px;
   bottom: 6px; */
   z-index: 1;
