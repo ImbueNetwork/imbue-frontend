@@ -103,12 +103,9 @@ export const SubmitProposal = (): JSX.Element => {
     !loadingUser && getUserAndFreelancer();
   }, [briefId, user?.username, loadingUser, profileView]);
 
-
-
   useEffect(() => {
-    connect()
+    connect();
   });
-
 
   const getWeb3Modal = async () => {
     const web3Modal = new Web3Modal({
@@ -246,6 +243,7 @@ export const SubmitProposal = (): JSX.Element => {
           total_cost_without_fee: totalCostWithoutFee,
           imbue_fee: imbueFee,
           currency_id: currencyId,
+          owner: user.web3_address,
           milestones: milestones
             .filter((m) => m.amount !== undefined)
             .map((m) => {
@@ -263,7 +261,7 @@ export const SubmitProposal = (): JSX.Element => {
           duration_id: durationId,
           description: brief?.description,
           verified_only: brief.verified_only,
-          payment_address: currencyId >= 100 ? paymentAddress : null,
+          payment_address: currencyId >= 100 ? paymentAddress : undefined,
         }),
       });
       if (resp.ok) {
@@ -273,7 +271,7 @@ export const SubmitProposal = (): JSX.Element => {
         await sendNotification(
           [brief.user_id],
           'breif.test.applied',
-          'Some one might have interested in your breif',
+          `You have a new brief application for brief ${brief.headline}`,
           `Submit a proposal`,
           briefId,
           applicationId

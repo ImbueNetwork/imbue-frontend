@@ -120,7 +120,6 @@ const GrantApplication = (): JSX.Element => {
   };
 
 
-  /* web3Modal configuration for enabling wallet access */
   const getWeb3Modal = async () => {
     const web3Modal = new Web3Modal({
       cacheProvider: false,
@@ -133,11 +132,6 @@ const GrantApplication = (): JSX.Element => {
     return web3Modal
   }
 
-  useEffect(() => {
-    connect()
-  })
-
-  /* the connect function uses web3 modal to connect to the user's wallet */
   const connect = async () => {
     try {
       const web3Modal = await getWeb3Modal();
@@ -150,6 +144,9 @@ const GrantApplication = (): JSX.Element => {
     }
   }
 
+  useEffect(() => {
+    connect();
+  });
   const onRemoveMilestone = (index: number) => {
     if (milestones.length <= 1) return;
 
