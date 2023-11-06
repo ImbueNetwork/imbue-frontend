@@ -44,6 +44,7 @@ export const getCurrentUser = async () => {
     }
   } catch (error) {
     console.log(error);
+    return null;
   }
   return null;
 };

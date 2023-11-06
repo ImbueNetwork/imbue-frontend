@@ -2,7 +2,12 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import passport from 'passport';
 
-import { fetchProjectById, updateMilestone } from '@/lib/models';
+import {
+  fetchProjectById,
+  updateMilestone,
+  updateProjectVoting,
+} from '@/lib/models';
+import { fetchProjectApprovers } from '@/lib/models';
 import {
   addVoteToDB,
   checkExistingVote,
@@ -90,7 +95,7 @@ export default nextConnect()
           return res.status(500).json({ message: 'Nothing to update' });
 
         if (!existingVote?.id) {
-          const resp = await addVoteToDB(
+          await addVoteToDB(
             projectId,
             milestoneIndex,
             voterAddress,
@@ -98,23 +103,37 @@ export default nextConnect()
             vote
           )(tx);
 
-          if (resp?.length)
-            return res
-              .status(200)
-              .json({ status: 'success', milestoneApproved });
+          // if (resp?.length)
+          //   res.status(200).json({ status: 'success', milestoneApproved });
         } else {
-          const resp = await updateVoteDB(
-            projectId,
-            milestoneIndex,
-            vote,
-            voterAddress
-          )(tx);
+          await updateVoteDB(projectId, milestoneIndex, vote, voterAddress)(tx);
 
-          if (resp)
-            return res
-              .status(200)
-              .json({ status: 'success', milestoneApproved });
+          // if (resp)
+          //   res.status(200).json({ status: 'success', milestoneApproved });
         }
+
+        const yes = await getYesOrNoVotes(projectId, milestoneIndex, true)(tx);
+
+        const no = await getYesOrNoVotes(projectId, milestoneIndex, false)(tx);
+
+        const allVotersRes = await fetchProjectApprovers(projectId)(tx);
+
+        if (yes.length / allVotersRes.length >= 0.75) {
+          // closing voting round and approving milestone if treshold reached
+          await updateProjectVoting(Number(projectId), false)(tx);
+          await updateMilestone(projectId, milestoneIndex, {
+            is_approved: true,
+          })(tx);
+        } else if (
+          no.length / allVotersRes.length >= 0.75 ||
+          allVotersRes.length === yes.length + no.length
+        ) {
+          // closing voting round if all votes are done without approval
+          await updateProjectVoting(Number(projectId), false)(tx);
+        }
+
+        res.status(200).json({ status: 'success', milestoneApproved });
+        
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error(error);

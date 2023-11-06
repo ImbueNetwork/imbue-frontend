@@ -101,6 +101,27 @@ export const getMilestoneAttachments = async (
   }
 };
 
+export const completeMilestone = async (
+  projectId: number,
+  milestoneIndex: number,
+) => {
+  const resp = await fetch(
+    `${config.apiBase}/project/completeMilestone?projectId=${projectId}&milestoneIndex=${milestoneIndex}`,
+    {
+      headers: config.postAPIHeaders,
+      method: 'put',
+    }
+  );
+
+  if (resp.ok) {
+    return await resp.json();
+  } else {
+    return {
+      message: 'Failed to complete milestone. status:' + resp.status,
+    };
+  }
+};
+
 export const updateMilestone = async (
   projectId: number,
   milestoneIndex: number,
