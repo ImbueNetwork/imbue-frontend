@@ -103,10 +103,6 @@ export const SubmitProposal = (): JSX.Element => {
     !loadingUser && getUserAndFreelancer();
   }, [briefId, user?.username, loadingUser, profileView]);
 
-  useEffect(() => {
-    connect();
-  });
-
   const getWeb3Modal = async () => {
     const web3Modal = new Web3Modal({
       cacheProvider: false,

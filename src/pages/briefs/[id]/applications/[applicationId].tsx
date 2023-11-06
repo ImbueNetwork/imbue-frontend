@@ -129,12 +129,6 @@ const ApplicationPreview = (): JSX.Element => {
   }
 
   useEffect(() => {
-    if(isApplicationOwner) {
-      connect();
-    }
-  });
-
-  useEffect(() => {
     const getSetUpData = async () => {
       try {
         const brief: Brief | undefined = await getBrief(briefId);

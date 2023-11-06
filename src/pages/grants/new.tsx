@@ -143,10 +143,7 @@ const GrantApplication = (): JSX.Element => {
       console.log('error:', err)
     }
   }
-
-  useEffect(() => {
-    connect();
-  });
+  
   const onRemoveMilestone = (index: number) => {
     if (milestones.length <= 1) return;
 
