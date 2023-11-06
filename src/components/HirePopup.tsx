@@ -340,7 +340,7 @@ export const HirePopup = ({
             onClick={() => {
               setstage(2);
             }}
-            disabled={escrowBalance == 0}
+            disabled={escrowBalance>= totalCostWithoutFee}
             className='primary-btn in-dark w-button lg:w-1/3 lg:mx-16 disabled'
             style={{ textAlign: 'center' }}
           >
