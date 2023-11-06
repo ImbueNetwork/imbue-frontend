@@ -15,7 +15,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { sendNotification } from '@/utils';
-import { getBalance, getEVMContract, ERC_20_ABI } from '@/utils/helper';
+import { ERC_20_ABI,getBalance, getEVMContract } from '@/utils/helper';
 
 import { Currency, OffchainProjectState } from '@/model';
 import { changeBriefApplicationStatus } from '@/redux/services/briefService';
