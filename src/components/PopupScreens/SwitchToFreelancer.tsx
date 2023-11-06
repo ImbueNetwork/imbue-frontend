@@ -31,7 +31,7 @@ const SwitchToFreelancer = () => {
         const checkFreelancerProfile = async () => {
             try {
                 const freelancer = await getFreelancerProfile(user?.username);
-                if (!freelancer?.id) setIsFreelancer(false);
+                 setIsFreelancer(freelancer !== undefined);
             } catch (error) {
                 // eslint-disable-next-line no-console
                 console.log(error);
