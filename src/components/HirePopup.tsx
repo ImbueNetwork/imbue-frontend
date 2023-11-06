@@ -8,13 +8,14 @@ import Fade from '@mui/material/Fade';
 import Modal from '@mui/material/Modal';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { WalletAccount } from '@talismn/connect-wallets';
+import { ethers } from 'ethers'
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { sendNotification } from '@/utils';
-import { getBalance } from '@/utils/helper';
+import { getBalance,getEVMContract, ERC_20_ABI } from '@/utils/helper';
 
 import { Currency, OffchainProjectState } from '@/model';
 import { changeBriefApplicationStatus } from '@/redux/services/briefService';
@@ -81,14 +82,13 @@ export const HirePopup = ({
       setFreelancerImbueBalance(balance);
     };
 
-
     const updateEscrowInfo = async () => {
       const escrowAddress = await getOffchainEscrowAddress(application.id);
       setEscrowAddress(escrowAddress);
       const allBalances = await getOffchainEscrowBalance(application.id);
       const currency = Currency[application.currency_id].toString().toLowerCase();
       const escrowBalance = Number(allBalances[currency]) ?? 0;
-      setEscrowBalance(escrowBalance)
+      setEscrowBalance(escrowBalance);
     };
     updateEscrowInfo();
     openHirePopup && checkBalance();
@@ -272,6 +272,55 @@ export const HirePopup = ({
   };
 
   const SecondContent = () => {
+    const depositIntoEscrow = async () => {
+      switch(application.currency_id) {
+        case Currency.ETH: {
+          console.log("****** sign eth transaction.....");
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const signer = await provider.getSigner();
+          console.log("****** signer is ");
+          console.log(signer)
+          console.log("***** escrowAddress is");
+          console.log(escrowAddress);
+          console.log(totalCostWithoutFee);
+          const transferAmount = ethers.parseEther((totalCostWithoutFee).toPrecision(5).toString());
+
+          console.log("***** transferAmount is ");
+          console.log(transferAmount);
+          // const deposit_tx = await signer.sendTransaction({ to: application.escrow_address, value: transferAmount });
+
+          break;
+        }
+
+        case Currency.USDT: {
+          console.log("****** sign USDT transaction.....");
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const signer = await provider.getSigner();
+          console.log("****** signer is ");
+          console.log(signer);
+          console.log("***** escrowAddress is");
+          console.log(escrowAddress);
+          console.log(totalCostWithoutFee);
+          const contract = await getEVMContract(application.currency_id);
+
+          console.log("***** contract is");
+          console.log(contract);
+
+          if(!contract) { 
+            break;
+          }
+
+          const token = new ethers.Contract(contract.address, ERC_20_ABI, signer);
+          const transferAmount = ethers.parseUnits((totalCostWithoutFee - escrowBalance).toPrecision(5).toString(), contract.decimals);
+          const deposit_tx = await token
+          .transfer(escrowAddress, transferAmount);
+          break;
+        }
+
+      }
+    }
+
+    
     if (application.currency < 100) {
       return (
         <div className='flex flex-col justify-center items-center modal-container px-5 lg:px-0 lg:w-2/3 mx-auto my-auto text-content'>
@@ -336,17 +385,31 @@ export const HirePopup = ({
             </span>
             ${Currency[application.currency_id]}
           </p>
-          <button
-            onClick={() => {
-              setstage(2);
-            }}
-            disabled={escrowBalance < totalCostWithoutFee}
-            className='primary-btn in-dark w-button lg:w-1/3 lg:mx-16 disabled'
-            style={{ textAlign: 'center' }}
-          >
-            Hire
-          </button>
-        </div>
+          {escrowBalance < totalCostWithoutFee ? (
+            <button
+              onClick={() => depositIntoEscrow()}
+              className='primary-btn in-dark w-button lg:w-1/3 lg:mx-16 disabled'
+              style={{ textAlign: 'center' }}
+            >
+              Deposit Funds
+            </button>
+          ) : (
+            <button
+              onClick={
+                () => {
+                  setstage(2);
+                }
+              }
+              className='primary-btn in-dark w-button lg:w-1/3 lg:mx-16 disabled'
+              style={{ textAlign: 'center' }}
+            >
+              Hire
+            </button>
+          )
+          }
+
+
+        </div >
       );
     }
 
