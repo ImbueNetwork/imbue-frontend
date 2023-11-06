@@ -88,9 +88,8 @@ export class MultiChainService {
           }
 
         } else {
-          const core = await initWasm();
           const ethProvider = new ethers.JsonRpcProvider(RPC_URL);
-          const { HDWallet, AnyAddress } = core;
+          const { HDWallet, AnyAddress } = MultiChainService.core;
           const wallet = HDWallet.createWithMnemonic(WALLET_MNEMONIC!, "");
           const coinType = await this.getCoinType(currencyId);
 
@@ -128,8 +127,7 @@ export class MultiChainService {
   };
 
   public generateAddress = async (projectId: number, currencyId: number) => {
-    const core = await initWasm();
-    const { HDWallet, AnyAddress } = core;
+    const { HDWallet, AnyAddress } = MultiChainService.core;
     const wallet = HDWallet.createWithMnemonic(WALLET_MNEMONIC!, "");
     const coinType = await this.getCoinType(currencyId);
     const key = wallet.getDerivedKey(coinType, projectId, 0, projectId);
@@ -272,8 +270,7 @@ export class MultiChainService {
     let withdrawnAmount = 0;
     try {
       const ethProvider = new ethers.JsonRpcProvider(RPC_URL);
-      const core = await initWasm();
-      const { CoinType, HDWallet, HexCoding } = core;
+      const { CoinType, HDWallet, HexCoding } = MultiChainService.core;
       if (!WALLET_MNEMONIC) {
         return new Error(`Wallet Mnemonic not populated`);
       }
@@ -370,8 +367,7 @@ export class MultiChainService {
       if (!gasPrice) {
         return totalGasCost
       }
-      const core = await initWasm();
-      const { HDWallet, HexCoding } = core;
+      const { HDWallet, HexCoding } = MultiChainService.core;
       if (!WALLET_MNEMONIC) {
         return totalGasCost;
       }
