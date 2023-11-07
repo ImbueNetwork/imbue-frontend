@@ -15,7 +15,7 @@ import { Currency } from '@/model';
 import { ImbueChainEvent } from '@/redux/services/chainService';
 
 import { ERC_20_ABI,getEVMContract } from './helper';
-import { handleError, initPolkadotJSAPI } from './polkadot';
+import { handleError, initPolkadotJSAPI, PolkadotJsApiInfo } from './polkadot';
 
 const WALLET_MNEMONIC = process.env.WALLET_MNEMONIC;
 const RPC_URL = process.env.ETH_RPC_URL;
@@ -23,9 +23,11 @@ const RPC_URL = process.env.ETH_RPC_URL;
 
 export class MultiChainService {
   static core: WalletCore;
+  static imbueApi: PolkadotJsApiInfo;
   public static async build(): Promise<MultiChainService> {
     if(!this.core) {
       this.core = await initWasm();
+      this.imbueApi = await initPolkadotJSAPI(process.env.IMBUE_NETWORK_WEBSOCK_ADDR!); 
     }
     return new MultiChainService()
   }
@@ -58,10 +60,9 @@ export class MultiChainService {
         const currencyId = project.currency_id;
         const escrowAddress = project.escrow_address;
         if (currencyId < 100) {
-          const imbueApi = await initPolkadotJSAPI(process.env.IMBUE_NETWORK_WEBSOCK_ADDR!);
           switch (currencyId) {
             case Currency.IMBU: {
-              const balance: any = await imbueApi.api.query.system.account(
+              const balance: any = await MultiChainService.imbueApi.api.query.system.account(
                 escrowAddress
               );
               const imbueBalance = balance?.data?.free / 1e12;
@@ -69,7 +70,7 @@ export class MultiChainService {
             }
             case Currency.MGX: {
               const mgxResponse: any =
-                await imbueApi.api.query.ormlTokens.accounts(
+                await MultiChainService.imbueApi.api.query.ormlTokens.accounts(
                   escrowAddress,
                   currencyId
                 );
@@ -78,7 +79,7 @@ export class MultiChainService {
             }
             default: {
               const accountResponse: any =
-                await imbueApi.api.query.ormlTokens.accounts(
+                await MultiChainService.imbueApi.api.query.ormlTokens.accounts(
                   escrowAddress,
                   currencyId
                 );
@@ -138,7 +139,6 @@ export class MultiChainService {
 
   public mintTokens = async (projectId: number, beneficiary: string) => {
     const offchainEscrowBalance: any = await this.getBalance(projectId);
-    const imbueApi = await initPolkadotJSAPI(process.env.IMBUE_NETWORK_WEBSOCK_ADDR!);
     const { HDWallet, CoinType } = MultiChainService.core;
     const wallet = HDWallet.createWithMnemonic(WALLET_MNEMONIC!, '');
     const coinType = CoinType.polkadot;
@@ -162,7 +162,7 @@ export class MultiChainService {
         const mintAmount = BigInt(project.total_cost_without_fee! * 1e12);
         let transactionState: BasicTxResponse = {} as BasicTxResponse;
         transactionState.status = false;
-        const extrinsic = imbueApi.api.tx.imbueProposals
+        const extrinsic = MultiChainService.imbueApi.api.tx.imbueProposals
           .mintOffchainAssets(
             beneficiary,
             currency,
@@ -231,10 +231,9 @@ export class MultiChainService {
               .filter(milestone => !milestone.withdrawn_offchain)
               .map((milestone: any) => Number(milestone.milestone_index));
             withdrawnFunds = Number(await this.transfer(projectId, project.currency_id, project.payment_address, approvedFunds, withdrawableMilestones, coverFees));
+            keepCalling = false;
+            break;
           }
-
-          keepCalling = false;
-          break;
         }
       } catch (e: any) {
         throw new Error(e.message);
@@ -246,9 +245,8 @@ export class MultiChainService {
 
   getApprovedFunds = async (project: any, milestones: Milestone[]) => {
     let approvedFundsTotal = 0;
-    const imbueApi = await initPolkadotJSAPI(process.env.IMBUE_NETWORK_WEBSOCK_ADDR!);
     const projectOnChain: any = (
-      await imbueApi.api.query.imbueProposals.projects(
+      await MultiChainService.imbueApi.api.query.imbueProposals.projects(
         project.chain_project_id
       )
     ).toHuman();
