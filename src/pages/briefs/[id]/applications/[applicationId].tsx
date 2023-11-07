@@ -1,11 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Tooltip } from '@mui/material';
+import WalletConnectProvider from '@walletconnect/web3-provider'
 import Filter from 'bad-words';
+import { ethers } from 'ethers'
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import { FiEdit, FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
+import Web3Modal from 'web3modal'
 
 import { fetchProject, fetchUser } from '@/utils';
 import {
@@ -96,9 +99,35 @@ const ApplicationPreview = (): JSX.Element => {
   const [error, setError] = useState<any>();
   const [success, setSuccess] = useState<boolean>(false);
   const [openAccountChoice, setOpenAccountChoice] = useState<boolean>(false);
+  const [accounts, setAccounts] = useState<string[]>([]);
 
   const router = useRouter();
   const { id: briefId, applicationId }: any = router.query;
+
+  const getWeb3Modal = async () => {
+    const web3Modal = new Web3Modal({
+      cacheProvider: false,
+      providerOptions: {
+        walletconnect: {
+          package: WalletConnectProvider,
+        },
+      },
+    })
+    return web3Modal
+  }
+
+  const connect = async () => {
+    try {
+      const web3Modal = await getWeb3Modal();
+      const connection = await web3Modal.connect();
+      const provider = new ethers.BrowserProvider(connection);
+      const accounts = (await provider.listAccounts()).map(jsonProvider => jsonProvider.address);
+      setPaymentAddress(accounts[0]);
+      setAccounts(accounts)
+    } catch (err) {
+      console.log('error:', err)
+    }
+  }
 
   useEffect(() => {
     const getSetUpData = async () => {
@@ -317,7 +346,7 @@ const ApplicationPreview = (): JSX.Element => {
         chain_project_id: chainProjectId,
         escrow_address: escrow_address,
         duration_id: durationId,
-        payment_address: paymentAddress
+        payment_address: currencyId >= 100 ? paymentAddress : null,
       });
 
       if (resp.id) {
@@ -722,15 +751,31 @@ const ApplicationPreview = (): JSX.Element => {
 
                 <div className='network-amount'>
 
-                  {isApplicationOwner && isEditingBio ? (
-                    <input
-                      type='string'
-                      placeholder='Add a payment address'
-                      className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
-                      value={paymentAddress || ''}
-                      onChange={(e) => setPaymentAddress(e.target.value)}
-                      name='paymentAddress'
-                    />
+                  {isApplicationOwner && isEditingBio && currencyId >= 100 ? (
+                    <>
+                      {accounts.length == 0 ? (
+                        <button className='primary-btn in-dark w-button' onClick={connect}>Connect</button>
+                      ) : (
+                        <select
+                          name='paymentAddress'
+                          value={paymentAddress}
+                          onChange={(e) => setPaymentAddress(e.target.value)}
+                          placeholder='Select a payment address'
+                          className='bg-transparent round border border-imbue-purple rounded-[5px] text-base px-5 py-3 mt-4 w-full text-content-primary outline-content-primary'
+                          required
+                        >
+                          {accounts.map((account: string) => (
+                            <option
+                              value={account}
+                              key={account}
+                              className='hover:!bg-overlay'
+                            >
+                              {account}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </>
                   ) : (
                     <p className='text-content-primary mt-2 w-full lg:text-end'>
                       {paymentAddress}
@@ -831,7 +876,7 @@ const ApplicationPreview = (): JSX.Element => {
       </ErrorScreen>
 
       <BackDropLoader open={loading} />
-    </div>
+    </div >
   );
 };
 

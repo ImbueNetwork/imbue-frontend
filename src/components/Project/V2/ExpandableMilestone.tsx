@@ -277,7 +277,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
 
               if (project.currency_id < 100) {
                 setSuccess(true);
-                setSuccessTitle('Withdraw successfull');
+                setSuccessTitle('Withdraw successful');
               }
 
 
@@ -299,7 +299,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
           setError({ message: withdrawResult.errorMessage });
         } else {
           setSuccess(true);
-          setSuccessTitle('Withdraw successfull');
+          setSuccessTitle('Withdraw successful');
         }
         setLoading(false);
       }

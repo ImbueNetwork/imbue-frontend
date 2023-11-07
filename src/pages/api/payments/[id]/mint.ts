@@ -6,7 +6,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import passport from 'passport';
 
-import { mintTokens } from '@/utils/multichain';
+import { MultiChainService } from '@/utils/multichain';
 
 import { BasicTxResponse } from '@/model';
 
@@ -17,8 +17,9 @@ export default nextConnect()
     const { id } = req.query;
     const projectId = Number(id);
     const { beneficiary } = req.body;
+    const multichainService = await MultiChainService.build();
     try {
-      const result: BasicTxResponse = await mintTokens(projectId, beneficiary);
+      const result: BasicTxResponse = await multichainService.mintTokens(projectId, beneficiary);
       if (!result.txError) {
         return res.status(200).json(result);
       }

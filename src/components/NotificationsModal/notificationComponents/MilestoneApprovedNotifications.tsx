@@ -24,10 +24,9 @@ export default function MilestoneApprovedNotifications(activity: any) {
           {activity.data.title || 'Title'}
         </p>
         <p className='text-sm mt-3'>
-          Great news! The{' '}
+          Great news! a {' '}
           <span className='text-lg text-imbue-purple underline'>milestone</span>{' '}
-          has been successfully completed for the{' '}
-          <span className='text-lg text-imbue-purple underline'>project</span> .
+          has been successfully approved
         </p>
       </div>
     </div>
