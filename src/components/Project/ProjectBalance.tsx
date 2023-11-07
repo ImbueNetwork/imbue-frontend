@@ -56,12 +56,11 @@ const ProjectBalance = (props: ProjectBalanceType) => {
             setBalanceLoading(true)
             try {
                 const balance = await getBalance(
-                    project?.escrow_address,
                     currency_id,
                     user,
+                    project.currency_id < 100  ? project?.escrow_address : undefined,
                     Number(project.id)
                 );
-
                 if (!balance && project.status_id !== OffchainProjectState.Completed) {
                     handlePopUpForUser();
                 }
@@ -75,7 +74,7 @@ const ProjectBalance = (props: ProjectBalanceType) => {
         }
 
         getAndSetBalace();
-        if (!currency_id) {
+        if (currency_id == undefined) {
             setCurrency_id(project.currency_id);
         }
 

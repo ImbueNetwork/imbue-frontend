@@ -97,9 +97,9 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
       );
       if (resp.status === 200 || resp.status === 201) {
         const bl = await getBalance(
-          account.address,
           application.currency_id,
-          user
+          user,
+          account.address
         );
         setBalance(bl);
       } else {
@@ -117,15 +117,15 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
       try {
         setLoadingWallet('loading');
         const balance = await getBalance(
-          user?.web3_address,
           application?.currency_id ?? Currency.IMBU,
           user,
+          user?.web3_address,
           application.id
         );
         const imbueBalance = await getBalance(
-          user?.web3_address,
           Currency.IMBU,
-          user
+          user,
+          user?.web3_address
         );
         setBalance(balance.toLocaleString());
         setImbueBalance(imbueBalance.toLocaleString());

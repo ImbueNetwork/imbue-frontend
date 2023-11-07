@@ -86,9 +86,9 @@ export const HirePopup = ({
     const checkBalance = async () => {
       setFreelancerImbueBalance('Checking Imbue Balance');
       const balance = await getBalance(
-        freelancer.web3_address,
         Currency.IMBU,
-        user
+        user,
+        freelancer.web3_address,
       );
 
       setFreelancerImbueBalance(balance);

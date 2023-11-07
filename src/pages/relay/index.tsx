@@ -184,9 +184,9 @@ const Relay = () => {
       setRequestSent(true);
       try {
         const balance = await getBalance(
-          user.web3_address as string,
           currency_id,
-          user
+          user,
+          user.web3_address as string,
         );
 
         setBalance(balance || 0);
