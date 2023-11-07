@@ -1,42 +1,53 @@
-import { CircularProgress, IconButton, InputAdornment, OutlinedInput } from "@mui/material";
-import { SignerResult } from "@polkadot/api/types";
-import { WalletAccount } from "@talismn/connect-wallets";
+import {
+  CircularProgress,
+  IconButton,
+  InputAdornment,
+  OutlinedInput,
+} from '@mui/material';
+import { SignerResult } from '@polkadot/api/types';
+import { WalletAccount } from '@talismn/connect-wallets';
 import bcrypt from 'bcryptjs';
 // const PasswordStrengthBar = dynamic(() => import('react-password-strength-bar'));
-import Image from "next/image";
-import { useRouter } from "next/router";
-import { useRef, useState } from "react";
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import { useRef, useState } from 'react';
 // import PasswordStrengthBar from "react-password-strength-bar";
-const PasswordStrengthBar = dynamic(() => import('react-password-strength-bar'), {
-  ssr: false,
-})
+const PasswordStrengthBar = dynamic(
+  () => import('react-password-strength-bar'),
+  {
+    ssr: false,
+  }
+);
 
-import dynamic from "next/dynamic";
+import dynamic from 'next/dynamic';
 
-import { matchedByUserName, matchedByUserNameEmail } from "@/utils";
-import { isUrlAndSpecialCharacterExist, isValidEmail, validateInputLength } from "@/utils/helper";
+import { matchedByUserName, matchedByUserNameEmail } from '@/utils';
+import {
+  isUrlAndSpecialCharacterExist,
+  isValidEmail,
+  validateInputLength,
+} from '@/utils/helper';
 
-import Carousel from "@/components/Carousel/Carousel";
-import GoogleSignIn from "@/components/GoogleSignIn";
-import Web3WalletModal from "@/components/WalletModal/Web3WalletModal";
+import Carousel from '@/components/Carousel/Carousel';
+import GoogleSignIn from '@/components/GoogleSignIn';
+import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 
 import { postAPIHeaders } from '@/config';
-import { authorise, getAccountAndSign } from "@/redux/services/polkadotService";
-
+import { authorise, getAccountAndSign } from '@/redux/services/polkadotService';
 
 type FormErrorMessage = {
-  username: string
-  email: string
-  password: string
-  confirmPassword: string
-}
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
 
 const initialState = {
   username: '',
   email: '',
   password: '',
   confirmPassword: '',
-}
+};
 const invalidUsernames = [
   'username',
   'imbue',
@@ -65,27 +76,26 @@ export default function SignIn() {
   const [email, setEmail] = useState<any>();
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [password, setPassword] = useState<string>("");
+  const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<FormErrorMessage>(initialState);
-  const router = useRouter()
-
+  const router = useRouter();
 
   const fullData = user?.length && email?.length && password?.length;
-  const ErrorFound = !!(error.confirmPassword?.length ||
+  const ErrorFound = !!(
+    error.confirmPassword?.length ||
     error.password?.length ||
     error.username?.length ||
-    error.email?.length)
+    error.email?.length
+  );
 
-  const disableSubmit =
-    !fullData ||
-    loading || ErrorFound
+  const disableSubmit = !fullData || loading || ErrorFound;
 
   const salt = bcrypt.genSaltSync(10);
 
   const redirect = (path: string) => {
     window.location.href = `${window.location.origin}/${path}`;
-}
+  };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -106,7 +116,8 @@ export default function SignIn() {
       });
 
       if (resp.ok) {
-        redirect("/dashboard");
+        window.localStorage.setItem('newUser', '1');
+        redirect('/dashboard');
       } else {
         const errorMessage = await resp.json();
 
@@ -128,14 +139,13 @@ export default function SignIn() {
         account
       );
       if (resp.ok) {
-        redirect("/dashboard");
+        redirect('/dashboard');
       }
     } catch (error) {
       // FIXME: error handling
       console.log(error);
     }
   };
-
 
   const handleChange = async (event: any) => {
     const { name, value } = event.target;
@@ -145,56 +155,50 @@ export default function SignIn() {
         setError((val) => {
           return {
             ...val,
-            username: 'Username already taken'
-          }
+            username: 'Username already taken',
+          };
         });
         return;
-      }
-      else if (invalidUsernames.includes(value)) {
-
+      } else if (invalidUsernames.includes(value)) {
         setError((val) => {
           return {
             ...val,
-            username: 'Username is not allowed'
-          }
+            username: 'Username is not allowed',
+          };
         });
-      }
-      else if (value.includes(" ")) {
+      } else if (value.includes(' ')) {
         setError((val) => {
           return {
             ...val,
-            username: 'Username cannot contain spaces'
-          }
+            username: 'Username cannot contain spaces',
+          };
         });
         return;
-      }
-      else if (!validateInputLength(value, 5, 30)) {
+      } else if (!validateInputLength(value, 5, 30)) {
         setError((val) => {
           return {
             ...val,
-            username: 'Username must be between 5 and 30 characters'
-          }
+            username: 'Username must be between 5 and 30 characters',
+          };
         });
         return;
-      }
-      else if (isUrlAndSpecialCharacterExist(value)) {
+      } else if (isUrlAndSpecialCharacterExist(value)) {
         setError((val) => {
           return {
             ...val,
-            username: 'Username cannot contain special characters or url'
-          }
+            username: 'Username cannot contain special characters or url',
+          };
         });
         return;
-      }
-      else {
+      } else {
         setError((val) => {
           return {
             ...val,
-            username: ''
-          }
+            username: '',
+          };
         });
         setUser(value);
-      };
+      }
     }
     if (name === 'email') {
       const data = await matchedByUserNameEmail(value);
@@ -203,26 +207,24 @@ export default function SignIn() {
         setError((val) => {
           return {
             ...val,
-            email: 'Email is invalid'
-          }
+            email: 'Email is invalid',
+          };
         });
         return;
-      }
-      else if (data) {
+      } else if (data) {
         setError((val) => {
           return {
             ...val,
-            email: 'Email already in use'
-          }
+            email: 'Email already in use',
+          };
         });
         return;
-      }
-      else {
+      } else {
         setError((val) => {
           return {
             ...val,
-            email: ''
-          }
+            email: '',
+          };
         });
         setEmail(value);
       }
@@ -234,26 +236,25 @@ export default function SignIn() {
           setError((val) => {
             return {
               ...val,
-              password: 'password must be at least 5 characters'
-            }
+              password: 'password must be at least 5 characters',
+            };
           });
           return;
-        }
-        else if (!validatePassword(value)) {
+        } else if (!validatePassword(value)) {
           setError((val) => {
             return {
               ...val,
 
-              password: 'Password must be between 6 and 15 characters and contain at least one number and one special character'
-            }
+              password:
+                'Password must be between 6 and 15 characters and contain at least one number and one special character',
+            };
           });
-        }
-        else {
+        } else {
           setError((val) => {
             return {
               ...val,
-              password: ''
-            }
+              password: '',
+            };
           });
         }
         setPassword(value);
@@ -263,26 +264,27 @@ export default function SignIn() {
     }
   };
 
-
   const closeModal = (): void => {
     showPolkadotAccounts(true);
   };
 
-  const walletRef = useRef<any>(null)
+  const walletRef = useRef<any>(null);
 
   return (
     // <div className="w-full max-width-400px:mt-0 -mt-[100px] lg:mt-0 h-screen lg:h-auto flex justify-center items-center">
-    <div className="flex justify-center items-center absolute top-0 min-width-376px:inset-0">
-      <div className="bg-white flex sm:space-x-5 p-2 rounded-2xl mx-4">
-        <div className="left-side">
-          <div className="left-side hidden lg:block w-[28rem] h-full lg:w-[31.25rem]">
+    <div className='flex justify-center items-center absolute top-0 min-width-376px:inset-0'>
+      <div className='bg-white flex sm:space-x-5 p-2 rounded-2xl mx-4'>
+        <div className='left-side'>
+          <div className='left-side hidden lg:block w-[28rem] h-full lg:w-[31.25rem]'>
             <Carousel />
           </div>
         </div>
-        <div className="content px-4 sm:px-8 py-4 lg:py-8">
-          <h2 className="text-imbue-purple-dark text-[1.75rem]" >Sign up to Imbue Network</h2>
-          <p className="text-[#9794AB] mt-1" >Make web3 work for you</p>
-          <div className="flex sm:flex-row flex-col-reverse gap-2 mt-4 items-center">
+        <div className='content px-4 sm:px-8 py-4 lg:py-8'>
+          <h2 className='text-imbue-purple-dark text-[1.75rem]'>
+            Sign up to Imbue Network
+          </h2>
+          <p className='text-[#9794AB] mt-1'>Make web3 work for you</p>
+          <div className='flex sm:flex-row flex-col-reverse gap-2 mt-4 items-center'>
             <div className='login justify-center items-center w-full flex flex-col'>
               <li
                 // ref={googleParentRef}
@@ -291,7 +293,10 @@ export default function SignIn() {
                 <GoogleSignIn sizeRef={walletRef} />
               </li>
             </div>
-            <div ref={walletRef} className='login justify-center items-center w-full flex flex-col'>
+            <div
+              ref={walletRef}
+              className='login justify-center items-center w-full flex flex-col'
+            >
               <li
                 className='flex flex-row items-center cursor-pointer w-full'
                 tabIndex={0}
@@ -301,13 +306,15 @@ export default function SignIn() {
                 <button className='h-[2.6rem] rounded-[1.56rem] border w-full justify-center hover:bg-imbue-lime-light transition-colors duration-300 px-5'>
                   <div className='flex text-xs sm:text-sm  text-[#344F00] justify-center items-center'>
                     <Image
-                      src={"/wallet.svg"}
+                      src={'/wallet.svg'}
                       width={32}
                       height={20}
                       alt='Wallet-icon'
                       className='relative right-2 w-5 lg:w-auto'
                     />
-                    <p className="lg:font-medium font-semibold font-inter">Sign up with wallet</p>
+                    <p className='lg:font-medium font-semibold font-inter'>
+                      Sign up with wallet
+                    </p>
                   </div>
                 </button>
               </li>
@@ -334,7 +341,10 @@ export default function SignIn() {
               <input
                 placeholder='victorimbue@gmail.com'
                 onChange={handleChange}
-                onKeyDown={(e) => (e.key === 'Enter') && document.getElementsByName('user')[0].focus()}
+                onKeyDown={(e) =>
+                  e.key === 'Enter' &&
+                  document.getElementsByName('user')[0].focus()
+                }
                 className='outlinedInput text-[0.875rem]'
                 required
                 // eslint-disable-next-line no-console
@@ -356,7 +366,10 @@ export default function SignIn() {
                 autoComplete='off'
                 placeholder='victordoe'
                 onChange={handleChange}
-                onKeyDown={(e) => (e.key === 'Enter') && document.getElementsByName('password')[0].focus()}
+                onKeyDown={(e) =>
+                  e.key === 'Enter' &&
+                  document.getElementsByName('password')[0].focus()
+                }
                 required
                 className='outlinedInput text-[0.875rem]'
                 name='user'
@@ -375,67 +388,96 @@ export default function SignIn() {
                 color='secondary'
                 notched={false}
                 className='h-[2.6rem] pl-[6px] text-[0.875rem]'
-                inputProps={
-                  { className: 'placeholder:text-[#D1D1D1] !text-black' }
-                }
+                inputProps={{
+                  className: 'placeholder:text-[#D1D1D1] !text-black',
+                }}
                 placeholder='*********'
                 type={showPassword ? 'text' : 'password'}
                 name='password'
                 onChange={handleChange}
-                onKeyDown={(e) => (e.key === 'Enter') && document.getElementsByName('submit')[0].click()}
+                onKeyDown={(e) =>
+                  e.key === 'Enter' &&
+                  document.getElementsByName('submit')[0].click()
+                }
                 endAdornment={
                   <InputAdornment position='end'>
                     <IconButton
                       aria-label='toggle password visibility'
                       onClick={() => setShowPassword(!showPassword)}
                       edge='end'
-                      className="mr-0"
+                      className='mr-0'
                     >
-                      {showPassword ? <Image className="h-5 w-5" src={require("../../../assets/svgs/eye.svg")} alt="" /> : <Image className="w-5 h-5" src={require("../../../assets/svgs/eyeClosed.svg")} alt="" />}
+                      {showPassword ? (
+                        <Image
+                          className='h-5 w-5'
+                          src={require('../../../assets/svgs/eye.svg')}
+                          alt=''
+                        />
+                      ) : (
+                        <Image
+                          className='w-5 h-5'
+                          src={require('../../../assets/svgs/eyeClosed.svg')}
+                          alt=''
+                        />
+                      )}
                     </IconButton>
                   </InputAdornment>
                 }
               />
               <PasswordStrengthBar password={password} />
-              <p className={`${!error ? 'hide' : 'error'} w-full max-w-sm text-sm my-1`}>
+              <p
+                className={`${
+                  !error ? 'hide' : 'error'
+                } w-full max-w-sm text-sm my-1`}
+              >
                 {error.password}
               </p>
             </div>
 
-            <div className="flex flex-col space-y-2 text-imbue-purple-dark items-center">
-              <p className="text-black">Password strength requirement</p>
-              <div className="flex text-[#A1A1A1] text-sm space-x-4">
-                <div className="flex flex-col items-center">
-                  <p className="text-lg md:text-xl text-lime-600 font-semibold">8+</p>
-                  <p className="text-xs lg:text">Characters</p>
+            <div className='flex flex-col space-y-2 text-imbue-purple-dark items-center'>
+              <p className='text-black'>Password strength requirement</p>
+              <div className='flex text-[#A1A1A1] text-sm space-x-4'>
+                <div className='flex flex-col items-center'>
+                  <p className='text-lg md:text-xl text-lime-600 font-semibold'>
+                    8+
+                  </p>
+                  <p className='text-xs lg:text'>Characters</p>
                 </div>
-                <div className="flex flex-col items-center">
-                  <p className="text-lg md:text-xl text-lime-600 font-semibold">AA</p>
-                  <p className="text-xs lg:text">Uppercase</p>
+                <div className='flex flex-col items-center'>
+                  <p className='text-lg md:text-xl text-lime-600 font-semibold'>
+                    AA
+                  </p>
+                  <p className='text-xs lg:text'>Uppercase</p>
                 </div>
-                <div className="flex flex-col items-center">
-                  <p className="text-lg md:text-xl text-red-600 font-semibold">aa</p>
-                  <p className="text-xs lg:text">Lowercase</p>
+                <div className='flex flex-col items-center'>
+                  <p className='text-lg md:text-xl text-red-600 font-semibold'>
+                    aa
+                  </p>
+                  <p className='text-xs lg:text'>Lowercase</p>
                 </div>
-                <div className="flex flex-col items-center">
-                  <p className="text-lg md:text-xl text-gray-600 font-semibold">123</p>
-                  <p className="text-xs lg:text">Numbers</p>
+                <div className='flex flex-col items-center'>
+                  <p className='text-lg md:text-xl text-gray-600 font-semibold'>
+                    123
+                  </p>
+                  <p className='text-xs lg:text'>Numbers</p>
                 </div>
-                <div className="flex flex-col items-center">
-                  <p className="text-lg md:text-xl text-gray-600 font-semibold" >$#^</p>
-                  <p className="text-xs lg:text">Symbol</p>
+                <div className='flex flex-col items-center'>
+                  <p className='text-lg md:text-xl text-gray-600 font-semibold'>
+                    $#^
+                  </p>
+                  <p className='text-xs lg:text'>Symbol</p>
                 </div>
               </div>
             </div>
 
-
             <div className='flex justify-center mt-4 w-full cursor-pointer'>
               <button
                 type='submit'
-                name="submit"
+                name='submit'
                 disabled={disableSubmit}
-                className={`primary-btn in-dark w-full !text-center relative group !mx-0 ${disableSubmit && '!bg-gray-400 !text-white'
-                  }`}
+                className={`primary-btn in-dark w-full !text-center relative group !mx-0 ${
+                  disableSubmit && '!bg-gray-400 !text-white'
+                }`}
                 id='create-account'
               >
                 {loading && (
@@ -453,18 +495,28 @@ export default function SignIn() {
             </div>
 
             <div className='mx-auto w-fit mt-5'>
-              <span className='text-[#9794AB] text-sm'>
-                Already on Imbue?
-              </span>
+              <span className='text-[#9794AB] text-sm'>Already on Imbue?</span>
               <span
                 className='signup text-imbue-purple-dark  ml-1 hover:underline cursor-pointer'
-                onClick={() => { router.push("/auth/sign-in") }}
+                onClick={() => {
+                  router.push('/auth/sign-in');
+                }}
               >
                 Sign In
               </span>
             </div>
           </form>
-          <p className="text-xs text-black">By signing up, you agree with Imbue’s <a href='https://www.imbue.network/blogs/terms' target='_blank' className="underline">Terms & Conditions</a>  and Privacy Policy.</p>
+          <p className='text-xs text-black'>
+            By signing up, you agree with Imbue’s{' '}
+            <a
+              href='https://www.imbue.network/blogs/terms'
+              target='_blank'
+              className='underline'
+            >
+              Terms & Conditions
+            </a>{' '}
+            and Privacy Policy.
+          </p>
         </div>
       </div>
 
@@ -472,9 +524,9 @@ export default function SignIn() {
         {...{
           polkadotAccountsVisible,
           showPolkadotAccounts,
-          accountSelected
+          accountSelected,
         }}
       />
     </div>
-  )
+  );
 }

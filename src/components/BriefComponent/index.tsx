@@ -1,5 +1,3 @@
-import StarIcon from '@mui/icons-material/Star';
-import { Rating } from '@mui/material';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en.json';
 import Image from 'next/image';
@@ -135,7 +133,11 @@ export default function BriefComponent({ brief }: { brief: any }) {
             <span className='text-imbue-purple mr-1.5'>
               <HiOutlineCurrencyDollar size={20} />
             </span>
-            ${user_Activites.totalSpent} total spent
+            $
+            {user_Activites.totalSpent >= 1000
+              ? Math.trunc(user_Activites.totalSpent / 1000) + 'k'
+              : user_Activites.totalSpent}{' '}
+            total spent
           </p>
           <p className='flex items-center'>
             <span className='text-imbue-purple mr-2'>
@@ -145,7 +147,7 @@ export default function BriefComponent({ brief }: { brief: any }) {
           </p>
         </div>
         <div className='text-xs pt-3 px-7 text-black'>
-          <Rating
+          {/* <Rating
             className='text-base'
             name='text-feedback'
             value={4.68}
@@ -154,9 +156,9 @@ export default function BriefComponent({ brief }: { brief: any }) {
             emptyIcon={
               <StarIcon style={{ opacity: 0.55 }} fontSize='inherit' />
             }
-          />
+          /> */}
           <div className='flex mt-1 justify-between'>
-            <p>4.68 of 40 reviews</p>
+            {/* <p>4.68 of 40 reviews</p> */}
             <p>Member since: {timeAgo.format(new Date(brief.joined))}</p>
           </div>
         </div>

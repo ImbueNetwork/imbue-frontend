@@ -59,7 +59,8 @@ export default nextConnect()
         if (
           date == 'Monday' &&
           userAnalytics &&
-          userAnalytics.analytics['Monday'].date === date1.getDate()
+          userAnalytics.analytics['Monday'].date !== date1.getDate() &&
+          !userAnalytics.analytics['Monday'].visitor.includes(user_id)
         ) {
           const newCount = {
             analytics: {
@@ -71,7 +72,8 @@ export default nextConnect()
               },
             },
           };
-          await updateUserAnalytics(freelancer_id, newCount)(tx);
+          const resp = await updateUserAnalytics(freelancer_id, newCount)(tx);
+          return res.status(200).json(resp);
         }
         if (date == 'Monday' && userAnalytics == undefined) {
           const newCount = {
@@ -84,7 +86,8 @@ export default nextConnect()
               },
             },
           };
-          await insertUserAnalytics(newCount)(tx);
+          const resp = await insertUserAnalytics(newCount)(tx);
+          return res.status(201).json(resp);
         }
 
         if (userAnalytics == undefined) {

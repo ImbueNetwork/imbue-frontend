@@ -10,6 +10,7 @@ import {
   InputAdornment,
   InputLabel,
   MenuItem,
+  OutlinedInput,
   Select,
   TextField,
   Tooltip,
@@ -102,6 +103,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const memberSince = moment(freelancer?.created).format('MMMM YYYY');
   const [prevUserName, setprevUserName] = useState(freelancer.username);
   const [titleError, settitleError] = useState<string | null>(null);
+  const [hourperrate, setHourPerrate] = useState<number | undefined>();
   const [skills, setSkills] = useState<string[]>(
     freelancer?.skills?.map(
       (skill: { id: number; name: string }) =>
@@ -547,20 +549,52 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                         {displayError}
                       </p>
                     )}
+
+                    <FormControl fullWidth sx={{ m: 1 }}>
+                      <InputLabel htmlFor='outlined-adornment-amount'>
+                        payment per hour
+                      </InputLabel>
+                      <OutlinedInput
+                        id='outlined-adornment-amount'
+                        label='payment per hour'
+                        onChange={(event: any) =>
+                          setHourPerrate(
+                            event.target.value > 0
+                              ? Math.trunc(event.target.value)
+                              : undefined
+                          )
+                        }
+                        className='w-full'
+                        value={hourperrate}
+                        defaultValue={freelancer?.hour_per_rate}
+                        placeholder='0.00'
+                        type='number'
+                        color='secondary'
+                        startAdornment={
+                          <InputAdornment position='start'>$</InputAdornment>
+                        }
+                      />
+                    </FormControl>
                   </>
                 ) : (
-                  <div className='flex gap-2'>
-                    <h3 className='!text-2xl z-[1] text-imbue-purple'>
-                      {freelancer?.display_name}
-                    </h3>
-                    {initFreelancer?.verified && (
-                      <div className='bg-[#EAFFC2] flex items-center px-2 rounded-full'>
-                        <VerifiedIcon htmlColor='#38e894' />
-                        <span className='text-sm ml-1 text-imbue-purple'>
-                          verified
-                        </span>
-                      </div>
-                    )}
+                  <div className='flex justify-between'>
+                    <div className='flex gap-2'>
+                      <h3 className='!text-2xl z-[1] text-imbue-purple'>
+                        {freelancer?.display_name}
+                      </h3>
+                      {initFreelancer?.verified && (
+                        <div className='bg-[#EAFFC2] flex items-center px-2 rounded-full'>
+                          <VerifiedIcon htmlColor='#38e894' />
+                          <span className='text-sm ml-1 text-imbue-purple'>
+                            verified
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <p className='text-imbue-purple text-xl'>
+                      ${Number(freelancer?.hour_per_rate).toFixed(2)}
+                      <span className='text-sm'>/hr</span>
+                    </p>
                   </div>
                 )}
 

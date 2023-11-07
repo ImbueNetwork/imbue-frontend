@@ -16,7 +16,10 @@ const LoginPopup = dynamic(() => import('@/components/LoginPopup/LoginPopup'));
 
 // import LoginPopup from '@/components/LoginPopup/LoginPopup';
 
+import { Modal } from '@mui/material';
+
 import { AppContext, AppContextType } from '@/components/Layout';
+import WelcomForNewUser from '@/components/WelcomeModalContent/WelcomeForNewUser';
 
 import { Project, User } from '@/model';
 import { Brief } from '@/model';
@@ -36,6 +39,7 @@ export type DashboardProps = {
 const Dashboard = (): JSX.Element => {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [client, setClient] = useState<StreamChat>();
+  const [newUser, setNewUser] = useState(false);
   const {
     user,
     loading: loadingUser,
@@ -47,6 +51,14 @@ const Dashboard = (): JSX.Element => {
   const [error, setError] = useState<any>(userError);
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const entity = window.localStorage.getItem('newUser');
+    if (entity) {
+      setNewUser(true);
+      window.localStorage.removeItem('newUser');
+    }
+  }, []);
 
   useEffect(() => {
     const setupStreamChat = async () => {
@@ -94,7 +106,9 @@ const Dashboard = (): JSX.Element => {
 
   return client ? (
     <div className='px-[15px]'>
-      
+      <Modal open={newUser} className='flex justify-center items-center'>
+        <WelcomForNewUser handleClose={setNewUser} />
+      </Modal>
       <ClientDashboard />
       <LoginPopup
         visible={loginModal}

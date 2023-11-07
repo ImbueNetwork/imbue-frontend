@@ -134,8 +134,9 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-xp-${index}`}
-            className={`${styles.freelanceXpItem} ${freelancingBefore === value ? styles.active : ''
-              }`}
+            className={`${styles.freelanceXpItem} ${
+              freelancingBefore === value ? styles.active : ''
+            }`}
             onClick={() => setFreelancingBefore(value)}
           >
             {label}
@@ -157,7 +158,13 @@ const Freelancer = (): JSX.Element => {
       <div className={styles.namePanelInputWrapper}>
         <OutlinedInput
           id='outlined-adornment-amount'
-          onChange={(event: any) => setHourPerrate(event.target.value)}
+          onChange={(event: any) =>
+            setHourPerrate(
+              event.target.value > 0
+                ? Math.trunc(event.target.value)
+                : undefined
+            )
+          }
           className='w-full'
           value={hourperrate}
           placeholder='0.00'
@@ -181,8 +188,9 @@ const Freelancer = (): JSX.Element => {
           <div
             key={index}
             data-testid={`freelance-goal-${index}`}
-            className={`${styles.freelanceXpItem} ${goal === value ? styles.active : ''
-              }`}
+            className={`${styles.freelanceXpItem} ${
+              goal === value ? styles.active : ''
+            }`}
             onClick={() => setGoal(value)}
           >
             {label}
@@ -422,6 +430,7 @@ const Freelancer = (): JSX.Element => {
     about,
     services?.length,
     step,
+    hourperrate,
   ]);
 
   const validate = (): boolean => {
@@ -457,7 +466,8 @@ const Freelancer = (): JSX.Element => {
       return false;
     } else if (step === 8 && !services.length) {
       return false;
-    }
+    } else if (step === 9 && (hourperrate === 0 || hourperrate === undefined))
+      return false;
     return true;
   };
 
@@ -561,9 +571,10 @@ const Freelancer = (): JSX.Element => {
                 }
               >
                 <button
-                  className={`primary-btn in-dark w-button !mt-0 ${disableSubmit &&
+                  className={`primary-btn in-dark w-button !mt-0 ${
+                    disableSubmit &&
                     '!bg-gray-400 !text-white !cursor-not-allowed'
-                    }`}
+                  }`}
                   data-testid='submit-button'
                   onClick={() => !disableSubmit && createProfile()}
                 >
@@ -579,9 +590,10 @@ const Freelancer = (): JSX.Element => {
                 }
               >
                 <button
-                  className={`primary-btn in-dark w-button !mt-0 ${disableSubmit &&
+                  className={`primary-btn in-dark w-button !mt-0 ${
+                    disableSubmit &&
                     '!bg-gray-400 !text-white !cursor-not-allowed'
-                    }`}
+                  }`}
                   data-testid='next-button'
                   onClick={() => !disableSubmit && setStep(step + 1)}
                 >
