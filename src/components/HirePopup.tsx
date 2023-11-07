@@ -48,7 +48,7 @@ export const HirePopup = ({
   const [escrowAddress, setEscrowAddress] = useState<string>('');
   const [escrowBalance, setEscrowBalance] = useState<number>(0);
   const router = useRouter();
-  const [freelancerBalance, setFreelancerBalance] = useState<number | string>(
+  const [freelancerImbueBalance, setFreelancerImbueBalance] = useState<number | string>(
     0
   );
 
@@ -71,14 +71,14 @@ export const HirePopup = ({
 
   useEffect(() => {
     const checkBalance = async () => {
-      setFreelancerBalance('Checking Balance');
+      setFreelancerImbueBalance('Checking Imbue Balance');
       const balance = await getBalance(
         freelancer.web3_address,
-        application?.currency_id,
+        Currency.IMBU,
         user
       );
 
-      setFreelancerBalance(balance);
+      setFreelancerImbueBalance(balance);
     };
 
 
@@ -96,12 +96,7 @@ export const HirePopup = ({
 
   const selectedAccount = async (account: WalletAccount) => {
     setLoading(true);
-
-    const mintResult = await mintTokens(application.id, account.address);
-    if (mintResult.txError) {
-      setError({ message: mintResult.errorMessage });
-    }
-
+    mintTokens(application.id, account.address);
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
     const briefOwners: string[] = user?.web3_address
@@ -181,9 +176,9 @@ export const HirePopup = ({
             <span className='text-xl text-secondary-dark-hover'>
               {freelancer?.display_name}
             </span>
-            {freelancerBalance !== 'Chekcing Balance' ? (
+            {freelancerImbueBalance !== 'Checking Imbue Balance' ? (
               <>
-                {Number(freelancerBalance) < 500 ? (
+                {Number(freelancerImbueBalance) < 500 ? (
                   <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-imbue-coral px-3 py-1 text-sm text-white'>
                     <ErrorOutlineOutlinedIcon className='h-4 w-4 inline' />
                     <p className='inline'>

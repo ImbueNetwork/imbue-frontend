@@ -26,7 +26,7 @@ export default function BriefComponent({ brief }: { brief: Brief }) {
     <div className='flex border-b hover:bg-imbue-light-purple-three cursor-pointer last:border-b-0'>
       <div
         onClick={() => router.push(`/briefs/${brief.id}`)}
-        className='py-9 px-7 max-w-[70%] w-full'
+        className='py-9 px-7 max-w-[70%] w-full break-words'
       >
         <p className='text-2xl text-imbue-purple-dark'>{brief.headline}</p>
         <div className='flex text-sm text-imbue-dark-coral gap-5 mt-5'>

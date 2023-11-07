@@ -1,13 +1,15 @@
 import { Avatar, AvatarGroup, LinearProgress } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { NoConfidenceVoter } from '@/lib/queryServices/projectQueries';
+import { initPolkadotJSAPI } from '@/utils/polkadot';
 
 import VoteModal from '@/components/ReviewModal/VoteModal';
 import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 
 import { Project, User } from '@/model';
+import ChainService from '@/redux/services/chainService';
 
 type MilestoneVoteBoxProps = {
     user: User;
@@ -38,6 +40,32 @@ const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
         // setMile stone key in view
         setMilestoneKeyInView(milestone_index);
     }
+
+    useEffect(() => {
+        const getNoConfidenceVotesChain = async () => {
+            if (!project.chain_project_id) return
+
+            const imbueApi = await initPolkadotJSAPI(
+                process.env.IMBUE_NETWORK_WEBSOCK_ADDR!
+            );
+            const relayChainApi = await initPolkadotJSAPI(
+                process.env.RELAY_CHAIN_WEBSOCK_ADDR!
+            );
+            const allApis = {
+                imbue: imbueApi,
+                relayChain: relayChainApi,
+            };
+
+            const chainService = new ChainService(allApis);
+
+            const noconfidenceVotes = await chainService.getNoConfidenceVoters(
+                Number(project.chain_project_id)
+            );
+            console.log("🚀 ~ file: NoConfidenceVoteBox.tsx:64 ~ getNoConfidenceVotesChain ~ noconfidenceVotes:", noconfidenceVotes)
+        }
+
+        getNoConfidenceVotesChain()
+    }, [project.chain_project_id])
 
     return (
         <div>

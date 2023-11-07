@@ -4,14 +4,14 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 import { Brief } from '@/model';
-import { getUserBriefs } from '@/redux/services/briefService';
 
 type ClientsHistoryType = {
     client: any;
     briefId: string;
+    allClientBriefs: any;
 }
 
-const ClientsHistory = ({ client, briefId }: ClientsHistoryType) => {
+const ClientsHistory = ({ client, briefId, allClientBriefs }: ClientsHistoryType) => {
     const [showClientHistory, setShowClientHistory] = useState<boolean>(false);
     const [clientBriefs, setClientAllBriefs] = useState<Brief[]>([])
     const [totalBriefs, setTotalBriefs] = useState<number>(0)
@@ -20,18 +20,16 @@ const ClientsHistory = ({ client, briefId }: ClientsHistoryType) => {
 
     useEffect(() => {
         const setUpClientHistory = async () => {
-            const res = await getUserBriefs(client.id)
-            // let allBriefs : Brief[] = []
-
-            // if(briefs?.briefsUnderReview?.length) allBriefs = [...allBriefs, ...briefs.briefsUnderReview]
-            // if(briefs?.acceptedBriefs?.length) allBriefs = [...allBriefs, ...briefs.acceptedBriefs]
-            const briefs = res.briefsUnderReview?.filter((brief: Brief) => brief.id != briefId)
+            if(!allClientBriefs) {
+                return
+            }
+            const briefs = allClientBriefs.briefsUnderReview?.filter((brief: Brief) => brief.id != briefId)
             setTotalBriefs(briefs?.length)
             briefs.splice(briefsToShow)
             setClientAllBriefs(briefs)
         }
         client?.id && setUpClientHistory()
-    }, [client?.id, briefId, briefsToShow])
+    }, [client?.id, briefId, allClientBriefs, briefsToShow])
 
     // const showBriefs = () =>{
     //     const truncatedBrief = [...clientBriefs]
