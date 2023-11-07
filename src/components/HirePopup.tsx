@@ -15,7 +15,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { sendNotification } from '@/utils';
-import { ERC_20_ABI,getBalance, getEVMContract } from '@/utils/helper';
+import { ERC_20_ABI, getBalance, getEVMContract } from '@/utils/helper';
 
 import { Currency, OffchainProjectState } from '@/model';
 import { changeBriefApplicationStatus } from '@/redux/services/briefService';
@@ -277,40 +277,50 @@ export const HirePopup = ({
 
   const SecondContent = () => {
     const depositIntoEscrow = async () => {
-
+      const transferAmount = totalCostWithoutFee - escrowBalance;
       switch (application.currency_id) {
         case Currency.ETH: {
           const provider = new ethers.BrowserProvider(window.ethereum);
           const signer = await provider.getSigner();
-          const transferAmount = ethers.parseEther((totalCostWithoutFee - escrowBalance).toPrecision(5).toString());
-          const depositTx = await signer.sendTransaction({ to: escrowAddress, value: transferAmount });
-          setDepositSuccess(true);
-          await provider.waitForTransaction(depositTx.hash, 1, 150000);
-          setDepositCompleted(true);
-          await updateEscrowInfo();
-          break;
+          const ethBalanceInWei = await provider.getBalance(signer.address);
+          const ethBalance = Number(ethers.formatEther(ethBalanceInWei));
+
+          if (ethBalance < transferAmount) {
+            setError({ message: `Insuffient $${Currency[application.currency_id]} balance` });
+            break;
+          }
+          else {
+            const transferAmountInWei = ethers.parseEther((transferAmount).toPrecision(5).toString());
+            const depositTx = await signer.sendTransaction({ to: escrowAddress, value: transferAmountInWei });
+            setDepositSuccess(true);
+            await provider.waitForTransaction(depositTx.hash, 1, 150000);
+            setDepositCompleted(true);
+            await updateEscrowInfo();
+            break;
+          }
         }
         case Currency.USDT: {
-
-          console.log("***** escrow address is ");
-          console.log(escrowAddress);
           const provider = new ethers.BrowserProvider(window.ethereum);
           const signer = await provider.getSigner();
           const contract = await getEVMContract(application.currency_id);
-          console.log("***** contract is ");
-          console.log(contract);
           if (!contract) {
+            setError({ message: "Contract address not found" });
             break;
           }
           const token = new ethers.Contract(contract.address, ERC_20_ABI, signer);
-          const transferAmount = ethers.parseUnits((totalCostWithoutFee - escrowBalance).toPrecision(5).toString(), contract.decimals);
-          const depositTx = await token
-            .transfer(escrowAddress, transferAmount);
-          setDepositSuccess(true);
-          await provider.waitForTransaction(depositTx.hash, 1, 150000);
-          setDepositCompleted(true);
-          await updateEscrowInfo();
-          break;
+          const usdtBalance = Number(ethers.formatUnits(await token.balanceOf(signer.address), await token.decimals()));
+          if (usdtBalance < transferAmount) {
+            setError({ message: `Insuffient $${Currency[application.currency_id]} balance` });
+          } else {
+            const transferAmountInWei = ethers.parseUnits((transferAmount).toPrecision(5).toString(), contract.decimals);
+            const depositTx = await token
+              .transfer(escrowAddress, transferAmountInWei);
+            setDepositSuccess(true);
+            await provider.waitForTransaction(depositTx.hash, 1, 150000);
+            setDepositCompleted(true);
+            await updateEscrowInfo();
+            break;
+          }
         }
       }
 
@@ -486,13 +496,13 @@ export const HirePopup = ({
       >
         <div className='flex flex-col gap-4 w-1/2'>
           <button
-          disabled={!depositCompleted}
-            onClick={() =>{setDepositSuccess(false); setstage(0)}} 
+            disabled={!depositCompleted}
+            onClick={() => { setDepositSuccess(false); setstage(0) }}
             className='primary-btn in-dark w-button w-full !m-0'
           >
 
 
-            {depositCompleted ? "Continue" : "Waiting for deposit confirmation......." }
+            {depositCompleted ? "Continue" : "Waiting for deposit confirmation......."}
           </button>
         </div>
       </SuccessScreen>
