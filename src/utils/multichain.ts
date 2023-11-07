@@ -313,7 +313,8 @@ export class MultiChainService {
               amount = currentEthBalance
             }
             const imbueFee = ethers.parseEther((amount * 0.05).toPrecision(5).toString());
-            const transferAmount = ethers.parseEther((amount).toPrecision(5).toString()) - imbueFee;
+            const additionalFees = await this.estimateGasCostsInEth(projectId, currencyId, destinationAddress, amount, true);
+            const transferAmount = ethers.parseEther((amount).toPrecision(5).toString()) - imbueFee - ethers.parseEther((additionalFees).toPrecision(5).toString());
             imbue_fee_transaction = await sender.sendTransaction({ to: treasuryAddress, value: imbueFee });
             withdrawal_transaction = await sender.sendTransaction({ to: destinationAddress, value: transferAmount });
             break;
@@ -389,6 +390,13 @@ export class MultiChainService {
       const privateKeyHex = HexCoding.encode(key.data());
       const sender = new ethers.Wallet(privateKeyHex, ethProvider);
       switch (currencyId) {
+        case Currency.ETH: {
+          const imbueFee = ethers.parseUnits((amount * 0.05).toPrecision(5).toString());
+          const transferAmount = ethers.parseUnits((amount).toPrecision(5).toString()) - imbueFee;
+          imbue_fee_gas_cost = await sender.estimateGas({ to: treasuryAddress, value: imbueFee });
+          withdrawal_gas_cost = await sender.estimateGas({ to: treasuryAddress, value: transferAmount });
+          break;
+        }
         case Currency.USDT: {
           const contract = await getEVMContract(currencyId);
           if (!contract) {
@@ -399,13 +407,14 @@ export class MultiChainService {
           const transferAmount = ethers.parseUnits((amount).toPrecision(5).toString(), contract.decimals) - imbueFee;
           imbue_fee_gas_cost = await token.transfer.estimateGas(treasuryAddress, imbueFee);
           withdrawal_gas_cost = await token.transfer.estimateGas(destinationAddress, transferAmount);
-          const gasAmount = includeTreasuryCover ? BigInt(imbue_fee_gas_cost + imbue_fee_gas_cost + withdrawal_gas_cost) : BigInt(imbue_fee_gas_cost + withdrawal_gas_cost);
-          const gasFeeInWei = gasAmount * gasPrice;
-          const gasFeeInETH = ethers.formatEther(gasFeeInWei);
-          totalGasCost = Number((Number(gasFeeInETH) * bufferCost).toPrecision(3));
           break;
         }
       }
+
+      const gasAmount = includeTreasuryCover ? BigInt(imbue_fee_gas_cost + imbue_fee_gas_cost + withdrawal_gas_cost) : BigInt(imbue_fee_gas_cost + withdrawal_gas_cost);
+      const gasFeeInWei = gasAmount * gasPrice;
+      const gasFeeInETH = ethers.formatEther(gasFeeInWei);
+      totalGasCost = Number((Number(gasFeeInETH) * bufferCost).toPrecision(5));
       return totalGasCost;
     } catch (e) {
       throw new Error(`Failed to estimate gas costs. ${e}`);
