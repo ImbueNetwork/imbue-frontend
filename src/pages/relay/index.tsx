@@ -152,7 +152,7 @@ const Relay = () => {
         }
       } else {
         const avilableBalance = Number(freeBalance.toBigInt() / BigInt(1e12));
-        const errorMessage = `Error: Insuffient balance to complete transfer. Available balance is ${avilableBalance.toFixed(
+        const errorMessage = `Error: Insufficient balance to complete transfer. Available balance is ${avilableBalance.toFixed(
           2
         )}`;
 

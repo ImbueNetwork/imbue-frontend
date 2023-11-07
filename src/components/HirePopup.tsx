@@ -286,7 +286,7 @@ export const HirePopup = ({
           const ethBalance = Number(ethers.formatEther(ethBalanceInWei));
 
           if (ethBalance < transferAmount) {
-            setError({ message: `Insuffient $${Currency[application.currency_id]} balance` });
+            setError({ message: `Insufficient $${Currency[application.currency_id]} balance in ${signer.address}` });
             break;
           }
           else {
@@ -310,7 +310,7 @@ export const HirePopup = ({
           const token = new ethers.Contract(contract.address, ERC_20_ABI, signer);
           const usdtBalance = Number(ethers.formatUnits(await token.balanceOf(signer.address), await token.decimals()));
           if (usdtBalance < transferAmount) {
-            setError({ message: `Insuffient $${Currency[application.currency_id]} balance` });
+            setError({ message: `Insufficient $${Currency[application.currency_id]} balance in ${signer.address}` });
           } else {
             const transferAmountInWei = ethers.parseUnits((transferAmount).toPrecision(5).toString(), contract.decimals);
             const depositTx = await token
