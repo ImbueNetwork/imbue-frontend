@@ -12,7 +12,7 @@ import {
   User,
 } from '@/lib/models';
 import { updateProject } from '@/lib/models';
-import { generateAddress } from '@/utils/multichain';
+import { MultiChainService } from '@/utils/multichain';
 
 import db from '@/db';
 
@@ -45,6 +45,8 @@ export default nextConnect()
     const grant: Grant = req.body as Grant;
     const filter = new Filter();
     const userAuth: Partial<User> | any = await authenticate('jwt', req, res);
+    const multichain = await MultiChainService.build();
+
     verifyUserIdFromJwt(req, res, [userAuth.id]);
     await db.transaction(async (tx: any) => {
       try {
@@ -62,7 +64,7 @@ export default nextConnect()
 
         const grantId = await insertGrant(filterdGrants)(tx);
         if (grant.currency_id >= 100) {
-          const offchainEscrowAddress = await generateAddress(Number(grantId), grant.currency_id);
+          const offchainEscrowAddress = await multichain.generateAddress(Number(grantId), grant.currency_id);
           const grantAsProject = await fetchProjectById(Number(grantId))(tx);
           if (grantAsProject) {
             grantAsProject.escrow_address = offchainEscrowAddress;

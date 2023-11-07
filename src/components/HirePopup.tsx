@@ -8,13 +8,14 @@ import Fade from '@mui/material/Fade';
 import Modal from '@mui/material/Modal';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { WalletAccount } from '@talismn/connect-wallets';
+import { ethers } from 'ethers'
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { sendNotification } from '@/utils';
-import { getBalance } from '@/utils/helper';
+import { ERC_20_ABI,getBalance, getEVMContract } from '@/utils/helper';
 
 import { Currency, OffchainProjectState } from '@/model';
 import { changeBriefApplicationStatus } from '@/redux/services/briefService';
@@ -44,6 +45,8 @@ export const HirePopup = ({
   const mobileView = useMediaQuery('(max-width:480px)');
 
   const [success, setSuccess] = useState<boolean>(false);
+  const [depositSuccess, setDepositSuccess] = useState<boolean>(false);
+  const [depositCompleted, setDepositCompleted] = useState<boolean>(false);
   const [error, setError] = useState<any>();
   const [escrowAddress, setEscrowAddress] = useState<string>('');
   const [escrowBalance, setEscrowBalance] = useState<number>(0);
@@ -69,6 +72,16 @@ export const HirePopup = ({
     zIndex: 1,
   };
 
+
+  const updateEscrowInfo = async () => {
+    const escrowAddress = await getOffchainEscrowAddress(application.id);
+    setEscrowAddress(escrowAddress);
+    const allBalances = await getOffchainEscrowBalance(application.id);
+    const currency = Currency[application.currency_id].toString().toLowerCase();
+    const escrowBalance = Number(allBalances[currency]) ?? 0;
+    setEscrowBalance(escrowBalance);
+  };
+
   useEffect(() => {
     const checkBalance = async () => {
       setFreelancerImbueBalance('Checking Imbue Balance');
@@ -81,15 +94,6 @@ export const HirePopup = ({
       setFreelancerImbueBalance(balance);
     };
 
-
-    const updateEscrowInfo = async () => {
-      const escrowAddress = await getOffchainEscrowAddress(application.id);
-      setEscrowAddress(escrowAddress);
-      const allBalances = await getOffchainEscrowBalance(application.id);
-      const currency = Currency[application.currency_id].toString().toLowerCase();
-      const escrowBalance = Number(allBalances[currency]) ?? 0;
-      setEscrowBalance(escrowBalance)
-    };
     updateEscrowInfo();
     openHirePopup && checkBalance();
   }, [freelancer.web3_address, application?.currency_id, user, openHirePopup]);
@@ -182,7 +186,7 @@ export const HirePopup = ({
                   <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-imbue-coral px-3 py-1 text-sm text-white'>
                     <ErrorOutlineOutlinedIcon className='h-4 w-4 inline' />
                     <p className='inline'>
-                      Freelance does not currently have the necessary deposit
+                      Freelancer does not currently have the necessary deposit
                       balance (500 $IMBU) to start the work
                     </p>
                   </div>
@@ -190,7 +194,7 @@ export const HirePopup = ({
                   <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-primary px-3 py-1 text-sm text-black'>
                     <CheckCircleOutlineIcon className='h-4 w-4 inline' />
                     <p className='inline'>
-                      Freelance currently has the necessary deposit balance (500
+                      Freelancer currently has the necessary deposit balance (500
                       $IMBU) to start the work
                     </p>
                   </div>
@@ -272,7 +276,47 @@ export const HirePopup = ({
   };
 
   const SecondContent = () => {
-    if (application.currency < 100) {
+    const depositIntoEscrow = async () => {
+
+      switch (application.currency_id) {
+        case Currency.ETH: {
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const signer = await provider.getSigner();
+          const transferAmount = ethers.parseEther((totalCostWithoutFee - escrowBalance).toPrecision(5).toString());
+          const depositTx = await signer.sendTransaction({ to: escrowAddress, value: transferAmount });
+          setDepositSuccess(true);
+          await provider.waitForTransaction(depositTx.hash, 1, 150000);
+          setDepositCompleted(true);
+          await updateEscrowInfo();
+          break;
+        }
+        case Currency.USDT: {
+
+          console.log("***** escrow address is ");
+          console.log(escrowAddress);
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const signer = await provider.getSigner();
+          const contract = await getEVMContract(application.currency_id);
+          console.log("***** contract is ");
+          console.log(contract);
+          if (!contract) {
+            break;
+          }
+          const token = new ethers.Contract(contract.address, ERC_20_ABI, signer);
+          const transferAmount = ethers.parseUnits((totalCostWithoutFee - escrowBalance).toPrecision(5).toString(), contract.decimals);
+          const depositTx = await token
+            .transfer(escrowAddress, transferAmount);
+          setDepositSuccess(true);
+          await provider.waitForTransaction(depositTx.hash, 1, 150000);
+          setDepositCompleted(true);
+          await updateEscrowInfo();
+          break;
+        }
+      }
+
+    }
+
+    if (application.currency_id < 100) {
       return (
         <div className='flex flex-col justify-center items-center modal-container px-5 lg:px-0 lg:w-2/3 mx-auto my-auto text-content'>
           <p className='text-center w-full text-lg lg:text-xl my-4 text-content-primary'>
@@ -336,17 +380,29 @@ export const HirePopup = ({
             </span>
             ${Currency[application.currency_id]}
           </p>
-          <button
-            onClick={() => {
-              setstage(2);
-            }}
-            disabled={escrowBalance == 0}
-            className='primary-btn in-dark w-button lg:w-1/3 lg:mx-16 disabled'
-            style={{ textAlign: 'center' }}
-          >
-            Hire
-          </button>
-        </div>
+          {escrowBalance < (totalCostWithoutFee) ? (
+            <button
+              onClick={() => depositIntoEscrow()}
+              className='primary-btn in-dark w-button lg:w-1/3 lg:mx-16 disabled'
+              style={{ textAlign: 'center' }}
+            >
+              Deposit Funds
+            </button>
+          ) : (
+            <button
+              onClick={
+                () => {
+                  setstage(2);
+                }
+              }
+              className='primary-btn in-dark w-button lg:w-1/3 lg:mx-16 disabled'
+              style={{ textAlign: 'center' }}
+            >
+              Hire
+            </button>
+          )
+          }
+        </div >
       );
     }
 
@@ -416,6 +472,27 @@ export const HirePopup = ({
             className='primary-btn in-dark w-button w-full !m-0'
           >
             Continue
+          </button>
+        </div>
+      </SuccessScreen>
+
+
+      <SuccessScreen
+        title={`Your transfer has been sent.
+
+        Please do not navigate away from this page until your transfer completes`}
+        open={depositSuccess}
+        setOpen={setDepositSuccess}
+      >
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+          disabled={!depositCompleted}
+            onClick={() =>{setDepositSuccess(false); setstage(0)}} 
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+
+
+            {depositCompleted ? "Continue" : "Waiting for deposit confirmation......." }
           </button>
         </div>
       </SuccessScreen>

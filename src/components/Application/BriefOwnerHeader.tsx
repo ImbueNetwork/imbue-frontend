@@ -336,7 +336,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
         </div>
 
         <div className='flex flex-col gap-1 mt-5 justify-center lg:items-end'>
-          <p className='text-content'>Balance</p>
+          <p className='text-content'>Escrow Balance</p>
           {application?.currency_id !== Currency.IMBU ? (
             <p className='text-sm text-imbue-purple'>
               {loadingWallet === 'loading' && 'Loading Wallet...'}
