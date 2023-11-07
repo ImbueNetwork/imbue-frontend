@@ -316,7 +316,7 @@ export const HirePopup = ({
 
     }
 
-    if (application.currency < 100) {
+    if (application.currency_id < 100) {
       return (
         <div className='flex flex-col justify-center items-center modal-container px-5 lg:px-0 lg:w-2/3 mx-auto my-auto text-content'>
           <p className='text-center w-full text-lg lg:text-xl my-4 text-content-primary'>
