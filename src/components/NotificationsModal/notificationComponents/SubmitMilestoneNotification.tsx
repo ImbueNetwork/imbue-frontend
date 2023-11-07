@@ -34,7 +34,7 @@ export default function SubmitMilestoneNotification(activity: any) {
             {activity.data.sender.display_name?.split(' ')[0] || 'someone'}
           </span>{' '}
           has submitted a
-          <span className='text-lg text-imbue-purple'>milestone</span> for the{' '}
+          <span className='text-lg text-imbue-purple'> milestone</span> for the{' '}
           <span className='text-lg text-imbue-purple'>project</span>. Take a
           moment to review and provide your feedback.
         </p>

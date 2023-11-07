@@ -89,13 +89,16 @@ export const getEVMContract = async (currencyId: number) => {
 };
 
 export const getBalance = async (
-  walletAddress: string,
   currency_id: number,
   user: any,
+  walletAddress?: string,
   projectId?: number
 ) => {
   try {
-    if(currency_id < 100) {
+
+    if(!walletAddress && currency_id<100) {
+      return 0
+    } else if(currency_id < 100 && walletAddress) {
       const imbueApi = await initImbueAPIInfo();
       const chainService = new ChainService(imbueApi, user);
       if (!walletAddress) return;
@@ -104,12 +107,11 @@ export const getBalance = async (
         currency_id
       );
       return balance;
-    } else if(projectId) {
+    } else if (projectId) {
       const allBalances = await getProjectBalance(projectId);
       const currency = Currency[currency_id].toLowerCase();
       return allBalances[currency];
-    }
-
+    } 
   } catch (error) {
     return {
       status: 'failed',

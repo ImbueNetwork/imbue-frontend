@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 import { ProgressBar } from '@/components/ProgressBar';
 
-import { applicationStatusId, Project } from '@/model';
+import { applicationStatusId, Currency, Project } from '@/model';
 
 interface OngoingProjectProps {
   projects: Project[];
@@ -105,7 +105,7 @@ const OngoingProject: React.FC<OngoingProjectProps> = ({ projects }) => {
                 </div>
                 <div className='flex pb-9 justify-between'>
                   <div className='flex space-x-5 text-sm text-imbue-purple-dark'>
-                    <p>${project.required_funds}</p>
+                    <p>{project.required_funds} ${Currency[project.currency_id]}</p>
                     <p>Fixed price</p>
                   </div>
                 </div>
