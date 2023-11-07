@@ -2,8 +2,10 @@ import { Alert, Dialog, IconButton, Tooltip } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import WalletIcon from '@svgs/wallet.svg';
 import { WalletAccount } from '@talismn/connect-wallets';
+import WalletConnectProvider from '@walletconnect/web3-provider'
 // import ChainService from '@/redux/services/chainService';
 import Filter from 'bad-words';
+import { ethers } from 'ethers'
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -11,6 +13,7 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import { FaRegCopy } from 'react-icons/fa';
 import { FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
+import Web3Modal from 'web3modal'
 
 import { sendNotification } from '@/utils';
 import { showErrorMessage } from '@/utils/errorMessages';
@@ -73,6 +76,7 @@ const GrantApplication = (): JSX.Element => {
   const [projectId, setProjectId] = useState<number>();
   const [copied, setCopied] = useState<boolean>(false);
   const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
+  const [accounts, setAccounts] = useState<string[]>([]);
 
   const copyAddress = () => {
     setCopied(true);
@@ -114,6 +118,32 @@ const GrantApplication = (): JSX.Element => {
       { name: '', amount: undefined, description: '' },
     ]);
   };
+
+
+  const getWeb3Modal = async () => {
+    const web3Modal = new Web3Modal({
+      cacheProvider: false,
+      providerOptions: {
+        walletconnect: {
+          package: WalletConnectProvider,
+        },
+      },
+    })
+    return web3Modal
+  }
+
+  const connect = async () => {
+    try {
+      const web3Modal = await getWeb3Modal();
+      const connection = await web3Modal.connect();
+      const provider = new ethers.BrowserProvider(connection);
+      const accounts = (await provider.listAccounts()).map(jsonProvider => jsonProvider.address);
+      setPaymentAddress(accounts[0]);
+      setAccounts(accounts)
+    } catch (err) {
+      console.log('error:', err)
+    }
+  }
 
   const onRemoveMilestone = (index: number) => {
     if (milestones.length <= 1) return;
@@ -191,7 +221,7 @@ const GrantApplication = (): JSX.Element => {
         total_cost_without_fee: totalCostWithoutFee,
         imbue_fee: imbueFee,
         chain_project_id: projectId,
-        payment_address: paymentAddress,
+        payment_address: currencyId >= 100 ? paymentAddress : null,
         milestones: milestones.map((milestone) => ({
           ...milestone,
           name: filter.clean(milestone.name),
@@ -562,20 +592,36 @@ const GrantApplication = (): JSX.Element => {
                 </select>
               </div>
             </div>
+            {currencyId >= 100 && (
             <div>
-              <p className='text-lg text-content m-0 p-0'>Payment Address:</p>
-              <div>
-                <input
-                  autoComplete='off'
+            <p className='text-lg text-content m-0 p-0'>Payment Address:</p>
+            <div>
+              {accounts.length == 0 ? (
+                <button className='primary-btn in-dark w-button' onClick={connect}>Connect</button>
+              ) : (
+                <select
+                  name='paymentAddress'
                   value={paymentAddress}
-                  maxLength={50}
-                  placeholder='Address to receive payment'
-                  onChange={handleChange}
-                  name='mainPaymentAddress'
-                  className='bg-transparent border border-imbue-purple rounded-md p-4 placeholder:text-imbue-light-purple text-imbue-purple outline-content-primary mt-4'
-                />
-              </div>
+                  onChange={(e) => setPaymentAddress(e.target.value)}
+                  placeholder='Select a payment address'
+                  className='bg-transparent round border border-imbue-purple rounded-[5px] text-base px-5 py-3 mt-4 w-full text-content-primary outline-content-primary'
+                  required
+                >
+                  {accounts.map((account: string) => (
+                    <option
+                      value={account}
+                      key={account}
+                      className='hover:!bg-overlay'
+                    >
+                      {account}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
+          </div>
+            )}
+
           </div>
         </div>
         <div className='text-[20px] text-content lg:pl-12 py-5 border-b'>
