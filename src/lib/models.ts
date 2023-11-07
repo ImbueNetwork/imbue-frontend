@@ -1418,8 +1418,9 @@ export const updateFreelancerDetails =
     web3_type: string,
     web3_challenge: string,
     // eslint-disable-next-line unused-imports/no-unused-vars
-    freelancer_clients: Array<{ id: number; name: string; img: string }>
+    freelancer_clients: Array<{ id: number; name: string; img: string }>,
     // token: string
+    hour_per_rate: number
   ) =>
   async (tx: Knex.Transaction) =>
     await tx<Freelancer>('freelancers')
@@ -1436,6 +1437,7 @@ export const updateFreelancerDetails =
         telegram_link: f.telegram_link,
         discord_link: f.discord_link,
         user_id: f.user_id,
+        hour_per_rate,
       })
       .where({ user_id: userId })
       .returning('id')

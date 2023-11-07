@@ -103,7 +103,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const memberSince = moment(freelancer?.created).format('MMMM YYYY');
   const [prevUserName, setprevUserName] = useState(freelancer.username);
   const [titleError, settitleError] = useState<string | null>(null);
-  const [hourperrate, setHourPerrate] = useState<number | undefined>();
+  const [hourperrate, setHourPerrate] = useState<number | undefined>(
+    freelancer.hour_per_rate
+  );
   const [skills, setSkills] = useState<string[]>(
     freelancer?.skills?.map(
       (skill: { id: number; name: string }) =>
@@ -199,6 +201,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           skills: skills,
           clients: clients,
           logged_in_user: browsingUser.id === initFreelancer.user_id,
+          hour_per_rate: hourperrate,
         };
 
         const resp: any = await updateFreelancer(data);
@@ -551,7 +554,10 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                     )}
 
                     <FormControl fullWidth sx={{ m: 1 }}>
-                      <InputLabel htmlFor='outlined-adornment-amount'>
+                      <InputLabel
+                        className='!text-imbue-purple'
+                        htmlFor='outlined-adornment-amount'
+                      >
                         payment per hour
                       </InputLabel>
                       <OutlinedInput
@@ -571,7 +577,12 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                         type='number'
                         color='secondary'
                         startAdornment={
-                          <InputAdornment position='start'>$</InputAdornment>
+                          <InputAdornment
+                            className='text-imbue-purple'
+                            position='start'
+                          >
+                            $
+                          </InputAdornment>
                         }
                       />
                     </FormControl>
