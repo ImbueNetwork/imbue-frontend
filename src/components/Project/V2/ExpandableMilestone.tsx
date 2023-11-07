@@ -18,7 +18,7 @@ import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 import VoteModal from '@/components/ReviewModal/VoteModal';
 import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 
-import { Milestone, OffchainProjectState, Project, User } from '@/model';
+import { Currency, Milestone, OffchainProjectState, Project, User } from '@/model';
 import ChainService, { ImbueChainEvent } from '@/redux/services/chainService';
 import {
   uploadMilestoneAttachments,
@@ -365,7 +365,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
               </p>
             </div>
             <p className='col-start-7 col-end-9 text-lg mr-10 ml-4'>
-              ${milestone.amount}
+              {milestone.amount} ${Currency[project.currency_id]}
             </p>
             <p className='col-start-9 text-lg col-end-11 ml-4'>
               {moment(milestone.modified).format('MMM Do YY')}
