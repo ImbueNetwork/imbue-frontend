@@ -51,9 +51,7 @@ const ProjectBalance = (props: ProjectBalanceType) => {
     useEffect(() => {
         const getAndSetBalace = async () => {
             if (
-                !project?.escrow_address ||
-                currency_id === undefined ||
-                !user.id
+                currency_id === undefined
             ) return
             setBalanceLoading(true)
             try {
