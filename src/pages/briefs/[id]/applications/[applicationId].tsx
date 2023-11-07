@@ -590,10 +590,10 @@ const ApplicationPreview = (): JSX.Element => {
                           </>
                         ) : (
                           <p className='text-[1rem] text-[#3B27C180] m-0'>
-                            $
+                            
                             {Number(
                               milestones[index]?.amount?.toFixed(2)
-                            )?.toLocaleString?.()}
+                            )?.toLocaleString?.()} ${Currency[currencyId]}
                           </p>
                         )}
 
@@ -647,7 +647,7 @@ const ApplicationPreview = (): JSX.Element => {
               </div>
             </div>
             <div className='budget-value text-xl text-imbue-purple-dark font-normal'>
-              ${Number(totalCostWithoutFee?.toFixed?.(2)).toLocaleString()}
+              {Number(totalCostWithoutFee?.toFixed?.(2)).toLocaleString()} ${Currency[currencyId]}
             </div>
           </div>
 
@@ -658,7 +658,7 @@ const ApplicationPreview = (): JSX.Element => {
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-purple-dark font-normal'>
-              ${Number(imbueFee?.toFixed?.(2))?.toLocaleString?.()}
+              {Number(imbueFee?.toFixed?.(2))?.toLocaleString?.()} ${Currency[currencyId]}
             </div>
           </div>
 

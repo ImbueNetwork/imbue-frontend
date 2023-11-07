@@ -244,7 +244,7 @@ export const HirePopup = ({
               </div>
             </div>
             <div className='budget-value'>
-              ${Number?.(totalCostWithoutFee?.toFixed?.(2))?.toLocaleString()}
+              {Number?.(totalCostWithoutFee?.toFixed?.(2))?.toLocaleString()} ${Currency[application.currencyId]}
             </div>
           </div>
           <div className={`${styles.budgetInfo} mx-5`}>
@@ -252,7 +252,7 @@ export const HirePopup = ({
               <p className='text-lg'>Imbue Service Fee 5%</p>
             </div>
             <div className='budget-value'>
-              ${Number?.(imbueFee?.toFixed?.(2))?.toLocaleString?.()}
+              {Number?.(imbueFee?.toFixed?.(2))?.toLocaleString?.()} ${Currency[application.currencyId]}
             </div>
           </div>
           <div className={`${styles.budgetInfo} mx-5 !mb-3`}>
