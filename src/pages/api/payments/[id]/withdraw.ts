@@ -21,7 +21,7 @@ export default nextConnect()
       if (withdrawnAmount > 0) {
         return res.status(200).json({ WithdrawnAmount: withdrawnAmount });
       } else {
-        return res.status(501).json({ WithdrawnAmount: 0 });
+        return res.status(501).json("No available funds to withdraw");
       }
     } catch (e: any) {
       return res.status(501).json(e.message);

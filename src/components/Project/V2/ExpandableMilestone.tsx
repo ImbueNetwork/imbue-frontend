@@ -297,7 +297,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
         if (withdrawResult.txError) {
           setSuccess(false);
           setError({ message: withdrawResult.errorMessage });
-        } else {
+        } else if(Number(withdrawResult.withdrawn) > 0) {
           setSuccess(true);
           setSuccessTitle('Withdraw successful');
         }
