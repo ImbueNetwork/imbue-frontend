@@ -4,21 +4,36 @@ import { BiArrowBack } from 'react-icons/bi';
 interface VotingModalProps {
   setVisible: (_visible: boolean) => void;
   setLoading: (_loading: boolean) => void;
-  handleRefund: () => void;
+  handleRefund: (_vote: boolean) => Promise<void>;
   handleVote: (_vote: boolean) => Promise<void>;
+  refundOnly: boolean;
 }
 
 export default function RefundModal({
   setVisible,
   handleRefund,
   handleVote,
-  setLoading
+  setLoading,
+  refundOnly
 }: VotingModalProps) {
+  console.log("🚀 ~ file: RefundModal.tsx:19 ~ refundOnly:", refundOnly)
 
-  const handleNoVote = async (): Promise<void> => {
+  const handleNo = async (): Promise<void> => {
     setLoading(true)
     setVisible(false);
-    await handleVote(false);
+    
+    if (refundOnly) {
+      await handleRefund(true)
+    } else {
+      await handleVote(false);
+    }
+    setLoading(false)
+  }
+
+  const handleYes = async (): Promise<void> => {
+    setLoading(true)
+    setVisible(false);
+    await handleRefund(false)
     setLoading(false)
   }
 
@@ -36,16 +51,13 @@ export default function RefundModal({
         </p>
         <div className='flex mb-5 space-x-3 w-full items-center mt-9'>
           <button
-            onClick={handleNoVote}
+            onClick={handleNo}
             className='border px-5 py-2  border-imbue-purple text-imbue-purple rounded-full w-[30%]'
           >
             No
           </button>
           <button
-            onClick={() => {
-              handleRefund()
-              setVisible(false)
-            }}
+            onClick={handleYes}
             className='primary-btn  ml-auto in-dark w-button w-[70%] '
             style={{ textAlign: 'center' }}
           >

@@ -1,11 +1,6 @@
-import {
-  CircularProgress,
-  IconButton,
-  InputAdornment,
-  OutlinedInput,
-} from '@mui/material';
-import { SignerResult } from '@polkadot/api/types';
-import { WalletAccount } from '@talismn/connect-wallets';
+import { CircularProgress, IconButton } from "@mui/material";
+import { SignerResult } from "@polkadot/api/types";
+import { WalletAccount } from "@talismn/connect-wallets";
 import bcrypt from 'bcryptjs';
 // const PasswordStrengthBar = dynamic(() => import('react-password-strength-bar'));
 import Image from 'next/image';
@@ -341,11 +336,8 @@ export default function SignIn() {
               <input
                 placeholder='victorimbue@gmail.com'
                 onChange={handleChange}
-                onKeyDown={(e) =>
-                  e.key === 'Enter' &&
-                  document.getElementsByName('user')[0].focus()
-                }
-                className='outlinedInput text-[0.875rem]'
+                onKeyDown={(e) => (e.key === 'Enter') && document.getElementsByName('user')[0].focus()}
+                className='outlinedInput text-[0.875rem] !border-[#BCBCBC] focus-within:outline focus-within:outline-1 focus-within:outline-imbue-purple evenShadow'
                 required
                 // eslint-disable-next-line no-console
                 onError={(err) => console.error(err)}
@@ -371,7 +363,7 @@ export default function SignIn() {
                   document.getElementsByName('password')[0].focus()
                 }
                 required
-                className='outlinedInput text-[0.875rem]'
+                className='outlinedInput text-[0.875rem] !border-[#BCBCBC] focus-within:outline focus-within:outline-1 focus-within:outline-imbue-purple evenShadow'
                 name='user'
               />
               <p className={`${!error ? 'hide' : 'error'} w-full text-sm mt-1`}>
@@ -383,7 +375,7 @@ export default function SignIn() {
               <label className='font-Aeonik text-base lg:text-[1rem] text-imbue-purple-dark font-normal mb-2'>
                 Password
               </label>
-              <OutlinedInput
+              {/* <OutlinedInput
                 id='outlined-adornment-password'
                 color='secondary'
                 notched={false}
@@ -423,7 +415,28 @@ export default function SignIn() {
                     </IconButton>
                   </InputAdornment>
                 }
-              />
+              /> */}
+
+              <div className="h-[2.6rem] px-[6px] text-[0.875rem] border border-[#BCBCBC] evenShadow focus-within:outline focus-within:outline-1 focus-within:outline-imbue-purple rounded-[4px] flex items-center w-full">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name='password'
+                  onChange={handleChange}
+                  placeholder='*********'
+                  onKeyDown={(e) => (e.key === 'Enter') && document.getElementsByName('submit')[0].click()}
+                  className="outline-none w-full text-black pl-3"
+                />
+
+                <IconButton
+                  aria-label='toggle password visibility'
+                  onClick={() => setShowPassword(!showPassword)}
+                  edge='end'
+                  className="mr-0"
+                >
+                  {showPassword ? <Image className="h-5 w-5" src={require("../../../assets/svgs/eye.svg")} alt="" /> : <Image className="w-5 h-5" src={require("../../../assets/svgs/eyeClosed.svg")} alt="" />}
+                </IconButton>
+              </div>
+
               <PasswordStrengthBar password={password} />
               <p
                 className={`${

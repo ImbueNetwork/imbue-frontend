@@ -73,8 +73,7 @@ function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
   const [targetUser, setTargetUser] = useState<any>({});
-  const [projectHasAttachments, setProjectHasAttachments] =
-    useState<boolean>(false);
+  // const [projectHasAttachments, setProjectHasAttachments] = useState<boolean>(false);
 
   // const [onChainProject, setOnChainProject] = useState<ProjectOnChain | any>();
   const { user, loading: userLoading } = useSelector(
@@ -99,6 +98,7 @@ function Project() {
   const [successTitle, setSuccessTitle] = useState<string>('');
   const [error, setError] = useState<any>();
   const [balance, setBalance] = useState<any>(0);
+  const [balanceLoading, setBalanceLoading] = useState(true)
   const [approversPreview, setApproverPreview] = useState<User[]>([]);
   const [isApprover, setIsApprover] = useState<boolean>(false);
   const [approverVotedOnRefund, setApproverVotedOnRefund] =
@@ -155,20 +155,22 @@ function Project() {
   const getChainProject = async (project: Project, freelancer: any) => {
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
     if (project?.chain_project_id && project?.id) {
-      // TODO Enable refunds first
-      if (project?.approvers?.length && user.web3_address) {
-        const userIsApprover = project.approvers?.includes(user.web3_address);
-        if (userIsApprover) {
-          setIsApprover(true);
-        }
-      }
 
       const voters: NoConfidenceVoter[] = await getProjectNoConfidenceVoters(
         project.id
       );
       setNoConfidenceVoters(voters);
 
-      if (user.web3_address && project.project_in_voting_of_no_confidence) {
+      if (!user.id || !user.web3_address) return
+
+      if (project?.approvers?.length && user?.web3_address) {
+        const userIsApprover = project.approvers?.includes(user.web3_address);
+        if (userIsApprover) {
+          setIsApprover(true);
+        }
+      }
+
+      if (user?.web3_address && project.project_in_voting_of_no_confidence) {
         const isApprover = voters?.find(
           (voter) => voter.web3_address === user.web3_address
         );
@@ -178,7 +180,12 @@ function Project() {
       }
     }
 
-    if (project.owner) {
+    const shouldSeePopup =
+      (user?.web3_address && project.approvers?.includes(user.web3_address)) ||
+      (freelancer?.id && user?.id === freelancer?.id) ||
+      project?.user_id === user?.id
+
+    if (project?.owner && shouldSeePopup) {
       switch (project.status_id) {
         case OffchainProjectState.PendingReview:
           setWait(true);
@@ -192,11 +199,12 @@ function Project() {
           setWait(false);
           setRefunded(true);
           break;
-        case OffchainProjectState.Completed:
+        case OffchainProjectState.Completed: {
           setWait(false);
           setSuccess(true);
           setSuccessTitle('This project has been successfully delivered!');
           break;
+        }
         case OffchainProjectState.Accepted:
           if (!project.chain_project_id) {
             setWaitMessage(
@@ -237,7 +245,7 @@ function Project() {
       if (!projectRes) {
         setError({ message: 'No project found!' });
         setLoading(false);
-        router.push('/error');
+        // router.push('/error');
       }
 
       // showing owner profile if the current user if the applicant freelancer
@@ -429,7 +437,7 @@ function Project() {
                     className='rounded-full w-10 h-10 object-cover'
                   />
                   <p className='text-imbue-coral'>
-                    {projectOwner?.display_name}
+                    {targetUser?.display_name}
                   </p>
                 </div>
               </div>
@@ -458,11 +466,10 @@ function Project() {
                   title='You cannot vote for refund more than once '
                 >
                   <button
-                    className={`px-5 py-2 ${
-                      approverVotedOnRefund
-                        ? 'border border-gray-400 bg-light-white opacity-50'
-                        : 'border border-imbue-coral text-imbue-coral bg-[#FFF0EF]'
-                    } rounded-full`}
+                    className={`px-5 py-2 ${approverVotedOnRefund
+                      ? 'border border-gray-400 bg-light-white opacity-50'
+                      : 'border border-imbue-coral text-imbue-coral bg-[#FFF0EF]'
+                      } rounded-full`}
                     onClick={() =>
                       !approverVotedOnRefund && setShowPolkadotAccounts(true)
                     }
@@ -498,7 +505,9 @@ function Project() {
                   loading,
                   setOpenVotingList,
                   targetUser,
-                  hasMilestoneAttachments: projectHasAttachments,
+                  balance,
+                  balanceLoading,
+                  // hasMilestoneAttachments: projectHasAttachments
                 }}
                 key={index}
               />
@@ -507,11 +516,11 @@ function Project() {
         </div>
         {/* Ending of milestone section */}
         {/* starting side bar for project details */}
-        <div className='col-start-10 mx-10 row-start-1 row-end-4 col-end-13'>
+        <div className='col-start-10 ml-5 row-start-1 row-end-4 col-end-13'>
           <div className='bg-light-grey mt-11 py-3 px-2 rounded-xl'>
             <p className='text-[#747474] text-sm mb-5'>Project Overview</p>
             <div className='space-y-2'>
-              <div className='flex bg-white justify-between px-5 py-3 rounded-xl'>
+              <div className='flex gap-4 bg-white justify-between px-5 py-3 rounded-xl'>
                 <p className='text-black mt-5'>Milestones</p>
                 <div className='w-48  mt-6'>
                   <MilestoneProgressBar
@@ -561,6 +570,8 @@ function Project() {
                     user,
                     handlePopUpForUser,
                     setBalance,
+                    balanceLoading,
+                    setBalanceLoading
                   }}
                 />
                 <div className='flex justify-between mt-2'>

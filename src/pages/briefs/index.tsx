@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
-import { InputAdornment, OutlinedInput, TextField } from '@mui/material';
+import { TextField } from '@mui/material';
 const IconButton = dynamic(() => import('@mui/material/IconButton'), {
   ssr: false,
 });
@@ -77,7 +77,7 @@ const Briefs = (): JSX.Element => {
   const [skills, setSkills] = useState<Item[]>([{ name: '', id: 0 }]);
   const [myApplications, _setMyApplications] = useState<Project[]>();
   const [error, setError] = useState<any>();
-  
+
   const {
     expRange,
     submitRange,
@@ -545,7 +545,7 @@ const Briefs = (): JSX.Element => {
               // eslint-disable-next-line no-console
               console.log(
                 'Invalid filter option selected or unimplemented. type:' +
-                  filterType
+                filterType
               );
           }
         }
@@ -707,8 +707,8 @@ const Briefs = (): JSX.Element => {
 
   const briefsData = savedBriefsActive
     ? briefs?.filter((brief) =>
-        brief?.headline.toLocaleLowerCase().includes(searchInput)
-      )
+      brief?.headline.toLocaleLowerCase().includes(searchInput)
+    )
     : briefs;
 
   return (
@@ -731,16 +731,7 @@ const Briefs = (): JSX.Element => {
             <div className='flex justify-between lg:flex-row flex-col items-start lg:py-[3rem]'>
               <div>
                 <div className='flex items-center'>
-                  {/* <input
-                    autoComplete='off'
-                    id='search-input'
-                    className='search-input px-[12px] !w-full  lg:!w-[20rem] !h-[2.875rem] !rounded-tr-[0px] !rounded-br-[0px]'
-                    placeholder='Search'
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    onKeyUp={e => e.key === 'Enter' && !savedBriefsActive && onSearch()}
-                  /> */}
-                  <OutlinedInput
+                  {/* <OutlinedInput
                     autoComplete='off'
                     color='secondary'
                     id='search-input'
@@ -770,7 +761,41 @@ const Briefs = (): JSX.Element => {
                         ''
                       )
                     }
-                  />
+                  /> */}
+
+                  <div className="px-[6px] text-[0.875rem] border border-[#BCBCBC] focus-within:border-imbue-purple flex items-center !w-[20rem] !h-[2.875rem] rounded-lg !rounded-r-none">
+                    <input
+                      id='search-input'
+                      autoComplete='off'
+                      placeholder='Search'
+                      type='text'
+                      name='password'
+                      required
+                      onChange={(e) => setSearchInput(e.target.value)}
+                      onKeyUp={(e) =>
+                        e.key === 'Enter' && !savedBriefsActive && onSearch()
+                      }
+                      value={searchInput}
+                      className="outline-none w-full text-black pl-3"
+                    />
+
+                    {
+                      searchInput.length
+                        ? (
+                          <IconButton
+                            aria-label='toggle password visibility'
+                            onClick={() =>
+                              searchInput?.length && setSearchInput('')
+                            }
+                            onMouseDown={(e) => e.preventDefault()}
+                            edge='end'
+                          >
+                            <ClearIcon />
+                          </IconButton>
+                        )
+                        : ''
+                    }
+                  </div>
 
                   <div
                     role='button'
