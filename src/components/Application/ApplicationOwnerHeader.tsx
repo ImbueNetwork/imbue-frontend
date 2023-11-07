@@ -54,15 +54,22 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
   const [openPopup, setOpenPopup] = useState(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<any>();
-  const [loadingWallet, setLoadingWallet] = useState<string>('');
+  const [loadingWallet, setLoadingWallet] = useState<string>('loading');
   const [imbueBalance, setImbueBalance] = useState<string>();
+  const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
   const router = useRouter();
 
   useEffect(() => {
     const showBalance = async () => {
+
+      if (loadingWallet === 'loading' && !firstLoad) return;
+
       try {
-        setLoadingWallet('loading');
+
+        if (firstLoad)
+          setLoadingWallet('loading');
+
         const balance = await getBalance(
           user?.web3_address,
           Currency.IMBU,
@@ -73,10 +80,18 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         setError({ message: error });
       } finally {
         setLoadingWallet('');
+        if (firstLoad)
+          setFirstLoad(false)
       }
     };
-    user?.web3_address && showBalance();
-  }, [user?.web3_address, application?.currency_id, user]);
+    // user?.web3_address && showBalance();
+
+    const timer = setInterval(() => {
+      user?.web3_address && showBalance();
+    }, 5000);
+    return () => clearInterval(timer);
+
+  }, [user?.web3_address, application.currency_id, user, loadingWallet, firstLoad]);
 
   const startWork = async (account: WalletAccount) => {
     setLoading(true);
@@ -140,7 +155,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           </p>
           <div className='flex flex-col gap-2'>
             <p className='text-[1.25rem] font-normal capitalize text-imbue-purple'>
-              {briefOwner?.display_name} 
+              {briefOwner?.display_name}
             </p>
             <CountrySelector user={briefOwner} />
           </div>
@@ -163,9 +178,8 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
             </button>
           ) : (
             <button
-              className={`${
-                applicationStatusId[application?.status_id]
-              }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
+              className={`${applicationStatusId[application?.status_id]
+                }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
             >
               {applicationStatusId[application?.status_id]}
             </button>
@@ -175,7 +189,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           <p className='text-sm lg:text-base mt-5 mb-3 text-imbue-purple text-right'>
             {loadingWallet === 'loading' && 'Loading Wallet...'}
             {loadingWallet === 'connecting' && 'Connecting Wallet...'}
-            {!loadingWallet &&
+            {loadingWallet !== 'loading' &&
               (imbueBalance === undefined
                 ? 'No wallet found'
                 : `Your Balance: ${imbueBalance} $${Currency[Currency.IMBU]}`)}

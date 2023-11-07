@@ -44,18 +44,23 @@ const Currencies = [
 const ProjectBalance = (props: ProjectBalanceType) => {
     const { balance, project, user, handlePopUpForUser, setBalance, balanceLoading, setBalanceLoading } = props;
     const [currency_id, setCurrency_id] = useState<number>();
+    const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const showOptions = Boolean(anchorEl);
 
     useEffect(() => {
         const getAndSetBalace = async () => {
+            if (balanceLoading && !firstLoad) return;
+
             if (
                 !project?.escrow_address ||
                 currency_id === undefined ||
                 !user.id
             ) return
+
             setBalanceLoading(true)
+
             try {
                 const balance = await getBalance(
                     project?.escrow_address,
@@ -67,7 +72,11 @@ const ProjectBalance = (props: ProjectBalanceType) => {
                 if (!balance && project.status_id !== OffchainProjectState.Completed) {
                     handlePopUpForUser();
                 }
+
                 setBalance(balance || 0);
+                if (firstLoad)
+                    setFirstLoad(false)
+
             } catch (error) {
                 // eslint-disable-next-line no-console
                 console.error(error);
@@ -76,13 +85,17 @@ const ProjectBalance = (props: ProjectBalanceType) => {
             }
         }
 
-        getAndSetBalace();
         if (!currency_id) {
             setCurrency_id(project.currency_id);
         }
 
+        const timer = setInterval(() => {
+            getAndSetBalace();
+        }, 5000);
+        return () => clearInterval(timer);
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currency_id, project?.escrow_address, project.status_id, user.id])
+    }, [currency_id, project?.escrow_address, project.status_id, user.id, firstLoad, balanceLoading])
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
@@ -97,7 +110,7 @@ const ProjectBalance = (props: ProjectBalanceType) => {
 
     return (
         <div className='text-sm text-[#868686] mt-2'>
-            {balanceLoading
+            {balanceLoading && firstLoad
                 ? (
                     <p className='text-xs font-semibold'> Loading Balance...</p>)
                 : (
