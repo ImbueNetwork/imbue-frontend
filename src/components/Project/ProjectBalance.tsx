@@ -7,7 +7,7 @@ import { getBalance } from '@/utils/helper';
 import { Currency, OffchainProjectState, Project, User } from '@/model';
 
 type ProjectBalanceType = {
-    balance: number;
+    balance: number | undefined;
     project: Project;
     user: User;
     handlePopUpForUser: () => void;

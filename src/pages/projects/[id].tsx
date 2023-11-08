@@ -99,7 +99,7 @@ function Project() {
   const [refunded, setRefunded] = useState<boolean>(false);
   const [successTitle, setSuccessTitle] = useState<string>('');
   const [error, setError] = useState<any>();
-  const [balance, setBalance] = useState<any>(0);
+  const [balance, setBalance] = useState<number | undefined>();
   const [balanceLoading, setBalanceLoading] = useState(true)
   const [approversPreview, setApproverPreview] = useState<User[]>([]);
   const [isApprover, setIsApprover] = useState<boolean>(false);
@@ -541,27 +541,27 @@ function Project() {
                   {timeData[project?.duration_id || 0].label}
                 </p>
               </div>
-                <div className='flex flex-col bg-white justify-between px-5 py-3 rounded-xl'>
-                  <CopyToClipboard text={project?.escrow_address}>
-                    <div className='ml-auto'>
-                      <IconButton className='' onClick={() => copyAddress()}>
-                        <Image
-                          className='w-4'
-                          src={require('@/assets/svgs/copy.svg')}
-                          alt='copy button'
-                        />
-                      </IconButton>
-                    </div>
-                  </CopyToClipboard>
-                  <div className='w-full flex justify-between items-end'>
-                    <p className='text-black'>Escrow Address</p>
-                    <p className='text-imbue-purple-dark text-xl line-clamp-1'>
-                      {project?.escrow_address?.slice(0, 6) +
-                        '...' +
-                        project?.escrow_address?.substr(-3)}
-                    </p>
+              <div className='flex flex-col bg-white justify-between px-5 py-3 rounded-xl'>
+                <CopyToClipboard text={project?.escrow_address}>
+                  <div className='ml-auto'>
+                    <IconButton className='' onClick={() => copyAddress()}>
+                      <Image
+                        className='w-4'
+                        src={require('@/assets/svgs/copy.svg')}
+                        alt='copy button'
+                      />
+                    </IconButton>
                   </div>
+                </CopyToClipboard>
+                <div className='w-full flex justify-between items-end'>
+                  <p className='text-black'>Escrow Address</p>
+                  <p className='text-imbue-purple-dark text-xl line-clamp-1'>
+                    {project?.escrow_address?.slice(0, 6) +
+                      '...' +
+                      project?.escrow_address?.substr(-3)}
+                  </p>
                 </div>
+              </div>
               <div className='flex flex-col bg-white justify-between px-5 py-3 rounded-xl'>
                 <ProjectBalance
                   {...{
