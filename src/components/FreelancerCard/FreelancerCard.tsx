@@ -67,7 +67,7 @@ export default function FreelancerCard({
         <p className='text-xs'>
           Job Success rate{' '}
           <span className='text-imbue-purple'>
-            {Number(freelancerSuccsRate).toFixed(2)}%
+            {Math.floor(freelancerSuccsRate)}%
           </span>
         </p>
       </div>
