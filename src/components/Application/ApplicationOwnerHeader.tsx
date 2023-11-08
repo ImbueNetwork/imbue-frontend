@@ -71,9 +71,9 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           setLoadingWallet('loading');
 
         const balance = await getBalance(
-          user?.web3_address,
           Currency.IMBU,
           user,
+          user?.web3_address
         );
         setImbueBalance(balance.toLocaleString());
       } catch (error) {

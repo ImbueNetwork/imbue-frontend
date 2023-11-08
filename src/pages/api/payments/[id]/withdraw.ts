@@ -19,9 +19,9 @@ export default nextConnect()
       const multichainService = await MultiChainService.build();
       const withdrawnAmount = await multichainService.withdraw(projectId, coverFees);
       if (withdrawnAmount > 0) {
-        return res.status(200).json({ WithdrawnAmount: withdrawnAmount });
+        return res.status(200).json(withdrawnAmount);
       } else {
-        return res.status(501).json({ WithdrawnAmount: 0 });
+        return res.status(501).json("No available funds to withdraw");
       }
     } catch (e: any) {
       return res.status(501).json(e.message);

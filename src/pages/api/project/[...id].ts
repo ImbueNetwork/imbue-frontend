@@ -236,9 +236,9 @@ const syncProject = async (project: any, tx: any) => {
       if (
         firstPendingMilestoneChain === project.first_pending_milestone &&
         project.project_in_milestone_voting ===
-          onChainProjectRes.projectInMilestoneVoting &&
+        onChainProjectRes.projectInMilestoneVoting &&
         project.project_in_voting_of_no_confidence ===
-          onChainProjectRes.projectInVotingOfNoConfidence &&
+        onChainProjectRes.projectInVotingOfNoConfidence &&
         !milestonesRequiresSync
       )
         return project;
@@ -289,6 +289,21 @@ const syncProject = async (project: any, tx: any) => {
 
       return pkg;
     } else {
+      const userCompletedProjects: number[] = (await imbueApi.api.query.imbueProposals.completedProjects(
+        project.owner
+      )).toJSON() as number[];
+      const projectCompleted = userCompletedProjects.includes(project.chain_project_id);
+
+      if (projectCompleted) {
+        project.milestones.map(async (item: any) => {
+          await models.updateMilestone(
+            Number(projectId),
+            Number(item.milestone_index),
+            { withdrawn_onchain: true }
+          )(tx);
+        });
+
+      }
       return project;
     }
   } catch (error) {
