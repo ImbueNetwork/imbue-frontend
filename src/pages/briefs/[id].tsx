@@ -177,14 +177,16 @@ const BriefDetails = (): JSX.Element => {
 
     return (
       <div
-        className={`transparent-conatainer !bg-imbue-light-purple-three relative ${showSimilarBrief ? '!pb-[3rem]' : ''
-          } `}
+        className={`transparent-conatainer !bg-imbue-light-purple-three relative ${
+          showSimilarBrief ? '!pb-[3rem]' : ''
+        } `}
       >
         <div className='flex justify-between w-full lg:px-[4rem] px-[1rem]'>
           <h3 className='text-imbue-purple-dark'>Similar projects on Imbue</h3>
           <div
-            className={`transition transform ease-in-out duration-600 ${showSimilarBrief && 'rotate-180'
-              } cursor-pointer`}
+            className={`transition transform ease-in-out duration-600 ${
+              showSimilarBrief && 'rotate-180'
+            } cursor-pointer`}
           >
             <ArrowIcon
               onClick={() => setShowSimilarBrief(!showSimilarBrief)}

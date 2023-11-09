@@ -16,7 +16,10 @@ const LoginPopup = dynamic(() => import('@/components/LoginPopup/LoginPopup'));
 
 // import LoginPopup from '@/components/LoginPopup/LoginPopup';
 
+import { Modal } from '@mui/material';
+
 import { AppContext, AppContextType } from '@/components/Layout';
+import WelcomForNewUser from '@/components/WelcomeModalContent/WelcomeForNewUser';
 
 import { Project, User } from '@/model';
 import { Brief } from '@/model';
@@ -36,6 +39,7 @@ export type DashboardProps = {
 const Dashboard = (): JSX.Element => {
   const [loginModal, setLoginModal] = useState<boolean>(false);
   const [client, setClient] = useState<StreamChat>();
+  const [newUser, setNewUser] = useState(false);
   const {
     user,
     loading: loadingUser,
@@ -48,39 +52,51 @@ const Dashboard = (): JSX.Element => {
 
   const dispatch = useDispatch();
 
-
-  const setup = async () => {
-    try {
-      if (!user?.username && !loadingUser) return router.push('/');
-      const client = await getStreamChat();
-      setClient(client);
-      if(client && user.getstream_token) {
-        client?.connectUser(
-          {
-            id: String(user.id),
-            username: user.username,
-            name: user.display_name,
-          },
-          user.getstream_token
-        );
-          const result = await client.getUnreadCount();
-          dispatch(setUnreadMessage({ message: result.channels.length }));
-        client.on((event) => {
-          if (event.total_unread_count !== undefined) {
-            dispatch(setUnreadMessage({ message: event.unread_channels }));
-          }
-        });
-      }
-      setLoadingStreamChat(false);
-
-    } catch (error) {
-      setError({ message: error });
+  useEffect(() => {
+    const entity = window.localStorage.getItem('newUser');
+    if (entity) {
+      setNewUser(true);
+      window.localStorage.removeItem('newUser');
     }
-  };
+  }, []);
 
   useEffect(() => {
-    setup();
+    const setupStreamChat = async () => {
+      try {
+        if (!user?.username && !loadingUser) return router.push('/');
+        setClient(await getStreamChat());
+      } catch (error) {
+        setError({ message: error });
+      } finally {
+        setLoadingStreamChat(false);
+      }
+    };
+
+    setupStreamChat();
   }, [user]);
+
+  useEffect(() => {
+    if (client && user?.username && !loadingStreamChat) {
+      client?.connectUser(
+        {
+          id: String(user.id),
+          username: user.username,
+          name: user.display_name,
+        },
+        user.getstream_token
+      );
+      const getUnreadMessageChannels = async () => {
+        const result = await client.getUnreadCount();
+        dispatch(setUnreadMessage({ message: result.channels.length }));
+      };
+      getUnreadMessageChannels();
+      client.on((event) => {
+        if (event.total_unread_count !== undefined) {
+          dispatch(setUnreadMessage({ message: event.unread_channels }));
+        }
+      });
+    }
+  }, [client, user?.getstream_token, user?.username, loadingStreamChat]);
 
   const { profileView } = useContext(AppContext) as AppContextType;
 
@@ -90,7 +106,9 @@ const Dashboard = (): JSX.Element => {
 
   return client ? (
     <div className='px-[15px]'>
-
+      <Modal open={newUser} className='flex justify-center items-center'>
+        <WelcomForNewUser handleClose={setNewUser} />
+      </Modal>
       <ClientDashboard />
       <LoginPopup
         visible={loginModal}

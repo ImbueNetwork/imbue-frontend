@@ -1,19 +1,34 @@
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import { AiOutlineHeart } from 'react-icons/ai';
 import { BiMessageRoundedDetail } from 'react-icons/bi';
 import { HiOutlineTicket } from 'react-icons/hi';
-
-import { Freelancer } from '@/model';
 
 export default function FreelancerCard({
   freelancer,
   handleMessage,
 }: {
-  freelancer: Freelancer;
+  freelancer: any;
   handleMessage: any;
 }) {
   const router = useRouter();
+  const [freelancerSuccsRate, setFreelancerSuccessRate] = useState(0);
+
+  useEffect(() => {
+    let cancelProject = 0;
+    let completedProject = 0;
+    for (const project of freelancer.projects) {
+      if (project.status_id === 6) completedProject++;
+      if (project.status_id === 3) cancelProject++;
+    }
+    if (completedProject && cancelProject) {
+      const success =
+        (completedProject / (completedProject + cancelProject)) * 100;
+      setFreelancerSuccessRate(success);
+    }
+  }, [freelancer]);
+
   return (
     <div className='border min-w-[28.75rem]  px-5 py-5 rounded-2xl '>
       <div className='flex items-center gap-2'>
@@ -44,14 +59,23 @@ export default function FreelancerCard({
           <div className='w-2 h-2 rounded-full bg-lime-900' />
         </p>
       </div>
-      {/* <div className='my-5 items-center flex justify-between'>
+      <div className='my-5 items-center flex justify-between'>
         <p className='text-lg text-imbue-purple-dark'>
-          $50-$75 <span className='text-xs'>hr</span>
+          ${freelancer.hour_per_rate.toFixed(2)}
+          <span className='text-xs'>hr</span>
         </p>
         <p className='text-xs'>
-          Job Success rate <span className='text-imbue-purple'>99.2%</span>
+          Job Success rate{' '}
+          {freelancerSuccsRate > 0 && (
+            <span className='text-imbue-purple'>
+              {Math.floor(freelancerSuccsRate)}%
+            </span>
+          )}
+          {freelancerSuccsRate === 0 && (
+            <span className='text-imbue-purple'>NA</span>
+          )}
         </p>
-      </div> */}
+      </div>
       <div className='flex mt-10 text-xs gap-5'>
         {[1, 2, 3, 4].map(
           (item: number, index: number) =>
