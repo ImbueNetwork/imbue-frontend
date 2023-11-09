@@ -72,7 +72,7 @@ export default nextConnect()
           total_cost_without_fee,
           imbue_fee,
           duration_id,
-          payment_address
+          payment_address,
           // project_type: project_type ?? models.ProjectType.Brief
         })(tx);
 

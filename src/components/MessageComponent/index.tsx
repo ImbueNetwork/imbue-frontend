@@ -1,7 +1,11 @@
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en.json';
 import Image from 'next/image';
-import { DefaultGenerics, FormatMessageResponse } from 'stream-chat';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { Channel, DefaultGenerics, User } from 'stream-chat';
+
+import { RootState } from '@/redux/store/store';
 
 TimeAgo.addLocale(en);
 
@@ -11,15 +15,22 @@ export default function MessageComponent({
   handleMessageClick,
   props,
 }: {
-  props: FormatMessageResponse<DefaultGenerics>;
+  props: Channel<DefaultGenerics>;
   handleMessageClick: any;
 }) {
+  const { user } = useSelector((state: RootState) => state.userState);
+
+  const [targetUser, setTargetUser] = useState<User>();
+
+  useEffect(() => {
+    const key = Object.keys(props.state.members);
+    Number(props.state.members[key[0]]?.user_id) === user.id
+      ? setTargetUser(props.state.members[key[1]]?.user)
+      : setTargetUser(props.state.members[key[0]]?.user);
+  }, [props.state.members, user.id]);
+
   const handleClick = () => {
-    // router.push({
-    //   pathname: `/dashboard/messages`,
-    //   query: `chat=${props.cid?.split(':')[1]}`,
-    // });
-    handleMessageClick(props?.user?.id);
+    handleMessageClick(targetUser?.id);
   };
 
   return (
@@ -28,9 +39,9 @@ export default function MessageComponent({
       className='flex items-center hover:bg-imbue-light-purple-three px-4 py-1 rounded-sm cursor-pointer text-black gap-5 text-sm'
     >
       <Image
-        className='w-14 h-14 mb-2 rounded-full'
+        className='w-14 h-14 object-cover mb-2 rounded-full'
         src={
-          props?.user?.profile_photo ||
+          targetUser?.profile_photo ||
           require('@/assets/images/profile-image.png')
         }
         width={40}
@@ -39,11 +50,12 @@ export default function MessageComponent({
       />
       <div className='flex border-b w-full pb-2 justify-between'>
         <div className=' space-y-1'>
-          <p>{props?.user?.name}</p>
-          <p className='text-text-aux-colour'>{props?.text}</p>
+          <p>{targetUser?.name}</p>
+          <p className='text-text-aux-colour'>{props?.lastMessage()?.text}</p>
         </div>
         <p className='min-w-fit text-text-aux-colour'>
-          {props?.created_at && timeAgo.format(new Date(props?.created_at))}
+          {props?.lastMessage()?.created_at &&
+            timeAgo.format(new Date(props?.lastMessage()?.created_at))}
         </p>
       </div>
     </div>

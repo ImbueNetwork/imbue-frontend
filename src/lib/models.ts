@@ -194,6 +194,7 @@ export type Freelancer = {
   country?: string;
   region?: string;
   profile_image?: string;
+  hour_per_rate: number;
 };
 
 export type BriefSqlFilter = {
@@ -523,6 +524,22 @@ export const insertProject =
   (project: Project) => async (tx: Knex.Transaction) =>
     (await tx<Project>('projects').insert(project).returning('*'))[0];
 
+export const insertUserAnalytics =
+  (user_analytics: any) => async (tx: Knex.Transaction) =>
+    (await tx('user_analytic').insert(user_analytics).returning('*'))[0];
+export const updateUserAnalytics =
+  (user_id: number, analytics: any) => async (tx: Knex.Transaction) =>
+    (
+      await tx('user_analytic')
+        .where({ user_id })
+        .update(analytics)
+        .returning('*')
+    )[0];
+
+export const getUserAnalytics =
+  (user_id: number) => async (tx: Knex.Transaction) =>
+    (await tx('user_analytic').where({ user_id }))[0];
+
 export const updateProject =
   (id: string | number, project: Project) => async (tx: Knex.Transaction) =>
     (
@@ -783,6 +800,7 @@ export const fetchAllBriefs = () => (tx: Knex.Transaction) =>
       'users.display_name as created_by',
       'users.profile_photo as owner_photo',
       'users.username as owner_name',
+      'users.created as joined',
       'experience_level',
       'briefs.experience_id',
       'briefs.created',
@@ -1181,6 +1199,7 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
       'telegram_link',
       'discord_link',
       'title',
+      'hour_per_rate',
       // 'bio',
       'freelancers.user_id',
       'username',
@@ -1291,6 +1310,10 @@ export const fetchFreelancerClients =
         }
       });
 
+export const freelancerProjects =
+  (freelancer_id: number) => async (tx: Knex.Transaction) =>
+    tx.select().where({ user_id: freelancer_id }).from('projects');
+
 export const fetchItems =
   (ids: number[], tableName: string) => async (tx: Knex.Transaction) =>
     tx(tableName).select('id', 'name').whereIn(`id`, ids);
@@ -1322,6 +1345,7 @@ export const insertFreelancerDetails =
         telegram_link: f.telegram_link,
         discord_link: f.discord_link,
         user_id: f.user_id,
+        hour_per_rate: f.hour_per_rate,
       })
 
       .returning('id')
@@ -1394,8 +1418,9 @@ export const updateFreelancerDetails =
     web3_type: string,
     web3_challenge: string,
     // eslint-disable-next-line unused-imports/no-unused-vars
-    freelancer_clients: Array<{ id: number; name: string; img: string }>
+    freelancer_clients: Array<{ id: number; name: string; img: string }>,
     // token: string
+    hour_per_rate: number
   ) =>
   async (tx: Knex.Transaction) =>
     await tx<Freelancer>('freelancers')
@@ -1412,6 +1437,7 @@ export const updateFreelancerDetails =
         telegram_link: f.telegram_link,
         discord_link: f.discord_link,
         user_id: f.user_id,
+        hour_per_rate,
       })
       .where({ user_id: userId })
       .returning('id')

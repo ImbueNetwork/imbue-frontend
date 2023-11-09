@@ -10,6 +10,7 @@ import {
   InputAdornment,
   InputLabel,
   MenuItem,
+  OutlinedInput,
   Select,
   TextField,
   Tooltip,
@@ -64,6 +65,7 @@ import SuccessScreen from '@/components/SuccessScreen';
 
 import { Currency, Freelancer, Project, User } from '@/model';
 import { fetchUserRedux } from '@/redux/reducers/userReducers';
+import { setUserAnalytics } from '@/redux/services/briefService';
 import {
   getFreelancerApplications,
   getFreelancerProfile,
@@ -101,6 +103,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
   const memberSince = moment(freelancer?.created).format('MMMM YYYY');
   const [prevUserName, setprevUserName] = useState(freelancer.username);
   const [titleError, settitleError] = useState<string | null>(null);
+  const [hourperrate, setHourPerrate] = useState<number | undefined>(
+    freelancer.hour_per_rate
+  );
   const [skills, setSkills] = useState<string[]>(
     freelancer?.skills?.map(
       (skill: { id: number; name: string }) =>
@@ -108,7 +113,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     )
   );
 
-  const { user: browsingUser } = useSelector(
+  const { user: browsingUser, loading: browsingUserLoading } = useSelector(
     (state: RootState) => state.userState
   );
   const dispatch = useDispatch<AppDispatch>();
@@ -196,6 +201,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           skills: skills,
           clients: clients,
           logged_in_user: browsingUser.id === initFreelancer.user_id,
+          hour_per_rate: hourperrate,
         };
 
         const resp: any = await updateFreelancer(data);
@@ -203,7 +209,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
           setSuccess(true);
           setprevUserName(data.username);
         } else {
-          setError({ message: 'Someting went wrong' + JSON.stringify(resp.message) });
+          setError({
+            message: 'Someting went wrong' + JSON.stringify(resp.message),
+          });
         }
       }
     } catch (error) {
@@ -213,11 +221,19 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     }
   };
 
+  useEffect(() => {
+    const updateFreelancerAnalytics = async () => {
+      await setUserAnalytics(browsingUser.id, freelancer.user_id);
+    };
+    if (!browsingUserLoading && browsingUser.id !== freelancer.user_id) {
+      updateFreelancerAnalytics();
+    }
+  }, [browsingUser]);
+
   const handleMessageBoxClick = () => {
     if (browsingUser.id) {
       setShowMessageBox(true);
-    }
-    else {
+    } else {
       setShowLoginPopup(true);
     }
   };
@@ -238,8 +254,13 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
       else settitleError(null);
     }
     if (e.target.name === 'display_name') {
-      if (newFreelancer.display_name.trim().length < 1 && newFreelancer.display_name.trim().length > 30) {
-        setDisplayNameError('Display name must be between 1 to 30 characters long');
+      if (
+        newFreelancer.display_name.trim().length < 1 &&
+        newFreelancer.display_name.trim().length > 30
+      ) {
+        setDisplayNameError(
+          'Display name must be between 1 to 30 characters long'
+        );
       } else if (isUrlExist(e.target.value)) {
         setDisplayNameError(
           'URL and special characters are not allowed in display name'
@@ -499,7 +520,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                   ...initFreelancer,
                   skills: freelancer?.skills?.map(
                     (skill: { id: number; name: string }) =>
-                      skill?.name?.charAt(0).toUpperCase() + skill?.name?.slice(1)
+                      skill?.name?.charAt(0).toUpperCase() +
+                      skill?.name?.slice(1)
                   ),
                   logged_in_user: browsingUser,
                 }}
@@ -518,7 +540,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                       label='Name'
                       variant='outlined'
                       color='secondary'
-                      defaultValue={freelancer?.display_name || ""}
+                      defaultValue={freelancer?.display_name || ''}
                       autoComplete='off'
                       inputProps={{ maxLength: 30 }}
                     />
@@ -530,20 +552,60 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                         {displayError}
                       </p>
                     )}
+
+                    <FormControl fullWidth sx={{ m: 1 }}>
+                      <InputLabel
+                        className='!text-imbue-purple'
+                        htmlFor='outlined-adornment-amount'
+                      >
+                        payment per hour
+                      </InputLabel>
+                      <OutlinedInput
+                        id='outlined-adornment-amount'
+                        label='payment per hour'
+                        onChange={(event: any) =>
+                          setHourPerrate(
+                            event.target.value > 0
+                              ? Math.trunc(event.target.value)
+                              : undefined
+                          )
+                        }
+                        className='w-full'
+                        value={hourperrate}
+                        defaultValue={freelancer?.hour_per_rate}
+                        placeholder='0.00'
+                        type='number'
+                        color='secondary'
+                        startAdornment={
+                          <InputAdornment
+                            className='text-imbue-purple'
+                            position='start'
+                          >
+                            $
+                          </InputAdornment>
+                        }
+                      />
+                    </FormControl>
                   </>
                 ) : (
-                  <div className='flex gap-2'>
-                    <h3 className='!text-2xl z-[1] text-imbue-purple'>
-                      {freelancer?.display_name}
-                    </h3>
-                    {initFreelancer?.verified && (
-                      <div className='bg-[#EAFFC2] flex items-center px-2 rounded-full'>
-                        <VerifiedIcon htmlColor='#38e894' />
-                        <span className='text-sm ml-1 text-imbue-purple'>
-                          verified
-                        </span>
-                      </div>
-                    )}
+                  <div className='flex justify-between'>
+                    <div className='flex gap-2'>
+                      <h3 className='!text-2xl z-[1] text-imbue-purple'>
+                        {freelancer?.display_name}
+                      </h3>
+                      {initFreelancer?.verified && (
+                        <div className='bg-[#EAFFC2] flex items-center px-2 rounded-full'>
+                          <VerifiedIcon htmlColor='#38e894' />
+                          <span className='text-sm ml-1 text-imbue-purple'>
+                            verified
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <p className='text-imbue-purple text-xl'>
+                      ${Number(freelancer?.hour_per_rate).toFixed(2)}
+                      <span className='text-sm'>/hr</span>
+                    </p>
                   </div>
                 )}
 
@@ -558,7 +620,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                         label='Username'
                         variant='outlined'
                         color='secondary'
-                        defaultValue={freelancer?.username || ""}
+                        defaultValue={freelancer?.username || ''}
                         autoComplete='off'
                         inputProps={{ maxLength: 30 }}
                       />
@@ -596,7 +658,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                           name='title'
                           label='Tittle'
                           variant='outlined'
-                          defaultValue={freelancer?.title || ""}
+                          defaultValue={freelancer?.title || ''}
                           autoComplete='off'
                         />
                         {titleError && (
@@ -866,7 +928,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
                                     <TextField
                                       color='secondary'
                                       autoComplete='off'
-                                      value={freelancer && freelancer[key] || ""}
+                                      value={
+                                        (freelancer && freelancer[key]) || ''
+                                      }
                                       onChange={(e) => {
                                         if (freelancer) {
                                           setFreelancer({
@@ -1030,7 +1094,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
               <>
                 <TextArea
                   maxLength={1000}
-                  value={freelancer?.about || ""}
+                  value={freelancer?.about || ''}
                   onChange={(e) => {
                     if (freelancer) {
                       setFreelancer({
@@ -1058,7 +1122,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
               <>
                 <TextArea
                   maxLength={1000}
-                  value={freelancer?.education || ""}
+                  value={freelancer?.education || ''}
                   onChange={(e) => {
                     if (freelancer) {
                       setFreelancer({
@@ -1363,8 +1427,9 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
       />
 
       <div
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
-          }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${
+          copied ? 'right-5' : '-right-full'
+        }`}
       >
         <Alert severity='success'>{`${copied} Copied to clipboard`}</Alert>
       </div>
