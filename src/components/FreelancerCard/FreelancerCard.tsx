@@ -13,7 +13,7 @@ export default function FreelancerCard({
   handleMessage: any;
 }) {
   const router = useRouter();
-  const [freelancerSuccsRate, setFreelancerSuccessRate] = useState(100);
+  const [freelancerSuccsRate, setFreelancerSuccessRate] = useState(0);
 
   useEffect(() => {
     let cancelProject = 0;
@@ -66,9 +66,14 @@ export default function FreelancerCard({
         </p>
         <p className='text-xs'>
           Job Success rate{' '}
-          <span className='text-imbue-purple'>
-            {Math.floor(freelancerSuccsRate)}%
-          </span>
+          {freelancerSuccsRate > 0 && (
+            <span className='text-imbue-purple'>
+              {Math.floor(freelancerSuccsRate)}%
+            </span>
+          )}
+          {freelancerSuccsRate === 0 && (
+            <span className='text-imbue-purple'>NA</span>
+          )}
         </p>
       </div>
       <div className='flex mt-10 text-xs gap-5'>
