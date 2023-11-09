@@ -69,8 +69,8 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
     user,
   } = props;
 
-  const [balance, setBalance] = useState<string>();
-  const [imbueBalance, setImbueBalance] = useState<string>();
+  const [balance, setBalance] = useState<number>(0);
+  const [imbueBalance, setImbueBalance] = useState<number>(0);
   const [loadingWallet, setLoadingWallet] = useState<string>('');
   const [error, setError] = useState<any>();
 
@@ -122,13 +122,15 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
           user?.web3_address,
           application.id
         );
+
         const imbueBalance = await getBalance(
           Currency.IMBU,
           user,
           user?.web3_address
         );
-        setBalance(balance.toLocaleString());
-        setImbueBalance(imbueBalance.toLocaleString());
+
+        setBalance(Number(balance) || 0);
+        setImbueBalance(Number(imbueBalance) || 0);
       } catch (error) {
         setError({ message: error });
       } finally {
@@ -244,9 +246,8 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
                 )}
               </button>
               <button
-                className={`${
-                  applicationStatusId[application?.status_id]
-                }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[10px]`}
+                className={`${applicationStatusId[application?.status_id]
+                  }-btn in-dark text-xs lg:text-base rounded-full py-3 px-3 lg:px-6 lg:py-[10px]`}
               >
                 {applicationStatusId[application?.status_id]}
               </button>

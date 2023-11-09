@@ -74,12 +74,19 @@ export const HirePopup = ({
 
 
   const updateEscrowInfo = async () => {
-    const escrowAddress = await getOffchainEscrowAddress(application.id);
-    setEscrowAddress(escrowAddress);
-    const allBalances = await getOffchainEscrowBalance(application.id);
-    const currency = Currency[application.currency_id].toString().toLowerCase();
-    const escrowBalance = Number(allBalances[currency]) ?? 0;
-    setEscrowBalance(escrowBalance);
+    try {
+      const escrowAddress = await getOffchainEscrowAddress(application.id);
+
+      if (escrowAddress?.status !== "Failed")
+        setEscrowAddress(escrowAddress);
+
+      const allBalances = await getOffchainEscrowBalance(application.id);
+      const currency = Currency[application.currency_id].toString().toLowerCase();
+      const escrowBalance = Number(allBalances[currency]) || 0;
+      setEscrowBalance(escrowBalance);
+    } catch (error) {
+      setError({ message: "Failed to load payment info" })
+    }
   };
 
   useEffect(() => {
