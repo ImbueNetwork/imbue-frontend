@@ -2,7 +2,6 @@ import { Avatar, AvatarGroup, LinearProgress } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import React, { useEffect, useState } from 'react';
 
-import { NoConfidenceVoter } from '@/lib/queryServices/projectQueries';
 import { initPolkadotJSAPI } from '@/utils/polkadot';
 
 import VoteModal from '@/components/ReviewModal/VoteModal';
@@ -13,7 +12,7 @@ import ChainService from '@/redux/services/chainService';
 
 type MilestoneVoteBoxProps = {
     user: User;
-    noConfidenceVoters: NoConfidenceVoter[];
+    noConfidenceVoters: Array<User & { vote: boolean }>;
     canVote: boolean;
     isApplicant: boolean;
     project: Project;

@@ -379,7 +379,7 @@ export const HirePopup = ({
           </p>
           <p className='mb-10'>
             <span>Escrow Address:</span>
-            <span className='text-lg lg:text-xl text-imbue-lemon mr-1'>
+            <span className='text-lg lg:text-xl text-imbue-lemon ml-1 font-mono'>
               {escrowAddress}
             </span>
           </p>

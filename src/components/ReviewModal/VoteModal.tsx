@@ -23,7 +23,7 @@ import {
 } from '@/model';
 import ChainService, { ImbueChainEvent } from '@/redux/services/chainService';
 import {
-  insertNoConfidenceVoter,
+  insertNoConfidenceVote,
   updateProject,
   voteOnMilestone,
   watchChain,
@@ -143,6 +143,11 @@ export default function VoteModal({
       let pollResult = ImbueChainPollResult.Pending;
       let noConfidencePoll = ImbueChainPollResult.Pending;
 
+      const voteData = {
+        voter: user,
+        vote
+      }
+
       if (project.project_in_voting_of_no_confidence) {
         const result = await chainService.voteOnNoConfidence(
           votingWalletAccount,
@@ -166,14 +171,14 @@ export default function VoteModal({
             if (pollResult == ImbueChainPollResult.EventFound) {
               project.status_id = OffchainProjectState.Refunded;
               await updateProject(project?.id, project);
-              await insertNoConfidenceVoter(project?.id, user);
+              await insertNoConfidenceVote(project?.id, voteData);
 
               setVisible(true);
               setVoteRefund(true);
               setStep(4);
               break;
             } else if (noConfidencePoll == ImbueChainPollResult.EventFound) {
-              await insertNoConfidenceVoter(project?.id, user);
+              await insertNoConfidenceVote(project?.id, voteData);
 
               setVisible(true);
               setVoteRefund(true);
@@ -216,7 +221,7 @@ export default function VoteModal({
             if (pollResult == ImbueChainPollResult.EventFound) {
               project.project_in_voting_of_no_confidence = true;
               await updateProject(project?.id, project);
-              await insertNoConfidenceVoter(project?.id, user);
+              await insertNoConfidenceVote(project?.id, voteData);
               setStep(4);
               setVoteRefund(true);
               setVisible(true);
