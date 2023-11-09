@@ -14,8 +14,8 @@ import { BasicTxResponse } from '@/model';
 import { Currency } from '@/model';
 import { ImbueChainEvent } from '@/redux/services/chainService';
 
-import { ERC_20_ABI,getEVMContract } from './helper';
-import { handleError, initPolkadotJSAPI } from './polkadot';
+import { ERC_20_ABI, getEVMContract } from './helper';
+import { handleError, initPolkadotJSAPI, PolkadotJsApiInfo } from './polkadot';
 
 const WALLET_MNEMONIC = process.env.WALLET_MNEMONIC;
 const RPC_URL = process.env.ETH_RPC_URL;
@@ -23,9 +23,11 @@ const RPC_URL = process.env.ETH_RPC_URL;
 
 export class MultiChainService {
   static core: WalletCore;
+  static imbueApi: PolkadotJsApiInfo;
   public static async build(): Promise<MultiChainService> {
-    if(!this.core) {
+    if (!this.core) {
       this.core = await initWasm();
+      this.imbueApi = await initPolkadotJSAPI(process.env.IMBUE_NETWORK_WEBSOCK_ADDR!);
     }
     return new MultiChainService()
   }
@@ -58,10 +60,9 @@ export class MultiChainService {
         const currencyId = project.currency_id;
         const escrowAddress = project.escrow_address;
         if (currencyId < 100) {
-          const imbueApi = await initPolkadotJSAPI(process.env.IMBUE_NETWORK_WEBSOCK_ADDR!);
           switch (currencyId) {
             case Currency.IMBU: {
-              const balance: any = await imbueApi.api.query.system.account(
+              const balance: any = await MultiChainService.imbueApi.api.query.system.account(
                 escrowAddress
               );
               const imbueBalance = balance?.data?.free / 1e12;
@@ -69,7 +70,7 @@ export class MultiChainService {
             }
             case Currency.MGX: {
               const mgxResponse: any =
-                await imbueApi.api.query.ormlTokens.accounts(
+                await MultiChainService.imbueApi.api.query.ormlTokens.accounts(
                   escrowAddress,
                   currencyId
                 );
@@ -78,7 +79,7 @@ export class MultiChainService {
             }
             default: {
               const accountResponse: any =
-                await imbueApi.api.query.ormlTokens.accounts(
+                await MultiChainService.imbueApi.api.query.ormlTokens.accounts(
                   escrowAddress,
                   currencyId
                 );
@@ -104,7 +105,7 @@ export class MultiChainService {
             }
             case (Currency.USDT): {
               const contract = await getEVMContract(currencyId);
-              if(!contract) {
+              if (!contract) {
                 throw new Error(`Could not find contract for currency Id ${currencyId}`);
               }
               const signer = await ethProvider.getSigner();
@@ -138,7 +139,6 @@ export class MultiChainService {
 
   public mintTokens = async (projectId: number, beneficiary: string) => {
     const offchainEscrowBalance: any = await this.getBalance(projectId);
-    const imbueApi = await initPolkadotJSAPI(process.env.IMBUE_NETWORK_WEBSOCK_ADDR!);
     const { HDWallet, CoinType } = MultiChainService.core;
     const wallet = HDWallet.createWithMnemonic(WALLET_MNEMONIC!, '');
     const coinType = CoinType.polkadot;
@@ -162,7 +162,7 @@ export class MultiChainService {
         const mintAmount = BigInt(project.total_cost_without_fee! * 1e12);
         let transactionState: BasicTxResponse = {} as BasicTxResponse;
         transactionState.status = false;
-        const extrinsic = imbueApi.api.tx.imbueProposals
+        const extrinsic = MultiChainService.imbueApi.api.tx.imbueProposals
           .mintOffchainAssets(
             beneficiary,
             currency,
@@ -170,7 +170,7 @@ export class MultiChainService {
           );
         extrinsic
           .signAndSend(sender, ((result: any) => {
-            imbueApi.api.query.system.events(
+            MultiChainService.imbueApi.api.query.system.events(
               (events: EventRecord[]) => {
                 if (!result || !result.status || !events) {
                   return;
@@ -230,11 +230,11 @@ export class MultiChainService {
             const withdrawableMilestones = approvedMilestones
               .filter(milestone => !milestone.withdrawn_offchain)
               .map((milestone: any) => Number(milestone.milestone_index));
-            withdrawnFunds = Number(await this.transfer(projectId, project.currency_id, project.payment_address, approvedFunds, withdrawableMilestones, coverFees));
+            const isFinalMilestone = milestones.length == approvedMilestones.length;
+            withdrawnFunds = Number(await this.transfer(projectId, project.currency_id, project.payment_address, approvedFunds, withdrawableMilestones, coverFees, isFinalMilestone));
+            keepCalling = false;
+            break;
           }
-
-          keepCalling = false;
-          break;
         }
       } catch (e: any) {
         throw new Error(e.message);
@@ -246,36 +246,37 @@ export class MultiChainService {
 
   getApprovedFunds = async (project: any, milestones: Milestone[]) => {
     let approvedFundsTotal = 0;
-    const imbueApi = await initPolkadotJSAPI(process.env.IMBUE_NETWORK_WEBSOCK_ADDR!);
+    let projectCompleted = false;
     const projectOnChain: any = (
-      await imbueApi.api.query.imbueProposals.projects(
+      await MultiChainService.imbueApi.api.query.imbueProposals.projects(
         project.chain_project_id
       )
     ).toHuman();
-    const onchainApprovedMilestoneIds: any[] = Object.keys(projectOnChain.milestones)
+
+    if (!projectOnChain) {
+      const userCompletedProjects: number[] = (await MultiChainService.imbueApi.api.query.imbueProposals.completedProjects(
+        project.owner
+      )).toJSON() as number[];
+      projectCompleted = userCompletedProjects.includes(project.chain_project_id);
+    }
+    const onchainApprovedMilestoneIds: any[] = projectOnChain ? Object.keys(projectOnChain.milestones)
       .map((milestoneItem: any) => projectOnChain.milestones[milestoneItem])
       .filter((milestone: any) => milestone.isApproved)
-      .map((milestone: any) => Number(milestone.milestoneKey));
+      .map((milestone: any) => Number(milestone.milestoneKey)) : [];
 
     const offchainApprovedMilestones = milestones.filter(milestone => milestone.is_approved);
     const milestonesMatch = JSON.stringify(offchainApprovedMilestones.map(milestone => Number(milestone.milestone_index))) == JSON.stringify(onchainApprovedMilestoneIds);
-    if (milestonesMatch) {
+    if (milestonesMatch || projectCompleted) {
       approvedFundsTotal = offchainApprovedMilestones.filter(milestone => !milestone.withdrawn_offchain)
         .reduce((sum, milestone) => sum + Number(milestone.amount), 0);
     }
     return approvedFundsTotal
   }
 
-  transfer = async (projectId: number, currencyId: number, destinationAddress: string, amount: number, withdrawableMilestones: number[], coverFees = false) => {
+  transfer = async (projectId: number, currencyId: number, destinationAddress: string, amount: number, withdrawableMilestones: number[], coverFees = false, isFinalMilestone = false) => {
     let withdrawnAmount = 0;
+    const { CoinType, HDWallet, HexCoding } = MultiChainService.core;
     try {
-      const ethProvider = new ethers.JsonRpcProvider(RPC_URL);
-      const { CoinType, HDWallet, HexCoding } = MultiChainService.core;
-      if (!WALLET_MNEMONIC) {
-        return new Error(`Wallet Mnemonic not populated`);
-      }
-      const currency = Currency[currencyId];
-      const treasuryAddress = await this.generateAddress(0, currencyId);
       const CURRENCY_COINTYPE_LOOKUP: Record<string, any> = {
         "eth": CoinType.ethereum,
         "usdt": CoinType.ethereum,
@@ -284,71 +285,82 @@ export class MultiChainService {
         "matic": CoinType.polygon,
         "dot": CoinType.polkadot,
       };
-      const wallet = HDWallet.createWithMnemonic(WALLET_MNEMONIC, "");
+      const currency = Currency[currencyId];
       const coinType = CURRENCY_COINTYPE_LOOKUP[currency.toLowerCase()];
 
-      if (coinType == CoinType.ethereum && !coverFees) {
+      if (coinType == CoinType.ethereum) {
+        const ethProvider = new ethers.JsonRpcProvider(RPC_URL);
+        if (!WALLET_MNEMONIC) {
+          return new Error(`Wallet Mnemonic not populated`);
+        }
+        const treasuryAddress = await this.generateAddress(0, currencyId);
+        const wallet = HDWallet.createWithMnemonic(WALLET_MNEMONIC, "");
         const balance: any = await this.getBalance(projectId);
-        if (balance.eth == 0) {
+        if (balance.eth == 0 && !coverFees) {
           throw Error(`Insufficent $ETH balance to cover withdrawal fees`);
         }
-      }
-      const key = wallet.getDerivedKey(coinType, projectId, 0, projectId);
-      const privateKeyHex = HexCoding.encode(key.data());
-      const sender = new ethers.Wallet(privateKeyHex, ethProvider);
-      let withdrawal_transaction: any;
-      let imbue_fee_transaction: any;
 
-      switch (currencyId) {
-        case Currency.ETH:
-          const imbueFee = ethers.parseEther((amount * 0.05).toPrecision(5).toString());
-          const transferAmount = ethers.parseEther((amount).toPrecision(5).toString()) - imbueFee;
-          imbue_fee_transaction = await sender.sendTransaction({ to: treasuryAddress, value: imbueFee });
-          withdrawal_transaction = await sender.sendTransaction({ to: destinationAddress, value: transferAmount });
-          break;
-        case Currency.USDT: {
-          const balance: any = await this.getBalance(projectId);
-          if (balance.usdt < amount) {
-            throw Error(`Insufficent $USDT balance to cover withdrawal`);
-          }
-          const contract = await getEVMContract(currencyId);
-          if (!contract) {
-            throw Error(`Cannot find contract for currency id ${currencyId}`);
-          }
-          const token = new ethers.Contract(contract.address, ERC_20_ABI, sender);
-          let imbueFee = ethers.parseUnits((amount * 0.05).toPrecision(5).toString(), contract.decimals);
-          if (coverFees) {
-            const initialTransferCost = await this.estimateGasCostsInEth(projectId, currencyId, destinationAddress, amount);
-            const additionalFees = await this.estimateGasCostsInEth(projectId, currencyId, destinationAddress, amount, true);
-            const escrowEthBalance: any = (await this.getBalance(projectId));
-            const accountTopupRequired = Number(escrowEthBalance.eth) < initialTransferCost;
-            if (accountTopupRequired) {
-              const treasuryKey = wallet.getDerivedKey(CoinType.ethereum, 0, 0, 0);
-              const treasuryKeyHex = HexCoding.encode(treasuryKey.data());
-              const treasurySender = new ethers.Wallet(treasuryKeyHex, ethProvider);
-              const treasuryTransferAmount = ethers.parseEther((initialTransferCost).toPrecision(5).toString());
-              const escrowAddress = await this.generateAddress(projectId, currencyId);
-              const treasuryTx = await treasurySender.sendTransaction({ to: escrowAddress, value: treasuryTransferAmount });
-              await ethProvider.waitForTransaction(treasuryTx.hash, 1, 150000);
-              const additionalFeesInEscrowAddress = await this.convertEthToEscrowCurrency(currencyId, additionalFees)
-              imbueFee = imbueFee + ethers.parseUnits((additionalFeesInEscrowAddress * 0.05).toPrecision(5).toString(), contract.decimals);
+        const key = wallet.getDerivedKey(coinType, projectId, 0, projectId);
+        const privateKeyHex = HexCoding.encode(key.data());
+        const sender = new ethers.Wallet(privateKeyHex, ethProvider);
+        let withdrawal_transaction: any;
+        let imbue_fee_transaction: any;
+
+        switch (currencyId) {
+          case Currency.ETH:
+            if (isFinalMilestone) {
+              const currentEthBalance = Number(balance.eth);
+              amount = currentEthBalance
             }
+            const imbueFee = ethers.parseEther((amount * 0.05).toPrecision(5).toString());
+            const additionalFees = await this.estimateGasCostsInEth(projectId, currencyId, destinationAddress, amount, true);
+            const transferAmount = ethers.parseEther((amount).toPrecision(5).toString()) - imbueFee - ethers.parseEther((additionalFees).toPrecision(5).toString());
+            imbue_fee_transaction = await sender.sendTransaction({ to: treasuryAddress, value: imbueFee });
+            withdrawal_transaction = await sender.sendTransaction({ to: destinationAddress, value: transferAmount });
+            break;
+          case Currency.USDT: {
+            const balance: any = await this.getBalance(projectId);
+            if (balance.usdt < amount) {
+              throw Error(`Insufficent $USDT balance to cover withdrawal`);
+            }
+            const contract = await getEVMContract(currencyId);
+            if (!contract) {
+              throw Error(`Cannot find contract for currency id ${currencyId}`);
+            }
+            const token = new ethers.Contract(contract.address, ERC_20_ABI, sender);
+            let imbueFee = ethers.parseUnits((amount * 0.05).toPrecision(5).toString(), contract.decimals);
+            if (coverFees) {
+              const initialTransferCost = await this.estimateGasCostsInEth(projectId, currencyId, destinationAddress, amount);
+              const additionalFees = await this.estimateGasCostsInEth(projectId, currencyId, destinationAddress, amount, true);
+              const escrowEthBalance: any = (await this.getBalance(projectId));
+              const accountTopupRequired = Number(escrowEthBalance.eth) < initialTransferCost;
+              if (accountTopupRequired) {
+                const treasuryKey = wallet.getDerivedKey(CoinType.ethereum, 0, 0, 0);
+                const treasuryKeyHex = HexCoding.encode(treasuryKey.data());
+                const treasurySender = new ethers.Wallet(treasuryKeyHex, ethProvider);
+                const treasuryTransferAmount = ethers.parseEther((initialTransferCost).toPrecision(5).toString());
+                const escrowAddress = await this.generateAddress(projectId, currencyId);
+                const treasuryTx = await treasurySender.sendTransaction({ to: escrowAddress, value: treasuryTransferAmount });
+                await ethProvider.waitForTransaction(treasuryTx.hash, 1, 150000);
+                const additionalFeesInEscrowAddress = await this.convertEthToEscrowCurrency(currencyId, additionalFees)
+                imbueFee = imbueFee + ethers.parseUnits((additionalFeesInEscrowAddress).toPrecision(5).toString(), contract.decimals);
+              }
+            }
+            const transferAmount = ethers.parseUnits((amount).toPrecision(5).toString(), contract.decimals) - imbueFee;
+            imbue_fee_transaction = await token
+              .transfer(treasuryAddress, imbueFee);
+            withdrawal_transaction = await token
+              .transfer(destinationAddress, transferAmount);
+            await ethProvider.waitForTransaction(imbue_fee_transaction.hash, 1, 150000);
+            await ethProvider.waitForTransaction(withdrawal_transaction.hash, 1, 150000);
+            break;
           }
-          const transferAmount = ethers.parseUnits((amount).toPrecision(5).toString(), contract.decimals) - imbueFee;
-          imbue_fee_transaction = await token
-            .transfer(treasuryAddress, imbueFee);
-          withdrawal_transaction = await token
-            .transfer(destinationAddress, transferAmount);
-          await ethProvider.waitForTransaction(imbue_fee_transaction.hash, 1, 150000);
-          await ethProvider.waitForTransaction(withdrawal_transaction.hash, 1, 150000);
-          break;
         }
+
+        await db.transaction(async (tx: any) => {
+          await updateMilestoneWithdrawHashs(projectId, withdrawableMilestones, withdrawal_transaction.hash, imbue_fee_transaction.hash)(tx);
+        });
       }
-
-      await db.transaction(async (tx: any) => {
-        await updateMilestoneWithdrawHashs(projectId, withdrawableMilestones, withdrawal_transaction.hash, imbue_fee_transaction.hash)(tx);
-      });
-
       withdrawnAmount = amount;
       return withdrawnAmount;
     } catch (e) {
@@ -378,9 +390,16 @@ export class MultiChainService {
       const privateKeyHex = HexCoding.encode(key.data());
       const sender = new ethers.Wallet(privateKeyHex, ethProvider);
       switch (currencyId) {
+        case Currency.ETH: {
+          const imbueFee = ethers.parseUnits((amount * 0.05).toPrecision(5).toString());
+          const transferAmount = ethers.parseUnits((amount).toPrecision(5).toString()) - imbueFee;
+          imbue_fee_gas_cost = await sender.estimateGas({ to: treasuryAddress, value: imbueFee });
+          withdrawal_gas_cost = await sender.estimateGas({ to: treasuryAddress, value: transferAmount });
+          break;
+        }
         case Currency.USDT: {
           const contract = await getEVMContract(currencyId);
-          if(!contract) {
+          if (!contract) {
             throw new Error(`Could not find contract for currency Id ${currencyId}`);
           }
           const token = new ethers.Contract(contract.address, ERC_20_ABI, sender);
@@ -388,13 +407,14 @@ export class MultiChainService {
           const transferAmount = ethers.parseUnits((amount).toPrecision(5).toString(), contract.decimals) - imbueFee;
           imbue_fee_gas_cost = await token.transfer.estimateGas(treasuryAddress, imbueFee);
           withdrawal_gas_cost = await token.transfer.estimateGas(destinationAddress, transferAmount);
-          const gasAmount = includeTreasuryCover ? BigInt(imbue_fee_gas_cost + imbue_fee_gas_cost + withdrawal_gas_cost) : BigInt(imbue_fee_gas_cost + withdrawal_gas_cost);
-          const gasFeeInWei = gasAmount * gasPrice;
-          const gasFeeInETH = ethers.formatEther(gasFeeInWei);
-          totalGasCost = Number((Number(gasFeeInETH) * bufferCost).toPrecision(3));
           break;
         }
       }
+
+      const gasAmount = includeTreasuryCover ? BigInt(imbue_fee_gas_cost + imbue_fee_gas_cost + withdrawal_gas_cost) : BigInt(imbue_fee_gas_cost + withdrawal_gas_cost);
+      const gasFeeInWei = gasAmount * gasPrice;
+      const gasFeeInETH = ethers.formatEther(gasFeeInWei);
+      totalGasCost = Number((Number(gasFeeInETH) * bufferCost).toPrecision(5));
       return totalGasCost;
     } catch (e) {
       throw new Error(`Failed to estimate gas costs. ${e}`);

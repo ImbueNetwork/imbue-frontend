@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 
 import { ProgressBar } from '@/components/ProgressBar';
 
-import { applicationStatusId, Project } from '@/model';
+import { applicationStatusId, Currency, Project } from '@/model';
 import { getFreelancerApplications } from '@/redux/services/freelancerService';
 import { RootState } from '@/redux/store/store';
 
@@ -205,7 +205,7 @@ export default function Myprojects() {
                 </div>
                 <div className='flex pb-9 justify-between'>
                   <div className='flex space-x-5 text-sm text-imbue-purple-dark'>
-                    <p>${project.required_funds}</p>
+                    <p>{project.required_funds} ${Currency[project.currency_id]}</p>
                     <p>Fixed price</p>
                   </div>
                 </div>
