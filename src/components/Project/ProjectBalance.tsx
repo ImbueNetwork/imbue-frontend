@@ -7,7 +7,7 @@ import { getBalance } from '@/utils/helper';
 import { Currency, OffchainProjectState, Project, User } from '@/model';
 
 type ProjectBalanceType = {
-    balance: number;
+    balance: number | undefined;
     project: Project;
     user: User;
     handlePopUpForUser: () => void;
@@ -44,16 +44,21 @@ const Currencies = [
 const ProjectBalance = (props: ProjectBalanceType) => {
     const { balance, project, user, handlePopUpForUser, setBalance, balanceLoading, setBalanceLoading } = props;
     const [currency_id, setCurrency_id] = useState<number>();
+    const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const showOptions = Boolean(anchorEl);
 
     useEffect(() => {
         const getAndSetBalace = async () => {
+            if (balanceLoading && !firstLoad) return;
+
             if (
                 currency_id === undefined
             ) return
+
             setBalanceLoading(true)
+
             try {
                 const balance = await getBalance(
                     currency_id,
@@ -64,7 +69,11 @@ const ProjectBalance = (props: ProjectBalanceType) => {
                 if (!balance && project.status_id !== OffchainProjectState.Completed) {
                     handlePopUpForUser();
                 }
+
                 setBalance(balance || 0);
+                if (firstLoad)
+                    setFirstLoad(false)
+
             } catch (error) {
                 // eslint-disable-next-line no-console
                 console.error(error);
@@ -78,8 +87,13 @@ const ProjectBalance = (props: ProjectBalanceType) => {
             setCurrency_id(project.currency_id);
         }
 
+        const timer = setInterval(() => {
+            getAndSetBalace();
+        }, 5000);
+        return () => clearInterval(timer);
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currency_id, project?.escrow_address, project.status_id, user.id])
+    }, [currency_id, project?.escrow_address, project.status_id, user.id, firstLoad, balanceLoading])
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
@@ -94,7 +108,7 @@ const ProjectBalance = (props: ProjectBalanceType) => {
 
     return (
         <div className='text-sm text-[#868686] mt-2'>
-            {balanceLoading
+            {balanceLoading && firstLoad
                 ? (
                     <p className='text-xs font-semibold'> Loading Balance...</p>)
                 : (
