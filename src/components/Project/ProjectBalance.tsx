@@ -7,7 +7,7 @@ import { getBalance } from '@/utils/helper';
 import { Currency, OffchainProjectState, Project, User } from '@/model';
 
 type ProjectBalanceType = {
-    balance: number;
+    balance: number | undefined;
     project: Project;
     user: User;
     handlePopUpForUser: () => void;
@@ -58,7 +58,7 @@ const ProjectBalance = (props: ProjectBalanceType) => {
                 const balance = await getBalance(
                     currency_id,
                     user,
-                    project.currency_id < 100  ? project?.escrow_address : undefined,
+                    project.currency_id < 100 ? project?.escrow_address : undefined,
                     Number(project.id)
                 );
                 if (!balance && project.status_id !== OffchainProjectState.Completed) {

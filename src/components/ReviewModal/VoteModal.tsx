@@ -170,8 +170,8 @@ export default function VoteModal({
           if (result.status || result.txError) {
             if (pollResult == ImbueChainPollResult.EventFound) {
               project.status_id = OffchainProjectState.Refunded;
-              await updateProject(project?.id, project);
               await insertNoConfidenceVote(project?.id, voteData);
+              await updateProject(project?.id, project);
 
               setVisible(true);
               setVoteRefund(true);
@@ -185,6 +185,8 @@ export default function VoteModal({
               setStep(4);
               break;
             } else if (result.status) {
+              await insertNoConfidenceVote(project?.id, voteData);
+
               setVisible(true);
               setStep(4);
               setVoteRefund(true);
@@ -226,6 +228,9 @@ export default function VoteModal({
               setVoteRefund(true);
               setVisible(true);
             } else if (result.status) {
+              project.project_in_voting_of_no_confidence = true;
+              await updateProject(project?.id, project);
+              await insertNoConfidenceVote(project?.id, voteData);
               setStep(4);
               setVoteRefund(true);
               setVisible(true);

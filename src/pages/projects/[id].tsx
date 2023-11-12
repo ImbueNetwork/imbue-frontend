@@ -97,7 +97,7 @@ function Project() {
   const [refunded, setRefunded] = useState<boolean>(false);
   const [successTitle, setSuccessTitle] = useState<string>('');
   const [error, setError] = useState<any>();
-  const [balance, setBalance] = useState<any>(0);
+  const [balance, setBalance] = useState<number>();
   const [balanceLoading, setBalanceLoading] = useState(true)
   const [approversPreview, setApproverPreview] = useState<User[]>([]);
   const [isApprover, setIsApprover] = useState<boolean>(false);
@@ -156,10 +156,10 @@ function Project() {
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
     if (project?.chain_project_id && project?.id) {
 
-      const voters: NoConfidenceVoter[] = await getProjectNoConfidenceVoters(
+      const noConfidenceResp: NoConfidenceVoter[] = await getProjectNoConfidenceVoters(
         project.id
       );
-      setNoConfidenceVoters(voters);
+      setNoConfidenceVoters(noConfidenceResp);
 
       if (!user.id || !user.web3_address) return
 
@@ -171,7 +171,7 @@ function Project() {
       }
 
       if (user?.web3_address && project.project_in_voting_of_no_confidence) {
-        const isApprover = voters?.find(
+        const isApprover = noConfidenceResp?.find(
           (voter) => voter.web3_address === user.web3_address
         );
         if (user?.web3_address && isApprover?.web3_address) {

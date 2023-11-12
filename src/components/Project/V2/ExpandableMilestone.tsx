@@ -43,7 +43,7 @@ interface ExpandableMilestonProps {
   canVote: boolean;
   loading: boolean;
   targetUser: any;
-  balance: number;
+  balance: number | undefined;
   balanceLoading: boolean;
   // hasMilestoneAttachments: boolean;
 }
@@ -62,7 +62,6 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
     setSuccess,
     targetUser,
     balance,
-    balanceLoading,
     // hasMilestoneAttachments = false
   } = props;
   const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
@@ -297,7 +296,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
         if (withdrawResult.txError) {
           setSuccess(false);
           setError({ message: withdrawResult.errorMessage });
-        } else if(Number(withdrawResult.withdrawn) > 0) {
+        } else if (Number(withdrawResult.withdrawn) > 0) {
           setSuccess(true);
           setSuccessTitle('Withdraw successful');
         }
@@ -526,7 +525,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
 
 
                       {
-                        balance === 0 && !balanceLoading && project?.brief_id && (
+                        balance === 0 && !project?.brief_id && (
                           <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-imbue-coral px-3 py-1 text-sm text-white w-fit ml-auto mt-3 '>
                             <ErrorOutlineOutlinedIcon className='h-4 w-4 inline' />
                             <p className='inline'>

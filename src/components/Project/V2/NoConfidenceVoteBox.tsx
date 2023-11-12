@@ -32,6 +32,9 @@ const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
     const [votingWalletAccount, setVotingWalletAccount] = useState<WalletAccount | any>({});
     const [refundOnly, setRefundOnly] = useState<boolean>(false);
 
+    const yesVote = noConfidenceVoters.filter((v) => !v.vote)
+    const noVote = noConfidenceVoters.filter((v) => v.vote)
+
     const handleVoting = (milestone_index: number) => {
         // show polkadot account modal
         setShowPolkadotAccounts(true);
@@ -107,16 +110,15 @@ const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
                             className='mt-auto cursor-pointer'
                             onClick={() => props?.setOpenVotingList(true)}
                         >
-                            {
-                                        /* <AvatarGroup className='justify-end' max={3}>
-                                        {
-                                            [1, 2, 3].map((v, index) => (
-                                                <Avatar className='h-6 w-6 !border !border-white' key={index} alt="Remy Sharp" src={v.profile_photo || '/profile-image.png'} />
-                                            ))
-                                        }
-                                            </AvatarGroup> */}
+                            <AvatarGroup className='justify-end' max={3}>
+                                {
+                                    noVote.map((v, index) => (
+                                        <Avatar className='h-6 w-6 !border !border-white' key={index} alt="Remy Sharp" src={v.profile_photo || '/profile-image.png'} />
+                                    ))
+                                }
+                            </AvatarGroup>
                             <p className='text-black text-sm'>
-                                No <span className='text-gray-400'>({0} votes/ {0}%)</span>
+                                No <span className='text-gray-400'>({noVote.length} votes/ {(noVote.length / props.approversCount) * 100}%)</span>
                             </p>
                         </div>
                         <div
@@ -125,14 +127,14 @@ const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
                         >
                             <AvatarGroup max={3}>
                                 {
-                                    noConfidenceVoters.map((v, index) => (
+                                    yesVote.map((v, index) => (
                                         <Avatar className='h-6 w-6 !border !border-white' key={index} alt="Remy Sharp" src={v.profile_photo || '/profile-image.png'} />
                                     ))
                                 }
                             </AvatarGroup>
                             <p className='text-black text-sm'>
                                 <span className='text-gray-400'>
-                                    ({noConfidenceVoters.length} Votes/ {(noConfidenceVoters.length / props.approversCount) * 100}%)</span> Yes
+                                    ({yesVote.length} Votes/ {(yesVote.length / props.approversCount) * 100}%)</span> Yes
                             </p>
                         </div>
                     </div>
@@ -141,7 +143,7 @@ const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
                             className='w-[52%] text-imbue-coral rotate-180 before:bg-[#DDDCD6]    h-5 rounded-full'
                             color='inherit'
                             variant='determinate'
-                            value={0}
+                            value={(noVote.length / props.approversCount) * 100 || 0}
                         />
                         <div className='w-3 left-[47%] top-[20%] absolute z-10 bg-[#DDDCD6] rounded-full h-3'></div>
                         {
@@ -150,7 +152,7 @@ const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
                                     <LinearProgress
                                         className='w-[55%] h-5 -ml-5 rounded-full bg-[#DDDCD6]'
                                         variant='determinate'
-                                        value={(noConfidenceVoters.length / props.approversCount) * 100 || 0}
+                                        value={(yesVote.length / props.approversCount) * 100 || 0}
                                         color='secondary'
                                     />)
                                 : ""
