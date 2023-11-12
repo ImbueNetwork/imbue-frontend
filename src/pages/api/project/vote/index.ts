@@ -118,6 +118,12 @@ export default nextConnect()
 
         const allVotersRes = await fetchProjectApprovers(projectId)(tx);
 
+        console.log('🚀 ~ file: index.ts:118 ~ db.transaction ~ yes:', {
+          yes,
+          no,
+          allVotersRes
+        });
+
         if (yes.length / allVotersRes.length >= 0.75) {
           // closing voting round and approving milestone if treshold reached
           await updateProjectVoting(Number(projectId), false)(tx);
@@ -133,7 +139,6 @@ export default nextConnect()
         }
 
         res.status(200).json({ status: 'success', milestoneApproved });
-        
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error(error);

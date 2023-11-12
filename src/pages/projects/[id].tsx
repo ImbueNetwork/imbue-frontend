@@ -97,7 +97,7 @@ function Project() {
   const [refunded, setRefunded] = useState<boolean>(false);
   const [successTitle, setSuccessTitle] = useState<string>('');
   const [error, setError] = useState<any>();
-  const [balance, setBalance] = useState<number>();
+  const [balance, setBalance] = useState<number | undefined>();
   const [balanceLoading, setBalanceLoading] = useState(true)
   const [approversPreview, setApproverPreview] = useState<User[]>([]);
   const [isApprover, setIsApprover] = useState<boolean>(false);
