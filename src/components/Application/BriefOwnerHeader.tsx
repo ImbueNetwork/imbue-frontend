@@ -69,8 +69,8 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
     user,
   } = props;
 
-  const [balance, setBalance] = useState<string>();
-  const [imbueBalance, setImbueBalance] = useState<string>();
+  const [balance, setBalance] = useState<number | undefined>();
+  const [imbueBalance, setImbueBalance] = useState<number | undefined>();
   const [loadingWallet, setLoadingWallet] = useState<string>('loading');
   const [error, setError] = useState<any>();
 
