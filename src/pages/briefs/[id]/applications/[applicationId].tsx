@@ -148,7 +148,7 @@ const ApplicationPreview = (): JSX.Element => {
           freelancerUser?.username
         );
 
-        if (!user?.id) return setLoginModal(true)
+        if (!user?.id) return router.push('/auth/sign-in')
         else if (user.id !== brief?.user_id && user.id !== applicationResponse?.user_id) return router.push('/dashboard')
 
         setBrief(brief);
@@ -160,7 +160,7 @@ const ApplicationPreview = (): JSX.Element => {
       } catch (error) {
         setError({ message: 'Could not find application' });
       } finally {
-        //setLoading(false);
+        setLoading(false);
       }
     };
 
@@ -246,18 +246,6 @@ const ApplicationPreview = (): JSX.Element => {
       setLoginModal(true);
     }
   };
-
-  useEffect(() => {
-    if (freelancer && briefOwner && user.id && !userLoading) {
-      if (freelancer.user_id === user.id || briefOwner.id === user.id) {
-        setLoading(false);
-      } else {
-        router.push('/');
-      }
-    } else if (!userLoading && (!user || !user.id)) {
-      router.push('/');
-    }
-  }, [briefOwner, freelancer]);
 
   const updateApplicationState = async (
     application: any,

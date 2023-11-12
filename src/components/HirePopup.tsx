@@ -24,6 +24,7 @@ import { getOffchainEscrowAddress, getOffchainEscrowBalance, mintTokens } from '
 import { RootState } from '@/redux/store/store';
 
 import AccountChoice from './AccountChoice';
+import CopyToClipboardToast from './CopyToClipboardToast';
 import ErrorScreen from './ErrorScreen';
 import SuccessScreen from './SuccessScreen';
 import styles from '../styles/modules/hire-modal.module.css';
@@ -386,8 +387,15 @@ export const HirePopup = ({
           </p>
           <p className='mb-10'>
             <span>Escrow Address:</span>
-            <span className='text-lg lg:text-xl text-imbue-lemon ml-1 font-mono'>
-              {escrowAddress}
+            <span
+              className='text-lg lg:text-xl text-imbue-lemon ml-1 font-mono'
+            >
+              <CopyToClipboardToast
+                title='Payment address'
+                link={escrowAddress}
+              >
+                {escrowAddress}
+              </CopyToClipboardToast>
             </span>
           </p>
           <p className='mb-10'>
