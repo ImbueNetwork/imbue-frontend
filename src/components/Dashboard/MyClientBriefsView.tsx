@@ -2,6 +2,7 @@
 //import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import { Freelancer, Project } from '@/model';
 import {
@@ -9,6 +10,7 @@ import {
   getUserBriefs,
 } from '@/redux/services/briefService';
 import { getUsersOngoingGrants } from '@/redux/services/projectServices';
+import { RootState } from '@/redux/store/store';
 
 // import OngoingProject from './FreelacerView/OngoingProject/OngoingProject';
 // import { ApplicationContainer } from '../Briefs/ApplicationContainer';
@@ -20,12 +22,13 @@ type ClientViewProps = {
   briefId: string | string[] | undefined;
   handleMessageBoxClick: (_userId: number, _freelander: Freelancer) => void;
   redirectToBriefApplications: (_applicationId: string) => void;
-  user: any;
 };
 
 const MyClientBriefsView = (props: ClientViewProps) => {
-  const { user, briefId, handleMessageBoxClick, redirectToBriefApplications } =
-    props;
+  const { briefId, handleMessageBoxClick, redirectToBriefApplications } = props;
+
+  const { user, loading } = useSelector((state: RootState) => state.userState);
+
 
   const [briefs, _setBriefs] = useState<any>();
   const [briefApplications, setBriefApplications] = useState<Project[]>([]);
@@ -35,25 +38,39 @@ const MyClientBriefsView = (props: ClientViewProps) => {
 
   useEffect(() => {
     const setUserBriefs = async () => {
-      if (user?.id) _setBriefs(await getUserBriefs(user?.id));
-      setOngoingGrants(await getUsersOngoingGrants(user?.web3_address));
+      if (!user.id) return router.push('/auth/sign-in')
+
+      _setBriefs(await getUserBriefs(user?.id));
+
+      if (user?.web3_address)
+        setOngoingGrants(await getUsersOngoingGrants(user?.web3_address));
     };
-    setUserBriefs();
-  }, [user?.id, user?.web3_address]);
+    !loading && setUserBriefs();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.id, user?.web3_address, loading]);
 
   useEffect(() => {
-    const getApplications = async (id: string | number) => {
+    const getApplications = async () => {
+      if (!briefId) return
+
       try {
         setLoadingApplications(true);
-        setBriefApplications(await getBriefApplications(id));
+        const resp = await getBriefApplications(String(briefId));
+
+        if (resp.status === 501)
+          return router.push('/dashboard');
+
+        setBriefApplications(resp);
+        setLoadingApplications(false);
       } catch (error) {
         console.log(error);
-      } finally {
         setLoadingApplications(false);
       }
     };
-    briefId && getApplications(briefId.toString());
-  }, [briefId, user?.id]);
+
+    briefId && getApplications();
+  }, [briefId, loading, router]);
 
   const goBack = () => {
     router.query.briefId = [];

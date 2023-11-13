@@ -167,9 +167,7 @@ export const getBriefApplications = async (brifId: string | number) => {
   if (resp.ok) {
     return await resp.json();
   } else {
-    throw new Error(
-      'Failed to get all brief applications. status:' + resp.status
-    );
+    return resp
   }
 };
 

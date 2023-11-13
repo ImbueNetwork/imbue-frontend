@@ -23,9 +23,9 @@ export default function SuccessRefundModal({
       }</h4>
       <p className='text-base  mt-4 mb-9'>
         {
-          (undergoingRefund && !vote)
+          (!undergoingRefund && !vote)
             ? "This project at this time would be put on hold and the approvers would be notified to vote on this refund request."
-            : "This project is currently on hold and the approvers are needed to vote on this refund request"
+            : "Your decision for refund has been recorded. Thank you for contributing to the decision-making process."
         }
       </p>
 
