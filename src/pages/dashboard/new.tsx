@@ -163,11 +163,7 @@ const FreelancerDashboard = (): JSX.Element => {
           watch: true, // this is the default
           state: true,
         });
-        const lastMessages: Channel<DefaultGenerics>[] = [];
-        channels.map((channel) => {
-          lastMessages.push(channel);
-        });
-        setMessageList(lastMessages);
+        setMessageList(channels);
       };
       getUnreadMessageChannels();
       getChannel();
