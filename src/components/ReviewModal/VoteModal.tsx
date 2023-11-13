@@ -23,7 +23,7 @@ import {
 } from '@/model';
 import ChainService, { ImbueChainEvent } from '@/redux/services/chainService';
 import {
-  insertNoConfidenceVoter,
+  insertNoConfidenceVote,
   updateProject,
   voteOnMilestone,
   watchChain,
@@ -143,6 +143,11 @@ export default function VoteModal({
       let pollResult = ImbueChainPollResult.Pending;
       let noConfidencePoll = ImbueChainPollResult.Pending;
 
+      const voteData = {
+        voter: user,
+        vote
+      }
+
       if (project.project_in_voting_of_no_confidence) {
         const result = await chainService.voteOnNoConfidence(
           votingWalletAccount,
@@ -165,21 +170,23 @@ export default function VoteModal({
           if (result.status || result.txError) {
             if (pollResult == ImbueChainPollResult.EventFound) {
               project.status_id = OffchainProjectState.Refunded;
+              await insertNoConfidenceVote(project?.id, voteData);
               await updateProject(project?.id, project);
-              await insertNoConfidenceVoter(project?.id, user);
 
               setVisible(true);
               setVoteRefund(true);
               setStep(4);
               break;
             } else if (noConfidencePoll == ImbueChainPollResult.EventFound) {
-              await insertNoConfidenceVoter(project?.id, user);
+              await insertNoConfidenceVote(project?.id, voteData);
 
               setVisible(true);
               setVoteRefund(true);
               setStep(4);
               break;
             } else if (result.status) {
+              await insertNoConfidenceVote(project?.id, voteData);
+
               setVisible(true);
               setStep(4);
               setVoteRefund(true);
@@ -216,11 +223,14 @@ export default function VoteModal({
             if (pollResult == ImbueChainPollResult.EventFound) {
               project.project_in_voting_of_no_confidence = true;
               await updateProject(project?.id, project);
-              await insertNoConfidenceVoter(project?.id, user);
+              await insertNoConfidenceVote(project?.id, voteData);
               setStep(4);
               setVoteRefund(true);
               setVisible(true);
             } else if (result.status) {
+              project.project_in_voting_of_no_confidence = true;
+              await updateProject(project?.id, project);
+              await insertNoConfidenceVote(project?.id, voteData);
               setStep(4);
               setVoteRefund(true);
               setVisible(true);
@@ -358,6 +368,7 @@ export default function VoteModal({
             handleRefund={refund}
             setVisible={setVisible}
             refundOnly={refundOnly}
+            undergoingRefund={project.project_in_voting_of_no_confidence || false}
           />
         )}
 
@@ -366,7 +377,10 @@ export default function VoteModal({
             {!voteRefund ? (
               <SuccessModal setVisible={setVisible} />
             ) : (
-              <SuccessRefundModal setVisible={setVisible} />
+              <SuccessRefundModal
+                undergoingRefund={project.project_in_voting_of_no_confidence || false}
+                vote={voteRefund} setVisible={setVisible}
+              />
             )}
           </>
         )}

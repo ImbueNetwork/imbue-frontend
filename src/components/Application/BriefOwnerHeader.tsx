@@ -69,8 +69,8 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
     user,
   } = props;
 
-  const [balance, setBalance] = useState<string>();
-  const [imbueBalance, setImbueBalance] = useState<string>();
+  const [balance, setBalance] = useState<number | undefined>();
+  const [imbueBalance, setImbueBalance] = useState<number | undefined>();
   const [loadingWallet, setLoadingWallet] = useState<string>('loading');
   const [error, setError] = useState<any>();
 
@@ -129,13 +129,15 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
           user?.web3_address,
           application.id
         );
+
         const imbueBalance = await getBalance(
           Currency.IMBU,
           user,
           user?.web3_address
         );
-        setBalance(balance.toLocaleString());
-        setImbueBalance(imbueBalance.toLocaleString());
+
+        setBalance(Number(balance) || 0);
+        setImbueBalance(Number(imbueBalance) || 0);
       } catch (error) {
         setError({ message: error });
       } finally {

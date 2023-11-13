@@ -63,7 +63,7 @@ const ProjectBalance = (props: ProjectBalanceType) => {
                 const balance = await getBalance(
                     currency_id,
                     user,
-                    project.currency_id < 100  ? project?.escrow_address : undefined,
+                    project.currency_id < 100 ? project?.escrow_address : undefined,
                     Number(project.id)
                 );
                 if (!balance && project.status_id !== OffchainProjectState.Completed) {
