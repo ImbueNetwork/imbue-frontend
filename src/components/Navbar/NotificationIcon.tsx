@@ -13,20 +13,9 @@ export default function NotificationIcon() {
   const [lastNotification, setLastNotification] = useState<
     string | undefined
   >();
-  const [limit, setLimit] = useState(10);
-  const [notifications, setNotifications] = useState<any>([]);
 
   
-  const getNotificationList = ()=>{
-    
-  }
-
-
   useEffect(() => {
-
-
-
-
     const notifications = async () => {
       const result = await getNotification();
       setNotificationCount(result.new_notification.length);
@@ -57,6 +46,7 @@ export default function NotificationIcon() {
     setAnchorEl(null);
     setModal(false);
   };
+  
 
   return (
     <div>
