@@ -332,24 +332,25 @@ function NewNavbar() {
               paddingRight: 2,
             }}
           >
-            <Badge className='mr-3' badgeContent={message} color='error'>
-              <Image
-                src='/message-dots-square.svg'
-                width={23}
-                height={20}
-                onClick={() => router.push('/dashboard/message')}
-                alt='message'
-                className='cursor-pointer'
-              />
-            </Badge>
-            <div className='relative'>
-              {/*  */}
-
-              <div>
-                {/* <NotificationDropdown feedGroup='user' right notify /> */}
-                <NotificationIcon />
-              </div>
-            </div>
+            {user?.username && (
+              <>
+                <Badge className='mr-3' badgeContent={message} color='error'>
+                  <Image
+                    src='/message-dots-square.svg'
+                    width={23}
+                    height={20}
+                    onClick={() => router.push('/dashboard/message')}
+                    alt='message'
+                    className='cursor-pointer'
+                  />
+                </Badge>
+                <div className='relative'>
+                  <div>
+                    <NotificationIcon />
+                  </div>
+                </div>
+              </>
+            )}
             <Tooltip
               title='Account settings'
               className={`${!user?.username && !loading && 'lg:hidden'}`}
