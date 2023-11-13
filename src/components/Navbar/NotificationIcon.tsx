@@ -13,8 +13,20 @@ export default function NotificationIcon() {
   const [lastNotification, setLastNotification] = useState<
     string | undefined
   >();
+  const [limit, setLimit] = useState(10);
+  const [notifications, setNotifications] = useState<any>([]);
+
+  
+  const getNotificationList = ()=>{
+    
+  }
+
 
   useEffect(() => {
+
+
+
+
     const notifications = async () => {
       const result = await getNotification();
       setNotificationCount(result.new_notification.length);
@@ -25,14 +37,12 @@ export default function NotificationIcon() {
     const timerId = setInterval(() => {
       notifications();
     }, 20000);
-
     return () => clearInterval(timerId);
   }, []);
 
   const updateFun = async () => {
     await updateLastNotification(lastNotification as string);
   };
-
   const handleOpenModal = (e: any) => {
     setModal((val) => !val);
     setAnchorEl(e.target);
@@ -47,6 +57,7 @@ export default function NotificationIcon() {
     setAnchorEl(null);
     setModal(false);
   };
+
   return (
     <div>
       <Badge badgeContent={unreadNotification} color='error'>
