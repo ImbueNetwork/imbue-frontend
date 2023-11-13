@@ -14,6 +14,7 @@ export default function NotificationIcon() {
     string | undefined
   >();
 
+  
   useEffect(() => {
     const notifications = async () => {
       const result = await getNotification();
