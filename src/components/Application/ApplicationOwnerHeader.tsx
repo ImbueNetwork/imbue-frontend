@@ -19,6 +19,7 @@ import {
   User,
 } from '@/model';
 import ChainService from '@/redux/services/chainService';
+import { getProjectEscrowAddress } from '@/redux/services/projectServices';
 
 import AccountChoice from '../AccountChoice';
 import BackButton from '../BackButton';
@@ -53,29 +54,44 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
   const [openPopup, setOpenPopup] = useState(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<any>();
-  const [loadingWallet, setLoadingWallet] = useState<string>('');
-  const [balance, setBalance] = useState<string>();
+  const [loadingWallet, setLoadingWallet] = useState<string>('loading');
+  const [imbueBalance, setImbueBalance] = useState<string>();
+  const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
   const router = useRouter();
 
   useEffect(() => {
     const showBalance = async () => {
+
+      if (loadingWallet === 'loading' && !firstLoad) return;
+
       try {
-        setLoadingWallet('loading');
+
+        if (firstLoad)
+          setLoadingWallet('loading');
+
         const balance = await getBalance(
-          user?.web3_address,
-          application?.currency_id ?? Currency.IMBU,
-          user
+          Currency.IMBU,
+          user,
+          user?.web3_address
         );
-        setBalance(balance.toLocaleString());
+        setImbueBalance(balance.toLocaleString());
       } catch (error) {
         setError({ message: error });
       } finally {
         setLoadingWallet('');
+        if (firstLoad)
+          setFirstLoad(false)
       }
     };
-    user?.web3_address && showBalance();
-  }, [user?.web3_address, application?.currency_id, user]);
+    // user?.web3_address && showBalance();
+
+    const timer = setInterval(() => {
+      user?.web3_address && showBalance();
+    }, 5000);
+    return () => clearInterval(timer);
+
+  }, [user?.web3_address, application.currency_id, user, loadingWallet, firstLoad]);
 
   const startWork = async (account: WalletAccount) => {
     setLoading(true);
@@ -90,10 +106,9 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
+            const escrowAddress = application.currency_id < 100 ? result?.eventData[5] : await getProjectEscrowAddress(application.id)
             const projectId = parseInt(result.eventData[2]);
-            const escrow_address = result.eventData[5];
-            // setProjectId(applicationId);
-            await updateProject(projectId, escrow_address);
+            await updateProject(projectId, escrowAddress);
             setSuccess(true);
           } else if (result.txError) {
             let errorMessage = showErrorMessage(result.errorMessage);
@@ -140,7 +155,7 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           </p>
           <div className='flex flex-col gap-2'>
             <p className='text-[1.25rem] font-normal capitalize text-imbue-purple'>
-              {briefOwner?.display_name} 
+              {briefOwner?.display_name}
             </p>
             <CountrySelector user={briefOwner} />
           </div>
@@ -163,9 +178,8 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
             </button>
           ) : (
             <button
-              className={`${
-                applicationStatusId[application?.status_id]
-              }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
+              className={`${applicationStatusId[application?.status_id]
+                }-btn in-dark text-xs lg:text-base rounded-full py-[7px] px-3 lg:px-6 lg:py-[10px]`}
             >
               {applicationStatusId[application?.status_id]}
             </button>
@@ -175,12 +189,12 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           <p className='text-sm lg:text-base mt-5 mb-3 text-imbue-purple text-right'>
             {loadingWallet === 'loading' && 'Loading Wallet...'}
             {loadingWallet === 'connecting' && 'Connecting Wallet...'}
-            {!loadingWallet &&
-              (balance === undefined
+            {loadingWallet !== 'loading' &&
+              (imbueBalance === undefined
                 ? 'No wallet found'
-                : `Your Balance: ${balance} $${Currency[Currency.IMBU]}`)}
+                : `Your Balance: ${imbueBalance} $${Currency[Currency.IMBU]}`)}
           </p>
-          {Number(balance) < 500 && (
+          {Number(imbueBalance) < 500 && (
             <div className='flex rounded-2xl gap-2 bg-imbue-coral px-2 py-1'>
               <ErrorOutlineOutlinedIcon />
               <p>the imbu balance is less than 500 $IMBU</p>

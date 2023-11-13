@@ -5,8 +5,7 @@ import type { ITuple } from '@polkadot/types/types';
 import { WalletAccount } from '@talismn/connect-wallets';
 
 import * as utils from '@/utils';
-import { ImbueApiInfo } from '@/utils/polkadot';
-import * as polkadot from '@/utils/polkadot';
+import { handleError,ImbueApiInfo } from '@/utils/polkadot';
 
 import {
   BasicTxResponse,
@@ -24,7 +23,7 @@ import {
 } from '@/model';
 
 import { updateMilestone, updateProject } from './projectServices';
-const WAIT_FOR_EVENT_IN_MS = 12_000; // WAIT FOR 1 MIN
+const WAIT_FOR_EVENT_IN_MS = 15_000; // WAIT FOR 15 seconds
 
 /* eslint-disable no-unused-vars */
 export enum ImbueChainEvent {
@@ -39,12 +38,13 @@ export enum ImbueChainEvent {
   CreateBrief = 'BriefSubmitted',
   CommenceWork = 'ProjectCreated',
   SubmitInitialGrant = 'ProjectCreated',
+  MintAsset = 'ForeignAssetMinted'
 }
 
 class ChainService {
   imbueApi: ImbueApiInfo;
-  user: User;
-  constructor(imbueApi: ImbueApiInfo, user: User) {
+  user?: User;
+  constructor(imbueApi: ImbueApiInfo, user?: User) {
     this.imbueApi = imbueApi;
     this.user = user;
   }
@@ -71,10 +71,11 @@ class ChainService {
     teasury: string,
     grantID: string
   ): Promise<BasicTxResponse> {
+    const currency = currencyId < 100 ? currencyId : {ForeignAsset: currencyId };
     const extrinsic = this.imbueApi.imbue.api.tx.imbueGrants.createAndConvert(
       milestones,
       approvers,
-      currencyId,
+      currency,
       amount * 1e12,
       teasury,
       grantID
@@ -96,13 +97,14 @@ class ChainService {
     currencyId: number,
     milestones: any[]
   ): Promise<BasicTxResponse> {
+    const currency = currencyId < 100 ? currencyId : {ForeignAsset: currencyId };
     const extrinsic = this.imbueApi.imbue.api.tx.imbueBriefs.createBrief(
       briefOwners,
       freelancerAddress,
       budget,
       initialContribution,
       briefHash,
-      currencyId,
+      currency,
       milestones
     );
     return await this.submitImbueExtrinsic(
@@ -135,7 +137,6 @@ class ChainService {
     projectId: number | string,
     milestoneKey: number
   ): Promise<BasicTxResponse> {
-    // const projectId = projectOnChain.milestones[0].project_chain_id;
     const extrinsic = this.imbueApi.imbue.api.tx.imbueProposals.submitMilestone(
       projectId,
       milestoneKey
@@ -217,8 +218,8 @@ class ChainService {
     );
   }
 
-  public async pollChainMessage(eventName: string, account: WalletAccount) {
-    const asyncTimeout = (imbueApi: any, account: WalletAccount) => {
+  public async pollChainMessage(eventName: string, address: string) {
+    const asyncTimeout = (imbueApi: any, address: string) => {
       const timeoutPromise = new Promise((resolve, _) => {
         setTimeout(
           () => resolve(ImbueChainPollResult.EventNotFound),
@@ -240,7 +241,7 @@ class ChainService {
                 if (
                   eventName &&
                   method === eventName &&
-                  data[0].toHuman() === account.address
+                  data[0].toHuman() === address
                 ) {
                   resolve(ImbueChainPollResult.EventFound);
                 }
@@ -255,7 +256,7 @@ class ChainService {
     };
     return (async (imbueApi) => {
       try {
-        const result = await asyncTimeout(imbueApi, account);
+        const result = await asyncTimeout(imbueApi, address);
         return result;
       } catch (ex) {
         return false;
@@ -354,7 +355,7 @@ class ChainService {
                       [DispatchError]
                     >;
                     if (dispatchError.isModule) {
-                      return this.handleError(transactionState, dispatchError);
+                      return handleError(transactionState, dispatchError);
                     }
 
                     if (
@@ -455,23 +456,6 @@ class ChainService {
     return transactionState;
   }
 
-  handleError(
-    transactionState: BasicTxResponse,
-    dispatchError: DispatchError
-  ): BasicTxResponse {
-    try {
-      const errorMessage = polkadot.getDispatchError(dispatchError);
-      transactionState.errorMessage = errorMessage;
-      transactionState.txError = true;
-    } catch (error) {
-      if (error instanceof Error) {
-        transactionState.errorMessage = error.message;
-      }
-      transactionState.txError = true;
-    }
-    return transactionState;
-  }
-
   public async getProject(projectId: string | number) {
     const project: Project | any = await utils.fetchProjectById(projectId);
     return await this.convertToOnChainProject(project);
@@ -520,7 +504,7 @@ class ChainService {
     return offChainProject;
   }
 
-  async convertToOnChainProject(project: Project) {
+  public async convertToOnChainProject(project: Project) {
     if (!project?.chain_project_id) return;
     const projectOnChain: any = await this.getProjectOnChain(
       project.chain_project_id
@@ -538,8 +522,8 @@ class ChainService {
     // get project state
     let projectState = OnchainProjectState.PendingProjectApproval;
     const userIsInitiator = await this.isUserInitiator(
+      projectOnChain,
       this.user,
-      projectOnChain
     );
     let projectInContributionRound = false;
     let projectInMilestoneVoting = false;
@@ -695,12 +679,12 @@ class ChainService {
   }
 
   public async isUserInitiator(
-    user: User,
-    projectOnChain: ProjectOnChain
+    projectOnChain: ProjectOnChain,
+    user?: User,
   ): Promise<boolean> {
     let userIsInitiator = false;
     const isLoggedIn = user && user.web3Accounts != null;
-    if (isLoggedIn) {
+    if (user && isLoggedIn) {
       user?.web3Accounts?.forEach((web3Account) => {
         if (web3Account.address == projectOnChain.initiator) {
           userIsInitiator = true;

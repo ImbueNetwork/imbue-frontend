@@ -1,3 +1,4 @@
+import ArrowBackIcon from '@mui/icons-material/ChevronLeft';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import {
   FilledInput,
@@ -8,7 +9,7 @@ import {
   MenuItem,
 } from '@mui/material';
 import { Signer } from '@polkadot/api/types';
-import { decodeAddress } from "@polkadot/util-crypto/address"
+import { decodeAddress } from '@polkadot/util-crypto/address';
 import { WalletAccount } from '@talismn/connect-wallets';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -28,44 +29,50 @@ import { RootState } from '@/redux/store/store';
 
 const Currencies = [
   {
-    name: "IMBU",
-    currencyId: 0
+    name: 'IMBU',
+    currencyId: 0,
   },
   {
-    name: "KSM",
-    currencyId: 1
+    name: 'KSM',
+    currencyId: 1,
   },
   // {AUSD : 2},
   // {KAR : 3},
   {
-    name: "MGX",
-    currencyId: 4
+    name: 'MGX',
+    currencyId: 4,
   },
-]
+];
 
 const Relay = () => {
   const [transferAmount, setTransferAmount] = useState<number>(0);
-  const [showPolkadotAccounts, setShowPolkadotAccounts] = useState<boolean>(false)
+  const [showPolkadotAccounts, setShowPolkadotAccounts] =
+    useState<boolean>(false);
 
   // screens
-  const [error, setError] = useState<any>()
-  const [success, setSuccess] = useState<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<any>();
+  const [success, setSuccess] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const router = useRouter()
+  const router = useRouter();
 
   const transferFromChain = async (account: WalletAccount) => {
     setShowPolkadotAccounts(false);
     setLoading(true);
-    const relayApi = (await initImbueAPIInfo()).relayChain.api
-    const imbueApi = (await initImbueAPIInfo()).imbue.api
-    const transferAmountInt = BigInt(parseFloat(transferAmount.toString()) * 1e12);
+    const relayApi = (await initImbueAPIInfo()).relayChain.api;
+    const imbueApi = (await initImbueAPIInfo()).imbue.api;
+    const transferAmountInt = BigInt(
+      parseFloat(transferAmount.toString()) * 1e12
+    );
 
     if (relayApi && transferAmountInt) {
       // Todo: loading screen
 
-      const { data: { free: freeBalance } } = await relayApi.query.system.account(account.address) as any
-      const userHasEnoughBalance = freeBalance.toBigInt() >= Number(transferAmount)
+      const {
+        data: { free: freeBalance },
+      } = (await relayApi.query.system.account(account.address)) as any;
+      const userHasEnoughBalance =
+        freeBalance.toBigInt() >= Number(transferAmount);
       if (userHasEnoughBalance) {
         const dest = {
           V3: {
@@ -81,23 +88,32 @@ const Relay = () => {
             interior: {
               X1: {
                 AccountId32: {
-                  id: decodeAddress(account.address)
-                }
-              }
-            }
-          }
+                  id: decodeAddress(account.address),
+                },
+              },
+            },
+          },
         };
 
         const assets = {
-          V3: [{
-            id: { Concrete: { parents: 0, interior: "Here" } },
-            fun: { Fungible: 1000000000000 }
-          }]
+          V3: [
+            {
+              id: { Concrete: { parents: 0, interior: 'Here' } },
+              fun: { Fungible: 1000000000000 },
+            },
+          ],
         };
 
         const feeAssetItem = 0;
         const weightLimit = 'Unlimited';
-        const extrinsic = await relayApi?.tx.xcmPallet.limitedReserveTransferAssets(dest, beneficiary, assets, feeAssetItem, weightLimit);
+        const extrinsic =
+          await relayApi?.tx.xcmPallet.limitedReserveTransferAssets(
+            dest,
+            beneficiary,
+            assets,
+            feeAssetItem,
+            weightLimit
+          );
         try {
           await extrinsic.signAndSend(
             account.address,
@@ -105,57 +121,57 @@ const Relay = () => {
             (result) => {
               imbueApi?.query.system.events((events: any) => {
                 if (events) {
-
                   if (!result || !result.status || !events) {
                     return;
                   }
 
-
                   // Loop through the Vec<EventRecord>
                   events.forEach((record: any) => {
                     const { event } = record;
-                    const currenciesDeposited = `${event.section}.${event.method}` == "ormlTokens.Deposited";
+                    const currenciesDeposited =
+                      `${event.section}.${event.method}` ==
+                      'ormlTokens.Deposited';
                     if (currenciesDeposited) {
                       // const types = event.typeDef;
                       const accountId = event.data[1];
                       if (accountId == account.address) {
-                        setSuccess(true)
+                        setSuccess(true);
                       }
                     }
                   });
                 }
               });
-            });
-
+            }
+          );
         } catch (error: any) {
           // eslint-disable-next-line no-console
-          console.error(error)
-          setError({ message: "Error occurred.  " + error })
+          console.error(error);
+          setError({ message: 'Error occurred.  ' + error });
         } finally {
-          setLoading(false)
+          setLoading(false);
         }
-      }
-      else {
-        const avilableBalance = Number(freeBalance.toBigInt() / BigInt(1e12))
-        const errorMessage = `Error: Insuffient balance to complete transfer. Available balance is ${avilableBalance.toFixed(2)}`
+      } else {
+        const avilableBalance = Number(freeBalance.toBigInt() / BigInt(1e12));
+        const errorMessage = `Error: Insufficient balance to complete transfer. Available balance is ${avilableBalance.toFixed(
+          2
+        )}`;
 
         // eslint-disable-next-line no-console
-        console.error(errorMessage)
-        setError({ message: errorMessage })
+        console.error(errorMessage);
+        setError({ message: errorMessage });
       }
     }
-  }
+  };
 
   const { user, loading: loadingUser } = useSelector(
     (state: RootState) => state.userState
   );
-  const [balanceLoading, setBalanceLoading] = useState(true)
-  const [requestSent, setRequestSent] = useState(false)
-  const [currency_id, setCurrency_id] = useState<number>(0)
-  const [balance, setBalance] = useState<number>(0)
+  const [balanceLoading, setBalanceLoading] = useState(true);
+  const [requestSent, setRequestSent] = useState(false);
+  const [currency_id, setCurrency_id] = useState<number>(0);
+  const [balance, setBalance] = useState<number>(0);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const showOptions = Boolean(anchorEl);
-
 
   // useEffect(() => {
   //   getAndSetBalace()
@@ -163,14 +179,14 @@ const Relay = () => {
 
   useEffect(() => {
     const getAndSetBalace = async () => {
-      if (!requestSent && !loadingUser && !user?.web3_address) return
+      if (!requestSent && !loadingUser && !user?.web3_address) return;
 
-      setRequestSent(true)
+      setRequestSent(true);
       try {
         const balance = await getBalance(
-          user.web3_address as string,
           currency_id,
-          user
+          user,
+          user.web3_address as string,
         );
 
         setBalance(balance || 0);
@@ -178,18 +194,16 @@ const Relay = () => {
         // eslint-disable-next-line no-console
         console.error(error);
       } finally {
-        setBalanceLoading(false)
-        setRequestSent(false)
+        setBalanceLoading(false);
+        setRequestSent(false);
       }
-    }
+    };
 
     const timer = setInterval(() => {
-      getAndSetBalace()
+      getAndSetBalace();
     }, 5000);
     return () => clearInterval(timer);
-
   }, [balanceLoading, currency_id, loadingUser, requestSent, user]);
-
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -198,57 +212,64 @@ const Relay = () => {
     setAnchorEl(null);
   };
   const selectCurrency = (currencyID: number) => {
-    setCurrency_id(currencyID)
+    setCurrency_id(currencyID);
     setAnchorEl(null);
   };
 
   return (
     <div className='bg-background p-10 rounded-2xl'>
-      <h1 className='fund-h1'>My funds</h1>
+      <div className='flex items-center'>
+        <div
+          onClick={() => router.back()}
+          className='border border-content group hover:bg-content rounded-full flex items-center justify-center cursor-pointer  left-5 top-10'
+        >
+          <ArrowBackIcon
+            className='h-7 w-7 group-hover:text-white'
+            color='secondary'
+          />
+        </div>
+        <h1 className='fund-h1 ml-3'>My funds</h1>
+      </div>
 
       <p className='my-5 text-content'>Transfer KSM to Imbue Network</p>
 
       <div className='text-sm text-[#868686] my-3'>
-        {balanceLoading
-          ? (
-            <p className='text-xs font-semibold'> Loading Balance...</p>)
-          : (
-            <div className='flex items-center gap-5'>
-              <div>
-                <button
-                  className='border rounded-xl px-[10px] py-1 text-xs flex items-start gap-1'
-                  onClick={(e) => handleClick(e)}
-                >
-                  {Currency[currency_id || 0]}
-                  <KeyboardArrowDownIcon className='text-sm' />
-                </button>
-                <Menu
-                  id="basic-menu"
-                  anchorEl={anchorEl}
-                  open={showOptions}
-                  onClose={handleClose}
-                  MenuListProps={{
-                    'aria-labelledby': 'basic-button',
-                  }}
-                >
-                  {
-                    Currencies.map((currency) => (
-                      <MenuItem
-                        key={currency.currencyId}
-                        onClick={() => selectCurrency(currency.currencyId)}
-                      >
-                        {currency.name}
-                      </MenuItem>
-                    ))
-                  }
-                </Menu>
-              </div>
-              <p>
-                Balance : {balance} ${Currency[currency_id || 0]}
-              </p>
+        {balanceLoading ? (
+          <p className='text-xs font-semibold'> Loading Balance...</p>
+        ) : (
+          <div className='flex items-center gap-5'>
+            <div>
+              <button
+                className='border rounded-xl px-[10px] py-1 text-xs flex items-start gap-1'
+                onClick={(e) => handleClick(e)}
+              >
+                {Currency[currency_id || 0]}
+                <KeyboardArrowDownIcon className='text-sm' />
+              </button>
+              <Menu
+                id='basic-menu'
+                anchorEl={anchorEl}
+                open={showOptions}
+                onClose={handleClose}
+                MenuListProps={{
+                  'aria-labelledby': 'basic-button',
+                }}
+              >
+                {Currencies.map((currency) => (
+                  <MenuItem
+                    key={currency.currencyId}
+                    onClick={() => selectCurrency(currency.currencyId)}
+                  >
+                    {currency.name}
+                  </MenuItem>
+                ))}
+              </Menu>
             </div>
-          )
-        }
+            <p>
+              Balance : {balance} ${Currency[currency_id || 0]}
+            </p>
+          </div>
+        )}
       </div>
 
       <FormControl
@@ -275,7 +296,11 @@ const Relay = () => {
         />
       </FormControl>
       <button
-        className={`rounded-xl transition-colors duration-300 ${transferAmount > 0 ? 'bg-background  hover:bg-primary hover:border-primary' : 'bg-light-grey'} text-content shadow-lg border border-imbue-light-purple w-full py-5 text-lg`}
+        className={`rounded-xl transition-colors duration-300 ${
+          transferAmount > 0
+            ? 'bg-background  hover:bg-primary hover:border-primary'
+            : 'bg-light-grey'
+        } text-content shadow-lg border border-imbue-light-purple w-full py-5 text-lg`}
         onClick={() => setShowPolkadotAccounts(true)}
         disabled={!transferAmount}
       >
@@ -299,7 +324,7 @@ const Relay = () => {
           <button
             onClick={() => {
               setSuccess(false);
-              setTransferAmount(0)
+              setTransferAmount(0);
             }}
             className='primary-btn in-dark w-button w-full !m-0'
           >

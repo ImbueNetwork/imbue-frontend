@@ -8,17 +8,19 @@ import Fade from '@mui/material/Fade';
 import Modal from '@mui/material/Modal';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { WalletAccount } from '@talismn/connect-wallets';
+import { ethers } from 'ethers'
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { sendNotification } from '@/utils';
-import { getBalance } from '@/utils/helper';
+import { ERC_20_ABI, getBalance, getEVMContract } from '@/utils/helper';
 
 import { Currency, OffchainProjectState } from '@/model';
 import { changeBriefApplicationStatus } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
+import { getOffchainEscrowAddress, getOffchainEscrowBalance, mintTokens } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 import AccountChoice from './AccountChoice';
@@ -43,9 +45,13 @@ export const HirePopup = ({
   const mobileView = useMediaQuery('(max-width:480px)');
 
   const [success, setSuccess] = useState<boolean>(false);
+  const [depositSuccess, setDepositSuccess] = useState<boolean>(false);
+  const [depositCompleted, setDepositCompleted] = useState<boolean>(false);
   const [error, setError] = useState<any>();
+  const [escrowAddress, setEscrowAddress] = useState<string>('');
+  const [escrowBalance, setEscrowBalance] = useState<number>(0);
   const router = useRouter();
-  const [freelancerBalance, setFreelancerBalance] = useState<number | string>(
+  const [freelancerImbueBalance, setFreelancerImbueBalance] = useState<number | string>(
     0
   );
 
@@ -66,23 +72,35 @@ export const HirePopup = ({
     zIndex: 1,
   };
 
+
+  const updateEscrowInfo = async () => {
+    const escrowAddress = await getOffchainEscrowAddress(application.id);
+    setEscrowAddress(escrowAddress);
+    const allBalances = await getOffchainEscrowBalance(application.id);
+    const currency = Currency[application.currency_id].toString().toLowerCase();
+    const escrowBalance = Number(allBalances[currency]) ?? 0;
+    setEscrowBalance(escrowBalance);
+  };
+
   useEffect(() => {
     const checkBalance = async () => {
-      setFreelancerBalance('Chekcing Balance');
+      setFreelancerImbueBalance('Checking Imbue Balance');
       const balance = await getBalance(
+        Currency.IMBU,
+        user,
         freelancer.web3_address,
-        application?.currency_id || 0,
-        user
       );
 
-      setFreelancerBalance(balance);
+      setFreelancerImbueBalance(balance);
     };
 
+    updateEscrowInfo();
     openHirePopup && checkBalance();
   }, [freelancer.web3_address, application?.currency_id, user, openHirePopup]);
 
   const selectedAccount = async (account: WalletAccount) => {
     setLoading(true);
+    mintTokens(application.id, account.address);
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
     const briefOwners: string[] = user?.web3_address
@@ -162,13 +180,13 @@ export const HirePopup = ({
             <span className='text-xl text-secondary-dark-hover'>
               {freelancer?.display_name}
             </span>
-            {freelancerBalance !== 'Chekcing Balance' ? (
+            {freelancerImbueBalance !== 'Checking Imbue Balance' ? (
               <>
-                {Number(freelancerBalance) < 500 ? (
+                {Number(freelancerImbueBalance) < 500 ? (
                   <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-imbue-coral px-3 py-1 text-sm text-white'>
                     <ErrorOutlineOutlinedIcon className='h-4 w-4 inline' />
                     <p className='inline'>
-                      Freelance does not currently have the necessary deposit
+                      Freelancer does not currently have the necessary deposit
                       balance (500 $IMBU) to start the work
                     </p>
                   </div>
@@ -176,7 +194,7 @@ export const HirePopup = ({
                   <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-primary px-3 py-1 text-sm text-black'>
                     <CheckCircleOutlineIcon className='h-4 w-4 inline' />
                     <p className='inline'>
-                      Freelance currently has the necessary deposit balance (500
+                      Freelancer currently has the necessary deposit balance (500
                       $IMBU) to start the work
                     </p>
                   </div>
@@ -226,7 +244,7 @@ export const HirePopup = ({
               </div>
             </div>
             <div className='budget-value'>
-              ${Number?.(totalCostWithoutFee?.toFixed?.(2))?.toLocaleString()}
+              {Number?.(totalCostWithoutFee?.toFixed?.(2))?.toLocaleString()} ${Currency[application.currencyId]}
             </div>
           </div>
           <div className={`${styles.budgetInfo} mx-5`}>
@@ -234,7 +252,7 @@ export const HirePopup = ({
               <p className='text-lg'>Imbue Service Fee 5%</p>
             </div>
             <div className='budget-value'>
-              ${Number?.(imbueFee?.toFixed?.(2))?.toLocaleString?.()}
+              {Number?.(imbueFee?.toFixed?.(2))?.toLocaleString?.()} ${Currency[application.currencyId]}
             </div>
           </div>
           <div className={`${styles.budgetInfo} mx-5 !mb-3`}>
@@ -242,7 +260,7 @@ export const HirePopup = ({
               <p className='text-lg'>Amount Received</p>
             </div>
             <div className='budget-value'>
-              ${Number?.(amountDue?.toFixed?.(2))?.toLocaleString?.()}
+              {Number?.(amountDue?.toFixed?.(2))?.toLocaleString?.()} ${Currency[application.currencyId]}
             </div>
           </div>
         </div>
@@ -258,36 +276,146 @@ export const HirePopup = ({
   };
 
   const SecondContent = () => {
-    return (
-      <div className='flex flex-col justify-center items-center modal-container px-5 lg:px-0 lg:w-2/3 mx-auto my-auto text-content'>
-        <p className='text-center w-full text-lg lg:text-xl my-4 text-content-primary'>
-          Deposit Funds
-        </p>
-        <p className='text-center w-full text-lg lg:text-xl my-4'>
-          Deposit the funds required for the project, these funds will be taken
-          from your account once the freelancer starts the project.
-        </p>
-        <p className='text-center w-full text-lg lg:text-xl my-4'>
-          The funds are then paid to the freelancer in stages only when you
-          approve the completion of each milestone
-        </p>
-        <p className='mb-10'>
-          <span className='text-lg lg:text-xl text-imbue-lemon mr-1'>
-            {Number(totalCostWithoutFee.toFixed(2)).toLocaleString()}
-          </span>
-          ${Currency[application.currency_id]}
-        </p>
-        <button
-          onClick={() => {
-            setstage(2);
-          }}
-          className='primary-btn in-dark w-button lg:w-1/3 lg:mx-16'
-          style={{ textAlign: 'center' }}
-        >
-          Deposit Funds
-        </button>
-      </div>
-    );
+    const depositIntoEscrow = async () => {
+      const transferAmount = totalCostWithoutFee - escrowBalance;
+      switch (application.currency_id) {
+        case Currency.ETH: {
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const signer = await provider.getSigner();
+          const ethBalanceInWei = await provider.getBalance(signer.address);
+          const ethBalance = Number(ethers.formatEther(ethBalanceInWei));
+
+          if (ethBalance < transferAmount) {
+            setError({ message: `Insufficient $${Currency[application.currency_id]} balance in ${signer.address}` });
+            break;
+          }
+          else {
+            const transferAmountInWei = ethers.parseEther((transferAmount).toPrecision(5).toString());
+            const depositTx = await signer.sendTransaction({ to: escrowAddress, value: transferAmountInWei });
+            setDepositSuccess(true);
+            await provider.waitForTransaction(depositTx.hash, 1, 150000);
+            setDepositCompleted(true);
+            await updateEscrowInfo();
+            break;
+          }
+        }
+        case Currency.USDT: {
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const signer = await provider.getSigner();
+          const contract = await getEVMContract(application.currency_id);
+          if (!contract) {
+            setError({ message: "Contract address not found" });
+            break;
+          }
+          const token = new ethers.Contract(contract.address, ERC_20_ABI, signer);
+          const usdtBalance = Number(ethers.formatUnits(await token.balanceOf(signer.address), await token.decimals()));
+          if (usdtBalance < transferAmount) {
+            setError({ message: `Insufficient $${Currency[application.currency_id]} balance in ${signer.address}` });
+          } else {
+            const transferAmountInWei = ethers.parseUnits((transferAmount).toPrecision(5).toString(), contract.decimals);
+            const depositTx = await token
+              .transfer(escrowAddress, transferAmountInWei);
+            setDepositSuccess(true);
+            await provider.waitForTransaction(depositTx.hash, 1, 150000);
+            setDepositCompleted(true);
+            await updateEscrowInfo();
+            break;
+          }
+        }
+      }
+
+    }
+
+    if (application.currency_id < 100) {
+      return (
+        <div className='flex flex-col justify-center items-center modal-container px-5 lg:px-0 lg:w-2/3 mx-auto my-auto text-content'>
+          <p className='text-center w-full text-lg lg:text-xl my-4 text-content-primary'>
+            Deposit Funds
+          </p>
+          <p className='text-center w-full text-lg lg:text-xl my-4'>
+            Deposit the funds required for the project, these funds will be taken
+            from your account once the freelancer starts the project.
+          </p>
+          <p className='text-center w-full text-lg lg:text-xl my-4'>
+            The funds are then paid to the freelancer in stages only when you
+            approve the completion of each milestone
+          </p>
+          <p className='mb-10'>
+            <span className='text-lg lg:text-xl text-imbue-lemon mr-1'>
+              {Number(totalCostWithoutFee.toFixed(2)).toLocaleString()}
+            </span>
+            ${Currency[application.currency_id]}
+          </p>
+          <button
+            onClick={() => {
+              setstage(2);
+            }}
+            className='primary-btn in-dark w-button lg:w-1/3 lg:mx-16'
+            style={{ textAlign: 'center' }}
+          >
+            Deposit Funds
+          </button>
+        </div>
+      );
+    } else {
+      // Imbue Multichain
+      return (
+        <div className='flex flex-col justify-center items-center modal-container px-5 lg:px-0 lg:w-2/3 mx-auto my-auto text-content'>
+          <p className='text-center w-full text-lg lg:text-xl my-4 text-content-primary'>
+            Deposit Funds
+          </p>
+          <p className='text-center w-full text-lg lg:text-xl my-4'>
+            To Hire {freelancer.display_name}, please deposit the funds required for the project.
+          </p>
+          <p className='text-center w-full text-lg lg:text-xl my-4'>
+            The funds are then paid to the freelancer in stages only when you
+            approve the completion of each milestone
+          </p>
+          <p className='mb-10'>
+            <span className='text-lg lg:text-xl text-imbue-lemon mr-1'>
+              {Number(totalCostWithoutFee.toFixed(2)).toLocaleString()}
+            </span>
+            ${Currency[application.currency_id]}
+          </p>
+          <p className='mb-10'>
+            <span>Escrow Address:</span>
+            <span className='text-lg lg:text-xl text-imbue-lemon mr-1'>
+              {escrowAddress}
+            </span>
+          </p>
+          <p className='mb-10'>
+            <span>Escrow Balance: </span>
+            <span className='text-lg lg:text-xl text-imbue-lemon mr-1'>
+              {escrowBalance}
+            </span>
+            ${Currency[application.currency_id]}
+          </p>
+          {escrowBalance < (totalCostWithoutFee) ? (
+            <button
+              onClick={() => depositIntoEscrow()}
+              className='primary-btn in-dark w-button lg:w-1/3 lg:mx-16 disabled'
+              style={{ textAlign: 'center' }}
+            >
+              Deposit Funds
+            </button>
+          ) : (
+            <button
+              onClick={
+                () => {
+                  setstage(2);
+                }
+              }
+              className='primary-btn in-dark w-button lg:w-1/3 lg:mx-16 disabled'
+              style={{ textAlign: 'center' }}
+            >
+              Hire
+            </button>
+          )
+          }
+        </div >
+      );
+    }
+
   };
 
   if (popupStage === 2 && openHirePopup)
@@ -354,6 +482,27 @@ export const HirePopup = ({
             className='primary-btn in-dark w-button w-full !m-0'
           >
             Continue
+          </button>
+        </div>
+      </SuccessScreen>
+
+
+      <SuccessScreen
+        title={`Your transfer has been sent.
+
+        Please do not navigate away from this page until your transfer completes`}
+        open={depositSuccess}
+        setOpen={setDepositSuccess}
+      >
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            disabled={!depositCompleted}
+            onClick={() => { setDepositSuccess(false); setstage(0) }}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+
+
+            {depositCompleted ? "Continue" : "Waiting for deposit confirmation......."}
           </button>
         </div>
       </SuccessScreen>

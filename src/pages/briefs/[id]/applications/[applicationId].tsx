@@ -1,11 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Tooltip } from '@mui/material';
+import WalletConnectProvider from '@walletconnect/web3-provider'
 import Filter from 'bad-words';
+import { ethers } from 'ethers'
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import { FiEdit, FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
+import Web3Modal from 'web3modal'
 
 import { fetchProject, fetchUser } from '@/utils';
 import {
@@ -87,6 +90,7 @@ const ApplicationPreview = (): JSX.Element => {
     milestones: [],
   });
   const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
+  const [paymentAddress, setPaymentAddress] = useState<string>('');
 
   const isApplicationOwner =
     user && application && user?.id == application?.user_id;
@@ -95,9 +99,35 @@ const ApplicationPreview = (): JSX.Element => {
   const [error, setError] = useState<any>();
   const [success, setSuccess] = useState<boolean>(false);
   const [openAccountChoice, setOpenAccountChoice] = useState<boolean>(false);
+  const [accounts, setAccounts] = useState<string[]>([]);
 
   const router = useRouter();
   const { id: briefId, applicationId }: any = router.query;
+
+  const getWeb3Modal = async () => {
+    const web3Modal = new Web3Modal({
+      cacheProvider: false,
+      providerOptions: {
+        walletconnect: {
+          package: WalletConnectProvider,
+        },
+      },
+    })
+    return web3Modal
+  }
+
+  const connect = async () => {
+    try {
+      const web3Modal = await getWeb3Modal();
+      const connection = await web3Modal.connect();
+      const provider = new ethers.BrowserProvider(connection);
+      const accounts = (await provider.listAccounts()).map(jsonProvider => jsonProvider.address);
+      setPaymentAddress(accounts[0]);
+      setAccounts(accounts)
+    } catch (err) {
+      console.log('error:', err)
+    }
+  }
 
   useEffect(() => {
     const getSetUpData = async () => {
@@ -123,6 +153,7 @@ const ApplicationPreview = (): JSX.Element => {
         setFreelancer(freelancerResponse);
         setCurrencyId(applicationResponse?.currency_id);
         setDurationId(applicationResponse?.duration_id);
+        setPaymentAddress(applicationResponse.payment_address);
       } catch (error) {
         setError({ message: 'Could not find application' });
       } finally {
@@ -247,7 +278,8 @@ const ApplicationPreview = (): JSX.Element => {
       inputErrors,
       milestones,
       brief?.headline,
-      brief?.description
+      brief?.description,
+      paymentAddress
     );
     setMilestones(milestonesRes);
     setInputErrors(errors);
@@ -314,6 +346,7 @@ const ApplicationPreview = (): JSX.Element => {
         chain_project_id: chainProjectId,
         escrow_address: escrow_address,
         duration_id: durationId,
+        payment_address: currencyId >= 100 ? paymentAddress : null,
       });
 
       if (resp.id) {
@@ -417,8 +450,8 @@ const ApplicationPreview = (): JSX.Element => {
                   <h3 className='text-lg lg:text-[1.25rem] text-imbue-light-purple-two leading-[1.5] font-normal m-0 p-0'>
                     Projects&apos;s budget:{' '}
                     <span className=' text-imbue-purple-dark text-lg lg:text-[1.25rem]'>
-                      $
-                      {Number(application.total_cost_without_fee)?.toLocaleString()}
+                      
+                      {Number(application.total_cost_without_fee)?.toLocaleString()} ${Currency[application.currency_id]}
                     </span>
                   </h3>
                 )}
@@ -449,9 +482,8 @@ const ApplicationPreview = (): JSX.Element => {
                       {index + 1}.
                     </div>
                     <div
-                      className={`flex ${
-                        isEditingBio ? 'flex-col lg:flex-row' : 'flex-row'
-                      } justify-between w-full`}
+                      className={`flex ${isEditingBio ? 'flex-col lg:flex-row' : 'flex-row'
+                        } justify-between w-full`}
                     >
                       <div className='w-full lg:w-2/3 h-fit'>
                         {isEditingBio ? (
@@ -558,10 +590,10 @@ const ApplicationPreview = (): JSX.Element => {
                           </>
                         ) : (
                           <p className='text-[1rem] text-[#3B27C180] m-0'>
-                            $
+                            
                             {Number(
                               milestones[index]?.amount?.toFixed(2)
-                            )?.toLocaleString?.()}
+                            )?.toLocaleString?.()} ${Currency[currencyId]}
                           </p>
                         )}
 
@@ -615,7 +647,7 @@ const ApplicationPreview = (): JSX.Element => {
               </div>
             </div>
             <div className='budget-value text-xl text-imbue-purple-dark font-normal'>
-              ${Number(totalCostWithoutFee?.toFixed?.(2)).toLocaleString()}
+              {Number(totalCostWithoutFee?.toFixed?.(2)).toLocaleString()} ${Currency[currencyId]}
             </div>
           </div>
 
@@ -626,7 +658,7 @@ const ApplicationPreview = (): JSX.Element => {
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-purple-dark font-normal'>
-              ${Number(imbueFee?.toFixed?.(2))?.toLocaleString?.()}
+              {Number(imbueFee?.toFixed?.(2))?.toLocaleString?.()} ${Currency[currencyId]}
             </div>
           </div>
 
@@ -637,7 +669,7 @@ const ApplicationPreview = (): JSX.Element => {
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-light-purple-two font-normal'>
-              ${Number(amountDue.toFixed(2))?.toLocaleString?.()}
+              {Number(amountDue.toFixed(2))?.toLocaleString?.()} ${Currency[currencyId]}
             </div>
           </div>
         </div>
@@ -711,6 +743,47 @@ const ApplicationPreview = (): JSX.Element => {
                 )}
               </div>
             </div>
+            {currencyId >= 100 && (
+              <div className='payment-options'>
+                <h3 className='text-lg lg:text-[1.25rem] font-normal m-0 p-0 text-imbue-purple-dark'>
+                  Payment Address
+                </h3>
+
+                <div className='network-amount'>
+
+                  {isApplicationOwner && isEditingBio && currencyId >= 100 ? (
+                    <>
+                      {accounts.length == 0 ? (
+                        <button className='primary-btn in-dark w-button' onClick={connect}>Connect</button>
+                      ) : (
+                        <select
+                          name='paymentAddress'
+                          value={paymentAddress}
+                          onChange={(e) => setPaymentAddress(e.target.value)}
+                          placeholder='Select a payment address'
+                          className='bg-transparent round border border-imbue-purple rounded-[5px] text-base px-5 py-3 mt-4 w-full text-content-primary outline-content-primary'
+                          required
+                        >
+                          {accounts.map((account: string) => (
+                            <option
+                              value={account}
+                              key={account}
+                              className='hover:!bg-overlay'
+                            >
+                              {account}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </>
+                  ) : (
+                    <p className='text-content-primary mt-2 w-full lg:text-end'>
+                      {paymentAddress}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -739,10 +812,9 @@ const ApplicationPreview = (): JSX.Element => {
                 title={disableSubmit && 'Please fill all the input fields'}
               >
                 <button
-                  className={`primary-btn in-dark w-button ${
-                    disableSubmit &&
+                  className={`primary-btn in-dark w-button ${disableSubmit &&
                     '!bg-gray-400 !text-white !cursor-not-allowed'
-                  }`}
+                    }`}
                   onClick={() => !disableSubmit && handleUpdateProject()}
                 >
                   Update
@@ -804,7 +876,7 @@ const ApplicationPreview = (): JSX.Element => {
       </ErrorScreen>
 
       <BackDropLoader open={loading} />
-    </div>
+    </div >
   );
 };
 

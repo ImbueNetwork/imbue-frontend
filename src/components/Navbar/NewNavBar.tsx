@@ -16,7 +16,7 @@ import {
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { BiBuildings } from 'react-icons/bi';
 import { BsPeople } from 'react-icons/bs';
 import { IoIosArrowDown } from 'react-icons/io';
@@ -32,7 +32,10 @@ import { AppDispatch, RootState } from '@/redux/store/store';
 import MenuItems from './MenuItems';
 const Login = dynamic(() => import('../Login'));
 
+import Link from 'next/link';
+
 import NotificationIcon from './NotificationIcon';
+import { AppContext, AppContextType } from '../Layout';
 import LoginPopup from '../LoginPopup/LoginPopup';
 import defaultProfile from '../../assets/images/profile-image.png';
 
@@ -96,6 +99,10 @@ function NewNavbar() {
 
   const navPillclasses =
     'text-imbue-purple-dark h-[3rem] bg-white  rounded-[5.07319rem] !flex justify-center items-center px-5 hover:no-underline !text-[1rem] ';
+
+  const { profileView, setProfileMode } = useContext(
+    AppContext
+  ) as AppContextType;
 
   return (
     <>
@@ -236,14 +243,10 @@ function NewNavbar() {
                 ) : (
                   ''
                 )}
-                <div
-                  onClick={() => {
-                    if (user.id) {
-                      setExpanded(false);
-                      router.push('/relay');
-                    } else setLoginModal(true);
-                  }}
+                <Link
+                  onClick={() => setExpanded(false)}
                   className={`mx-1 hover:bg-imbue-lime-light text-xs lg:text-sm hidden lg:inline-block cursor-pointer ${navPillclasses} nav-item nav-item-2`}
+                  href='/relay'
                 >
                   <Image
                     src='/wallet-2.svg'
@@ -253,11 +256,10 @@ function NewNavbar() {
                     className='mr-2 mb-1'
                   />
                   Wallet
-                </div>
-                {/* <Link
+                </Link>
+                <div
                   onClick={() => setExpanded(false)}
                   className={`mx-1 relative group text-xs hover:bg-imbue-lime-light lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${navPillclasses}`}
-                  href='#'
                 >
                   <Image
                     src='/user-edit.svg'
@@ -271,17 +273,42 @@ function NewNavbar() {
                     className='ml-3 text-[#A8A8A8] group-hover:text-black'
                     size={20}
                   />
-                  <div className='absolute hidden  group-hover:block shadow-lg space-y-3 pl-1  py-1 rounded-xl top-[3.3rem] left-1 bg-white w-72'>
-                    <div className='flex gap-2 items-center px-2 hover:bg-imbue-lime-light py-2 rounded-md '>
-                      <div className='border p-1 rounded-xl'>
-                        <BiBuildings color='black' size={23} />
-                      </div>
-                      <div className='ml-1'>
-                        <p className='text-sm'>Switch to Hiring</p>
-                      </div>
+                  <div className='absolute hidden bg-transparent  group-hover:block  space-y-3  rounded-xl top-3 left-1  w-72'>
+                    <div className='bg-white mt-10 rounded-lg pl-1 shadow-lg py-1'>
+                      {profileView === 'client' ? (
+                        <div
+                          className='flex gap-2 items-center px-2 hover:bg-imbue-lime-light py-2 rounded-md '
+                          onClick={() => {
+                            setProfileMode('freelancer');
+                            router.push('/dashboard');
+                          }}
+                        >
+                          <div className='border p-1 rounded-xl'>
+                            <BiBuildings color='black' size={23} />
+                          </div>
+                          <div className='ml-1'>
+                            <p className='text-sm'>Switch to Freelancer</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          className='flex gap-2 items-center px-2 hover:bg-imbue-lime-light py-2 rounded-md '
+                          onClick={() => {
+                            setProfileMode('client');
+                            router.push('/dashboard');
+                          }}
+                        >
+                          <div className='border p-1 rounded-xl'>
+                            <BiBuildings color='black' size={23} />
+                          </div>
+                          <div className='ml-1'>
+                            <p className='text-sm'>Switch to Hiring</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </Link> */}
+                </div>
               </div>
             </div>
           </div>
@@ -305,19 +332,24 @@ function NewNavbar() {
               paddingRight: 2,
             }}
           >
-            {user.id && (
-              <Badge className='mr-3' badgeContent={message} color='error'>
-                <Image
-                  src='/message-dots-square.svg'
-                  width={23}
-                  height={20}
-                  onClick={() => router.push('/dashboard/message')}
-                  alt='message'
-                  className='cursor-pointer'
-                />
-              </Badge>
-            )}
-            {user.id && <NotificationIcon />}
+            <Badge className='mr-3' badgeContent={message} color='error'>
+              <Image
+                src='/message-dots-square.svg'
+                width={23}
+                height={20}
+                onClick={() => router.push('/dashboard/message')}
+                alt='message'
+                className='cursor-pointer'
+              />
+            </Badge>
+            <div className='relative'>
+              {/*  */}
+
+              <div>
+                {/* <NotificationDropdown feedGroup='user' right notify /> */}
+                <NotificationIcon />
+              </div>
+            </div>
             <Tooltip
               title='Account settings'
               className={`${!user?.username && !loading && 'lg:hidden'}`}

@@ -42,7 +42,7 @@ export default nextConnect()
 
           return res.status(200).send({
             currentData,
-            totalFreelancers: currentData?.length || 0,
+            totalFreelancers: allFreelancers?.length || 0,
             // totalFreelancers: 26,
           });
         });

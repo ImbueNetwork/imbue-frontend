@@ -1,8 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Autocomplete, TextField, Tooltip } from '@mui/material';
+import {
+  Autocomplete,
+  InputAdornment,
+  OutlinedInput,
+  TextField,
+  Tooltip,
+} from '@mui/material';
 import Filter from 'bad-words';
 import { useRouter } from 'next/router';
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import * as utils from '@/utils';
@@ -10,6 +16,7 @@ import { isUrlExist, validateInputLength } from '@/utils/helper';
 
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
+import { AppContext, AppContextType } from '@/components/Layout';
 import ValidatableInput from '@/components/ValidatableInput';
 
 import {
@@ -55,6 +62,7 @@ const Freelancer = (): JSX.Element => {
   );
   const [suggestedLanguages, setSuggestedLanguages] = useState<string[]>([]);
   const dispatch = useDispatch<AppDispatch>();
+  const { setProfileMode } = useContext(AppContext) as AppContextType;
 
   useEffect(() => {
     if (!userLoading && (!user || !user?.id)) {
@@ -134,6 +142,36 @@ const Freelancer = (): JSX.Element => {
             {label}
           </div>
         ))}
+      </div>
+    </div>
+  );
+
+  const [hourperrate, setHourPerrate] = useState<number | undefined>();
+
+  const FreelancerHourPerRate = (
+    <div className={styles.freelanceXpContainer}>
+      <div className={styles.contentTextSmallFlex}>
+        {stepData[step].content.split('\n').map((line, index) => (
+          <p key={index}>{line}</p>
+        ))}
+      </div>
+      <div className={styles.namePanelInputWrapper}>
+        <OutlinedInput
+          id='outlined-adornment-amount'
+          onChange={(event: any) =>
+            setHourPerrate(
+              event.target.value > 0
+                ? Math.trunc(event.target.value)
+                : undefined
+            )
+          }
+          className='w-full'
+          value={hourperrate}
+          placeholder='0.00'
+          type='number'
+          color='secondary'
+          startAdornment={<InputAdornment position='start'>$</InputAdornment>}
+        />
       </div>
     </div>
   );
@@ -377,6 +415,7 @@ const Freelancer = (): JSX.Element => {
     SkillsPanel,
     BioPanel,
     ServicesPanel,
+    FreelancerHourPerRate,
     ConfirmPanel,
   ];
 
@@ -391,6 +430,7 @@ const Freelancer = (): JSX.Element => {
     about,
     services?.length,
     step,
+    hourperrate,
   ]);
 
   const validate = (): boolean => {
@@ -419,11 +459,15 @@ const Freelancer = (): JSX.Element => {
     // }
     else if (step === 6 && !skills.length) {
       return false;
-    } else if (step === 7 && (!about || !validateInputLength(about, 50, 5000))) {
+    } else if (
+      step === 7 &&
+      (!about || !validateInputLength(about, 50, 5000))
+    ) {
       return false;
     } else if (step === 8 && !services.length) {
       return false;
-    }
+    } else if (step === 9 && (hourperrate === 0 || hourperrate === undefined))
+      return false;
     return true;
   };
 
@@ -449,6 +493,7 @@ const Freelancer = (): JSX.Element => {
         services: services.map((item) =>
           item.trim().length ? filter.clean(item).trim() : ''
         ),
+        hour_per_rate: hourperrate || 0,
         user_id: user?.id,
         username: user?.display_name,
         display_name: user?.display_name,
@@ -466,6 +511,7 @@ const Freelancer = (): JSX.Element => {
 
       if (response.status === 201) {
         dispatch(fetchUserRedux());
+        setProfileMode('freelancer');
         setStep(step + 1);
       } else {
         setError({

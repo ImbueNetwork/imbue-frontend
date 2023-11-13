@@ -4,7 +4,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: process.env.NODE_ENV != 'production',
   output: 'standalone',
   env: {
     PORT: 8080,

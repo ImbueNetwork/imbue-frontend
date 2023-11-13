@@ -73,6 +73,7 @@ export type ProposedMilestone = {
   amount: number;
   description: string;
   chain_project_id?: string;
+  attachments: any;
 };
 
 export type GrantApprover = string;
@@ -93,12 +94,18 @@ export type Grant = {
   approvers: GrantApprover[];
   chain_project_id: number;
   escrow_address: string;
+  payment_address: string;
 };
 
 export type Milestone = ProposedMilestone & {
   milestone_index: number;
   project_id: number | string;
   is_approved: boolean;
+  withdrawn_onchain: boolean;
+  withdrawn_offchain: boolean;
+  withdrawal_transaction_hash: string;
+  imbue_fee_transaction_hash: string;
+  attachments: any;
 };
 
 export type MilestoneDetails = {
@@ -129,6 +136,7 @@ export type Project = {
   completed?: boolean;
   first_pending_milestone?: number;
   project_in_voting_of_no_confidence?: boolean;
+  payment_address: string;
 };
 
 export type ProjectProperties = {
@@ -186,6 +194,7 @@ export type Freelancer = {
   country?: string;
   region?: string;
   profile_image?: string;
+  hour_per_rate: number;
 };
 
 export type BriefSqlFilter = {
@@ -515,6 +524,22 @@ export const insertProject =
   (project: Project) => async (tx: Knex.Transaction) =>
     (await tx<Project>('projects').insert(project).returning('*'))[0];
 
+export const insertUserAnalytics =
+  (user_analytics: any) => async (tx: Knex.Transaction) =>
+    (await tx('user_analytic').insert(user_analytics).returning('*'))[0];
+export const updateUserAnalytics =
+  (user_id: number, analytics: any) => async (tx: Knex.Transaction) =>
+    (
+      await tx('user_analytic')
+        .where({ user_id })
+        .update(analytics)
+        .returning('*')
+    )[0];
+
+export const getUserAnalytics =
+  (user_id: number) => async (tx: Knex.Transaction) =>
+    (await tx('user_analytic').where({ user_id }))[0];
+
 export const updateProject =
   (id: string | number, project: Project) => async (tx: Knex.Transaction) =>
     (
@@ -615,11 +640,16 @@ export const insertMilestones = (
   milestones: ProposedMilestone[],
   project_id: string | number
 ) => {
-  const values = milestones.map((m, idx) => ({
-    ...m,
-    project_id,
-    milestone_index: idx,
-  }));
+  const values = milestones.map((m, idx) => {
+    const mileston = m;
+    delete mileston.attachments;
+
+    return {
+      ...mileston,
+      project_id,
+      milestone_index: idx,
+    };
+  });
 
   return (tx: Knex.Transaction) =>
     tx<Milestone>('milestones').insert(values).returning('*');
@@ -689,6 +719,34 @@ export const updateMilestone =
       .update(details)
       .returning('*');
 
+export const updateMilestoneWithdrawHashs =
+  (
+    projectId: number,
+    milestoneIds: number[],
+    tx_hash: string,
+    imbue_fee_tx_hash: string
+  ) =>
+  (tx: Knex.Transaction) =>
+    tx<Milestone>('milestones')
+      .where(`project_id`, projectId)
+      .whereIn(`milestone_index`, milestoneIds)
+      .update({
+        withdrawal_transaction_hash: tx_hash,
+        imbue_fee_transaction_hash: imbue_fee_tx_hash,
+        withdrawn_offchain: true,
+      })
+      .returning('*');
+
+export const updateMilestoneWithdrawStatus =
+  (projectId: number, milestoneIds: number[]) => (tx: Knex.Transaction) =>
+    tx<Milestone>('milestones')
+      .where(`project_id`, projectId)
+      .whereIn(`milestone_index`, milestoneIds)
+      .update({
+        withdrawn_onchain: true,
+      })
+      .returning('*');
+
 export const insertMilestoneDetails =
   (value: MilestoneDetails) => async (tx: Knex.Transaction) =>
     (
@@ -740,6 +798,9 @@ export const fetchAllBriefs = () => (tx: Knex.Transaction) =>
       'briefs.duration_id',
       'budget',
       'users.display_name as created_by',
+      'users.profile_photo as owner_photo',
+      'users.username as owner_name',
+      'users.created as joined',
       'experience_level',
       'briefs.experience_id',
       'briefs.created',
@@ -768,7 +829,8 @@ export const fetchAllBriefs = () => (tx: Knex.Transaction) =>
     .groupBy('users.display_name')
     .groupBy('briefs.experience_id')
     .groupBy('experience.experience_level')
-    .groupBy('users.id');
+    .groupBy('users.id')
+    .groupBy('users.username');
 
 export const fetchAllGrants = () => (tx: Knex.Transaction) =>
   tx
@@ -1137,6 +1199,7 @@ export const fetchAllFreelancers = () => (tx: Knex.Transaction) =>
       'telegram_link',
       'discord_link',
       'title',
+      'hour_per_rate',
       // 'bio',
       'freelancers.user_id',
       'username',
@@ -1247,6 +1310,10 @@ export const fetchFreelancerClients =
         }
       });
 
+export const freelancerProjects =
+  (freelancer_id: number) => async (tx: Knex.Transaction) =>
+    tx.select().where({ user_id: freelancer_id }).from('projects');
+
 export const fetchItems =
   (ids: number[], tableName: string) => async (tx: Knex.Transaction) =>
     tx(tableName).select('id', 'name').whereIn(`id`, ids);
@@ -1278,6 +1345,7 @@ export const insertFreelancerDetails =
         telegram_link: f.telegram_link,
         discord_link: f.discord_link,
         user_id: f.user_id,
+        hour_per_rate: f.hour_per_rate,
       })
 
       .returning('id')
@@ -1350,8 +1418,9 @@ export const updateFreelancerDetails =
     web3_type: string,
     web3_challenge: string,
     // eslint-disable-next-line unused-imports/no-unused-vars
-    freelancer_clients: Array<{ id: number; name: string; img: string }>
+    freelancer_clients: Array<{ id: number; name: string; img: string }>,
     // token: string
+    hour_per_rate: number
   ) =>
   async (tx: Knex.Transaction) =>
     await tx<Freelancer>('freelancers')
@@ -1368,6 +1437,7 @@ export const updateFreelancerDetails =
         telegram_link: f.telegram_link,
         discord_link: f.discord_link,
         user_id: f.user_id,
+        hour_per_rate,
       })
       .where({ user_id: userId })
       .returning('id')
@@ -1692,6 +1762,7 @@ export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
     user_id,
     escrow_address,
     duration_id,
+    payment_address,
   } = grant;
   const project = await insertProject({
     name: title,
@@ -1709,6 +1780,7 @@ export const insertGrant = (grant: Grant) => async (tx: Knex.Transaction) => {
     imbue_fee,
     duration_id,
     status_id: ProjectStatus.Accepted,
+    payment_address,
     // project_type: project_type ?? models.ProjectType.Brief
   })(tx);
 

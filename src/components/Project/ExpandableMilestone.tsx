@@ -114,7 +114,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
               await sendNotification(
                 project.approvers,
                 'submit_Milestone.testing',
-                'A New Milestone has been made',
+                `A New Milestone has been submitted on project ${project.name}`,
                 `Milestone Submitted Successfully`,
                 Number(project.id),
                 milestone.milestone_index + 1
@@ -185,7 +185,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
       if (!result.txError) {
         pollResult = (await chainService.pollChainMessage(
           ImbueChainEvent.ApproveMilestone,
-          account
+          account.address
         )) as ImbueChainPollResult;
       } else {
         setError({ message: result.errorMessage });
@@ -300,7 +300,7 @@ const ExpandableDropDowns = (props: ExpandableDropDownsProps) => {
           }
           setLoading(false);
           setSuccess(true);
-          setSuccessTitle('Withdraw successfull');
+          setSuccessTitle('Withdraw successful');
         } else if (result.txError) {
           setLoading(false);
           setError({ message: result.errorMessage });

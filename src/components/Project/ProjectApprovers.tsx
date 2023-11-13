@@ -146,7 +146,7 @@ const ProjectApprovers = (props: ProjectApproversType) => {
                     {approversPreview?.slice(0, 4).map((approver: any, index: number) => (
                         <div
                             key={index}
-                            className={`col-span-3 flex text-content px-3 py-2 rounded-xl gap-4 items-center ${approver?.display_name && 'cursor-pointer'} ${approver.id === user?.id && "bg-[#FFDAD8]"}`}
+                            className={`col-span-3 flex text-content px-2 py-2 rounded-xl gap-2 items-center ${approver?.display_name && 'cursor-pointer'} ${approver.id === user?.id && "bg-[#FFDAD8]"}`}
                             onClick={() =>
                                 approver.display_name &&
                                 router.push(`/profile/${approver.username}`)
@@ -164,8 +164,8 @@ const ProjectApprovers = (props: ProjectApproversType) => {
                             <div className='flex flex-col'>
                                 <span className='text-base'>
                                     {
-                                        approver?.display_name.length > 12
-                                            ? approver.display_name.substring(0, 12) + "..."
+                                        approver?.display_name.length > 5
+                                            ? approver.display_name.substring(0, 5) + "..."
                                             : approver.display_name
                                     }
                                 </span>

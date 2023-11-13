@@ -2,8 +2,10 @@ import { Alert, Dialog, IconButton, Tooltip } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import WalletIcon from '@svgs/wallet.svg';
 import { WalletAccount } from '@talismn/connect-wallets';
+import WalletConnectProvider from '@walletconnect/web3-provider'
 // import ChainService from '@/redux/services/chainService';
 import Filter from 'bad-words';
+import { ethers } from 'ethers'
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -11,6 +13,7 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import { FaRegCopy } from 'react-icons/fa';
 import { FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
+import Web3Modal from 'web3modal'
 
 import { sendNotification } from '@/utils';
 import { showErrorMessage } from '@/utils/errorMessages';
@@ -30,6 +33,7 @@ import * as config from '@/config';
 import { timeData } from '@/config/briefs-data';
 import { Currency, OffchainProjectState } from '@/model';
 import ChainService from '@/redux/services/chainService';
+import { getProjectEscrowAddress } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 interface MilestoneItem {
@@ -59,6 +63,7 @@ const GrantApplication = (): JSX.Element => {
   });
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
+  const [paymentAddress, setPaymentAddress] = useState<string>('');
   const [escrowAddress, setEscrowAddress] = useState<string>('');
   const [approvers, setApprovers] = useState<string[]>([]);
   // const [newApprover, setNewApprover] = useState<string>();
@@ -71,6 +76,7 @@ const GrantApplication = (): JSX.Element => {
   const [projectId, setProjectId] = useState<number>();
   const [copied, setCopied] = useState<boolean>(false);
   const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
+  const [accounts, setAccounts] = useState<string[]>([]);
 
   const copyAddress = () => {
     setCopied(true);
@@ -98,19 +104,13 @@ const GrantApplication = (): JSX.Element => {
     (key: any) => !isNaN(Number(Currency[key]))
   );
 
-  // const onAddApprover = () => {
-  //   if (!newApprover) return;
-  //   setApprovers([...approvers, newApprover]);
-  //   setNewApprover('');
-  // };
-
   const imbueFeePercentage = 5;
   const totalCostWithoutFee = milestones.reduce(
     (acc, { amount }) => acc + (amount ?? 0),
     0
   );
   const imbueFee = (totalCostWithoutFee * imbueFeePercentage) / 100;
-  const amountDue =  totalCostWithoutFee - imbueFee;
+  const amountDue = totalCostWithoutFee - imbueFee;
 
   const onAddMilestone = () => {
     setMilestones([
@@ -118,6 +118,32 @@ const GrantApplication = (): JSX.Element => {
       { name: '', amount: undefined, description: '' },
     ]);
   };
+
+
+  const getWeb3Modal = async () => {
+    const web3Modal = new Web3Modal({
+      cacheProvider: false,
+      providerOptions: {
+        walletconnect: {
+          package: WalletConnectProvider,
+        },
+      },
+    })
+    return web3Modal
+  }
+
+  const connect = async () => {
+    try {
+      const web3Modal = await getWeb3Modal();
+      const connection = await web3Modal.connect();
+      const provider = new ethers.BrowserProvider(connection);
+      const accounts = (await provider.listAccounts()).map(jsonProvider => jsonProvider.address);
+      setPaymentAddress(accounts[0]);
+      setAccounts(accounts)
+    } catch (err) {
+      console.log('error:', err)
+    }
+  }
 
   const onRemoveMilestone = (index: number) => {
     if (milestones.length <= 1) return;
@@ -195,6 +221,7 @@ const GrantApplication = (): JSX.Element => {
         total_cost_without_fee: totalCostWithoutFee,
         imbue_fee: imbueFee,
         chain_project_id: projectId,
+        payment_address: currencyId >= 100 ? paymentAddress : null,
         milestones: milestones.map((milestone) => ({
           ...milestone,
           name: filter.clean(milestone.name),
@@ -235,7 +262,7 @@ const GrantApplication = (): JSX.Element => {
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
-            setEscrowAddress(result?.eventData[5]);
+
             const resp = await fetch(`${config.apiBase}grants`, {
               headers: config.postAPIHeaders,
               method: 'post',
@@ -261,15 +288,24 @@ const GrantApplication = (): JSX.Element => {
             });
 
             if (resp.status === 200 || resp.status === 201) {
-              const { grant_id } = (await resp.json()) as any;
-              setProjectId(grant_id);
+              const { grant_id: grantId } = (await resp.json()) as any;
+              setProjectId(grantId);
+
+
+              if (currencyId < 100) {
+                setEscrowAddress(result?.eventData[5]);
+              } else {
+                const offchainProjectAddress = await getProjectEscrowAddress(grantId);
+                setEscrowAddress(offchainProjectAddress);
+              }
+
               setSuccess(true);
               await sendNotification(
                 grant.approvers,
                 'AddApprovers.testing',
                 'You were invited as an Approver',
                 `Please review and provide your feedback.`,
-                grant_id
+                grantId
               );
             } else {
               const errorBody = await resp.json();
@@ -307,17 +343,20 @@ const GrantApplication = (): JSX.Element => {
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     milestoneIndex: number | undefined = undefined
   ) => {
-    const { titleRes, descriptionRes, milestonesRes, errors } =
+
+    const { titleRes, descriptionRes, milestonesRes, paymentAddressRes, errors } =
       handleApplicationInput(
         event,
         milestoneIndex,
         inputErrors,
         milestones,
         title,
-        description
+        description,
+        paymentAddress
       );
     setTitle(titleRes);
     setDescription(descriptionRes);
+    setPaymentAddress(paymentAddressRes);
     setMilestones(milestonesRes);
     setInputErrors(errors);
   };
@@ -450,7 +489,7 @@ const GrantApplication = (): JSX.Element => {
       <div className='rounded-[20px] bg-background'>
         <div className='flex justify-between text-[20px] text-content px-6 lg:px-12 py-5 border-b border-imbue-light-purple'>
           <p>Approvers</p>
-          <div>{`Total grant: ${amountDue} ${currencies[currencyId]}`}</div>
+          <div>{`Total grant: ${amountDue} ${Currency[currencyId]}`}</div>
         </div>
         <div className='flex flex-col lg:flex-row justify-between px-6 lg:px-12 py-8 text-base leading-[1.2] border-b border-b-imbue-light-purple items-start'>
           <div className='flex flex-col gap-8 w-full lg:w-1/2'>
@@ -553,6 +592,36 @@ const GrantApplication = (): JSX.Element => {
                 </select>
               </div>
             </div>
+            {currencyId >= 100 && (
+            <div>
+            <p className='text-lg text-content m-0 p-0'>Payment Address:</p>
+            <div>
+              {accounts.length == 0 ? (
+                <button className='primary-btn in-dark w-button' onClick={connect}>Connect</button>
+              ) : (
+                <select
+                  name='paymentAddress'
+                  value={paymentAddress}
+                  onChange={(e) => setPaymentAddress(e.target.value)}
+                  placeholder='Select a payment address'
+                  className='bg-transparent round border border-imbue-purple rounded-[5px] text-base px-5 py-3 mt-4 w-full text-content-primary outline-content-primary'
+                  required
+                >
+                  {accounts.map((account: string) => (
+                    <option
+                      value={account}
+                      key={account}
+                      className='hover:!bg-overlay'
+                    >
+                      {account}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          </div>
+            )}
+
           </div>
         </div>
         <div className='text-[20px] text-content lg:pl-12 py-5 border-b'>
@@ -636,9 +705,8 @@ const GrantApplication = (): JSX.Element => {
                                   ''}
                               </p>
                               <div className='text-imbue-purple text-sm ml-auto text-right'>
-                                {`${
-                                  milestones[index].description?.length || 0
-                                }/5000`}
+                                {`${milestones[index].description?.length || 0
+                                  }/5000`}
                               </div>
                             </div>
                           </div>
@@ -712,9 +780,8 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${
-                  currencies[currencyId]
-                }`}
+                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} $${Currency[currencyId]
+                  }`}
               </div>
             </div>
 
@@ -734,9 +801,8 @@ const GrantApplication = (): JSX.Element => {
                 </p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(imbueFee.toFixed(2)).toLocaleString()} ${
-                  currencies[currencyId]
-                }`}
+                {`${Number(imbueFee.toFixed(2)).toLocaleString()} $${Currency[currencyId]
+                  }`}
               </div>
             </div>
 
@@ -747,7 +813,9 @@ const GrantApplication = (): JSX.Element => {
                 <p className='text-lg lg:text-xl text-content m-0 p-0'>Amount Received</p>
               </div>
               <div className='text-content-primary'>
-                ${Number(amountDue.toFixed(2)).toLocaleString()}
+                {Number(amountDue.toFixed(2)).toLocaleString()} ${
+                  Currency[currencyId]
+                }
               </div>
             </div>
           </div>
@@ -762,9 +830,8 @@ const GrantApplication = (): JSX.Element => {
         >
           <button
             // disabled={!formDataValid}
-            className={`primary-btn in-dark w-button ${
-              disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
-            }`}
+            className={`primary-btn in-dark w-button ${disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
+              }`}
             onClick={() => !disableSubmit && handleSubmit()}
           >
             Submit
@@ -817,9 +884,8 @@ const GrantApplication = (): JSX.Element => {
           </button>
         </div>
         <Alert
-          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${
-            copied ? 'flex' : 'hidden'
-          }`}
+          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${copied ? 'flex' : 'hidden'
+            }`}
           severity='success'
         >
           Grant Wallet Address Copied to clipboard

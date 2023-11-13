@@ -5,12 +5,6 @@ import Grid from '@mui/material/Grid';
 const TextField = dynamic(() => import("@mui/material/TextField"), {
   ssr: false,
 })
-const OutlinedInput = dynamic(() => import("@mui/material/OutlinedInput"), {
-  ssr: false,
-})
-const InputAdornment = dynamic(() => import("@mui/material/InputAdornment"), {
-  ssr: false,
-})
 const IconButton = dynamic(() => import("@mui/material/IconButton"), {
   ssr: false,
 })
@@ -212,79 +206,80 @@ const Freelancers = (): JSX.Element => {
 
   useEffect(() => {
     const fetchAndSetFreelancers = async () => {
-      if (Object.keys(router?.query).length) {
-        setLoading(true)
-        let filter: FreelancerSqlFilter = {
-          skills_range: [],
-          services_range: [],
-          languages_range: [],
-          name: '',
-          page: currentPage,
-          items_per_page: itemsPerPage
-        };
-
-
-        if (sizeProp) {
-          filter = { ...filter, items_per_page: Number(sizeProp) || 12 };
-          setItemsPerPage(Number(sizeProp))
-        }
-
-        if (Number(pageProp)) {
-          filter = { ...filter, page: Number(pageProp) || 1 };
-        }
-
-        if (name) {
-          filter = { ...filter, name: name };
-          // const input = document.getElementById(
-          //   'search-input'
-          // ) as HTMLInputElement;
-          // if (input) input.value = name.toString();
-          setSearchInput(name.toString())
-        }
-
-        if (skillsRangeProps) {
-          const range = strToIntRange(skillsRangeProps);
-          range?.forEach?.((v: any) => {
-            if (!selectedFilterIds.includes(`0-${v}`))
-              setSlectedFilterIds([...selectedFilterIds, `0-${v}`]);
-          });
-          filter = { ...filter, skills_range: range };
-        }
-
-        if (servicesRangeProps) {
-          const range = strToIntRange(servicesRangeProps);
-
-          range?.forEach?.((v: any) => {
-            if (!selectedFilterIds.includes(`1-${v}`))
-              setSlectedFilterIds([...selectedFilterIds, `1-${v}`]);
-          });
-          filter = {
-            ...filter,
-            services_range: range,
+      setLoading(true)
+      try {
+        if (Object.keys(router?.query).length) {
+          let filter: FreelancerSqlFilter = {
+            skills_range: [],
+            services_range: [],
+            languages_range: [],
+            name: '',
+            page: currentPage,
+            items_per_page: itemsPerPage
           };
-        }
 
-        if (languagesRangeProps) {
-          const range = strToIntRange(languagesRangeProps);
-          range?.forEach?.((v: any) => {
-            if (!selectedFilterIds.includes(`2-${v}`))
-              setSlectedFilterIds([...selectedFilterIds, `2-${v}`]);
-          });
-          filter = {
-            ...filter,
-            languages_range: strToIntRange(languagesRangeProps),
-          };
-        }
 
-        if (freelancerInfoProps) {
-          const data = JSON.parse(freelancerInfoProps as string);
-          const { verified } = data;
-          if (verified) {
-            filter = { ...filter, verified: true };
-            setSlectedFilterIds([...selectedFilterIds, '3-0']); // FIXME:
+          if (sizeProp) {
+            filter = { ...filter, items_per_page: Number(sizeProp) || 12 };
+            setItemsPerPage(Number(sizeProp))
           }
-        }
-        try {
+
+          if (Number(pageProp)) {
+            filter = { ...filter, page: Number(pageProp) || 1 };
+          }
+
+          if (name) {
+            filter = { ...filter, name: name };
+            // const input = document.getElementById(
+            //   'search-input'
+            // ) as HTMLInputElement;
+            // if (input) input.value = name.toString();
+            setSearchInput(name.toString())
+          }
+
+          if (skillsRangeProps) {
+            const range = strToIntRange(skillsRangeProps);
+            range?.forEach?.((v: any) => {
+              if (!selectedFilterIds.includes(`0-${v}`))
+                setSlectedFilterIds([...selectedFilterIds, `0-${v}`]);
+            });
+            filter = { ...filter, skills_range: range };
+          }
+
+          if (servicesRangeProps) {
+            const range = strToIntRange(servicesRangeProps);
+
+            range?.forEach?.((v: any) => {
+              if (!selectedFilterIds.includes(`1-${v}`))
+                setSlectedFilterIds([...selectedFilterIds, `1-${v}`]);
+            });
+            filter = {
+              ...filter,
+              services_range: range,
+            };
+          }
+
+          if (languagesRangeProps) {
+            const range = strToIntRange(languagesRangeProps);
+            range?.forEach?.((v: any) => {
+              if (!selectedFilterIds.includes(`2-${v}`))
+                setSlectedFilterIds([...selectedFilterIds, `2-${v}`]);
+            });
+            filter = {
+              ...filter,
+              languages_range: strToIntRange(languagesRangeProps),
+            };
+          }
+
+          if (freelancerInfoProps) {
+            const data = JSON.parse(freelancerInfoProps as string);
+            const { verified } = data;
+            if (verified) {
+              filter = { ...filter, verified: true };
+              setSlectedFilterIds([...selectedFilterIds, '3-0']); // FIXME:
+            }
+          }
+
           const { currentData, totalFreelancers } = await callSearchFreelancers(
             filter
           );
@@ -301,16 +296,26 @@ const Freelancers = (): JSX.Element => {
           setPageInput(filter.page)
           setFreelancers(currentData);
           setFreelancersTotal(totalFreelancers);
-        } catch (error) {
-          setError({ message: "Could not get the results. Please try again" })
-        } finally {
-          setLoading(false)
+
+        } else {
+          const data: FreelancerResponse = await getAllFreelancers(
+            itemsPerPage,
+            currentPage
+          );
+          setSlectedFilterIds([]);
+          setSearchInput("")
+          setFreelancers(data.currentData);
+          setFreelancersTotal(data.totalFreelancers);
         }
+      } catch (error) {
+        setError({ message: "Could not get the results. Please try again" })
+      } finally {
+        setLoading(false)
       }
     };
 
     router.isReady && fetchAndSetFreelancers();
-  }, [router.isReady, currentPage, itemsPerPage]);
+  }, [router.isReady, router?.query, currentPage, itemsPerPage]);
 
 
   const onSearch = async () => {
@@ -429,9 +434,9 @@ const Freelancers = (): JSX.Element => {
       currentPage
     );
     setSlectedFilterIds([]);
+    setSearchInput("")
     setFreelancers(allFreelancers?.currentData);
     setFreelancersTotal(allFreelancers?.totalFreelancers);
-    setSearchInput("")
   };
 
   const cancelFilters = async () => {
@@ -467,15 +472,7 @@ const Freelancers = (): JSX.Element => {
             <div className='flex justify-between lg:flex-row flex-col items-start'>
               <div>
                 <div className='flex items-center'>
-                  {/* <input
-                    value={searhInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    id='search-input'
-                    className='search-input px-[12px] !w-full lg:!w-[20rem] !h-[2.875rem] !rounded-tr-[0px] !rounded-br-[0px] !text-black'
-                    placeholder='Search'
-                    autoComplete='off'
-                  /> */}
-                  <OutlinedInput
+                  {/* <OutlinedInput
                     autoComplete='off'
                     color='secondary'
                     id='search-input'
@@ -500,7 +497,40 @@ const Freelancers = (): JSX.Element => {
                           </InputAdornment>)
                         : ""
                     }
-                  />
+                  /> */}
+
+                  <div className="px-[6px] text-[0.875rem] border border-[#BCBCBC] focus-within:border-imbue-purple flex items-center !w-[20rem] !h-[2.875rem] rounded-lg !rounded-r-none">
+                    <input
+                      id='search-input'
+                      autoComplete='off'
+                      placeholder='Search'
+                      type='text'
+                      name='password'
+                      required
+                      onChange={(e) => setSearchInput(e.target.value)}
+                      onKeyUp={e => e.key === 'Enter' && onSearch()}
+                      value={searchInput}
+                      className="outline-none w-full text-black pl-3"
+                    />
+
+                    {
+                      searchInput.length
+                        ? (
+                          <IconButton
+                            aria-label='toggle password visibility'
+                            onClick={() =>
+                              searchInput?.length && setSearchInput('')
+                            }
+                            onMouseDown={(e) => e.preventDefault()}
+                            edge='end'
+                          >
+                            <ClearIcon />
+                          </IconButton>
+                        )
+                        : ''
+                    }
+                  </div>
+
                   <div
                     role='button'
                     onClick={onSearch}

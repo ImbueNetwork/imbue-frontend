@@ -7,6 +7,8 @@ import passport from 'passport';
 import {
   fetchAllBriefs,
   fetchItems,
+  fetchProjectById,
+  fetchUserBriefs,
   incrementUserBriefSubmissions,
   insertBrief,
   upsertItems,
@@ -48,6 +50,20 @@ export default nextConnect()
         await Promise.all([
           currentData,
           ...currentData.map(async (brief: any) => {
+            const userProject = await fetchUserBriefs(brief.user_id)(tx);
+            const user_hire_history = await Promise.all(
+              userProject.map(async (brief: any) => {
+                if (brief.project_id) {
+                  const re = await fetchProjectById(brief.project_id)(tx);
+                  return {
+                    project_status: re?.status_id,
+                    cost: re?.total_cost_without_fee,
+                  };
+                }
+                return { project_status: 0 };
+              })
+            );
+            brief.user_hire_history = user_hire_history;
             brief.skills = await fetchItems(brief.skill_ids, 'skills')(tx);
             brief.industries = await fetchItems(
               brief.industry_ids,

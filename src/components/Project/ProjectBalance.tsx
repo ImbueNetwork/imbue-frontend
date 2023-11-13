@@ -7,11 +7,13 @@ import { getBalance } from '@/utils/helper';
 import { Currency, OffchainProjectState, Project, User } from '@/model';
 
 type ProjectBalanceType = {
-    balance: number;
+    balance: number | undefined;
     project: Project;
     user: User;
     handlePopUpForUser: () => void;
     setBalance: (_balance: number) => void;
+    setBalanceLoading: (_loading: boolean) => void;
+    balanceLoading: boolean;
 }
 
 const Currencies = [
@@ -23,42 +25,55 @@ const Currencies = [
         name: "KSM",
         currencyId: 1
     },
-    // {AUSD : 2},
-    // {KAR : 3},
     {
         name: "MGX",
         currencyId: 4
     },
+
+    // Anything over 100 should be multichain 
+    {
+        name: "ETH",
+        currencyId: 100
+    },
+    {
+        name: "USDT",
+        currencyId: 101
+    },
 ]
 
 const ProjectBalance = (props: ProjectBalanceType) => {
-    const { balance, project, user, handlePopUpForUser, setBalance } = props;
-    const [balanceLoading, setBalanceLoading] = useState(true)
-    const [currency_id, setCurrency_id] = useState<number>(project?.currency_id || 0)
+    const { balance, project, user, handlePopUpForUser, setBalance, balanceLoading, setBalanceLoading } = props;
+    const [currency_id, setCurrency_id] = useState<number>();
+    const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const showOptions = Boolean(anchorEl);
 
     useEffect(() => {
         const getAndSetBalace = async () => {
+            if (balanceLoading && !firstLoad) return;
+
             if (
-                !project?.escrow_address ||
-                currency_id === undefined ||
-                !user.id
+                currency_id === undefined
             ) return
-            
+
             setBalanceLoading(true)
+
             try {
                 const balance = await getBalance(
-                    project?.escrow_address,
                     currency_id,
-                    user
+                    user,
+                    project.currency_id < 100  ? project?.escrow_address : undefined,
+                    Number(project.id)
                 );
-
                 if (!balance && project.status_id !== OffchainProjectState.Completed) {
                     handlePopUpForUser();
                 }
+
                 setBalance(balance || 0);
+                if (firstLoad)
+                    setFirstLoad(false)
+
             } catch (error) {
                 // eslint-disable-next-line no-console
                 console.error(error);
@@ -67,10 +82,18 @@ const ProjectBalance = (props: ProjectBalanceType) => {
             }
         }
 
-        getAndSetBalace()
+        getAndSetBalace();
+        if (currency_id == undefined) {
+            setCurrency_id(project.currency_id);
+        }
+
+        const timer = setInterval(() => {
+            getAndSetBalace();
+        }, 5000);
+        return () => clearInterval(timer);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currency_id, project?.escrow_address, project.status_id, user.id])
+    }, [currency_id, project?.escrow_address, project.status_id, user.id, firstLoad, balanceLoading])
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
@@ -85,7 +108,7 @@ const ProjectBalance = (props: ProjectBalanceType) => {
 
     return (
         <div className='text-sm text-[#868686] mt-2'>
-            {balanceLoading
+            {balanceLoading && firstLoad
                 ? (
                     <p className='text-xs font-semibold'> Loading Balance...</p>)
                 : (
@@ -120,7 +143,7 @@ const ProjectBalance = (props: ProjectBalanceType) => {
                             </Menu>
                         </div>
                         <p>
-                            Balance : {balance} ${Currency[currency_id || 0]}
+                            Balance: {balance} ${Currency[currency_id || 0]}
                         </p>
                     </div>
                 )

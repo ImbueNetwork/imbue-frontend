@@ -1,4 +1,5 @@
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { Button, Tooltip } from '@mui/material';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -8,7 +9,7 @@ import { WalletAccount } from '@talismn/connect-wallets';
 import axios from 'axios';
 import moment from 'moment';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { sendNotification } from '@/utils';
 import { initImbueAPIInfo } from '@/utils/polkadot';
@@ -17,11 +18,12 @@ import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 import VoteModal from '@/components/ReviewModal/VoteModal';
 import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 
-import { Milestone, OffchainProjectState, Project, User } from '@/model';
-import ChainService from '@/redux/services/chainService';
+import { Currency, Milestone, Project, User } from '@/model';
+import ChainService, { ImbueChainEvent } from '@/redux/services/chainService';
 import {
-  getMilestoneAttachments,
   uploadMilestoneAttachments,
+  watchChain,
+  withdrawOffchain,
 } from '@/redux/services/projectServices';
 import { updateProject } from '@/redux/services/projectServices';
 
@@ -41,6 +43,9 @@ interface ExpandableMilestonProps {
   canVote: boolean;
   loading: boolean;
   targetUser: any;
+  balance: number | undefined;
+  balanceLoading: boolean;
+  // hasMilestoneAttachments: boolean;
 }
 
 const ExpandableMilestone = (props: ExpandableMilestonProps) => {
@@ -56,7 +61,10 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
     setSuccessTitle,
     setSuccess,
     targetUser,
+    balance,
+    // hasMilestoneAttachments = false
   } = props;
+
   const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
   const [submittingMilestone, setSubmittingMilestone] =
     useState<boolean>(false);
@@ -81,21 +89,23 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
     !project.project_in_milestone_voting &&
     !milestone?.is_approved;
 
-  const [attachments, setAttachment] = useState<any>([]);
+  // const [attachments, setAttachment] = useState<any>([]);
 
-  useEffect(() => {
-    const getAttachments = async () => {
-      if (!project?.id || milestone?.milestone_index === undefined) return;
+  // useEffect(() => {
+  //   const getAttachments = async () => {
+  //     if (!project?.id || milestone?.milestone_index === undefined) return;
 
-      const resp = await getMilestoneAttachments(
-        project.id,
-        milestone.milestone_index
-      );
-      setAttachment(resp);
-    };
+  //     const resp = await getMilestoneAttachments(
+  //       project.id,
+  //       milestone.milestone_index
+  //     );
+  //     setAttachment(resp);
+  //   };
 
-    getAttachments();
-  }, [milestone.milestone_index, project.id]);
+  //   if(hasMilestoneAttachments){ 
+  //     getAttachments();
+  //   }
+  // }, [milestone.milestone_index, project.id]);
 
   const [files, setFiles] = useState<File[]>();
 
@@ -152,6 +162,8 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
         milestoneKeyInView
       );
 
+      watchChain(ImbueChainEvent.SubmitMilestone, account.address, project.id);
+
       // eslint-disable-next-line no-constant-condition
       while (true) {
         if (result.status || result.txError) {
@@ -165,6 +177,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
               milestone.milestone_index,
               fileURLs
             );
+
             if (resp) {
               await sendNotification(
                 projectType === 'brief'
@@ -229,45 +242,81 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
 
   // withdrawing funds
   const withdraw = async (account: WalletAccount) => {
+    if (!project.id)
+      return
     setLoading(true);
 
     try {
-      const imbueApi = await initImbueAPIInfo();
       const projectMilestones = project.milestones;
       // const user: User | any = await utils.getCurrentUser();
-      const chainService = new ChainService(imbueApi, user);
-      const result = await chainService.withdraw(
-        account,
-        project.chain_project_id
-      );
+      const approvedMilestones = project.milestones.filter((milestone: Milestone) => milestone.is_approved).map(milestone => milestone.milestone_index);
+      const withdrawnMilestones = project.milestones.filter((milestone: Milestone) => milestone.withdrawn_onchain).map(milestone => milestone.milestone_index);
+      const onChainWithdrawalRequired = JSON.stringify(approvedMilestones) != JSON.stringify(withdrawnMilestones);
+      watchChain(ImbueChainEvent.Withraw, account.address, project.id);
 
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        if (result.status || result.txError) {
-          if (result.status) {
-            const haveAllMilestonesBeenApproved = projectMilestones
-              .map((m: any) => m.is_approved)
-              .every(Boolean);
+      if (onChainWithdrawalRequired) {
+        const imbueApi = await initImbueAPIInfo();
+        const chainService = new ChainService(imbueApi, user);
+        const result = await chainService.withdraw(
+          account,
+          project.chain_project_id
+        );
 
-            if (haveAllMilestonesBeenApproved) {
-              project.status_id = OffchainProjectState.Completed;
-              project.completed = true;
+        while (onChainWithdrawalRequired) {
+          if (result.status || result.txError) {
+            if (result.status) {
+              // const haveAllMilestonesBeenApproved = projectMilestones
+              //   .map((m: any) => m.is_approved)
+              //   .every(Boolean);
+
+              // if (haveAllMilestonesBeenApproved) {
+              //   project.status_id = OffchainProjectState.Completed;
+              //   project.completed = true;
+              //   await updateProject(Number(project?.id), project);
+              // }
+
+              projectMilestones.forEach((m) => {
+                if (m.milestone_index <= milestoneKeyInView && !m.withdrawn_onchain) {
+                  project.milestones[m.milestone_index].withdrawn_onchain = true;
+                  project.milestones[m.milestone_index].withdrawal_transaction_hash = result?.transactionHash || "";
+                }
+              })
+
               await updateProject(Number(project?.id), project);
+
+              if (project.currency_id < 100) {
+                setSuccess(true);
+                setSuccessTitle('Withdraw successful');
+              }
+
+
+            } else if (result.txError) {
+              // setLoading(false);
+              setError({ message: 'Error : ' + (result.errorMessage || "Withdrawal unsuccessful. Please verify if you have any funds available for withdrawal.") });
             }
-            // setLoading(false);
-            setSuccess(true);
-            setSuccessTitle('Withdraw successfull');
-          } else if (result.txError) {
-            // setLoading(false);
-            setError({ message: 'Error : ' + result.errorMessage });
+            break;
           }
-          break;
+          await new Promise((f) => setTimeout(f, 1000));
         }
-        await new Promise((f) => setTimeout(f, 1000));
+
       }
-      setLoading(false);
+
+      if (project.currency_id >= 100 && project.id) {
+        const withdrawResult = await withdrawOffchain(project.id);
+        if (withdrawResult.txError) {
+          setSuccess(false);
+          setError({ message: withdrawResult.errorMessage });
+        } else if (Number(withdrawResult.withdrawn) > 0) {
+          setSuccess(true);
+          setSuccessTitle('Withdraw successful');
+        }
+        setLoading(false);
+      }
+
     } catch (error) {
       setError({ message: 'Error' + error });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -292,8 +341,8 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
           }}
           polkadotAccountsVisible={showPolkadotAccounts}
           showPolkadotAccounts={setShowPolkadotAccounts}
-          // initiatorAddress={project?.owner}
-          // filterByInitiator
+        // initiatorAddress={project?.owner}
+        // filterByInitiator
         />
       )}
 
@@ -322,14 +371,12 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                 <span className='relative text-sm z-10'>{index + 1}</span>
                 <div className='w-2 h-2 -rotate-45 bg-[#2400FF] absolute -bottom-0.5  '></div>
               </div>
-              <p className='text-black ml-3 text-2xl'>
-                {milestone?.name?.length > 40
-                  ? milestone.name.substring(0, 40) + ' ...'
-                  : milestone.name}
+              <p className='text-black ml-3 text-2xl break-words w-11/12'>
+                {milestone?.name}
               </p>
             </div>
             <p className='col-start-7 col-end-9 text-lg mr-10 ml-4'>
-              ${milestone.amount}
+              {milestone.amount} ${Currency[project.currency_id]}
             </p>
             <p className='col-start-9 text-lg col-end-11 ml-4'>
               {moment(milestone.modified).format('MMM Do YY')}
@@ -343,23 +390,21 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                         {item.is_approved ? 'Completed' : 'Open for voting'}
                     </p> */}
             {project.first_pending_milestone === milestone.milestone_index &&
-            project.project_in_milestone_voting ? (
+              project.project_in_milestone_voting ? (
               <p
-                className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ml-auto h-fit ${
-                  milestone.is_approved
-                    ? 'bg-lime-100 text-lime-600'
-                    : 'bg-red-100 text-red-500'
-                }`}
+                className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ml-auto h-fit ${milestone.is_approved
+                  ? 'bg-lime-100 text-lime-600'
+                  : 'bg-red-100 text-red-500'
+                  }`}
               >
                 {milestone.is_approved ? 'Completed' : 'Open for voting'}
               </p>
             ) : (
               <p
-                className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ml-auto h-fit ${
-                  milestone.is_approved
-                    ? 'bg-lime-100 text-lime-600'
-                    : 'bg-[#EBEAE2] text-[#949494]'
-                }`}
+                className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ml-auto h-fit ${milestone.is_approved
+                  ? 'bg-lime-100 text-lime-600'
+                  : 'bg-[#EBEAE2] text-[#949494]'
+                  }`}
               >
                 {milestone.is_approved ? 'Completed' : 'Pending'}
               </p>
@@ -375,30 +420,30 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
               <p className='mt-5 whitespace-pre-wrap break-words'>
                 {milestone.description}
               </p>
-              {attachments?.length ? (
+              {milestone.attachments?.length ? (
                 <div>
                   <p className='text-black mt-10 font-semibold text-lg'>
                     Project Attachments
                   </p>
                   <div className='grid grid-cols-6 gap-3'>
-                    {attachments?.length
-                      ? attachments.map((attachment: any, index: number) => (
-                          <a
-                            className='col-span-1'
-                            key={index}
-                            href={attachment.fileURL}
-                            target='_blank'
-                          >
-                            <div className='border rounded-lg mt-5 px-3 text-xs py-3'>
-                              <div className='space-y-2'>
-                                <p>
-                                  {attachment.fileURL?.split('$')[1] ||
-                                    'Attachment'}
-                                </p>
-                              </div>
+                    {milestone.attachments?.length
+                      ? milestone.attachments.map((attachment: any, index: number) => (
+                        <a
+                          className='col-span-1'
+                          key={index}
+                          href={attachment.fileURL}
+                          target='_blank'
+                        >
+                          <div className='border rounded-lg mt-5 px-3 text-xs py-3'>
+                            <div className='space-y-2'>
+                              <p>
+                                {attachment.fileURL?.split('$')[1] ||
+                                  'Attachment'}
+                              </p>
                             </div>
-                          </a>
-                        ))
+                          </div>
+                        </a>
+                      ))
                       : ''}
                   </div>
                 </div>
@@ -414,22 +459,22 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                   <div className='flex space-x-5'>
                     {files?.length
                       ? files.map((file, index) => (
-                          <div
-                            key={index}
-                            className='border rounded-lg mt-5 flex space-x-4 items-center px-3 text-xs py-3'
-                          >
-                            <div className='space-y-2'>
-                              <p>{file.name}</p>
-                              <p>{(file.size / 1048576).toFixed(2)} MB</p>
-                            </div>
-                            <Image
-                              className='cursor-pointer ml-2'
-                              src={require('@/assets/svgs/trash.svg')}
-                              alt=''
-                              onClick={() => handleRemoveFile(index)}
-                            />
+                        <div
+                          key={index}
+                          className='border rounded-lg mt-5 flex space-x-4 items-center px-3 text-xs py-3'
+                        >
+                          <div className='space-y-2'>
+                            <p>{file.name}</p>
+                            <p>{(file.size / 1048576).toFixed(2)} MB</p>
                           </div>
-                        ))
+                          <Image
+                            className='cursor-pointer ml-2'
+                            src={require('@/assets/svgs/trash.svg')}
+                            alt=''
+                            onClick={() => handleRemoveFile(index)}
+                          />
+                        </div>
+                      ))
                       : ''}
                   </div>
 
@@ -451,22 +496,20 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                 </div>
               )}
 
-              <div className='w-full mt-7 flex'>
+              <div className='w-full mt-7'>
                 {!props?.loading && showVoteButton && (
                   <Tooltip
                     followCursor
                     title={
                       !props?.canVote &&
-                      `Only approvers are allowed to vote on a milestone and you cannot vote more than once.${
-                        user.web3_address &&
-                        `You are currently on wallet: ${user.web3_address}`
+                      `Only approvers are allowed to vote on a milestone and you cannot vote more than once.${user.web3_address &&
+                      `You are currently on wallet: ${user.web3_address}`
                       }`
                     }
                   >
                     <button
-                      className={`primary-btn  ml-auto in-dark w-button lg:w-1/5 text-center ${
-                        !props?.canVote && '!bg-gray-300 !text-gray-400'
-                      }`}
+                      className={`primary-btn  ml-auto in-dark w-button lg:w-1/5 text-center ${!props?.canVote && '!bg-gray-300 !text-gray-400'
+                        }`}
                       onClick={() =>
                         props?.canVote &&
                         handleVoting(milestone.milestone_index)
@@ -477,23 +520,42 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                   </Tooltip>
                 )}
 
-                {showSubmitButton && (
-                  <button
-                    className='primary-btn  ml-auto in-dark w-button lg:w-1/5'
-                    style={{ textAlign: 'center' }}
-                    onClick={() =>
-                      handleSubmitMilestone(milestone.milestone_index)
-                    }
-                  >
-                    Submit Milestone
-                  </button>
-                )}
+                {
+                  showSubmitButton && (
+                    <div>
+                      <div className='w-full flex'>
+                        <button
+                          className='primary-btn  ml-auto in-dark w-button lg:w-1/5'
+                          style={{ textAlign: 'center' }}
+                          onClick={() =>
+                            handleSubmitMilestone(milestone.milestone_index)
+                          }
+                        >
+                          Submit Milestone
+                        </button>
+                      </div>
+
+
+                      {
+                        balance === 0 && !project?.brief_id && (
+                          <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-imbue-coral px-3 py-1 text-sm text-white w-fit ml-auto mt-3 '>
+                            <ErrorOutlineOutlinedIcon className='h-4 w-4 inline' />
+                            <p className='inline'>
+                              No funds have been deposited to the escrow address. If you still want to submit your work the risks are upto you.
+                            </p>
+                          </div>
+                        )
+                      }
+                    </div>
+
+                  )
+                }
 
                 {isApplicant && milestone.is_approved && (
                   <button
-                    className='primary-btn  ml-auto in-dark w-button lg:w-1/5'
+                    className={`primary-btn  ml-auto in-dark w-button lg:w-1/5 text-center ${milestone?.withdrawn_onchain && '!bg-gray-300 !text-gray-400'}`}
                     style={{ textAlign: 'center' }}
-                    onClick={() => handleWithdraw(milestone.milestone_index)}
+                    onClick={() => !milestone?.withdrawn_onchain && handleWithdraw(milestone.milestone_index)}
                   >
                     Withdraw
                   </button>

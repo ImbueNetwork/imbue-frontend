@@ -3,11 +3,14 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
+import WalletConnectProvider from '@walletconnect/web3-provider'
 import Filter from 'bad-words';
+import { ethers } from 'ethers'
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
+import Web3Modal from 'web3modal'
 
 import { sendNotification } from '@/utils';
 import {
@@ -19,6 +22,8 @@ import AccountChoice from '@/components/AccountChoice';
 import { BriefInsights } from '@/components/Briefs/BriefInsights';
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
+import { AppContext, AppContextType } from '@/components/Layout';
+import SwitchToFreelancer from '@/components/PopupScreens/SwitchToFreelancer';
 import SuccessScreen from '@/components/SuccessScreen';
 
 import * as config from '@/config';
@@ -48,6 +53,7 @@ export const SubmitProposal = (): JSX.Element => {
   const filter = new Filter();
   const [currencyId, setCurrencyId] = useState(0);
   const [durationId, setDurationId] = useState(0);
+  const [paymentAddress, setPaymentAddress] = useState<string>('');
   const [brief, setBrief] = useState<Brief | any>();
   // const [user, setUser] = useState<User>();
   const { user, loading: loadingUser } = useSelector(
@@ -68,6 +74,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
+  const { profileView } = useContext(AppContext) as AppContextType
 
   const [applicationId, setapplicationId] = useState();
   const [error, setError] = useState<any>();
@@ -75,29 +82,55 @@ export const SubmitProposal = (): JSX.Element => {
   const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
   // eslint-disable-next-line no-unused-vars, unused-imports/no-unused-vars
   const [inputError, setInputError] = useState<any>([]);
+  const [accounts, setAccounts] = useState<string[]>([]);
 
   useEffect(() => {
     setOpen(applicationId ? true : false);
   }, [applicationId]);
 
   useEffect(() => {
+    const getUserAndFreelancer = async () => {
+      const freelancer = await getFreelancerProfile(user?.username);
+      // if (!freelancer?.id) router.push(`/freelancers/new`);
+      setFreelancer(freelancer);
+
+      const userApplication: any = await getFreelancerBrief(user?.id, briefId);
+      if (userApplication && profileView === 'freelancer') {
+        router.push(`/briefs/${briefId}/applications/${userApplication?.id}/`);
+      }
+    };
+
     !loadingUser && getUserAndFreelancer();
-  }, [briefId, user?.username, loadingUser]);
+  }, [briefId, user?.username, loadingUser, profileView]);
+
+  const getWeb3Modal = async () => {
+    const web3Modal = new Web3Modal({
+      cacheProvider: false,
+      providerOptions: {
+        walletconnect: {
+          package: WalletConnectProvider,
+        },
+      },
+    })
+    return web3Modal
+  }
+  const connect = async () => {
+    try {
+      const web3Modal = await getWeb3Modal();
+      const connection = await web3Modal.connect();
+      const provider = new ethers.BrowserProvider(connection);
+      const accounts = (await provider.listAccounts()).map(jsonProvider => jsonProvider.address);
+      setPaymentAddress(accounts[0]);
+      setAccounts(accounts)
+    } catch (err) {
+      console.log('error:', err)
+    }
+  }
+
 
   useEffect(() => {
     router?.isReady && getCurrentUserBrief();
   }, [user, router.isReady]);
-
-  const getUserAndFreelancer = async () => {
-    const freelancer = await getFreelancerProfile(user?.username);
-    if (!freelancer?.id) router.push(`/freelancers/new`);
-    setFreelancer(freelancer);
-
-    const userApplication: any = await getFreelancerBrief(user?.id, briefId);
-    if (userApplication) {
-      router.push(`/briefs/${briefId}/applications/${userApplication?.id}/`);
-    }
-  };
 
   const getCurrentUserBrief = async () => {
     if (briefId && user) {
@@ -207,6 +240,7 @@ export const SubmitProposal = (): JSX.Element => {
           total_cost_without_fee: totalCostWithoutFee,
           imbue_fee: imbueFee,
           currency_id: currencyId,
+          owner: user.web3_address,
           milestones: milestones
             .filter((m) => m.amount !== undefined)
             .map((m) => {
@@ -224,6 +258,7 @@ export const SubmitProposal = (): JSX.Element => {
           duration_id: durationId,
           description: brief?.description,
           verified_only: brief.verified_only,
+          payment_address: currencyId >= 100 ? paymentAddress : undefined,
         }),
       });
       if (resp.ok) {
@@ -233,7 +268,7 @@ export const SubmitProposal = (): JSX.Element => {
         await sendNotification(
           [brief.user_id],
           'breif.test.applied',
-          'Some one might have interested in your breif',
+          `You have a new brief application for brief ${brief.headline}`,
           `Submit a proposal`,
           briefId,
           applicationId
@@ -266,13 +301,15 @@ export const SubmitProposal = (): JSX.Element => {
       inputErrors,
       milestones,
       brief?.headline,
-      brief?.description
+      brief?.description,
+      paymentAddress
     );
     setMilestones(milestonesRes);
     setInputErrors(errors);
   };
 
   // const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
+
 
   if (loadingUser || loading) <FullScreenLoader />;
 
@@ -456,7 +493,7 @@ export const SubmitProposal = (): JSX.Element => {
               </div>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-purple-dark font-normal'>
-              ${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()}
+              {Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${Currency[currencyId]}
             </div>
           </div>
 
@@ -474,7 +511,7 @@ export const SubmitProposal = (): JSX.Element => {
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-purple-dark font-normal'>
-              ${Number(imbueFee.toFixed(2)).toLocaleString()}
+              {Number(imbueFee.toFixed(2)).toLocaleString()} ${Currency[currencyId]}
             </div>
           </div>
 
@@ -485,7 +522,7 @@ export const SubmitProposal = (): JSX.Element => {
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-light-purple-two font-normal'>
-              ${Number(totalCostMinusFee.toFixed(2)).toLocaleString()}
+              {Number(totalCostMinusFee.toFixed(2)).toLocaleString()} ${Currency[currencyId]}
             </div>
           </div>
         </div>
@@ -543,6 +580,35 @@ export const SubmitProposal = (): JSX.Element => {
               </select>
             </div>
           </div>
+          {currencyId >= 100 && (
+            <div>
+              <p className='text-lg text-content m-0 p-0'>Payment Address:</p>
+              <div>
+                {accounts.length == 0 ? (
+                  <button className='primary-btn in-dark w-button' onClick={connect}>Connect</button>
+                ) : (
+                  <select
+                    name='paymentAddress'
+                    value={paymentAddress}
+                    onChange={(e) => setPaymentAddress(e.target.value)}
+                    placeholder='Select a payment address'
+                    className='bg-transparent round border border-imbue-purple rounded-[5px] text-base px-5 py-3 mt-4 w-full text-content-primary outline-content-primary'
+                    required
+                  >
+                    {accounts.map((account: string) => (
+                      <option
+                        value={account}
+                        key={account}
+                        className='hover:!bg-overlay'
+                      >
+                        {account}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -554,9 +620,8 @@ export const SubmitProposal = (): JSX.Element => {
             title={disableSubmit && 'Please fill all the required input fields'}
           >
             <button
-              className={`primary-btn in-dark w-button ${
-                disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
-              }`}
+              className={`primary-btn in-dark w-button ${disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
+                }`}
               onClick={() => !disableSubmit && handleSubmit()}
             >
               Submit
@@ -615,6 +680,13 @@ export const SubmitProposal = (): JSX.Element => {
           </button>
         </div>
       </ErrorScreen>
+
+      {
+        profileView === 'client' && (
+          <SwitchToFreelancer />
+        )
+      }
+
     </div>
   );
 };
