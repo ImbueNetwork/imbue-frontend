@@ -368,6 +368,7 @@ export default function VoteModal({
             handleRefund={refund}
             setVisible={setVisible}
             refundOnly={refundOnly}
+            undergoingRefund={project.project_in_voting_of_no_confidence || false}
           />
         )}
 
@@ -376,7 +377,10 @@ export default function VoteModal({
             {!voteRefund ? (
               <SuccessModal setVisible={setVisible} />
             ) : (
-              <SuccessRefundModal setVisible={setVisible} />
+              <SuccessRefundModal
+                undergoingRefund={project.project_in_voting_of_no_confidence || false}
+                vote={voteRefund} setVisible={setVisible}
+              />
             )}
           </>
         )}
