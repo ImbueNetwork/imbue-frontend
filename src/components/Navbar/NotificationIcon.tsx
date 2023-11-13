@@ -45,6 +45,7 @@ export default function NotificationIcon() {
     setAnchorEl(null);
     setModal(false);
   };
+  
 
   return (
     <div>
