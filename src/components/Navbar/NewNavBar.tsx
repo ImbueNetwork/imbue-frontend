@@ -60,6 +60,8 @@ function NewNavbar() {
   } = useSelector((state: RootState) => state.userState);
   const dispatch = useDispatch<AppDispatch>();
 
+  const [expanded, setExpanded] = useState(false);
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
     setOpenMenu(Boolean(event.currentTarget));
@@ -86,6 +88,14 @@ function NewNavbar() {
     };
     setup();
   }, [dispatch, user?.username]);
+
+  const navigateToPage = (url: string) => {
+    if (user?.username) {
+      router.push(url);
+    } else {
+      setLoginModal(true);
+    }
+  };
 
   const navPillclasses =
     'text-imbue-purple-dark h-[3rem] bg-white  rounded-[5.07319rem] !flex justify-center items-center px-5 hover:no-underline !text-[1rem] ';
@@ -234,6 +244,7 @@ function NewNavbar() {
                   ''
                 )}
                 <Link
+                  onClick={() => setExpanded(false)}
                   className={`mx-1 hover:bg-imbue-lime-light text-xs lg:text-sm hidden lg:inline-block cursor-pointer ${navPillclasses} nav-item nav-item-2`}
                   href='/relay'
                 >
@@ -247,6 +258,7 @@ function NewNavbar() {
                   Wallet
                 </Link>
                 <div
+                  onClick={() => setExpanded(false)}
                   className={`mx-1 relative group text-xs hover:bg-imbue-lime-light lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${navPillclasses}`}
                 >
                   <Image
@@ -320,24 +332,25 @@ function NewNavbar() {
               paddingRight: 2,
             }}
           >
-            <Badge className='mr-3' badgeContent={message} color='error'>
-              <Image
-                src='/message-dots-square.svg'
-                width={23}
-                height={20}
-                onClick={() => router.push('/dashboard/messages')}
-                alt='message'
-                className='cursor-pointer'
-              />
-            </Badge>
-            <div className='relative'>
-              {/*  */}
-
-              <div>
-                {/* <NotificationDropdown feedGroup='user' right notify /> */}
-                <NotificationIcon />
-              </div>
-            </div>
+            {user?.username && (
+              <>
+                <Badge className='mr-3' badgeContent={message} color='error'>
+                  <Image
+                    src='/message-dots-square.svg'
+                    width={23}
+                    height={20}
+                    onClick={() => router.push('/dashboard/message')}
+                    alt='message'
+                    className='cursor-pointer'
+                  />
+                </Badge>
+                <div className='relative'>
+                  <div>
+                    <NotificationIcon />
+                  </div>
+                </div>
+              </>
+            )}
             <Tooltip
               title='Account settings'
               className={`${!user?.username && !loading && 'lg:hidden'}`}
@@ -410,6 +423,13 @@ function NewNavbar() {
           />
         </Menu>
       </header>
+      {/* <Login
+        visible={loginModal}
+        setVisible={(val: any) => {
+          setLoginModal(val);
+        }}
+        redirectUrl={router?.asPath}
+      /> */}
       <LoginPopup
         visible={loginModal}
         setVisible={(val: any) => {
