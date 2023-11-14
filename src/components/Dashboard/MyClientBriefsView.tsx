@@ -52,7 +52,7 @@ const MyClientBriefsView = (props: ClientViewProps) => {
 
   useEffect(() => {
     const getApplications = async () => {
-      if (!briefId) return
+      if (!briefId || !user.id) return
 
       try {
         setLoadingApplications(true);
@@ -70,7 +70,7 @@ const MyClientBriefsView = (props: ClientViewProps) => {
     };
 
     briefId && getApplications();
-  }, [briefId, loading, router]);
+  }, [briefId, loading, router, user.id]);
 
   const goBack = () => {
     router.query.briefId = [];
