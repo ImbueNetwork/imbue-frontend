@@ -181,7 +181,7 @@ export default nextConnect()
           const web3_type = freelancer.web3_type;
           const web3_challenge = freelancer.web3_challenge;
           const freelancer_clients = freelancer?.clients;
-
+          const hour_per_rate = freelancer.hour_per_rate;
           // const token = await models.generateGetStreamToken(freelancer);
           await models.updateGetStreamUserName({
             ...userAuth,
@@ -214,7 +214,8 @@ export default nextConnect()
             web3_address,
             web3_type,
             web3_challenge,
-            freelancer_clients
+            freelancer_clients,
+            hour_per_rate
             // token
           )(tx);
 

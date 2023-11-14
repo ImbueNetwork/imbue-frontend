@@ -18,7 +18,8 @@ export const briefsData = [
         name: 'agriculture',
       },
     ],
-    description: 'finance brief briefOne has to be longer ? so make this longer briefOne has to be longer ? so make this longer',
+    description:
+      'finance brief briefOne has to be longer ? so make this longer briefOne has to be longer ? so make this longer',
     skills: [
       {
         id: 23,
@@ -45,24 +46,24 @@ export const briefsData = [
     document_url: 'http://www.imbue.com',
     number_of_briefs_submitted: 12,
     user_id: 1234,
-    verified_only:false
+    verified_only: false,
   },
   {
     id: 2,
     headline: 'briefTwo',
     industries: [
-        {
-          id: 23,
-          name: 'finance two',
-        },
-        {
-          id: 23,
-          name: 'gramental two',
-        },
-        {
-          id: 23,
-          name: 'agriculture two',
-        },
+      {
+        id: 23,
+        name: 'finance two',
+      },
+      {
+        id: 23,
+        name: 'gramental two',
+      },
+      {
+        id: 23,
+        name: 'agriculture two',
+      },
     ],
     description: 'finance brief two',
     skills: [
@@ -91,7 +92,7 @@ export const briefsData = [
     document_url: 'http://www.imbue.com',
     number_of_briefs_submitted: 3,
     user_id: 1234,
-    verified_only:true
+    verified_only: true,
   },
   {
     id: 3,
@@ -137,7 +138,7 @@ export const briefsData = [
     document_url: 'http://www.imbue.com',
     number_of_briefs_submitted: 11,
     user_id: 1234,
-    verified_only:false
+    verified_only: false,
   },
 ];
 
@@ -410,4 +411,6 @@ export const dummyFreelancerBrief = {
     },
   ],
   industry_ids: ['10'],
+  owner_name: 'polkadot',
+  owner_photo: '',
 };

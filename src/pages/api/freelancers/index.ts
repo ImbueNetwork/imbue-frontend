@@ -7,6 +7,7 @@ import {
   fetchAllFreelancers,
   fetchFreelancerClients,
   fetchFreelancerMetadata,
+  freelancerProjects,
   insertFreelancerDetails,
   upsertItems,
 } from '@/lib/models';
@@ -46,6 +47,9 @@ export default nextConnect()
                 freelancer.clients = await fetchFreelancerClients(
                   freelancer.id
                 )(tx);
+                freelancer.projects = await freelancerProjects(freelancer.id)(
+                  tx
+                );
               }),
             ]);
 

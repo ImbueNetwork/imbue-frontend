@@ -1,11 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Tooltip } from '@mui/material';
+import WalletConnectProvider from '@walletconnect/web3-provider'
 import Filter from 'bad-words';
+import { ethers } from 'ethers'
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import { FiEdit, FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
+import Web3Modal from 'web3modal'
 
 import { fetchProject, fetchUser } from '@/utils';
 import {
@@ -96,9 +99,35 @@ const ApplicationPreview = (): JSX.Element => {
   const [error, setError] = useState<any>();
   const [success, setSuccess] = useState<boolean>(false);
   const [openAccountChoice, setOpenAccountChoice] = useState<boolean>(false);
+  const [accounts, setAccounts] = useState<string[]>([]);
 
   const router = useRouter();
   const { id: briefId, applicationId }: any = router.query;
+
+  const getWeb3Modal = async () => {
+    const web3Modal = new Web3Modal({
+      cacheProvider: false,
+      providerOptions: {
+        walletconnect: {
+          package: WalletConnectProvider,
+        },
+      },
+    })
+    return web3Modal
+  }
+
+  const connect = async () => {
+    try {
+      const web3Modal = await getWeb3Modal();
+      const connection = await web3Modal.connect();
+      const provider = new ethers.BrowserProvider(connection);
+      const accounts = (await provider.listAccounts()).map(jsonProvider => jsonProvider.address);
+      setPaymentAddress(accounts[0]);
+      setAccounts(accounts)
+    } catch (err) {
+      console.log('error:', err)
+    }
+  }
 
   useEffect(() => {
     const getSetUpData = async () => {
@@ -119,6 +148,9 @@ const ApplicationPreview = (): JSX.Element => {
           freelancerUser?.username
         );
 
+        if (!user?.id) return router.push('/auth/sign-in')
+        else if (user.id !== brief?.user_id && user.id !== applicationResponse?.user_id) return router.push('/dashboard')
+
         setBrief(brief);
         setApplication(applicationResponse);
         setFreelancer(freelancerResponse);
@@ -128,14 +160,14 @@ const ApplicationPreview = (): JSX.Element => {
       } catch (error) {
         setError({ message: 'Could not find application' });
       } finally {
-        //setLoading(false);
+        setLoading(false);
       }
     };
 
-    if (briefId && applicationId) {
+    if (briefId && applicationId && !userLoading) {
       getSetUpData();
     }
-  }, [briefId, applicationId]);
+  }, [briefId, applicationId, userLoading]);
 
   useEffect(() => {
     async function setup() {
@@ -214,18 +246,6 @@ const ApplicationPreview = (): JSX.Element => {
       setLoginModal(true);
     }
   };
-
-  useEffect(() => {
-    if (freelancer && briefOwner && user.id && !userLoading) {
-      if (freelancer.user_id === user.id || briefOwner.id === user.id) {
-        setLoading(false);
-      } else {
-        router.push('/');
-      }
-    } else if (!userLoading && (!user || !user.id)) {
-      router.push('/');
-    }
-  }, [briefOwner, freelancer]);
 
   const updateApplicationState = async (
     application: any,
@@ -317,7 +337,7 @@ const ApplicationPreview = (): JSX.Element => {
         chain_project_id: chainProjectId,
         escrow_address: escrow_address,
         duration_id: durationId,
-        payment_address: paymentAddress
+        payment_address: currencyId >= 100 ? paymentAddress : null,
       });
 
       if (resp.id) {
@@ -421,8 +441,8 @@ const ApplicationPreview = (): JSX.Element => {
                   <h3 className='text-lg lg:text-[1.25rem] text-imbue-light-purple-two leading-[1.5] font-normal m-0 p-0'>
                     Projects&apos;s budget:{' '}
                     <span className=' text-imbue-purple-dark text-lg lg:text-[1.25rem]'>
-                      $
-                      {Number(application.total_cost_without_fee)?.toLocaleString()}
+
+                      {Number(application.total_cost_without_fee)?.toLocaleString()} ${Currency[application.currency_id]}
                     </span>
                   </h3>
                 )}
@@ -561,10 +581,10 @@ const ApplicationPreview = (): JSX.Element => {
                           </>
                         ) : (
                           <p className='text-[1rem] text-[#3B27C180] m-0'>
-                            $
+
                             {Number(
                               milestones[index]?.amount?.toFixed(2)
-                            )?.toLocaleString?.()}
+                            )?.toLocaleString?.()} ${Currency[currencyId]}
                           </p>
                         )}
 
@@ -618,7 +638,7 @@ const ApplicationPreview = (): JSX.Element => {
               </div>
             </div>
             <div className='budget-value text-xl text-imbue-purple-dark font-normal'>
-              ${Number(totalCostWithoutFee?.toFixed?.(2)).toLocaleString()}
+              {Number(totalCostWithoutFee?.toFixed?.(2)).toLocaleString()} ${Currency[currencyId]}
             </div>
           </div>
 
@@ -629,7 +649,7 @@ const ApplicationPreview = (): JSX.Element => {
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-purple-dark font-normal'>
-              ${Number(imbueFee?.toFixed?.(2))?.toLocaleString?.()}
+              {Number(imbueFee?.toFixed?.(2))?.toLocaleString?.()} ${Currency[currencyId]}
             </div>
           </div>
 
@@ -722,15 +742,31 @@ const ApplicationPreview = (): JSX.Element => {
 
                 <div className='network-amount'>
 
-                  {isApplicationOwner && isEditingBio ? (
-                    <input
-                      type='string'
-                      placeholder='Add a payment address'
-                      className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
-                      value={paymentAddress || ''}
-                      onChange={(e) => setPaymentAddress(e.target.value)}
-                      name='paymentAddress'
-                    />
+                  {isApplicationOwner && isEditingBio && currencyId >= 100 ? (
+                    <>
+                      {accounts.length == 0 ? (
+                        <button className='primary-btn in-dark w-button' onClick={connect}>Connect</button>
+                      ) : (
+                        <select
+                          name='paymentAddress'
+                          value={paymentAddress}
+                          onChange={(e) => setPaymentAddress(e.target.value)}
+                          placeholder='Select a payment address'
+                          className='bg-transparent round border border-imbue-purple rounded-[5px] text-base px-5 py-3 mt-4 w-full text-content-primary outline-content-primary'
+                          required
+                        >
+                          {accounts.map((account: string) => (
+                            <option
+                              value={account}
+                              key={account}
+                              className='hover:!bg-overlay'
+                            >
+                              {account}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </>
                   ) : (
                     <p className='text-content-primary mt-2 w-full lg:text-end'>
                       {paymentAddress}
@@ -787,7 +823,7 @@ const ApplicationPreview = (): JSX.Element => {
         setVisible={(val) => {
           setLoginModal(val);
         }}
-        redirectUrl={router.pathname}
+        redirectUrl={router.asPath}
       />
 
       <SuccessScreen
@@ -831,7 +867,7 @@ const ApplicationPreview = (): JSX.Element => {
       </ErrorScreen>
 
       <BackDropLoader open={loading} />
-    </div>
+    </div >
   );
 };
 

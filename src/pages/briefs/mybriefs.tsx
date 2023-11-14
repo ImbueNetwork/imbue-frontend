@@ -33,7 +33,6 @@ export default function MyBriefs() {
     <div className='bg-white py-5 rounded-3xl'>
       <MyClientBriefsView
         {...{
-          user,
           briefId,
           handleMessageBoxClick,
           redirectToBriefApplications,

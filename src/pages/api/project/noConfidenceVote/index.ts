@@ -5,7 +5,7 @@ import passport from 'passport';
 import * as models from '@/lib/models';
 import {
   insertToNoConfidenceVoters,
-  NoConfidenceVoter,
+  NoConfidenceVote,
 } from '@/lib/queryServices/projectQueries';
 
 import db from '@/db';
@@ -18,7 +18,7 @@ export default nextConnect()
     db.transaction(async (tx) => {
       try {
         const { projectId } = req.query;
-        const userData = req.body;
+        const { voter, vote } = req.body;
 
         if (!projectId) {
           return res
@@ -26,13 +26,11 @@ export default nextConnect()
             .json({ message: 'No project found for update' });
         }
 
-        const voter: NoConfidenceVoter = {
+        const voteData: NoConfidenceVote = {
           project_id: Number(projectId),
-          user_id: userData.id,
-          username: userData.username,
-          web3_address: userData.web3_address,
-          display_name: userData.display_name,
-          profile_photo: userData.profile_photo,
+          user_id: voter.id,
+          web3_address: voter.web3_address,
+          vote,
         };
 
         const userAuth: Partial<models.User> | any = await authenticate(
@@ -47,7 +45,7 @@ export default nextConnect()
 
         const result = await insertToNoConfidenceVoters(
           Number(projectId),
-          voter
+          voteData
         )(tx);
         return res.status(201).json(result);
       } catch (cause) {

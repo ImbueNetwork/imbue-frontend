@@ -53,9 +53,7 @@ import {
 import { Currency } from '@/model';
 import { getBrief, getProjectById } from '@/redux/services/briefService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
-import {
-  getProjectNoConfidenceVoters,
-} from '@/redux/services/projectServices';
+import { getProjectNoConfidenceVoters } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 TimeAgo.addDefaultLocale(en);
@@ -99,7 +97,7 @@ function Project() {
   const [refunded, setRefunded] = useState<boolean>(false);
   const [successTitle, setSuccessTitle] = useState<string>('');
   const [error, setError] = useState<any>();
-  const [balance, setBalance] = useState<any>(0);
+  const [balance, setBalance] = useState<number | undefined>();
   const [balanceLoading, setBalanceLoading] = useState(true)
   const [approversPreview, setApproverPreview] = useState<User[]>([]);
   const [isApprover, setIsApprover] = useState<boolean>(false);
@@ -158,10 +156,10 @@ function Project() {
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
     if (project?.chain_project_id && project?.id) {
 
-      const voters: NoConfidenceVoter[] = await getProjectNoConfidenceVoters(
+      const noConfidenceResp: NoConfidenceVoter[] = await getProjectNoConfidenceVoters(
         project.id
       );
-      setNoConfidenceVoters(voters);
+      setNoConfidenceVoters(noConfidenceResp);
 
       if (!user.id || !user.web3_address) return
 
@@ -173,7 +171,7 @@ function Project() {
       }
 
       if (user?.web3_address && project.project_in_voting_of_no_confidence) {
-        const isApprover = voters?.find(
+        const isApprover = noConfidenceResp?.find(
           (voter) => voter.web3_address === user.web3_address
         );
         if (user?.web3_address && isApprover?.web3_address) {
@@ -209,6 +207,9 @@ function Project() {
         }
         case OffchainProjectState.Accepted:
           if (!project.chain_project_id) {
+            // redirecting freelancer to application if he should start work
+            if (user.id === freelancer.user_id) return router.push(`/briefs/${project.brief_id}/applications/${project.id}`)
+
             setWaitMessage(
               `Waiting for ${freelancer.display_name} to start the work`
             );
@@ -275,6 +276,11 @@ function Project() {
         setTargetUser(owner);
       }
 
+      // Don't show project if it still an application
+      if (projectRes.status_id === OffchainProjectState.PendingReview) {
+        return router.push('/dashboard')
+      }
+
       setIsProjectOwner(owner?.id === user.id);
       setProjectOwner(owner);
       setProject(projectRes);
@@ -316,7 +322,6 @@ function Project() {
       await getChainProject(projectRes, freelancerRes);
       setLoading(false);
       // setChainLoading(false);
-
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error);
@@ -326,8 +331,6 @@ function Project() {
       // setChainLoading(false);
     }
   };
-
-
 
   const [copied, setCopied] = useState<boolean>(false);
 
@@ -363,12 +366,17 @@ function Project() {
         onClick={() => router.back()}
         className='border border-content group hover:bg-content rounded-full flex items-center justify-center cursor-pointer absolute left-5 top-5'
       >
-        <ArrowBackIcon className='h-7 w-7 group-hover:text-white' color='secondary' />
+        <ArrowBackIcon
+          className='h-7 w-7 group-hover:text-white'
+          color='secondary'
+        />
       </div>
 
       <div className='w-full grid grid-cols-12 bg-white py-5 px-7 rounded-2xl'>
         <div className='col-start-1 col-end-10'>
-          <p className='text-black capitalize ml-8'>{projectType} information</p>
+          <p className='text-black capitalize ml-8'>
+            {projectType} information
+          </p>
           {/* starting of project section */}
           <div className='border-inherit mt-5 border rounded-xl py-4 px-5'>
             <div className='flex mb-4 items-center justify-between'>
@@ -541,27 +549,27 @@ function Project() {
                   {timeData[project?.duration_id || 0].label}
                 </p>
               </div>
-                <div className='flex flex-col bg-white justify-between px-5 py-3 rounded-xl'>
-                  <CopyToClipboard text={project?.escrow_address}>
-                    <div className='ml-auto'>
-                      <IconButton className='' onClick={() => copyAddress()}>
-                        <Image
-                          className='w-4'
-                          src={require('@/assets/svgs/copy.svg')}
-                          alt='copy button'
-                        />
-                      </IconButton>
-                    </div>
-                  </CopyToClipboard>
-                  <div className='w-full flex justify-between items-end'>
-                    <p className='text-black'>Escrow Address</p>
-                    <p className='text-imbue-purple-dark text-xl line-clamp-1'>
-                      {project?.escrow_address?.slice(0, 6) +
-                        '...' +
-                        project?.escrow_address?.substr(-3)}
-                    </p>
+              <div className='flex flex-col bg-white justify-between px-5 py-3 rounded-xl'>
+                <CopyToClipboard text={project?.escrow_address}>
+                  <div className='ml-auto'>
+                    <IconButton className='' onClick={() => copyAddress()}>
+                      <Image
+                        className='w-4'
+                        src={require('@/assets/svgs/copy.svg')}
+                        alt='copy button'
+                      />
+                    </IconButton>
                   </div>
+                </CopyToClipboard>
+                <div className='w-full flex justify-between items-end'>
+                  <p className='text-black'>Escrow Address</p>
+                  <p className='text-imbue-purple-dark text-xl line-clamp-1'>
+                    {project?.escrow_address?.slice(0, 6) +
+                      '...' +
+                      project?.escrow_address?.substr(-3)}
+                  </p>
                 </div>
+              </div>
               <div className='flex flex-col bg-white justify-between px-5 py-3 rounded-xl'>
                 <ProjectBalance
                   {...{
@@ -611,7 +619,6 @@ function Project() {
                 />
               </div>
             )}
-
 
             <div className='bg-white col-start-10 px-2 rounded-xl py-3 border border-light-grey'>
               <MilestoneVoteBox

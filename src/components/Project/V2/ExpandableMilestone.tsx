@@ -18,7 +18,7 @@ import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 import VoteModal from '@/components/ReviewModal/VoteModal';
 import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 
-import { Milestone, OffchainProjectState, Project, User } from '@/model';
+import { Currency, Milestone, Project, User } from '@/model';
 import ChainService, { ImbueChainEvent } from '@/redux/services/chainService';
 import {
   uploadMilestoneAttachments,
@@ -43,7 +43,7 @@ interface ExpandableMilestonProps {
   canVote: boolean;
   loading: boolean;
   targetUser: any;
-  balance: number;
+  balance: number | undefined;
   balanceLoading: boolean;
   // hasMilestoneAttachments: boolean;
 }
@@ -62,9 +62,9 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
     setSuccess,
     targetUser,
     balance,
-    balanceLoading,
     // hasMilestoneAttachments = false
   } = props;
+
   const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
   const [submittingMilestone, setSubmittingMilestone] =
     useState<boolean>(false);
@@ -265,25 +265,34 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
         while (onChainWithdrawalRequired) {
           if (result.status || result.txError) {
             if (result.status) {
-              const haveAllMilestonesBeenApproved = projectMilestones
-                .map((m: any) => m.is_approved)
-                .every(Boolean);
+              // const haveAllMilestonesBeenApproved = projectMilestones
+              //   .map((m: any) => m.is_approved)
+              //   .every(Boolean);
 
-              if (haveAllMilestonesBeenApproved) {
-                project.status_id = OffchainProjectState.Completed;
-                project.completed = true;
-                await updateProject(Number(project?.id), project);
-              }
+              // if (haveAllMilestonesBeenApproved) {
+              //   project.status_id = OffchainProjectState.Completed;
+              //   project.completed = true;
+              //   await updateProject(Number(project?.id), project);
+              // }
+
+              projectMilestones.forEach((m) => {
+                if (m.milestone_index <= milestoneKeyInView && !m.withdrawn_onchain) {
+                  project.milestones[m.milestone_index].withdrawn_onchain = true;
+                  project.milestones[m.milestone_index].withdrawal_transaction_hash = result?.transactionHash || "";
+                }
+              })
+
+              await updateProject(Number(project?.id), project);
 
               if (project.currency_id < 100) {
                 setSuccess(true);
-                setSuccessTitle('Withdraw successfull');
+                setSuccessTitle('Withdraw successful');
               }
 
 
             } else if (result.txError) {
               // setLoading(false);
-              setError({ message: 'Error : ' + result.errorMessage });
+              setError({ message: 'Error : ' + (result.errorMessage || "Withdrawal unsuccessful. Please verify if you have any funds available for withdrawal.") });
             }
             break;
           }
@@ -297,15 +306,17 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
         if (withdrawResult.txError) {
           setSuccess(false);
           setError({ message: withdrawResult.errorMessage });
-        } else {
+        } else if (Number(withdrawResult.withdrawn) > 0) {
           setSuccess(true);
-          setSuccessTitle('Withdraw successfull');
+          setSuccessTitle('Withdraw successful');
         }
         setLoading(false);
       }
 
     } catch (error) {
       setError({ message: 'Error' + error });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -365,7 +376,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
               </p>
             </div>
             <p className='col-start-7 col-end-9 text-lg mr-10 ml-4'>
-              ${milestone.amount}
+              {milestone.amount} ${Currency[project.currency_id]}
             </p>
             <p className='col-start-9 text-lg col-end-11 ml-4'>
               {moment(milestone.modified).format('MMM Do YY')}
@@ -526,7 +537,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
 
 
                       {
-                        balance === 0 && !balanceLoading && project?.brief_id && (
+                        balance === 0 && !project?.brief_id && (
                           <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-imbue-coral px-3 py-1 text-sm text-white w-fit ml-auto mt-3 '>
                             <ErrorOutlineOutlinedIcon className='h-4 w-4 inline' />
                             <p className='inline'>
@@ -542,9 +553,9 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
 
                 {isApplicant && milestone.is_approved && (
                   <button
-                    className='primary-btn  ml-auto in-dark w-button lg:w-1/5'
+                    className={`primary-btn  ml-auto in-dark w-button lg:w-1/5 text-center ${milestone?.withdrawn_onchain && '!bg-gray-300 !text-gray-400'}`}
                     style={{ textAlign: 'center' }}
-                    onClick={() => handleWithdraw(milestone.milestone_index)}
+                    onClick={() => !milestone?.withdrawn_onchain && handleWithdraw(milestone.milestone_index)}
                   >
                     Withdraw
                   </button>

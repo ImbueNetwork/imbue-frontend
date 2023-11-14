@@ -6,7 +6,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import passport from 'passport';
 
-import { withdraw } from '@/utils/multichain';
+import { MultiChainService } from '@/utils/multichain';
 
 
 export default nextConnect()
@@ -16,11 +16,12 @@ export default nextConnect()
     const projectId = Number(id);
     try {
       const coverFees = true;
-      const withdrawnAmount = await withdraw(projectId, coverFees);
+      const multichainService = await MultiChainService.build();
+      const withdrawnAmount = await multichainService.withdraw(projectId, coverFees);
       if (withdrawnAmount > 0) {
-        return res.status(200).json({ WithdrawnAmount: withdrawnAmount });
+        return res.status(200).json(withdrawnAmount);
       } else {
-        return res.status(501).json({ WithdrawnAmount: 0 });
+        return res.status(501).json("No available funds to withdraw");
       }
     } catch (e: any) {
       return res.status(501).json(e.message);

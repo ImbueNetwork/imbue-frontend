@@ -7,6 +7,7 @@ interface VotingModalProps {
   handleRefund: (_vote: boolean) => Promise<void>;
   handleVote: (_vote: boolean) => Promise<void>;
   refundOnly: boolean;
+  undergoingRefund: boolean;
 }
 
 export default function RefundModal({
@@ -14,15 +15,15 @@ export default function RefundModal({
   handleRefund,
   handleVote,
   setLoading,
-  refundOnly
+  refundOnly,
+  undergoingRefund
 }: VotingModalProps) {
-  console.log("🚀 ~ file: RefundModal.tsx:19 ~ refundOnly:", refundOnly)
 
   const handleNo = async (): Promise<void> => {
     setLoading(true)
     setVisible(false);
-    
-    if (refundOnly) {
+
+    if (refundOnly || undergoingRefund) {
       await handleRefund(true)
     } else {
       await handleVote(false);
@@ -49,16 +50,20 @@ export default function RefundModal({
           and believe strongly that its deliverables is not quantifiable by
           expected milestones.
         </p>
-        <div className='flex mb-5 space-x-3 w-full items-center mt-9'>
-          <button
-            onClick={handleNo}
-            className='border px-5 py-2  border-imbue-purple text-imbue-purple rounded-full w-[30%]'
-          >
-            No
-          </button>
+        <div className='flex mb-5 space-x-3 w-full items-center mt-9 gap-2'>
+          {
+            ((undergoingRefund && refundOnly) || !refundOnly) && (
+              <button
+                onClick={handleNo}
+                className='border px-5 py-2  border-imbue-purple text-imbue-purple rounded-full w-[30%]'
+              >
+                No
+              </button>
+            )
+          }
           <button
             onClick={handleYes}
-            className='primary-btn  ml-auto in-dark w-button w-[70%] '
+            className='primary-btn in-dark w-button w-[70%] !mx-auto'
             style={{ textAlign: 'center' }}
           >
             Yes, initiate refund

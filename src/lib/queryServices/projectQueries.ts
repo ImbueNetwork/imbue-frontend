@@ -1,19 +1,28 @@
 import { Knex } from 'knex';
 
-export type NoConfidenceVoter = {
-  id?: number;
+import { User } from '@/model';
+
+// export type NoConfidenceVoter = {
+//   id?: number;
+//   project_id: number;
+//   user_id: number;
+//   web3_address: string;
+//   vote: boolean;
+// };
+
+export type NoConfidenceVote = {
   project_id: number;
   user_id: number;
-  username: string;
-  display_name: string;
-  profile_photo: string;
   web3_address: string;
+  vote: boolean;
 };
+
+export type NoConfidenceVoter = User & { vote: boolean };
 
 // no confidence votes
 
 export const insertToNoConfidenceVoters =
-  (id: string | number, voter: NoConfidenceVoter) => (tx: Knex.Transaction) =>
+  (id: string | number, voter: NoConfidenceVote) => (tx: Knex.Transaction) =>
     tx('no_confidence_voters')
       .where({ project_id: id })
       .insert(voter)
@@ -23,9 +32,12 @@ export const getNoConfidenceVotersByProjectId =
   (id: string | number) => (tx: Knex.Transaction) =>
     tx('no_confidence_voters').select().where({ project_id: id });
 
-export const getNoConfidenceVotersAddress =
+export const getNoConfidenceVotes =
   (id: string | number) => (tx: Knex.Transaction) =>
-    tx('no_confidence_voters').select('*').where({ project_id: id });
+    tx('no_confidence_voters')
+      .select('*', 'no_confidence_voters.web3_address')
+      .where({ project_id: id })
+      .leftJoin('users', 'no_confidence_voters.user_id', 'users.id');
 
 // votes
 

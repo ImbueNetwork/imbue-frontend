@@ -7,7 +7,7 @@ import nextConnect from 'next-connect';
 import passport from 'passport';
 
 import { fetchProjectById } from '@/lib/models';
-import { generateAddress } from '@/utils/multichain';
+import { MultiChainService } from '@/utils/multichain';
 
 import db from '@/db';
 
@@ -20,7 +20,7 @@ export default nextConnect()
     await db.transaction(async (tx: any) => {
       try {
         const project = await fetchProjectById(Number(projectId))(tx);
-
+        const multichain = await MultiChainService.build();
         if (!project) {
           return res.status(404).end();
         }
@@ -28,7 +28,7 @@ export default nextConnect()
         if (project.currency_id < 100) {
           address = project.escrow_address;
         } else {
-          address = await generateAddress(projectId, project.currency_id);
+          address = await multichain.generateAddress(projectId, project.currency_id);
         }
 
       } catch (e) {

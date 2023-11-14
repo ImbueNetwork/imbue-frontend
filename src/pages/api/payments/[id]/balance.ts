@@ -6,7 +6,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import passport from 'passport';
 
-import { getBalance } from '@/utils/multichain';
+import { MultiChainService } from '@/utils/multichain';
 
 
 export default nextConnect()
@@ -14,7 +14,8 @@ export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
     const { id } = req.query;
     const projectId = Number(id);
-    const projectBalance = await getBalance(projectId);
+    const multichainService = await MultiChainService.build();
+    const projectBalance = await multichainService.getBalance(projectId);
     if (projectBalance == undefined) {
       return res.status(404).end();
     }

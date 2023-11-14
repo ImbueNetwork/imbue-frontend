@@ -18,13 +18,13 @@ const postAPIHeaders = {
 export const callSearchBriefs = async (filter: BriefSqlFilter) => {
   // return [] as Array<Brief>;
   //:TODO implement api for callSearchBriefs
-  
+
   const resp = await fetch(`${config.apiBase}briefs/search`, {
     headers: postAPIHeaders,
     method: 'post',
     body: JSON.stringify(filter),
   });
-  
+
   if (resp.ok) {
     const data = await resp.json();
     return { status: resp.status, ...data } as PaginatedResponse;
@@ -167,9 +167,7 @@ export const getBriefApplications = async (brifId: string | number) => {
   if (resp.ok) {
     return await resp.json();
   } else {
-    throw new Error(
-      'Failed to get all brief applications. status:' + resp.status
-    );
+    return resp
   }
 };
 
@@ -238,7 +236,7 @@ export const updateBriefById = async (params: BriefInfo) => {
         budget: params.budget,
         id: params.brief_id,
         verified_only: params.verified_only,
-        user_id: params.user_id
+        user_id: params.user_id,
       }),
     });
     if (resp.ok) {
@@ -253,6 +251,27 @@ export const updateBriefById = async (params: BriefInfo) => {
     console.log(error);
     return false;
   }
+};
+
+export const setUserAnalytics = async (
+  user_id: number,
+  freelancer_id: number
+) => {
+  const resp = await fetch(`${config.apiBase}analytics`, {
+    headers: postAPIHeaders,
+    method: 'post',
+    body: JSON.stringify({ user_id, freelancer_id }),
+  });
+  return await resp.json();
+};
+
+export const getUserAnalytics = async (user_id: number) => {
+  const resp = await fetch(`${config.apiBase}analytics/getanalytics`, {
+    headers: postAPIHeaders,
+    method: 'post',
+    body: JSON.stringify({ user_id }),
+  });
+  return await resp.json();
 };
 
 export const saveBriefData = async (brief: Brief) => {

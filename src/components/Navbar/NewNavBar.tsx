@@ -100,7 +100,9 @@ function NewNavbar() {
   const navPillclasses =
     'text-imbue-purple-dark h-[3rem] bg-white  rounded-[5.07319rem] !flex justify-center items-center px-5 hover:no-underline !text-[1rem] ';
 
-  const { profileView, setProfileMode } = useContext(AppContext) as AppContextType
+  const { profileView, setProfileMode } = useContext(
+    AppContext
+  ) as AppContextType;
 
   return (
     <>
@@ -277,8 +279,8 @@ function NewNavbar() {
                         <div
                           className='flex gap-2 items-center px-2 hover:bg-imbue-lime-light py-2 rounded-md '
                           onClick={() => {
-                            setProfileMode('freelancer')
-                            router.push('/dashboard')
+                            setProfileMode('freelancer');
+                            router.push('/dashboard');
                           }}
                         >
                           <div className='border p-1 rounded-xl'>
@@ -292,8 +294,8 @@ function NewNavbar() {
                         <div
                           className='flex gap-2 items-center px-2 hover:bg-imbue-lime-light py-2 rounded-md '
                           onClick={() => {
-                            setProfileMode('client')
-                            router.push('/dashboard')
+                            setProfileMode('client');
+                            router.push('/dashboard');
                           }}
                         >
                           <div className='border p-1 rounded-xl'>
@@ -330,24 +332,25 @@ function NewNavbar() {
               paddingRight: 2,
             }}
           >
-            <Badge className='mr-3' badgeContent={message} color='error'>
-              <Image
-                src='/message-dots-square.svg'
-                width={23}
-                height={20}
-                onClick={() => router.push('/dashboard/messages')}
-                alt='message'
-                className='cursor-pointer'
-              />
-            </Badge>
-            <div className='relative'>
-              {/*  */}
-
-              <div>
-                {/* <NotificationDropdown feedGroup='user' right notify /> */}
-                <NotificationIcon />
-              </div>
-            </div>
+            {user?.username && (
+              <>
+                <Badge className='mr-3' badgeContent={message} color='error'>
+                  <Image
+                    src='/message-dots-square.svg'
+                    width={23}
+                    height={20}
+                    onClick={() => router.push('/dashboard/message')}
+                    alt='message'
+                    className='cursor-pointer'
+                  />
+                </Badge>
+                <div className='relative'>
+                  <div>
+                    <NotificationIcon />
+                  </div>
+                </div>
+              </>
+            )}
             <Tooltip
               title='Account settings'
               className={`${!user?.username && !loading && 'lg:hidden'}`}

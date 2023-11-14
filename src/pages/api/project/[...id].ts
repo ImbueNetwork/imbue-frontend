@@ -154,6 +154,15 @@ export default nextConnect()
         // if (project_in_milestone_voting)
         //   newProject.project_in_milestone_voting = project_in_milestone_voting;
 
+        const haveAllMilestonesBeenApproved = milestones
+          .map((m: any) => m.is_approved)
+          .every(Boolean);
+
+        if (haveAllMilestonesBeenApproved) {
+          newProject.status_id = OffchainProjectState.Completed;
+          newProject.completed = true;
+        }
+
         const project = await models.updateProject(projectId, newProject)(tx);
         const filter = new Filter();
 
@@ -227,9 +236,9 @@ const syncProject = async (project: any, tx: any) => {
       if (
         firstPendingMilestoneChain === project.first_pending_milestone &&
         project.project_in_milestone_voting ===
-          onChainProjectRes.projectInMilestoneVoting &&
+        onChainProjectRes.projectInMilestoneVoting &&
         project.project_in_voting_of_no_confidence ===
-          onChainProjectRes.projectInVotingOfNoConfidence &&
+        onChainProjectRes.projectInVotingOfNoConfidence &&
         !milestonesRequiresSync
       )
         return project;
@@ -269,17 +278,32 @@ const syncProject = async (project: any, tx: any) => {
       //     description: filter.clean(item.description),
       //   };
       // });
-      
+
       // await models.insertMilestones(filterdMileStone, project.id)(tx);
-      
+
       const pkg: ProjectPkg = {
         ...updatedProject,
         approvers: project.approvers,
         milestones: project.milestones,
       };
-      
+
       return pkg;
     } else {
+      const userCompletedProjects: number[] = (await imbueApi.api.query.imbueProposals.completedProjects(
+        project.owner
+      )).toJSON() as number[];
+      const projectCompleted = userCompletedProjects.includes(project.chain_project_id);
+
+      if (projectCompleted) {
+        project.milestones.map(async (item: any) => {
+          await models.updateMilestone(
+            Number(projectId),
+            Number(item.milestone_index),
+            { withdrawn_onchain: true }
+          )(tx);
+        });
+
+      }
       return project;
     }
   } catch (error) {

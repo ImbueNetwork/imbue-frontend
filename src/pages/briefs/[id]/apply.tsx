@@ -3,11 +3,14 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
+import WalletConnectProvider from '@walletconnect/web3-provider'
 import Filter from 'bad-words';
+import { ethers } from 'ethers'
 import { useRouter } from 'next/router';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
+import Web3Modal from 'web3modal'
 
 import { sendNotification } from '@/utils';
 import {
@@ -79,6 +82,7 @@ export const SubmitProposal = (): JSX.Element => {
   const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
   // eslint-disable-next-line no-unused-vars, unused-imports/no-unused-vars
   const [inputError, setInputError] = useState<any>([]);
+  const [accounts, setAccounts] = useState<string[]>([]);
 
   useEffect(() => {
     setOpen(applicationId ? true : false);
@@ -98,6 +102,31 @@ export const SubmitProposal = (): JSX.Element => {
 
     !loadingUser && getUserAndFreelancer();
   }, [briefId, user?.username, loadingUser, profileView]);
+
+  const getWeb3Modal = async () => {
+    const web3Modal = new Web3Modal({
+      cacheProvider: false,
+      providerOptions: {
+        walletconnect: {
+          package: WalletConnectProvider,
+        },
+      },
+    })
+    return web3Modal
+  }
+  const connect = async () => {
+    try {
+      const web3Modal = await getWeb3Modal();
+      const connection = await web3Modal.connect();
+      const provider = new ethers.BrowserProvider(connection);
+      const accounts = (await provider.listAccounts()).map(jsonProvider => jsonProvider.address);
+      setPaymentAddress(accounts[0]);
+      setAccounts(accounts)
+    } catch (err) {
+      console.log('error:', err)
+    }
+  }
+
 
   useEffect(() => {
     router?.isReady && getCurrentUserBrief();
@@ -211,6 +240,7 @@ export const SubmitProposal = (): JSX.Element => {
           total_cost_without_fee: totalCostWithoutFee,
           imbue_fee: imbueFee,
           currency_id: currencyId,
+          owner: user.web3_address,
           milestones: milestones
             .filter((m) => m.amount !== undefined)
             .map((m) => {
@@ -228,7 +258,7 @@ export const SubmitProposal = (): JSX.Element => {
           duration_id: durationId,
           description: brief?.description,
           verified_only: brief.verified_only,
-          payment_address: paymentAddress
+          payment_address: currencyId >= 100 ? paymentAddress : undefined,
         }),
       });
       if (resp.ok) {
@@ -238,7 +268,7 @@ export const SubmitProposal = (): JSX.Element => {
         await sendNotification(
           [brief.user_id],
           'breif.test.applied',
-          'Some one might have interested in your breif',
+          `You have a new brief application for brief ${brief.headline}`,
           `Submit a proposal`,
           briefId,
           applicationId
@@ -463,7 +493,7 @@ export const SubmitProposal = (): JSX.Element => {
               </div>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-purple-dark font-normal'>
-              ${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()}
+              {Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${Currency[currencyId]}
             </div>
           </div>
 
@@ -481,7 +511,7 @@ export const SubmitProposal = (): JSX.Element => {
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-purple-dark font-normal'>
-              ${Number(imbueFee.toFixed(2)).toLocaleString()}
+              {Number(imbueFee.toFixed(2)).toLocaleString()} ${Currency[currencyId]}
             </div>
           </div>
 
@@ -551,24 +581,33 @@ export const SubmitProposal = (): JSX.Element => {
             </div>
           </div>
           {currencyId >= 100 && (
-          <div className='payment-options'>
-            <h3 className='text-lg lg:text-[1.25rem] font-normal m-0 p-0 text-imbue-purple-dark'>
-              Payment Address
-            </h3>
-
-            <div className='network-amount'>
-            <input
-                        type='string'
-                        data-testid={`payment address`}
-                        placeholder='Add a payment address'
-                        className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
-                        value={paymentAddress || ''}
-                        onChange={(e) => setPaymentAddress(e.target.value)}
-                        name='paymentAddress'
-                      />
-
+            <div>
+              <p className='text-lg text-content m-0 p-0'>Payment Address:</p>
+              <div>
+                {accounts.length == 0 ? (
+                  <button className='primary-btn in-dark w-button' onClick={connect}>Connect</button>
+                ) : (
+                  <select
+                    name='paymentAddress'
+                    value={paymentAddress}
+                    onChange={(e) => setPaymentAddress(e.target.value)}
+                    placeholder='Select a payment address'
+                    className='bg-transparent round border border-imbue-purple rounded-[5px] text-base px-5 py-3 mt-4 w-full text-content-primary outline-content-primary'
+                    required
+                  >
+                    {accounts.map((account: string) => (
+                      <option
+                        value={account}
+                        key={account}
+                        className='hover:!bg-overlay'
+                      >
+                        {account}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
             </div>
-          </div>
           )}
         </div>
       </div>

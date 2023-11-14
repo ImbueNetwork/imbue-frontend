@@ -4,7 +4,7 @@ ENV IMAGE_TAG=$COMMIT_SHA
 WORKDIR /
 
 RUN apt-get update
-RUN apt-get install -y make
+RUN apt-get install -y make git
 
 COPY . .
 
