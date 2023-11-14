@@ -221,15 +221,15 @@ export default function VoteModal({
             pollResult == ImbueChainPollResult.EventFound
           ) {
             if (pollResult == ImbueChainPollResult.EventFound) {
-              project.project_in_voting_of_no_confidence = true;
-              await updateProject(project?.id, project);
+              // project.project_in_voting_of_no_confidence = true;
+              await updateProject(project?.id, { ...project, project_in_voting_of_no_confidence: true });
               await insertNoConfidenceVote(project?.id, voteData);
               setStep(4);
               setVoteRefund(vote);
               setVisible(true);
             } else if (result.status) {
-              project.project_in_voting_of_no_confidence = true;
-              await updateProject(project?.id, project);
+              // project.project_in_voting_of_no_confidence = true;
+              await updateProject(project?.id, { ...project, project_in_voting_of_no_confidence: true });
               await insertNoConfidenceVote(project?.id, voteData);
               setStep(4);
               setVoteRefund(vote);
