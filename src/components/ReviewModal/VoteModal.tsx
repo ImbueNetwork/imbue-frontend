@@ -60,7 +60,7 @@ export default function VoteModal({
   projectType,
 }: VotingModalProps) {
   const [vote, setVote] = useState<boolean>(true);
-  const [voteRefund, setVoteRefund] = useState<boolean>(false);
+  const [voteRefund, setVoteRefund] = useState<boolean | undefined>();
   const [step, setStep] = useState<number>(0);
 
   const handleVoteOnMilestone = async (vote: boolean) => {
@@ -174,14 +174,14 @@ export default function VoteModal({
               await updateProject(project?.id, project);
 
               setVisible(true);
-              setVoteRefund(true);
+              setVoteRefund(vote);
               setStep(4);
               break;
             } else if (noConfidencePoll == ImbueChainPollResult.EventFound) {
               await insertNoConfidenceVote(project?.id, voteData);
 
               setVisible(true);
-              setVoteRefund(true);
+              setVoteRefund(vote);
               setStep(4);
               break;
             } else if (result.status) {
@@ -189,7 +189,7 @@ export default function VoteModal({
 
               setVisible(true);
               setStep(4);
-              setVoteRefund(true);
+              setVoteRefund(vote);
               break;
             } else if (result.txError) {
               setError({ message: result.errorMessage });
@@ -225,14 +225,14 @@ export default function VoteModal({
               await updateProject(project?.id, project);
               await insertNoConfidenceVote(project?.id, voteData);
               setStep(4);
-              setVoteRefund(true);
+              setVoteRefund(vote);
               setVisible(true);
             } else if (result.status) {
               project.project_in_voting_of_no_confidence = true;
               await updateProject(project?.id, project);
               await insertNoConfidenceVote(project?.id, voteData);
               setStep(4);
-              setVoteRefund(true);
+              setVoteRefund(vote);
               setVisible(true);
             } else if (result.txError) {
               setError({ message: result.errorMessage });
@@ -374,12 +374,12 @@ export default function VoteModal({
 
         {step === 4 && (
           <>
-            {!voteRefund ? (
+            {voteRefund === undefined ? (
               <SuccessModal setVisible={setVisible} />
             ) : (
               <SuccessRefundModal
                 undergoingRefund={project.project_in_voting_of_no_confidence || false}
-                vote={voteRefund} setVisible={setVisible}
+                setVisible={setVisible}
               />
             )}
           </>
