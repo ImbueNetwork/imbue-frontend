@@ -22,13 +22,13 @@ export default function MessageItem({
     return (
       <div
         className={classNames(
-          'flex flex-row-reverse items-center gap-2 ',
+          'flex flex-row-reverse items-end gap-2 ',
           showProfile ? ' mt-1 mb-9' : 'my-1'
         )}
       >
         {showProfile && (
           <Image
-            className='w-10 mb-7 h-10 rounded-full object-cover'
+            className='w-10 mb-5 h-10 rounded-full object-cover'
             src={
               user.profile_photo || require('@/assets/images/profile-image.png')
             }
@@ -38,10 +38,27 @@ export default function MessageItem({
           />
         )}
         {!showProfile && <div className='w-10 h-10' />}
-        <div className='flex  flex-col items-end'>
-          <div className='bg-imbue-lime-light  px-4 py-1.5 rounded-2xl text-right text-black'>
-            <p>{message.text}</p>
-          </div>
+        <div className='flex w-[70%]  flex-col items-end'>
+          {!!message.attachments?.length && (
+            <div className='flex gap-1 my-1 flex-wrap'>
+              {message.attachments?.map((item) => (
+                <div className='' key={item.image_url}>
+                  <Image
+                    className='w-80 max-h-36 rounded-md object-cover'
+                    src={item.image_url || ''}
+                    width={1920}
+                    height={1080}
+                    alt='attachments'
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+          {!!message.text?.trim().length && (
+            <div className='bg-imbue-lime-light   px-4 py-1.5 rounded-2xl text-right text-black'>
+              <p>{message.text}</p>
+            </div>
+          )}
           {showProfile && (
             <p className='text-[#7C8B9D]'>
               {timeAgo.format(new Date(message.created_at))}
@@ -54,13 +71,13 @@ export default function MessageItem({
   return (
     <div
       className={classNames(
-        'flex items-center gap-2 ',
+        'flex items-end gap-2 ',
         showProfile ? ' mt-1 mb-9' : 'my-1'
       )}
     >
       {showProfile && (
         <Image
-          className='w-10 mb-7 h-10 rounded-full object-cover'
+          className='w-10 mb-5 h-10 rounded-full object-cover'
           src={
             message.user?.profile_photo ||
             require('@/assets/images/profile-image.png')
@@ -71,10 +88,27 @@ export default function MessageItem({
         />
       )}
       {!showProfile && <div className='w-10 h-10' />}
-      <div className='flex flex-col items-start'>
-        <div className='bg-white px-4 py-1.5 rounded-2xl text-right text-black'>
-          <p>{message.text}</p>
-        </div>
+      <div className='flex w-[70%] flex-col items-start'>
+        {!!message.attachments?.length && (
+          <div className='flex gap-1 my-1 flex-wrap'>
+            {message.attachments?.map((item) => (
+              <div className='' key={item.image_url}>
+                <Image
+                  className='w-80 max-h-44 rounded-md object-contain'
+                  src={item.image_url || ''}
+                  width={1920}
+                  height={1080}
+                  alt='attachments'
+                />
+              </div>
+            ))}
+          </div>
+        )}
+        {!!message.text?.trim().length && (
+          <div className='bg-white px-4 py-1.5 rounded-2xl text-right text-black'>
+            <p>{message.text}</p>
+          </div>
+        )}
         {showProfile && (
           <p className='text-[#7C8B9D] ml-2'>
             {timeAgo.format(new Date(message.created_at))}

@@ -22,6 +22,10 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
+        hostname: 'dublin.stream-io-cdn.com',
+      },
+      {
+        protocol: 'https',
         hostname: 'avatars.githubusercontent.com',
       },
       {

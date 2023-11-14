@@ -40,6 +40,11 @@ export default function Messages() {
       setChannels(channels);
     };
     getChannel();
+    client.on((event) => {
+      if (event.total_unread_count !== undefined) {
+        getChannel();
+      }
+    });
   }, [client, user.id]);
 
   return (

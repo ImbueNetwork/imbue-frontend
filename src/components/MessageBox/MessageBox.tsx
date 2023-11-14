@@ -1,13 +1,13 @@
 import { TextareaAutosize } from '@mui/base/TextareaAutosize';
 import classNames from 'classnames';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   AiOutlineFlag,
   AiOutlineInfoCircle,
   AiOutlinePlus,
 } from 'react-icons/ai';
-import { BsArchive, BsEmojiSmile, BsPinAngle } from 'react-icons/bs';
+import { BsArchive, BsEmojiSmile, BsPinAngle, BsSend } from 'react-icons/bs';
 import { IoImageOutline } from 'react-icons/io5';
 import { VscMention } from 'react-icons/vsc';
 import { useSelector } from 'react-redux';
@@ -15,6 +15,7 @@ import {
   Channel,
   DefaultGenerics,
   FormatMessageResponse,
+  SendFileAPIResponse,
   User,
 } from 'stream-chat';
 
@@ -36,6 +37,10 @@ export default function MessageBox({
 }) {
   const { user } = useSelector((state: RootState) => state.userState);
   const [targetUser, setTargetUser] = useState<User>();
+  const [textVal, setTextVal] = useState<string>('');
+  const [selectedImages, setSelectedImages] = useState<SendFileAPIResponse[]>(
+    []
+  );
   const [messages, setMessages] =
     useState<FormatMessageResponse<DefaultGenerics>[]>();
 
@@ -49,11 +54,59 @@ export default function MessageBox({
   }, [channel.state.members, channel.state.messageSets, user.id, channel]);
 
   const handleChnages = (e: any) => {
-    channel.keystroke();
+    setTextVal(e.target.value);
+  };
+
+  useEffect(() => {
+    const objDiv = document.getElementById('message_box');
+    objDiv?.scrollTo({ top: objDiv.scrollHeight });
+  }, [messages]);
+
+  const onSendMessage = async () => {
+    if (textVal.trim().length > 0 || selectedImages.length > 0) {
+      const attachment = selectedImages.map((item) => {
+        return {
+          duration: item.duration,
+          thumb_url: item.thumb_url,
+          image_url: item.file,
+        };
+      });
+      await channel.sendMessage({ text: textVal, attachments: attachment });
+    }
+    setTextVal('');
+    setSelectedImages([]);
+    const { messages } = channel.state.messageSets[0];
+    setMessages(messages);
+  };
+  const imageRef = useRef<HTMLInputElement | null>(null);
+  const handleImageUpload = async () => {
+    if (imageRef?.current) {
+      imageRef.current.click();
+    }
+  };
+  const inputMessageRef = useRef<HTMLDivElement | null>(null);
+  const [hState, setHstate] = useState<string>('60vh');
+  useEffect(() => {
+    if (inputMessageRef.current?.offsetHeight) {
+      const val =
+        72 - (100 * inputMessageRef.current?.offsetHeight) / window.innerHeight;
+      setHstate(val + 'vh');
+    }
+  }, [inputMessageRef.current?.offsetHeight]);
+
+  /// culprits that are responsible for uploading images //////////
+  const uploadFileToChannel = async (file: File) => {
+    const data = await channel.sendImage(file);
+    setSelectedImages((val) => [...val, data]);
+  };
+  const onChangeImage = (event: any) => {
+    if (event.target.files[0]) {
+      uploadFileToChannel(event.target.files[0]);
+    }
   };
 
   return (
-    <div className="border-[4px] h-full bg-[url('/message-box-pattern.svg')] back  rounded-2xl">
+    <div className="border-[4px] relative h-full bg-[url('/message-box-pattern.svg')] back  rounded-2xl">
       {/* messaging header sections */}
       <div className='bg-white justify-between items-center flex rounded-xl px-5 py-3'>
         <div className='flex'>
@@ -92,7 +145,11 @@ export default function MessageBox({
         </div>
       </div>
       {/* messaging header sections ends */}
-      <div className='h-[60vh]  overflow-auto'>
+      <div
+        id='message_box'
+        style={{ height: hState }}
+        className='max-h-[60vh] h-full overflow-auto'
+      >
         {messages?.map((item, index) => {
           let bool = false;
           if (!lastMessage) {
@@ -118,7 +175,7 @@ export default function MessageBox({
           }
           return (
             <MessageItem
-              key={new Date(item.created_at).getMilliseconds()}
+              key={new Date(item.created_at).getMilliseconds() + Math.random()}
               user={user}
               message={item}
               showProfile={bool}
@@ -126,12 +183,32 @@ export default function MessageBox({
           );
         })}
       </div>
-      <div className='bg-white py-2 mx-2 px-2 rounded-lg'>
+      <div
+        ref={inputMessageRef}
+        id='input_message'
+        className='bg-white absolute w-[99%]  h-auto py-2 mx-2 px-2  bottom-0 rounded-lg'
+      >
+        {selectedImages.length > 0 && (
+          <div className='flex gap-3'>
+            {selectedImages.map((item) => (
+              <div className='w-24 h-24' key={item.duration}>
+                <Image
+                  className='w-24 h-24 '
+                  src={item.file}
+                  width={1920}
+                  height={1020}
+                  alt='selected images'
+                />
+              </div>
+            ))}
+          </div>
+        )}
         <TextareaAutosize
           placeholder='type here'
           onChange={handleChnages}
-          minRows={2}
-          maxRows={2}
+          value={textVal}
+          minRows={3}
+          maxRows={6}
           className='outline-none placeholder:text-text-aux-colour border-none text-black'
         />
         <div className='text-text-aux-colour gap-2 flex items-center'>
@@ -142,11 +219,24 @@ export default function MessageBox({
           <p className='text-lg'>|</p>
           <VscMention className='hover:text-black cursor-pointer' size={28} />
           <BsEmojiSmile className='hover:text-black cursor-pointer' size={18} />
+
           <IoImageOutline
+            onClick={handleImageUpload}
             className='hover:text-black cursor-pointer'
             size={20}
           />
+          <BsSend
+            onClick={onSendMessage}
+            className='ml-auto mr-2 text-xl cursor-pointer text-imbue-purple'
+          />
         </div>
+        <input
+          ref={imageRef}
+          onChange={onChangeImage}
+          className='hidden'
+          type='file'
+          accept='.jpg , .png , .jpeg'
+        />
       </div>
     </div>
   );
