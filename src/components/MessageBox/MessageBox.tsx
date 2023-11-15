@@ -1,5 +1,6 @@
 import { TextareaAutosize } from '@mui/base/TextareaAutosize';
 import classNames from 'classnames';
+import EmojiPicker from 'emoji-picker-react';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -8,6 +9,7 @@ import {
   AiOutlinePlus,
 } from 'react-icons/ai';
 import { BsArchive, BsEmojiSmile, BsPinAngle, BsSend } from 'react-icons/bs';
+import { IoIosRemoveCircleOutline } from 'react-icons/io';
 import { IoImageOutline } from 'react-icons/io5';
 import { VscMention } from 'react-icons/vsc';
 import { useSelector } from 'react-redux';
@@ -28,6 +30,11 @@ type lastMessageType = {
   user_id: number;
 };
 
+interface imagesType extends SendFileAPIResponse {
+  type: string;
+  name: string;
+}
+
 let lastMessage: lastMessageType | null = null;
 
 export default function MessageBox({
@@ -38,9 +45,9 @@ export default function MessageBox({
   const { user } = useSelector((state: RootState) => state.userState);
   const [targetUser, setTargetUser] = useState<User>();
   const [textVal, setTextVal] = useState<string>('');
-  const [selectedImages, setSelectedImages] = useState<SendFileAPIResponse[]>(
-    []
-  );
+  const [selectedImages, setSelectedImages] = useState<imagesType[]>([]);
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const [isEmojiOpen, setEmojiOpen] = useState<boolean>(false);
   const [messages, setMessages] =
     useState<FormatMessageResponse<DefaultGenerics>[]>();
 
@@ -54,7 +61,11 @@ export default function MessageBox({
   }, [channel.state.members, channel.state.messageSets, user.id, channel]);
 
   const handleChnages = (e: any) => {
-    setTextVal(e.target.value);
+    if (e.emoji) {
+      setTextVal((val) => val + e.emoji);
+    } else {
+      setTextVal(e.target.value);
+    }
   };
 
   useEffect(() => {
@@ -69,6 +80,8 @@ export default function MessageBox({
           duration: item.duration,
           thumb_url: item.thumb_url,
           image_url: item.file,
+          type: item.type,
+          name: item.name,
         };
       });
       await channel.sendMessage({ text: textVal, attachments: attachment });
@@ -84,6 +97,12 @@ export default function MessageBox({
       imageRef.current.click();
     }
   };
+
+  const handleFileUpload = async () => {
+    if (fileRef?.current) {
+      fileRef.current.click();
+    }
+  };
   const inputMessageRef = useRef<HTMLDivElement | null>(null);
   const [hState, setHstate] = useState<string>('60vh');
   useEffect(() => {
@@ -96,8 +115,16 @@ export default function MessageBox({
 
   /// culprits that are responsible for uploading images //////////
   const uploadFileToChannel = async (file: File) => {
-    const data = await channel.sendImage(file);
-    setSelectedImages((val) => [...val, data]);
+    let data;
+    if (file.type === 'image/png') {
+      data = await channel.sendImage(file);
+    } else data = await channel.sendFile(file);
+    const res = {
+      ...data,
+      type: file.type,
+      name: file.name,
+    };
+    setSelectedImages((val) => [...val, res]);
   };
   const onChangeImage = (event: any) => {
     if (event.target.files[0]) {
@@ -105,8 +132,17 @@ export default function MessageBox({
     }
   };
 
+  const handleEmoji = () => {
+    setEmojiOpen((val) => !val);
+  };
+
+  const removeItem = (target: string) => {
+    const filtered = selectedImages.filter((item) => item.file !== target);
+    setSelectedImages(filtered);
+  };
+
   return (
-    <div className="border-[4px] relative h-full bg-[url('/message-box-pattern.svg')] back  rounded-2xl">
+    <div className="border-[4px] relative h-full bg-[url('/message-box-pattern.svg')]  back  rounded-2xl">
       {/* messaging header sections */}
       <div className='bg-white justify-between items-center flex rounded-xl px-5 py-3'>
         <div className='flex'>
@@ -189,18 +225,39 @@ export default function MessageBox({
         className='bg-white absolute w-[99%]  h-auto py-2 mx-2 px-2  bottom-0 rounded-lg'
       >
         {selectedImages.length > 0 && (
-          <div className='flex gap-3'>
-            {selectedImages.map((item) => (
-              <div className='w-24 h-24' key={item.duration}>
-                <Image
-                  className='w-24 h-24 '
-                  src={item.file}
-                  width={1920}
-                  height={1020}
-                  alt='selected images'
-                />
-              </div>
-            ))}
+          <div className='flex items-center gap-3'>
+            {selectedImages.map((item) =>
+              item.type === 'image/png' ? (
+                <div className='w-32 relative h-32' key={item.duration}>
+                  <Image
+                    className='w-32 h-32 object-fill '
+                    src={item.file}
+                    width={1920}
+                    height={1020}
+                    alt='selected images'
+                  />
+                  <IoIosRemoveCircleOutline
+                    onClick={() => removeItem(item.file)}
+                    className='text-text-aux-colour z-10 top-0 right-0 absolute cursor-pointer hover:text-black
+                  '
+                    size={20}
+                  />
+                </div>
+              ) : (
+                <div
+                  className='text-black flex items-center gap-1.5 bg-imbue-light-grey text-sm px-2 py-1 rounded-full'
+                  key={item.file}
+                >
+                  <p>{item.name}</p>
+                  <IoIosRemoveCircleOutline
+                    onClick={() => removeItem(item.file)}
+                    className='text-text-aux-colour cursor-pointer hover:text-black
+                  '
+                    size={16}
+                  />
+                </div>
+              )
+            )}
           </div>
         )}
         <TextareaAutosize
@@ -213,13 +270,24 @@ export default function MessageBox({
         />
         <div className='text-text-aux-colour gap-2 flex items-center'>
           <AiOutlinePlus
+            onClick={handleFileUpload}
             className='hover:text-black cursor-pointer'
             size={21}
           />
           <p className='text-lg'>|</p>
           <VscMention className='hover:text-black cursor-pointer' size={28} />
-          <BsEmojiSmile className='hover:text-black cursor-pointer' size={18} />
-
+          <div className='relative flex items-center'>
+            <BsEmojiSmile
+              onClick={handleEmoji}
+              className='hover:text-black cursor-pointer'
+              size={18}
+            />
+            {isEmojiOpen && (
+              <div className='absolute -top-[28.5rem] shadow'>
+                <EmojiPicker lazyLoadEmojis onEmojiClick={handleChnages} />
+              </div>
+            )}
+          </div>
           <IoImageOutline
             onClick={handleImageUpload}
             className='hover:text-black cursor-pointer'
@@ -236,6 +304,13 @@ export default function MessageBox({
           className='hidden'
           type='file'
           accept='.jpg , .png , .jpeg'
+        />
+        <input
+          ref={fileRef}
+          onChange={onChangeImage}
+          className='hidden'
+          type='file'
+          accept='.rar , .zip , .html , .pdf , .pptx , .docs , .word'
         />
       </div>
     </div>

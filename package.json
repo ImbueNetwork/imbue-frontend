@@ -49,6 +49,7 @@
     "cookies-next": "^2.1.1",
     "country-list": "^2.3.0",
     "csv-parser": "^3.0.0",
+    "emoji-picker-react": "^4.5.15",
     "eslint": "^8.42.0",
     "eslint-config-next": "^13.4.5",
     "eslint-config-prettier": "^8.8.0",
