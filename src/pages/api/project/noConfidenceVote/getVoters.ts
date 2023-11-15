@@ -3,7 +3,7 @@ import nextConnect from 'next-connect';
 import passport from 'passport';
 
 import {
-    getNoConfidenceVotersAddress,
+    getNoConfidenceVotes,
 } from '@/lib/queryServices/projectQueries';
 
 import db from '@/db';
@@ -32,7 +32,7 @@ export default nextConnect()
         // )(tx);
         // verifyUserIdFromJwt(req, res, [userAuth.id, ...projectApproverIds]);
 
-        const result = await getNoConfidenceVotersAddress(
+        const result = await getNoConfidenceVotes(
           Number(projectId)
         )(tx);
         return res.status(201).json(result);

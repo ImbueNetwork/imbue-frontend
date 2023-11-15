@@ -24,6 +24,7 @@ import { getOffchainEscrowAddress, getOffchainEscrowBalance, mintTokens } from '
 import { RootState } from '@/redux/store/store';
 
 import AccountChoice from './AccountChoice';
+import CopyToClipboardToast from './CopyToClipboardToast';
 import ErrorScreen from './ErrorScreen';
 import SuccessScreen from './SuccessScreen';
 import styles from '../styles/modules/hire-modal.module.css';
@@ -74,12 +75,19 @@ export const HirePopup = ({
 
 
   const updateEscrowInfo = async () => {
-    const escrowAddress = await getOffchainEscrowAddress(application.id);
-    setEscrowAddress(escrowAddress);
-    const allBalances = await getOffchainEscrowBalance(application.id);
-    const currency = Currency[application.currency_id].toString().toLowerCase();
-    const escrowBalance = Number(allBalances[currency]) ?? 0;
-    setEscrowBalance(escrowBalance);
+    try {
+      const escrowAddress = await getOffchainEscrowAddress(application.id);
+
+      if (escrowAddress?.status !== "Failed")
+        setEscrowAddress(escrowAddress);
+
+      const allBalances = await getOffchainEscrowBalance(application.id);
+      const currency = Currency[application.currency_id].toString().toLowerCase();
+      const escrowBalance = Number(allBalances[currency]) || 0;
+      setEscrowBalance(escrowBalance);
+    } catch (error) {
+      setError({ message: "Failed to load payment info" })
+    }
   };
 
   useEffect(() => {
@@ -379,8 +387,15 @@ export const HirePopup = ({
           </p>
           <p className='mb-10'>
             <span>Escrow Address:</span>
-            <span className='text-lg lg:text-xl text-imbue-lemon mr-1'>
-              {escrowAddress}
+            <span
+              className='text-lg lg:text-xl text-imbue-lemon ml-1 font-mono'
+            >
+              <CopyToClipboardToast
+                title='Payment address'
+                link={escrowAddress}
+              >
+                {escrowAddress}
+              </CopyToClipboardToast>
             </span>
           </p>
           <p className='mb-10'>

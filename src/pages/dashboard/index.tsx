@@ -71,7 +71,6 @@ const Dashboard = (): JSX.Element => {
         setLoadingStreamChat(false);
       }
     };
-
     setupStreamChat();
   }, [user]);
 

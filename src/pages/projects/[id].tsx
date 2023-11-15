@@ -97,7 +97,7 @@ function Project() {
   const [refunded, setRefunded] = useState<boolean>(false);
   const [successTitle, setSuccessTitle] = useState<string>('');
   const [error, setError] = useState<any>();
-  const [balance, setBalance] = useState<any>(0);
+  const [balance, setBalance] = useState<number | undefined>();
   const [balanceLoading, setBalanceLoading] = useState(true)
   const [approversPreview, setApproverPreview] = useState<User[]>([]);
   const [isApprover, setIsApprover] = useState<boolean>(false);
@@ -156,10 +156,10 @@ function Project() {
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
     if (project?.chain_project_id && project?.id) {
 
-      const voters: NoConfidenceVoter[] = await getProjectNoConfidenceVoters(
+      const noConfidenceResp: NoConfidenceVoter[] = await getProjectNoConfidenceVoters(
         project.id
       );
-      setNoConfidenceVoters(voters);
+      setNoConfidenceVoters(noConfidenceResp);
 
       if (!user.id || !user.web3_address) return
 
@@ -171,7 +171,7 @@ function Project() {
       }
 
       if (user?.web3_address && project.project_in_voting_of_no_confidence) {
-        const isApprover = voters?.find(
+        const isApprover = noConfidenceResp?.find(
           (voter) => voter.web3_address === user.web3_address
         );
         if (user?.web3_address && isApprover?.web3_address) {
@@ -207,6 +207,9 @@ function Project() {
         }
         case OffchainProjectState.Accepted:
           if (!project.chain_project_id) {
+            // redirecting freelancer to application if he should start work
+            if (user.id === freelancer.user_id) return router.push(`/briefs/${project.brief_id}/applications/${project.id}`)
+
             setWaitMessage(
               `Waiting for ${freelancer.display_name} to start the work`
             );
@@ -273,6 +276,11 @@ function Project() {
         setTargetUser(owner);
       }
 
+      // Don't show project if it still an application
+      if (projectRes.status_id === OffchainProjectState.PendingReview) {
+        return router.push('/dashboard')
+      }
+
       setIsProjectOwner(owner?.id === user.id);
       setProjectOwner(owner);
       setProject(projectRes);
@@ -306,7 +314,7 @@ function Project() {
 
       const totalCost = Number(
         Number(projectRes?.total_cost_without_fee) +
-          Number(projectRes?.imbue_fee)
+        Number(projectRes?.imbue_fee)
       );
       setRequiredBalance(totalCost * 0.95);
 
@@ -528,8 +536,8 @@ function Project() {
                       projectInMilestoneVoting
                         ? firstPendingMilestone
                         : firstPendingMilestone === -1
-                        ? project?.milestones?.length
-                        : firstPendingMilestone - 1
+                          ? project?.milestones?.length
+                          : firstPendingMilestone - 1
                     }
                     titleArray={project?.milestones}
                   />
@@ -541,27 +549,27 @@ function Project() {
                   {timeData[project?.duration_id || 0].label}
                 </p>
               </div>
-                <div className='flex flex-col bg-white justify-between px-5 py-3 rounded-xl'>
-                  <CopyToClipboard text={project?.escrow_address}>
-                    <div className='ml-auto'>
-                      <IconButton className='' onClick={() => copyAddress()}>
-                        <Image
-                          className='w-4'
-                          src={require('@/assets/svgs/copy.svg')}
-                          alt='copy button'
-                        />
-                      </IconButton>
-                    </div>
-                  </CopyToClipboard>
-                  <div className='w-full flex justify-between items-end'>
-                    <p className='text-black'>Escrow Address</p>
-                    <p className='text-imbue-purple-dark text-xl line-clamp-1'>
-                      {project?.escrow_address?.slice(0, 6) +
-                        '...' +
-                        project?.escrow_address?.substr(-3)}
-                    </p>
+              <div className='flex flex-col bg-white justify-between px-5 py-3 rounded-xl'>
+                <CopyToClipboard text={project?.escrow_address}>
+                  <div className='ml-auto'>
+                    <IconButton className='' onClick={() => copyAddress()}>
+                      <Image
+                        className='w-4'
+                        src={require('@/assets/svgs/copy.svg')}
+                        alt='copy button'
+                      />
+                    </IconButton>
                   </div>
+                </CopyToClipboard>
+                <div className='w-full flex justify-between items-end'>
+                  <p className='text-black'>Escrow Address</p>
+                  <p className='text-imbue-purple-dark text-xl line-clamp-1'>
+                    {project?.escrow_address?.slice(0, 6) +
+                      '...' +
+                      project?.escrow_address?.substr(-3)}
+                  </p>
                 </div>
+              </div>
               <div className='flex flex-col bg-white justify-between px-5 py-3 rounded-xl'>
                 <ProjectBalance
                   {...{
@@ -655,12 +663,12 @@ function Project() {
         setOpenVotingList={setOpenVotingList}
         loading={loading}
         votes={votes}
-        // setMilestoneVotes={setMilestoneVotes}
-        // firstPendingMilestone={firstPendingMilestone}
-        // approvers={approversPreview}
-        // chainProjectId={project.chain_project_id}
-        // projectId={project.id}
-        // project={project}
+      // setMilestoneVotes={setMilestoneVotes}
+      // firstPendingMilestone={firstPendingMilestone}
+      // approvers={approversPreview}
+      // chainProjectId={project.chain_project_id}
+      // projectId={project.id}
+      // project={project}
       />
 
       {openNoRefundList && (
@@ -764,9 +772,8 @@ function Project() {
       </WaitingScreen>
 
       <div
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${
-          copied ? 'right-5' : '-right-full'
-        }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
+          }`}
       >
         <Alert severity='success'>
           Grant Wallet Address Copied to clipboard

@@ -148,6 +148,9 @@ const ApplicationPreview = (): JSX.Element => {
           freelancerUser?.username
         );
 
+        if (!user?.id) return router.push('/auth/sign-in')
+        else if (user.id !== brief?.user_id && user.id !== applicationResponse?.user_id) return router.push('/dashboard')
+
         setBrief(brief);
         setApplication(applicationResponse);
         setFreelancer(freelancerResponse);
@@ -157,14 +160,14 @@ const ApplicationPreview = (): JSX.Element => {
       } catch (error) {
         setError({ message: 'Could not find application' });
       } finally {
-        //setLoading(false);
+        setLoading(false);
       }
     };
 
-    if (briefId && applicationId) {
+    if (briefId && applicationId && !userLoading) {
       getSetUpData();
     }
-  }, [briefId, applicationId]);
+  }, [briefId, applicationId, userLoading]);
 
   useEffect(() => {
     async function setup() {
@@ -243,18 +246,6 @@ const ApplicationPreview = (): JSX.Element => {
       setLoginModal(true);
     }
   };
-
-  useEffect(() => {
-    if (freelancer && briefOwner && user.id && !userLoading) {
-      if (freelancer.user_id === user.id || briefOwner.id === user.id) {
-        setLoading(false);
-      } else {
-        router.push('/');
-      }
-    } else if (!userLoading && (!user || !user.id)) {
-      router.push('/');
-    }
-  }, [briefOwner, freelancer]);
 
   const updateApplicationState = async (
     application: any,
@@ -450,7 +441,7 @@ const ApplicationPreview = (): JSX.Element => {
                   <h3 className='text-lg lg:text-[1.25rem] text-imbue-light-purple-two leading-[1.5] font-normal m-0 p-0'>
                     Projects&apos;s budget:{' '}
                     <span className=' text-imbue-purple-dark text-lg lg:text-[1.25rem]'>
-                      
+
                       {Number(application.total_cost_without_fee)?.toLocaleString()} ${Currency[application.currency_id]}
                     </span>
                   </h3>
@@ -590,7 +581,7 @@ const ApplicationPreview = (): JSX.Element => {
                           </>
                         ) : (
                           <p className='text-[1rem] text-[#3B27C180] m-0'>
-                            
+
                             {Number(
                               milestones[index]?.amount?.toFixed(2)
                             )?.toLocaleString?.()} ${Currency[currencyId]}
@@ -832,7 +823,7 @@ const ApplicationPreview = (): JSX.Element => {
         setVisible={(val) => {
           setLoginModal(val);
         }}
-        redirectUrl={router.pathname}
+        redirectUrl={router.asPath}
       />
 
       <SuccessScreen

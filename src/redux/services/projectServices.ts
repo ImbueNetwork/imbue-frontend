@@ -103,7 +103,7 @@ export const getMilestoneAttachments = async (
 
 export const completeMilestone = async (
   projectId: number,
-  milestoneIndex: number,
+  milestoneIndex: number
 ) => {
   const resp = await fetch(
     `${config.apiBase}/project/completeMilestone?projectId=${projectId}&milestoneIndex=${milestoneIndex}`,
@@ -316,16 +316,16 @@ export const getProjectNoConfidenceVoters = async (
   }
 };
 
-export const insertNoConfidenceVoter = async (
+export const insertNoConfidenceVote = async (
   projectId: number | string,
-  voter: User
+  voteData: { voter: User; vote: boolean }
 ) => {
   const resp = await fetch(
     `${config.apiBase}/project/noConfidenceVote?projectId=${projectId}`,
     {
       headers: config.postAPIHeaders,
       method: 'post',
-      body: JSON.stringify(voter),
+      body: JSON.stringify(voteData),
     }
   );
 
@@ -339,9 +339,7 @@ export const insertNoConfidenceVoter = async (
 };
 
 // Multichain
-export const getProjectBalance = async (
-  projectId: number,
-) => {
+export const getProjectBalance = async (projectId: number) => {
   try {
     const resp = await fetch(
       `${config.apiBase}/payments/${projectId}/balance`,
@@ -359,10 +357,7 @@ export const getProjectBalance = async (
   }
 };
 
-
-export const getProjectEscrowAddress = async (
-  projectId: number,
-) => {
+export const getProjectEscrowAddress = async (projectId: number) => {
   try {
     const resp = await fetch(
       `${config.apiBase}/payments/${projectId}/address`,
@@ -380,9 +375,7 @@ export const getProjectEscrowAddress = async (
   }
 };
 
-export const withdrawOffchain = async (
-  projectId: number | string,
-) => {
+export const withdrawOffchain = async (projectId: number | string) => {
   try {
     const resp = await fetch(
       `${config.apiBase}/payments/${projectId}/withdraw`,
@@ -415,57 +408,40 @@ export const watchChain = async (
   imbueChainEvent: ImbueChainEvent,
   address: string,
   projectId: number | string,
-  milestoneId?: number | string,
+  milestoneId?: number | string
 ) => {
-  const resp = await fetch(
-    `${config.apiBase}/watch`,
-    {
-      headers: config.postAPIHeaders,
-      method: 'POST',
-      body: JSON.stringify({ imbueChainEvent, address, projectId, milestoneId }),
-    }
-  );
+  const resp = await fetch(`${config.apiBase}/watch`, {
+    headers: config.postAPIHeaders,
+    method: 'POST',
+    body: JSON.stringify({ imbueChainEvent, address, projectId, milestoneId }),
+  });
   return await resp.json();
 };
 
-
-export const getOffchainEscrowAddress = async (
-  projectId: string | number,
-) => {
-  const resp = await fetch(
-    `${config.apiBase}/payments/${projectId}/address`,
-    {
-      headers: config.postAPIHeaders,
-      method: 'GET',
-    }
-  );
+export const getOffchainEscrowAddress = async (projectId: string | number) => {
+  const resp = await fetch(`${config.apiBase}/payments/${projectId}/address`, {
+    headers: config.postAPIHeaders,
+    method: 'GET',
+  });
   return await resp.json();
 };
 
-export const getOffchainEscrowBalance = async (
-  projectId: string | number,
-) => {
-  const resp = await fetch(
-    `${config.apiBase}/payments/${projectId}/balance`,
-    {
-      headers: config.postAPIHeaders,
-      method: 'GET',
-    }
-  );
+export const getOffchainEscrowBalance = async (projectId: string | number) => {
+  const resp = await fetch(`${config.apiBase}/payments/${projectId}/balance`, {
+    headers: config.postAPIHeaders,
+    method: 'GET',
+  });
   return await resp.json();
 };
 
 export const mintTokens = async (
   projectId: string | number,
-  beneficiary: string,
+  beneficiary: string
 ) => {
-  const resp = await fetch(
-    `${config.apiBase}/payments/${projectId}/mint`,
-    {
-      headers: config.postAPIHeaders,
-      method: 'POST',
-      body: JSON.stringify({ beneficiary }),
-    }
-  );
+  const resp = await fetch(`${config.apiBase}/payments/${projectId}/mint`, {
+    headers: config.postAPIHeaders,
+    method: 'POST',
+    body: JSON.stringify({ beneficiary }),
+  });
   return await resp.json();
 };

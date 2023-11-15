@@ -154,6 +154,15 @@ export default nextConnect()
         // if (project_in_milestone_voting)
         //   newProject.project_in_milestone_voting = project_in_milestone_voting;
 
+        const haveAllMilestonesBeenApproved = milestones
+          .map((m: any) => m.is_approved)
+          .every(Boolean);
+
+        if (haveAllMilestonesBeenApproved) {
+          newProject.status_id = OffchainProjectState.Completed;
+          newProject.completed = true;
+        }
+
         const project = await models.updateProject(projectId, newProject)(tx);
         const filter = new Filter();
 

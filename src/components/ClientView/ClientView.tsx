@@ -54,7 +54,7 @@ export default function ClientView({
             onClick={() => setSwitcher('projects')}
             className='text-2xl text-black py-5 border-r text-center w-full'
           >
-            Projects({briefs?.acceptedBriefs.length})
+            Projects({briefs?.acceptedBriefs?.length})
           </p>
           <p
             onClick={() => setSwitcher('grants')}

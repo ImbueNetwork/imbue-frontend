@@ -3,6 +3,8 @@ import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { NoConfidenceVote } from '@/lib/queryServices/projectQueries';
+
 import freelalncerPic from '@/assets/images/profile-image.png'
 import { Project, User } from '@/model';
 import { getProjectNoConfidenceVoters } from '@/redux/services/projectServices';
@@ -46,7 +48,9 @@ const NoConfidenceList = (props: VotingListProps) => {
                     }
                 });
 
-                setVotes({ yes: voteResp, pending: pending })
+                const yes = voteResp.filter((v: NoConfidenceVote) => !v.vote)
+                const no = voteResp.filter((v: NoConfidenceVote) => v.vote)
+                setVotes({ yes, no, pending })
                 // const votersAddressed = voteResp?.map((voter: any) => voter.web3_address)
             } catch (error) {
                 // eslint-disable-next-line no-console

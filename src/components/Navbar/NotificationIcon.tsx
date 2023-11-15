@@ -14,6 +14,7 @@ export default function NotificationIcon() {
     string | undefined
   >();
 
+  
   useEffect(() => {
     const notifications = async () => {
       const result = await getNotification();
@@ -25,14 +26,12 @@ export default function NotificationIcon() {
     const timerId = setInterval(() => {
       notifications();
     }, 20000);
-
     return () => clearInterval(timerId);
   }, []);
 
   const updateFun = async () => {
     await updateLastNotification(lastNotification as string);
   };
-
   const handleOpenModal = (e: any) => {
     setModal((val) => !val);
     setAnchorEl(e.target);
@@ -47,6 +46,8 @@ export default function NotificationIcon() {
     setAnchorEl(null);
     setModal(false);
   };
+  
+
   return (
     <div>
       <Badge badgeContent={unreadNotification} color='error'>
