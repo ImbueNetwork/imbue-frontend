@@ -77,7 +77,7 @@ const GrantApplication = (): JSX.Element => {
   const [copied, setCopied] = useState<boolean>(false);
   const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
   const [accounts, setAccounts] = useState<string[]>([]);
-
+  const IMBUE_DEPOSIT_REQURED = 500;
   const copyAddress = () => {
     setCopied(true);
 
@@ -202,6 +202,19 @@ const GrantApplication = (): JSX.Element => {
         message: 'Total cost must be Less than 100,000,000',
       });
 
+
+    const imbueApi = await initImbueAPIInfo();
+    const chainService = new ChainService(imbueApi, user);
+    const balance: any = await chainService.getBalance(
+      account.address,
+      Currency.IMBU
+    );
+
+    if (Number(balance) < IMBUE_DEPOSIT_REQURED)
+      return setError({
+        message: `Account has insufficient $IMBU (${IMBUE_DEPOSIT_REQURED} $IMBU) to cover the deposit fees`,
+      });
+
     setLoading(true);
 
     try {
@@ -233,8 +246,6 @@ const GrantApplication = (): JSX.Element => {
         approvers,
       };
 
-      const imbueApi = await initImbueAPIInfo();
-      const chainService = new ChainService(imbueApi, user);
 
       const grantMilestones = grant.milestones.map((m) => ({
         percentageToUnlock: m.percentage_to_unlock,
@@ -593,33 +604,33 @@ const GrantApplication = (): JSX.Element => {
               </div>
             </div>
             {currencyId >= 100 && (
-            <div>
-            <p className='text-lg text-content m-0 p-0'>Payment Address:</p>
-            <div>
-              {accounts.length == 0 ? (
-                <button className='primary-btn in-dark w-button' onClick={connect}>Connect</button>
-              ) : (
-                <select
-                  name='paymentAddress'
-                  value={paymentAddress}
-                  onChange={(e) => setPaymentAddress(e.target.value)}
-                  placeholder='Select a payment address'
-                  className='bg-transparent round border border-imbue-purple rounded-[5px] text-base px-5 py-3 mt-4 w-full text-content-primary outline-content-primary'
-                  required
-                >
-                  {accounts.map((account: string) => (
-                    <option
-                      value={account}
-                      key={account}
-                      className='hover:!bg-overlay'
+              <div>
+                <p className='text-lg text-content m-0 p-0'>Payment Address:</p>
+                <div>
+                  {accounts.length == 0 ? (
+                    <button className='primary-btn in-dark w-button' onClick={connect}>Connect</button>
+                  ) : (
+                    <select
+                      name='paymentAddress'
+                      value={paymentAddress}
+                      onChange={(e) => setPaymentAddress(e.target.value)}
+                      placeholder='Select a payment address'
+                      className='bg-transparent round border border-imbue-purple rounded-[5px] text-base px-5 py-3 mt-4 w-full text-content-primary outline-content-primary'
+                      required
                     >
-                      {account}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-          </div>
+                      {accounts.map((account: string) => (
+                        <option
+                          value={account}
+                          key={account}
+                          className='hover:!bg-overlay'
+                        >
+                          {account}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              </div>
             )}
 
           </div>
