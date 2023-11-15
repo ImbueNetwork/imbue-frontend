@@ -40,11 +40,17 @@ export default function RefundModal({
 
   return (
     <div className='bg-white  max-w-[31.938rem] text-left rounded-[18px]'>
-      <div className='inline-block bg-light-grey pt-2 pb-4 mt-12 mb-8  px-4 rounded-lg'>
+      <div className='w-fit bg-light-grey pt-2 pb-4 mt-12 mb-8 mx-auto px-4 rounded-lg'>
         <Image src={'/wallet.svg'} width={70} height={70} alt='icon' />
       </div>
-      <div className='text-left'>
-        <h4 className='text-[27px]'>Should a refund be initiated?</h4>
+      <div className='text-center'>
+        <h4 className='text-[27px]'>
+          {
+            undergoingRefund
+              ? "Should a Refund be Approved?"
+              : "Should a refund be initiated?"
+          }
+        </h4>
         <p className='text-base mt-4 '>
           A refund can be made when you vote against a milestone deliverables
           and believe strongly that its deliverables is not quantifiable by
@@ -66,7 +72,11 @@ export default function RefundModal({
             className='primary-btn in-dark w-button w-[70%] !mx-auto'
             style={{ textAlign: 'center' }}
           >
-            Yes, initiate refund
+            {
+              undergoingRefund
+                ? "Yes, Approve Refund"
+                : "Yes, initiate refund"
+            }
             <BiArrowBack
               className='rotate-180 ml-3 text-imbue-lime '
               size={18}

@@ -52,7 +52,7 @@ export default function SignIn() {
       });
 
       if (resp.ok) {
-        redirect('/dashboard');
+        redirect('dashboard');
       } else {
         setErrorMessage('incorrect username or password');
       }
@@ -73,7 +73,7 @@ export default function SignIn() {
         account
       );
       if (resp.ok) {
-        redirect('/dashboard');
+        redirect('dashboard');
       }
     } catch (error) {
       // FIXME: error handling

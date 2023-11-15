@@ -458,7 +458,11 @@ const GrantApplication = (): JSX.Element => {
                       Ecosystem
                     </h3>
                     <div className='mt-2 text-content-primary'>
-                      Kusama Treasury (KSM)
+                      {
+                        currencyId < 100
+                          ? "Kusama Treasury (KSM)"
+                          : "Ethereum"
+                      }
                     </div>
                   </div>
                 </div>
@@ -593,33 +597,33 @@ const GrantApplication = (): JSX.Element => {
               </div>
             </div>
             {currencyId >= 100 && (
-            <div>
-            <p className='text-lg text-content m-0 p-0'>Payment Address:</p>
-            <div>
-              {accounts.length == 0 ? (
-                <button className='primary-btn in-dark w-button' onClick={connect}>Connect</button>
-              ) : (
-                <select
-                  name='paymentAddress'
-                  value={paymentAddress}
-                  onChange={(e) => setPaymentAddress(e.target.value)}
-                  placeholder='Select a payment address'
-                  className='bg-transparent round border border-imbue-purple rounded-[5px] text-base px-5 py-3 mt-4 w-full text-content-primary outline-content-primary'
-                  required
-                >
-                  {accounts.map((account: string) => (
-                    <option
-                      value={account}
-                      key={account}
-                      className='hover:!bg-overlay'
+              <div>
+                <p className='text-lg text-content m-0 p-0'>Payment Address:</p>
+                <div>
+                  {accounts.length == 0 ? (
+                    <button className='primary-btn in-dark w-button' onClick={connect}>Connect</button>
+                  ) : (
+                    <select
+                      name='paymentAddress'
+                      value={paymentAddress}
+                      onChange={(e) => setPaymentAddress(e.target.value)}
+                      placeholder='Select a payment address'
+                      className='bg-transparent round border border-imbue-purple rounded-[5px] text-base px-5 py-3 mt-4 w-full text-content-primary outline-content-primary'
+                      required
                     >
-                      {account}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-          </div>
+                      {accounts.map((account: string) => (
+                        <option
+                          value={account}
+                          key={account}
+                          className='hover:!bg-overlay'
+                        >
+                          {account}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              </div>
             )}
 
           </div>
