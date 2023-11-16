@@ -210,7 +210,7 @@ const GrantApplication = (): JSX.Element => {
       Currency.IMBU
     );
 
-    if (Number(balance) ?? 0 < IMBUE_DEPOSIT_REQURED)
+    if ((Number(balance) ?? 0) < IMBUE_DEPOSIT_REQURED)
       return setError({
         message: `Account has insufficient $IMBU (${IMBUE_DEPOSIT_REQURED} $IMBU) to cover the deposit fees`,
       });
