@@ -469,7 +469,11 @@ const GrantApplication = (): JSX.Element => {
                       Ecosystem
                     </h3>
                     <div className='mt-2 text-content-primary'>
-                      Kusama Treasury (KSM)
+                      {
+                        currencyId < 100
+                          ? "Kusama Treasury (KSM)"
+                          : "Ethereum"
+                      }
                     </div>
                   </div>
                 </div>

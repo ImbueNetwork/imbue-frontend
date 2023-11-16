@@ -28,7 +28,7 @@ const GoogleSignIn = ({ sizeRef: walletRef, redirectUrl }: GoogleComponentProps)
     }, [walletRef]);
 
     const redirect = (path: string) => {
-        window.location.href = `${window.location.origin}/${path}`;
+        window.location.href = `${window.location.origin}${path}`;
     }
 
     const googleLogin = async (response: any) => {
