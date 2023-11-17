@@ -147,7 +147,7 @@ export default function MessageItem({
                   >
                     <div
                       onClick={handleCloseModal}
-                      className=' text-black rounded-2xl'
+                      className=' text-black min-w-24 rounded-2xl'
                     >
                       <p className='px-2 py-1 cursor-pointer hover:bg-slate-100'>
                         Replay
@@ -195,7 +195,7 @@ export default function MessageItem({
     <div
       id={message.id}
       className={classNames(
-        'flex items-end gap-2 ',
+        'flex items-center gap-2 ',
         showProfile ? ' mt-1 mb-9' : 'my-1'
       )}
     >
@@ -222,7 +222,17 @@ export default function MessageItem({
         />
       )}
       {!showProfile && <div className='w-10 h-10' />}
-      <div className='flex w-[70%] flex-col items-start'>
+
+      <div className='flex relative max-w-[70%] flex-col items-start'>
+        {message.pinned && !message.deleted_at && (
+          <Image
+            src={'/pin.png'}
+            width={1920}
+            height={1920}
+            className='w-4 -rotate-90 -top-1.5 absolute'
+            alt='pinned '
+          />
+        )}
         {!!message.attachments?.length && (
           <div className='flex gap-1 my-1 flex-wrap'>
             {message.attachments?.map((item: any) =>
@@ -251,7 +261,7 @@ export default function MessageItem({
           </div>
         )}
         {!!message.text?.trim().length && (
-          <div className='bg-white px-4 py-1.5 rounded-2xl text-right text-black'>
+          <div className='bg-white px-4 py-1.5 rounded-2xl  text-black'>
             <p>{message.text}</p>
           </div>
         )}
@@ -261,6 +271,64 @@ export default function MessageItem({
           </p>
         )}
       </div>
+      {!message.deleted_at && (
+        <div
+          className={classNames(
+            ' gap-2  flex items-center',
+            showProfile ? 'mb-6' : 'mb-0'
+          )}
+        >
+          <div className='flex items-center'>
+            <BsThreeDotsVertical
+              onClick={handlePopOver}
+              size={18}
+              className='hover:text-black  cursor-pointer text-text-aux-colour'
+            />
+            <Menu
+              disableScrollLock={true}
+              id='basic-menu'
+              anchorEl={anchorEl}
+              open={modal}
+              onClose={handleCloseModal}
+              className='mt-2  left-1'
+            >
+              <div
+                onClick={handleCloseModal}
+                className=' text-black w-24 rounded-2xl'
+              >
+                <p className='px-2 py-1 cursor-pointer hover:bg-slate-100'>
+                  Replay
+                </p>
+                {!message.pinned ? (
+                  <p
+                    onClick={() => setPinMessage(message)}
+                    className=' px-2 py-1 cursor-pointer hover:bg-slate-100'
+                  >
+                    Pin
+                  </p>
+                ) : (
+                  <p
+                    onClick={() => setUnPinMessage(message)}
+                    className=' px-2 py-1 cursor-pointer hover:bg-slate-100'
+                  >
+                    Unpin
+                  </p>
+                )}
+                <p
+                  onClick={() => setUnPinMessage(message)}
+                  className=' px-2 py-1 cursor-pointer hover:bg-slate-100'
+                >
+                  Flag
+                </p>
+              </div>
+            </Menu>
+          </div>
+          <BsEmojiSmile
+            className='hover:text-black text-text-aux-colour cursor-pointer'
+            size={18}
+          />
+        </div>
+      )}
     </div>
   );
 }

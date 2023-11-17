@@ -15,9 +15,11 @@ export default function ChannelListItem({
   channel,
   setChannel,
   selectedChannel,
+  handleChannelState,
 }: {
   channel: Channel<DefaultGenerics>;
   setChannel: any;
+  handleChannelState: any;
   selectedChannel: Channel | null;
 }) {
   const { user } = useSelector((state: RootState) => state.userState);
@@ -28,7 +30,14 @@ export default function ChannelListItem({
     Number(channel.state.members[key[0]]?.user_id) === user.id
       ? setTargetUser(channel.state.members[key[1]]?.user)
       : setTargetUser(channel.state.members[key[0]]?.user);
-  }, [channel.state?.members, user.id]);
+
+    const myChannelListener = channel.on((event) => {
+      if (event.type === 'message.new') handleChannelState();
+    });
+    return () => {
+      myChannelListener.unsubscribe();
+    };
+  }, [channel, user.id]);
 
   return (
     <div
@@ -68,9 +77,16 @@ export default function ChannelListItem({
               timeAgo.format(new Date(channel?.lastMessage()?.created_at))}
           </p>
         </div>
-        <p className='text-text-aux-colour mt-1'>
-          {channel?.lastMessage()?.text?.substring(0, 20)}
-        </p>
+        <div className='flex items-end justify-between'>
+          <p className='text-text-aux-colour '>
+            {channel?.lastMessage()?.text?.substring(0, 60)}
+          </p>
+          {channel.countUnread() > 0 && (
+            <span className='bg-[#FF0B00] w-5 flex justify-center h-5 items-center text-sm rounded-full'>
+              {channel.countUnread() > 99 ? 99 : channel.countUnread()}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

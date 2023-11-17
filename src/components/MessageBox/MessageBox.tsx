@@ -44,7 +44,7 @@ export default function MessageBox({
 }) {
   const { user, client } = useSelector((state: RootState) => state.userState);
   const [targetUser, setTargetUser] = useState<User>();
-
+  const [isTyping, setTyping] = useState(false);
   const [textVal, setTextVal] = useState<string>('');
   const [selectedImages, setSelectedImages] = useState<imagesType[]>([]);
   const fileRef = useRef<HTMLInputElement | null>(null);
@@ -74,11 +74,26 @@ export default function MessageBox({
       }
     };
 
-    channel.on((event) => {
+    const myListener = channel.on((event) => {
+      if (
+        event.type === 'typing.start' &&
+        Number(event.user?.id) !== user?.id
+      ) {
+        setTyping(true);
+      } else if (
+        event.type === 'typing.stop' &&
+        Number(event.user?.id) !== user?.id
+      ) {
+        setTyping(false);
+      } else if (event.type !== 'message.new')
+        setMessageId(event.message?.id || null);
+      else if (event.type === 'message.new') setMessageId(null);
       getChannel();
-      if (event.type !== 'message.new') setMessageId(event.message?.id || null);
-      if (event.type === 'message.new') setMessageId(null);
     });
+
+    return () => {
+      myListener.unsubscribe();
+    };
   }, [
     channel.state.members,
     channel.state.messageSets,
@@ -86,7 +101,12 @@ export default function MessageBox({
     channel,
     client,
   ]);
+
+  const handleTyping = async () => {
+    await channel.keystroke();
+  };
   const handleChnages = (e: any) => {
+    handleTyping();
     if (e.emoji) {
       setTextVal((val) => val + e.emoji);
     } else {
@@ -187,8 +207,17 @@ export default function MessageBox({
     setPrevKey('');
   };
 
+  const handleReadMessage = async () => {
+    if (channel.countUnread() > 0) {
+      await channel.markRead();
+    }
+  };
+
   return (
-    <div className="border-[4px] relative h-full bg-[url('/message-box-pattern.svg')]  back  rounded-2xl">
+    <div
+      onClick={handleReadMessage}
+      className="border-[4px] relative h-full bg-[url('/message-box-pattern.svg')]  back  rounded-2xl"
+    >
       {/* messaging header sections */}
       <div className='bg-white justify-between items-center flex rounded-xl px-5 py-3'>
         <div className='flex'>
@@ -264,6 +293,14 @@ export default function MessageBox({
             />
           );
         })}
+        {isTyping && (
+          <div className='flex animate-bounce gap-1 ml-14'>
+            <div className='w-3 animate-bounce bg-text-aux-colour h-3 rounded-full' />
+            <div className='w-3 animate-bounce bg-text-aux-colour h-3 rounded-full' />
+            <div className='w-3 animate-bounce bg-text-aux-colour h-3 rounded-full' />
+            <div className='w-3 animate-bounce bg-text-aux-colour h-3 rounded-full' />
+          </div>
+        )}
       </div>
       <div
         ref={inputMessageRef}
