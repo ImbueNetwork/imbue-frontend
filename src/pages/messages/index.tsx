@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { useSelector } from 'react-redux';
-import { Channel, DefaultGenerics, StreamChat } from 'stream-chat';
-
-import { getGetStreamClient } from '@/utils/getStreamClientInstance';
+import { Channel, DefaultGenerics } from 'stream-chat';
 
 import ChannelListItem from '@/components/ChannelListItem/ChannelListItem';
 import EmptyMessageBox from '@/components/MessageBox/EmptyMessageBox';
@@ -12,18 +10,10 @@ import MessageBox from '@/components/MessageBox/MessageBox';
 import { RootState } from '@/redux/store/store';
 
 export default function Messages() {
-  const { user, loading } = useSelector((state: RootState) => state.userState);
-  const [client, setClient] = useState<StreamChat>();
+  const { user, client } = useSelector((state: RootState) => state.userState);
   const [channels, setChannels] = useState<Channel<DefaultGenerics>[]>([]);
   const [selectedChannel, setSelectedChannel] =
     useState<Channel<DefaultGenerics> | null>(null);
-  useEffect(() => {
-    const getClient = async () => {
-      const client = await getGetStreamClient();
-      if (client) setClient(client);
-    };
-    getClient();
-  }, [user, loading]);
 
   useEffect(() => {
     if (!client) return;

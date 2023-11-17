@@ -42,14 +42,21 @@ export default function MessageBox({
 }: {
   channel: Channel<DefaultGenerics>;
 }) {
-  const { user } = useSelector((state: RootState) => state.userState);
+  const { user, client } = useSelector((state: RootState) => state.userState);
   const [targetUser, setTargetUser] = useState<User>();
+
   const [textVal, setTextVal] = useState<string>('');
   const [selectedImages, setSelectedImages] = useState<imagesType[]>([]);
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [isEmojiOpen, setEmojiOpen] = useState<boolean>(false);
-  const [messages, setMessages] =
-    useState<FormatMessageResponse<DefaultGenerics>[]>();
+  const [messages, setMessages] = useState<
+    FormatMessageResponse<DefaultGenerics>[]
+  >([]);
+  const [messageId, setMessageId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setMessageId(null);
+  }, [channel]);
 
   useEffect(() => {
     const key = Object.keys(channel.state?.members);
@@ -58,8 +65,27 @@ export default function MessageBox({
       : setTargetUser(channel.state.members[key[0]]?.user);
     const { messages } = channel.state.messageSets[0];
     setMessages(messages);
-  }, [channel.state.members, channel.state.messageSets, user.id, channel]);
 
+    const getChannel = async () => {
+      const res = await client?.queryChannels({ id: channel.id });
+      if (res) {
+        const { messages } = res[0].state.messageSets[0];
+        setMessages(messages);
+      }
+    };
+
+    channel.on((event) => {
+      getChannel();
+      if (event.type !== 'message.new') setMessageId(event.message?.id || null);
+      if (event.type === 'message.new') setMessageId(null);
+    });
+  }, [
+    channel.state.members,
+    channel.state.messageSets,
+    user.id,
+    channel,
+    client,
+  ]);
   const handleChnages = (e: any) => {
     if (e.emoji) {
       setTextVal((val) => val + e.emoji);
@@ -70,7 +96,9 @@ export default function MessageBox({
 
   useEffect(() => {
     const objDiv = document.getElementById('message_box');
-    objDiv?.scrollTo({ top: objDiv.scrollHeight });
+    if (messageId === null) {
+      objDiv?.scrollTo({ top: objDiv.scrollHeight });
+    }
   }, [messages]);
 
   const onSendMessage = async () => {
@@ -139,6 +167,24 @@ export default function MessageBox({
   const removeItem = (target: string) => {
     const filtered = selectedImages.filter((item) => item.file !== target);
     setSelectedImages(filtered);
+  };
+
+  const [prevKey, setPrevKey] = useState<string>();
+
+  const handleKeyDown = (event: any) => {
+    if (event.code === 'ShiftLeft' || event.code === 'ShiftLeft') {
+      setPrevKey(event.code);
+      return;
+    } else if (
+      prevKey === 'ShiftLeft' ||
+      (prevKey === 'ShiftLeft' && event.code === 'Enter')
+    ) {
+      ////////// just do the default things
+    } else if (event.code === 'Enter') {
+      event.preventDefault();
+      onSendMessage();
+    }
+    setPrevKey('');
   };
 
   return (
@@ -211,7 +257,7 @@ export default function MessageBox({
           }
           return (
             <MessageItem
-              key={new Date(item.created_at).getMilliseconds() + Math.random()}
+              key={item.id}
               user={user}
               message={item}
               showProfile={bool}
@@ -263,6 +309,7 @@ export default function MessageBox({
         <TextareaAutosize
           placeholder='type here'
           onChange={handleChnages}
+          onKeyDown={handleKeyDown}
           value={textVal}
           minRows={3}
           maxRows={6}

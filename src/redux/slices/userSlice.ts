@@ -1,15 +1,21 @@
 'use client';
 
 import { createSlice } from '@reduxjs/toolkit';
+import { DefaultGenerics, StreamChat } from 'stream-chat';
 
 import { User } from '@/model';
 
-import { fetchUserRedux, logout } from '../reducers/userReducers';
+import {
+  fetchUserRedux,
+  getStreamClient,
+  logout,
+} from '../reducers/userReducers';
 
 export const initialState: {
   user: User;
   loading: boolean;
   message: 0;
+  client: StreamChat<DefaultGenerics> | null;
   error: any;
 } = {
   user: {
@@ -21,6 +27,7 @@ export const initialState: {
   message: 0,
   loading: true,
   error: {},
+  client: null,
 };
 
 export const userState = createSlice({
@@ -31,6 +38,7 @@ export const userState = createSlice({
       state.message = action.payload.message;
     },
   },
+
   extraReducers: (builder) => {
     builder.addCase(logout.fulfilled, (state) => {
       state = initialState;
@@ -47,6 +55,9 @@ export const userState = createSlice({
 
     builder.addCase(fetchUserRedux.pending, (state) => {
       state.loading = true;
+    });
+    builder.addCase(getStreamClient.fulfilled, (state, action) => {
+      state.client = action.payload;
     });
   },
 });

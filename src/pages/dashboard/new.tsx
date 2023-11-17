@@ -5,10 +5,10 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { BiChevronDown, BiRightArrowAlt } from 'react-icons/bi';
 import { MdOutlineAttachMoney } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { Channel, DefaultGenerics, StreamChat } from 'stream-chat';
+import { Channel, DefaultGenerics } from 'stream-chat';
 import 'stream-chat-react/dist/css/v2/index.css';
 
-import { fetchUser, getStreamChat } from '@/utils';
+import { fetchUser } from '@/utils';
 
 import AreaGrah from '@/components/AreaGraph';
 import ChatPopup from '@/components/ChatPopup';
@@ -40,11 +40,11 @@ export type userAnalyticsType = {
 };
 
 const FreelancerDashboard = (): JSX.Element => {
-  const [client, setClient] = useState<StreamChat>();
   const {
     user,
     loading: loadingUser,
     error: userError,
+    client,
   } = useSelector((state: RootState) => state.userState);
   const [unreadMessages, setUnreadMsg] = useState<number>(0);
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
@@ -98,7 +98,6 @@ const FreelancerDashboard = (): JSX.Element => {
     const setupStreamChat = async () => {
       try {
         if (!user?.username && !loadingUser) return router.push('/');
-        setClient(await getStreamChat());
       } catch (error) {
         setError({ message: error });
       } finally {
@@ -139,14 +138,6 @@ const FreelancerDashboard = (): JSX.Element => {
 
   useEffect(() => {
     if (client && user?.username && !loadingStreamChat) {
-      client?.connectUser(
-        {
-          id: String(user.id),
-          username: user.username,
-          name: user.display_name,
-        },
-        user.getstream_token
-      );
       const getUnreadMessageChannels = async () => {
         const result = await client.getUnreadCount();
         dispatch(setUnreadMessage({ message: result.channels.length }));
@@ -175,7 +166,14 @@ const FreelancerDashboard = (): JSX.Element => {
         }
       });
     }
-  }, [client, user?.getstream_token, user?.username, loadingStreamChat]);
+  }, [
+    client,
+    user.getstream_token,
+    user?.username,
+    loadingStreamChat,
+    user.id,
+    dispatch,
+  ]);
 
   const [applications, setApplciations] = useState<Project[]>([]);
 

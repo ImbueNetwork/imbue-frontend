@@ -25,7 +25,7 @@ import { MdOutlineWork } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { appLogo } from '@/assets/svgs';
-import { fetchUserRedux } from '@/redux/reducers/userReducers';
+import { fetchUserRedux, getStreamClient } from '@/redux/reducers/userReducers';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { AppDispatch, RootState } from '@/redux/store/store';
 
@@ -70,6 +70,10 @@ function NewNavbar() {
     setAnchorEl(null);
     setOpenMenu(false);
   };
+
+  useEffect(() => {
+    if (user && user.id) dispatch(getStreamClient(user));
+  }, [dispatch, user, user.id]);
 
   useEffect(() => {
     const setup = async () => {
@@ -335,14 +339,15 @@ function NewNavbar() {
             {user?.username && (
               <>
                 <Badge className='mr-3' badgeContent={message} color='error'>
-                  <Image
-                    src='/message-dots-square.svg'
-                    width={23}
-                    height={20}
-                    onClick={() => router.push('/dashboard/message')}
-                    alt='message'
-                    className='cursor-pointer'
-                  />
+                  <a href={'/messages'}>
+                    <Image
+                      src='/message-dots-square.svg'
+                      width={23}
+                      height={20}
+                      alt='message'
+                      className='cursor-pointer'
+                    />
+                  </a>
                 </Badge>
                 <div className='relative'>
                   <div>

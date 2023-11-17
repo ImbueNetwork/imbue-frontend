@@ -1,10 +1,17 @@
-import { Modal } from '@mui/material';
+import { Menu, Modal } from '@mui/material';
 import classNames from 'classnames';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en.json';
 import Image from 'next/image';
 import { useState } from 'react';
+import { BsEmojiSmile, BsThreeDotsVertical } from 'react-icons/bs';
 import { DefaultGenerics, FormatMessageResponse } from 'stream-chat';
+
+import {
+  deleteMessage,
+  setPinMessage,
+  setUnPinMessage,
+} from '@/utils/MessageOptions';
 
 import { User } from '@/model';
 
@@ -23,6 +30,17 @@ export default function MessageItem({
   message: FormatMessageResponse<DefaultGenerics>;
 }) {
   const [isModal, setModal] = useState<string | false>(false);
+  const [modal, setModal1] = useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const handlePopOver = (e: any) => {
+    setAnchorEl(e.target);
+    setModal1((val) => !val);
+  };
+
+  const handleCloseModal = () => {
+    setModal1(false);
+  };
+
   if (Number(message.user?.id) === user?.id) {
     return (
       <>
@@ -38,8 +56,9 @@ export default function MessageItem({
         </Modal>
 
         <div
+          id={message.id}
           className={classNames(
-            'flex flex-row-reverse items-end gap-2 ',
+            'flex group flex-row-reverse items-end gap-2 ',
             showProfile ? ' mt-1 mb-9' : 'my-1'
           )}
         >
@@ -56,43 +75,116 @@ export default function MessageItem({
             />
           )}
           {!showProfile && <div className='w-10 h-10' />}
-          <div className='flex w-[70%]  flex-col items-end'>
-            {!!message.attachments?.length && (
-              <div className='flex gap-1 my-1 flex-wrap'>
-                {message.attachments?.map((item: any) =>
-                  item.type === 'image/png' || item.type === 'image' ? (
-                    <div className='' key={item.image_url}>
-                      <Image
-                        onClick={() => setModal(item.image_url)}
-                        className='w-80 cursor-pointer max-h-36 rounded-md object-cover'
-                        src={item.image_url || ''}
-                        width={1920}
-                        height={1080}
-                        alt='attachments'
-                      />
-                    </div>
-                  ) : (
-                    <div
-                      className='bg-imbue-lime-light text-black px-2 py-1 rounded-full'
-                      key={item.image_url}
-                    >
-                      <a className='underline' href={item.image_url}>
-                        {item.name}
-                      </a>
-                    </div>
-                  )
+          <div className='flex flex-row-reverse gap-3 items-center w-full'>
+            <div className='flex relative max-w-[70%]  flex-col items-end'>
+              {message.pinned && !message.deleted_at && (
+                <Image
+                  src={'/pin.png'}
+                  width={1920}
+                  height={1920}
+                  className='w-4 -top-1.5 absolute'
+                  alt='pinned '
+                />
+              )}
+              {!!message.attachments?.length && (
+                <div className='flex gap-1 my-1 flex-wrap'>
+                  {message.attachments?.map((item: any) =>
+                    item.type === 'image/png' || item.type === 'image' ? (
+                      <div className='' key={'first' + item.image_url}>
+                        <Image
+                          onClick={() => setModal(item.image_url)}
+                          className='w-80 cursor-pointer max-h-36 rounded-md object-cover'
+                          src={item.image_url || ''}
+                          width={1920}
+                          height={1080}
+                          alt='attachments'
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        className='bg-imbue-lime-light text-black px-2 py-1 rounded-full'
+                        key={'second' + item.image_url}
+                      >
+                        <a className='underline' href={item.image_url}>
+                          {item.name}
+                        </a>
+                      </div>
+                    )
+                  )}
+                </div>
+              )}
+              {!!message.text?.trim().length && (
+                <div className='bg-imbue-lime-light   px-4 py-1.5 rounded-2xl text-right text-black'>
+                  <p>{message.text}</p>
+                </div>
+              )}
+              {showProfile && (
+                <p className='text-[#7C8B9D]'>
+                  {timeAgo.format(new Date(message.created_at))}
+                </p>
+              )}
+            </div>
+            {!message.deleted_at && (
+              <div
+                className={classNames(
+                  ' gap-2  flex items-center',
+                  showProfile ? 'mb-6' : 'mb-0'
                 )}
+              >
+                <div className='flex items-center'>
+                  <BsThreeDotsVertical
+                    onClick={handlePopOver}
+                    size={18}
+                    className='hover:text-black  cursor-pointer text-text-aux-colour'
+                  />
+                  <Menu
+                    disableScrollLock={true}
+                    id='basic-menu'
+                    anchorEl={anchorEl}
+                    open={modal}
+                    onClose={handleCloseModal}
+                    className='mt-2  -left-20'
+                  >
+                    <div
+                      onClick={handleCloseModal}
+                      className=' text-black rounded-2xl'
+                    >
+                      <p className='px-2 py-1 cursor-pointer hover:bg-slate-100'>
+                        Replay
+                      </p>
+                      {!message.pinned ? (
+                        <p
+                          onClick={() => setPinMessage(message)}
+                          className=' px-2 py-1 cursor-pointer hover:bg-slate-100'
+                        >
+                          Pin
+                        </p>
+                      ) : (
+                        <p
+                          onClick={() => setUnPinMessage(message)}
+                          className=' px-2 py-1 cursor-pointer hover:bg-slate-100'
+                        >
+                          Unpin
+                        </p>
+                      )}
+
+                      <p className=' px-2 py-1 cursor-pointer hover:bg-slate-100'>
+                        Edit Message
+                      </p>
+                      <p
+                        onClick={() => deleteMessage(message)}
+                        className=' px-2 py-1 cursor-pointer hover:bg-slate-100'
+                      >
+                        Delete
+                      </p>
+                    </div>
+                  </Menu>
+                </div>
+                <BsEmojiSmile
+                  className='hover:text-black text-text-aux-colour cursor-pointer'
+                  size={18}
+                />
               </div>
-            )}
-            {!!message.text?.trim().length && (
-              <div className='bg-imbue-lime-light   px-4 py-1.5 rounded-2xl text-right text-black'>
-                <p>{message.text}</p>
-              </div>
-            )}
-            {showProfile && (
-              <p className='text-[#7C8B9D]'>
-                {timeAgo.format(new Date(message.created_at))}
-              </p>
             )}
           </div>
         </div>
@@ -101,6 +193,7 @@ export default function MessageItem({
   }
   return (
     <div
+      id={message.id}
       className={classNames(
         'flex items-end gap-2 ',
         showProfile ? ' mt-1 mb-9' : 'my-1'
@@ -134,7 +227,7 @@ export default function MessageItem({
           <div className='flex gap-1 my-1 flex-wrap'>
             {message.attachments?.map((item: any) =>
               item.type === 'image/png' || item.type === 'image' ? (
-                <div className='' key={item.image_url}>
+                <div className='' key={'third' + item.image_url}>
                   <Image
                     onClick={() => setModal(item.image_url)}
                     className='w-80 cursor-pointer max-h-36 rounded-md object-cover'
@@ -147,7 +240,7 @@ export default function MessageItem({
               ) : (
                 <div
                   className='bg-imbue-lime-light text-black px-2 py-1 rounded-full'
-                  key={item.image_url}
+                  key={'fourth' + item.image_url}
                 >
                   <a className='underline' href={item.image_url}>
                     {item.name}

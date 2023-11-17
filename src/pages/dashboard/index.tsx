@@ -5,10 +5,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { StreamChat } from 'stream-chat';
 import 'stream-chat-react/dist/css/v2/index.css';
-
-import { getStreamChat } from '@/utils';
 
 import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
@@ -38,12 +35,12 @@ export type DashboardProps = {
 
 const Dashboard = (): JSX.Element => {
   const [loginModal, setLoginModal] = useState<boolean>(false);
-  const [client, setClient] = useState<StreamChat>();
   const [newUser, setNewUser] = useState(false);
   const {
     user,
     loading: loadingUser,
     error: userError,
+    client,
   } = useSelector((state: RootState) => state.userState);
   const [loadingStreamChat, setLoadingStreamChat] = useState<boolean>(true);
   const router = useRouter();
@@ -64,7 +61,6 @@ const Dashboard = (): JSX.Element => {
     const setupStreamChat = async () => {
       try {
         if (!user?.username && !loadingUser) return router.push('/');
-        setClient(await getStreamChat());
       } catch (error) {
         setError({ message: error });
       } finally {
@@ -76,14 +72,6 @@ const Dashboard = (): JSX.Element => {
 
   useEffect(() => {
     if (client && user?.username && !loadingStreamChat) {
-      client?.connectUser(
-        {
-          id: String(user.id),
-          username: user.username,
-          name: user.display_name,
-        },
-        user.getstream_token
-      );
       const getUnreadMessageChannels = async () => {
         const result = await client.getUnreadCount();
         dispatch(setUnreadMessage({ message: result.channels.length }));
