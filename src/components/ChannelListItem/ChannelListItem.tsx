@@ -38,6 +38,7 @@ export default function ChannelListItem({
       myChannelListener.unsubscribe();
     };
   }, [channel, user.id]);
+  
 
   return (
     <div
