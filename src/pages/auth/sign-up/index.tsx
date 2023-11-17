@@ -112,7 +112,7 @@ export default function SignIn() {
 
       if (resp.ok) {
         window.localStorage.setItem('newUser', '1');
-        redirect('/dashboard');
+        redirect('dashboard');
       } else {
         const errorMessage = await resp.json();
 
@@ -134,7 +134,7 @@ export default function SignIn() {
         account
       );
       if (resp.ok) {
-        redirect('/dashboard');
+        redirect('dashboard');
       }
     } catch (error) {
       // FIXME: error handling
