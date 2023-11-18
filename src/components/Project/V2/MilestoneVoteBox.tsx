@@ -114,10 +114,6 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
           projectId,
           firstPendingMilestone
         );
-        console.log(
-          '🚀 ~ file: MilestoneVoteBox.tsx:87 ~ syncVotes ~ voteResp:',
-          voteResp
-        );
         setVotes(voteResp);
         // const resp = await syncProjectVotes(projectId, firstPendingMilestone, votes)
       }
@@ -131,10 +127,6 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
         const voteResp = await getMilestoneVotes(
           projectId,
           firstPendingMilestone
-        );
-        console.log(
-          '🚀 ~ file: MilestoneVoteBox.tsx:99 ~ setVotingList ~ voteResp:',
-          voteResp
         );
         setVotes(voteResp);
         setMilestoneVotes(voteResp?.allVoters);

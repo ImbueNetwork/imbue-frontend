@@ -9,6 +9,7 @@ import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 
 import { Project, User } from '@/model';
 import ChainService from '@/redux/services/chainService';
+import { insertNoConfidenceVote } from '@/redux/services/projectServices';
 
 type MilestoneVoteBoxProps = {
     user: User;
@@ -21,10 +22,11 @@ type MilestoneVoteBoxProps = {
     setLoadingMain: (_value: boolean) => void;
     approversCount: number;
     approverVotedOnRefund: boolean;
+    loading: boolean;
 }
 
 const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
-    const { user, project, setLoadingMain, setError, noConfidenceVoters, approverVotedOnRefund } = props;
+    const { user, project, setLoadingMain, setError, noConfidenceVoters, approverVotedOnRefund, loading } = props;
 
     const [milestoneKeyInView, setMilestoneKeyInView] = useState<number>(0);
     const [showPolkadotAccounts, setShowPolkadotAccounts] = useState<boolean>(false);
@@ -45,7 +47,9 @@ const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
 
     useEffect(() => {
         const getNoConfidenceVotesChain = async () => {
-            if (!project.chain_project_id) return
+            if (!project.chain_project_id || !project.id || loading) return
+
+            console.log("hit", noVote);
 
             const imbueApi = await initPolkadotJSAPI(
                 process.env.IMBUE_NETWORK_WEBSOCK_ADDR!
@@ -63,11 +67,17 @@ const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
             const noconfidenceVotes = await chainService.getNoConfidenceVoters(
                 Number(project.chain_project_id)
             );
-            console.log("🚀 ~ file: NoConfidenceVoteBox.tsx:64 ~ getNoConfidenceVotesChain ~ noconfidenceVotes:", noconfidenceVotes)
+
+            if (!noconfidenceVotes.length) return
+            // the first no confidence vote will always be false so adding noConfidenceVotes[0] vote to the list if not added 
+            if (!yesVote.map(v => v.web3_address).includes(noconfidenceVotes[0]) && user.web3_address === noconfidenceVotes[0]) {
+                await insertNoConfidenceVote(project.id, { voter: user, vote: false })
+            }
         }
 
         getNoConfidenceVotesChain()
-    }, [project.chain_project_id])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [loading, project.chain_project_id, project.id])
 
     return (
         <div>
