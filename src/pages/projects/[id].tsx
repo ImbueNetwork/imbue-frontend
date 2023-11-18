@@ -37,6 +37,7 @@ import MilestoneVoteBox from '@/components/Project/V2/MilestoneVoteBox';
 import NoConfidenceBox from '@/components/Project/V2/NoConfidenceVoteBox';
 import NoConfidenceList from '@/components/Project/VotingList/NoConfidenceList';
 import VotingList from '@/components/Project/VotingList/VotingList';
+import ReviewButton from '@/components/Review/ReviewModal';
 import VoteModal from '@/components/ReviewModal/VoteModal';
 import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
@@ -360,6 +361,8 @@ function Project() {
     }
   };
 
+  const canReview = project?.milestones?.find((m: Milestone) => m.is_approved) ? true : false
+
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
       <div
@@ -432,21 +435,29 @@ function Project() {
                     </p>
                   )}
                 </div>
-                <div className='flex items-center space-x-2 mt-8'>
-                  <Image
-                    src={
-                      targetUser.profile_photo ||
-                      targetUser.profile_image ||
-                      '/profile-image.png'
-                    }
-                    width={100}
-                    height={100}
-                    alt='image'
-                    className='rounded-full w-10 h-10 object-cover'
-                  />
-                  <p className='text-imbue-coral'>
-                    {targetUser?.display_name}
-                  </p>
+                <div className='flex gap-2 mt-8 items-center justify-between'>
+                  <div className='flex items-center space-x-2'>
+                    <Image
+                      src={
+                        targetUser.profile_photo ||
+                        targetUser.profile_image ||
+                        '/profile-image.png'
+                      }
+                      width={100}
+                      height={100}
+                      alt='image'
+                      className='rounded-full w-10 h-10 object-cover'
+                    />
+                    <p className='text-imbue-coral break-all text-sm'>
+                      {targetUser?.display_name}
+                    </p>
+                  </div>
+                  {
+                    canReview && (
+                      <ReviewButton freelancerName={targetUser?.display_name} />
+                    )
+                  }
+
                 </div>
               </div>
 
