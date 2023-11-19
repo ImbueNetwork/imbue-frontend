@@ -49,6 +49,7 @@
     "cookies-next": "^2.1.1",
     "country-list": "^2.3.0",
     "csv-parser": "^3.0.0",
+    "dotenv": "^16.3.1",
     "eslint": "^8.42.0",
     "eslint-config-next": "^13.4.5",
     "eslint-config-prettier": "^8.8.0",
@@ -69,6 +70,7 @@
     "next": "13.2.4",
     "next-connect": "^0.13.0",
     "next-swagger-doc": "^0.4.0",
+    "openai": "^4.17.4",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "pg": "^8.7.1",
@@ -92,7 +94,7 @@
     "sharp": "^0.32.6",
     "slick-carousel": "^1.8.1",
     "stream-browserify": "^3.0.0",
-    "stream-chat": "^8.5.0",
+    "stream-chat": "^8.14.1",
     "stream-chat-react": "^10.7.3",
     "styled-components": "^5.3.9",
     "swagger-ui-react": "^4.19.0",
@@ -119,5 +121,18 @@
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.23",
     "tailwindcss": "^3.3.1"
-  }
+  },
+  "description": "<a href=\"https://github.com/w3f/Grants-Program/pull/703\"><img src=\"https://github.com/ImbueNetwork/website-assets/blob/main/Web3%20Foundation%20Grants%20Badge/PNG/web3%20foundation_grants_badge_black.png?raw=true\" alt=\"imbue-web3-open-grant\" /></a>",
+  "main": ".eslintrc.js",
+  "directories": {
+    "test": "tests"
+  },
+  "repository": "git+https://github.com/ImbueNetwork/imbue-frontend.git",
+  "keywords": [],
+  "author": "zey <zeypen6@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ImbueNetwork/imbue-frontend/issues"
+  },
+  "homepage": "https://github.com/ImbueNetwork/imbue-frontend#readme"
 }

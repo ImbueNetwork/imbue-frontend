@@ -35,6 +35,7 @@ import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { selectAccount } from '@/redux/services/polkadotService';
 //import { createProject } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
+import axios from 'axios';
 
 interface MilestoneItem {
   name: string;
@@ -71,6 +72,92 @@ export const SubmitProposal = (): JSX.Element => {
     approvers: '',
     milestones: [],
   });
+
+  const [milestones, setMilestones] = useState<MilestoneItem[]>([
+    { name: '', amount: undefined, description: '' },
+  ]);
+  const [keywords, setKeywords] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleGenerateContent = async () => {
+    const jobDescription = brief.description;
+    const jobSkills = brief.skills;
+    const jobBudget = brief.budget;
+
+    const prompt = `
+    As a skilled freelancer specializing in "${jobSkills}", you are applying for a project with the following details:
+    - Job Description: "${jobDescription}"
+    - Required Skills: "${jobSkills}"
+    - Client's Budget: "${jobBudget}"
+    - Additional Keywords (including the number of milestones, budget, skills): "${keywords}"
+  
+    Based on the user's input in "${keywords}", generate a milestone plan in JSON format. If the user specifies a number of milestones in "${keywords}", create that many milestones. Otherwise, default to a single milestone.
+  
+    Each milestone should include:
+    - A unique milestone number
+    - A specific name
+    - An allocated budget amount
+    - A detailed description relevant to each phase of the project
+  
+    The total budget for the project should align with the client's specified budget of "${jobBudget}", unless the user specifies a different budget.
+  
+    Example JSON response when a user specifies 2 milestones:
+    {
+      "application": [
+        {
+          "milestone": 1,
+          "name": "Initial Database Setup",
+          "amount": "5",
+          "description": "Setting up the database structure and preparing for API integration..."
+        },
+        {
+          "milestone": 2,
+          "name": "API Integration and GPT Development",
+          "amount": "5",
+          "description": "Integrating the API with the database and developing the custom GPT functionality..."
+        }
+      ]
+    }
+  
+    Example JSON response for a single milestone (if no specific number is mentioned, only create 1 milestone):
+    {
+      "application": [
+        {
+          "milestone": 1,
+          "name": "Complete Project Execution",
+          "amount": "${jobBudget}",
+          "description": "Comprehensive execution of the project including all necessary stages from initial setup to final integration..."
+        }
+      ]
+    }
+  
+    Ensure that the milestone descriptions reflect a logical progression in the project's development and align with the user's requirements as stated in "${keywords}".
+  `;
+  
+    setIsLoading(true);
+    try {
+      const response = await axios.post('/api/generate', { prompt, max_tokens: 500 });
+      const planJSON = JSON.parse(response.data.text);
+      console.log("Retrived Data:", planJSON)
+
+      if (planJSON.application && Array.isArray(planJSON.application)) {
+        const newMilestones = planJSON.application.map((item: any) => ({
+          name: item.name,
+          amount: parseFloat(item.amount),
+          description: item.description
+        }));
+
+        setMilestones(newMilestones);
+      } else {
+        console.error('Invalid format of planJSON:', planJSON);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
 
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
@@ -157,9 +244,6 @@ export const SubmitProposal = (): JSX.Element => {
   const imbueFeePercentage = 5;
 
   const milestonesRef = useRef<any>([]);
-  const [milestones, setMilestones] = useState<MilestoneItem[]>([
-    { name: '', amount: 0, description: '' },
-  ]);
 
   const durationOptions = timeData.sort((a, b) =>
     a.value > b.value ? 1 : a.value < b.value ? -1 : 0
@@ -339,6 +423,23 @@ export const SubmitProposal = (): JSX.Element => {
         {brief && <BriefInsights brief={brief} />}
       </div>
 
+      <div className='text-lg lg:text-[1.25rem] leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0 flex'>
+        <input
+          type="text"
+          maxLength={150}
+          className='border-2 w-1/2 text-base rounded-md py-3 px-5 text-imbue-purple-dark text-left placeholder:text-imbue-light-purple'
+          value={keywords}
+          onChange={(e) => setKeywords(e.target.value)}
+          placeholder="Enter your skills, and number of milestones"
+        />
+        <button
+          className='ml-2 px-5 py-2 bg-imbue-purple-dark text-white'
+          onClick={handleGenerateContent}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Generating...' : 'Generate an Application Form with AI'}
+        </button>
+      </div>
       <div className='milestones border border-white py-[2rem] rounded-[20px] bg-white'>
         <div className='flex flex-row justify-between mx-5 lg:mx-14 -mb-3'>
           <h3 className='text-lg lg:text-[1.25rem] leading-[1.5] text-imbue-purple-dark font-normal m-0 p-0 flex'>
@@ -390,8 +491,8 @@ export const SubmitProposal = (): JSX.Element => {
                       data-testid={`milestone-title-${index}`}
                       className='input-budget text-base rounded-md py-3 px-5 text-imbue-purple text-left placeholder:text-imbue-light-purple mb-1'
                       placeholder='Add milestone name here'
-                      value={name || ''}
                       name='milestoneTitle'
+                      value={name}
                       onChange={(e) => handleMilestoneChange(e, index)}
                     />
                     <div className='flex items-center justify-between mb-4'>
@@ -442,7 +543,7 @@ export const SubmitProposal = (): JSX.Element => {
                         data-testid={`milestone-amount-${index}`}
                         placeholder='Add an amount'
                         className='input-budget text-base rounded-[5px] py-3 pl-14 pr-5 text-imbue-purple text-right placeholder:text-imbue-light-purple'
-                        value={amount || ''}
+                        value={amount?.toString() || ''}
                         onChange={(e) => handleMilestoneChange(e, index)}
                         name='milestoneAmount'
                       />
