@@ -249,6 +249,7 @@ export default function VoteModal({
     }
   };
 
+  
   const handleVote = async () => {
     if (project?.brief_id) {
       setLoading(true);
