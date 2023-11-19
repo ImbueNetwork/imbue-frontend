@@ -45,6 +45,7 @@ interface VotingModalProps {
   setError: (_value: any) => void;
   targetUser?: any;
   projectType?: 'grant' | 'brief' | null;
+  approversPreview?: User[];
 }
 
 export default function VoteModal({
@@ -58,6 +59,7 @@ export default function VoteModal({
   setError,
   refundOnly = false,
   projectType,
+  approversPreview
 }: VotingModalProps) {
   const [vote, setVote] = useState<boolean>(true);
   const [voteRefund, setVoteRefund] = useState<boolean | undefined>();
@@ -173,6 +175,16 @@ export default function VoteModal({
               await insertNoConfidenceVote(project?.id, voteData);
               await updateProject(project?.id, project);
 
+              if (approversPreview?.length)
+                sendNotification(
+                  [...approversPreview.map(a => String(a.id)), String(project.user_id)],
+                  'refund_complete.testing',
+                  'Refund Completed',
+                  `The project {project_id} has been officially refunded. If you encounter any issues or have further concerns, please utilise the report feature for assistance.`,
+                  Number(project.id),
+                  Number(project.first_pending_milestone) + 1
+                );
+
               setVisible(true);
               setVoteRefund(vote);
               setStep(4);
@@ -224,6 +236,28 @@ export default function VoteModal({
               // project.project_in_voting_of_no_confidence = true;
               await updateProject(project?.id, { ...project, project_in_voting_of_no_confidence: true });
               await insertNoConfidenceVote(project?.id, voteData);
+
+              // notification to voters for knowing refund initialed
+              if (approversPreview?.length)
+                sendNotification(
+                  approversPreview.filter(a => a.id !== user.id)?.map(a => String(a.id)),
+                  'refund_initialed.testing',
+                  'Refund has been initiated for a grant',
+                  `One of your fellow grant voters initiated refund for project ${project.id}. Please add your vote on refunding the project`,
+                  Number(project.id),
+                  Number(project.first_pending_milestone) + 1
+                );
+
+              // notification to grant owner for knowing refund initialed
+              sendNotification(
+                [String(project.user_id)],
+                'refund_initialed.testing',
+                'Refund has been initiated for your grant',
+                `The client is requesting a refund due to their dissatisfaction with your work. Please review the project ${project.id} for more details.`,
+                Number(project.id),
+                Number(project.first_pending_milestone) + 1
+              );
+
               setStep(4);
               setVoteRefund(vote);
               setVisible(true);
@@ -249,7 +283,7 @@ export default function VoteModal({
     }
   };
 
-  
+
   const handleVote = async () => {
     if (project?.brief_id) {
       setLoading(true);

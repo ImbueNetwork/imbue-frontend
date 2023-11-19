@@ -696,6 +696,7 @@ function Project() {
           votingWalletAccount,
           projectType,
           targetUser,
+          approversPreview
         }}
       />
 
