@@ -89,6 +89,7 @@ export const SubmitProposal = (): JSX.Element => {
     - Job Description: "${jobDescription}"
     - Required Skills: "${jobSkills}"
     - Client's Budget: "${jobBudget}"
+    - Freelancers's Skills: "${jobSkills}"
     - Additional Keywords (including the number of milestones, budget, skills): "${keywords}"
   
     Based on the user's input in "${keywords}", generate a milestone plan in JSON format. If the user specifies a number of milestones in "${keywords}", create that many milestones. Otherwise, default to a single milestone.
@@ -100,21 +101,23 @@ export const SubmitProposal = (): JSX.Element => {
     - A detailed description relevant to each phase of the project
   
     The total budget for the project should align with the client's specified budget of "${jobBudget}", unless the user specifies a different budget.
+
+    Generate milestone description based on the brief requirement
   
     Example JSON response when a user specifies 2 milestones:
     {
       "application": [
         {
           "milestone": 1,
-          "name": "Initial Database Setup",
+          "name": "Milestone 1 name",
           "amount": "5",
-          "description": "Setting up the database structure and preparing for API integration..."
+          "description": "Milestone 1 description..."
         },
         {
           "milestone": 2,
-          "name": "API Integration and GPT Development",
+          "name": "Milestone 2 name",
           "amount": "5",
-          "description": "Integrating the API with the database and developing the custom GPT functionality..."
+          "description": "Milestone 2 description..."
         }
       ]
     }
