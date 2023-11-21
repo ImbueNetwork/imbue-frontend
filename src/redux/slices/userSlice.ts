@@ -23,6 +23,7 @@ export const initialState: {
     display_name: '',
     username: '',
     getstream_token: '',
+    email: '',
   },
   message: 0,
   loading: true,
