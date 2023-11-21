@@ -1,14 +1,15 @@
 import { Knex } from 'knex';
 
-export interface RreviewType {
+export interface Review {
   user_id: number;
   reviewer_id: number;
   title: string;
   description: string;
   ratings: number;
+  project_id?: string | number;
 }
 
-export const getReviewByFreelancer =
+export const getAllReviewsOfUser =
   (user_id: number) => async (tx: Knex.Transaction) =>
     tx('reviews')
       .select(
@@ -28,9 +29,8 @@ export const getReviewByFreelancer =
       .leftJoin('users', 'user_id', 'users.id');
 
 export const getReviewByUser =
-  (review: RreviewType) => async (tx: Knex.Transaction) =>
+  (review: Review) => async (tx: Knex.Transaction) =>
     tx('reviews').insert(review);
 
-export const postReview =
-  (review: RreviewType) => async (tx: Knex.Transaction) =>
-    tx('reviews').insert(review).returning('id');
+export const postReview = (review: Review) => async (tx: Knex.Transaction) =>
+  tx('reviews').insert(review).returning('id');

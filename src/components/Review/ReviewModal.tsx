@@ -3,9 +3,8 @@ import React, { useState } from 'react';
 import { FaStar } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 
-import { apiBase } from '@/config';
-import { postAPIHeaders } from '@/config';
 import { Project, User } from '@/model';
+import { postReviewService } from '@/redux/services/reviewServices';
 import { RootState } from '@/redux/store/store';
 
 import InputOutlined from '../Common/InputOutlined';
@@ -15,7 +14,11 @@ import { LoginPopupStateType } from '../Layout';
 interface ReviewModalProps {
     targetUser: User;
     project: Project;
-    setShowLoginPopup: (_value: LoginPopupStateType) => void
+    setShowLoginPopup: (_value: LoginPopupStateType) => void;
+    setLoading: (_value: boolean) => void;
+    setSuccessTitle: (_value: string) => void;
+    setSuccess: (_value: boolean) => void;
+    setError: (_value: any) => void;
 }
 
 const labels: { [index: string]: string } = {
@@ -30,11 +33,11 @@ function getLabelText(value: number) {
     return `${value} Star${value !== 1 ? 's' : ''}, ${labels[value]}`;
 }
 
-const ReviewButton = ({ targetUser, project, setShowLoginPopup }: ReviewModalProps) => {
+const ReviewButton = ({ targetUser, project, setShowLoginPopup, setSuccess, setSuccessTitle, setLoading, setError }: ReviewModalProps) => {
     const [open, setOpen] = useState<boolean>(false)
     const [hover, setHover] = React.useState(-1);
 
-    const [rating, setRating] = React.useState<number | null>(3);
+    const [rating, setRating] = React.useState<number>(3);
     const [title, setTitle] = useState<string>("")
     const [description, setDescription] = useState<string>("")
 
@@ -45,19 +48,26 @@ const ReviewButton = ({ targetUser, project, setShowLoginPopup }: ReviewModalPro
     const handleClose = () => setOpen(false);
 
     const handleSubmit = async () => {
-        const resp = await fetch(`${apiBase}reviews`, {
-            method: 'Post',
-            headers: postAPIHeaders,
-            body: JSON.stringify({
-                title,
-                description,
-                ratings: rating,
-                user_id: targetUser.id
-            })
-        })
+        setLoading(true);
+        handleClose();
 
-        console.log(await resp.json());
+        const review = {
+            title,
+            description,
+            ratings: rating,
+            user_id: targetUser.id,
+            project_id: project.id,
+            reviewer_id: user.id,
+        }
+        const resp = await postReviewService(review)
 
+        if (resp.status === 'success') {
+            setSuccess(true);
+            setSuccessTitle("Your review has been successfully submitted")
+        } else {
+            setError({ message: resp.message })
+        }
+        setLoading(false);
     }
 
     return (
@@ -83,7 +93,7 @@ const ReviewButton = ({ targetUser, project, setShowLoginPopup }: ReviewModalPro
                                     value={rating}
                                     getLabelText={getLabelText}
                                     onChange={(event, newValue) => {
-                                        setRating(newValue);
+                                        setRating(newValue || 0);
                                     }}
                                     onChangeActive={(event, newHover) => {
                                         setHover(newHover);

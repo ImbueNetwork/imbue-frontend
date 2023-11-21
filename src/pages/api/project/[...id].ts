@@ -4,6 +4,7 @@ import nextConnect from 'next-connect';
 import passport from 'passport';
 
 import * as models from '@/lib/models';
+import { Review } from '@/lib/queryServices/reviewQueries';
 import { initPolkadotJSAPI } from '@/utils/polkadot';
 
 import db from '@/db';
@@ -15,6 +16,7 @@ import { authenticate, verifyUserIdFromJwt } from '../auth/common';
 type ProjectPkg = models.Project & {
   milestones: models.Milestone[];
   approvers?: string[];
+  reviews?: Review[];
 };
 
 export default nextConnect()
@@ -51,6 +53,9 @@ export default nextConnect()
         });
 
         const attachments = await Promise.all(attachmentPromises);
+        const reviews = await tx('reviews')
+          .select('*')
+          .where({ project_id: projectId });
 
         const pkg: ProjectPkg = {
           ...project,
@@ -59,14 +64,15 @@ export default nextConnect()
             attachments: attachments[index],
           })),
           approvers: approvers.map(({ approver }: any) => approver),
+          reviews,
         };
 
         const updatedProject = await syncProject(pkg, tx);
         return res.status(200).send(updatedProject);
         // return res.status(200).send(pkg);
       } catch (e) {
-        return res.status(404).end();
-        new Error(`Failed to fetch project by id: ${id}`, {
+        res.status(404).end();
+        throw new Error(`Failed to fetch project by id: ${id}`, {
           cause: e as Error,
         });
       }
@@ -236,9 +242,9 @@ const syncProject = async (project: any, tx: any) => {
       if (
         firstPendingMilestoneChain === project.first_pending_milestone &&
         project.project_in_milestone_voting ===
-        onChainProjectRes.projectInMilestoneVoting &&
+          onChainProjectRes.projectInMilestoneVoting &&
         project.project_in_voting_of_no_confidence ===
-        onChainProjectRes.projectInVotingOfNoConfidence &&
+          onChainProjectRes.projectInVotingOfNoConfidence &&
         !milestonesRequiresSync
       )
         return project;
@@ -289,10 +295,12 @@ const syncProject = async (project: any, tx: any) => {
 
       return pkg;
     } else {
-      const userCompletedProjects: number[] = (await imbueApi.api.query.imbueProposals.completedProjects(
-        project.owner
-      )).toJSON() as number[];
-      const projectCompleted = userCompletedProjects.includes(project.chain_project_id);
+      const userCompletedProjects: number[] = (
+        await imbueApi.api.query.imbueProposals.completedProjects(project.owner)
+      ).toJSON() as number[];
+      const projectCompleted = userCompletedProjects.includes(
+        project.chain_project_id
+      );
 
       if (projectCompleted) {
         project.milestones.map(async (item: any) => {
@@ -302,7 +310,6 @@ const syncProject = async (project: any, tx: any) => {
             { withdrawn_onchain: true }
           )(tx);
         });
-
       }
       return project;
     }

@@ -3,7 +3,7 @@ import nextConnect from 'next-connect';
 import passport from 'passport';
 
 import {
-  getReviewByFreelancer as getReviewsOfUser,
+  getAllReviewsOfUser,
   postReview,
 } from '@/lib/queryServices/reviewQueries';
 
@@ -22,7 +22,7 @@ export default nextConnect()
         if (!user_id)
           return res.status(404).json({ message: `Freelancer id not found` });
 
-        const resp = await getReviewsOfUser(Number(user_id))(tx);
+        const resp = await getAllReviewsOfUser(Number(user_id))(tx);
 
         res.status(200).json(resp);
       } catch (error) {
@@ -35,7 +35,7 @@ export default nextConnect()
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
     db.transaction(async (tx) => {
       try {
-        const { user_id, title, description, ratings } = req.body;
+        const { user_id, title, description, ratings, project_id } = req.body;
 
         const userAuth: Partial<User> | any = await authenticate(
           'jwt',
@@ -45,6 +45,12 @@ export default nextConnect()
         verifyUserIdFromJwt(req, res, [userAuth.id]);
 
         const reviewer_id = userAuth.id;
+
+        if (user_id == reviewer_id)
+          return res.status(500).send({
+            status: 'error',
+            message: `You cannot review your own profile`,
+          });
 
         if (!user_id || !user_id || !ratings)
           return res.status(500).send({
@@ -58,10 +64,10 @@ export default nextConnect()
           title,
           description,
           ratings,
+          project_id,
         };
 
         const resp = await postReview(review)(tx);
-        console.log('🚀 ~ file: index.ts:67 ~ db.transaction ~ resp:', resp);
 
         if (!resp)
           return res
