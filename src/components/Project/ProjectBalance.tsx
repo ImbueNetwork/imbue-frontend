@@ -82,14 +82,13 @@ const ProjectBalance = (props: ProjectBalanceType) => {
             }
         }
 
-        getAndSetBalace();
         if (currency_id == undefined) {
             setCurrency_id(project.currency_id);
         }
 
         const timer = setInterval(() => {
             getAndSetBalace();
-        }, 5000);
+        }, 10000);
         return () => clearInterval(timer);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps

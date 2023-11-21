@@ -2,14 +2,14 @@ import { Knex } from 'knex';
 
 export interface RreviewType {
   user_id: number;
-  freelancer_id: number;
+  reviewer_id: number;
   title: string;
   description: string;
   ratings: number;
 }
 
 export const getReviewByFreelancer =
-  (freelancer_id: number) => async (tx: Knex.Transaction) =>
+  (user_id: number) => async (tx: Knex.Transaction) =>
     tx('reviews')
       .select(
         'reviews.id',
@@ -24,7 +24,7 @@ export const getReviewByFreelancer =
         'users.region',
         'users.username'
       )
-      .where({ freelancer_id })
+      .where({ user_id })
       .leftJoin('users', 'user_id', 'users.id');
 
 export const getReviewByUser =
@@ -33,4 +33,4 @@ export const getReviewByUser =
 
 export const postReview =
   (review: RreviewType) => async (tx: Knex.Transaction) =>
-    tx('reviews').insert(review).returning('id').first()
+    tx('reviews').insert(review).returning('id');

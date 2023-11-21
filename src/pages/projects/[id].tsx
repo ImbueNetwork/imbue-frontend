@@ -454,7 +454,10 @@ function Project() {
                   </div>
                   {
                     canReview && (
-                      <ReviewButton freelancerName={targetUser?.display_name} />
+                      <ReviewButton
+                        setShowLoginPopup={setShowLoginPopup}
+                        project={project}
+                        targetUser={targetUser} />
                     )
                   }
 
