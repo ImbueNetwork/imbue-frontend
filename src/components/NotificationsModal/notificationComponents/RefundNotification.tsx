@@ -8,6 +8,8 @@ export default function RefundNotification(activity: any) {
             router.push(`/profile/${activity.data.sender.username}`);
         } else router.push(`/projects/${activity.data.briefId}`);
     };
+
+    const text = `<span class='mx-0.5 underline text-imbue-purple'>project</span>`
     return (
         <div
             onClick={handleClick}
@@ -28,6 +30,7 @@ export default function RefundNotification(activity: any) {
                 </p>
                 <p className='text-sm mt-3'>
                     {activity.data.text}
+                    <p dangerouslySetInnerHTML={{ __html: text }} ></p>
                 </p>
             </div>
         </div>

@@ -56,12 +56,11 @@ export default function NotificationsModal({ onClose }: { onClose: any }) {
                 {activity.object === 'AddApprovers.testing' && (
                   <GrantApproversNotifications {...activity} />
                 )}
-                {activity.object === "refund.initiated" && (
-                  <RefundNotification {...activity} />
-                )}
-                {activity.object === "refund.complete" && (
-                  <RefundNotification {...activity} />
-                )}
+                {
+                  activity.object === "refund.initiated" ||
+                  activity.object === "refund.complete" && (
+                    <RefundNotification {...activity} />
+                  )}
               </div>
             )}
           />

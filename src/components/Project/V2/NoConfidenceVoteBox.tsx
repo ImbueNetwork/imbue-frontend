@@ -49,8 +49,6 @@ const NoConfidenceBox = (props: MilestoneVoteBoxProps) => {
         const getNoConfidenceVotesChain = async () => {
             if (!project.chain_project_id || !project.id || loading) return
 
-            console.log("hit", noVote);
-
             const imbueApi = await initPolkadotJSAPI(
                 process.env.IMBUE_NETWORK_WEBSOCK_ADDR!
             );

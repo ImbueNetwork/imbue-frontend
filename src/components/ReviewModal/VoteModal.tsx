@@ -180,7 +180,7 @@ export default function VoteModal({
                   [...approversPreview.map(a => String(a.id)), String(project.user_id)],
                   'refund.complete',
                   'Refund Completed',
-                  `The project ID: ${project.chain_project_id} has been officially refunded. If you encounter any issues or have further concerns, please utilise the report feature for assistance.`,
+                  `The project <span class='mx-0.5 underline text-imbue-purple'>project</span> has been officially refunded. If you encounter any issues or have further concerns, please utilise the report feature for assistance.`,
                   Number(project.id),
                   Number(project.first_pending_milestone) + 1
                 );
@@ -243,7 +243,7 @@ export default function VoteModal({
                   approversPreview.filter(a => a.id !== user.id)?.map(a => String(a.id)),
                   'refund.initiated',
                   'Refund has been initiated for a grant',
-                  `One of your fellow grant voters initiated refund for project ID: ${project.chain_project_id}.. Please add your vote on refunding the project`,
+                  `One of your fellow grant voters initiated refund for project <span class='mx-0.5 underline text-imbue-purple'>project</span>. Please add your vote on refunding the project`,
                   Number(project.id),
                   Number(project.first_pending_milestone) + 1
                 );
@@ -253,7 +253,7 @@ export default function VoteModal({
                 [String(project.user_id)],
                 'refund.initiated',
                 'Refund has been initiated for your grant',
-                `The client is requesting a refund due to their dissatisfaction with your work. Please review the project ID: ${project.chain_project_id}. for more details.`,
+                `The client is requesting a refund due to their dissatisfaction with your work. Please review the project <span class='mx-0.5 underline text-imbue-purple'>project</span>. for more details.`,
                 Number(project.id),
                 Number(project.first_pending_milestone) + 1
               );
@@ -272,7 +272,7 @@ export default function VoteModal({
                   approversPreview.filter(a => a.id !== user.id)?.map(a => String(a.id)),
                   'refund.initiated',
                   'Refund has been initiated for a grant',
-                  `One of your fellow grant voters initiated refund for project ID: ${project.chain_project_id}. Please add your vote on refunding the project`,
+                  `One of your fellow grant voters initiated refund for project <span class='mx-0.5 underline text-imbue-purple'>project</span>. Please add your vote on refunding the project`,
                   Number(project.id),
                   Number(project.first_pending_milestone) + 1
                 );
@@ -282,7 +282,7 @@ export default function VoteModal({
                 [String(project.user_id)],
                 'refund.initiated',
                 'Refund has been initiated for your grant',
-                `The client is requesting a refund due to their dissatisfaction with your work. Please review the project ID: ${project.chain_project_id}. for more details.`,
+                `The client is requesting a refund due to their dissatisfaction with your work. Please review the project <span class='mx-0.5 underline text-imbue-purple'>project</span>. for more details.`,
                 Number(project.id),
                 Number(project.first_pending_milestone) + 1
               );
