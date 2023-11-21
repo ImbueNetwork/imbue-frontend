@@ -22,6 +22,7 @@ export default function Messages() {
     }
     setSelectedChannel(Selected);
   };
+  
 
   const getChannel = async () => {
     if (!client) return;
