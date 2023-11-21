@@ -9,7 +9,6 @@ export default function RefundNotification(activity: any) {
         } else router.push(`/projects/${activity.data.briefId}`);
     };
 
-    const text = `<span class='mx-0.5 underline text-imbue-purple'>project</span>`
     return (
         <div
             onClick={handleClick}
@@ -29,8 +28,7 @@ export default function RefundNotification(activity: any) {
                     {activity.data.title || 'You have a notification'}
                 </p>
                 <p className='text-sm mt-3'>
-                    {activity.data.text}
-                    <p dangerouslySetInnerHTML={{ __html: text }} ></p>
+                    <p dangerouslySetInnerHTML={{ __html: activity.data.text }} ></p>
                 </p>
             </div>
         </div>
