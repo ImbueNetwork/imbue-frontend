@@ -606,6 +606,7 @@ function Project() {
                 <NoConfidenceBox
                   noConfidenceVoters={noConfidenceVoters}
                   setLoadingMain={setLoading}
+                  loading={loading}
                   approversCount={approversPreview?.length || 0}
                   {...{
                     setError,
@@ -695,6 +696,7 @@ function Project() {
           votingWalletAccount,
           projectType,
           targetUser,
+          approversPreview
         }}
       />
 
