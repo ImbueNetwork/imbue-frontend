@@ -28,3 +28,12 @@ export const deleteMessage = async (
     await client.deleteMessage(message.id);
   }
 };
+
+export const flagMessages = async (
+  message: FormatMessageResponse<DefaultGenerics>
+) => {
+  const { client } = store.getState().userState;
+  if (client) {
+    await client.flagMessage(message.id);
+  }
+};

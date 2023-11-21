@@ -5,10 +5,11 @@ import en from 'javascript-time-ago/locale/en.json';
 import Image from 'next/image';
 import { useState } from 'react';
 import { BsEmojiSmile, BsThreeDotsVertical } from 'react-icons/bs';
-import { DefaultGenerics, FormatMessageResponse } from 'stream-chat';
+import { FormatMessageResponse } from 'stream-chat';
 
 import {
   deleteMessage,
+  flagMessages,
   setPinMessage,
   setUnPinMessage,
 } from '@/utils/MessageOptions';
@@ -20,14 +21,20 @@ import ImageCurosal from './ImageCurosal';
 TimeAgo.addLocale(en);
 const timeAgo = new TimeAgo('en-US');
 
+export interface CustomMessage extends FormatMessageResponse {
+  parent_message: FormatMessageResponse;
+}
+
 export default function MessageItem({
   message,
   user,
   showProfile,
+  handleReplayMessage,
 }: {
+  handleReplayMessage: (_message: FormatMessageResponse) => void;
   user: User;
   showProfile: boolean;
-  message: FormatMessageResponse<DefaultGenerics>;
+  message: CustomMessage | any;
 }) {
   const [isModal, setModal] = useState<string | false>(false);
   const [modal, setModal1] = useState<boolean>(false);
@@ -59,7 +66,7 @@ export default function MessageItem({
           id={message.id}
           className={classNames(
             'flex group flex-row-reverse items-end gap-2 ',
-            showProfile ? ' mt-1 mb-9' : 'my-1'
+            message.parent_id ? 'mt-9' : showProfile ? ' mt-1 mb-9' : 'my-1'
           )}
         >
           {showProfile && (
@@ -75,8 +82,21 @@ export default function MessageItem({
             />
           )}
           {!showProfile && <div className='w-10 h-10' />}
-          <div className='flex flex-row-reverse gap-3 items-center w-full'>
-            <div className='flex relative max-w-[70%]  flex-col items-end'>
+          <div className='flex relative h-auto flex-row-reverse gap-3 items-center w-full'>
+            {message.parent_id && (
+              <div className='bg-gray-300 absolute cursor-pointer  -top-8 rounded-3xl pt-1.5 pb-2 min-w-fit text-gray-600 px-5'>
+                {message.parent_message?.attachments?.length > 0 && (
+                  <p>Attachments</p>
+                )}
+                <p>
+                  {message.parent_message?.text?.length &&
+                  message.parent_message?.text?.length > 50
+                    ? message.parent_message?.text?.substring(0, 50) + '...'
+                    : message.parent_message.text}
+                </p>
+              </div>
+            )}
+            <div className='flex  relative max-w-[70%]  flex-col items-end'>
               {message.pinned && !message.deleted_at && (
                 <Image
                   src={'/pin.png'}
@@ -149,7 +169,10 @@ export default function MessageItem({
                       onClick={handleCloseModal}
                       className=' text-black min-w-24 rounded-2xl'
                     >
-                      <p className='px-2 py-1 cursor-pointer hover:bg-slate-100'>
+                      <p
+                        onClick={() => handleReplayMessage(message)}
+                        className='px-2 py-1 cursor-pointer hover:bg-slate-100'
+                      >
                         Replay
                       </p>
                       {!message.pinned ? (
@@ -195,8 +218,8 @@ export default function MessageItem({
     <div
       id={message.id}
       className={classNames(
-        'flex items-center gap-2 ',
-        showProfile ? ' mt-1 mb-9' : 'my-1'
+        'flex items-center gap-2 relative ',
+        message.parent_id ? 'mt-9' : showProfile ? ' mt-1 mb-9' : 'my-1'
       )}
     >
       <Modal
@@ -222,7 +245,19 @@ export default function MessageItem({
         />
       )}
       {!showProfile && <div className='w-10 h-10' />}
-
+      {message.parent_id && (
+        <div className='bg-gray-300 absolute cursor-pointer left-12 -top-8 rounded-3xl pt-1.5 pb-2 min-w-fit text-gray-600 px-5'>
+          {message.parent_message?.attachments?.length > 0 && (
+            <p>Attachments</p>
+          )}
+          <p>
+            {message.parent_message?.text?.length &&
+            message.parent_message?.text?.length > 50
+              ? message.parent_message?.text?.substring(0, 50) + '...'
+              : message.parent_message?.text}
+          </p>
+        </div>
+      )}
       <div className='flex relative max-w-[70%] flex-col items-start'>
         {message.pinned && !message.deleted_at && (
           <Image
@@ -296,7 +331,10 @@ export default function MessageItem({
                 onClick={handleCloseModal}
                 className=' text-black w-24 rounded-2xl'
               >
-                <p className='px-2 py-1 cursor-pointer hover:bg-slate-100'>
+                <p
+                  onClick={() => handleReplayMessage(message)}
+                  className='px-2 py-1 cursor-pointer hover:bg-slate-100'
+                >
                   Replay
                 </p>
                 {!message.pinned ? (
@@ -315,7 +353,7 @@ export default function MessageItem({
                   </p>
                 )}
                 <p
-                  onClick={() => setUnPinMessage(message)}
+                  onClick={() => flagMessages(message)}
                   className=' px-2 py-1 cursor-pointer hover:bg-slate-100'
                 >
                   Flag

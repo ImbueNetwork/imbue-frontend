@@ -21,9 +21,13 @@ import {
   User,
 } from 'stream-chat';
 
+import { fetchUser } from '@/utils';
+
 import { RootState } from '@/redux/store/store';
 
 import MessageItem from './MessageItem';
+import MessageSideBar from './MessageSideBar';
+import PinMessages from './PinMessages';
 
 type lastMessageType = {
   date: Date;
@@ -45,17 +49,21 @@ export default function MessageBox({
   const { user, client } = useSelector((state: RootState) => state.userState);
   const [targetUser, setTargetUser] = useState<User>();
   const [isTyping, setTyping] = useState(false);
+  const [isPinedMessageOpen, setPinnedMessageOpen] = useState(false);
   const [textVal, setTextVal] = useState<string>('');
   const [selectedImages, setSelectedImages] = useState<imagesType[]>([]);
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [isEmojiOpen, setEmojiOpen] = useState<boolean>(false);
+  const [targetUserDetails, setTargetUserDetails] = useState<any | null>(null);
   const [messages, setMessages] = useState<
     FormatMessageResponse<DefaultGenerics>[]
   >([]);
   const [messageId, setMessageId] = useState<string | null>(null);
-
+  const [isReplayMessage, setReplayMessage] =
+    useState<FormatMessageResponse | null>(null);
   useEffect(() => {
     setMessageId(null);
+    setTargetUserDetails(null);
   }, [channel]);
 
   useEffect(() => {
@@ -102,6 +110,18 @@ export default function MessageBox({
     client,
   ]);
 
+  const getUserDetailsForChannel = async () => {
+    if (isPinedMessageOpen) {
+      setPinnedMessageOpen(false);
+    }
+    if (targetUserDetails) {
+      setTargetUserDetails(null);
+      return;
+    }
+    const user = await fetchUser(Number(targetUser?.id || 0));
+    setTargetUserDetails(user);
+  };
+
   const handleTyping = async () => {
     await channel.keystroke();
   };
@@ -132,8 +152,19 @@ export default function MessageBox({
           name: item.name,
         };
       });
-      await channel.sendMessage({ text: textVal, attachments: attachment });
+
+      if (isReplayMessage !== null) {
+        await channel.sendMessage({
+          text: textVal,
+          attachments: attachment,
+          parent_id: isReplayMessage.id,
+          parent_message: isReplayMessage,
+          show_in_channel: true,
+        });
+      } else
+        await channel.sendMessage({ text: textVal, attachments: attachment });
     }
+    setReplayMessage(() => null);
     setTextVal('');
     setSelectedImages([]);
     const { messages } = channel.state.messageSets[0];
@@ -207,6 +238,13 @@ export default function MessageBox({
     setPrevKey('');
   };
 
+  const handleBarOptions = () => {
+    if (targetUserDetails) {
+      setTargetUserDetails(null);
+    }
+    setPinnedMessageOpen((val) => !val);
+  };
+
   const handleReadMessage = async () => {
     if (channel.countUnread() > 0) {
       await channel.markRead();
@@ -214,189 +252,259 @@ export default function MessageBox({
   };
 
   return (
-    <div
-      onClick={handleReadMessage}
-      className="border-[4px] relative h-full bg-[url('/message-box-pattern.svg')]  back  rounded-2xl"
-    >
-      {/* messaging header sections */}
-      <div className='bg-white justify-between items-center flex rounded-xl px-5 py-3'>
-        <div className='flex'>
-          <div className='w-14 justify-self-start  relative'>
-            <Image
-              className='w-12 h-12  object-cover rounded-full'
-              src={
-                targetUser?.profile_photo ||
-                require('@/assets/images/profile-image.png')
-              }
-              width={100}
-              height={200}
-              alt='image'
-            />
-            <div
-              className={classNames(
-                'w-3 h-3 absolute -bottom-0.5 border-2 right-3  rounded-full',
-                targetUser?.online
-                  ? 'bg-[#437EF7]'
-                  : 'border-white bg-[#DAE0E6]'
-              )}
-            />
+    <div className='flex h-full'>
+      <div
+        onClick={handleReadMessage}
+        className="border-[4px] w-full relative h-full bg-[url('/message-box-pattern.svg')]  back  rounded-2xl"
+      >
+        {/* messaging header sections */}
+        <div className='bg-white w-full justify-between items-center flex rounded-xl px-5 py-3'>
+          <div className='flex'>
+            <div className='w-14 justify-self-start  relative'>
+              <Image
+                className='w-12 h-12  object-cover rounded-full'
+                src={
+                  targetUser?.profile_photo ||
+                  require('@/assets/images/profile-image.png')
+                }
+                width={100}
+                height={200}
+                alt='image'
+              />
+              <div
+                className={classNames(
+                  'w-3 h-3 absolute -bottom-0.5 border-2 right-3  rounded-full',
+                  targetUser?.online
+                    ? 'bg-[#437EF7]'
+                    : 'border-white bg-[#DAE0E6]'
+                )}
+              />
+            </div>
+            <div>
+              <p className='text-black'>{targetUser?.name}</p>
+              <p className='text-text-aux-colour text-sm'>
+                {targetUser?.online ? 'Online' : 'Offline'}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className='text-black'>{targetUser?.name}</p>
-            <p className='text-text-aux-colour text-sm'>
-              {targetUser?.online ? 'Online' : 'Offline'}
+          <div className='flex text-text-aux-colour gap-4  items-center'>
+            <p className='cursor-pointer p-3 flex items-center  rounded-full hover:bg-imbue-lime-light'>
+              <BsArchive size={18} />
             </p>
+            <BsPinAngle
+              size={44}
+              onClick={handleBarOptions}
+              className='-rotate-45 rounded-full p-3 hover:bg-imbue-lime-light cursor-pointer'
+            />
+            <AiOutlineFlag
+              className='cursor-pointer rounded-full p-3 hover:bg-imbue-lime-light'
+              size={44}
+            />
+            <AiOutlineInfoCircle
+              onClick={getUserDetailsForChannel}
+              className='cursor-pointer p-3 rounded-full hover:bg-imbue-lime-light'
+              size={44}
+            />
           </div>
         </div>
-        <div className='flex text-text-aux-colour gap-7 items-center'>
-          <BsArchive size={20} />
-          <BsPinAngle size={22} className='-rotate-45' />
-          <AiOutlineFlag size={22} />
-          <AiOutlineInfoCircle size={22} />
-        </div>
-      </div>
-      {/* messaging header sections ends */}
-      <div
-        id='message_box'
-        style={{ height: hState }}
-        className='max-h-[60vh] h-full overflow-auto'
-      >
-        {messages?.map((item, index) => {
-          let bool = false;
-          if (!lastMessage) {
-            lastMessage = {
-              date: item.created_at,
-              user_id: Number(item.user?.id),
-            };
-          }
+        {/* messaging header sections ends */}
+        <div
+          id='message_box'
+          style={{ height: hState }}
+          className='max-h-[60vh] h-full overflow-auto'
+        >
+          {messages?.map((item, index) => {
+            let bool = false;
+            if (!lastMessage) {
+              lastMessage = {
+                date: item.created_at,
+                user_id: Number(item.user?.id),
+              };
+            }
 
-          if (index + 1 >= messages.length) {
-            bool = true;
-          } else if (
-            new Date(messages[index + 1].created_at).getUTCMinutes() -
-              new Date(lastMessage.date).getUTCMinutes() >
-              2 ||
-            lastMessage.user_id !== Number(messages[index + 1].user?.id)
-          ) {
-            bool = true;
-            lastMessage = {
-              date: messages[index + 1].created_at,
-              user_id: Number(messages[index + 1].user?.id),
-            };
-          }
-          return (
-            <MessageItem
-              key={item.id}
-              user={user}
-              message={item}
-              showProfile={bool}
-            />
-          );
-        })}
-        {isTyping && (
-          <div className='flex animate-bounce gap-1 ml-14'>
-            <div className='w-3 animate-bounce bg-text-aux-colour h-3 rounded-full' />
-            <div className='w-3 animate-bounce bg-text-aux-colour h-3 rounded-full' />
-            <div className='w-3 animate-bounce bg-text-aux-colour h-3 rounded-full' />
-            <div className='w-3 animate-bounce bg-text-aux-colour h-3 rounded-full' />
-          </div>
-        )}
-      </div>
-      <div
-        ref={inputMessageRef}
-        id='input_message'
-        className='bg-white absolute w-[99%]  h-auto py-2 mx-2 px-2  bottom-0 rounded-lg'
-      >
-        {selectedImages.length > 0 && (
-          <div className='flex items-center gap-3'>
-            {selectedImages.map((item) =>
-              item.type === 'image/png' ? (
-                <div className='w-32 relative h-32' key={item.duration}>
-                  <Image
-                    className='w-32 h-32 object-fill '
-                    src={item.file}
-                    width={1920}
-                    height={1020}
-                    alt='selected images'
-                  />
-                  <IoIosRemoveCircleOutline
-                    onClick={() => removeItem(item.file)}
-                    className='text-text-aux-colour z-10 top-0 right-0 absolute cursor-pointer hover:text-black
+            if (index + 1 >= messages.length) {
+              bool = true;
+            } else if (
+              new Date(messages[index + 1].created_at).getUTCMinutes() -
+                new Date(lastMessage.date).getUTCMinutes() >
+                2 ||
+              lastMessage.user_id !== Number(messages[index + 1].user?.id)
+            ) {
+              bool = true;
+              lastMessage = {
+                date: messages[index + 1].created_at,
+                user_id: Number(messages[index + 1].user?.id),
+              };
+            }
+            return (
+              <MessageItem
+                handleReplayMessage={setReplayMessage}
+                key={item.id}
+                user={user}
+                message={item}
+                showProfile={bool}
+              />
+            );
+          })}
+          {isTyping && (
+            <div className='flex animate-bounce gap-1 ml-14'>
+              <div className='w-3 animate-bounce bg-text-aux-colour h-3 rounded-full' />
+              <div className='w-3 animate-bounce bg-text-aux-colour h-3 rounded-full' />
+              <div className='w-3 animate-bounce bg-text-aux-colour h-3 rounded-full' />
+              <div className='w-3 animate-bounce bg-text-aux-colour h-3 rounded-full' />
+            </div>
+          )}
+        </div>
+        <div
+          ref={inputMessageRef}
+          id='input_message'
+          className='bg-white absolute w-[99%]  h-auto py-2 mx-2 px-2  bottom-0 rounded-lg'
+        >
+          {isReplayMessage !== null && (
+            <div className='bg-imbue-light-grey px-3 py-2 rounded-xl text-black'>
+              <p className='flex mb-2 justify-between'>
+                Replaying to {isReplayMessage.user?.username}
+                <IoIosRemoveCircleOutline
+                  onClick={() => setReplayMessage(null)}
+                  className='text-text-aux-colour cursor-pointer hover:text-black
                   '
-                    size={20}
-                  />
-                </div>
-              ) : (
-                <div
-                  className='text-black flex items-center gap-1.5 bg-imbue-light-grey text-sm px-2 py-1 rounded-full'
-                  key={item.file}
-                >
-                  <p>{item.name}</p>
-                  <IoIosRemoveCircleOutline
-                    onClick={() => removeItem(item.file)}
-                    className='text-text-aux-colour cursor-pointer hover:text-black
+                  size={16}
+                />
+              </p>
+              {isReplayMessage.attachments?.map((item: any) =>
+                item.type === 'image/png' ? (
+                  <div className='w-32 relative h-32' key={item.image_url}>
+                    {item.image_url && (
+                      <Image
+                        className='w-28 h-28 rounded-lg object-fill '
+                        src={item.image_url}
+                        width={1920}
+                        height={1020}
+                        alt='selected images'
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <div
+                    className='text-black flex items-center gap-1.5 bg-imbue-light-grey text-sm px-2 py-1 rounded-full'
+                    key={item.image_url}
+                  >
+                    <p>{item.name}</p>
+                  </div>
+                )
+              )}
+              <p className='text-text-aux-colour text-sm'>
+                {isReplayMessage.text?.length &&
+                isReplayMessage.text?.length > 150
+                  ? isReplayMessage.text?.substring(0, 150) + ' .....'
+                  : isReplayMessage.text}
+              </p>
+            </div>
+          )}
+          {selectedImages.length > 0 && (
+            <div className='flex items-center gap-3'>
+              {selectedImages.map((item) =>
+                item.type === 'image/png' ? (
+                  <div className='w-32 relative h-32' key={item.duration}>
+                    <Image
+                      className='w-32 h-32 object-fill '
+                      src={item.file}
+                      width={1920}
+                      height={1020}
+                      alt='selected images'
+                    />
+                    <IoIosRemoveCircleOutline
+                      onClick={() => removeItem(item.file)}
+                      className='text-text-aux-colour z-10 top-0 right-0 absolute cursor-pointer hover:text-black
                   '
-                    size={16}
-                  />
-                </div>
-              )
-            )}
-          </div>
-        )}
-        <TextareaAutosize
-          placeholder='type here'
-          onChange={handleChnages}
-          onKeyDown={handleKeyDown}
-          value={textVal}
-          minRows={3}
-          maxRows={6}
-          className='outline-none placeholder:text-text-aux-colour border-none text-black'
-        />
-        <div className='text-text-aux-colour gap-2 flex items-center'>
-          <AiOutlinePlus
-            onClick={handleFileUpload}
-            className='hover:text-black cursor-pointer'
-            size={21}
+                      size={20}
+                    />
+                  </div>
+                ) : (
+                  <div
+                    className='text-black flex items-center gap-1.5 bg-imbue-light-grey text-sm px-2 py-1 rounded-full'
+                    key={item.file}
+                  >
+                    <p>{item.name}</p>
+                    <IoIosRemoveCircleOutline
+                      onClick={() => removeItem(item.file)}
+                      className='text-text-aux-colour cursor-pointer hover:text-black
+                  '
+                      size={16}
+                    />
+                  </div>
+                )
+              )}
+            </div>
+          )}
+          <TextareaAutosize
+            placeholder='type here'
+            onChange={handleChnages}
+            onKeyDown={handleKeyDown}
+            value={textVal}
+            minRows={3}
+            maxRows={6}
+            className='outline-none placeholder:text-text-aux-colour border-none text-black'
           />
-          <p className='text-lg'>|</p>
-          <VscMention className='hover:text-black cursor-pointer' size={28} />
-          <div className='relative flex items-center'>
-            <BsEmojiSmile
-              onClick={handleEmoji}
+          <div className='text-text-aux-colour gap-2 flex items-center'>
+            <AiOutlinePlus
+              onClick={handleFileUpload}
               className='hover:text-black cursor-pointer'
-              size={18}
+              size={21}
             />
-            {isEmojiOpen && (
-              <div className='absolute -top-[28.5rem] shadow'>
-                <EmojiPicker lazyLoadEmojis onEmojiClick={handleChnages} />
-              </div>
-            )}
+            <p className='text-lg'>|</p>
+            <VscMention className='hover:text-black cursor-pointer' size={28} />
+            <div className='relative flex items-center'>
+              <BsEmojiSmile
+                onClick={handleEmoji}
+                className='hover:text-black cursor-pointer'
+                size={18}
+              />
+              {isEmojiOpen && (
+                <div className='absolute -top-[28.5rem] shadow'>
+                  <EmojiPicker lazyLoadEmojis onEmojiClick={handleChnages} />
+                </div>
+              )}
+            </div>
+            <IoImageOutline
+              onClick={handleImageUpload}
+              className='hover:text-black cursor-pointer'
+              size={20}
+            />
+            <BsSend
+              onClick={onSendMessage}
+              className='ml-auto mr-2 text-xl cursor-pointer text-imbue-purple'
+            />
           </div>
-          <IoImageOutline
-            onClick={handleImageUpload}
-            className='hover:text-black cursor-pointer'
-            size={20}
+          <input
+            ref={imageRef}
+            onChange={onChangeImage}
+            className='hidden'
+            type='file'
+            accept='.jpg , .png , .jpeg'
           />
-          <BsSend
-            onClick={onSendMessage}
-            className='ml-auto mr-2 text-xl cursor-pointer text-imbue-purple'
+          <input
+            ref={fileRef}
+            onChange={onChangeImage}
+            className='hidden'
+            type='file'
+            accept='.rar , .zip , .html , .pdf , .pptx , .docs , .word'
           />
         </div>
-        <input
-          ref={imageRef}
-          onChange={onChangeImage}
-          className='hidden'
-          type='file'
-          accept='.jpg , .png , .jpeg'
-        />
-        <input
-          ref={fileRef}
-          onChange={onChangeImage}
-          className='hidden'
-          type='file'
-          accept='.rar , .zip , .html , .pdf , .pptx , .docs , .word'
-        />
       </div>
+      {targetUserDetails && (
+        <div className='bg-white  w-[30rem] text-text-aux-colour mb-2 pl-2 h-full rounded-r-3xl  '>
+          <MessageSideBar
+            targetUserDetails={targetUserDetails}
+            targetChannel={channel}
+          />
+        </div>
+      )}
+      {isPinedMessageOpen && (
+        <div className='bg-white  w-[30rem] text-text-aux-colour mb-2 pl-2 h-full rounded-r-3xl  '>
+          <PinMessages channel={channel} />
+        </div>
+      )}
     </div>
   );
 }
