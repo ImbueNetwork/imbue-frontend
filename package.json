@@ -100,6 +100,7 @@
     "swiper": "^11.0.3",
     "test-utils": "^1.1.1",
     "typescript": "5.0.2",
+    "use-onclickoutside": "^0.4.1",
     "uuidv4": "^6.2.12",
     "web3modal": "^1.9.12"
   },
