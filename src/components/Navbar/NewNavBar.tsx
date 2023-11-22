@@ -107,7 +107,7 @@ function NewNavbar() {
   return (
     <>
       <header className={`navBar bg-[#ebeae2]`} id='header-wrapper'>
-        <div className='text-center w-full bg-primary text-black py-1 text-xs lg:text-sm'>
+        <div className='text-center w-full bg-primary text-black py-1 font-normal text-xs lg:text-sm'>
           Thanks for trying the beta version of Imbue. Please let us know what
           we should work on to make it better! Submit your feedback
           <a
@@ -120,12 +120,12 @@ function NewNavbar() {
         </div>
         <div
           id='main-header'
-          className='flex justify-between items-center px-4 lg:px-8 py-2'
+          className='flex justify-between items-center px-4 lg:px-8 py-3'
         >
           <div className={`flex items-center transition-all`}>
             <div
               onClick={() => router.push('/')}
-              className={`bg-white w-[12rem] rounded-full  flex justify-center items-center cursor-pointer z-10 relative px-9 py-3 `}
+              className={`bg-white rounded-full  flex justify-center items-center cursor-pointer z-10 relative px-4 py-3 mr-[5px]`}
             >
               <div id='logo'>
                 <Image
@@ -136,10 +136,10 @@ function NewNavbar() {
               </div>
             </div>
 
-            <div className='relative  max-width-1100px:hidden items-center bg-[#DFDDCD] ml-5 py-1 rounded-full lg:flex'>
-              <div className={`flex items-center ml-0.5  transition-all`}>
+            <div className='relative max-width-1100px:hidden items-center bg-[#DFDDCD] ml- py-1 rounded-full lg:flex px-1'>
+              <div className={`flex gap-[6px] items-center ml-0.5  transition-all`}>
                 <div
-                  className={`mx-1 group lg:text-sm relative  lg:inline-block cursor-pointer text-imbue-purple h-[3rem] bg-white hover:bg-imbue-lime-light rounded-[5.07319rem] !flex justify-center items-center pl-5 pr-3 hover:no-underline !text-[1rem]`}
+                  className={`group lg:text-sm relative  lg:inline-block cursor-pointer text-imbue-purple h-[3rem] bg-white hover:bg-imbue-lime-light rounded-[5.07319rem] !flex justify-center items-center pl-5 pr-3 hover:no-underline !text-[1rem]`}
                 >
                   <Image
                     src='/target.svg'
@@ -192,7 +192,7 @@ function NewNavbar() {
                 </div>
                 {user?.id ? (
                   <div
-                    className={`mx-1 hover:bg-imbue-lime-light relative group  lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
+                    className={`hover:bg-imbue-lime-light relative group lg:text-sm lg:inline-block cursor-pointer ${navPillclasses}`}
                   >
                     <div className='flex'>
                       <Image
@@ -245,7 +245,7 @@ function NewNavbar() {
                 )}
                 <Link
                   onClick={() => setExpanded(false)}
-                  className={`mx-1 hover:bg-imbue-lime-light text-xs lg:text-sm hidden lg:inline-block cursor-pointer ${navPillclasses} nav-item nav-item-2`}
+                  className={`hover:bg-imbue-lime-light text-xs lg:text-sm hidden lg:inline-block cursor-pointer ${navPillclasses} nav-item nav-item-2`}
                   href='/relay'
                 >
                   <Image
@@ -259,7 +259,7 @@ function NewNavbar() {
                 </Link>
                 <div
                   onClick={() => setExpanded(false)}
-                  className={`mx-1 relative group text-xs hover:bg-imbue-lime-light lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${navPillclasses}`}
+                  className={`relative group text-xs hover:bg-imbue-lime-light lg:text-sm hidden lg:inline-block cursor-pointer hover:underline ${navPillclasses}`}
                 >
                   <Image
                     src='/user-edit.svg'
@@ -328,72 +328,83 @@ function NewNavbar() {
               display: 'flex',
               alignItems: 'center',
               textAlign: 'center',
-              paddingLeft: 2,
-              paddingRight: 2,
+              padding: '7px',
             }}
           >
-            {user?.username && (
-              <>
-                <Badge className='mr-3' badgeContent={message} color='error'>
-                  <Image
-                    src='/message-dots-square.svg'
-                    width={23}
-                    height={20}
-                    onClick={() => router.push('/dashboard/message')}
-                    alt='message'
-                    className='cursor-pointer'
-                  />
-                </Badge>
-                <div className='relative'>
-                  <div>
-                    <NotificationIcon />
-                  </div>
-                </div>
-              </>
-            )}
+            {
+              user?.username
+                ? (
+                  <div className='flex items-center bg-white hover:bg-imbue-lime-light px-2 py-3 rounded-full'>
+                    <Badge className='mr-3 cursor-pointer' badgeContent={message} color='error'>
+                      <Image
+                        src='/message-dots-square.svg'
+                        width={23}
+                        height={20}
+                        onClick={() => router.push('/dashboard/message')}
+                        alt='message'
+                        className='cursor-pointer h-5 w-5'
+                      />
+                    </Badge>
+                    <div className='relative cursor-pointer'>
+                      <div>
+                        <NotificationIcon />
+                      </div>
+                    </div>
+                  </div>)
+                : ""
+            }
+
             <Tooltip
               title='Account settings'
               className={`${!user?.username && !loading && 'lg:hidden'}`}
             >
-              {loading ? (
-                <Skeleton variant='circular' width={40} height={40} />
-              ) : (
-                <IconButton
-                  onClick={(e) => handleClick(e)}
-                  size='small'
-                  sx={{ ml: 2 }}
-                  aria-controls={open ? 'account-menu' : undefined}
-                  aria-haspopup='true'
-                  aria-expanded={open ? 'true' : undefined}
-                >
-                  {user?.username ? (
-                    <Avatar className='w-8 h-8 lg:w-10 lg:h-10'>
-                      <Image
-                        src={user?.profile_photo ?? defaultProfile}
-                        width={40}
-                        height={40}
-                        alt='profile'
-                      />
-                    </Avatar>
-                  ) : (
-                    <div
-                      className={`mx-1 text-xs lg:text-sm lg:inline-block cursor-pointer text-imbue-purple h-[2.9375rem] !bg-white rounded-[5.07319rem] !flex justify-center items-center px-[0.8rem] hover:no-underline !text-[1.10975rem] `}
+              {
+                loading
+                  ? (
+                    <Skeleton variant='circular' width={40} height={40} />)
+                  : (
+                    <IconButton
+                      onClick={(e) => handleClick(e)}
+                      size='small'
+                      sx={{ ml: 2 }}
+                      aria-controls={open ? 'account-menu' : undefined}
+                      aria-haspopup='true'
+                      aria-expanded={open ? 'true' : undefined}
+                      className='bg-white p-[6px] hover:bg-imbue-lime-light rounded-full'
                     >
-                      {openMenu ? (
-                        <CloseIcon htmlColor='#3B27C1' />
-                      ) : (
-                        <div onClick={() => setOpenMenu(!openMenu)}>
-                          {openMenu ? (
-                            <CloseIcon htmlColor='#3B27C1' />
-                          ) : (
-                            <MenuIcon htmlColor='#3B27C1' />
-                          )}
-                        </div>
-                      )}
-                    </div>
+                      {user?.username
+                        ? (
+                          <div className='flex items-center gap-3'>
+                            <Avatar className='w-5 h-5 lg:w-8 lg:h-8'>
+                              <Image
+                                src={user?.profile_photo ?? defaultProfile}
+                                width={40}
+                                height={40}
+                                alt='profile'
+                              />
+                            </Avatar>
+                            <IoIosArrowDown className={`${openMenu && "rotate-180"}`} />
+                          </div>)
+                        : (
+                          <div
+                            className={`text-xs lg:text-sm lg:inline-block cursor-pointer text-imbue-purple h-[2.9375rem] !bg-white rounded-[5.07319rem] !flex justify-center items-center px-[0.8rem] hover:no-underline !text-[1.10975rem] `}
+                          >
+                            {openMenu
+                              ? (
+                                <CloseIcon htmlColor='#3B27C1' />)
+                              : (
+                                <div onClick={() => setOpenMenu(!openMenu)}>
+                                  {openMenu ? (
+                                    <CloseIcon htmlColor='#3B27C1' />
+                                  ) : (
+                                    <MenuIcon htmlColor='#3B27C1' />
+                                  )}
+                                </div>
+                              )}
+                          </div>
+                        )}
+                    </IconButton>
                   )}
-                </IconButton>
-              )}
             </Tooltip>
             {!loadingUser && !user.username && (
               <button

@@ -113,7 +113,7 @@ function Layout({ children }: LayoutProps) {
               ) && <NewNavbar />}
 
               <main
-                className={`padded lg:!px-[var(--hq-layout-padding)] !pt-[100px]`}
+                className={`padded lg:!px-[var(--hq-layout-padding)] !pt-[111px]`}
                 id='main-content'
               >
                 <LoginPopupContext.Provider

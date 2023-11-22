@@ -1,3 +1,4 @@
+import { connect } from 'getstream';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import passport from 'passport';
@@ -18,6 +19,9 @@ import {
 } from '@/lib/queryServices/projectQueries';
 
 import db from '@/db';
+import { User } from '@/model';
+
+import { authenticate, verifyUserIdFromJwt } from '../../auth/common';
 
 export default nextConnect()
   .use(passport.initialize())
@@ -59,18 +63,24 @@ export default nextConnect()
     });
   })
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
+    const client = connect(
+      process.env.GETSTREAM_API_KEY as string,
+      process.env.GETSTREAM_SECRET_KEY as string,
+      process.env.GETSTREAM_APP_ID as string
+    );
+
     db.transaction(async (tx) => {
       try {
         const { projectId, milestoneIndex, userId, voterAddress, vote } =
           JSON.parse(req.body);
 
-        // const userAuth: Partial<models.User> | any = await authenticate(
-        //   'jwt',
-        //   req,
-        //   res
-        // );
+        const userAuth: Partial<User> | any = await authenticate(
+          'jwt',
+          req,
+          res
+        );
 
-        // await verifyUserIdFromJwt(req, res, [userAuth.id]);
+        await verifyUserIdFromJwt(req, res, [userAuth.id]);
 
         const existingVote = await checkExistingVote(
           projectId,
@@ -102,7 +112,6 @@ export default nextConnect()
             userId,
             vote
           )(tx);
-
           // if (resp?.length)
           //   res.status(200).json({ status: 'success', milestoneApproved });
         } else {
@@ -118,12 +127,6 @@ export default nextConnect()
 
         const allVotersRes = await fetchProjectApprovers(projectId)(tx);
 
-        console.log('🚀 ~ file: index.ts:118 ~ db.transaction ~ yes:', {
-          yes,
-          no,
-          allVotersRes
-        });
-
         if (yes.length / allVotersRes.length >= 0.75) {
           // closing voting round and approving milestone if treshold reached
           await updateProjectVoting(Number(projectId), false)(tx);
@@ -136,6 +139,31 @@ export default nextConnect()
         ) {
           // closing voting round if all votes are done without approval
           await updateProjectVoting(Number(projectId), false)(tx);
+
+          const activity = {
+            actor: 'User:' + userAuth.id,
+            verb: 'pin',
+            object: 'milestone.rejected',
+            data: {
+              sender: {
+                display_name: userAuth.display_name,
+                profile_photo: userAuth.profile_photo,
+                username: userAuth.username,
+              },
+              text: `The milestone <span class='mx-0.5 underline text-imbue-purple'>${milestoneIndex}</span> has been rejected for the <span class='mx-0.5 underline text-imbue-purple'>project</span>. Please carefully review the client's feedback and make the necessary revisions to improve the work.`,
+              title: `A milestone has been rejected`,
+              briefId: projectId,
+              applicationId: null,
+            },
+          };
+
+          const userId = client.user(String(project?.user_id));
+          const targetUser = client.feed(
+            'user',
+            String(userId.id),
+            userId.token
+          );
+          await targetUser.addActivity(activity);
         }
 
         res.status(200).json({ status: 'success', milestoneApproved });
