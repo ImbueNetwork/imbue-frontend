@@ -43,6 +43,19 @@ export default nextConnect()
         )(tx);
         verifyUserIdFromJwt(req, res, [userAuth.id, ...projectApproverIds]);
 
+        const existingVote = await tx('no_confidence_voters')
+          .select('*')
+          .where({
+            project_id: Number(projectId),
+            web3_address: voter.web3_address,
+          })
+          .first();
+
+        if (existingVote?.id)
+          return res
+            .status(401)
+            .json({ status: 'Error', message: 'vote already exists' });
+
         const result = await insertToNoConfidenceVoters(
           Number(projectId),
           voteData

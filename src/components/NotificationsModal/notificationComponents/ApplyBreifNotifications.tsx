@@ -31,7 +31,7 @@ export default function ApplyBreifNotification(activity: any) {
         </p>
         <p className='text-sm mt-3'>
           You have a new applicant for your{' '}
-          <span id='link' className='text-lg underline text-imbue-purple'>
+          <span id='link' className='underline text-imbue-purple'>
             brief
           </span>{' '}
           . Take a moment to review their application and consider their

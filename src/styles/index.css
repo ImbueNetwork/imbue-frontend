@@ -881,6 +881,11 @@ input:-webkit-autofill {
   color: white;
 } */
 
+/* notification styles */
+.project_link{
+  color: var(--theme-primary);
+}
+
 @media screen and (max-width: 500px) {
   h2 {
     font-size: 26px;
