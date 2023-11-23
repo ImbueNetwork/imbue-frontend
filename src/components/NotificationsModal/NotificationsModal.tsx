@@ -14,6 +14,7 @@ import NotificationsLoader from './NotificationsLoader.tsx';
 
 export default function NotificationsModal({ onClose }: { onClose: any }) {
   const { user } = useSelector((state: RootState) => state.userState);
+  
   return (
     <div
       className={classNames(
