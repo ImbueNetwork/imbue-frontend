@@ -21,7 +21,7 @@ import { TfiNewWindow } from 'react-icons/tfi';
 import { useSelector } from 'react-redux';
 
 import { NoConfidenceVoter } from '@/lib/queryServices/projectQueries';
-import { Review } from '@/lib/queryServices/reviewQueries';
+import { ReviewBody } from '@/lib/queryServices/reviewQueries';
 import * as utils from '@/utils';
 
 import ChatPopup from '@/components/ChatPopup';
@@ -363,8 +363,8 @@ function Project() {
   };
 
   const oneMielstoneApproved = project?.milestones?.find((m: Milestone) => m.is_approved) ? true : false
-  const userReviewed = project?.reviews?.find((r: Review) => r.reviewer_id === user?.id) ? true : false
-  const canReview = oneMielstoneApproved && !userReviewed
+  const userReviewed = project?.reviews?.find((r: ReviewBody) => r.reviewer_id === user?.id) ? true : false
+  const canReview = oneMielstoneApproved && !userReviewed && canVote
 
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>

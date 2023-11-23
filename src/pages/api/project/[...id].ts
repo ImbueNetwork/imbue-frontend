@@ -4,7 +4,7 @@ import nextConnect from 'next-connect';
 import passport from 'passport';
 
 import * as models from '@/lib/models';
-import { Review } from '@/lib/queryServices/reviewQueries';
+import { ReviewBody } from '@/lib/queryServices/reviewQueries';
 import { initPolkadotJSAPI } from '@/utils/polkadot';
 
 import db from '@/db';
@@ -16,7 +16,7 @@ import { authenticate, verifyUserIdFromJwt } from '../auth/common';
 type ProjectPkg = models.Project & {
   milestones: models.Milestone[];
   approvers?: string[];
-  reviews?: Review[];
+  reviews?: ReviewBody[];
 };
 
 export default nextConnect()

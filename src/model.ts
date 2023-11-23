@@ -1,4 +1,4 @@
-import { Review } from "./lib/queryServices/reviewQueries";
+import { ReviewBody } from "./lib/queryServices/reviewQueries";
 
 export enum Currency {
   IMBU = 0,
@@ -116,7 +116,7 @@ export type Project = {
   project_in_milestone_voting?: boolean;
   first_pending_milestone?: number;
   payment_address: string;
-  reviews?: Review[];
+  reviews?: ReviewBody[];
 };
 
 export type ProjectOnChain = {
