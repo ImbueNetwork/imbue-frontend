@@ -1,15 +1,15 @@
-import { Menu, Modal } from '@mui/material';
+import { Modal } from '@mui/material';
 import classNames from 'classnames';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en.json';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BsEmojiSmile, BsThreeDotsVertical } from 'react-icons/bs';
 import { FormatMessageResponse } from 'stream-chat';
+import useOnClickOutside from 'use-onclickoutside';
 
 import {
   deleteMessage,
-  flagMessages,
   setPinMessage,
   setUnPinMessage,
 } from '@/utils/MessageOptions';
@@ -38,15 +38,29 @@ export default function MessageItem({
 }) {
   const [isModal, setModal] = useState<string | false>(false);
   const [modal, setModal1] = useState<boolean>(false);
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const handlePopOver = (e: any) => {
-    setAnchorEl(e.target);
+  const modalRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const listener = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isModal) {
+        setModal(false);
+      }
+    };
+    window.addEventListener('keydown', listener);
+
+    return () => {
+      window.removeEventListener('keydown', listener);
+    };
+  }, [isModal]);
+
+  const handlePopOver = () => {
     setModal1((val) => !val);
   };
 
   const handleCloseModal = () => {
     setModal1(false);
   };
+  useOnClickOutside(modalRef, handleCloseModal);
 
   if (Number(message.user?.id) === user?.id) {
     return (
@@ -92,7 +106,7 @@ export default function MessageItem({
                   {message.parent_message?.text?.length &&
                   message.parent_message?.text?.length > 50
                     ? message.parent_message?.text?.substring(0, 50) + '...'
-                    : message.parent_message.text}
+                    : message.parent_message?.text}
                 </p>
               </div>
             )}
@@ -107,13 +121,13 @@ export default function MessageItem({
                 />
               )}
               {!!message.attachments?.length && (
-                <div className='flex gap-1 my-1 flex-wrap'>
+                <div className='flex flex-row-reverse gap-1 my-1 flex-wrap'>
                   {message.attachments?.map((item: any) =>
                     item.type === 'image/png' || item.type === 'image' ? (
                       <div className='' key={'first' + item.image_url}>
                         <Image
                           onClick={() => setModal(item.image_url)}
-                          className='w-80 cursor-pointer max-h-36 rounded-md object-cover'
+                          className='w-80 cursor-pointer h-36 rounded-md object-cover'
                           src={item.image_url || ''}
                           width={1920}
                           height={1080}
@@ -147,8 +161,9 @@ export default function MessageItem({
             {!message.deleted_at && (
               <div
                 className={classNames(
-                  ' gap-2  flex items-center',
-                  showProfile ? 'mb-6' : 'mb-0'
+                  ' gap-2  relative    items-center',
+                  showProfile ? 'mb-6' : 'mb-0',
+                  modal ? 'flex' : 'group-hover:flex hidden'
                 )}
               >
                 <div className='flex items-center'>
@@ -157,51 +172,47 @@ export default function MessageItem({
                     size={18}
                     className='hover:text-black  cursor-pointer text-text-aux-colour'
                   />
-                  <Menu
-                    disableScrollLock={true}
-                    id='basic-menu'
-                    anchorEl={anchorEl}
-                    open={modal}
-                    onClose={handleCloseModal}
-                    className='mt-2  -left-20'
-                  >
-                    <div
-                      onClick={handleCloseModal}
-                      className=' text-black min-w-24 rounded-2xl'
-                    >
-                      <p
-                        onClick={() => handleReplayMessage(message)}
-                        className='px-2 py-1 cursor-pointer hover:bg-slate-100'
-                      >
-                        Replay
-                      </p>
-                      {!message.pinned ? (
-                        <p
-                          onClick={() => setPinMessage(message)}
-                          className=' px-2 py-1 cursor-pointer hover:bg-slate-100'
-                        >
-                          Pin
-                        </p>
-                      ) : (
-                        <p
-                          onClick={() => setUnPinMessage(message)}
-                          className=' px-2 py-1 cursor-pointer hover:bg-slate-100'
-                        >
-                          Unpin
-                        </p>
-                      )}
 
-                      <p className=' px-2 py-1 cursor-pointer hover:bg-slate-100'>
-                        Edit Message
-                      </p>
+                  <div
+                    ref={modalRef}
+                    onClick={handleCloseModal}
+                    className={classNames(
+                      'absolute z-20 text-black min-w-32  w-32 top-6  right-5 bg-white shadow-lg  rounded-md',
+                      modal ? 'block' : 'hidden'
+                    )}
+                  >
+                    <p
+                      onClick={() => handleReplayMessage(message)}
+                      className='px-2 py-1 cursor-pointer hover:bg-slate-100'
+                    >
+                      Reply
+                    </p>
+                    {!message.pinned ? (
                       <p
-                        onClick={() => deleteMessage(message)}
+                        onClick={() => setPinMessage(message)}
                         className=' px-2 py-1 cursor-pointer hover:bg-slate-100'
                       >
-                        Delete
+                        Pin
                       </p>
-                    </div>
-                  </Menu>
+                    ) : (
+                      <p
+                        onClick={() => setUnPinMessage(message)}
+                        className=' px-2 py-1 cursor-pointer hover:bg-slate-100'
+                      >
+                        Unpin
+                      </p>
+                    )}
+
+                    <p className=' px-2 py-1 cursor-pointer hover:bg-slate-100'>
+                      Edit Message
+                    </p>
+                    <p
+                      onClick={() => deleteMessage(message)}
+                      className=' px-2 py-1 cursor-pointer hover:bg-slate-100'
+                    >
+                      Delete
+                    </p>
+                  </div>
                 </div>
                 <BsEmojiSmile
                   className='hover:text-black text-text-aux-colour cursor-pointer'
@@ -218,7 +229,7 @@ export default function MessageItem({
     <div
       id={message.id}
       className={classNames(
-        'flex items-center gap-2 relative ',
+        'flex group items-center gap-2 relative ',
         message.parent_id ? 'mt-9' : showProfile ? ' mt-1 mb-9' : 'my-1'
       )}
     >
@@ -275,7 +286,7 @@ export default function MessageItem({
                 <div className='' key={'third' + item.image_url}>
                   <Image
                     onClick={() => setModal(item.image_url)}
-                    className='w-80 cursor-pointer max-h-36 rounded-md object-cover'
+                    className='w-80 cursor-pointer h-36 rounded-md object-cover'
                     src={item.image_url || ''}
                     width={1920}
                     height={1080}
@@ -309,8 +320,9 @@ export default function MessageItem({
       {!message.deleted_at && (
         <div
           className={classNames(
-            ' gap-2  flex items-center',
-            showProfile ? 'mb-6' : 'mb-0'
+            ' gap-2  relative    items-center',
+            showProfile ? 'mb-6' : 'mb-0',
+            modal ? 'flex' : 'group-hover:flex hidden'
           )}
         >
           <div className='flex items-center'>
@@ -319,47 +331,37 @@ export default function MessageItem({
               size={18}
               className='hover:text-black  cursor-pointer text-text-aux-colour'
             />
-            <Menu
-              disableScrollLock={true}
-              id='basic-menu'
-              anchorEl={anchorEl}
-              open={modal}
-              onClose={handleCloseModal}
-              className='mt-2  left-1'
+
+            <div
+              ref={modalRef}
+              onClick={handleCloseModal}
+              className={classNames(
+                'bg-white z-20 absolute top-8 text-black w-32 rounded-md',
+                modal ? 'block' : 'hidden'
+              )}
             >
-              <div
-                onClick={handleCloseModal}
-                className=' text-black w-24 rounded-2xl'
+              <p
+                onClick={() => handleReplayMessage(message)}
+                className='px-2 py-1 cursor-pointer hover:bg-slate-100'
               >
+                Reply
+              </p>
+              {!message.pinned ? (
                 <p
-                  onClick={() => handleReplayMessage(message)}
-                  className='px-2 py-1 cursor-pointer hover:bg-slate-100'
-                >
-                  Replay
-                </p>
-                {!message.pinned ? (
-                  <p
-                    onClick={() => setPinMessage(message)}
-                    className=' px-2 py-1 cursor-pointer hover:bg-slate-100'
-                  >
-                    Pin
-                  </p>
-                ) : (
-                  <p
-                    onClick={() => setUnPinMessage(message)}
-                    className=' px-2 py-1 cursor-pointer hover:bg-slate-100'
-                  >
-                    Unpin
-                  </p>
-                )}
-                <p
-                  onClick={() => flagMessages(message)}
+                  onClick={() => setPinMessage(message)}
                   className=' px-2 py-1 cursor-pointer hover:bg-slate-100'
                 >
-                  Flag
+                  Pin
                 </p>
-              </div>
-            </Menu>
+              ) : (
+                <p
+                  onClick={() => setUnPinMessage(message)}
+                  className=' px-2 py-1 cursor-pointer hover:bg-slate-100'
+                >
+                  Unpin
+                </p>
+              )}
+            </div>
           </div>
           <BsEmojiSmile
             className='hover:text-black text-text-aux-colour cursor-pointer'

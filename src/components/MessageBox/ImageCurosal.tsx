@@ -19,6 +19,22 @@ export function Controller({ activeSlide }: { activeSlide: number }) {
     setClick(!click);
   };
 
+  useEffect(() => {
+    const handleKeyBoardKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') {
+        handleForward();
+      } else if (e.key === 'ArrowLeft') {
+        handleBackward();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyBoardKey);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyBoardKey);
+    };
+  });
+
   return (
     <div className='flex justify-between  absolute gap-5 items-center top-[50%] z-20  w-full '>
       <p>

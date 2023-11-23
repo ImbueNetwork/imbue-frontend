@@ -3,12 +3,8 @@ import classNames from 'classnames';
 import EmojiPicker from 'emoji-picker-react';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
-import {
-  AiOutlineFlag,
-  AiOutlineInfoCircle,
-  AiOutlinePlus,
-} from 'react-icons/ai';
-import { BsArchive, BsEmojiSmile, BsPinAngle, BsSend } from 'react-icons/bs';
+import { AiOutlineInfoCircle, AiOutlinePlus } from 'react-icons/ai';
+import { BsEmojiSmile, BsPinAngle, BsSend } from 'react-icons/bs';
 import { IoIosRemoveCircleOutline } from 'react-icons/io';
 import { IoImageOutline } from 'react-icons/io5';
 import { VscMention } from 'react-icons/vsc';
@@ -20,6 +16,7 @@ import {
   SendFileAPIResponse,
   User,
 } from 'stream-chat';
+import useOnClickOutside from 'use-onclickoutside';
 
 import { fetchUser } from '@/utils';
 
@@ -58,6 +55,7 @@ export default function MessageBox({
   const [messages, setMessages] = useState<
     FormatMessageResponse<DefaultGenerics>[]
   >([]);
+  const emojiRef = useRef<HTMLDivElement | null>(null);
   const [messageId, setMessageId] = useState<string | null>(null);
   const [isReplayMessage, setReplayMessage] =
     useState<FormatMessageResponse | null>(null);
@@ -65,6 +63,18 @@ export default function MessageBox({
     setMessageId(null);
     setTargetUserDetails(null);
   }, [channel]);
+
+  useEffect(() => {
+    const listener = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isEmojiOpen) {
+        setEmojiOpen(false);
+      }
+    };
+    window.addEventListener('keydown', listener);
+    return () => {
+      window.removeEventListener('keydown', listener);
+    };
+  }, [isEmojiOpen]);
 
   useEffect(() => {
     const key = Object.keys(channel.state?.members);
@@ -140,6 +150,8 @@ export default function MessageBox({
       objDiv?.scrollTo({ top: objDiv.scrollHeight });
     }
   }, [messages]);
+
+  useOnClickOutside(emojiRef, () => setEmojiOpen(false));
 
   const onSendMessage = async () => {
     if (textVal.trim().length > 0 || selectedImages.length > 0) {
@@ -288,18 +300,18 @@ export default function MessageBox({
             </div>
           </div>
           <div className='flex text-text-aux-colour gap-4  items-center'>
-            <p className='cursor-pointer p-3 flex items-center  rounded-full hover:bg-imbue-lime-light'>
+            {/* <p className='cursor-pointer p-3 flex items-center  rounded-full hover:bg-imbue-lime-light'>
               <BsArchive size={18} />
-            </p>
+            </p> */}
             <BsPinAngle
               size={44}
               onClick={handleBarOptions}
               className='-rotate-45 rounded-full p-3 hover:bg-imbue-lime-light cursor-pointer'
             />
-            <AiOutlineFlag
+            {/* <AiOutlineFlag
               className='cursor-pointer rounded-full p-3 hover:bg-imbue-lime-light'
               size={44}
-            />
+            /> */}
             <AiOutlineInfoCircle
               onClick={getUserDetailsForChannel}
               className='cursor-pointer p-3 rounded-full hover:bg-imbue-lime-light'
@@ -363,7 +375,7 @@ export default function MessageBox({
           {isReplayMessage !== null && (
             <div className='bg-imbue-light-grey px-3 py-2 rounded-xl text-black'>
               <p className='flex mb-2 justify-between'>
-                Replaying to {isReplayMessage.user?.username}
+                Replying to {isReplayMessage.user?.name}
                 <IoIosRemoveCircleOutline
                   onClick={() => setReplayMessage(null)}
                   className='text-text-aux-colour cursor-pointer hover:text-black
@@ -453,7 +465,11 @@ export default function MessageBox({
               size={21}
             />
             <p className='text-lg'>|</p>
-            <VscMention className='hover:text-black cursor-pointer' size={28} />
+            <VscMention
+              onClick={() => setTextVal((val) => String(val + '@'))}
+              className='hover:text-black cursor-pointer'
+              size={28}
+            />
             <div className='relative flex items-center'>
               <BsEmojiSmile
                 onClick={handleEmoji}
@@ -461,7 +477,7 @@ export default function MessageBox({
                 size={18}
               />
               {isEmojiOpen && (
-                <div className='absolute -top-[28.5rem] shadow'>
+                <div ref={emojiRef} className='absolute -top-[28.5rem] shadow'>
                   <EmojiPicker lazyLoadEmojis onEmojiClick={handleChnages} />
                 </div>
               )}
@@ -481,14 +497,14 @@ export default function MessageBox({
             onChange={onChangeImage}
             className='hidden'
             type='file'
-            accept='.jpg , .png , .jpeg'
+            accept='.jpg , .png , .jpeg, .svg'
           />
           <input
             ref={fileRef}
             onChange={onChangeImage}
             className='hidden'
             type='file'
-            accept='.rar , .zip , .html , .pdf , .pptx , .docs , .word'
+            accept='.rar,.zip ,.html,.pdf,.pptx,.docs,.word,.docx,.csv,.xlsx,.txt,.psd'
           />
         </div>
       </div>

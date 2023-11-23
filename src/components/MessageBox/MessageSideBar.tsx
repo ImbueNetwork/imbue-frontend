@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 import { AiOutlineMail } from 'react-icons/ai';
 import { BiBuildings } from 'react-icons/bi';
@@ -16,10 +17,10 @@ export default function MessageSideBar({
   targetChannel: Channel;
   targetUserDetails: any;
 }) {
+  const router = useRouter();
   const Attachments = useMemo(() => {
     const Images: Attachment[] = [];
     const File: Attachment[] = [];
-
     targetChannel.state.messageSets[0].messages.map((item) => {
       if (item.attachments?.length && item.attachments?.length > 0) {
         item.attachments.map((item) => {
@@ -34,7 +35,10 @@ export default function MessageSideBar({
 
   return (
     <div className='bg-imbue-light-grey h-full overflow-auto  rounded-3xl py-5 px-5 '>
-      <div className='flex gap-2 text-black'>
+      <div
+        onClick={() => router.push(`/profile/${targetUserDetails.username}`)}
+        className='flex cursor-pointer gap-2 text-black'
+      >
         <Image
           src={
             targetUserDetails?.profile_photo ||
@@ -42,7 +46,7 @@ export default function MessageSideBar({
           }
           width={1920}
           height={1080}
-          className='w-20 h-20 object-cover'
+          className='w-20 rounded-lg h-20 object-cover'
           alt='profile image'
         />
         <div className='mt-2'>
@@ -104,7 +108,7 @@ export default function MessageSideBar({
         <div className='flex'>
           <p className='uppercase text-sm'>Shared Attachments</p>
         </div>
-        <div className='flex mt-5 gap-3'>
+        <div className='flex flex-wrap mt-5 gap-2'>
           {Attachments.Images?.map(
             (item) =>
               item.image_url && (

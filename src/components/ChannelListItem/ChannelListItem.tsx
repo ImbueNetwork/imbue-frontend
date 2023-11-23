@@ -43,7 +43,7 @@ export default function ChannelListItem({
     <div
       onClick={() => setChannel(channel)}
       className={classNames(
-        'flex px-3 rounded-md border-l-2 h-[6rem] border-white hover:border-imbue-lime cursor-pointer hover:bg-imbue-lime-light gap-3 py-4',
+        'flex px-3 rounded-md border-l-2 h-[6rem] border-white hover:border-gray-700 cursor-pointer hover:bg-[#F5F5F5] gap-3 py-4',
         selectedChannel?.id === channel.id ? 'bg-imbue-lime-light' : 'bg-white'
       )}
     >
