@@ -6,7 +6,13 @@ import { RootState } from '@/redux/store/store';
 
 import MessageItem from './MessageItem';
 
-export default function PinMessages({ channel }: { channel: Channel }) {
+export default function PinMessages({
+  channel,
+  handleReplayMessage,
+}: {
+  handleReplayMessage: any;
+  channel: Channel;
+}) {
   const { user } = useSelector((state: RootState) => state.userState);
   const [pinedmessage, setPinnedMessage] = useState<GetRepliesAPIResponse>();
   useEffect(() => {
@@ -23,9 +29,7 @@ export default function PinMessages({ channel }: { channel: Channel }) {
         <MessageItem
           key={item.id}
           message={item}
-          handleReplayMessage={(message) => {
-            message;
-          }}
+          handleReplayMessage={handleReplayMessage}
           showProfile
           user={user}
         />

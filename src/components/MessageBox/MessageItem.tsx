@@ -10,6 +10,7 @@ import useOnClickOutside from 'use-onclickoutside';
 
 import {
   deleteMessage,
+  sendMessageReaction,
   setPinMessage,
   setUnPinMessage,
 } from '@/utils/MessageOptions';
@@ -39,6 +40,8 @@ export default function MessageItem({
   const [isModal, setModal] = useState<string | false>(false);
   const [modal, setModal1] = useState<boolean>(false);
   const modalRef = useRef<HTMLDivElement | null>(null);
+  const emojiRef = useRef<HTMLDivElement | null>(null);
+  const [isEmojiModalOpen, setIsEmojiModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const listener = (e: KeyboardEvent) => {
@@ -61,6 +64,7 @@ export default function MessageItem({
     setModal1(false);
   };
   useOnClickOutside(modalRef, handleCloseModal);
+  useOnClickOutside(emojiRef, () => setIsEmojiModalOpen(false));
 
   if (Number(message.user?.id) === user?.id) {
     return (
@@ -148,12 +152,23 @@ export default function MessageItem({
                 </div>
               )}
               {!!message.text?.trim().length && (
-                <div className='bg-imbue-lime-light   px-4 py-1.5 rounded-2xl text-right text-black'>
+                <div className='bg-imbue-lime-light relative  px-4 py-1.5 rounded-2xl text-right text-black'>
                   <p>{message.text}</p>
+
+                  {message.lates_reactions?.length > 0 && (
+                    <p className='absolute right-0 p-0.5 rounded-full bg-white'>
+                      {message.lates_reactions[0].val}
+                    </p>
+                  )}
                 </div>
               )}
               {showProfile && (
-                <p className='text-[#7C8B9D]'>
+                <p
+                  className={classNames(
+                    'text-[#7C8B9D]',
+                    message.lates_reactions?.length > 0 ? 'mt-5' : 'mt-0'
+                  )}
+                >
                   {timeAgo.format(new Date(message.created_at))}
                 </p>
               )}
@@ -163,7 +178,7 @@ export default function MessageItem({
                 className={classNames(
                   ' gap-2  relative    items-center',
                   showProfile ? 'mb-6' : 'mb-0',
-                  modal ? 'flex' : 'group-hover:flex hidden'
+                  modal || isEmojiModalOpen ? 'flex' : 'group-hover:flex hidden'
                 )}
               >
                 <div className='flex items-center'>
@@ -214,10 +229,47 @@ export default function MessageItem({
                     </p>
                   </div>
                 </div>
-                <BsEmojiSmile
-                  className='hover:text-black text-text-aux-colour cursor-pointer'
-                  size={18}
-                />
+                <div ref={emojiRef} className='relative'>
+                  <BsEmojiSmile
+                    onClick={() => setIsEmojiModalOpen((val) => !val)}
+                    className='hover:text-black text-text-aux-colour cursor-pointer'
+                    size={18}
+                  />
+                  {isEmojiModalOpen && (
+                    <div className='absolute z-30 bg-white flex -top-10 right-0 rounded-md  items-center   text-xl'>
+                      <p
+                        onClick={() => sendMessageReaction(message, '😁')}
+                        className='hover:bg-imbue-light-grey py-1 px-3 cursor-pointer'
+                      >
+                        😁
+                      </p>
+                      <p
+                        onClick={() => sendMessageReaction(message, '👍')}
+                        className='hover:bg-imbue-light-grey py-1 px-2 cursor-pointer'
+                      >
+                        👍
+                      </p>
+                      <p
+                        onClick={() => sendMessageReaction(message, '👎')}
+                        className='hover:bg-imbue-light-grey py-1 px-2 cursor-pointer'
+                      >
+                        👎
+                      </p>
+                      <p
+                        onClick={() => sendMessageReaction(message, '❤️')}
+                        className='hover:bg-imbue-light-grey py-1 px-2 cursor-pointer'
+                      >
+                        ❤️
+                      </p>
+                      <p
+                        onClick={() => sendMessageReaction(message, '😢')}
+                        className='hover:bg-imbue-light-grey py-1 px-3 cursor-pointer'
+                      >
+                        😢
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -322,7 +374,7 @@ export default function MessageItem({
           className={classNames(
             ' gap-2  relative    items-center',
             showProfile ? 'mb-6' : 'mb-0',
-            modal ? 'flex' : 'group-hover:flex hidden'
+            modal || isEmojiModalOpen ? 'flex' : 'group-hover:flex hidden'
           )}
         >
           <div className='flex items-center'>
@@ -363,10 +415,47 @@ export default function MessageItem({
               )}
             </div>
           </div>
-          <BsEmojiSmile
-            className='hover:text-black text-text-aux-colour cursor-pointer'
-            size={18}
-          />
+          <div ref={emojiRef} className='relative'>
+            <BsEmojiSmile
+              onClick={() => setIsEmojiModalOpen((val) => !val)}
+              className='hover:text-black text-text-aux-colour cursor-pointer'
+              size={18}
+            />
+            {isEmojiModalOpen && (
+              <div className='absolute z-30 bg-white flex -top-10  rounded-md  items-center   text-xl'>
+                <p
+                  onClick={() => sendMessageReaction(message, '😁')}
+                  className='hover:bg-imbue-light-grey py-1 px-3 cursor-pointer'
+                >
+                  😁
+                </p>
+                <p
+                  onClick={() => sendMessageReaction(message, '👍')}
+                  className='hover:bg-imbue-light-grey py-1 px-2 cursor-pointer'
+                >
+                  👍
+                </p>
+                <p
+                  onClick={() => sendMessageReaction(message, '👎')}
+                  className='hover:bg-imbue-light-grey py-1 px-2 cursor-pointer'
+                >
+                  👎
+                </p>
+                <p
+                  onClick={() => sendMessageReaction(message, '❤️')}
+                  className='hover:bg-imbue-light-grey py-1 px-2 cursor-pointer'
+                >
+                  ❤️
+                </p>
+                <p
+                  onClick={() => sendMessageReaction(message, '😢')}
+                  className='hover:bg-imbue-light-grey py-1 px-3 cursor-pointer'
+                >
+                  😢
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

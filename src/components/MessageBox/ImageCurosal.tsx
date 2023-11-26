@@ -38,17 +38,23 @@ export function Controller({ activeSlide }: { activeSlide: number }) {
   return (
     <div className='flex justify-between  absolute gap-5 items-center top-[50%] z-20  w-full '>
       <p>
-        <IoIosArrowForward
-          onClick={handleBackward}
-          size={80}
-          className='rotate-180 cursor-pointer text-imbue-purple'
-        />
+        {!sp.isBeginning && (
+          <IoIosArrowForward
+            onClick={handleBackward}
+            size={80}
+            className='rotate-180 cursor-pointer text-imbue-purple'
+          />
+        )}
       </p>
-      <IoIosArrowForward
-        onClick={handleForward}
-        size={80}
-        className=' cursor-pointer text-imbue-purple'
-      />
+      <p>
+        {!sp.isEnd && (
+          <IoIosArrowForward
+            onClick={handleForward}
+            size={80}
+            className=' cursor-pointer text-imbue-purple'
+          />
+        )}
+      </p>
     </div>
   );
 }

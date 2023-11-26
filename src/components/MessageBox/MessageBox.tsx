@@ -2,6 +2,7 @@ import { TextareaAutosize } from '@mui/base/TextareaAutosize';
 import classNames from 'classnames';
 import EmojiPicker from 'emoji-picker-react';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { AiOutlineInfoCircle, AiOutlinePlus } from 'react-icons/ai';
 import { BsEmojiSmile, BsPinAngle, BsSend } from 'react-icons/bs';
@@ -55,6 +56,7 @@ export default function MessageBox({
   const [messages, setMessages] = useState<
     FormatMessageResponse<DefaultGenerics>[]
   >([]);
+  const router = useRouter();
   const emojiRef = useRef<HTMLDivElement | null>(null);
   const [messageId, setMessageId] = useState<string | null>(null);
   const [isReplayMessage, setReplayMessage] =
@@ -271,7 +273,10 @@ export default function MessageBox({
       >
         {/* messaging header sections */}
         <div className='bg-white w-full justify-between items-center flex rounded-xl px-5 py-3'>
-          <div className='flex'>
+          <div
+            onClick={() => router.push(`/profile/${targetUser?.username}`)}
+            className='flex cursor-pointer'
+          >
             <div className='w-14 justify-self-start  relative'>
               <Image
                 className='w-12 h-12  object-cover rounded-full'
@@ -518,7 +523,10 @@ export default function MessageBox({
       )}
       {isPinedMessageOpen && (
         <div className='bg-white  w-[30rem] text-text-aux-colour mb-2 pl-2 h-full rounded-r-3xl  '>
-          <PinMessages channel={channel} />
+          <PinMessages
+            channel={channel}
+            handleReplayMessage={setReplayMessage}
+          />
         </div>
       )}
     </div>

@@ -37,3 +37,17 @@ export const flagMessages = async (
     await client.flagMessage(message.id);
   }
 };
+
+export const sendMessageReaction = async (
+  message: FormatMessageResponse,
+  val: any
+) => {
+  const { client, user } = store.getState().userState;
+  if (client && user?.id) {
+    await client.partialUpdateMessage(message.id, {
+      set: {
+        latest_reactions: [{ val, user, user_ids: [user.id] }],
+      },
+    });
+  }
+};
