@@ -38,7 +38,7 @@ import MilestoneVoteBox from '@/components/Project/V2/MilestoneVoteBox';
 import NoConfidenceBox from '@/components/Project/V2/NoConfidenceVoteBox';
 import NoConfidenceList from '@/components/Project/VotingList/NoConfidenceList';
 import VotingList from '@/components/Project/VotingList/VotingList';
-import ReviewButton from '@/components/Review/ReviewModal';
+import ReviewFormModal from '@/components/Review/ReviewModal';
 import VoteModal from '@/components/ReviewModal/VoteModal';
 import SuccessScreen from '@/components/SuccessScreen';
 import WaitingScreen from '@/components/WaitingScreen';
@@ -457,7 +457,7 @@ function Project() {
                   </div>
                   {
                     canReview && (
-                      <ReviewButton
+                      <ReviewFormModal
                         setShowLoginPopup={setShowLoginPopup}
                         project={project}
                         targetUser={targetUser}
@@ -465,6 +465,7 @@ function Project() {
                         setSuccess={setSuccess}
                         setSuccessTitle={setSuccessTitle}
                         setError={setError}
+                        button={true}
                       />
                     )
                   }

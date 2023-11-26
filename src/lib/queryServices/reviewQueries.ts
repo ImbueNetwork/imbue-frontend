@@ -33,8 +33,8 @@ export const getAllReviewsOfUser =
         'ratings',
         'title',
         'description',
-        'created',
-        'modified',
+        'created_at as created',
+        'updated_at as modified',
         'reviewer_id',
         'project_id',
         'users.display_name',
@@ -44,11 +44,28 @@ export const getAllReviewsOfUser =
         'users.username'
       )
       .where({ user_id })
-      .leftJoin('users', 'user_id', 'users.id');
+      .leftJoin('users', 'reviewer_id', 'users.id');
 
-export const getReviewByUser =
-  (review: ReviewBody) => async (tx: Knex.Transaction) =>
-    tx('reviews').insert(review);
+export const getAllReviewsByUser =
+  (reviewer_id: number) => async (tx: Knex.Transaction) =>
+    tx('reviews')
+      .select(
+        'reviews.id',
+        'ratings',
+        'title',
+        'description',
+        'created_at as created',
+        'updated_at as modified',
+        'reviewer_id',
+        'project_id',
+        'users.display_name',
+        'users.profile_photo',
+        'users.country',
+        'users.region',
+        'users.username'
+      )
+      .where({ reviewer_id })
+      .leftJoin('users', 'user_id', 'users.id');
 
 export const postReview =
   (review: ReviewBody) => async (tx: Knex.Transaction) =>

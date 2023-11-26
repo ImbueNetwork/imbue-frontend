@@ -3,6 +3,7 @@ import nextConnect from 'next-connect';
 import passport from 'passport';
 
 import {
+  getAllReviewsByUser,
   getAllReviewsOfUser,
   postReview,
 } from '@/lib/queryServices/reviewQueries';
@@ -17,12 +18,16 @@ export default nextConnect()
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
     db.transaction(async (tx) => {
       try {
-        const { user_id } = req.query;
+        const { user_id, reviewer_id } = req.query;
+        console.log("🚀 ~ file: index.ts:22 ~ db.transaction ~ req.query:", req.query)
 
-        if (!user_id)
-          return res.status(404).json({ message: `Freelancer id not found` });
+        if (!user_id && !reviewer_id)
+          return res.status(404).json({ message: `user id not found` });
 
-        const resp = await getAllReviewsOfUser(Number(user_id))(tx);
+        let resp;
+
+        if (user_id) resp = await getAllReviewsOfUser(Number(user_id))(tx);
+        else resp = await getAllReviewsByUser(Number(reviewer_id))(tx);
 
         res.status(200).json(resp);
       } catch (error) {

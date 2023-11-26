@@ -16,12 +16,20 @@ export const postReviewService = async (review: ReviewBody) => {
   }
 };
 
-export const getReviewService = async (user_id: string | number) => {
+export const getReviewService = async (
+  user_id?: string | number,
+  reviewer_id?: number | string
+) => {
   try {
-    const resp = await fetch(`${apiBase}reviews?user_id=${user_id}`, {
-      method: 'GET',
-      headers: getAPIHeaders,
-    });
+    const resp = await fetch(
+      `${apiBase}reviews?user_id=${user_id || ''}&reviewer_id=${
+        reviewer_id || ''
+      }`,
+      {
+        method: 'GET',
+        headers: getAPIHeaders,
+      }
+    );
 
     return await resp.json();
   } catch (error) {

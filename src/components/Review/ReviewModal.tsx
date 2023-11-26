@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { FaStar } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 
+import { ReviewType } from '@/lib/queryServices/reviewQueries';
+
 import { Project, User } from '@/model';
 import { postReviewService } from '@/redux/services/reviewServices';
 import { RootState } from '@/redux/store/store';
@@ -13,12 +15,16 @@ import { LoginPopupStateType } from '../Layout';
 
 interface ReviewModalProps {
     targetUser: User;
-    project: Project;
-    setShowLoginPopup: (_value: LoginPopupStateType) => void;
-    setLoading: (_value: boolean) => void;
+    project?: Project;
+    setShowLoginPopup?: (_value: LoginPopupStateType) => void;
+    setLoading?: (_value: boolean) => void;
     setSuccessTitle: (_value: string) => void;
     setSuccess: (_value: boolean) => void;
     setError: (_value: any) => void;
+    review?: ReviewType;
+    button?: boolean;
+    openMain?: boolean;
+    setOpenMain?: (_value: boolean) => void;
 }
 
 const labels: { [index: string]: string } = {
@@ -33,11 +39,11 @@ function getLabelText(value: number) {
     return `${value} Star${value !== 1 ? 's' : ''}, ${labels[value]}`;
 }
 
-const ReviewButton = ({ targetUser, project, setShowLoginPopup, setSuccess, setSuccessTitle, setLoading, setError }: ReviewModalProps) => {
-    const [open, setOpen] = useState<boolean>(false)
+const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, setSuccessTitle, setLoading, setError, review, button, openMain = false, setOpenMain }: ReviewModalProps) => {
+    const [open, setOpen] = useState<boolean>(openMain)
     const [hover, setHover] = React.useState(-1);
 
-    const [rating, setRating] = React.useState<number>(3);
+    const [rating, setRating] = React.useState<number>(review?.ratings || 3);
     const [title, setTitle] = useState<string>("")
     const [description, setDescription] = useState<string>("")
 
@@ -45,10 +51,13 @@ const ReviewButton = ({ targetUser, project, setShowLoginPopup, setSuccess, setS
         (state: RootState) => state.userState
     )
 
-    const handleClose = () => setOpen(false);
+    const handleClose = () => {
+        setOpen(false);
+        setOpenMain?.(false);
+    }
 
     const handleSubmit = async () => {
-        setLoading(true);
+        setLoading?.(true);
         handleClose();
 
         const review = {
@@ -56,7 +65,7 @@ const ReviewButton = ({ targetUser, project, setShowLoginPopup, setSuccess, setS
             description,
             ratings: rating,
             user_id: targetUser.id,
-            project_id: project.id,
+            project_id: project?.id,
             reviewer_id: user.id,
         }
         const resp = await postReviewService(review)
@@ -67,13 +76,13 @@ const ReviewButton = ({ targetUser, project, setShowLoginPopup, setSuccess, setS
         } else {
             setError({ message: resp.message })
         }
-        setLoading(false);
+        setLoading?.(false);
     }
 
     return (
         <div>
             <Dialog
-                open={open}
+                open={open || openMain}
                 onClose={handleClose}
                 aria-labelledby='alert-dialog-title'
                 aria-describedby='alert-dialog-description'
@@ -90,6 +99,7 @@ const ReviewButton = ({ targetUser, project, setShowLoginPopup, setSuccess, setS
                             <div className='flex'>
                                 <Rating
                                     name="hover-feedback"
+                                    defaultValue={review?.ratings}
                                     value={rating}
                                     getLabelText={getLabelText}
                                     onChange={(event, newValue) => {
@@ -113,6 +123,7 @@ const ReviewButton = ({ targetUser, project, setShowLoginPopup, setSuccess, setS
                         <p>Title</p>
                         <InputOutlined
                             onChange={(e) => setTitle(e.target.value)}
+                            inputProps={{ defaultValue: review?.title }}
                         />
 
                         <p>Description</p>
@@ -120,6 +131,7 @@ const ReviewButton = ({ targetUser, project, setShowLoginPopup, setSuccess, setS
                             props={{
                                 onChange: (e) => setDescription(e.target.value)
                             }}
+                            inputProps={{ defaultValue: review?.description }}
                         />
 
                         <div className='flex items-center justify-center w-full mt-3'>
@@ -131,17 +143,21 @@ const ReviewButton = ({ targetUser, project, setShowLoginPopup, setSuccess, setS
                     </div>
                 </div>
             </Dialog>
-            <button
-                className='px-3 py-1 rounded-full bg-imbue-light-purple text-sm text-content'
-                onClick={() => {
-                    if (userLoading || !user.id) setShowLoginPopup({ open: true, redirectURL: `/projects/${project.id}` });
-                    else setOpen(true)
-                }}
-            >
-                Review
-            </button>
+            {
+                button && (
+                    <button
+                        className='px-3 py-1 rounded-full bg-imbue-light-purple text-sm text-content'
+                        onClick={() => {
+                            if (userLoading || !user.id) setShowLoginPopup?.({ open: true, redirectURL: `/projects/${project?.id}` });
+                            else setOpen(true)
+                        }}
+                    >
+                        Review
+                    </button>
+                )
+            }
         </div>
     );
 };
 
-export default ReviewButton;
+export default ReviewFormModal;
