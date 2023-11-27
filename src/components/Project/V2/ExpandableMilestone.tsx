@@ -541,7 +541,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                           <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-imbue-coral px-3 py-1 text-sm text-white w-fit ml-auto mt-3 '>
                             <ErrorOutlineOutlinedIcon className='h-4 w-4 inline' />
                             <p className='inline'>
-                              No funds have been deposited to the escrow address. If you still want to submit your work the risks are upto you.
+                              No funds have been deposited to the escrow address yet.
                             </p>
                           </div>
                         )

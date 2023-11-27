@@ -8,6 +8,7 @@ import AcceptBreifNotifications from './notificationComponents/AcceptBreifNotifi
 import ApplyBreifNotification from './notificationComponents/ApplyBreifNotifications';
 import GrantApproversNotifications from './notificationComponents/GrantApproversNotifications';
 import MilestoneApprovedNotifications from './notificationComponents/MilestoneApprovedNotifications';
+import RefundNotification from './notificationComponents/RefundNotification';
 import SubmitMilestoneNotification from './notificationComponents/SubmitMilestoneNotification';
 import NotificationsLoader from './NotificationsLoader.tsx';
 
@@ -55,6 +56,14 @@ export default function NotificationsModal({ onClose }: { onClose: any }) {
                 {activity.object === 'AddApprovers.testing' && (
                   <GrantApproversNotifications {...activity} />
                 )}
+                {
+                  (
+                    activity.object === "refund.initiated" ||
+                    activity.object === "refund.complete" || 
+                    activity.object === "refund_initialed.testing"
+                  ) && (
+                    <RefundNotification {...activity} />
+                  )}
               </div>
             )}
           />

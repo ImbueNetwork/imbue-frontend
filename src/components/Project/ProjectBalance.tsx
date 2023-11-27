@@ -82,6 +82,7 @@ const ProjectBalance = (props: ProjectBalanceType) => {
             }
         }
 
+        // getAndSetBalace();
         if (currency_id == undefined) {
             setCurrency_id(project.currency_id);
         }
