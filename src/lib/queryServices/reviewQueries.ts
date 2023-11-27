@@ -23,6 +23,7 @@ export interface ReviewType {
   description: string;
   ratings: number;
   project_id?: string | number;
+  user_id: string | number;
 }
 
 export const getAllReviewsOfUser =

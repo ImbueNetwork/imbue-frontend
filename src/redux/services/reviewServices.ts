@@ -36,3 +36,34 @@ export const getReviewService = async (
     return { status: 'Error', message: error };
   }
 };
+
+export const editReview = async (review: ReviewBody) => {
+  try {
+    const resp = await fetch(`${apiBase}reviews`, {
+      method: 'PUT',
+      headers: postAPIHeaders,
+      body: JSON.stringify(review),
+    });
+
+    return await resp.json();
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    return { status: 'Error', message: error };
+  }
+};
+
+export const deleteReview = async (id: string | number) => {
+  try {
+    const resp = await fetch(`${apiBase}reviews?id=${id}`, {
+      method: 'DELETE',
+      headers: postAPIHeaders,
+    });
+
+    return await resp.json();
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    return { status: 'Error', message: error };
+  }
+};

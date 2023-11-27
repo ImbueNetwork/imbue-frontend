@@ -5,8 +5,8 @@ import { useSelector } from 'react-redux';
 
 import { ReviewType } from '@/lib/queryServices/reviewQueries';
 
-import { Project, User } from '@/model';
-import { postReviewService } from '@/redux/services/reviewServices';
+import { Project } from '@/model';
+import { editReview, postReviewService } from '@/redux/services/reviewServices';
 import { RootState } from '@/redux/store/store';
 
 import InputOutlined from '../Common/InputOutlined';
@@ -14,7 +14,7 @@ import TextAreaOutlined from '../Common/TextAreaOutlined';
 import { LoginPopupStateType } from '../Layout';
 
 interface ReviewModalProps {
-    targetUser: User;
+    targetUser: any;
     project?: Project;
     setShowLoginPopup?: (_value: LoginPopupStateType) => void;
     setLoading?: (_value: boolean) => void;
@@ -25,6 +25,7 @@ interface ReviewModalProps {
     button?: boolean;
     openMain?: boolean;
     setOpenMain?: (_value: boolean) => void;
+    action: 'post' | 'edit';
 }
 
 const labels: { [index: string]: string } = {
@@ -39,13 +40,13 @@ function getLabelText(value: number) {
     return `${value} Star${value !== 1 ? 's' : ''}, ${labels[value]}`;
 }
 
-const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, setSuccessTitle, setLoading, setError, review, button, openMain = false, setOpenMain }: ReviewModalProps) => {
+const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, setSuccessTitle, setLoading, setError, review, button, openMain = false, setOpenMain, action }: ReviewModalProps) => {
     const [open, setOpen] = useState<boolean>(openMain)
     const [hover, setHover] = React.useState(-1);
 
     const [rating, setRating] = React.useState<number>(review?.ratings || 3);
-    const [title, setTitle] = useState<string>("")
-    const [description, setDescription] = useState<string>("")
+    const [title, setTitle] = useState<string>(review?.title || "")
+    const [description, setDescription] = useState<string>(review?.description || "")
 
     const { user, loading: userLoading } = useSelector(
         (state: RootState) => state.userState
@@ -60,17 +61,26 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, s
         setLoading?.(true);
         handleClose();
 
-        const review = {
+        const reviewBody: any = {
             title,
             description,
             ratings: rating,
-            user_id: targetUser.id,
+            user_id: targetUser?.user_id || targetUser.id,
             project_id: project?.id,
             reviewer_id: user.id,
         }
-        const resp = await postReviewService(review)
 
-        if (resp.status === 'success') {
+        let resp;
+
+        if (action === 'post')
+            resp = await postReviewService(reviewBody)
+        else if (action === 'edit') {
+            reviewBody.id = review?.id
+            resp = await editReview(reviewBody)
+        }
+
+
+        if (resp?.status === 'success') {
             setSuccess(true);
             setSuccessTitle("Your review has been successfully submitted")
         } else {

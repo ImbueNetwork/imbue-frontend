@@ -19,7 +19,6 @@ export default nextConnect()
     db.transaction(async (tx) => {
       try {
         const { user_id, reviewer_id } = req.query;
-        console.log("🚀 ~ file: index.ts:22 ~ db.transaction ~ req.query:", req.query)
 
         if (!user_id && !reviewer_id)
           return res.status(404).json({ message: `user id not found` });
@@ -84,6 +83,110 @@ export default nextConnect()
         // eslint-disable-next-line no-console
         console.error(error);
         return res.status(401).json(new Error('Server error: ' + error));
+      }
+    });
+  })
+  .put(async (req: NextApiRequest, res: NextApiResponse) => {
+    db.transaction(async (tx) => {
+      const userAuth: Partial<User> | any = await authenticate('jwt', req, res);
+      verifyUserIdFromJwt(req, res, [userAuth.id]);
+
+      try {
+        const {
+          id,
+          user_id,
+          project_id,
+          ratings,
+          title,
+          description,
+          reviewer_id,
+        } = req.body;
+
+        if (!user_id || !reviewer_id)
+          return res.status(404).json({
+            status: 'Error',
+            message: 'No user_id or reviewer_id were specified',
+          });
+
+        const existingReview = await tx('reviews')
+          .select('*')
+          .where({ id })
+          .first();
+
+        if (existingReview.reviewer_id !== userAuth.id)
+          return res.status(500).json({
+            status: 'Error',
+            message: 'You are not allowed to update this review',
+          });
+
+        const review = {
+          user_id,
+          project_id,
+          ratings,
+          title,
+          description,
+          reviewer_id,
+        };
+
+        const resp = await tx('reviews').update(review).where({ id });
+        if (resp) res.status(200).json({ status: 'success' });
+        else
+          res
+            .status(404)
+            .json({ status: 'Failed', message: 'Failed to update data' });
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error);
+        return res.status(404).json({
+          status: 'Error',
+          message: error,
+        });
+      }
+    });
+  })
+  .delete(async (req: NextApiRequest, res: NextApiResponse) => {
+    db.transaction(async (tx) => {
+      try {
+        const { id } = req.query;
+
+        if (!id)
+          return res.status(404).json({
+            status: 'Error',
+            message: 'No id specified to delete',
+          });
+
+        const userAuth: Partial<User> | any = await authenticate(
+          'jwt',
+          req,
+          res
+        );
+        verifyUserIdFromJwt(req, res, [userAuth.id]);
+
+        const existingReview = await tx('reviews')
+          .select('*')
+          .where({ id })
+          .first();
+
+        if (existingReview.reviewer_id !== userAuth.id)
+          return res.status(500).json({
+            status: 'Error',
+            message: 'You are not allowed to update this review',
+          });
+
+        const resp = await tx('reviews').delete().where({ id });
+
+        if (resp) res.status(200).json({ status: 'success' });
+        else
+          res
+            .status(404)
+            .json({ status: 'Failed', message: 'Failed to update data' });
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error);
+        return res.status(404).json({
+          status: 'Error',
+          message: error,
+        });
       }
     });
   });

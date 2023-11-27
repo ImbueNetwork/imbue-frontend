@@ -1220,7 +1220,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
             View More
           </p>
 
-          <ReviewSection user_id={initFreelancer?.user_id} />
+          <ReviewSection user_id={initFreelancer?.user_id} targetUser={initFreelancer} />
         </div>
       </div>
       {browsingUser && showMessageBox && (

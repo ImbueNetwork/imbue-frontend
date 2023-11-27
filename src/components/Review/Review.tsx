@@ -1,8 +1,10 @@
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { Dialog } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import moment from 'moment';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
@@ -12,19 +14,24 @@ import { useSelector } from 'react-redux';
 
 import { ReviewType } from '@/lib/queryServices/reviewQueries';
 
+import { deleteReview } from '@/redux/services/reviewServices';
 import { RootState } from '@/redux/store/store';
 
 import ReviewFormModal from './ReviewModal';
 import ErrorScreen from '../ErrorScreen';
 import { findFlag } from '../Profile/CountrySelector';
 import SuccessScreen from '../SuccessScreen';
+const Lottie = dynamic(() => import("react-lottie"));
+import FullScreenLoader from '../FullScreenLoader';
+import animationIcon from '../../assets/svgs/warning_animation.json'
 
 interface ReviewProps {
     review: ReviewType;
+    targetUser: any;
 }
 
-const Review = ({ review }: ReviewProps) => {
-    const { user: browsingUser, loading } = useSelector((state: RootState) => state.userState)
+const Review = ({ review, targetUser }: ReviewProps) => {
+    const { user: browsingUser, loading: userLoading } = useSelector((state: RootState) => state.userState)
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -35,7 +42,13 @@ const Review = ({ review }: ReviewProps) => {
         setAnchorEl(null);
     };
 
+    const [loading, setLoading] = useState<boolean>(false)
     const [expanded, setExpanded] = useState<boolean>(false)
+    const [openReviewForm, setOpenReviewForm] = useState<boolean>(false)
+    const [error, setError] = useState<any>()
+    const [warninig, setWarning] = useState<boolean>(false)
+    const [success, setSuccess] = useState<boolean>(false)
+    const [successTitle, setSuccessTitle] = useState<string>("")
 
     const showExpandButton = review.description.length > 500 && !expanded
 
@@ -44,18 +57,27 @@ const Review = ({ review }: ReviewProps) => {
     const handleEdit = async () => {
         setOpenReviewForm(true)
     }
+    const handleDelete = async () => {
+        handleClose()
+        setLoading(true)
+        setWarning(false)
+        const resp = await deleteReview(review.id)
 
-    const [openReviewForm, setOpenReviewForm] = useState<boolean>(false)
-    const [error, setError] = useState<any>()
-    const [success, setSuccess] = useState<boolean>(false)
-    const [successTitle, setSuccessTitle] = useState<string>("")
+        setLoading(false)
+        if (resp.status === 'success') {
+            setSuccess(true)
+            setSuccessTitle("You have successfully deleted your review")
+        }
+    }
+
+    if (loading) return <FullScreenLoader />
 
     return (
         <div
             className='flex flex-col gap-2 pt-2 pb-5 border-b last:border-b-0 border-b-imbue-light-purple text-imbue-purple-dark relative'
         >
             {
-                !loading && browsingUser.id === review.reviewer_id && (
+                !userLoading && browsingUser.id === review.reviewer_id && (
                     <div className='absolute right-0 top-0'>
                         <IconButton
                             aria-label="more"
@@ -84,7 +106,7 @@ const Review = ({ review }: ReviewProps) => {
                             <MenuItem onClick={handleEdit}>
                                 Edit
                             </MenuItem>
-                            <MenuItem onClick={handleClose}>
+                            <MenuItem onClick={() => setWarning(true)}>
                                 Delete
                             </MenuItem>
                         </Menu>
@@ -183,14 +205,60 @@ const Review = ({ review }: ReviewProps) => {
             <ReviewFormModal
                 openMain={openReviewForm}
                 setOpenMain={setOpenReviewForm}
-                targetUser={browsingUser}
+                targetUser={targetUser}
                 review={review}
+                action='edit'
                 {...{
                     setSuccess,
                     setSuccessTitle,
                     setError
                 }}
             />
+
+            <Dialog
+                open={warninig}
+                onClose={() => setWarning(false)}
+                aria-labelledby='alert-dialog-title'
+                aria-describedby='alert-dialog-description'
+                className='p-14 errorDialogue'
+            >
+                <div className='my-auto flex flex-col gap-3 items-center p-8 text-content'>
+                    <div className={`w-fit h-fit rounded-full border-2 border-yellow-200 p-1`}>
+                        <Lottie options={{
+                            loop: false,
+                            autoplay: true,
+                            animationData: animationIcon,
+                            rendererSettings: {
+                                preserveAspectRatio: 'xMidYMid slice'
+                            }
+                        }}
+                            height={130}
+                            width={130}
+                        />
+                    </div>
+
+                    <div className='mt-2 lg:mt-5'>
+                        <p className='text-center text-lg lg:text-2xl font-bold text-content-primary'>
+                            Are you sure you want to delete this review?
+                        </p>
+                        <p className='text-center lg:text-xl my-2 lg:my-5 text-content'>This action cannot be undone.</p>
+                    </div>
+                    <div className='flex flex-col gap-4 w-1/2'>
+                        <button
+                            onClick={() => handleDelete()}
+                            className='primary-btn in-dark w-button w-full !m-0'
+                        >
+                            Continue to Delete
+                        </button>
+                        <button
+                            onClick={() => setWarning(false)}
+                            className='underline text-xs lg:text-base font-bold'
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </Dialog>
 
             <ErrorScreen {...{ error, setError }}>
                 <div className='flex flex-col gap-4 w-1/2'>
@@ -209,7 +277,7 @@ const Review = ({ review }: ReviewProps) => {
                 </div>
             </ErrorScreen>
             <SuccessScreen
-                noRetry={false}
+                noRetry={true}
                 title={successTitle}
                 open={success}
                 setOpen={setSuccess}
@@ -218,6 +286,7 @@ const Review = ({ review }: ReviewProps) => {
                     <button
                         onClick={() => {
                             setSuccess(false);
+                            window.location.reload();
                         }}
                         className='primary-btn in-dark w-button w-full !m-0'
                     >

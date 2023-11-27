@@ -466,6 +466,7 @@ function Project() {
                         setSuccessTitle={setSuccessTitle}
                         setError={setError}
                         button={true}
+                        action='post'
                       />
                     )
                   }

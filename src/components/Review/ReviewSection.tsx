@@ -12,9 +12,10 @@ interface ReviewSectionProps {
     user_id?: string | number;
     reviewer_id?: string | number;
     setError?: (_error: any) => void;
+    targetUser: any
 }
 
-const ReviewSection = ({ user_id, reviewer_id, setError }: ReviewSectionProps) => {
+const ReviewSection = ({ user_id, reviewer_id, setError, targetUser }: ReviewSectionProps) => {
 
     const [sortReviews, setSortReviews] = useState<any>('relevant');
     const [reviews, setReviews] = useState<ReviewType[]>([])
@@ -167,7 +168,7 @@ const ReviewSection = ({ user_id, reviewer_id, setError }: ReviewSectionProps) =
                         <div className='flex flex-col gap-5 bg-white px-10 py-10 rounded-xl'>
                             {
                                 filteredReviews.map((review, index) => (
-                                    <Review key={index} review={review} />
+                                    <Review key={index} review={review} targetUser={targetUser}/>
                                 ))
                             }
                         </div>

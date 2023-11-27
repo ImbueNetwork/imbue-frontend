@@ -623,6 +623,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
 
           <ReviewSection
             user_id={user.id}
+            targetUser={user}
           />
         </div>
       </div>
