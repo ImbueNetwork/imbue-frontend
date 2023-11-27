@@ -67,9 +67,7 @@ export default function ImageCurosal({
   activeSlide: string;
 }) {
   const images = useMemo(() => {
-    const filterData = Images.filter(
-      (img: any) => img.type === 'image/png' || img.type === 'image'
-    );
+    const filterData = Images.filter((img: any) => img.type.includes('image'));
     return filterData;
   }, [Images]);
 

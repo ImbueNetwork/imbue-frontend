@@ -127,7 +127,7 @@ export default function MessageItem({
               {!!message.attachments?.length && (
                 <div className='flex flex-row-reverse gap-1 my-1 flex-wrap'>
                   {message.attachments?.map((item: any) =>
-                    item.type === 'image/png' || item.type === 'image' ? (
+                    item.type?.includes('image') ? (
                       <div className='' key={'first' + item.image_url}>
                         <Image
                           onClick={() => setModal(item.image_url)}
@@ -334,7 +334,7 @@ export default function MessageItem({
         {!!message.attachments?.length && (
           <div className='flex gap-1 my-1 flex-wrap'>
             {message.attachments?.map((item: any) =>
-              item.type === 'image/png' || item.type === 'image' ? (
+              item.type.includes('image') ? (
                 <div className='' key={'third' + item.image_url}>
                   <Image
                     onClick={() => setModal(item.image_url)}

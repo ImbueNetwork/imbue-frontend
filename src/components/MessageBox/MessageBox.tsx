@@ -64,6 +64,7 @@ export default function MessageBox({
   useEffect(() => {
     setMessageId(null);
     setTargetUserDetails(null);
+    setTextVal('');
   }, [channel]);
 
   useEffect(() => {
@@ -209,7 +210,8 @@ export default function MessageBox({
   /// culprits that are responsible for uploading images //////////
   const uploadFileToChannel = async (file: File) => {
     let data;
-    if (file.type === 'image/png') {
+
+    if (file.type.includes('image')) {
       data = await channel.sendImage(file);
     } else data = await channel.sendFile(file);
     const res = {
@@ -222,6 +224,9 @@ export default function MessageBox({
   const onChangeImage = (event: any) => {
     if (event.target.files[0]) {
       uploadFileToChannel(event.target.files[0]);
+      if (imageRef.current) {
+        imageRef.current.value = '';
+      }
     }
   };
 
@@ -389,7 +394,7 @@ export default function MessageBox({
                 />
               </p>
               {isReplayMessage.attachments?.map((item: any) =>
-                item.type === 'image/png' ? (
+                item.type.includes('image') ? (
                   <div className='w-32 relative h-32' key={item.image_url}>
                     {item.image_url && (
                       <Image
@@ -421,7 +426,7 @@ export default function MessageBox({
           {selectedImages.length > 0 && (
             <div className='flex items-center gap-3'>
               {selectedImages.map((item) =>
-                item.type === 'image/png' ? (
+                item.type.includes('image') ? (
                   <div className='w-32 relative h-32' key={item.duration}>
                     <Image
                       className='w-32 h-32 object-fill '
@@ -461,7 +466,7 @@ export default function MessageBox({
             value={textVal}
             minRows={3}
             maxRows={6}
-            className='outline-none placeholder:text-text-aux-colour border-none text-black'
+            className='outline-none resize-none placeholder:text-text-aux-colour border-none text-black'
           />
           <div className='text-text-aux-colour gap-2 flex items-center'>
             <AiOutlinePlus
