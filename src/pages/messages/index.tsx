@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { useSelector } from 'react-redux';
@@ -6,13 +7,17 @@ import { Channel, DefaultGenerics, UserResponse } from 'stream-chat';
 import useOnClickOutside from 'use-onclickoutside';
 
 import ChannelListItem from '@/components/ChannelListItem/ChannelListItem';
+import FullScreenLoader from '@/components/FullScreenLoader';
 import EmptyMessageBox from '@/components/MessageBox/EmptyMessageBox';
 import MessageBox from '@/components/MessageBox/MessageBox';
 
 import { RootState } from '@/redux/store/store';
 
 export default function Messages() {
-  const { user, client } = useSelector((state: RootState) => state.userState);
+  const { user, loading, client } = useSelector(
+    (state: RootState) => state.userState
+  );
+  const router = useRouter();
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [channels, setChannels] = useState<Channel<DefaultGenerics>[]>([]);
   const [searchUsers, setSearchUsers] = useState<UserResponse[]>([]);
@@ -26,6 +31,12 @@ export default function Messages() {
     }
     setSelectedChannel(Selected);
   };
+
+  useEffect(() => {
+    if (!user.id && !loading) {
+      router.push('/');
+    }
+  }, [user, loading]);
 
   useOnClickOutside(searchRef, () => setSearchUsers([]));
 
@@ -90,6 +101,10 @@ export default function Messages() {
       if (res?.users) setSearchUsers(res?.users);
     }
   };
+
+  if (loading) {
+    return <FullScreenLoader />;
+  }
 
   return (
     <div className='bg-white h-[83vh] flex   mt-5 px-2 py-2 rounded-3xl'>
