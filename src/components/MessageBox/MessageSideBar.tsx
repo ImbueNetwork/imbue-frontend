@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 import { AiOutlineMail } from 'react-icons/ai';
 import { BiBuildings } from 'react-icons/bi';
-import { BsThreeDotsVertical } from 'react-icons/bs';
 import { FiDownload } from 'react-icons/fi';
 import { IoCopyOutline } from 'react-icons/io5';
 import { SlWallet } from 'react-icons/sl';
@@ -28,8 +27,7 @@ export default function MessageSideBar({
     targetChannel.state.messageSets[0].messages.map((item) => {
       if (item.attachments?.length && item.attachments?.length > 0) {
         item.attachments.map((item) => {
-          if (item.type === 'image/png' || item.type === 'image')
-            Images.push(item);
+          if (item.type?.includes('image')) Images.push(item);
           else File.push(item);
         });
       }
@@ -148,7 +146,7 @@ export default function MessageSideBar({
               (item: any) =>
                 item.image_url && (
                   <div
-                    className='flex items-center justify-between text-black'
+                    className='flex items-center my-2 justify-between text-black'
                     key={item.image_url}
                   >
                     <p className='text-black'>{item.name}</p>
@@ -156,7 +154,6 @@ export default function MessageSideBar({
                       <a href={item.image_url}>
                         <FiDownload size={17} />
                       </a>
-                      <BsThreeDotsVertical className='mt-1.5 cursor-pointer' />
                     </div>
                   </div>
                 )

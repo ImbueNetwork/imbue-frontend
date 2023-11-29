@@ -5,7 +5,6 @@ import { Swiper, SwiperSlide, useSwiper } from 'swiper/react';
 import 'swiper/css';
 export function Controller({ activeSlide }: { activeSlide: number }) {
   const sp = useSwiper();
-
   const [click, setClick] = useState(false);
   useEffect(() => {
     sp.activeIndex = activeSlide;

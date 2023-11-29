@@ -9,7 +9,9 @@ import MessageItem from './MessageItem';
 export default function PinMessages({
   channel,
   handleReplayMessage,
+  handleScroll,
 }: {
+  handleScroll: any;
   handleReplayMessage: any;
   channel: Channel;
 }) {
@@ -26,13 +28,16 @@ export default function PinMessages({
   return (
     <div className='h-full overflow-auto bg-imbue-light-grey px-2 py-7'>
       {pinedmessage?.messages.map((item) => (
-        <MessageItem
-          key={item.id}
-          message={item}
-          handleReplayMessage={handleReplayMessage}
-          showProfile
-          user={user}
-        />
+        <div onClick={() => handleScroll(item.id)} key={item.id}>
+          <MessageItem
+            key={item.id}
+            isPinMessages={true}
+            message={item}
+            handleReplayMessage={handleReplayMessage}
+            showProfile
+            user={user}
+          />
+        </div>
       ))}
     </div>
   );

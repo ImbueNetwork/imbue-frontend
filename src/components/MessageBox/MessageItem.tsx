@@ -10,7 +10,6 @@ import useOnClickOutside from 'use-onclickoutside';
 
 import {
   deleteMessage,
-  sendMessageReaction,
   setPinMessage,
   setUnPinMessage,
 } from '@/utils/MessageOptions';
@@ -26,12 +25,31 @@ export interface CustomMessage extends FormatMessageResponse {
   parent_message: FormatMessageResponse;
 }
 
+const emojis = (type: string) => {
+  switch (type) {
+    case 'lol':
+      return '😁';
+    case 'like':
+      return '👍';
+    case 'dislike':
+      return '👎';
+    case 'love':
+      return '❤️';
+    case 'sad':
+      return '😢';
+  }
+};
+
 export default function MessageItem({
+  isPinMessages,
   message,
   user,
   showProfile,
   handleReplayMessage,
+  handleSendReaction,
 }: {
+  handleSendReaction?: any;
+  isPinMessages?: boolean;
   handleReplayMessage: (_message: FormatMessageResponse) => void;
   user: User;
   showProfile: boolean;
@@ -81,10 +99,14 @@ export default function MessageItem({
         </Modal>
 
         <div
-          id={message.id}
+          id={isPinMessages ? 'pinMessage' + message.id : message.id}
           className={classNames(
             'flex group flex-row-reverse items-end gap-2 ',
-            message.parent_id ? 'mt-9' : showProfile ? ' mt-1 mb-9' : 'my-1'
+            message.parent_id
+              ? 'mt-9'
+              : showProfile || message.latest_reactions?.length > 0
+              ? ' mt-1 mb-9'
+              : 'my-1'
           )}
         >
           {showProfile && (
@@ -120,7 +142,7 @@ export default function MessageItem({
                   src={'/pin.png'}
                   width={1920}
                   height={1920}
-                  className='w-4 -top-1.5 absolute'
+                  className='w-4 -top-1.5 absolute z-10'
                   alt='pinned '
                 />
               )}
@@ -152,13 +174,25 @@ export default function MessageItem({
                 </div>
               )}
               {!!message.text?.trim().length && (
-                <div className='bg-imbue-lime-light relative  px-4 py-1.5 rounded-2xl text-right text-black'>
-                  <p>{message.text}</p>
+                <div className='bg-imbue-lime-light cursor-pointer relative  px-4 py-1.5 rounded-2xl text-right text-black'>
+                  <p className='break-all'>{message.text}</p>
 
-                  {message.lates_reactions?.length > 0 && (
-                    <p className='absolute right-0 p-0.5 rounded-full bg-white'>
-                      {message.lates_reactions[0].val}
-                    </p>
+                  {Object.entries(message.reaction_counts).length > 0 && (
+                    <div className='flex  bg-transparent absolute right-0'>
+                      {Object.entries(message.reaction_counts).map(
+                        (item: any) => (
+                          <p
+                            key={item.created_at}
+                            className='right-0 p-0.5 flex items-center gap-x-1 px-1 rounded-full bg-white'
+                          >
+                            <span>{emojis(item[0])}</span>
+                            {item[1] > 1 && (
+                              <span className='text-xs'>{item[1]}</span>
+                            )}
+                          </p>
+                        )
+                      )}
+                    </div>
                   )}
                 </div>
               )}
@@ -166,7 +200,7 @@ export default function MessageItem({
                 <p
                   className={classNames(
                     'text-[#7C8B9D]',
-                    message.lates_reactions?.length > 0 ? 'mt-5' : 'mt-0'
+                    message.latest_reactions?.length > 0 ? 'mt-5' : 'mt-0'
                   )}
                 >
                   {timeAgo.format(new Date(message.created_at))}
@@ -178,7 +212,11 @@ export default function MessageItem({
                 className={classNames(
                   ' gap-2  relative    items-center',
                   showProfile ? 'mb-6' : 'mb-0',
-                  modal || isEmojiModalOpen ? 'flex' : 'group-hover:flex hidden'
+                  isPinMessages
+                    ? 'hidden'
+                    : modal || isEmojiModalOpen
+                    ? 'flex'
+                    : 'group-hover:flex hidden'
                 )}
               >
                 <div className='flex items-center'>
@@ -238,31 +276,33 @@ export default function MessageItem({
                   {isEmojiModalOpen && (
                     <div className='absolute z-30 bg-white flex -top-10 right-0 rounded-md  items-center   text-xl'>
                       <p
-                        onClick={() => sendMessageReaction(message, '😁')}
+                        onClick={() => handleSendReaction(message.id, 'lol')}
                         className='hover:bg-imbue-light-grey py-1 px-3 cursor-pointer'
                       >
                         😁
                       </p>
                       <p
-                        onClick={() => sendMessageReaction(message, '👍')}
+                        onClick={() => handleSendReaction(message.id, 'like')}
                         className='hover:bg-imbue-light-grey py-1 px-2 cursor-pointer'
                       >
                         👍
                       </p>
                       <p
-                        onClick={() => sendMessageReaction(message, '👎')}
+                        onClick={() =>
+                          handleSendReaction(message.id, 'dislike')
+                        }
                         className='hover:bg-imbue-light-grey py-1 px-2 cursor-pointer'
                       >
                         👎
                       </p>
                       <p
-                        onClick={() => sendMessageReaction(message, '❤️')}
+                        onClick={() => handleSendReaction(message.id, 'love')}
                         className='hover:bg-imbue-light-grey py-1 px-2 cursor-pointer'
                       >
                         ❤️
                       </p>
                       <p
-                        onClick={() => sendMessageReaction(message, '😢')}
+                        onClick={() => handleSendReaction(message.id, 'sad')}
                         className='hover:bg-imbue-light-grey py-1 px-3 cursor-pointer'
                       >
                         😢
@@ -279,10 +319,14 @@ export default function MessageItem({
   }
   return (
     <div
-      id={message.id}
+      id={isPinMessages ? 'pinMessage' + message.id : message.id}
       className={classNames(
         'flex group items-center gap-2 relative ',
-        message.parent_id ? 'mt-9' : showProfile ? ' mt-1 mb-9' : 'my-1'
+        message.parent_id
+          ? 'mt-9'
+          : showProfile || message.latest_reactions?.length > 0
+          ? ' mt-1 mb-9'
+          : 'my-1'
       )}
     >
       <Modal
@@ -327,7 +371,7 @@ export default function MessageItem({
             src={'/pin.png'}
             width={1920}
             height={1920}
-            className='w-4 -rotate-90 -top-1.5 absolute'
+            className='w-4 -rotate-90 -top-1.5 absolute z-10'
             alt='pinned '
           />
         )}
@@ -359,12 +403,31 @@ export default function MessageItem({
           </div>
         )}
         {!!message.text?.trim().length && (
-          <div className='bg-white px-4 py-1.5 rounded-2xl  text-black'>
-            <p>{message.text}</p>
+          <div className='bg-white relative w-auto cursor-pointer px-4 py-1.5 rounded-2xl  text-black'>
+            <p className='break-all'>{message.text}</p>
+
+            {Object.entries(message.reaction_counts).length > 0 && (
+              <div className='flex  bg-transparent absolute'>
+                {Object.entries(message.reaction_counts).map((item: any) => (
+                  <p
+                    key={item.created_at}
+                    className='right-0 p-0.5 flex items-center gap-x-1 px-1 rounded-full bg-white'
+                  >
+                    <span>{emojis(item[0])}</span>
+                    {item[1] > 1 && <span className='text-xs'>{item[1]}</span>}
+                  </p>
+                ))}
+              </div>
+            )}
           </div>
         )}
         {showProfile && (
-          <p className='text-[#7C8B9D] ml-2'>
+          <p
+            className={classNames(
+              'text-[#7C8B9D] ml-2',
+              message.latest_reactions?.length > 0 ? 'mt-5' : 'mt-0'
+            )}
+          >
             {timeAgo.format(new Date(message.created_at))}
           </p>
         )}
@@ -374,7 +437,11 @@ export default function MessageItem({
           className={classNames(
             ' gap-2  relative    items-center',
             showProfile ? 'mb-6' : 'mb-0',
-            modal || isEmojiModalOpen ? 'flex' : 'group-hover:flex hidden'
+            isPinMessages
+              ? 'hidden'
+              : modal || isEmojiModalOpen
+              ? 'flex'
+              : 'group-hover:flex hidden'
           )}
         >
           <div className='flex items-center'>
@@ -424,31 +491,31 @@ export default function MessageItem({
             {isEmojiModalOpen && (
               <div className='absolute z-30 bg-white flex -top-10  rounded-md  items-center   text-xl'>
                 <p
-                  onClick={() => sendMessageReaction(message, '😁')}
+                  onClick={() => handleSendReaction(message.id, 'lol')}
                   className='hover:bg-imbue-light-grey py-1 px-3 cursor-pointer'
                 >
                   😁
                 </p>
                 <p
-                  onClick={() => sendMessageReaction(message, '👍')}
+                  onClick={() => handleSendReaction(message.id, 'like')}
                   className='hover:bg-imbue-light-grey py-1 px-2 cursor-pointer'
                 >
                   👍
                 </p>
                 <p
-                  onClick={() => sendMessageReaction(message, '👎')}
+                  onClick={() => handleSendReaction(message.id, 'dislike')}
                   className='hover:bg-imbue-light-grey py-1 px-2 cursor-pointer'
                 >
                   👎
                 </p>
                 <p
-                  onClick={() => sendMessageReaction(message, '❤️')}
+                  onClick={() => handleSendReaction(message.id, 'love')}
                   className='hover:bg-imbue-light-grey py-1 px-2 cursor-pointer'
                 >
                   ❤️
                 </p>
                 <p
-                  onClick={() => sendMessageReaction(message, '😢')}
+                  onClick={() => handleSendReaction(message.id, 'sad')}
                   className='hover:bg-imbue-light-grey py-1 px-3 cursor-pointer'
                 >
                   😢

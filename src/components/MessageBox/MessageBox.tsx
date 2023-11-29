@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { AiOutlineInfoCircle, AiOutlinePlus } from 'react-icons/ai';
 import { BsEmojiSmile, BsPinAngle, BsSend } from 'react-icons/bs';
-import { IoIosRemoveCircleOutline } from 'react-icons/io';
+import { IoIosRemoveCircleOutline, IoMdClose } from 'react-icons/io';
 import { IoImageOutline } from 'react-icons/io5';
 import { VscMention } from 'react-icons/vsc';
 import { useSelector } from 'react-redux';
@@ -41,7 +41,11 @@ let lastMessage: lastMessageType | null = null;
 
 export default function MessageBox({
   channel,
+  chatpopup,
+  handleChatPopUp,
 }: {
+  chatpopup?: boolean;
+  handleChatPopUp?: any;
   channel: Channel<DefaultGenerics>;
 }) {
   const { user, client } = useSelector((state: RootState) => state.userState);
@@ -65,6 +69,7 @@ export default function MessageBox({
     setMessageId(null);
     setTargetUserDetails(null);
     setTextVal('');
+    setSelectedImages([]);
   }, [channel]);
 
   useEffect(() => {
@@ -137,6 +142,9 @@ export default function MessageBox({
 
   const handleTyping = async () => {
     await channel.keystroke();
+  };
+  const handleScrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
   const handleChnages = (e: any) => {
     handleTyping();
@@ -230,6 +238,14 @@ export default function MessageBox({
     }
   };
 
+  const handleSendReaction = async (messageID: string, type: string) => {
+    await channel.sendReaction(
+      messageID,
+      { type: type, user_id: String(user.id) },
+      { enforce_unique: true }
+    );
+  };
+
   const handleEmoji = () => {
     setEmojiOpen((val) => !val);
   };
@@ -274,17 +290,22 @@ export default function MessageBox({
     <div className='flex h-full'>
       <div
         onClick={handleReadMessage}
-        className="border-[4px] w-full relative h-full bg-[url('/message-box-pattern.svg')]  back  rounded-2xl"
+        className="border-[4px] w-full relative h-full bg-[url('/message-box-pattern.svg')]    rounded-2xl"
       >
         {/* messaging header sections */}
-        <div className='bg-white w-full justify-between items-center flex rounded-xl px-5 py-3'>
+        <div
+          className={classNames(
+            'bg-white w-full justify-between items-center flex rounded-xl px-5 ',
+            chatpopup ? 'py-1' : 'py-3'
+          )}
+        >
           <div
             onClick={() => router.push(`/profile/${targetUser?.username}`)}
             className='flex cursor-pointer'
           >
             <div className='w-14 justify-self-start  relative'>
               <Image
-                className='w-12 h-12  object-cover rounded-full'
+                className={classNames('object-cover rounded-full w-12 h-12')}
                 src={
                   targetUser?.profile_photo ||
                   require('@/assets/images/profile-image.png')
@@ -309,31 +330,41 @@ export default function MessageBox({
               </p>
             </div>
           </div>
-          <div className='flex text-text-aux-colour gap-4  items-center'>
-            {/* <p className='cursor-pointer p-3 flex items-center  rounded-full hover:bg-imbue-lime-light'>
+          {!chatpopup && (
+            <div className='flex text-text-aux-colour gap-4  items-center'>
+              {/* <p className='cursor-pointer p-3 flex items-center  rounded-full hover:bg-imbue-lime-light'>
               <BsArchive size={18} />
             </p> */}
-            <BsPinAngle
-              size={44}
-              onClick={handleBarOptions}
-              className='-rotate-45 rounded-full p-3 hover:bg-imbue-lime-light cursor-pointer'
-            />
-            {/* <AiOutlineFlag
+              <BsPinAngle
+                size={44}
+                onClick={handleBarOptions}
+                className='-rotate-45 rounded-full p-3 hover:bg-imbue-lime-light cursor-pointer'
+              />
+              {/* <AiOutlineFlag
               className='cursor-pointer rounded-full p-3 hover:bg-imbue-lime-light'
               size={44}
             /> */}
-            <AiOutlineInfoCircle
-              onClick={getUserDetailsForChannel}
-              className='cursor-pointer p-3 rounded-full hover:bg-imbue-lime-light'
-              size={44}
-            />
-          </div>
+              <AiOutlineInfoCircle
+                onClick={getUserDetailsForChannel}
+                className='cursor-pointer p-3 rounded-full hover:bg-imbue-lime-light'
+                size={44}
+              />
+            </div>
+          )}
+          {chatpopup && (
+            <div onClick={() => handleChatPopUp(false)}>
+              <IoMdClose className='text-black cursor-pointer' size={20} />
+            </div>
+          )}
         </div>
         {/* messaging header sections ends */}
         <div
           id='message_box'
           style={{ height: hState }}
-          className='max-h-[60vh] h-full overflow-auto'
+          className={classNames(
+            ' h-full  overflow-auto',
+            chatpopup ? 'max-h-[35vh]' : 'max-h-[60vh]'
+          )}
         >
           {messages?.map((item, index) => {
             let bool = false;
@@ -361,6 +392,7 @@ export default function MessageBox({
             return (
               <MessageItem
                 handleReplayMessage={setReplayMessage}
+                handleSendReaction={handleSendReaction}
                 key={item.id}
                 user={user}
                 message={item}
@@ -380,7 +412,9 @@ export default function MessageBox({
         <div
           ref={inputMessageRef}
           id='input_message'
-          className='bg-white absolute w-[99%]  h-auto py-2 mx-2 px-2  bottom-0 rounded-lg'
+          className={classNames(
+            'bg-white  w-[99%] absolute h-auto py-2 mx-2 px-2  bottom-0 rounded-lg'
+          )}
         >
           {isReplayMessage !== null && (
             <div className='bg-imbue-light-grey px-3 py-2 rounded-xl text-black'>
@@ -464,8 +498,8 @@ export default function MessageBox({
             onChange={handleChnages}
             onKeyDown={handleKeyDown}
             value={textVal}
-            minRows={3}
-            maxRows={6}
+            minRows={chatpopup ? 1 : 3}
+            maxRows={chatpopup ? 6 : 2}
             className='outline-none resize-none placeholder:text-text-aux-colour border-none text-black'
           />
           <div className='text-text-aux-colour gap-2 flex items-center'>
@@ -529,6 +563,7 @@ export default function MessageBox({
       {isPinedMessageOpen && (
         <div className='bg-white  w-[30rem] text-text-aux-colour mb-2 pl-2 h-full rounded-r-3xl  '>
           <PinMessages
+            handleScroll={handleScrollTo}
             channel={channel}
             handleReplayMessage={setReplayMessage}
           />

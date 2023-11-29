@@ -19,14 +19,15 @@ export default nextConnect()
         res
       );
 
-      if(!userAuth) {
+      if (!userAuth) {
         return res.status(404).send('unable to fetch notifications');
       }
-      
+
       const client = connect(
         process.env.GETSTREAM_API_KEY as string,
         process.env.GETSTREAM_SECRET_KEY as string
       );
+
       const user = client.feed('user', userAuth.id);
       await db.transaction(async (tx) => {
         try {
