@@ -499,7 +499,7 @@ export default function MessageBox({
             onKeyDown={handleKeyDown}
             value={textVal}
             minRows={chatpopup ? 1 : 3}
-            maxRows={chatpopup ? 6 : 2}
+            maxRows={chatpopup ? 2 : 6}
             className='outline-none resize-none placeholder:text-text-aux-colour border-none text-black'
           />
           <div className='text-text-aux-colour gap-2 flex items-center'>
