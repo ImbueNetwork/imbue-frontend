@@ -25,6 +25,7 @@ import ErrorScreen from '@/components/ErrorScreen';
 import FullScreenLoader from '@/components/FullScreenLoader';
 import CountrySelector from '@/components/Profile/CountrySelector';
 import UploadImage from '@/components/Profile/UploadImage';
+import ReviewSection from '@/components/Review/ReviewSection';
 import SuccessScreen from '@/components/SuccessScreen';
 
 import * as config from '@/config';
@@ -206,10 +207,10 @@ const Profile = ({ initUser, browsingUser }: any) => {
 
   const handleChange = async (e: any) => {
     if (e.target.name === 'display_name') {
-      if(isUrlExist(e.target.value)) {
+      if (isUrlExist(e.target.value)) {
         setDisplayNameError('URL is not allowed in name');
       }
-        else if (e.target.value.length < 1 && e.target.value.length > 30)
+      else if (e.target.value.length < 1 && e.target.value.length > 30)
         setDisplayNameError('name must be between 1 and 30 characters');
       else setDisplayNameError(null);
     }
@@ -299,7 +300,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                     variant='outlined'
                     defaultValue={user?.display_name}
                     autoComplete='off'
-                    inputProps={{maxLength:30}}
+                    inputProps={{ maxLength: 30 }}
                   />
                   {displayNameError && (
                     <p
@@ -335,7 +336,7 @@ const Profile = ({ initUser, browsingUser }: any) => {
                     label='Username'
                     variant='outlined'
                     defaultValue={user?.username}
-                    inputProps={{maxLength:30}}
+                    inputProps={{ maxLength: 30 }}
                   />
                   {userNameError && (
                     <p
@@ -619,6 +620,11 @@ const Profile = ({ initUser, browsingUser }: any) => {
               </div>
             </div>
           )}
+
+          <ReviewSection
+            user_id={user.id}
+            targetUser={user}
+          />
         </div>
       </div>
       {user && showMessageBox && (

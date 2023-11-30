@@ -2,20 +2,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import SearchIcon from '@mui/icons-material/Search';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import {
   Alert,
   FormControl,
   InputAdornment,
   InputLabel,
-  MenuItem,
   OutlinedInput,
-  Select,
   TextField,
   Tooltip,
 } from '@mui/material';
-import { StyledEngineProvider } from '@mui/system';
 import { SignerResult } from '@polkadot/api/types';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Filter from 'bad-words';
@@ -23,15 +19,12 @@ import moment from 'moment';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import ReactCountryFlag from 'react-country-flag';
 import { AiOutlineUser } from 'react-icons/ai';
 import { BsPencilSquare } from 'react-icons/bs';
 import {
   FaDiscord,
   FaFacebook,
   FaRegShareSquare,
-  FaRegThumbsDown,
-  FaRegThumbsUp,
   FaStar,
   FaTelegram,
   FaTwitter,
@@ -61,6 +54,7 @@ import Clients from '@/components/Profile/Clients';
 import CountrySelector from '@/components/Profile/CountrySelector';
 import Skills from '@/components/Profile/Skills';
 import UploadImage from '@/components/Profile/UploadImage';
+import ReviewSection from '@/components/Review/ReviewSection';
 import SuccessScreen from '@/components/SuccessScreen';
 
 import { Currency, Freelancer, Project, User } from '@/model';
@@ -400,42 +394,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
     budgetType: 'Fixed Price',
   };
 
-  const [sortReviews, setSortReviews] = useState<any>('relevant');
-  const reviews = [
-    {
-      name: 'Sam',
-      ratings: 3,
-      time: '1 month',
-      description:
-        'I have created a web NFT marketplace landing page for imbue , you can check on my profile to see more',
-      countryCode: 'US',
-      country: 'United States',
-      image:
-        'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
-    },
-    {
-      name: 'Sausan',
-      ratings: 3,
-      time: '1 month',
-      description:
-        'I have created a web NFT marketplace landing page for imbue , you can check on my profile to see more',
-      countryCode: 'NO',
-      country: 'Norway',
-      image:
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
-    },
-    {
-      name: 'Aala S.',
-      ratings: 3,
-      time: '1 month',
-      description:
-        'I have contacted idris muhammad for building web3 for new eBook product that i am developing for my coaching business',
-      countryCode: 'CA',
-      country: 'Canada',
-      image:
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
-    },
-  ];
+
 
   // const clinetsData = [
   //   {
@@ -1261,113 +1220,7 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
             View More
           </p>
 
-          <StyledEngineProvider injectFirst>
-            <div className='flex flex-col'>
-              <TextField
-                autoComplete='off'
-                color='secondary'
-                id='outlined-controlled'
-                label='Search'
-                sx={{ maxWidth: '350px' }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position='end'>
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <FormControl
-                variant='standard'
-                sx={{ m: 1, minWidth: 180, maxWidth: '100px' }}
-              >
-                <InputLabel id='demo-simple-select-standard-label'>
-                  Sort by
-                </InputLabel>
-                <Select
-                  labelId='demo-simple-select-standard-label'
-                  id='demo-simple-select-standard'
-                  value={sortReviews}
-                  onChange={(e) => setSortReviews(e.target.value)}
-                  label='Sort by'
-                >
-                  <MenuItem value='relevant'>Most Relevant</MenuItem>
-                  <MenuItem value='ratings'>Ratings</MenuItem>
-                  <MenuItem value='budget'>Budget</MenuItem>
-                  <MenuItem value='date'>Date</MenuItem>
-                </Select>
-              </FormControl>
-            </div>
-          </StyledEngineProvider>
-          <hr className='separator' />
-
-          <div className='flex flex-col gap-5 bg-white px-10 py-10 rounded-xl'>
-            {reviews.map((review, index) => (
-              <div
-                key={index}
-                className='flex flex-col gap-3 pt-2 pb-5 border-b last:border-b-0 border-b-imbue-light-purple text-imbue-purple-dark'
-              >
-                <div className='flex gap-3'>
-                  <div className='h-[46px] w-[46px] rounded-full overflow-hidden relative'>
-                    <Image
-                      sizes='24'
-                      className='object-cover'
-                      src={review.image}
-                      fill
-                      alt='user'
-                    />
-                  </div>
-                  <div>
-                    <p>
-                      {review.name}
-                      {review.name.length > 50
-                        ? `${review.name.substring(0, 50)}...`
-                        : review.name}
-                    </p>
-                    <div className='flex gap-2 items-center'>
-                      <ReactCountryFlag countryCode={review.countryCode} />
-                      <span>{review.country}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className='flex items-center'>
-                  {[...Array(4)].map((r, ri) => (
-                    <FaStar
-                      className='lg:h-[24px] lg:w-[24px]'
-                      key={ri}
-                      color={
-                        ri + 1 > review.ratings
-                          ? 'var(--theme-purple-light)'
-                          : 'var(--theme-primary)'
-                      }
-                    />
-                  ))}
-                  <span className='text-imbue-purple ml-3'>
-                    | {review.time}
-                  </span>
-                </div>
-                <p className='mt-2 break-all'>
-                  {review.description.length > 500
-                    ? `${review.description.substring(0, 500)}...`
-                    : review.description}
-                </p>
-                <div className='flex gap-4'>
-                  <p>Helpful?</p>
-                  <div className='flex gap-3'>
-                    <div className='cta-vote'>
-                      <FaRegThumbsUp />
-                      Yes
-                    </div>
-                    <div className='cta-vote'>
-                      <FaRegThumbsDown />
-                      No
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <ReviewSection user_id={initFreelancer?.user_id} targetUser={initFreelancer} />
         </div>
       </div>
       {browsingUser && showMessageBox && (
@@ -1427,9 +1280,8 @@ const Profile = ({ initFreelancer }: ProfileProps): JSX.Element => {
       />
 
       <div
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${
-          copied ? 'right-5' : '-right-full'
-        }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
+          }`}
       >
         <Alert severity='success'>{`${copied} Copied to clipboard`}</Alert>
       </div>
