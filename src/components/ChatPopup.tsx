@@ -21,20 +21,20 @@ const ChatPopup = (props: ChatPopupProps) => {
     setShowMessageBox,
     browsingUser,
     targetUser,
-    showFreelancerProfile
+    showFreelancerProfile,
   } = props;
 
   return (
     <StyledEngineProvider injectFirst>
       <Slide
         direction='up'
-        className='z-10 chat-popup'
+        className='z-10  chat-popup'
         in={showMessageBox}
         mountOnEnter
         unmountOnExit
       >
         <Box>
-          <div className='relative h-full border border-imbue-light-purple'>
+          <div className='relative bg-imbue-light-grey h-full border border-imbue-light-purple'>
             {/* <div
               className='w-5 cursor-pointer absolute top-2 right-1 z-10 font-semibold text-content-primary'
               onClick={() => setShowMessageBox(false)}

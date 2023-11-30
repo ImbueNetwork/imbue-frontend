@@ -36,6 +36,7 @@ export default nextConnect().post(
               username: '',
               web3_address: wallet,
               getstream_token: '',
+              email: '',
             });
         });
 

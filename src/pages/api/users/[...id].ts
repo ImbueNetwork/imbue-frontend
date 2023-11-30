@@ -12,13 +12,15 @@ export default nextConnect()
     const id: any = query.id;
     db.transaction(async (tx) => {
       try {
-        const usernameRes =  await models.fetchUserWithUsernameOrAddress(id.toString())(tx);
+        const usernameRes = await models.fetchUserWithUsernameOrAddress(
+          id.toString()
+        )(tx);
 
         if (!usernameRes) {
           return res.status(404).end();
         }
 
-        const user = await models.fetchUser(usernameRes?.id)(tx) as User;
+        const user = (await models.fetchUser(usernameRes?.id)(tx)) as User;
         if (!user) {
           return res.status(404).end();
         }

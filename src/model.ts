@@ -1,3 +1,5 @@
+import { ReviewBody } from "./lib/queryServices/reviewQueries";
+
 export enum Currency {
   IMBU = 0,
   KSM = 1,
@@ -114,6 +116,7 @@ export type Project = {
   project_in_milestone_voting?: boolean;
   first_pending_milestone?: number;
   payment_address: string;
+  reviews?: ReviewBody[];
 };
 
 export type ProjectOnChain = {
@@ -170,6 +173,7 @@ export type Web3Account = {
 };
 
 export type User = {
+  email: any;
   id: number;
   display_name: string;
   web3Accounts?: Web3Account[];

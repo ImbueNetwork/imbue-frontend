@@ -10,6 +10,15 @@ type CountrySelectorProps = {
   isEditMode?: boolean;
 };
 
+export const findFlag = (country: string) => {
+  if (!country) return;
+  if (country === 'United States')
+    return getCode('United States of America');
+  if (country === 'United Kingdom') return 'UK';
+  if (country === 'Turkey') return 'TR';
+  else return getCode(country);
+};
+
 const CountrySelector = ({
   setUser,
   user,
@@ -28,14 +37,7 @@ const CountrySelector = ({
     setUser?.({ ...user, region: regionName });
   };
 
-  const findFlag = () => {
-    if (!user.country) return;
-    if (user?.country === 'United States')
-      return getCode('United States of America');
-    if (user?.country === 'United Kingdom') return 'UK';
-    if (user?.country === 'Turkey') return 'TR';
-    else return getCode(user?.country);
-  };
+
 
   return (
     <>
@@ -62,7 +64,7 @@ const CountrySelector = ({
             <>
               <ReactCountryFlag
                 className='text-imbue-purple-dark font-bold'
-                countryCode={findFlag() || 'TR'}
+                countryCode={findFlag(user.country) || 'TR'}
               />
               <p className='text-base leading-[1.2] text-imbue-purple-dark'>
                 {user?.region && `${user?.region}, `} {user?.country}
