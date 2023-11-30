@@ -1,4 +1,4 @@
-import { Modal } from '@mui/material';
+import { Alert, Modal } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
@@ -35,6 +35,16 @@ export default function MessageSideBar({
     return { Images, File };
   }, [targetChannel]);
 
+  const [copied, setCopied] = useState(false);
+
+  const copyAddress = () => {
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 3000);
+  };
+
   return (
     <>
       <Modal
@@ -48,6 +58,13 @@ export default function MessageSideBar({
         />
       </Modal>
       <div className='bg-imbue-light-grey h-full overflow-auto  rounded-3xl py-5 px-5 '>
+        <div
+          className={`fixed top-28 z-10 transform duration-300 transition-all ${
+            copied ? 'right-5' : '-right-full'
+          }`}
+        >
+          <Alert severity='success'>Wallet Address Copied to clipboard</Alert>
+        </div>
         <div
           onClick={() => router.push(`/profile/${targetUserDetails.username}`)}
           className='flex cursor-pointer gap-2 text-black'
@@ -97,7 +114,16 @@ export default function MessageSideBar({
                     targetUserDetails?.web3_address.length - 3,
                     targetUserDetails?.web3_address.length
                   )}
-                <IoCopyOutline className='text-text-aux-colour' size={16} />
+                <IoCopyOutline
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      targetUserDetails?.web3_address
+                    );
+                    copyAddress();
+                  }}
+                  className='text-text-aux-colour cursor-pointer'
+                  size={16}
+                />
               </p>
             </div>
             <div className='flex w-full justify-between'>
