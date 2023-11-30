@@ -3,7 +3,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { IoIosArrowForward } from 'react-icons/io';
 import { Swiper, SwiperSlide, useSwiper } from 'swiper/react';
 import 'swiper/css';
-export function Controller({ activeSlide }: { activeSlide: number }) {
+export function Controller({
+  activeSlide,
+  images,
+}: {
+  activeSlide: number;
+  images: string[];
+}) {
   const sp = useSwiper();
   const [click, setClick] = useState(false);
   useEffect(() => {
@@ -37,7 +43,7 @@ export function Controller({ activeSlide }: { activeSlide: number }) {
   return (
     <div className='flex justify-between  absolute gap-5 items-center top-[50%] z-20  w-full '>
       <p>
-        {!sp.isBeginning && (
+        {sp.activeIndex !== 0 && (
           <IoIosArrowForward
             onClick={handleBackward}
             size={80}
@@ -46,7 +52,7 @@ export function Controller({ activeSlide }: { activeSlide: number }) {
         )}
       </p>
       <p>
-        {!sp.isEnd && (
+        {sp.activeIndex !== images.length - 1 && (
           <IoIosArrowForward
             onClick={handleForward}
             size={80}
@@ -76,7 +82,7 @@ export default function ImageCurosal({
   }, [Images, activeSlide]);
   return (
     <Swiper slidesPerView={1} className='relative  w-[80%] h-[80%]'>
-      <Controller activeSlide={activeIndex} />
+      <Controller activeSlide={activeIndex} images={images} />
       {images?.map((item: any) => (
         <SwiperSlide key={'images' + item.image_url}>
           <Image
