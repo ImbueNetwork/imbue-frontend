@@ -8,7 +8,7 @@ import { AiOutlineInfoCircle, AiOutlinePlus } from 'react-icons/ai';
 import { BsEmojiSmile, BsPinAngle, BsSend } from 'react-icons/bs';
 import { IoIosRemoveCircleOutline, IoMdClose } from 'react-icons/io';
 import { IoImageOutline } from 'react-icons/io5';
-import { VscMention } from 'react-icons/vsc';
+import { VscNewline } from 'react-icons/vsc';
 import { useSelector } from 'react-redux';
 import {
   Channel,
@@ -494,7 +494,7 @@ export default function MessageBox({
             </div>
           )}
           <TextareaAutosize
-            placeholder='type here'
+            placeholder='type here...'
             onChange={handleChnages}
             onKeyDown={handleKeyDown}
             value={textVal}
@@ -509,10 +509,10 @@ export default function MessageBox({
               size={21}
             />
             <p className='text-lg'>|</p>
-            <VscMention
-              onClick={() => setTextVal((val) => String(val + '@'))}
+            <VscNewline
               className='hover:text-black cursor-pointer'
-              size={28}
+              onClick={() => setTextVal((val) => val + '\n')}
+              size={24}
             />
             <div className='relative flex items-center'>
               <BsEmojiSmile
