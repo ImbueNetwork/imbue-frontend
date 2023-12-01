@@ -1,7 +1,7 @@
 import { Divider } from '@mui/material';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
-import router from 'next/router';
+import Link from 'next/link';
 import { useState } from 'react';
 
 import { ProgressBar } from '@/components/ProgressBar';
@@ -20,25 +20,29 @@ const OngoingProject: React.FC<OngoingProjectProps> = ({ projects }) => {
   /// limit ongoing project
   const OngoingProjectLimit = 10;
   const [value, setValue] = useState(OngoingProjectLimit);
-  const redirectToApplication = (project: Project) => {
-    router.push(`/projects/${project.id}`);
-  };
+  // const redirectToApplication = (project: Project) => {
+  //   router.push(`/projects/${project.id}`);
+  // };
 
-  const redirectToDiscoverBriefs = () => {
-    router.push(`/briefs`);
-  };
+  // const redirectToDiscoverBriefs = () => {
+  //   router.push(`/briefs`);
+  // };
 
   if (projects?.length === 0)
     return (
       <div className='w-full flex justify-center py-6'>
         <button
-          onClick={() => {
-            redirectToDiscoverBriefs();
-          }}
+          // onClick={() => {
+          //   redirectToDiscoverBriefs();
+          // }}
           className='primary-btn in-dark w-button lg:w-1/3'
           style={{ textAlign: 'center' }}
         >
-          Discover Briefs
+          <Link
+            href={'/briefs'}
+          >
+            Discover Briefs
+          </Link>
         </button>
       </div>
     );
@@ -48,10 +52,12 @@ const OngoingProject: React.FC<OngoingProjectProps> = ({ projects }) => {
         (project, index: number) =>
           index <
           Math.min(Math.max(value, OngoingProjectLimit), projects.length) && (
-            <>
+            <Link
+              key={project.id}
+              href={`/projects/${project.id}`}
+            >
               <div
-                key={project.id}
-                onClick={() => redirectToApplication(project)}
+                // onClick={() => redirectToApplication(project)}
                 className=' hover:bg-imbue-light-purple cursor-pointer px-9 text-imbue-purple'
               >
                 <div className='flex flex-col pt-7 gap-y-5 '>
@@ -111,7 +117,7 @@ const OngoingProject: React.FC<OngoingProjectProps> = ({ projects }) => {
                 </div>
               </div>
               {index !== projects.length - 1 && <Divider />}
-            </>
+            </Link>
           )
       )}
       <div className='flex'>

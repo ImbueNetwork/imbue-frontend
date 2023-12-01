@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import Image from 'next/image';
+import Link from 'next/link';
 import React from 'react';
 
 // import { FaPaperclip } from 'react-icons/fa';
@@ -7,7 +8,7 @@ import { ApplicationContainerProps, applicationStatusId } from '@/model';
 
 export const ApplicationContainer = ({
   application,
-  redirectToApplication,
+  // redirectToApplication,
   handleMessageBoxClick,
 }: ApplicationContainerProps) => {
   return (
@@ -44,9 +45,14 @@ export const ApplicationContainer = ({
 
           <button
             className='border border-imbue-purple rounded-full px-5 text-imbue-purple hover:bg-primary hover:border-primary font-medium py-[6px] md:py-2 !text-sm lg:!text-base'
-            onClick={() => redirectToApplication(application?.id)}
+            // onClick={() => redirectToApplication(application?.id)}
           >
+            <Link
+            href={`/briefs/${application.brief_id}/applications/${application?.id}`}
+            rel='noopener noreferrer'
+            >
             View proposal
+            </Link>
           </button>
           <button
             onClick={() =>
