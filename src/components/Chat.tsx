@@ -1,21 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Skeleton } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import {
-  Channel,
-  Chat,
-  MessageInput,
-  MessageList,
-  Window,
-} from 'stream-chat-react';
 import 'stream-chat-react/dist/css/v2/index.css';
 
 import { getStreamChat } from '@/utils';
 
 import { User } from '@/model';
 
-import { CustomChannelHeader } from './StreamChatComponents/CustomChannelHeader';
-
+import MessageBox from './MessageBox/MessageBox';
 
 export type ChatProps = {
   user: User;
@@ -25,7 +17,6 @@ export type ChatProps = {
   chatPopUp?: boolean;
   showFreelancerProfile: boolean;
 };
-
 
 function CustomSkeletonLoading() {
   return (
@@ -74,7 +65,6 @@ export const ChatBox = ({
   showMessageBox,
   setShowMessageBox,
   chatPopUp,
-  showFreelancerProfile
 }: ChatProps) => {
   const [content, setContent] = useState<any>(<CustomSkeletonLoading />);
 
@@ -95,7 +85,9 @@ export const ChatBox = ({
           );
 
           const channel = client.channel('messaging', {
-            image: 'https://www.drupal.org/files/project-images/react.png',
+            image:
+              targetUser.profile_photo ||
+              'https://www.drupal.org/files/project-images/react.png',
             name: currentChannel,
             members: [String(user.id), String(targetUser.id)],
           });
@@ -103,29 +95,11 @@ export const ChatBox = ({
           await channel.watch();
 
           setContent(
-            <Chat client={client} theme='str-chat__theme-light'>
-              <Channel channel={channel}>
-                <Window>
-                  <div>
-                    <div
-                      className='w-5 cursor-pointer absolute top-2 right-1 z-10 font-semibold text-content-primary'
-                      onClick={() => setShowMessageBox(false)}
-                    >
-                      x
-                    </div>
-                    <CustomChannelHeader {...{ targetUser, showFreelancerProfile, chatPopUp }} />
-                  </div>
-                  <MessageList
-                    closeReactionSelectorOnClick={true}
-                    messageActions={['edit', 'delete', 'flag', 'mute', 'pin', 'quote', 'react']}
-                  />
-                  <div className='border-t border-t-white border-opacity-25'>
-                    <MessageInput />
-                  </div>
-                </Window>
-                {/* <Thread /> */}
-              </Channel>
-            </Chat>
+            <MessageBox
+              handleChatPopUp={setShowMessageBox}
+              chatpopup={chatPopUp}
+              channel={channel}
+            />
           );
         }
       } catch (error) {

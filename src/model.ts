@@ -173,6 +173,7 @@ export type Web3Account = {
 };
 
 export type User = {
+  email: any;
   id: number;
   display_name: string;
   web3Accounts?: Web3Account[];

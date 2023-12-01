@@ -14,7 +14,6 @@ export default function NotificationIcon() {
     string | undefined
   >();
 
-  
   useEffect(() => {
     const notifications = async () => {
       const result = await getNotification();
@@ -46,7 +45,6 @@ export default function NotificationIcon() {
     setAnchorEl(null);
     setModal(false);
   };
-  
 
   return (
     <div>
