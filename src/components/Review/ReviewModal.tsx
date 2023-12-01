@@ -1,5 +1,5 @@
 import { Box, Dialog, Rating } from '@mui/material';
-import React, { useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { FaStar } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 
@@ -9,9 +9,9 @@ import { Project } from '@/model';
 import { editReview, postReviewService } from '@/redux/services/reviewServices';
 import { RootState } from '@/redux/store/store';
 
-import InputOutlined from '../Common/InputOutlined';
-import TextAreaOutlined from '../Common/TextAreaOutlined';
 import { LoginPopupStateType } from '../Layout';
+import ValidatableInput from '../ValidatableInput';
+import styles from '../../styles/modules/Freelancers/new-Freelancer.module.css';
 
 interface ReviewModalProps {
     targetUser: any;
@@ -96,7 +96,7 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, s
                 onClose={handleClose}
                 aria-labelledby='alert-dialog-title'
                 aria-describedby='alert-dialog-description'
-                className='p-14 errorDialogue'
+                className='p-14 errorDialogue min-h-fit'
             >
                 <div className='flex flex-col gap-3 p-8 text-content'>
                     <p className='text-center text-lg lg:text-2xl font-bold text-content-primary'>
@@ -130,18 +130,45 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, s
                         </div>
 
 
-                        <p>Title</p>
-                        <InputOutlined
+                        <p className='mb-2'>Title</p>
+                        {/* <InputOutlined
                             onChange={(e) => setTitle(e.target.value)}
                             inputProps={{ defaultValue: review?.title }}
+                        /> */}
+                        <ValidatableInput
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                setTitle(e.target.value)
+                            }
+                            className={`${styles.fieldInput} ${styles.large}`}
+                            placeholder='Add a Title'
+                            data-testid='title'
+                            name='title'
+                            maxLength={100}
+                            minLength={15}
+                            defaultValue={review?.title}
+                            value={title}
                         />
 
-                        <p>Description</p>
-                        <TextAreaOutlined
+                        <p className='mb-2'>Description</p>
+                        {/* <TextAreaOutlined
                             props={{
                                 onChange: (e) => setDescription(e.target.value)
                             }}
                             inputProps={{ defaultValue: review?.description }}
+                        /> */}
+                        <ValidatableInput
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                setDescription(e.target.value)
+                            }
+                            className={`${styles.fieldInput} ${styles.large}`}
+                            placeholder='Add a description'
+                            data-testid='description'
+                            name='description'
+                            maxLength={5000}
+                            minLength={50}
+                            rows={6}
+                            defaultValue={review?.description}
+                            value={description}
                         />
 
                         <div className='flex items-center justify-center w-full mt-3'>
