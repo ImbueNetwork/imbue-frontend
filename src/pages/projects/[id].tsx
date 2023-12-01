@@ -74,6 +74,7 @@ TimeAgo.addDefaultLocale(en);
 function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
+  console.log("🚀 ~ file: [id].tsx:77 ~ Project ~ project:", project)
   const [targetUser, setTargetUser] = useState<any>({});
   // const [projectHasAttachments, setProjectHasAttachments] = useState<boolean>(false);
 
@@ -364,7 +365,7 @@ function Project() {
 
   const oneMielstoneApproved = project?.milestones?.find((m: Milestone) => m.is_approved) ? true : false
   const userReviewed = project?.reviews?.find((r: ReviewBody) => r.reviewer_id === user?.id) ? true : false
-  const canReview = oneMielstoneApproved && !userReviewed && canVote
+  const canReview = oneMielstoneApproved && !userReviewed && (isApprover || (projectType === 'brief' && isProjectOwner))
 
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>

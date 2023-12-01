@@ -158,7 +158,7 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, s
                     <button
                         className='px-3 py-1 rounded-full bg-imbue-light-purple text-sm text-content'
                         onClick={() => {
-                            if (userLoading || !user.id) setShowLoginPopup?.({ open: true, redirectURL: `/projects/${project?.id}` });
+                            if (!userLoading && !user.id) setShowLoginPopup?.({ open: true, redirectURL: `/projects/${project?.id}` });
                             else setOpen(true)
                         }}
                     >
