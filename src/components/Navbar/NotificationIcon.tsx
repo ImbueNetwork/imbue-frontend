@@ -54,7 +54,7 @@ export default function NotificationIcon() {
           src='/bell-01.svg'
           width={23}
           height={20}
-          className='cursor-pointer '
+          className='cursor-pointer h-5 w-5'
           alt='notifications'
         />
       </Badge>
