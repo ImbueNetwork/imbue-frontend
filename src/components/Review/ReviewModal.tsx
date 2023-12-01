@@ -1,4 +1,5 @@
 import { Box, Dialog, Rating } from '@mui/material';
+import Link from 'next/link';
 import React, { ChangeEvent, useState } from 'react';
 import { FaStar } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
@@ -10,6 +11,7 @@ import { editReview, postReviewService } from '@/redux/services/reviewServices';
 import { RootState } from '@/redux/store/store';
 
 import { LoginPopupStateType } from '../Layout';
+import SuccessScreen from '../SuccessScreen';
 import ValidatableInput from '../ValidatableInput';
 import styles from '../../styles/modules/Freelancers/new-Freelancer.module.css';
 
@@ -18,8 +20,6 @@ interface ReviewModalProps {
     project?: Project;
     setShowLoginPopup?: (_value: LoginPopupStateType) => void;
     setLoading?: (_value: boolean) => void;
-    setSuccessTitle: (_value: string) => void;
-    setSuccess: (_value: boolean) => void;
     setError: (_value: any) => void;
     review?: ReviewType;
     button?: boolean;
@@ -40,12 +40,13 @@ function getLabelText(value: number) {
     return `${value} Star${value !== 1 ? 's' : ''}, ${labels[value]}`;
 }
 
-const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, setSuccessTitle, setLoading, setError, review, button, openMain = false, setOpenMain, action }: ReviewModalProps) => {
+const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setLoading, setError, review, button, openMain = false, setOpenMain, action }: ReviewModalProps) => {
     const [open, setOpen] = useState<boolean>(openMain)
+    const [success, setSuccess] = useState<boolean>(false)
     const [hover, setHover] = React.useState(-1);
 
     const [rating, setRating] = React.useState<number>(review?.ratings || 3);
-    const [title, setTitle] = useState<string>(review?.title || "")
+    const [title, setTitle] = useState<string | undefined>(action === 'post' ? project?.name : review?.title)
     const [description, setDescription] = useState<string>(review?.description || "")
 
     const { user, loading: userLoading } = useSelector(
@@ -82,7 +83,6 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, s
 
         if (resp?.status === 'success') {
             setSuccess(true);
-            setSuccessTitle("Your review has been successfully submitted")
         } else {
             setError({ message: resp.message })
         }
@@ -143,10 +143,10 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, s
                             placeholder='Add a Title'
                             data-testid='title'
                             name='title'
-                            maxLength={100}
-                            minLength={15}
-                            defaultValue={review?.title}
-                            value={title}
+                            maxLength={50}
+                            minLength={3}
+                            // defaultValue={action === 'post' ? project?.name : review?.title}
+                            value={title || ""}
                         />
 
                         <p className='mb-2'>Description</p>
@@ -164,8 +164,8 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, s
                             placeholder='Add a description'
                             data-testid='description'
                             name='description'
-                            maxLength={5000}
-                            minLength={50}
+                            maxLength={500}
+                            minLength={3}
                             rows={6}
                             defaultValue={review?.description}
                             value={description}
@@ -193,6 +193,32 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, s
                     </button>
                 )
             }
+
+            <SuccessScreen
+                noRetry={false}
+                title={'Your review has been successfully submitted'}
+                open={success}
+                setOpen={setSuccess}
+            >
+                <div className='flex flex-col gap-4 w-1/2'>
+                    <button
+                        onClick={() => {
+                            window.location.reload();
+                            setSuccess(false);
+                        }}
+                        className='primary-btn in-dark w-button w-full !m-0'
+                    >
+                        Continue to Project
+                    </button>
+                    <button className='underline text-xs lg:text-base font-bold'>
+                        <Link
+                            href={`/dashboard`}
+                        >
+                            Go to dashboard
+                        </Link>
+                    </button>
+                </div>
+            </SuccessScreen>
         </div>
     );
 };

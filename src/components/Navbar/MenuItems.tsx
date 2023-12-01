@@ -1,4 +1,5 @@
 import { ListItemIcon, MenuItem } from '@mui/material';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -79,8 +80,11 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
       setLoginModal(true);
     } else if (link === "/login") {
       setLoginModal(true)
-    } else {
+    } else if (link === "/logout") {
       router.push(link);
+    }
+    else {
+      // router.push(link);
     }
   };
   return (
@@ -93,15 +97,44 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
             key={index}
             onClick={() => navigateToPage(item.link, item.needAuthentication)}
           >
-            <ListItemIcon>
-              <i
-                className='material-icons relative top-[4px] text-imbue-purple-dark'
-                aria-hidden='true'
-              >
-                {item?.icon}
-              </i>
-            </ListItemIcon>
-            <p className='text-imbue-purple-dark text-sm lg:text-base'>{item?.text}</p>
+            {
+              (item.needAuthentication && !user?.username) ||
+                item.link === '/logout' ||
+                item.link === '/login'
+                ? (
+                  <div
+                    className='w-full flex items-center'
+                  >
+                    <ListItemIcon>
+                      <i
+                        className='material-icons relative top-[4px] text-imbue-purple-dark'
+                        aria-hidden='true'
+                      >
+                        {item?.icon}
+                      </i>
+                    </ListItemIcon>
+                    <p className='text-imbue-purple-dark text-sm lg:text-base'>{item?.text}</p>
+                  </div>)
+                : (
+                  <Link
+                    href={item.link}
+                    rel="noopener noreferrer"
+                  >
+                    <div
+                      className='w-full flex items-center'
+                    >
+                      <ListItemIcon>
+                        <i
+                          className='material-icons relative top-[4px] text-imbue-purple-dark'
+                          aria-hidden='true'
+                        >
+                          {item?.icon}
+                        </i>
+                      </ListItemIcon>
+                      <p className='text-imbue-purple-dark text-sm lg:text-base'>{item?.text}</p>
+                    </div>
+                  </Link>)
+            }
           </MenuItem>
         ))}
       </div>

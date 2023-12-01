@@ -209,8 +209,6 @@ const Review = ({ review, targetUser }: ReviewProps) => {
                 review={review}
                 action='edit'
                 {...{
-                    setSuccess,
-                    setSuccessTitle,
                     setError
                 }}
             />

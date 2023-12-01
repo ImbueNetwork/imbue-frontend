@@ -463,8 +463,6 @@ function Project() {
                         project={project}
                         targetUser={targetUser}
                         setLoading={setLoading}
-                        setSuccess={setSuccess}
-                        setSuccessTitle={setSuccessTitle}
                         setError={setError}
                         button={true}
                         action='post'
