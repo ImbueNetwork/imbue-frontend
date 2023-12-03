@@ -8,6 +8,7 @@ import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useContext, useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
@@ -440,22 +441,30 @@ function Project() {
                   )}
                 </div>
                 <div className='flex gap-2 mt-8 items-center justify-between'>
-                  <div className='flex items-center space-x-2'>
-                    <Image
-                      src={
-                        targetUser.profile_photo ||
-                        targetUser.profile_image ||
-                        '/profile-image.png'
-                      }
-                      width={100}
-                      height={100}
-                      alt='image'
-                      className='rounded-full w-10 h-10 object-cover'
-                    />
-                    <p className='text-imbue-coral break-all text-sm'>
-                      {targetUser?.display_name}
-                    </p>
-                  </div>
+                  <Link
+                    href={
+                      project.brief_id
+                        ? `/freelancers/${targetUser.username}`
+                        : `/profile/${targetUser.username}`
+                    }
+                  >
+                    <div className='flex items-center space-x-2 cursor-pointer'>
+                      <Image
+                        src={
+                          targetUser.profile_photo ||
+                          targetUser.profile_image ||
+                          '/profile-image.png'
+                        }
+                        width={100}
+                        height={100}
+                        alt='image'
+                        className='rounded-full w-10 h-10 object-cover'
+                      />
+                      <p className='text-imbue-coral break-all text-sm'>
+                        {targetUser?.display_name}
+                      </p>
+                    </div>
+                  </Link>
                   {
                     canReview && (
                       <ReviewFormModal

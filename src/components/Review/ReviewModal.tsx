@@ -1,4 +1,4 @@
-import { Box, Dialog, Rating } from '@mui/material';
+import { Dialog, Rating } from '@mui/material';
 import Link from 'next/link';
 import React, { ChangeEvent, useState } from 'react';
 import { FaStar } from 'react-icons/fa';
@@ -43,10 +43,10 @@ function getLabelText(value: number) {
 const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setLoading, setError, review, button, openMain = false, setOpenMain, action }: ReviewModalProps) => {
     const [open, setOpen] = useState<boolean>(openMain)
     const [success, setSuccess] = useState<boolean>(false)
-    const [hover, setHover] = React.useState(-1);
+    // const [hover, setHover] = React.useState(-1);
 
     const [rating, setRating] = React.useState<number>(review?.ratings || 3);
-    const [title, setTitle] = useState<string | undefined>(action === 'post' ? project?.name : review?.title)
+    // const [title, setTitle] = useState<string | undefined>(action === 'post' ? project?.name : review?.title)
     const [description, setDescription] = useState<string>(review?.description || "")
 
     const { user, loading: userLoading } = useSelector(
@@ -59,11 +59,13 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setLoading, s
     }
 
     const handleSubmit = async () => {
-        setLoading?.(true);
+        if (!rating) return setError({ message: "Please use a rating from 1 to 5" })
+        
         handleClose();
+        setLoading?.(true);
 
         const reviewBody: any = {
-            title,
+            title: project?.name || "",
             description,
             ratings: rating,
             user_id: targetUser?.user_id || targetUser.id,
@@ -115,26 +117,22 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setLoading, s
                                     onChange={(event, newValue) => {
                                         setRating(newValue || 0);
                                     }}
-                                    onChangeActive={(event, newHover) => {
-                                        setHover(newHover);
-                                    }}
+                                    // onChangeActive={(event, newHover) => {
+                                    //     setHover(newHover);
+                                    // }}
                                     icon={
                                         <FaStar color='var(--theme-primary)' />
                                     }
                                 // emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
                                 />
-                                {rating !== null && (
+                                {/* {rating !== null && (
                                     <Box sx={{ ml: 2 }}>{labels[hover !== -1 ? hover : rating]}</Box>
-                                )}
+                                )} */}
                             </div>
                         </div>
 
 
-                        <p className='mb-2'>Title</p>
-                        {/* <InputOutlined
-                            onChange={(e) => setTitle(e.target.value)}
-                            inputProps={{ defaultValue: review?.title }}
-                        /> */}
+                        {/* <p className='mb-2'>Title</p>
                         <ValidatableInput
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
                                 setTitle(e.target.value)
@@ -147,9 +145,11 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setLoading, s
                             minLength={3}
                             // defaultValue={action === 'post' ? project?.name : review?.title}
                             value={title || ""}
-                        />
+                        /> */}
 
-                        <p className='mb-2'>Description</p>
+                        <p className='mt-5 mb-3'>Project Title: {project?.name}</p>
+
+                        <p className='mb-2'>Description (optional)</p>
                         {/* <TextAreaOutlined
                             props={{
                                 onChange: (e) => setDescription(e.target.value)
@@ -165,7 +165,7 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setLoading, s
                             data-testid='description'
                             name='description'
                             maxLength={500}
-                            minLength={3}
+                            minLength={0}
                             rows={6}
                             defaultValue={review?.description}
                             value={description}
@@ -195,7 +195,7 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setLoading, s
             }
 
             <SuccessScreen
-                noRetry={false}
+                noRetry={true}
                 title={'Your review has been successfully submitted'}
                 open={success}
                 setOpen={setSuccess}
