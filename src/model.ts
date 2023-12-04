@@ -345,5 +345,5 @@ export type ApplicationData = {
 export type ApplicationContainerProps = {
   application: ApplicationData;
   handleMessageBoxClick: (_userId: number, _freelander: Freelancer) => void;
-  redirectToApplication: (_applicationId: string) => void;
+  // redirectToApplication: (_applicationId: string) => void;
 };

@@ -11,7 +11,7 @@ interface ClientViewProps {
   briefId: string | string[] | undefined;
   briefs: any;
   handleMessageBoxClick: (_userId: number, _freelander: Freelancer) => void;
-  redirectToBriefApplications: (_applicationId: string) => void;
+  // redirectToBriefApplications: (_applicationId: string) => void;
   briefApplications: Project[];
   loadingApplications: boolean;
 }
@@ -20,7 +20,7 @@ export default function Applications({
   briefId,
   briefs,
   handleMessageBoxClick,
-  redirectToBriefApplications,
+  // redirectToBriefApplications,
   briefApplications,
   loadingApplications,
   goBack,
@@ -44,7 +44,7 @@ export default function Applications({
                     <ApplicationContainer
                       application={application}
                       handleMessageBoxClick={handleMessageBoxClick}
-                      redirectToApplication={redirectToBriefApplications}
+                      // redirectToApplication={redirectToBriefApplications}
                       key={index}
                     />
                   );

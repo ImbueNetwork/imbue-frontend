@@ -21,11 +21,11 @@ import ClientView from '../ClientView/ClientView';
 type ClientViewProps = {
   briefId: string | string[] | undefined;
   handleMessageBoxClick: (_userId: number, _freelander: Freelancer) => void;
-  redirectToBriefApplications: (_applicationId: string) => void;
+  redirectToBriefApplications?: (_applicationId: string) => void;
 };
 
 const MyClientBriefsView = (props: ClientViewProps) => {
-  const { briefId, handleMessageBoxClick, redirectToBriefApplications } = props;
+  const { briefId, handleMessageBoxClick } = props;
 
   const { user, loading } = useSelector((state: RootState) => state.userState);
 
@@ -84,7 +84,7 @@ const MyClientBriefsView = (props: ClientViewProps) => {
         briefId={briefId}
         briefs={briefs}
         handleMessageBoxClick={handleMessageBoxClick}
-        redirectToBriefApplications={redirectToBriefApplications}
+        // redirectToBriefApplications={redirectToBriefApplications}
         briefApplications={briefApplications}
         ongoingGrants={ongoingGrants}
         loadingApplications={loadingApplications}

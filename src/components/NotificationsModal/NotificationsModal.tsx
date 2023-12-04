@@ -14,6 +14,7 @@ import NotificationsLoader from './NotificationsLoader.tsx';
 
 export default function NotificationsModal({ onClose }: { onClose: any }) {
   const { user } = useSelector((state: RootState) => state.userState);
+  
   return (
     <div
       className={classNames(
@@ -59,8 +60,9 @@ export default function NotificationsModal({ onClose }: { onClose: any }) {
                 {
                   (
                     activity.object === "refund.initiated" ||
-                    activity.object === "refund.complete" || 
-                    activity.object === "refund_initialed.testing"
+                    activity.object === "refund.complete" ||
+                    activity.object === "refund_initialed.testing" ||
+                    activity.object === "milestone.rejected"
                   ) && (
                     <RefundNotification {...activity} />
                   )}

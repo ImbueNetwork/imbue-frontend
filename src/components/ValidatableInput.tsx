@@ -20,7 +20,7 @@ const ValidatableInput = (props: any) => {
   ) => {
     const value = event.target.value;
 
-    if (value === undefined || value === null || value.length === 0) {
+    if (minLength && (value === undefined || value === null || value.length === 0)) {
       setError(`${name} cannot be empty`);
     } else if (value.length < minLength || value.length > maxLength) {
       setError(
