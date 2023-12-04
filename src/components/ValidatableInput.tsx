@@ -12,7 +12,6 @@ const ValidatableInput = (props: any) => {
     hideLimit = false,
     value,
   } = props;
-  console.log("🚀 ~ file: ValidatableInput.tsx:9 ~ ValidatableInput ~ minLength:", minLength)
 
   const [error, setError] = useState<string>('');
 

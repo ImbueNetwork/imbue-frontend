@@ -60,12 +60,12 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setLoading, s
 
     const handleSubmit = async () => {
         if (!rating) return setError({ message: "Please use a rating from 1 to 5" })
-        
+
         handleClose();
         setLoading?.(true);
 
         const reviewBody: any = {
-            title: project?.name || "",
+            title: action === 'post' ? project?.name : review?.title,
             description,
             ratings: rating,
             user_id: targetUser?.user_id || targetUser.id,
@@ -147,7 +147,7 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setLoading, s
                             value={title || ""}
                         /> */}
 
-                        <p className='mt-5 mb-3'>Project Title: {project?.name}</p>
+                        <p className='mt-5 mb-3'>Project Title: {action === 'post' ? project?.name : review?.title}</p>
 
                         <p className='mb-2'>Description (optional)</p>
                         {/* <TextAreaOutlined
@@ -208,7 +208,7 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setLoading, s
                         }}
                         className='primary-btn in-dark w-button w-full !m-0'
                     >
-                        Continue to Project
+                        Continue
                     </button>
                     <button className='underline text-xs lg:text-base font-bold'>
                         <Link
