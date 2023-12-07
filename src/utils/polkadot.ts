@@ -9,6 +9,7 @@ export const imbueNetwork = 'Imbue Network';
 import { WalletAccount } from '@talismn/connect-wallets';
 
 import { BasicTxResponse } from '@/model';
+import { typesBundle } from './typesBundle';
 
 export type PolkadotJsApiInfo = {
   api: ApiPromise;
@@ -73,7 +74,10 @@ export async function initPolkadotJSAPI(
   });
 
   try {
-    const api = await ApiPromise.create({ provider });
+    let api = await ApiPromise.create({ provider });;
+    if (webSockAddr.includes("imbue")) {
+      api = await ApiPromise.create({ provider, typesBundle });
+    }
     await api.isReady;
 
     return {
