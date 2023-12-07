@@ -260,7 +260,8 @@ const GrantApplication = (): JSX.Element => {
         currencyId,
         totalCostWithoutFee,
         'kusama',
-        grant_id
+        grant_id,
+        paymentAddress
       );
 
       if (result.txError) {

@@ -60,8 +60,8 @@ export async function initPolkadotJSAPI(
 ): Promise<PolkadotJsApiInfo> {
   const provider = new WsProvider(webSockAddr);
   provider.on('error', (e) => {
-    errorNotification(e);
     console.log(e);
+    errorNotification(e);
   });
 
   provider.on('disconnected', (e) => {

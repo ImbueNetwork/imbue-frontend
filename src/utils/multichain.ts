@@ -158,7 +158,7 @@ export class MultiChainService {
         if (currencyBalance == 0) {
           throw new Error("Cannot deposit funds onchain, escrow balance is empty");
         }
-        const currency = currencyId < 100 ? currencyId : { ForeignAsset: Number(currencyId) };
+        const currency = currencyId < 100 ? currencyId : { ForeignAsset: Currency[currencyId] };
         const mintAmount = BigInt(project.total_cost_without_fee! * 1e12);
         let transactionState: BasicTxResponse = {} as BasicTxResponse;
         transactionState.status = false;

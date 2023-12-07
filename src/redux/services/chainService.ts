@@ -5,7 +5,7 @@ import type { ITuple } from '@polkadot/types/types';
 import { WalletAccount } from '@talismn/connect-wallets';
 
 import * as utils from '@/utils';
-import { handleError,ImbueApiInfo } from '@/utils/polkadot';
+import { handleError, ImbueApiInfo } from '@/utils/polkadot';
 
 import {
   BasicTxResponse,
@@ -69,16 +69,30 @@ class ChainService {
     currencyId: number,
     amount: number,
     teasury: string,
-    grantID: string
+    grantID: string,
+    paymentAddress: string
   ): Promise<BasicTxResponse> {
-    const currency = currencyId < 100 ? currencyId : {ForeignAsset: currencyId };
+    let currency: any = currencyId;
+    let onchainPaymentAddress: any = null;
+    switch (currencyId) {
+      case Currency.ETH:
+      case Currency.USDT: {
+        currency = { ForeignAsset: Currency[currencyId] };
+        onchainPaymentAddress = currencyId < 100 ? null : { ETH: `${paymentAddress}` };
+        break;
+      }
+      default: {
+        break;
+      }
+    }    
     const extrinsic = this.imbueApi.imbue.api.tx.imbueGrants.createAndConvert(
       milestones,
       approvers,
       currency,
       amount * 1e12,
       teasury,
-      grantID
+      grantID,
+      onchainPaymentAddress
     );
     return await this.submitImbueExtrinsic(
       account,
@@ -95,9 +109,22 @@ class ChainService {
     initialContribution: bigint,
     briefHash: string,
     currencyId: number,
-    milestones: any[]
+    milestones: any[],
+    paymentAddress: string
   ): Promise<BasicTxResponse> {
-    const currency = currencyId < 100 ? currencyId : {ForeignAsset: currencyId };
+    let currency: any = currencyId;
+    let onchainPaymentAddress: any = null;
+    switch (currencyId) {
+      case Currency.ETH:
+      case Currency.USDT: {
+        currency = { ForeignAsset: Currency[currencyId] };
+        onchainPaymentAddress = currencyId < 100 ? null : { ETH: `${paymentAddress}` };
+        break;
+      }
+      default: {
+        break;
+      }
+    }
     const extrinsic = this.imbueApi.imbue.api.tx.imbueBriefs.createBrief(
       briefOwners,
       freelancerAddress,
@@ -105,7 +132,8 @@ class ChainService {
       initialContribution,
       briefHash,
       currency,
-      milestones
+      milestones,
+      onchainPaymentAddress
     );
     return await this.submitImbueExtrinsic(
       account,
@@ -614,21 +642,21 @@ class ChainService {
       milestones: milestones,
       contributions: Object.keys(projectOnChain.contributions).map(
         (accountId: string) =>
-          ({
-            value: BigInt(
-              projectOnChain.contributions[accountId].value?.replaceAll(
-                ',',
-                ''
-              ) || 0
-            ),
-            accountId: accountId,
-            timestamp: BigInt(
-              projectOnChain.contributions[accountId].timestamp?.replaceAll(
-                ',',
-                ''
-              ) || 0
-            ),
-          } as Contribution)
+        ({
+          value: BigInt(
+            projectOnChain.contributions[accountId].value?.replaceAll(
+              ',',
+              ''
+            ) || 0
+          ),
+          accountId: accountId,
+          timestamp: BigInt(
+            projectOnChain.contributions[accountId].timestamp?.replaceAll(
+              ',',
+              ''
+            ) || 0
+          ),
+        } as Contribution)
       ),
       initiator: projectOnChain.initiator,
       createBlockNumber: BigInt(
@@ -655,24 +683,24 @@ class ChainService {
       .map((milestoneItem: any) => projectOnChain.milestones[milestoneItem])
       .map(
         (milestone: any) =>
-          ({
-            project_id: projectOffChain.id,
-            chain_project_id: Number(milestone.projectKey),
-            milestone_index: Number(milestone.milestoneKey),
-            name: projectOffChain.milestones[milestone.milestoneKey].name,
-            description:
-              projectOffChain.milestones[milestone.milestoneKey].description,
-            modified:
-              projectOffChain.milestones[milestone.milestoneKey].modified,
-            percentage_to_unlock: Number(
-              projectOffChain.milestones[milestone.milestoneKey]
-                .percentage_to_unlock
-            ),
-            amount: Number(
-              projectOffChain.milestones[milestone.milestoneKey].amount
-            ),
-            is_approved: milestone.isApproved,
-          } as Milestone)
+        ({
+          project_id: projectOffChain.id,
+          chain_project_id: Number(milestone.projectKey),
+          milestone_index: Number(milestone.milestoneKey),
+          name: projectOffChain.milestones[milestone.milestoneKey].name,
+          description:
+            projectOffChain.milestones[milestone.milestoneKey].description,
+          modified:
+            projectOffChain.milestones[milestone.milestoneKey].modified,
+          percentage_to_unlock: Number(
+            projectOffChain.milestones[milestone.milestoneKey]
+              .percentage_to_unlock
+          ),
+          amount: Number(
+            projectOffChain.milestones[milestone.milestoneKey].amount
+          ),
+          is_approved: milestone.isApproved,
+        } as Milestone)
       );
 
     return milestones;
