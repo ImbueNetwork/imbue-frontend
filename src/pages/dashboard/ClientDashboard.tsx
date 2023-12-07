@@ -167,7 +167,7 @@ export default function ClientDashboard() {
         </button>
       </div>
       {/* starting of the box sections */}
-      <div className='flex text-text-grey gap-7 mt-9'>
+      <div className='flex flex-col lg:flex-row text-text-grey gap-7 mt-9'>
         <div className=' py-5 px-5 rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full'>
           <div className='flex justify-between'>
             <p>Projects</p>
