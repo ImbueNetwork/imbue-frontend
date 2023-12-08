@@ -2,6 +2,7 @@ import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 import type { DispatchError } from '@polkadot/types/interfaces';
 import type { EventRecord } from '@polkadot/types/interfaces';
 import type { ITuple } from '@polkadot/types/types';
+import type { AnyJson } from '@polkadot/types-codec/types';
 import { WalletAccount } from '@talismn/connect-wallets';
 
 import * as utils from '@/utils';
@@ -532,11 +533,35 @@ class ChainService {
     return offChainProject;
   }
 
+
   public async convertToOnChainProject(project: Project) {
     if (!project?.chain_project_id) return;
-    const projectOnChain: any = await this.getProjectOnChain(
-      project.chain_project_id
-    );
+    const chain_project_id = project.chain_project_id;
+    const projectOnChain: any = await this.getProjectOnChain(chain_project_id);
+    // TODO: Use the below values to construct info for the ui to set the correct states and not need to call the chain again
+    const projectVotes: AnyJson = await this.getProjectVotes(chain_project_id);
+    const disputeVotes: AnyJson = await this.getOnChainDisputes(chain_project_id);
+    const milestoneVotes: AnyJson = await this.getOnChainMilestoneVotes(chain_project_id);
+    const projectInVotingWindow = milestoneVotes ? milestoneVotes?.toLocaleString().length > 0 : false;
+    const projectInDisputeWindow = disputeVotes ? disputeVotes?.toLocaleString().length > 0 : false;
+
+    console.log("***** projectVotes is");
+    console.log(projectVotes);
+
+    console.log("***** disputeVotes is");
+    console.log(disputeVotes);
+
+    console.log("***** milestoneVotes is");
+    console.log(milestoneVotes);
+
+    console.log("***** disputeVotes is");
+    console.log(disputeVotes);
+
+    console.log("***** projectInVotingWindow length is");
+    console.log(projectInVotingWindow);
+
+    console.log("***** projectInDisputeWindow length is");
+    console.log(projectInDisputeWindow);
 
     if (!projectOnChain) {
       return;
@@ -754,6 +779,34 @@ class ChainService {
       )
     ).toHuman();
     return projectOnChain;
+  }
+
+  public async getProjectVotes(chain_project_id: string | number) {
+    const projectVotes: any = (
+      await this.imbueApi.imbue.api.query.imbueProposals.individualVoteStore(
+        chain_project_id
+      )
+    ).toJSON();
+
+    return projectVotes;
+  }
+
+  public async getOnChainDisputes(chain_project_id: string | number) {
+    const disputes: any = (
+      await this.imbueApi.imbue.api.query.imbueProposals.projectsInDispute(
+        chain_project_id
+      )
+    ).toJSON();
+    return disputes;
+  }
+
+  public async getOnChainMilestoneVotes(chain_project_id: string | number) {
+    const milestoneVotes: any = (
+      await this.imbueApi.imbue.api.query.imbueProposals.milestoneVotes(
+        chain_project_id
+      )
+    ).toJSON();
+    return milestoneVotes;
   }
 
   public async getBalance(accountAddress: string, currencyId: number) {

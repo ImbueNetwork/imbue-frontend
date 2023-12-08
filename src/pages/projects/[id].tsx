@@ -75,7 +75,6 @@ TimeAgo.addDefaultLocale(en);
 function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
-  console.log("🚀 ~ file: [id].tsx:77 ~ Project ~ project:", project)
   const [targetUser, setTargetUser] = useState<any>({});
   // const [projectHasAttachments, setProjectHasAttachments] = useState<boolean>(false);
 
@@ -159,7 +158,6 @@ function Project() {
   const getChainProject = async (project: Project, freelancer: any) => {
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
     if (project?.chain_project_id && project?.id) {
-
       const noConfidenceResp: NoConfidenceVoter[] = await getProjectNoConfidenceVoters(
         project.id
       );

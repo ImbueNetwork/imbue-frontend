@@ -9,6 +9,7 @@ export const imbueNetwork = 'Imbue Network';
 import { WalletAccount } from '@talismn/connect-wallets';
 
 import { BasicTxResponse } from '@/model';
+
 import { typesBundle } from './typesBundle';
 
 export type PolkadotJsApiInfo = {
