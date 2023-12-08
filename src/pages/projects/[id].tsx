@@ -24,6 +24,7 @@ import { useSelector } from 'react-redux';
 import { NoConfidenceVoter } from '@/lib/queryServices/projectQueries';
 import { ReviewBody } from '@/lib/queryServices/reviewQueries';
 import * as utils from '@/utils';
+import { getBalance } from '@/utils/helper';
 
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
@@ -58,7 +59,6 @@ import { getBrief, getProjectById } from '@/redux/services/briefService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { getProjectNoConfidenceVoters } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
-import { getBalance } from '@/utils/helper';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -619,7 +619,6 @@ function Project() {
                     project,
                     user,
                     handlePopUpForUser,
-                    setBalance,
                     balanceLoading,
                     setBalanceLoading
                   }}
