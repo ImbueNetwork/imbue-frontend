@@ -2,10 +2,11 @@ import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 import type { DispatchError } from '@polkadot/types/interfaces';
 import type { EventRecord } from '@polkadot/types/interfaces';
 import type { ITuple } from '@polkadot/types/types';
+import type { AnyJson } from '@polkadot/types-codec/types';
 import { WalletAccount } from '@talismn/connect-wallets';
 
 import * as utils from '@/utils';
-import { handleError,ImbueApiInfo } from '@/utils/polkadot';
+import { handleError, ImbueApiInfo } from '@/utils/polkadot';
 
 import {
   BasicTxResponse,
@@ -69,16 +70,30 @@ class ChainService {
     currencyId: number,
     amount: number,
     teasury: string,
-    grantID: string
+    grantID: string,
+    paymentAddress: string
   ): Promise<BasicTxResponse> {
-    const currency = currencyId < 100 ? currencyId : {ForeignAsset: currencyId };
+    let currency: any = currencyId;
+    let onchainPaymentAddress: any = null;
+    switch (currencyId) {
+      case Currency.ETH:
+      case Currency.USDT: {
+        currency = { ForeignAsset: Currency[currencyId] };
+        onchainPaymentAddress = currencyId < 100 ? null : { ETH: `${paymentAddress}` };
+        break;
+      }
+      default: {
+        break;
+      }
+    }    
     const extrinsic = this.imbueApi.imbue.api.tx.imbueGrants.createAndConvert(
       milestones,
       approvers,
       currency,
       amount * 1e12,
       teasury,
-      grantID
+      grantID,
+      onchainPaymentAddress
     );
     return await this.submitImbueExtrinsic(
       account,
@@ -95,9 +110,22 @@ class ChainService {
     initialContribution: bigint,
     briefHash: string,
     currencyId: number,
-    milestones: any[]
+    milestones: any[],
+    paymentAddress: string
   ): Promise<BasicTxResponse> {
-    const currency = currencyId < 100 ? currencyId : {ForeignAsset: currencyId };
+    let currency: any = currencyId;
+    let onchainPaymentAddress: any = null;
+    switch (currencyId) {
+      case Currency.ETH:
+      case Currency.USDT: {
+        currency = { ForeignAsset: Currency[currencyId] };
+        onchainPaymentAddress = currencyId < 100 ? null : { ETH: `${paymentAddress}` };
+        break;
+      }
+      default: {
+        break;
+      }
+    }
     const extrinsic = this.imbueApi.imbue.api.tx.imbueBriefs.createBrief(
       briefOwners,
       freelancerAddress,
@@ -105,7 +133,8 @@ class ChainService {
       initialContribution,
       briefHash,
       currency,
-      milestones
+      milestones,
+      onchainPaymentAddress
     );
     return await this.submitImbueExtrinsic(
       account,
@@ -504,11 +533,35 @@ class ChainService {
     return offChainProject;
   }
 
+
   public async convertToOnChainProject(project: Project) {
     if (!project?.chain_project_id) return;
-    const projectOnChain: any = await this.getProjectOnChain(
-      project.chain_project_id
-    );
+    const chain_project_id = project.chain_project_id;
+    const projectOnChain: any = await this.getProjectOnChain(chain_project_id);
+    // TODO: Use the below values to construct info for the ui to set the correct states and not need to call the chain again
+    const projectVotes: AnyJson = await this.getProjectVotes(chain_project_id);
+    const disputeVotes: AnyJson = await this.getOnChainDisputes(chain_project_id);
+    const milestoneVotes: AnyJson = await this.getOnChainMilestoneVotes(chain_project_id);
+    const projectInVotingWindow = milestoneVotes ? milestoneVotes?.toLocaleString().length > 0 : false;
+    const projectInDisputeWindow = disputeVotes ? disputeVotes?.toLocaleString().length > 0 : false;
+
+    console.log("***** projectVotes is");
+    console.log(projectVotes);
+
+    console.log("***** disputeVotes is");
+    console.log(disputeVotes);
+
+    console.log("***** milestoneVotes is");
+    console.log(milestoneVotes);
+
+    console.log("***** disputeVotes is");
+    console.log(disputeVotes);
+
+    console.log("***** projectInVotingWindow length is");
+    console.log(projectInVotingWindow);
+
+    console.log("***** projectInDisputeWindow length is");
+    console.log(projectInDisputeWindow);
 
     if (!projectOnChain) {
       return;
@@ -614,21 +667,21 @@ class ChainService {
       milestones: milestones,
       contributions: Object.keys(projectOnChain.contributions).map(
         (accountId: string) =>
-          ({
-            value: BigInt(
-              projectOnChain.contributions[accountId].value?.replaceAll(
-                ',',
-                ''
-              ) || 0
-            ),
-            accountId: accountId,
-            timestamp: BigInt(
-              projectOnChain.contributions[accountId].timestamp?.replaceAll(
-                ',',
-                ''
-              ) || 0
-            ),
-          } as Contribution)
+        ({
+          value: BigInt(
+            projectOnChain.contributions[accountId].value?.replaceAll(
+              ',',
+              ''
+            ) || 0
+          ),
+          accountId: accountId,
+          timestamp: BigInt(
+            projectOnChain.contributions[accountId].timestamp?.replaceAll(
+              ',',
+              ''
+            ) || 0
+          ),
+        } as Contribution)
       ),
       initiator: projectOnChain.initiator,
       createBlockNumber: BigInt(
@@ -655,24 +708,24 @@ class ChainService {
       .map((milestoneItem: any) => projectOnChain.milestones[milestoneItem])
       .map(
         (milestone: any) =>
-          ({
-            project_id: projectOffChain.id,
-            chain_project_id: Number(milestone.projectKey),
-            milestone_index: Number(milestone.milestoneKey),
-            name: projectOffChain.milestones[milestone.milestoneKey].name,
-            description:
-              projectOffChain.milestones[milestone.milestoneKey].description,
-            modified:
-              projectOffChain.milestones[milestone.milestoneKey].modified,
-            percentage_to_unlock: Number(
-              projectOffChain.milestones[milestone.milestoneKey]
-                .percentage_to_unlock
-            ),
-            amount: Number(
-              projectOffChain.milestones[milestone.milestoneKey].amount
-            ),
-            is_approved: milestone.isApproved,
-          } as Milestone)
+        ({
+          project_id: projectOffChain.id,
+          chain_project_id: Number(milestone.projectKey),
+          milestone_index: Number(milestone.milestoneKey),
+          name: projectOffChain.milestones[milestone.milestoneKey].name,
+          description:
+            projectOffChain.milestones[milestone.milestoneKey].description,
+          modified:
+            projectOffChain.milestones[milestone.milestoneKey].modified,
+          percentage_to_unlock: Number(
+            projectOffChain.milestones[milestone.milestoneKey]
+              .percentage_to_unlock
+          ),
+          amount: Number(
+            projectOffChain.milestones[milestone.milestoneKey].amount
+          ),
+          is_approved: milestone.isApproved,
+        } as Milestone)
       );
 
     return milestones;
@@ -726,6 +779,34 @@ class ChainService {
       )
     ).toHuman();
     return projectOnChain;
+  }
+
+  public async getProjectVotes(chain_project_id: string | number) {
+    const projectVotes: any = (
+      await this.imbueApi.imbue.api.query.imbueProposals.individualVoteStore(
+        chain_project_id
+      )
+    ).toJSON();
+
+    return projectVotes;
+  }
+
+  public async getOnChainDisputes(chain_project_id: string | number) {
+    const disputes: any = (
+      await this.imbueApi.imbue.api.query.imbueProposals.projectsInDispute(
+        chain_project_id
+      )
+    ).toJSON();
+    return disputes;
+  }
+
+  public async getOnChainMilestoneVotes(chain_project_id: string | number) {
+    const milestoneVotes: any = (
+      await this.imbueApi.imbue.api.query.imbueProposals.milestoneVotes(
+        chain_project_id
+      )
+    ).toJSON();
+    return milestoneVotes;
   }
 
   public async getBalance(accountAddress: string, currencyId: number) {

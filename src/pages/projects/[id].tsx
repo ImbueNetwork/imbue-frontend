@@ -24,6 +24,7 @@ import { useSelector } from 'react-redux';
 import { NoConfidenceVoter } from '@/lib/queryServices/projectQueries';
 import { ReviewBody } from '@/lib/queryServices/reviewQueries';
 import * as utils from '@/utils';
+import { getBalance } from '@/utils/helper';
 
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
@@ -75,7 +76,6 @@ TimeAgo.addDefaultLocale(en);
 function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
-  console.log("🚀 ~ file: [id].tsx:77 ~ Project ~ project:", project)
   const [targetUser, setTargetUser] = useState<any>({});
   // const [projectHasAttachments, setProjectHasAttachments] = useState<boolean>(false);
 
@@ -159,7 +159,6 @@ function Project() {
   const getChainProject = async (project: Project, freelancer: any) => {
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
     if (project?.chain_project_id && project?.id) {
-
       const noConfidenceResp: NoConfidenceVoter[] = await getProjectNoConfidenceVoters(
         project.id
       );
@@ -243,6 +242,16 @@ function Project() {
     }
   };
 
+  const updateBalanceInfo = async (currency_id: number) => {
+    const balance = await getBalance(
+      currency_id,
+      user,
+      project.currency_id < 100 ? project?.escrow_address : undefined,
+      Number(project.id)
+    );
+    setBalance(balance);
+
+  }
   const getProject = async () => {
     if (!projectId) return;
 
@@ -254,6 +263,7 @@ function Project() {
         setLoading(false);
         // router.push('/error');
       }
+      updateBalanceInfo(projectRes.currency_id);
 
       // showing owner profile if the current user if the applicant freelancer
       let owner;
@@ -609,7 +619,6 @@ function Project() {
                     project,
                     user,
                     handlePopUpForUser,
-                    setBalance,
                     balanceLoading,
                     setBalanceLoading
                   }}
