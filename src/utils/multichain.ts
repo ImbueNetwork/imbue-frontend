@@ -51,8 +51,9 @@ export class MultiChainService {
 
 
   public getBalance = async (projectId: number) => {
-    return await db.transaction(async (tx: any) => {
-      try {
+    try {
+      return await db.transaction(async (tx: any) => {
+
         const project = await fetchProjectById(Number(projectId))(tx);
         if (!project) {
           throw new Error(`Project id ${projectId} not found`);
@@ -118,13 +119,10 @@ export class MultiChainService {
               return
           }
         }
-
-      } catch (e) {
-        throw new Error(`Failed to retreive balance for project id ${projectId}. ${e}`);
-      }
-    });
-
-
+      });
+    } catch (e) {
+      throw new Error(`Failed to retreive balance for project id ${projectId}. ${e}`);
+    }
   };
 
   public generateAddress = async (projectId: number, currencyId: number) => {

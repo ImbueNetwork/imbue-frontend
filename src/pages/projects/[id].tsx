@@ -58,6 +58,7 @@ import { getBrief, getProjectById } from '@/redux/services/briefService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { getProjectNoConfidenceVoters } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
+import { getBalance } from '@/utils/helper';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -241,6 +242,16 @@ function Project() {
     }
   };
 
+  const updateBalanceInfo = async (currency_id: number) => {
+    const balance = await getBalance(
+      currency_id,
+      user,
+      project.currency_id < 100 ? project?.escrow_address : undefined,
+      Number(project.id)
+    );
+    setBalance(balance);
+
+  }
   const getProject = async () => {
     if (!projectId) return;
 
@@ -252,6 +263,7 @@ function Project() {
         setLoading(false);
         // router.push('/error');
       }
+      updateBalanceInfo(projectRes.currency_id);
 
       // showing owner profile if the current user if the applicant freelancer
       let owner;
