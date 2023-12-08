@@ -115,6 +115,7 @@ class ChainService {
   ): Promise<BasicTxResponse> {
     let currency: any = currencyId;
     let onchainPaymentAddress: any = null;
+    const requireFellowshipApproval = true;
     switch (currencyId) {
       case Currency.ETH:
       case Currency.USDT: {
@@ -134,8 +135,10 @@ class ChainService {
       briefHash,
       currency,
       milestones,
-      onchainPaymentAddress
+      onchainPaymentAddress,
+      requireFellowshipApproval
     );
+
     return await this.submitImbueExtrinsic(
       account,
       extrinsic,
@@ -542,8 +545,8 @@ class ChainService {
     const projectVotes: AnyJson = await this.getProjectVotes(chain_project_id);
     const disputeVotes: AnyJson = await this.getOnChainDisputes(chain_project_id);
     const milestoneVotes: AnyJson = await this.getOnChainMilestoneVotes(chain_project_id);
-    const projectInVotingWindow = milestoneVotes ? milestoneVotes?.toLocaleString().length > 0 : false;
-    const projectInDisputeWindow = disputeVotes ? disputeVotes?.toLocaleString().length > 0 : false;
+    const projectInVotingWindow = JSON.stringify(milestoneVotes) !== '{}';
+    const projectInDisputeWindow = JSON.stringify(disputeVotes) !== '[]';
 
     console.log("***** projectVotes is");
     console.log(projectVotes);
@@ -557,10 +560,10 @@ class ChainService {
     console.log("***** disputeVotes is");
     console.log(disputeVotes);
 
-    console.log("***** projectInVotingWindow length is");
+    console.log("***** projectInVotingWindow is");
     console.log(projectInVotingWindow);
 
-    console.log("***** projectInDisputeWindow length is");
+    console.log("***** projectInDisputeWindow is");
     console.log(projectInDisputeWindow);
 
     if (!projectOnChain) {
