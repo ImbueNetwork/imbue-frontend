@@ -61,7 +61,6 @@ const ProjectBalance = (props: ProjectBalanceType) => {
 
             try {
 
-
                 if (!balance && project.status_id !== OffchainProjectState.Completed) {
                     handlePopUpForUser();
                 }
