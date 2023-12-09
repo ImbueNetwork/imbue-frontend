@@ -37,7 +37,7 @@ type ApplicationOwnerProps = {
     _escrow_address?: string
   ) => Promise<void>;
   user: User | any;
-  imbueBalance: string;
+  imbueBalance: string | any;
 };
 
 const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
