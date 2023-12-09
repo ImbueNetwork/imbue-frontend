@@ -8,7 +8,6 @@ import React, { useEffect, useState } from 'react';
 
 import { Brief } from '@/lib/models';
 import { showErrorMessage } from '@/utils/errorMessages';
-import { getBalance } from '@/utils/helper';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import {
