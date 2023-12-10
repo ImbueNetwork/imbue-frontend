@@ -9,6 +9,7 @@ import { initPolkadotJSAPI } from '@/utils/polkadot';
 
 import db from '@/db';
 import { OffchainProjectState } from '@/model';
+import { User } from '@/model';
 import ChainService from '@/redux/services/chainService';
 
 import { authenticate, verifyUserIdFromJwt } from '../auth/common';
@@ -17,6 +18,15 @@ type ProjectPkg = models.Project & {
   milestones: models.Milestone[];
   approvers?: string[];
   reviews?: ReviewBody[];
+};
+
+type Vote = {
+  id?: number;
+  project_id: number | string;
+  milestone_index: number | string;
+  user_id?: number | string;
+  voter_address: string;
+  vote: boolean;
 };
 
 export default nextConnect()
@@ -226,11 +236,61 @@ const syncProject = async (project: any, tx: any) => {
     const onChainProjectRes = await chainService.convertToOnChainProject(
       project
     );
+
+    const milestoneIndex = 0;
+
+    const milestoneVoteJson =
+      onChainProjectRes?.projectVotes?.votes[milestoneIndex];
+
+    const milestoneVoteArray = Object.keys(milestoneVoteJson).map((k) => ({
+      voter_address: k,
+      vote: milestoneVoteJson[k],
+    }));
+
+    const votesOffchain: Vote[] = await tx('project_votes').select('*').where({
+      project_id: projectId,
+      milestone_index: milestoneIndex,
+    });
+
+    const newVote: Vote[] = [];
+    let votesNeedSync = false;
+
+    const approvers: User[] = await tx('users')
+      .select('*')
+      .whereIn('web3_address', project.approvers);
+
+    milestoneVoteArray.forEach((v) => {
+      const match = votesOffchain.find(
+        (vote) => vote.voter_address === v.voter_address
+      );
+
+      if (!match) {
+        votesNeedSync = true;
+
+        const user = approvers.find(
+          (approver) => approver.web3_address === v.voter_address
+        );
+
+        newVote.push({
+          ...v,
+          project_id: projectId,
+          milestone_index: milestoneIndex,
+          user_id: user?.id,
+        });
+      }
+    });
+
+    if (votesNeedSync) {
+      await tx('project_votes').insert(newVote);
+    }
+
     if (onChainProjectRes) {
       onChainProjectRes.milestones.map((milestone, index) => {
-        project.milestones[index].is_approved = milestone.is_approved;
+        if (project.milestones[index].is_approved !== milestone.is_approved) {
+          project.milestones[index].is_approved = milestone.is_approved;
+          milestonesRequiresSync = true;
+        }
       });
-      milestonesRequiresSync = true;
     }
 
     if (onChainProjectRes?.id && project?.id) {
@@ -294,6 +354,9 @@ const syncProject = async (project: any, tx: any) => {
         milestones: project.milestones,
         reviews: project.reviews,
       };
+
+      // todo: sync milestone votes if necessary or return pkg
+      // if(onChainProjectRes?.projectVotes.)
 
       return pkg;
     } else {

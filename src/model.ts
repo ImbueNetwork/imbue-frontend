@@ -139,6 +139,9 @@ export type ProjectOnChain = {
   fundingType: any;
   projectInMilestoneVoting: boolean;
   projectInVotingOfNoConfidence: boolean;
+  projectVotes?: any;
+  milestoneVotes?: any;
+  disputeVotes?: any;
 };
 
 export type Milestone = {

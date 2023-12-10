@@ -557,9 +557,6 @@ class ChainService {
     console.log("***** milestoneVotes is");
     console.log(milestoneVotes);
 
-    console.log("***** disputeVotes is");
-    console.log(disputeVotes);
-
     console.log("***** projectInVotingWindow is");
     console.log(projectInVotingWindow);
 
@@ -697,6 +694,9 @@ class ChainService {
       fundingType: projectOnChain.fundingType,
       projectInMilestoneVoting,
       projectInVotingOfNoConfidence,
+      projectVotes,
+      milestoneVotes,
+      disputeVotes,
       // roundKey,
     };
 
