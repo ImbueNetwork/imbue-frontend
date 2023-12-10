@@ -8,6 +8,7 @@ import { WalletAccount } from '@talismn/connect-wallets';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useContext, useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
@@ -23,6 +24,7 @@ import { useSelector } from 'react-redux';
 import { NoConfidenceVoter } from '@/lib/queryServices/projectQueries';
 import { ReviewBody } from '@/lib/queryServices/reviewQueries';
 import * as utils from '@/utils';
+import { getBalance } from '@/utils/helper';
 
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
@@ -157,7 +159,6 @@ function Project() {
   const getChainProject = async (project: Project, freelancer: any) => {
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
     if (project?.chain_project_id && project?.id) {
-
       const noConfidenceResp: NoConfidenceVoter[] = await getProjectNoConfidenceVoters(
         project.id
       );
@@ -241,6 +242,16 @@ function Project() {
     }
   };
 
+  const updateBalanceInfo = async (currency_id: number) => {
+    const balance = await getBalance(
+      currency_id,
+      user,
+      project.currency_id < 100 ? project?.escrow_address : undefined,
+      Number(project.id)
+    );
+    setBalance(balance);
+
+  }
   const getProject = async () => {
     if (!projectId) return;
 
@@ -252,6 +263,7 @@ function Project() {
         setLoading(false);
         // router.push('/error');
       }
+      updateBalanceInfo(projectRes.currency_id);
 
       // showing owner profile if the current user if the applicant freelancer
       let owner;
@@ -364,7 +376,7 @@ function Project() {
 
   const oneMielstoneApproved = project?.milestones?.find((m: Milestone) => m.is_approved) ? true : false
   const userReviewed = project?.reviews?.find((r: ReviewBody) => r.reviewer_id === user?.id) ? true : false
-  const canReview = oneMielstoneApproved && !userReviewed && canVote
+  const canReview = oneMielstoneApproved && !userReviewed && (isApprover || (projectType === 'brief' && isProjectOwner))
 
   return (
     <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
@@ -439,22 +451,30 @@ function Project() {
                   )}
                 </div>
                 <div className='flex gap-2 mt-8 items-center justify-between'>
-                  <div className='flex items-center space-x-2'>
-                    <Image
-                      src={
-                        targetUser.profile_photo ||
-                        targetUser.profile_image ||
-                        '/profile-image.png'
-                      }
-                      width={100}
-                      height={100}
-                      alt='image'
-                      className='rounded-full w-10 h-10 object-cover'
-                    />
-                    <p className='text-imbue-coral break-all text-sm'>
-                      {targetUser?.display_name}
-                    </p>
-                  </div>
+                  <Link
+                    href={
+                      project.brief_id
+                        ? `/freelancers/${targetUser.username}`
+                        : `/profile/${targetUser.username}`
+                    }
+                  >
+                    <div className='flex items-center space-x-2 cursor-pointer'>
+                      <Image
+                        src={
+                          targetUser.profile_photo ||
+                          targetUser.profile_image ||
+                          '/profile-image.png'
+                        }
+                        width={100}
+                        height={100}
+                        alt='image'
+                        className='rounded-full w-10 h-10 object-cover'
+                      />
+                      <p className='text-imbue-coral break-all text-sm'>
+                        {targetUser?.display_name}
+                      </p>
+                    </div>
+                  </Link>
                   {
                     canReview && (
                       <ReviewFormModal
@@ -462,8 +482,6 @@ function Project() {
                         project={project}
                         targetUser={targetUser}
                         setLoading={setLoading}
-                        setSuccess={setSuccess}
-                        setSuccessTitle={setSuccessTitle}
                         setError={setError}
                         button={true}
                         action='post'
@@ -601,7 +619,6 @@ function Project() {
                     project,
                     user,
                     handlePopUpForUser,
-                    setBalance,
                     balanceLoading,
                     setBalanceLoading
                   }}

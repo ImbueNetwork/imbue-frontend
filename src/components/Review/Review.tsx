@@ -116,14 +116,16 @@ const Review = ({ review, targetUser }: ReviewProps) => {
 
             <div className='flex gap-3'>
                 <div className='h-[46px] w-[46px] rounded-full overflow-hidden relative'>
-                    <Image
-                        sizes='24'
-                        className='object-cover cursor-pointer'
-                        src={review.profile_photo || require('../../assets/images/profile-image.png')}
-                        fill
-                        alt='user'
-                        onClick={() => router.push(`/profile/${review.username}`)}
-                    />
+                    <a href={`/profile/${review.username}`}>
+                        <Image
+                            sizes='24'
+                            className='object-cover cursor-pointer'
+                            src={review.profile_photo || require('../../assets/images/profile-image.png')}
+                            fill
+                            alt='user'
+                        // onClick={() => router.push(`/profile/${review.username}`)}
+                        />
+                    </a>
                 </div>
                 <div>
                     <p>
@@ -209,8 +211,6 @@ const Review = ({ review, targetUser }: ReviewProps) => {
                 review={review}
                 action='edit'
                 {...{
-                    setSuccess,
-                    setSuccessTitle,
                     setError
                 }}
             />

@@ -13,13 +13,17 @@ export default nextConnect()
   .use(passport.initialize())
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
     const { id } = req.query;
-    const projectId = Number(id);
-    const multichainService = await MultiChainService.build();
-    const projectBalance = await multichainService.getBalance(projectId);
-    if (projectBalance == undefined) {
-      return res.status(404).end();
+    try {
+      const projectId = Number(id);
+      const multichainService = await MultiChainService.build();
+      const projectBalance = await multichainService.getBalance(projectId);
+      if (projectBalance == undefined) {
+        return res.status(404).end();
+      }
+      return res.status(200).json(projectBalance);
+    } catch (e) {
+      throw new Error(`Failed to retreive balance for project id ${id}. ${e}`);
     }
-    return res.status(200).json(projectBalance);
   });
 
 

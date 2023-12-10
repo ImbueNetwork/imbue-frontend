@@ -10,6 +10,8 @@ import { WalletAccount } from '@talismn/connect-wallets';
 
 import { BasicTxResponse } from '@/model';
 
+import { typesBundle } from './typesBundle';
+
 export type PolkadotJsApiInfo = {
   api: ApiPromise;
   provider: WsProvider;
@@ -60,8 +62,8 @@ export async function initPolkadotJSAPI(
 ): Promise<PolkadotJsApiInfo> {
   const provider = new WsProvider(webSockAddr);
   provider.on('error', (e) => {
-    errorNotification(e);
     console.log(e);
+    errorNotification(e);
   });
 
   provider.on('disconnected', (e) => {
@@ -73,7 +75,10 @@ export async function initPolkadotJSAPI(
   });
 
   try {
-    const api = await ApiPromise.create({ provider });
+    let api = await ApiPromise.create({ provider });;
+    if (webSockAddr.includes("imbue")) {
+      api = await ApiPromise.create({ provider, typesBundle });
+    }
     await api.isReady;
 
     return {

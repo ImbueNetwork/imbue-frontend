@@ -8,7 +8,6 @@ import React, { useEffect, useState } from 'react';
 
 import { Brief } from '@/lib/models';
 import { showErrorMessage } from '@/utils/errorMessages';
-import { getBalance } from '@/utils/helper';
 import { initImbueAPIInfo } from '@/utils/polkadot';
 
 import {
@@ -38,6 +37,7 @@ type ApplicationOwnerProps = {
     _escrow_address?: string
   ) => Promise<void>;
   user: User | any;
+  imbueBalance: string | any;
 };
 
 const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
@@ -49,20 +49,19 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
     setLoading,
     updateProject,
     user,
+    imbueBalance,
   } = props;
 
   const [openPopup, setOpenPopup] = useState(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<any>();
   const [loadingWallet, setLoadingWallet] = useState<string>('loading');
-  const [imbueBalance, setImbueBalance] = useState<string>();
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
   const router = useRouter();
 
   useEffect(() => {
     const showBalance = async () => {
-
       if (loadingWallet === 'loading' && !firstLoad) return;
 
       try {
@@ -70,12 +69,6 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
         if (firstLoad)
           setLoadingWallet('loading');
 
-        const balance = await getBalance(
-          Currency.IMBU,
-          user,
-          user?.web3_address
-        );
-        setImbueBalance(balance.toLocaleString());
       } catch (error) {
         setError({ message: error });
       } finally {

@@ -1,5 +1,6 @@
-import { Box, Dialog, Rating } from '@mui/material';
-import React, { useState } from 'react';
+import { Dialog, Rating } from '@mui/material';
+import Link from 'next/link';
+import React, { ChangeEvent, useState } from 'react';
 import { FaStar } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 
@@ -9,17 +10,16 @@ import { Project } from '@/model';
 import { editReview, postReviewService } from '@/redux/services/reviewServices';
 import { RootState } from '@/redux/store/store';
 
-import InputOutlined from '../Common/InputOutlined';
-import TextAreaOutlined from '../Common/TextAreaOutlined';
 import { LoginPopupStateType } from '../Layout';
+import SuccessScreen from '../SuccessScreen';
+import ValidatableInput from '../ValidatableInput';
+import styles from '../../styles/modules/Freelancers/new-Freelancer.module.css';
 
 interface ReviewModalProps {
     targetUser: any;
     project?: Project;
     setShowLoginPopup?: (_value: LoginPopupStateType) => void;
     setLoading?: (_value: boolean) => void;
-    setSuccessTitle: (_value: string) => void;
-    setSuccess: (_value: boolean) => void;
     setError: (_value: any) => void;
     review?: ReviewType;
     button?: boolean;
@@ -40,12 +40,13 @@ function getLabelText(value: number) {
     return `${value} Star${value !== 1 ? 's' : ''}, ${labels[value]}`;
 }
 
-const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, setSuccessTitle, setLoading, setError, review, button, openMain = false, setOpenMain, action }: ReviewModalProps) => {
+const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setLoading, setError, review, button, openMain = false, setOpenMain, action }: ReviewModalProps) => {
     const [open, setOpen] = useState<boolean>(openMain)
-    const [hover, setHover] = React.useState(-1);
+    const [success, setSuccess] = useState<boolean>(false)
+    // const [hover, setHover] = React.useState(-1);
 
     const [rating, setRating] = React.useState<number>(review?.ratings || 3);
-    const [title, setTitle] = useState<string>(review?.title || "")
+    // const [title, setTitle] = useState<string | undefined>(action === 'post' ? project?.name : review?.title)
     const [description, setDescription] = useState<string>(review?.description || "")
 
     const { user, loading: userLoading } = useSelector(
@@ -58,11 +59,13 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, s
     }
 
     const handleSubmit = async () => {
-        setLoading?.(true);
+        if (!rating) return setError({ message: "Please use a rating from 1 to 5" })
+
         handleClose();
+        setLoading?.(true);
 
         const reviewBody: any = {
-            title,
+            title: action === 'post' ? project?.name : review?.title,
             description,
             ratings: rating,
             user_id: targetUser?.user_id || targetUser.id,
@@ -82,7 +85,6 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, s
 
         if (resp?.status === 'success') {
             setSuccess(true);
-            setSuccessTitle("Your review has been successfully submitted")
         } else {
             setError({ message: resp.message })
         }
@@ -96,7 +98,7 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, s
                 onClose={handleClose}
                 aria-labelledby='alert-dialog-title'
                 aria-describedby='alert-dialog-description'
-                className='p-14 errorDialogue'
+                className='p-14 errorDialogue min-h-fit'
             >
                 <div className='flex flex-col gap-3 p-8 text-content'>
                     <p className='text-center text-lg lg:text-2xl font-bold text-content-primary'>
@@ -115,33 +117,58 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, s
                                     onChange={(event, newValue) => {
                                         setRating(newValue || 0);
                                     }}
-                                    onChangeActive={(event, newHover) => {
-                                        setHover(newHover);
-                                    }}
+                                    // onChangeActive={(event, newHover) => {
+                                    //     setHover(newHover);
+                                    // }}
                                     icon={
                                         <FaStar color='var(--theme-primary)' />
                                     }
                                 // emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
                                 />
-                                {rating !== null && (
+                                {/* {rating !== null && (
                                     <Box sx={{ ml: 2 }}>{labels[hover !== -1 ? hover : rating]}</Box>
-                                )}
+                                )} */}
                             </div>
                         </div>
 
 
-                        <p>Title</p>
-                        <InputOutlined
-                            onChange={(e) => setTitle(e.target.value)}
-                            inputProps={{ defaultValue: review?.title }}
-                        />
+                        {/* <p className='mb-2'>Title</p>
+                        <ValidatableInput
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                setTitle(e.target.value)
+                            }
+                            className={`${styles.fieldInput} ${styles.large}`}
+                            placeholder='Add a Title'
+                            data-testid='title'
+                            name='title'
+                            maxLength={50}
+                            minLength={3}
+                            // defaultValue={action === 'post' ? project?.name : review?.title}
+                            value={title || ""}
+                        /> */}
 
-                        <p>Description</p>
-                        <TextAreaOutlined
+                        <p className='mt-5 mb-3'>Project Title: {action === 'post' ? project?.name : review?.title}</p>
+
+                        <p className='mb-2'>Description (optional)</p>
+                        {/* <TextAreaOutlined
                             props={{
                                 onChange: (e) => setDescription(e.target.value)
                             }}
                             inputProps={{ defaultValue: review?.description }}
+                        /> */}
+                        <ValidatableInput
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                setDescription(e.target.value)
+                            }
+                            className={`${styles.fieldInput} ${styles.large}`}
+                            placeholder='Add a description'
+                            data-testid='description'
+                            name='description'
+                            maxLength={500}
+                            minLength={0}
+                            rows={6}
+                            defaultValue={review?.description}
+                            value={description}
                         />
 
                         <div className='flex items-center justify-center w-full mt-3'>
@@ -158,7 +185,7 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, s
                     <button
                         className='px-3 py-1 rounded-full bg-imbue-light-purple text-sm text-content'
                         onClick={() => {
-                            if (userLoading || !user.id) setShowLoginPopup?.({ open: true, redirectURL: `/projects/${project?.id}` });
+                            if (!userLoading && !user.id) setShowLoginPopup?.({ open: true, redirectURL: `/projects/${project?.id}` });
                             else setOpen(true)
                         }}
                     >
@@ -166,6 +193,32 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setSuccess, s
                     </button>
                 )
             }
+
+            <SuccessScreen
+                noRetry={true}
+                title={'Your review has been successfully submitted'}
+                open={success}
+                setOpen={setSuccess}
+            >
+                <div className='flex flex-col gap-4 w-1/2'>
+                    <button
+                        onClick={() => {
+                            window.location.reload();
+                            setSuccess(false);
+                        }}
+                        className='primary-btn in-dark w-button w-full !m-0'
+                    >
+                        Continue
+                    </button>
+                    <button className='underline text-xs lg:text-base font-bold'>
+                        <Link
+                            href={`/dashboard`}
+                        >
+                            Go to dashboard
+                        </Link>
+                    </button>
+                </div>
+            </SuccessScreen>
         </div>
     );
 };

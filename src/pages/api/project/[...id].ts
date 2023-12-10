@@ -265,6 +265,7 @@ const syncProject = async (project: any, tx: any) => {
 
       delete newProject.milestones;
       delete newProject.approvers;
+      delete newProject.reviews;
       const updatedProject = await models.updateProject(
         projectId,
         newProject
@@ -291,6 +292,7 @@ const syncProject = async (project: any, tx: any) => {
         ...updatedProject,
         approvers: project.approvers,
         milestones: project.milestones,
+        reviews: project.reviews,
       };
 
       return pkg;

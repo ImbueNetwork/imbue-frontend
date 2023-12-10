@@ -101,7 +101,6 @@ export const HirePopup = ({
 
       setFreelancerImbueBalance(balance);
     };
-
     updateEscrowInfo();
     openHirePopup && checkBalance();
   }, [freelancer.web3_address, application?.currency_id, user, openHirePopup]);
@@ -132,7 +131,8 @@ export const HirePopup = ({
       initialContribution,
       briefHash,
       currencyId,
-      milestones
+      milestones,
+      application.payment_address
     );
     // eslint-disable-next-line no-constant-condition
     while (true) {

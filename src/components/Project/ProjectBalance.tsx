@@ -2,8 +2,6 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Menu, MenuItem } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
-import { getBalance } from '@/utils/helper';
-
 import { Currency, OffchainProjectState, Project, User } from '@/model';
 
 type ProjectBalanceType = {
@@ -11,7 +9,6 @@ type ProjectBalanceType = {
     project: Project;
     user: User;
     handlePopUpForUser: () => void;
-    setBalance: (_balance: number) => void;
     setBalanceLoading: (_loading: boolean) => void;
     balanceLoading: boolean;
 }
@@ -42,7 +39,7 @@ const Currencies = [
 ]
 
 const ProjectBalance = (props: ProjectBalanceType) => {
-    const { balance, project, user, handlePopUpForUser, setBalance, balanceLoading, setBalanceLoading } = props;
+    const { balance, project, user, handlePopUpForUser, balanceLoading, setBalanceLoading } = props;
     const [currency_id, setCurrency_id] = useState<number>();
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
@@ -51,7 +48,7 @@ const ProjectBalance = (props: ProjectBalanceType) => {
 
     useEffect(() => {
         const getAndSetBalace = async () => {
-            if (balanceLoading && !firstLoad) return;
+            if (balanceLoading && !firstLoad && !balance) return;
 
             if (
                 currency_id === undefined
@@ -60,17 +57,11 @@ const ProjectBalance = (props: ProjectBalanceType) => {
             setBalanceLoading(true)
 
             try {
-                const balance = await getBalance(
-                    currency_id,
-                    user,
-                    project.currency_id < 100 ? project?.escrow_address : undefined,
-                    Number(project.id)
-                );
+
                 if (!balance && project.status_id !== OffchainProjectState.Completed) {
                     handlePopUpForUser();
                 }
 
-                setBalance(balance || 0);
                 if (firstLoad)
                     setFirstLoad(false)
 
@@ -93,7 +84,7 @@ const ProjectBalance = (props: ProjectBalanceType) => {
         return () => clearInterval(timer);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currency_id, project?.escrow_address, project.status_id, user.id, firstLoad, balanceLoading])
+    }, [project, user])
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);

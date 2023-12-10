@@ -13,7 +13,7 @@ interface ClientViewProps {
   briefId: string | string[] | undefined;
   briefs: any;
   handleMessageBoxClick: (_userId: number, _freelander: Freelancer) => void;
-  redirectToBriefApplications: (_applicationId: string) => void;
+  // redirectToBriefApplications: (_applicationId: string) => void;
   briefApplications: Project[];
   ongoingGrants: Project[];
   loadingApplications: boolean;
@@ -24,7 +24,7 @@ export default function ClientView({
   briefId,
   briefs,
   handleMessageBoxClick,
-  redirectToBriefApplications,
+  // redirectToBriefApplications,
   briefApplications,
   ongoingGrants,
   loadingApplications,
@@ -109,7 +109,7 @@ export default function ClientView({
           briefApplications={briefApplications}
           loadingApplications={loadingApplications}
           handleMessageBoxClick={handleMessageBoxClick}
-          redirectToBriefApplications={redirectToBriefApplications}
+          // redirectToBriefApplications={redirectToBriefApplications}
         />
       )}
       {switcher === 'projects' && <Projects briefs={briefs} />}
