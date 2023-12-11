@@ -9,8 +9,8 @@ import { initPolkadotJSAPI } from '@/utils/polkadot';
 
 import db from '@/db';
 import { OffchainProjectState } from '@/model';
-import { User } from '@/model';
 import ChainService from '@/redux/services/chainService';
+import { syncMilestoneVotes } from '@/redux/services/syncServices';
 
 import { authenticate, verifyUserIdFromJwt } from '../auth/common';
 
@@ -18,15 +18,6 @@ type ProjectPkg = models.Project & {
   milestones: models.Milestone[];
   approvers?: string[];
   reviews?: ReviewBody[];
-};
-
-type Vote = {
-  id?: number;
-  project_id: number | string;
-  milestone_index: number | string;
-  user_id?: number | string;
-  voter_address: string;
-  vote: boolean;
 };
 
 export default nextConnect()
@@ -237,53 +228,6 @@ const syncProject = async (project: any, tx: any) => {
       project
     );
 
-    const milestoneIndex = 0;
-
-    const milestoneVoteJson =
-      onChainProjectRes?.projectVotes?.votes[milestoneIndex];
-
-    const milestoneVoteArray = Object.keys(milestoneVoteJson).map((k) => ({
-      voter_address: k,
-      vote: milestoneVoteJson[k],
-    }));
-
-    const votesOffchain: Vote[] = await tx('project_votes').select('*').where({
-      project_id: projectId,
-      milestone_index: milestoneIndex,
-    });
-
-    const newVote: Vote[] = [];
-    let votesNeedSync = false;
-
-    const approvers: User[] = await tx('users')
-      .select('*')
-      .whereIn('web3_address', project.approvers);
-
-    milestoneVoteArray.forEach((v) => {
-      const match = votesOffchain.find(
-        (vote) => vote.voter_address === v.voter_address
-      );
-
-      if (!match) {
-        votesNeedSync = true;
-
-        const user = approvers.find(
-          (approver) => approver.web3_address === v.voter_address
-        );
-
-        newVote.push({
-          ...v,
-          project_id: projectId,
-          milestone_index: milestoneIndex,
-          user_id: user?.id,
-        });
-      }
-    });
-
-    if (votesNeedSync) {
-      await tx('project_votes').insert(newVote);
-    }
-
     if (onChainProjectRes) {
       onChainProjectRes.milestones.map((milestone, index) => {
         if (project.milestones[index].is_approved !== milestone.is_approved) {
@@ -298,6 +242,22 @@ const syncProject = async (project: any, tx: any) => {
         await chainService.findFirstPendingMilestone(
           onChainProjectRes.milestones
         );
+
+      // Syncing milestone votes if necessary
+      await syncMilestoneVotes(
+        onChainProjectRes,
+        project,
+        firstPendingMilestoneChain,
+        tx
+      );
+     
+      // Syncing no confidence votes if necessary
+      // await syncMilestoneVotes(
+      //   onChainProjectRes,
+      //   project,
+      //   firstPendingMilestoneChain,
+      //   tx
+      // );
 
       if (
         firstPendingMilestoneChain === project.first_pending_milestone &&
@@ -330,23 +290,10 @@ const syncProject = async (project: any, tx: any) => {
         projectId,
         newProject
       )(tx);
+
       if (!updatedProject.id) {
         return new Error('Cannot update milestones: `project_id` missing.');
       }
-
-      // // drop then recreate
-      // await models.deleteMilestones(projectId)(tx);
-
-      // //filtering milestones in back-end
-      // const filterdMileStone = project.milestones.map((item: any) => {
-      //   return {
-      //     ...item,
-      //     name: filter.clean(item.name),
-      //     description: filter.clean(item.description),
-      //   };
-      // });
-
-      // await models.insertMilestones(filterdMileStone, project.id)(tx);
 
       const pkg: ProjectPkg = {
         ...updatedProject,
@@ -354,9 +301,6 @@ const syncProject = async (project: any, tx: any) => {
         milestones: project.milestones,
         reviews: project.reviews,
       };
-
-      // todo: sync milestone votes if necessary or return pkg
-      // if(onChainProjectRes?.projectVotes.)
 
       return pkg;
     } else {
@@ -379,8 +323,8 @@ const syncProject = async (project: any, tx: any) => {
       return project;
     }
   } catch (error) {
-    console.log('**** error is ');
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     return project;
   }
 };

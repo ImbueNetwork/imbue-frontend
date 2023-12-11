@@ -242,16 +242,26 @@ function Project() {
     }
   };
 
-  const updateBalanceInfo = async (currency_id: number) => {
-    const balance = await getBalance(
-      currency_id,
-      user,
-      project.currency_id < 100 ? project?.escrow_address : undefined,
-      Number(project.id)
-    );
-    setBalance(balance);
+  const updateBalanceInfo = async (currency_id: number, escrow_address: string) => {
+    if (!escrow_address) return;
 
+    setBalanceLoading(true)
+    try {
+      const balance = await getBalance(
+        currency_id,
+        user,
+        currency_id < 100 ? escrow_address : undefined,
+        Number(project.id)
+      );
+      setBalance(balance);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log(error);
+    } finally {
+      setBalanceLoading(false)
+    }
   }
+
   const getProject = async () => {
     if (!projectId) return;
 
@@ -263,7 +273,8 @@ function Project() {
         setLoading(false);
         // router.push('/error');
       }
-      updateBalanceInfo(projectRes.currency_id);
+
+      updateBalanceInfo(projectRes.currency_id, projectRes.escrow_address);
 
       // showing owner profile if the current user if the applicant freelancer
       let owner;
@@ -616,11 +627,13 @@ function Project() {
                 <ProjectBalance
                   {...{
                     balance,
+                    setBalance,
                     project,
                     user,
                     handlePopUpForUser,
                     balanceLoading,
-                    setBalanceLoading
+                    setBalanceLoading,
+                    updateBalanceInfo
                   }}
                 />
                 <div className='flex justify-between mt-2'>
