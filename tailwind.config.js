@@ -57,6 +57,7 @@ module.exports = {
         'max-width-500px': { raw: '(max-width: 500px)' },
         'max-width-400px': { raw: '(max-width: 400px)' },
         'min-width-1280px': { raw: '(min-width: 1280px)' },
+        'min-width-868px': { raw: '(min-width: 868px)' },
         'min-width-750px': { raw: '(min-width: 750px)' },
         'min-width-500px': { raw: '(min-width: 500px)' },
         'min-width-376px': { raw: '(min-width: 376px)' },

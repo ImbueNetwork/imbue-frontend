@@ -1,6 +1,4 @@
-import {
-  CircularProgress, IconButton,
-} from '@mui/material';
+import { CircularProgress, IconButton } from '@mui/material';
 import { SignerResult } from '@polkadot/api/types';
 import { WalletAccount } from '@talismn/connect-wallets';
 import Image from 'next/image';
@@ -13,6 +11,8 @@ const Web3WalletModal = dynamic(
 );
 
 import dynamic from 'next/dynamic';
+
+import { fetchUserByUsernameOrAddress } from '@/utils';
 
 import GoogleSignIn from '@/components/GoogleSignIn';
 
@@ -32,9 +32,8 @@ export default function SignIn() {
 
   const redirect = (path: string) => {
     window.location.href = `${window.location.origin}/${path}`;
-  }
+  };
 
-  
   const handleSubmit = async () => {
     setLoading(true);
     try {
@@ -66,6 +65,10 @@ export default function SignIn() {
 
   const accountSelected = async (account: WalletAccount): Promise<any> => {
     try {
+      const res = await fetchUserByUsernameOrAddress(account.address);
+      if (res && res.error?.length > 0) {
+        window.localStorage.setItem('newUser', '1');
+      }
       const result = await getAccountAndSign(account);
       const resp = await authorise(
         result?.signature as SignerResult,
@@ -89,9 +92,9 @@ export default function SignIn() {
   const walletRef = useRef<any>(null);
 
   return (
-    <div className="flex justify-center items-center absolute inset-0">
-      <div className="bg-white flex lg:space-x-5 p-2 rounded-2xl mx-4">
-        <div className="left-side hidden lg:block w-[28rem] lg:w-[31.25rem]">
+    <div className='flex justify-center items-center absolute inset-0'>
+      <div className='bg-white flex lg:space-x-5 p-2 rounded-2xl mx-4'>
+        <div className='left-side hidden lg:block w-[28rem] lg:w-[31.25rem]'>
           <Carousel />
         </div>
         <div className='content px-4 lg:px-8 py-6 lg:py-16'>
@@ -161,18 +164,20 @@ export default function SignIn() {
               onKeyUp={(e) => (e.key === 'Enter') && document.getElementsByName('password')[0].focus()}
             /> */}
 
-            <div className="h-[2.6rem] px-[6px] text-[0.875rem] border border-[#BCBCBC] evenShadow focus-within:outline focus-within:outline-1 focus-within:outline-imbue-purple rounded-[4px] flex items-center w-full">
+            <div className='h-[2.6rem] px-[6px] text-[0.875rem] border border-[#BCBCBC] evenShadow focus-within:outline focus-within:outline-1 focus-within:outline-imbue-purple rounded-[4px] flex items-center w-full'>
               <input
                 type='text'
                 name='emailorUsername'
                 placeholder='victorimbue@gmail.com'
                 onChange={(e: any) => setUserOrEmail(e.target.value)}
                 required
-                onKeyUp={(e) => (e.key === 'Enter') && document.getElementsByName('password')[0].focus()}
-                className="outline-none w-full text-black pl-3"
+                onKeyUp={(e) =>
+                  e.key === 'Enter' &&
+                  document.getElementsByName('password')[0].focus()
+                }
+                className='outline-none w-full text-black pl-3'
               />
             </div>
-
           </div>
           <div className='flex flex-col justify-center pb-[10px] w-full mt-[1.2rem]'>
             <label className='font-Aeonik text-base lg:text-[1rem] text-imbue-purple-dark font-normal mb-2'>
@@ -218,27 +223,38 @@ export default function SignIn() {
               }
             /> */}
 
-            <div className="h-[2.6rem] px-[6px] text-[0.875rem] border border-[#BCBCBC] evenShadow focus-within:outline focus-within:outline-1 focus-within:outline-imbue-purple rounded-[4px] flex items-center w-full">
+            <div className='h-[2.6rem] px-[6px] text-[0.875rem] border border-[#BCBCBC] evenShadow focus-within:outline focus-within:outline-1 focus-within:outline-imbue-purple rounded-[4px] flex items-center w-full'>
               <input
                 placeholder='*********'
                 type={showPassword ? 'text' : 'password'}
                 name='password'
                 required
                 onChange={(e: any) => setPassword(e.target.value)}
-                onKeyUp={(e) => (e.key === 'Enter') && handleSubmit()}
-                className="outline-none w-full text-black pl-3"
+                onKeyUp={(e) => e.key === 'Enter' && handleSubmit()}
+                className='outline-none w-full text-black pl-3'
               />
 
               <IconButton
                 aria-label='toggle password visibility'
                 onClick={() => setShowPassword(!showPassword)}
                 edge='end'
-                className="mr-0"
+                className='mr-0'
               >
-                {showPassword ? <Image className="h-5 w-5" src={require("../../../assets/svgs/eye.svg")} alt="" /> : <Image className="w-5 h-5" src={require("../../../assets/svgs/eyeClosed.svg")} alt="" />}
+                {showPassword ? (
+                  <Image
+                    className='h-5 w-5'
+                    src={require('../../../assets/svgs/eye.svg')}
+                    alt=''
+                  />
+                ) : (
+                  <Image
+                    className='w-5 h-5'
+                    src={require('../../../assets/svgs/eyeClosed.svg')}
+                    alt=''
+                  />
+                )}
               </IconButton>
             </div>
-
           </div>
           <div className='flex justify-center my-2 w-full cursor-pointer'>
             <button

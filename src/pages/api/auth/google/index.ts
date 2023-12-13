@@ -58,7 +58,10 @@ export default nextConnect().post(
                   const payload = { id: user.id };
                   const token = await jwt.sign(payload, jwtOptions.secretOrKey);
                   await setTokenCookie(res, token);
-                  res.send({ id: user.id, display_name: user.display_name });
+                  res.send({
+                    id: user.id,
+                    display_name: user.display_name,
+                  });
                 });
               }
             );
