@@ -2,7 +2,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CancelIcon from '@mui/icons-material/Cancel';
 import MarkEmailUnreadOutlinedIcon from '@mui/icons-material/MarkEmailUnreadOutlined';
 import VerifiedIcon from '@mui/icons-material/Verified';
-import { Alert, Tooltip } from '@mui/material';
+import { Alert, Skeleton, Tooltip } from '@mui/material';
 import moment from 'moment';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -52,7 +52,7 @@ const BioInsights = ({
   setShowMessageBox,
   targetUser,
   canSubmitProposal,
-  allClientBriefs,
+  allClientBriefs = [],
   setSuccess,
   setError,
   setSuccessTitle,
@@ -67,9 +67,13 @@ const BioInsights = ({
   const [briefApplications, setBriefApplications] = useState<Project[]>([]);
   const lastApplication: Project =
     briefApplications[briefApplications?.length - 1];
-  const pendingApplciations: Project[] = briefApplications.filter(
-    (application) => application?.status_id === 1
-  );
+
+  const pendingApplciations: Project[] =
+    !briefApplications?.length
+      ? []
+      : briefApplications?.filter(
+        (application) => application?.status_id === 1
+      );
 
   let hint = '';
   if (!canSubmitProposal)
@@ -100,11 +104,12 @@ const BioInsights = ({
     }
 
     fetchSavedBriefs()
-  }, [brief?.id, browsingUser?.id])
+  }, [brief?.id, browsingUser?.id, setError])
 
   useEffect(() => {
     const setUp = async () => {
-      if (!allClientBriefs) return;
+      if (!allClientBriefs.length) return;
+      
       const allBriefs = [...allClientBriefs.acceptedBriefs, ...allClientBriefs.briefsUnderReview];
       setClientBrief(allBriefs);
     };
@@ -152,50 +157,57 @@ const BioInsights = ({
     setSuccessTitle('Brief Unsaved Successfully');
   };
 
-  // TODO: Add skeleton
-  if (loading || loadingMain) return <p>Loading...</p>
+  if (loading || loadingMain) return (
+    <div className='brief-insights py-6 px-6 lg:py-10 lg:px-10 mt-[2rem] lg:mt-0 w-full md:w-[35%] relative'>
+      <Skeleton variant="text" className='text-xl w-52' />
+      <div className='flex gap-2 w-full my-3'>
+        <Skeleton variant="text" className='text-xl w-28 h-10 rounded-full' />
+        <Skeleton variant="text" className='text-xl w-40 h-10 rounded-full' />
+      </div>
+
+      <Skeleton variant="text" className='text-base w-52 mb-3' />
+      <Skeleton variant="text" className='text-base w-52 mb-3' />
+      <Skeleton variant="text" className='text-base w-52 mb-3' />
+
+      <Skeleton variant="text" className='text-base w-52 mt-6' />
+      <Skeleton variant="rounded" className='mt-4 w-full' height={180} />
+
+      <Skeleton variant="text" className='text-base w-52 mt-5' />
+      <Skeleton variant="text" className='text-base w-52 mt-2' />
+      <Skeleton variant="rounded" className='mt-4 w-full' height={30} />
+    </div>
+  )
 
   return (
     <div
-      className='brief-insights 
-      py-6
-      px-6
-      lg:py-10
-      lg:px-10
-      mt-[2rem]
-      lg:mt-0
-      w-full
-      md:w-[35%]
-      relative
-    '
+      className='brief-insights py-6 px-6 lg:py-10 lg:px-10 mt-[2rem] lg:mt-0 w-full md:w-[35%] relative'
     >
-      <div className=''>
-        <div className=''>
-          <h3 className='text-imbue-purple-dark !font-normal'>
-            Activities on this job
-          </h3>
+      <div>
+        <h3 className='text-imbue-purple-dark !font-normal'>
+          Activities on this job
+        </h3>
 
-          {!brief?.project_id && (
-            <div className='flex gap-3 lg:items-center mt-4 flex-wrap'>
+        {!brief?.project_id && (
+          <div className='flex gap-3 lg:items-center mt-4 flex-wrap'>
+            <button
+              onClick={() => (isSavedBrief ? unsaveBrief?.() : saveBrief?.())}
+              className={` ${isSavedBrief
+                ? 'bg-imbue-coral text-white border-imbue-coral'
+                : 'bg-transparent text-content border border-content'
+                } rounded-3xl h-[2.48rem] text-base font-normal px-5 max-width-1100px:w-full max-width-500px:w-auto `}
+            >
+              {isSavedBrief ? 'Unsave' : 'Save'}
+            </button>
+
+            <Tooltip
+              title={hint}
+              arrow
+              placement='bottom'
+              leaveTouchDelay={5}
+              followCursor
+            >
               <button
-                onClick={() => (isSavedBrief ? unsaveBrief?.() : saveBrief?.())}
-                className={` ${isSavedBrief
-                  ? 'bg-imbue-coral text-white border-imbue-coral'
-                  : 'bg-transparent text-content border border-content'
-                  } rounded-3xl h-[2.48rem] text-base font-normal px-5 max-width-1100px:w-full max-width-500px:w-auto `}
-              >
-                {isSavedBrief ? 'Unsave' : 'Save'}
-              </button>
-
-              <Tooltip
-                title={hint}
-                arrow
-                placement='bottom'
-                leaveTouchDelay={5}
-                followCursor
-              >
-                <button
-                  className={`primary-btn 
+                className={`primary-btn 
               in-dark
               !text-[1rem]
               !font-normal
@@ -205,34 +217,33 @@ const BioInsights = ({
               !m-0
               !px-4
               ${(!canSubmitProposal || isOwnerOfBrief) &&
-                    '!bg-gray-300 !text-gray-400 !cursor-not-allowed'
-                    }
-              `}
-                  onClick={() =>
-                    canSubmitProposal && !isOwnerOfBrief && redirectToApply()
+                  '!bg-gray-300 !text-gray-400 !cursor-not-allowed'
                   }
-                >
-                  Submit a Proposal <FaRegShareSquare />
-                </button>
-              </Tooltip>
-
-              <Tooltip
-                title='Go back to previous page'
-                followCursor
-                leaveTouchDelay={10}
-                enterDelay={500}
-                className='cursor-pointer'
+              `}
+                onClick={() =>
+                  canSubmitProposal && !isOwnerOfBrief && redirectToApply()
+                }
               >
-                <div
-                  onClick={() => router.back()}
-                  className='border border-content rounded-full p-1 flex items-center justify-center absolute right-5 top-5'
-                >
-                  <ArrowBackIcon className='h-5 w-5' color='secondary' />
-                </div>
-              </Tooltip>
-            </div>
-          )}
-        </div>
+                Submit a Proposal <FaRegShareSquare />
+              </button>
+            </Tooltip>
+
+            <Tooltip
+              title='Go back to previous page'
+              followCursor
+              leaveTouchDelay={10}
+              enterDelay={500}
+              className='cursor-pointer'
+            >
+              <div
+                onClick={() => router.back()}
+                className='border border-content rounded-full p-1 flex items-center justify-center absolute right-5 top-5'
+              >
+                <ArrowBackIcon className='h-5 w-5' color='secondary' />
+              </div>
+            </Tooltip>
+          </div>
+        )}
       </div>
 
       <div className='subsection !mb-[0.75rem]'>
@@ -256,7 +267,8 @@ const BioInsights = ({
               </span>
             </Tooltip>
             <span className='primary-text font-normal ml-2 !text-imbue-lemon'>
-              Less than {briefApplications?.length || 0}
+              {briefApplications?.length > 0 ? "Less than " : ""}
+              {briefApplications?.length || 0}
             </span>
           </div>
         </div>

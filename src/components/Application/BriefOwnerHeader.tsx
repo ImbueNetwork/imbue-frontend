@@ -146,12 +146,13 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
           setFirstLoad(false)
       }
     };
-    // user?.web3_address && showBalance();
+    
+    user?.web3_address && showBalance();
 
-    const timer = setInterval(() => {
-      user?.web3_address && showBalance();
-    }, 5000);
-    return () => clearInterval(timer);
+    // const timer = setInterval(() => {
+    //   user?.web3_address && showBalance();
+    // }, 5000);
+    // return () => clearInterval(timer);
 
   }, [user?.web3_address, application.currency_id, user, loadingWallet, firstLoad]);
 

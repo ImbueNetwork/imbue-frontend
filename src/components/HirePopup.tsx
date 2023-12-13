@@ -70,7 +70,7 @@ export const HirePopup = ({
     pb: mobileView ? '10px' : '28px',
     boxShadow: 24,
     borderRadius: '20px',
-    zIndex: 1,
+    zIndex: 10,
   };
 
 
