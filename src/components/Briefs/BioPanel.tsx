@@ -20,6 +20,7 @@ type BioPanelData = {
   targetUser: any;
   browsingUser: User;
   showLoginPopUp: (_value: LoginPopupStateType) => void;
+  loadingMain: boolean;
 };
 
 const BioPanel = ({
@@ -28,7 +29,8 @@ const BioPanel = ({
   isOwnerOfBrief,
   targetUser,
   browsingUser,
-  showLoginPopUp
+  showLoginPopUp,
+  loadingMain
 }: BioPanelData) => {
   const [expandBreifDesc, setExpandBreifDesc] = useState<number>(500);
   const timePosted = timeAgo.format(new Date(brief.created));

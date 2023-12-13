@@ -6,7 +6,7 @@ import { Alert, Tooltip } from '@mui/material';
 import moment from 'moment';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { FaRegShareSquare } from 'react-icons/fa';
 
 import { checkEnvironment } from '@/utils';
@@ -16,9 +16,13 @@ import ChatPopup from '@/components/ChatPopup';
 import { copyIcon } from '@/assets/svgs';
 import { Brief, Project, User } from '@/model';
 import {
+  checkIfBriefSaved,
+  deleteSavedBrief,
   getBriefApplications,
+  saveBriefData,
 } from '@/redux/services/briefService';
 
+import { LoginPopupContext, LoginPopupContextType } from '../Layout';
 import CountrySelector from '../Profile/CountrySelector';
 
 type BioInsightsProps = {
@@ -26,15 +30,16 @@ type BioInsightsProps = {
   brief: Brief;
   isOwnerOfBrief: boolean | null;
   handleMessageBoxClick: () => void;
-  saveBrief?: () => void;
   showMessageBox: boolean;
   setShowMessageBox: (_: boolean) => void;
   targetUser: User | null;
   browsingUser: User | null;
   canSubmitProposal: boolean | undefined;
-  isSavedBrief?: boolean;
-  unsaveBrief?: () => Promise<void>;
   allClientBriefs: any;
+  setSuccess: (_value: boolean) => void;
+  setSuccessTitle: (_value: string) => void;
+  setError: (_value: any) => void;
+  loadingMain: boolean;
 };
 
 const BioInsights = ({
@@ -47,16 +52,18 @@ const BioInsights = ({
   setShowMessageBox,
   targetUser,
   canSubmitProposal,
-  saveBrief,
-  unsaveBrief,
-  isSavedBrief,
   allClientBriefs,
+  setSuccess,
+  setError,
+  setSuccessTitle,
+  loadingMain
 }: BioInsightsProps) => {
   const router = useRouter();
   const [copied, setCopied] = useState(false);
 
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isSavedBrief, setIsSavedBrief] = useState<boolean>(false);
   const [clientBriefs, setClientBrief] = useState<Brief[]>([]);
-  const [openBriefs, setIOpenBriefs] = useState<Brief[]>([]);
   const [briefApplications, setBriefApplications] = useState<Project[]>([]);
   const lastApplication: Project =
     briefApplications[briefApplications?.length - 1];
@@ -70,17 +77,40 @@ const BioInsights = ({
   else if (isOwnerOfBrief)
     hint = 'You are not allowed to submit proposal to your own brief';
 
+  const { setShowLoginPopup } = useContext(
+    LoginPopupContext
+  ) as LoginPopupContextType;
+
+  useEffect(() => {
+    const fetchSavedBriefs = async () => {
+      if (!brief?.id || !browsingUser?.id) return
+
+      try {
+        const briefIsSaved = await checkIfBriefSaved(
+          brief?.id,
+          browsingUser?.id
+        );
+        setBriefApplications(await getBriefApplications(brief?.id));
+        setIsSavedBrief(briefIsSaved.isSaved);
+      } catch (error) {
+        setError({ message: "Failed to get application data. Please try again. " + error })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchSavedBriefs()
+  }, [brief?.id, browsingUser?.id])
+
   useEffect(() => {
     const setUp = async () => {
-      if (!targetUser?.id || !allClientBriefs) return;
+      if (!allClientBriefs) return;
       const allBriefs = [...allClientBriefs.acceptedBriefs, ...allClientBriefs.briefsUnderReview];
       setClientBrief(allBriefs);
-      setIOpenBriefs(allClientBriefs.briefsUnderReview || []);
-      setBriefApplications(await getBriefApplications(brief?.id));
     };
 
     setUp();
-  }, [targetUser?.id, brief?.id]);
+  }, [allClientBriefs]);
 
   const copyToClipboard = () => {
     const textToCopy = checkEnvironment().concat(`${router.asPath}`);
@@ -92,6 +122,38 @@ const BioInsights = ({
       setCopied(false);
     }, 3000);
   };
+
+  const saveBrief = async () => {
+    if (!browsingUser?.id)
+      return setShowLoginPopup({
+        open: true,
+        redirectURL: `/briefs/${brief.id}`,
+      });
+
+    const resp = await saveBriefData({
+      ...brief,
+      currentUserId: browsingUser?.id,
+    });
+    if (resp?.brief_id) {
+      setSuccessTitle('Brief Saved Successfully');
+      setIsSavedBrief(true);
+      setSuccess(true);
+    } else {
+      setError({ message: 'Brief already Saved' });
+    }
+  };
+
+  const unsaveBrief = async () => {
+    if (!browsingUser?.id) return setError({ message: "No user information found." });
+
+    await deleteSavedBrief(brief.id, browsingUser?.id);
+    setIsSavedBrief(false);
+    setSuccess(true);
+    setSuccessTitle('Brief Unsaved Successfully');
+  };
+
+  // TODO: Add skeleton
+  if (loading || loadingMain) return <p>Loading...</p>
 
   return (
     <div
@@ -118,8 +180,8 @@ const BioInsights = ({
               <button
                 onClick={() => (isSavedBrief ? unsaveBrief?.() : saveBrief?.())}
                 className={` ${isSavedBrief
-                    ? 'bg-imbue-coral text-white border-imbue-coral'
-                    : 'bg-transparent text-content border border-content'
+                  ? 'bg-imbue-coral text-white border-imbue-coral'
+                  : 'bg-transparent text-content border border-content'
                   } rounded-3xl h-[2.48rem] text-base font-normal px-5 max-width-1100px:w-full max-width-500px:w-auto `}
               >
                 {isSavedBrief ? 'Unsave' : 'Save'}
@@ -243,7 +305,7 @@ const BioInsights = ({
           <div className='brief-insights-stat flex gap-2 justify-start items-center max-width-1800px:flex-wrap '>
             {targetUser?.web3_address ? (
               <>
-                <VerifiedIcon fontSize='small' color='secondary'/>
+                <VerifiedIcon fontSize='small' color='secondary' />
                 <span className='font-normal text-imbue-purple-dark text-[1rem] mr-3'>
                   Payment method verified
                 </span>
@@ -278,7 +340,7 @@ const BioInsights = ({
               </div>
             </div>
             <p className='mt-2 text-imbue-purple text-[1rem]'>
-              1 hire rate, {openBriefs?.length || 0} open job
+              1 hire rate, {allClientBriefs?.briefsUnderReview?.length || 0} open job
             </p>
           </div>
         </div>

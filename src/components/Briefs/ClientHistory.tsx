@@ -7,7 +7,7 @@ import { Brief } from '@/model';
 
 type ClientsHistoryType = {
     client: any;
-    briefId: string;
+    briefId: number;
     allClientBriefs: any;
 }
 
@@ -20,7 +20,7 @@ const ClientsHistory = ({ client, briefId, allClientBriefs }: ClientsHistoryType
 
     useEffect(() => {
         const setUpClientHistory = async () => {
-            if(!allClientBriefs) {
+            if (!allClientBriefs?.length) {
                 return
             }
             const briefs = allClientBriefs.briefsUnderReview?.filter((brief: Brief) => brief.id != briefId)
