@@ -4,8 +4,11 @@ import passport from 'passport';
 
 import * as models from '@/lib/models';
 import { Brief, BriefSqlFilter, fetchItems } from '@/lib/models';
+import { deleteAllBriefApplications, deleteBriefIndustries, deleteBriefSkills } from '@/lib/queryServices/briefQueries';
 
 import db from '@/db';
+
+import { authenticate, verifyUserIdFromJwt } from '../../auth/common';
 
 export default nextConnect()
   .use(passport.initialize())
@@ -100,5 +103,38 @@ export default nextConnect()
         res.status(401).json({ currentData: [], totalBriefs: 0 });
         throw new Error(`Failed to search for briefs`, { cause: e as Error });
       }
+    });
+  })
+  .delete(async (req: NextApiRequest, res: NextApiResponse) => {
+    const { id } = req.query;
+    if (!id)
+      return res
+        .status(404)
+        .send({ status: 'Failed', message: 'No brief found to delete.' });
+
+    await db.transaction(async (tx: any) => {
+      const userAuth: Partial<models.User> | any = await authenticate(
+        'jwt',
+        req,
+        res
+      );
+      verifyUserIdFromJwt(req, res, [userAuth.id]);
+
+      const brief = await models.fetchBrief(id)(tx);
+      await deleteBriefSkills(brief.id)(tx);
+      await deleteBriefIndustries(brief.id)(tx);
+      await deleteAllBriefApplications(brief.id)(tx);
+
+      if (brief.user_id !== userAuth.id)
+        return res
+          .status(500)
+          .send({ status: 'Failed', message: 'Unauthorized action' });
+
+      await tx('briefs').where({ id: id }).del();
+
+      res.status(200).send({
+        status: 'Success',
+        message: `brief: ${id} deleted successfully`,
+      });
     });
   });

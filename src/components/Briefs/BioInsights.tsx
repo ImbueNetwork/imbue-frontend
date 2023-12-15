@@ -1,4 +1,3 @@
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CancelIcon from '@mui/icons-material/Cancel';
 import MarkEmailUnreadOutlinedIcon from '@mui/icons-material/MarkEmailUnreadOutlined';
 import VerifiedIcon from '@mui/icons-material/Verified';
@@ -85,6 +84,12 @@ const BioInsights = ({
     LoginPopupContext
   ) as LoginPopupContextType;
 
+
+  const briefWithApplications = allClientBriefs?.briefsUnderReview?.length ? allClientBriefs.briefsUnderReview.filter((brief: Brief) => brief.number_of_applications) : 0
+  const hiredCount = allClientBriefs?.acceptedBriefs?.length || 0
+
+  const hireRate = (hiredCount / briefWithApplications) * 100
+
   useEffect(() => {
     const fetchSavedBriefs = async () => {
       if (!brief?.id || !browsingUser?.id) return
@@ -109,7 +114,7 @@ const BioInsights = ({
   useEffect(() => {
     const setUp = async () => {
       if (!allClientBriefs.length) return;
-      
+
       const allBriefs = [...allClientBriefs.acceptedBriefs, ...allClientBriefs.briefsUnderReview];
       setClientBrief(allBriefs);
     };
@@ -227,21 +232,6 @@ const BioInsights = ({
                 Submit a Proposal <FaRegShareSquare />
               </button>
             </Tooltip>
-
-            <Tooltip
-              title='Go back to previous page'
-              followCursor
-              leaveTouchDelay={10}
-              enterDelay={500}
-              className='cursor-pointer'
-            >
-              <div
-                onClick={() => router.back()}
-                className='border border-content rounded-full p-1 flex items-center justify-center absolute right-5 top-5'
-              >
-                <ArrowBackIcon className='h-5 w-5' color='secondary' />
-              </div>
-            </Tooltip>
           </div>
         )}
       </div>
@@ -352,7 +342,8 @@ const BioInsights = ({
               </div>
             </div>
             <p className='mt-2 text-imbue-purple text-[1rem]'>
-              1 hire rate, {allClientBriefs?.briefsUnderReview?.length || 0} open job
+              {hireRate > 0 && <span className='mr-1'>{hireRate}% hire rate,</span>}
+              {allClientBriefs?.briefsUnderReview?.length || 0} open job
             </p>
           </div>
         </div>

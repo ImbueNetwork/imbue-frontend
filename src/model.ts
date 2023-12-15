@@ -1,4 +1,4 @@
-import { ReviewBody } from "./lib/queryServices/reviewQueries";
+import { ReviewBody } from './lib/queryServices/reviewQueries';
 
 export enum Currency {
   IMBU = 0,
@@ -292,6 +292,7 @@ export type Brief = {
   experience_level: string;
   experience_id: number;
   number_of_briefs_submitted: number;
+  number_of_applications?: number;
   user_id: number;
   project_id?: number;
   currentUserId?: number;

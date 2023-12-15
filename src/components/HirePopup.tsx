@@ -86,7 +86,7 @@ export const HirePopup = ({
       const escrowBalance = Number(allBalances[currency]) || 0;
       setEscrowBalance(escrowBalance);
     } catch (error) {
-      setError({ message: "Failed to load payment info" })
+      setError({ message: "Failed to load payment info. " + error })
     }
   };
 
@@ -103,6 +103,7 @@ export const HirePopup = ({
     };
     updateEscrowInfo();
     openHirePopup && checkBalance();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [freelancer.web3_address, application?.currency_id, user, openHirePopup]);
 
   const selectedAccount = async (account: WalletAccount) => {
@@ -155,8 +156,10 @@ export const HirePopup = ({
           setSuccess(true);
         } else if (result.txError) {
           let errorMessage = result.errorMessage;
-          if (result.errorMessage?.includes('1010:')) {
+          if (result?.errorMessage?.includes('1010:')) {
             errorMessage = `${result.errorMessage}.\nYou must have minimum balance of 500 $IMBUE`;
+          } else {
+            errorMessage = `Something went wrong. Please try again later.`;
           }
           setError({ message: errorMessage });
           application.status_id = OffchainProjectState.PendingReview;

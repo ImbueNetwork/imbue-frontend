@@ -30,7 +30,7 @@ const MyClientBriefsView = (props: ClientViewProps) => {
   const { user, loading } = useSelector((state: RootState) => state.userState);
 
 
-  const [briefs, _setBriefs] = useState<any>();
+  const [briefs, setBriefs] = useState<any>();
   const [briefApplications, setBriefApplications] = useState<Project[]>([]);
   const [ongoingGrants, setOngoingGrants] = useState<Project[]>([]);
   const [loadingApplications, setLoadingApplications] = useState<boolean>(true);
@@ -40,7 +40,7 @@ const MyClientBriefsView = (props: ClientViewProps) => {
     const setUserBriefs = async () => {
       if (!user.id) return router.push('/auth/sign-in')
 
-      _setBriefs(await getUserBriefs(user?.id));
+      setBriefs(await getUserBriefs(user?.id));
 
       if (user?.web3_address)
         setOngoingGrants(await getUsersOngoingGrants(user?.web3_address));

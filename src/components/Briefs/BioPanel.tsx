@@ -8,8 +8,14 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
 import { Brief, User } from '@/model';
+import { deleteBriefById } from '@/redux/services/briefService';
 
+import BackButton from '../BackButton';
+import ErrorScreen from '../ErrorScreen';
 import { LoginPopupStateType } from '../Layout';
+import BackDropLoader from '../LoadingScreen/BackDropLoader';
+import WarningScreen from '../PopupScreens/WarningScreen';
+import SuccessScreen from '../SuccessScreen';
 
 TimeAgo.addLocale(en);
 
@@ -47,6 +53,24 @@ const BioPanel = ({
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const [warning, setWarning] = useState<boolean>(false);
+  const [loadingDelete, setLoading] = useState<boolean>(false);
+  const [success, setSuccess] = useState<boolean>(false);
+  const [error, setError] = useState<any>();
+
+  const handleDelete = async () => {
+    setLoading(true);
+
+    const resp = await deleteBriefById(brief.id)
+
+    if (resp.status == 'Success')
+      setSuccess(true);
+    else
+      setError({ message: `Failed to delete brief. ` + resp.message });
+
+    setLoading(false);
+  }
 
   if (loadingMain) return (
     <div className='brief-bio py-5 px-10 max-width-750px:!p-5 max-width-750px:!w-full max-width-1100px:p-[1rem] relative'>
@@ -120,14 +144,20 @@ const BioPanel = ({
                       Edit Brief
                     </MenuItem>
                   </Link>
-                  
-                  <MenuItem onClick={handleClose}>
+
+                  <MenuItem
+                    onClick={() => {
+                      handleClose();
+                      setWarning(true)
+                    }}
+                  >
                     Delete Brief
                   </MenuItem>
                 </Menu>
               </div>
             )
           }
+
 
           <div className='header relative'>
             {
@@ -138,9 +168,12 @@ const BioPanel = ({
                 </p>
               )
             }
-            <p className='!text-3xl text-imbue-purple-dark !font-normal'>
-              {brief.headline}
-            </p>
+            <div className='flex gap-2 items-center'>
+              <BackButton className='w-7 h-7 border rounded-full border-imbue-purple-dark' />
+              <p className='!text-3xl text-imbue-purple-dark !font-normal'>
+                {brief.headline}
+              </p>
+            </div>
           </div>
 
           {/* {isOwnerOfBrief && !brief?.project_id && (
@@ -287,6 +320,47 @@ const BioPanel = ({
           ${Number(brief.budget).toLocaleString()}
         </span>
       </div>
+
+      <WarningScreen
+        title='brief'
+        open={warning}
+        setOpen={setWarning}
+        handler={handleDelete}
+      />
+
+      <ErrorScreen {...{ error, setError }}>
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => setError(null)}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Try Again
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='underline text-xs lg:text-base font-bold'
+          >
+            Go to Dashboard
+          </button>
+        </div>
+      </ErrorScreen>
+      <SuccessScreen
+        noRetry={true}
+        title={'Brief deleted successfully'}
+        open={success}
+        setOpen={setSuccess}
+      >
+        <div className='flex flex-col gap-4 w-1/2'>
+          <button
+            onClick={() => router.push(`/dashboard`)}
+            className='primary-btn in-dark w-button w-full !m-0'
+          >
+            Go to dashboard
+          </button>
+        </div>
+      </SuccessScreen>
+
+      <BackDropLoader open={loadingDelete} />
     </div >
   );
 };
