@@ -108,7 +108,7 @@ export default function Messages() {
 
   return (
     <div className='bg-white h-[83vh] flex   mt-5 px-2 py-2 rounded-3xl'>
-      <div className='pl-5 pr-3 min-w-[28.25rem] max-w-[28.25rem] py-5 h-[78vh] overflow-auto'>
+      <div className='pl-5 pr-3   max-w-[18.25rem]   lg:max-w-[22.25rem] xl:max-w-[28.25rem]  w-full py-5 h-[78vh] overflow-auto'>
         <div className='text-black flex text-xl gap-2 items-center'>
           <p>Messages </p>
           <div className='text-sm bg-imbue-light-grey w-7 h-7 flex items-center justify-center  text-text-aux-colour  rounded-full'>

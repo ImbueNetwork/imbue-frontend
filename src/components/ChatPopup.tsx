@@ -24,6 +24,8 @@ const ChatPopup = (props: ChatPopupProps) => {
     showFreelancerProfile,
   } = props;
 
+
+
   return (
     <StyledEngineProvider injectFirst>
       <Slide

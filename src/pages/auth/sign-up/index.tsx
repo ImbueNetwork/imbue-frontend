@@ -1,6 +1,6 @@
-import { CircularProgress, IconButton } from "@mui/material";
-import { SignerResult } from "@polkadot/api/types";
-import { WalletAccount } from "@talismn/connect-wallets";
+import { CircularProgress, IconButton } from '@mui/material';
+import { SignerResult } from '@polkadot/api/types';
+import { WalletAccount } from '@talismn/connect-wallets';
 import bcrypt from 'bcryptjs';
 // const PasswordStrengthBar = dynamic(() => import('react-password-strength-bar'));
 import Image from 'next/image';
@@ -16,7 +16,11 @@ const PasswordStrengthBar = dynamic(
 
 import dynamic from 'next/dynamic';
 
-import { matchedByUserName, matchedByUserNameEmail } from '@/utils';
+import {
+  fetchUserByUsernameOrAddress,
+  matchedByUserName,
+  matchedByUserNameEmail,
+} from '@/utils';
 import {
   isUrlAndSpecialCharacterExist,
   isValidEmail,
@@ -127,6 +131,10 @@ export default function SignIn() {
 
   const accountSelected = async (account: WalletAccount): Promise<any> => {
     try {
+      const res = await fetchUserByUsernameOrAddress(account.address);
+      if (res && res.error?.length > 0) {
+        window.localStorage.setItem('newUser', '1');
+      }
       const result = await getAccountAndSign(account);
       const resp = await authorise(
         result?.signature as SignerResult,
@@ -336,7 +344,10 @@ export default function SignIn() {
               <input
                 placeholder='victorimbue@gmail.com'
                 onChange={handleChange}
-                onKeyDown={(e) => (e.key === 'Enter') && document.getElementsByName('user')[0].focus()}
+                onKeyDown={(e) =>
+                  e.key === 'Enter' &&
+                  document.getElementsByName('user')[0].focus()
+                }
                 className='outlinedInput text-[0.875rem] !border-[#BCBCBC] focus-within:outline focus-within:outline-1 focus-within:outline-imbue-purple evenShadow'
                 required
                 // eslint-disable-next-line no-console
@@ -417,23 +428,38 @@ export default function SignIn() {
                 }
               /> */}
 
-              <div className="h-[2.6rem] px-[6px] text-[0.875rem] border border-[#BCBCBC] evenShadow focus-within:outline focus-within:outline-1 focus-within:outline-imbue-purple rounded-[4px] flex items-center w-full">
+              <div className='h-[2.6rem] px-[6px] text-[0.875rem] border border-[#BCBCBC] evenShadow focus-within:outline focus-within:outline-1 focus-within:outline-imbue-purple rounded-[4px] flex items-center w-full'>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name='password'
                   onChange={handleChange}
                   placeholder='*********'
-                  onKeyDown={(e) => (e.key === 'Enter') && document.getElementsByName('submit')[0].click()}
-                  className="outline-none w-full text-black pl-3"
+                  onKeyDown={(e) =>
+                    e.key === 'Enter' &&
+                    document.getElementsByName('submit')[0].click()
+                  }
+                  className='outline-none w-full text-black pl-3'
                 />
 
                 <IconButton
                   aria-label='toggle password visibility'
                   onClick={() => setShowPassword(!showPassword)}
                   edge='end'
-                  className="mr-0"
+                  className='mr-0'
                 >
-                  {showPassword ? <Image className="h-5 w-5" src={require("../../../assets/svgs/eye.svg")} alt="" /> : <Image className="w-5 h-5" src={require("../../../assets/svgs/eyeClosed.svg")} alt="" />}
+                  {showPassword ? (
+                    <Image
+                      className='h-5 w-5'
+                      src={require('../../../assets/svgs/eye.svg')}
+                      alt=''
+                    />
+                  ) : (
+                    <Image
+                      className='w-5 h-5'
+                      src={require('../../../assets/svgs/eyeClosed.svg')}
+                      alt=''
+                    />
+                  )}
                 </IconButton>
               </div>
 
