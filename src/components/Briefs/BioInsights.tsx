@@ -62,7 +62,7 @@ const BioInsights = ({
 
   const [loading, setLoading] = useState<boolean>(true);
   const [isSavedBrief, setIsSavedBrief] = useState<boolean>(false);
-  const [clientBriefs, setClientBrief] = useState<Brief[]>([]);
+  // const [clientBriefs, setClientBrief] = useState<Brief[]>([]);
   const [briefApplications, setBriefApplications] = useState<Project[]>([]);
   const lastApplication: Project =
     briefApplications[briefApplications?.length - 1];
@@ -84,11 +84,12 @@ const BioInsights = ({
     LoginPopupContext
   ) as LoginPopupContextType;
 
+  const clientBriefs = [...allClientBriefs.acceptedBriefs, ...allClientBriefs.briefsUnderReview]
 
   const briefWithApplications = allClientBriefs?.briefsUnderReview?.length ? allClientBriefs.briefsUnderReview.filter((brief: Brief) => brief.number_of_applications) : 0
   const hiredCount = allClientBriefs?.acceptedBriefs?.length || 0
 
-  const hireRate = (hiredCount / briefWithApplications) * 100
+  const hireRate = (hiredCount / briefWithApplications.length) * 100
 
   useEffect(() => {
     const fetchSavedBriefs = async () => {
@@ -111,16 +112,16 @@ const BioInsights = ({
     fetchSavedBriefs()
   }, [brief?.id, browsingUser?.id, setError])
 
-  useEffect(() => {
-    const setUp = async () => {
-      if (!allClientBriefs.length) return;
+  // useEffect(() => {
+  //   const setUp = async () => {
+  //     if (!allClientBriefs.length) return;
 
-      const allBriefs = [...allClientBriefs.acceptedBriefs, ...allClientBriefs.briefsUnderReview];
-      setClientBrief(allBriefs);
-    };
+  //     const allBriefs = [...allClientBriefs.acceptedBriefs, ...allClientBriefs.briefsUnderReview];
+  //     setClientBrief(allBriefs);
+  //   };
 
-    setUp();
-  }, [allClientBriefs]);
+  //   setUp();
+  // }, [allClientBriefs]);
 
   const copyToClipboard = () => {
     const textToCopy = checkEnvironment().concat(`${router.asPath}`);
