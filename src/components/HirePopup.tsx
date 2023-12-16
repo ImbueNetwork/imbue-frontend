@@ -162,7 +162,7 @@ export const HirePopup = ({
           if (result?.errorMessage?.includes('1010:')) {
             errorMessage = `${result.errorMessage}.\nYou must have minimum balance of 500 $IMBUE`;
           } else {
-            errorMessage = `Something went wrong. Please try again later.`;
+            errorMessage = `Something went wrong.\n\n ${result.errorMessage}`;
           }
           setError({ message: errorMessage });
           application.status_id = OffchainProjectState.PendingReview;

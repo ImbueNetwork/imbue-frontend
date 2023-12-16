@@ -206,7 +206,6 @@ const ApplicationPreview = (): JSX.Element => {
   );
 
   useEffect(() => {
-    console.log("***** test 2")
 
     setMilestones(applicationMilestones);
   }, [application]);
