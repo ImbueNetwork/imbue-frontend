@@ -84,7 +84,9 @@ const BioInsights = ({
     LoginPopupContext
   ) as LoginPopupContextType;
 
-  const clientBriefs = [...allClientBriefs.acceptedBriefs, ...allClientBriefs.briefsUnderReview]
+  const acceptedBriefs = allClientBriefs?.acceptedBriefs || []
+  const briefsUnderReview = allClientBriefs?.briefsUnderReview || []
+  const clientBriefs = [...acceptedBriefs, ...briefsUnderReview]
 
   const briefWithApplications = allClientBriefs?.briefsUnderReview?.length ? allClientBriefs.briefsUnderReview.filter((brief: Brief) => brief.number_of_applications) : 0
   const hiredCount = allClientBriefs?.acceptedBriefs?.length || 0
