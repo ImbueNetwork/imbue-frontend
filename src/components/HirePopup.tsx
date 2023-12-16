@@ -134,6 +134,7 @@ export const HirePopup = ({
     const milestones = application.milestones.map((m: any) => ({
       percentageToUnlock: parseInt(m.percentage_to_unlock),
     }));
+    
     const result = await chainService?.hireFreelancer(
       account,
       briefOwners,
@@ -143,7 +144,8 @@ export const HirePopup = ({
       briefHash,
       currencyId,
       milestones,
-      application.payment_address
+      application.payment_address,
+      brief.verified_only
     );
     // eslint-disable-next-line no-constant-condition
     while (true) {

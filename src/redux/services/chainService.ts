@@ -111,11 +111,11 @@ class ChainService {
     briefHash: string,
     currencyId: number,
     milestones: any[],
-    paymentAddress: string
+    paymentAddress: string,
+    onlyFellowshipFreelancers: boolean
   ): Promise<BasicTxResponse> {
     let currency: any = currencyId;
     let onchainPaymentAddress: any = null;
-    const requireFellowshipApproval = true;
     switch (currencyId) {
       case Currency.ETH:
       case Currency.USDT: {
@@ -127,6 +127,7 @@ class ChainService {
         break;
       }
     }
+
     const extrinsic = this.imbueApi.imbue.api.tx.imbueBriefs.createBrief(
       briefOwners,
       freelancerAddress,
@@ -136,7 +137,7 @@ class ChainService {
       currency,
       milestones,
       onchainPaymentAddress,
-      requireFellowshipApproval
+      onlyFellowshipFreelancers
     );
 
     return await this.submitImbueExtrinsic(
@@ -566,6 +567,7 @@ class ChainService {
     if (!projectOnChain) {
       return;
     }
+
     const raisedFunds = BigInt(
       projectOnChain?.raisedFunds?.replaceAll(',', '') || 0
     );
