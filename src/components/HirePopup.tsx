@@ -92,6 +92,8 @@ export const HirePopup = ({
 
   useEffect(() => {
     const checkBalance = async () => {
+      if (!freelancer?.web3_address || !user?.id || !openHirePopup) return
+
       setFreelancerImbueBalance('Checking Imbue Balance');
       const balance = await getBalance(
         Currency.IMBU,
@@ -101,8 +103,13 @@ export const HirePopup = ({
 
       setFreelancerImbueBalance(balance);
     };
+    checkBalance();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [freelancer.web3_address, user?.id, openHirePopup])
+
+  useEffect(() => {
+
     updateEscrowInfo();
-    openHirePopup && checkBalance();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [freelancer.web3_address, application?.currency_id, user, openHirePopup]);
 
