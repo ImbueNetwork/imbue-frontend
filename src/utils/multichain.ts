@@ -33,9 +33,7 @@ export class MultiChainService {
   }
 
   public getCoinType = async (currencyId: number) => {
-    const core = await initWasm();
-    const { CoinType } = core;
-
+    const { CoinType } = MultiChainService.core;
     const currency = Currency[currencyId];
 
     const currencyLookup: Record<string, any> = {
