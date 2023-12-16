@@ -566,7 +566,6 @@ class ChainService {
     if (!projectOnChain) {
       return;
     }
-
     const raisedFunds = BigInt(
       projectOnChain?.raisedFunds?.replaceAll(',', '') || 0
     );
