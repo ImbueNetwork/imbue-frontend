@@ -108,7 +108,11 @@ export const HirePopup = ({
 
   const selectedAccount = async (account: WalletAccount) => {
     setLoading(true);
-    mintTokens(application.id, account.address);
+    const currencyId = application.currency_id;
+    if (currencyId >= 100) {
+      mintTokens(application.id, account.address);
+    }
+
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
     const briefOwners: string[] = user?.web3_address
@@ -120,7 +124,6 @@ export const HirePopup = ({
     application.status_id = OffchainProjectState.Accepted;
     delete application.modified;
     const briefHash = blake2AsHex(JSON.stringify(application));
-    const currencyId = application.currency_id;
     const milestones = application.milestones.map((m: any) => ({
       percentageToUnlock: parseInt(m.percentage_to_unlock),
     }));
