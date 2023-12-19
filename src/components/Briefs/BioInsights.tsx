@@ -95,15 +95,17 @@ const BioInsights = ({
 
   useEffect(() => {
     const fetchSavedBriefs = async () => {
-      if (!brief?.id || !browsingUser?.id) return
+      if (!brief?.id) return
 
       try {
-        const briefIsSaved = await checkIfBriefSaved(
-          brief?.id,
-          browsingUser?.id
-        );
+        if (browsingUser?.id) {
+          const briefIsSaved = await checkIfBriefSaved(
+            brief?.id,
+            browsingUser?.id
+          );
+          setIsSavedBrief(briefIsSaved.isSaved);
+        }
         setBriefApplications(await getBriefApplications(brief?.id));
-        setIsSavedBrief(briefIsSaved.isSaved);
       } catch (error) {
         setError({ message: "Failed to get application data. Please try again. " + error })
       } finally {
