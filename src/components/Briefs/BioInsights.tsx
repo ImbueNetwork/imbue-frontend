@@ -91,7 +91,7 @@ const BioInsights = ({
   const briefWithApplications = allClientBriefs?.briefsUnderReview?.length ? allClientBriefs.briefsUnderReview.filter((brief: Brief) => brief.number_of_applications) : 0
   const hiredCount = allClientBriefs?.acceptedBriefs?.length || 0
 
-  const hireRate = (hiredCount / (briefWithApplications.length + hiredCount)) * 100
+  const hireRate = Math.round((hiredCount / (briefWithApplications.length + hiredCount)) * 100)
 
   useEffect(() => {
     const fetchSavedBriefs = async () => {
