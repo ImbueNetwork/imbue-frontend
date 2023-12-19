@@ -74,6 +74,18 @@ const BioInsights = ({
         (application) => application?.status_id === 1
       );
 
+  let applicationCount = '0';
+
+  if (briefApplications.length > 0 && briefApplications.length <= 5) {
+    applicationCount = '1 - 5';
+  } else if (briefApplications.length > 5 && briefApplications.length <= 10) {
+    applicationCount = '5 - 10';
+  } else if (briefApplications.length > 10 && briefApplications.length <= 20) {
+    applicationCount = '10 - 20';
+  } else if (briefApplications.length > 20) {
+    applicationCount = '20+';
+  }
+
   let hint = '';
   if (!canSubmitProposal)
     hint = 'Only verified freelancers can apply to briefs';
@@ -261,9 +273,8 @@ const BioInsights = ({
                 ?
               </span>
             </Tooltip>
-            <span className='primary-text font-normal ml-2 !text-imbue-lemon'>
-              {briefApplications?.length > 0 ? "Less than " : ""}
-              {briefApplications?.length || 0}
+            <span className='primary-text font-semibold ml-2 !text-imbue-lemon'>
+              {applicationCount}
             </span>
           </div>
         </div>
