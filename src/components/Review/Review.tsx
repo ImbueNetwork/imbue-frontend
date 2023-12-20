@@ -1,10 +1,8 @@
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Dialog } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import moment from 'moment';
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
@@ -19,11 +17,10 @@ import { RootState } from '@/redux/store/store';
 
 import ReviewFormModal from './ReviewModal';
 import ErrorScreen from '../ErrorScreen';
+import FullScreenLoader from '../FullScreenLoader';
+import WarningScreen from '../PopupScreens/WarningScreen';
 import { findFlag } from '../Profile/CountrySelector';
 import SuccessScreen from '../SuccessScreen';
-const Lottie = dynamic(() => import("react-lottie"));
-import FullScreenLoader from '../FullScreenLoader';
-import animationIcon from '../../assets/svgs/warning_animation.json'
 
 interface ReviewProps {
     review: ReviewType;
@@ -215,7 +212,7 @@ const Review = ({ review, targetUser }: ReviewProps) => {
                 }}
             />
 
-            <Dialog
+            {/* <Dialog
                 open={warninig}
                 onClose={() => setWarning(false)}
                 aria-labelledby='alert-dialog-title'
@@ -258,7 +255,14 @@ const Review = ({ review, targetUser }: ReviewProps) => {
                         </button>
                     </div>
                 </div>
-            </Dialog>
+            </Dialog> */}
+
+            <WarningScreen
+                title='review'
+                open={warninig}
+                setOpen={setWarning}
+                handler={handleDelete}
+            />
 
             <ErrorScreen {...{ error, setError }}>
                 <div className='flex flex-col gap-4 w-1/2'>

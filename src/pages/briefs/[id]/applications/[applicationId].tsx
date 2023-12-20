@@ -12,7 +12,6 @@ import Web3Modal from 'web3modal'
 
 import { fetchProject, fetchUser } from '@/utils';
 import {
-  getBalance,
   handleApplicationInput,
   validateApplicationInput,
 } from '@/utils/helper';
@@ -101,7 +100,6 @@ const ApplicationPreview = (): JSX.Element => {
   const [success, setSuccess] = useState<boolean>(false);
   const [openAccountChoice, setOpenAccountChoice] = useState<boolean>(false);
   const [accounts, setAccounts] = useState<string[]>([]);
-  const [imbueBalance, setImbueBalance] = useState<string>();
 
   const router = useRouter();
   const { id: briefId, applicationId }: any = router.query;
@@ -155,14 +153,6 @@ const ApplicationPreview = (): JSX.Element => {
         if (!user?.id) return router.push('/auth/sign-in')
         else if (user.id !== brief?.user_id && user.id !== applicationResponse?.user_id) return router.push('/dashboard')
 
-
-        const balance = await getBalance(
-          Currency.IMBU,
-          user,
-          user?.web3_address
-        );
-
-        setImbueBalance(balance.toLocaleString());
         setBrief(brief);
         setApplication(applicationResponse);
         setFreelancer(freelancerResponse);
@@ -216,7 +206,6 @@ const ApplicationPreview = (): JSX.Element => {
   );
 
   useEffect(() => {
-    console.log("***** test 2")
 
     setMilestones(applicationMilestones);
   }, [application]);
@@ -431,8 +420,7 @@ const ApplicationPreview = (): JSX.Element => {
                 application,
                 setLoading,
                 updateProject: handleUpdateProject,
-                user,
-                imbueBalance
+                user
               }}
             />
           </div>

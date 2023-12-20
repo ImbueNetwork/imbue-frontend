@@ -167,7 +167,7 @@ export const getBriefApplications = async (brifId: string | number) => {
   if (resp.ok) {
     return await resp.json();
   } else {
-    return resp
+    return resp;
   }
 };
 
@@ -250,6 +250,25 @@ export const updateBriefById = async (params: BriefInfo) => {
     // FIXME: error handling
     console.log(error);
     return false;
+  }
+};
+
+export const deleteBriefById = async (brief_id: number | string) => {
+  try {
+    const resp = await fetch(`${config.apiBase}/briefs/${brief_id}`, {
+      headers: postAPIHeaders,
+      method: 'delete',
+    });
+    
+    if (resp.ok) {
+      return await resp.json();
+    } else {
+      return resp;
+    }
+  } catch (error) {
+    // FIXME: error handling
+    console.log(error);
+    return { status: 'Failed', message: 'Failed to load request. ' + error };
   }
 };
 

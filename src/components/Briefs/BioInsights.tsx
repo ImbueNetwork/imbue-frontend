@@ -1,12 +1,11 @@
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CancelIcon from '@mui/icons-material/Cancel';
 import MarkEmailUnreadOutlinedIcon from '@mui/icons-material/MarkEmailUnreadOutlined';
 import VerifiedIcon from '@mui/icons-material/Verified';
-import { Alert, Tooltip } from '@mui/material';
+import { Alert, Skeleton, Tooltip } from '@mui/material';
 import moment from 'moment';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { FaRegShareSquare } from 'react-icons/fa';
 
 import { checkEnvironment } from '@/utils';
@@ -16,9 +15,13 @@ import ChatPopup from '@/components/ChatPopup';
 import { copyIcon } from '@/assets/svgs';
 import { Brief, Project, User } from '@/model';
 import {
+  checkIfBriefSaved,
+  deleteSavedBrief,
   getBriefApplications,
+  saveBriefData,
 } from '@/redux/services/briefService';
 
+import { LoginPopupContext, LoginPopupContextType } from '../Layout';
 import CountrySelector from '../Profile/CountrySelector';
 
 type BioInsightsProps = {
@@ -26,15 +29,16 @@ type BioInsightsProps = {
   brief: Brief;
   isOwnerOfBrief: boolean | null;
   handleMessageBoxClick: () => void;
-  saveBrief?: () => void;
   showMessageBox: boolean;
   setShowMessageBox: (_: boolean) => void;
   targetUser: User | null;
   browsingUser: User | null;
   canSubmitProposal: boolean | undefined;
-  isSavedBrief?: boolean;
-  unsaveBrief?: () => Promise<void>;
   allClientBriefs: any;
+  setSuccess: (_value: boolean) => void;
+  setSuccessTitle: (_value: string) => void;
+  setError: (_value: any) => void;
+  loadingMain: boolean;
 };
 
 const BioInsights = ({
@@ -47,22 +51,40 @@ const BioInsights = ({
   setShowMessageBox,
   targetUser,
   canSubmitProposal,
-  saveBrief,
-  unsaveBrief,
-  isSavedBrief,
-  allClientBriefs,
+  allClientBriefs = [],
+  setSuccess,
+  setError,
+  setSuccessTitle,
+  loadingMain
 }: BioInsightsProps) => {
   const router = useRouter();
   const [copied, setCopied] = useState(false);
 
-  const [clientBriefs, setClientBrief] = useState<Brief[]>([]);
-  const [openBriefs, setIOpenBriefs] = useState<Brief[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isSavedBrief, setIsSavedBrief] = useState<boolean>(false);
+  // const [clientBriefs, setClientBrief] = useState<Brief[]>([]);
   const [briefApplications, setBriefApplications] = useState<Project[]>([]);
   const lastApplication: Project =
     briefApplications[briefApplications?.length - 1];
-  const pendingApplciations: Project[] = briefApplications.filter(
-    (application) => application?.status_id === 1
-  );
+
+  const pendingApplciations: Project[] =
+    !briefApplications?.length
+      ? []
+      : briefApplications?.filter(
+        (application) => application?.status_id === 1
+      );
+
+  let applicationCount = '0';
+
+  if (briefApplications.length > 0 && briefApplications.length <= 5) {
+    applicationCount = '1 - 5';
+  } else if (briefApplications.length > 5 && briefApplications.length <= 10) {
+    applicationCount = '5 - 10';
+  } else if (briefApplications.length > 10 && briefApplications.length <= 20) {
+    applicationCount = '10 - 20';
+  } else if (briefApplications.length > 20) {
+    applicationCount = '20+';
+  }
 
   let hint = '';
   if (!canSubmitProposal)
@@ -70,17 +92,52 @@ const BioInsights = ({
   else if (isOwnerOfBrief)
     hint = 'You are not allowed to submit proposal to your own brief';
 
-  useEffect(() => {
-    const setUp = async () => {
-      if (!targetUser?.id || !allClientBriefs) return;
-      const allBriefs = [...allClientBriefs.acceptedBriefs, ...allClientBriefs.briefsUnderReview];
-      setClientBrief(allBriefs);
-      setIOpenBriefs(allClientBriefs.briefsUnderReview || []);
-      setBriefApplications(await getBriefApplications(brief?.id));
-    };
+  const { setShowLoginPopup } = useContext(
+    LoginPopupContext
+  ) as LoginPopupContextType;
 
-    setUp();
-  }, [targetUser?.id, brief?.id]);
+  const acceptedBriefs = allClientBriefs?.acceptedBriefs || []
+  const briefsUnderReview = allClientBriefs?.briefsUnderReview || []
+  const clientBriefs = [...acceptedBriefs, ...briefsUnderReview]
+
+  const briefWithApplications = allClientBriefs?.briefsUnderReview?.length ? allClientBriefs.briefsUnderReview.filter((brief: Brief) => brief.number_of_applications) : 0
+  const hiredCount = allClientBriefs?.acceptedBriefs?.length || 0
+
+  const hireRate = Math.round((hiredCount / (briefWithApplications.length + hiredCount)) * 100)
+
+  useEffect(() => {
+    const fetchSavedBriefs = async () => {
+      if (!brief?.id) return
+
+      try {
+        if (browsingUser?.id) {
+          const briefIsSaved = await checkIfBriefSaved(
+            brief?.id,
+            browsingUser?.id
+          );
+          setIsSavedBrief(briefIsSaved.isSaved);
+        }
+        setBriefApplications(await getBriefApplications(brief?.id));
+      } catch (error) {
+        setError({ message: "Failed to get application data. Please try again. " + error })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchSavedBriefs()
+  }, [brief?.id, browsingUser?.id, setError])
+
+  // useEffect(() => {
+  //   const setUp = async () => {
+  //     if (!allClientBriefs.length) return;
+
+  //     const allBriefs = [...allClientBriefs.acceptedBriefs, ...allClientBriefs.briefsUnderReview];
+  //     setClientBrief(allBriefs);
+  //   };
+
+  //   setUp();
+  // }, [allClientBriefs]);
 
   const copyToClipboard = () => {
     const textToCopy = checkEnvironment().concat(`${router.asPath}`);
@@ -93,47 +150,86 @@ const BioInsights = ({
     }, 3000);
   };
 
+  const saveBrief = async () => {
+    if (!browsingUser?.id)
+      return setShowLoginPopup({
+        open: true,
+        redirectURL: `/briefs/${brief.id}`,
+      });
+
+    const resp = await saveBriefData({
+      ...brief,
+      currentUserId: browsingUser?.id,
+    });
+    if (resp?.brief_id) {
+      setSuccessTitle('Brief Saved Successfully');
+      setIsSavedBrief(true);
+      setSuccess(true);
+    } else {
+      setError({ message: 'Brief already Saved' });
+    }
+  };
+
+  const unsaveBrief = async () => {
+    if (!browsingUser?.id) return setError({ message: "No user information found." });
+
+    await deleteSavedBrief(brief.id, browsingUser?.id);
+    setIsSavedBrief(false);
+    setSuccess(true);
+    setSuccessTitle('Brief Unsaved Successfully');
+  };
+
+  if (loading || loadingMain) return (
+    <div className='brief-insights py-6 px-6 lg:py-10 lg:px-10 mt-[2rem] lg:mt-0 w-full md:w-[35%] relative'>
+      <Skeleton variant="text" className='text-xl w-52' />
+      <div className='flex gap-2 w-full my-3'>
+        <Skeleton variant="text" className='text-xl w-28 h-10 rounded-full' />
+        <Skeleton variant="text" className='text-xl w-40 h-10 rounded-full' />
+      </div>
+
+      <Skeleton variant="text" className='text-base w-52 mb-3' />
+      <Skeleton variant="text" className='text-base w-52 mb-3' />
+      <Skeleton variant="text" className='text-base w-52 mb-3' />
+
+      <Skeleton variant="text" className='text-base w-52 mt-6' />
+      <Skeleton variant="rounded" className='mt-4 w-full' height={180} />
+
+      <Skeleton variant="text" className='text-base w-52 mt-5' />
+      <Skeleton variant="text" className='text-base w-52 mt-2' />
+      <Skeleton variant="rounded" className='mt-4 w-full' height={30} />
+    </div>
+  )
+
   return (
     <div
-      className='brief-insights 
-      py-6
-      px-6
-      lg:py-10
-      lg:px-10
-      mt-[2rem]
-      lg:mt-0
-      w-full
-      md:w-[35%]
-      relative
-    '
+      className='brief-insights py-6 px-6 lg:py-10 lg:px-10 mt-[2rem] lg:mt-0 w-full md:w-[35%] relative'
     >
-      <div className=''>
-        <div className=''>
-          <h3 className='text-imbue-purple-dark !font-normal'>
-            Activities on this job
-          </h3>
+      <div>
+        <h3 className='text-imbue-purple-dark !font-normal'>
+          Activities on this job
+        </h3>
 
-          {!brief?.project_id && (
-            <div className='flex gap-3 lg:items-center mt-4 flex-wrap'>
+        {!brief?.project_id && (
+          <div className='flex gap-3 lg:items-center mt-4 flex-wrap'>
+            <button
+              onClick={() => (isSavedBrief ? unsaveBrief?.() : saveBrief?.())}
+              className={` ${isSavedBrief
+                ? 'bg-imbue-coral text-white border-imbue-coral'
+                : 'bg-transparent text-content border border-content'
+                } rounded-3xl h-[2.48rem] text-base font-normal px-5 max-width-1100px:w-full max-width-500px:w-auto `}
+            >
+              {isSavedBrief ? 'Unsave' : 'Save'}
+            </button>
+
+            <Tooltip
+              title={hint}
+              arrow
+              placement='bottom'
+              leaveTouchDelay={5}
+              followCursor
+            >
               <button
-                onClick={() => (isSavedBrief ? unsaveBrief?.() : saveBrief?.())}
-                className={` ${isSavedBrief
-                    ? 'bg-imbue-coral text-white border-imbue-coral'
-                    : 'bg-transparent text-content border border-content'
-                  } rounded-3xl h-[2.48rem] text-base font-normal px-5 max-width-1100px:w-full max-width-500px:w-auto `}
-              >
-                {isSavedBrief ? 'Unsave' : 'Save'}
-              </button>
-
-              <Tooltip
-                title={hint}
-                arrow
-                placement='bottom'
-                leaveTouchDelay={5}
-                followCursor
-              >
-                <button
-                  className={`primary-btn 
+                className={`primary-btn 
               in-dark
               !text-[1rem]
               !font-normal
@@ -143,34 +239,18 @@ const BioInsights = ({
               !m-0
               !px-4
               ${(!canSubmitProposal || isOwnerOfBrief) &&
-                    '!bg-gray-300 !text-gray-400 !cursor-not-allowed'
-                    }
-              `}
-                  onClick={() =>
-                    canSubmitProposal && !isOwnerOfBrief && redirectToApply()
+                  '!bg-gray-300 !text-gray-400 !cursor-not-allowed'
                   }
-                >
-                  Submit a Proposal <FaRegShareSquare />
-                </button>
-              </Tooltip>
-
-              <Tooltip
-                title='Go back to previous page'
-                followCursor
-                leaveTouchDelay={10}
-                enterDelay={500}
-                className='cursor-pointer'
+              `}
+                onClick={() =>
+                  canSubmitProposal && !isOwnerOfBrief && redirectToApply()
+                }
               >
-                <div
-                  onClick={() => router.back()}
-                  className='border border-content rounded-full p-1 flex items-center justify-center absolute right-5 top-5'
-                >
-                  <ArrowBackIcon className='h-5 w-5' color='secondary' />
-                </div>
-              </Tooltip>
-            </div>
-          )}
-        </div>
+                Submit a Proposal <FaRegShareSquare />
+              </button>
+            </Tooltip>
+          </div>
+        )}
       </div>
 
       <div className='subsection !mb-[0.75rem]'>
@@ -193,8 +273,8 @@ const BioInsights = ({
                 ?
               </span>
             </Tooltip>
-            <span className='primary-text font-normal ml-2 !text-imbue-lemon'>
-              Less than {briefApplications?.length || 0}
+            <span className='primary-text font-semibold ml-2 !text-imbue-lemon'>
+              {applicationCount}
             </span>
           </div>
         </div>
@@ -243,7 +323,7 @@ const BioInsights = ({
           <div className='brief-insights-stat flex gap-2 justify-start items-center max-width-1800px:flex-wrap '>
             {targetUser?.web3_address ? (
               <>
-                <VerifiedIcon fontSize='small' color='secondary'/>
+                <VerifiedIcon fontSize='small' color='secondary' />
                 <span className='font-normal text-imbue-purple-dark text-[1rem] mr-3'>
                   Payment method verified
                 </span>
@@ -278,7 +358,8 @@ const BioInsights = ({
               </div>
             </div>
             <p className='mt-2 text-imbue-purple text-[1rem]'>
-              1 hire rate, {openBriefs?.length || 0} open job
+              {hireRate > 0 && <span className='mr-1'>{hireRate}% hire rate,</span>}
+              {allClientBriefs?.briefsUnderReview?.length || 0} open job
             </p>
           </div>
         </div>
