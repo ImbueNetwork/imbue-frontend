@@ -862,8 +862,34 @@ input[type='radio'] {
   background: var(--theme-coral);
 }
 
-.slick-active button {
+/* .slick-active button {
   background: var(--theme-coral) !important;
+} */
+
+.dashboard_slider{
+  display: flex !important;
+  gap: 4px;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 0;
+  margin: 0;
+  list-style: none;
+  text-align: center;
+}
+
+.dashboard_slider li button {
+  border: none;
+  background-color: #EBEAE2;
+  color: transparent;
+  cursor: pointer;
+  display: block;
+  height: 10px;
+  width: 10px;
+  border-radius: 7.5px;
+}
+
+.dashboard_slider li.slick-active button {
+  background: #03116A;
 }
 
 input:-webkit-autofill,
