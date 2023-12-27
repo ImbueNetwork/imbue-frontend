@@ -7,10 +7,14 @@ import { IoIosArrowBack } from 'react-icons/io';
 import { MdOutlineAttachMoney } from 'react-icons/md';
 import { VscNewFile } from 'react-icons/vsc';
 import { useSelector } from 'react-redux';
+import Slider from 'react-slick';
 // Import Swiper React components
 import { Swiper, SwiperSlide, useSwiper } from 'swiper/react';
 // Import Swiper styles
 import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/scrollbar';
 
 import { fetchUser } from '@/utils';
 
@@ -23,9 +27,12 @@ import { getUserBriefs } from '@/redux/services/briefService';
 import { getAllFreelancers } from '@/redux/services/freelancerService';
 import { getUsersOngoingGrants } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
+
+
 export function Controller() {
   const sp = useSwiper();
   const [click, setClick] = useState(false);
+
   const handleForward = () => {
     sp.slideNext();
     setClick(!click);
@@ -36,7 +43,7 @@ export function Controller() {
   };
 
   return (
-    <div className='flex gap-5 items-center  w-full '>
+    <div className='flex gap-5 items-center text-xs w-full'>
       <p className='min-w-fit'>Recommended for you ✨</p>
       <hr className='w-full mt-1' />
       <p className='min-w-fit cursor-pointer flex items-center'>
@@ -44,7 +51,7 @@ export function Controller() {
         <IoIosArrowBack
           onClick={handleBackward}
           className={classNames(
-            '',
+            'w-4 h-4 lg:w-6 lg:h-6',
             sp.isBeginning ? 'text-text-aux-colour' : 'block'
           )}
           size={22}
@@ -52,7 +59,7 @@ export function Controller() {
         <IoIosArrowBack
           onClick={handleForward}
           className={classNames(
-            'rotate-180',
+            'rotate-180 w-4 h-4 lg:w-6 lg:h-6',
             sp.isEnd ? 'text-text-aux-colour' : 'block'
           )}
           size={22}
@@ -146,7 +153,28 @@ export default function ClientDashboard() {
     });
   };
 
+  const settings = {
+    dots: true,
+    infinite: false,
+    arrows: false,
+    slidesToShow: 3,
+    slidesToScroll: 3,
+    dotsClass: 'dashboard_slider',
+    variableWidth: true,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          dots: true,
+        }
+      },
+    ]
+  }
+
   if (loadingUser) return <FullScreenLoader />;
+
   return (
     <div className='bg-white  mt-2 py-7 px-5 rounded-3xl'>
       <div className='flex justify-between items-center'>
@@ -167,53 +195,57 @@ export default function ClientDashboard() {
         </button>
       </div>
       {/* starting of the box sections */}
-      <div className='flex flex-col lg:flex-row text-text-grey gap-7 mt-9'>
-        <div className=' py-5 px-5 rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full'>
-          <div className='flex justify-between'>
-            <p>Projects</p>
 
-            <p
-              onClick={() => router.push('/briefs/mybriefs')}
-              className='bg-imbue-purple px-7 py-2 text-white text-sm rounded-full cursor-pointer'
-            >
-              View all
-            </p>
-          </div>
-          <div className='mt-5'>
-            <div className='flex items-center gap-2'>
-              <div className='w-1.5 h-1  rounded-full bg-imbue-coral' />
-              <p className='text-sm min-w-fit '>Briefs</p>
-              <hr className='w-full border-dashed mt-3  border-imbue-coral ' />
-              <p className='text-[22px] font-semibold text-black'>
-                {Briefs?.briefsUnderReview?.length || 0}
+      <Slider className='w-full text-text-grey mt-9' {...settings}>
+        <section className='pr-7 min-w-[300px]'>
+          <div className='py-5 px-5 rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey w-full'>
+            <div className='flex justify-between'>
+              <p>Projects</p>
+
+              <p
+                onClick={() => router.push('/briefs/mybriefs')}
+                className='bg-imbue-purple px-7 py-2 text-white text-sm rounded-full cursor-pointer'
+              >
+                View all
               </p>
             </div>
-          </div>
-          <div className='mt-0.5'>
-            <div className='flex items-center gap-2'>
-              <div className='w-1.5 h-1 rounded-full bg-imbue-purple' />
-              <p className='text-sm min-w-fit '>Projects</p>
-              <hr className='w-full border-dashed mt-3  border-imbue-purple ' />
-              <p className='text-[22px] font-semibold text-black'>
-                {Briefs?.acceptedBriefs?.length || 0}
-              </p>
+            <div className='mt-5'>
+              <div className='flex items-center gap-2'>
+                <div className='!w-1.5 !h-1  rounded-full bg-imbue-coral' />
+                <p className='text-sm min-w-fit '>Briefs</p>
+                <hr className='w-full border-dashed mt-3  border-imbue-coral ' />
+                <p className='text-[22px] font-semibold text-black'>
+                  {Briefs?.briefsUnderReview?.length || 0}
+                </p>
+              </div>
+            </div>
+            <div className='mt-0.5'>
+              <div className='flex items-center gap-2'>
+                <div className='w-1.5 !h-1 rounded-full bg-imbue-purple' />
+                <p className='text-sm min-w-fit '>Projects</p>
+                <hr className='w-full border-dashed mt-3  border-imbue-purple ' />
+                <p className='text-[22px] font-semibold text-black'>
+                  {Briefs?.acceptedBriefs?.length || 0}
+                </p>
+              </div>
+            </div>
+            <div className='mt-0.5'>
+              <div className='flex items-center gap-2'>
+                <div className='w-1.5 !h-1 rounded-full bg-imbue-lemon' />
+                <p className='text-sm min-w-fit '>Grants</p>
+                <hr className='w-full border-dashed mt-3  border-imbue-lemon ' />
+                <p className='text-[22px] font-semibold text-black'>
+                  {Grants?.length || 0}
+                </p>
+              </div>
             </div>
           </div>
-          <div className='mt-0.5'>
-            <div className='flex items-center gap-2'>
-              <div className='w-1.5 h-1 rounded-full bg-imbue-lemon' />
-              <p className='text-sm min-w-fit '>Grants</p>
-              <hr className='w-full border-dashed mt-3  border-imbue-lemon ' />
-              <p className='text-[22px] font-semibold text-black'>
-                {Grants?.length || 0}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className='py-5 px-5 flex flex-col justify-between rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full '>
+        </section>
+
+        <div className='py-5 px-5 flex flex-col justify-between rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full'>
           <div className=' flex justify-between items-center'>
             <p>Grants</p>
-            <div className='relative w-44 select-none'>
+            <div className='relative lg:w-44 select-none'>
               <div
                 className='flex bg-white p-2 rounded-md gap-1.5 items-center cursor-pointer'
                 onClick={() => setOpenedOption((prev) => !prev)}
@@ -230,14 +262,13 @@ export default function ClientDashboard() {
               </div>
 
               <div
-                className={`${
-                  !openedOption && 'hidden'
-                } bg-white absolute w-full rounded-md`}
+                className={`${!openedOption && 'hidden'
+                  } absolute z-[1] w-full rounded-md`}
               >
                 {options.map((option, index) => (
                   <div
                     key={index}
-                    className='flex items-center gap-2 p-2 cursor-pointer hover:bg-imbue-light-purple'
+                    className={`flex items-center gap-2 p-2 cursor-pointer ${option.status_id === filterGrantoptions.status_id ? 'bg-imbue-light-purple': "bg-white"}`}
                     onClick={() => {
                       setFilterGrantoptions(option);
                       setOpenedOption(false);
@@ -251,52 +282,64 @@ export default function ClientDashboard() {
             </div>
           </div>
           <div>
-            <div className='mb-2 flex items-center justify-between'>
-              <div>
-                <p className='text-4xl font-semibold  text-black'>
-                  {filteredGrants.length}
-                </p>
-                <p>{filterGrantoptions.name} Grants</p>
-              </div>
-              <p
-                onClick={handleGrantRedirect}
-                className='bg-imbue-purple px-7 items-center py-2 text-white text-sm rounded-full cursor-pointer'
-              >
-                View all
+            <div className='flex flex-col justify-between mt-6 gap-1'>
+              <p className='text-4xl font-semibold  text-black'>
+                {filteredGrants.length}
               </p>
+              <div className='flex justify-between items-center gap-4'>
+                <p>{filterGrantoptions.name} Grants</p>
+                <p
+                  onClick={handleGrantRedirect}
+                  className='bg-imbue-purple px-4 lg:px-7 items-center py-1 lg:py-2 text-white text-sm rounded-full cursor-pointer'
+                >
+                  View all
+                </p>
+              </div>
             </div>
           </div>
         </div>
-        <div className=' py-5 px-5 flex flex-col rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full '>
-          <div className='flex justify-between'>
-            <p>Total Spent</p>
-          </div>
-          <div className='text-black flex items-center justify-between mt-auto'>
-            <div>
-              <div className='flex'>
+
+        <section className='pl-7'>
+          <div className=' py-5 px-5 flex flex-col rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full '>
+            <div className='flex justify-between'>
+              <p>Total Spent</p>
+            </div>
+            <div className='text-black flex flex-col justify-between mt-auto'>
+              <div className='flex items-center'>
                 <MdOutlineAttachMoney size={23} />
                 <p className='text-4xl font-semibold'>{totalSpent} </p>
               </div>
-              <p className='text-text-grey'>Payout Accounts</p>
+              <div className='flex items-center gap-3'>
+                <p className='text-text-grey'>Payout Accounts</p>
+                <p
+                  onClick={() => router.push('/relay')}
+                  className='bg-imbue-purple px-4 lg:px-7 items-center py-1 lg:py-2 text-white text-sm rounded-full cursor-pointer'
+                >
+                  Get Started
+                </p>
+              </div>
             </div>
-            <p
-              onClick={() => router.push('/relay')}
-              className='bg-imbue-purple px-7 py-2 text-white text-sm rounded-full cursor-pointer'
-            >
-              Get Started
-            </p>
           </div>
-        </div>
-      </div>
+        </section>
+      </Slider>
       {/* ending of the box sections */}
+
       <div className='text-text-grey mt-20'>
         {/* Freelancer recomendations */}
         <Swiper
           spaceBetween={50}
-          slidesPerView={3}
+          slidesPerView={1}
+          breakpoints={{
+            768: {
+              slidesPerView: 2,
+            },
+            1280: {
+              slidesPerView: 3,
+            },
+          }}
           className=' !flex !flex-col-reverse   relative'
         >
-          <div className='pb-12 '>
+          <div className='pb-12'>
             <Controller />
           </div>
 

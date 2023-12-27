@@ -257,7 +257,7 @@ const FreelancerDashboard = (): JSX.Element => {
     dotsClass: 'dashboard_slider',
     responsive: [
       {
-        breakpoint: 840,
+        breakpoint: 860,
         settings: {
           slidesToShow: 1,
           slidesToScroll: 1,
@@ -284,8 +284,8 @@ const FreelancerDashboard = (): JSX.Element => {
       {/* starting of the box sections */}
 
       <Slider className='w-full text-text-grey mt-9' ref={sliderRef} {...settings}>
-        <div className='pr-7 min-w-[300px]'>
-          <div className='py-5 px-5 rounded-[18px] bg-imbue-light-grey w-full'>
+        <div className='pr-7'>
+          <div className='py-5 px-5 rounded-[18px] bg-imbue-light-grey w-[250px] lg:w-full'>
             <div className='flex justify-between items-center'>
               <p>Projects</p>
               <p
@@ -338,10 +338,10 @@ const FreelancerDashboard = (): JSX.Element => {
           </div>
         </div>
 
-        <div className='py-5 px-5 !flex flex-col justify-between rounded-[18px] bg-imbue-light-grey h-full  w-full text-text-grey min-h-[234px]'>
+        <div className='py-5 px-5 !flex flex-col justify-between rounded-[18px] bg-imbue-light-grey h-full  w-full text-text-grey min-h-[210px]'>
           <div className='flex justify-between items-center gap-3'>
             <p>Briefs</p>
-            <div className='relative w-44 select-none'>
+            <div className='relative lg:w-44 select-none'>
               <div
                 className='flex bg-white p-2 rounded-md gap-1.5 items-center cursor-pointer'
                 onClick={() => setOpenedOption((prev) => !prev)}
@@ -381,7 +381,7 @@ const FreelancerDashboard = (): JSX.Element => {
                 {filteredApplications?.length || 0}
               </p>
             </div>
-            <div className='flex  justify-between'>
+            <div className='flex gap-4 items-center justify-between'>
               <p>{selectedOption.name} brief</p>
               <div
                 className='px-3 py-0.5 border text-black border-text-aux-colour rounded-full cursor-pointer'
@@ -409,7 +409,7 @@ const FreelancerDashboard = (): JSX.Element => {
               </div>
             </div>
             <div className='text-black mt-auto'>
-              <div className='flex'>
+              <div className='flex items-center'>
                 <MdOutlineAttachMoney size={23} />
                 <p className='text-4xl font-semibold'>{totalEarnings}</p>
               </div>
