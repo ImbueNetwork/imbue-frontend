@@ -250,18 +250,19 @@ const FreelancerDashboard = (): JSX.Element => {
 
   const settings = {
     dots: true,
+    infinite: false,
     arrows: false,
-    speed: 500,
     slidesToShow: 3,
     slidesToScroll: 3,
     dotsClass: 'dashboard_slider',
     responsive: [
       {
-        breakpoint: 1024,
+        breakpoint: 840,
         settings: {
-          slidesToShow: 2,
-          slidesToScroll: 2,
-          dots: true
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          dots: true,
+          variableWidth: true,
         }
       },
     ]
@@ -283,9 +284,9 @@ const FreelancerDashboard = (): JSX.Element => {
       {/* starting of the box sections */}
 
       <Slider className='w-full text-text-grey mt-9' ref={sliderRef} {...settings}>
-        <div className='pr-7'>
+        <div className='pr-7 min-w-[300px]'>
           <div className='py-5 px-5 rounded-[18px] bg-imbue-light-grey w-full'>
-            <div className='flex justify-between'>
+            <div className='flex justify-between items-center'>
               <p>Projects</p>
               <p
                 className='bg-imbue-purple px-7 py-2 text-white text-sm rounded-full cursor-pointer'
@@ -338,7 +339,7 @@ const FreelancerDashboard = (): JSX.Element => {
         </div>
 
         <div className='py-5 px-5 !flex flex-col justify-between rounded-[18px] bg-imbue-light-grey h-full  w-full text-text-grey min-h-[234px]'>
-          <div className='flex justify-between'>
+          <div className='flex justify-between items-center gap-3'>
             <p>Briefs</p>
             <div className='relative w-44 select-none'>
               <div
@@ -356,12 +357,12 @@ const FreelancerDashboard = (): JSX.Element => {
 
               <div
                 className={`${!openedOption && 'hidden'
-                  } bg-white absolute w-full rounded-md`}
+                  } absolute z-[1] w-full rounded-md`}
               >
                 {options.map((option, index) => (
                   <div
                     key={index}
-                    className='flex items-center gap-2 p-2 cursor-pointer hover:bg-imbue-light-purple'
+                    className={`flex items-center gap-2 p-2 cursor-pointer ${option.status_id === selectedOption.status_id ? 'bg-imbue-light-purple': "bg-white"}`}
                     onClick={() => {
                       setSelectedOption(option);
                       setOpenedOption(false);
@@ -402,7 +403,7 @@ const FreelancerDashboard = (): JSX.Element => {
               <p>Total Earnings</p>
               <div
                 onClick={() => router.push('/relay')}
-                className='px-3 py-0.5 border cursor-pointer text-black border-text-aux-colour rounded-full'
+                className='px-3 ml-3 py-0.5 border cursor-pointer text-black border-text-aux-colour rounded-full'
               >
                 <BiRightArrowAlt size={22} className='-rotate-45' />
               </div>
@@ -418,15 +419,15 @@ const FreelancerDashboard = (): JSX.Element => {
         </div>
       </Slider>
       {/* ending of the box sections */}
-      
-      <div className='mt-9 flex w-full gap-7'>
+
+      <div className='mt-9 flex flex-col-reverse lg:flex-row w-full gap-7'>
         <BriefsView
           {...{
             setError,
             currentUser: user,
           }}
         />
-        <div className='max-w-[25%] w-full rounded-md  '>
+        <div className='lg:max-w-[25%] w-full rounded-md'>
           {/* Starting of graph */}
           <div className='bg-imbue-light-grey px-0.5 rounded-3xl pb-0.5 '>
             <div className='flex justify-between items-center py-7 px-7'>
