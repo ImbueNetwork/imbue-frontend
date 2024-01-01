@@ -2,16 +2,12 @@ import { Avatar, AvatarGroup, LinearProgress, Skeleton } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
 import React, { useEffect, useState } from 'react';
 
-import { initImbueAPIInfo } from '@/utils/polkadot';
-
 import VoteModal from '@/components/ReviewModal/VoteModal';
 import Web3WalletModal from '@/components/WalletModal/Web3WalletModal';
 
 import { Project, User, VotesResp } from '@/model';
-import ChainService from '@/redux/services/chainService';
 import {
   getMilestoneVotes,
-  voteOnMilestone,
 } from '@/redux/services/projectServices';
 
 type MilestoneVoteBoxProps = {
@@ -31,11 +27,6 @@ type MilestoneVoteBoxProps = {
   votes: VotesResp | null;
   setVotes: (_vote: VotesResp) => void;
   setMilestoneVotes: (_value: string[]) => void;
-};
-
-type MilestoneVotes = {
-  voterAddress: any;
-  vote: boolean;
 };
 
 const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
@@ -79,46 +70,6 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
     : '';
 
   useEffect(() => {
-    const syncVotes = async () => {
-      if (!chainProjectId || !projectId || firstPendingMilestone === undefined)
-        return;
-
-      const imbueApi = await initImbueAPIInfo();
-      const chainService = new ChainService(imbueApi, user);
-      const milestoneVotes: any = await chainService.getMilestoneVotes(
-        chainProjectId,
-        firstPendingMilestone
-      );
-
-      const votesArray = Object.keys(milestoneVotes);
-
-      if (votesArray.length > 0) {
-        const votes: MilestoneVotes[] =
-          votesArray?.map((key: any) => ({
-            voterAddress: key,
-            vote: milestoneVotes[key],
-          })) || [];
-
-        const promises = votes.map(
-          async (v) =>
-            await voteOnMilestone(
-              null,
-              v.voterAddress,
-              firstPendingMilestone,
-              v.vote,
-              projectId
-            )
-        );
-        await Promise.all(promises);
-        const voteResp = await getMilestoneVotes(
-          projectId,
-          firstPendingMilestone
-        );
-        setVotes(voteResp);
-        // const resp = await syncProjectVotes(projectId, firstPendingMilestone, votes)
-      }
-    };
-
     const setVotingList = async () => {
       if (!projectId || firstPendingMilestone === undefined) return;
 
@@ -131,8 +82,6 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
         setVotes(voteResp);
         setMilestoneVotes(voteResp?.allVoters);
         setLoading(false);
-        // const votersAddressed = voteResp?.map((voter: any) => voter.web3_address)
-        syncVotes();
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error(error);
@@ -143,7 +92,6 @@ const MilestoneVoteBox = (props: MilestoneVoteBoxProps) => {
 
     setVotingList();
   }, [
-    user,
     firstPendingMilestone,
     projectId,
     chainProjectId,

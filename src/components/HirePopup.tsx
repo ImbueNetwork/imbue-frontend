@@ -74,7 +74,7 @@ export const HirePopup = ({
     pb: mobileView ? '10px' : '28px',
     boxShadow: 24,
     borderRadius: '20px',
-    zIndex: 1,
+    zIndex: 10,
   };
 
   const updateEscrowInfo = async () => {
@@ -90,12 +90,14 @@ export const HirePopup = ({
       const escrowBalance = Number(allBalances[currency]) || 0;
       setEscrowBalance(escrowBalance);
     } catch (error) {
-      setError({ message: 'Failed to load payment info' });
+      setError({ message: "Failed to load payment info. " + error })
     }
   };
 
   useEffect(() => {
     const checkBalance = async () => {
+      if (!freelancer?.web3_address || !user?.id || !openHirePopup) return
+
       setFreelancerImbueBalance('Checking Imbue Balance');
       const balance = await getBalance(
         Currency.IMBU,
@@ -105,13 +107,23 @@ export const HirePopup = ({
 
       setFreelancerImbueBalance(balance);
     };
+    checkBalance();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [freelancer.web3_address, user?.id, openHirePopup])
+
+  useEffect(() => {
+
     updateEscrowInfo();
-    openHirePopup && checkBalance();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [freelancer.web3_address, application?.currency_id, user, openHirePopup]);
 
   const selectedAccount = async (account: WalletAccount) => {
     setLoading(true);
-    mintTokens(application.id, account.address);
+    const currencyId = application.currency_id;
+    if (currencyId >= 100) {
+      mintTokens(application.id, account.address);
+    }
+
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
     const briefOwners: string[] = user?.web3_address
@@ -123,10 +135,10 @@ export const HirePopup = ({
     application.status_id = OffchainProjectState.Accepted;
     delete application.modified;
     const briefHash = blake2AsHex(JSON.stringify(application));
-    const currencyId = application.currency_id;
     const milestones = application.milestones.map((m: any) => ({
       percentageToUnlock: parseInt(m.percentage_to_unlock),
     }));
+    
     const result = await chainService?.hireFreelancer(
       account,
       briefOwners,
@@ -136,7 +148,8 @@ export const HirePopup = ({
       briefHash,
       currencyId,
       milestones,
-      application.payment_address
+      application.payment_address,
+      brief.verified_only
     );
     // eslint-disable-next-line no-constant-condition
     while (true) {
@@ -160,8 +173,10 @@ export const HirePopup = ({
           setSuccess(true);
         } else if (result.txError) {
           let errorMessage = result.errorMessage;
-          if (result.errorMessage?.includes('1010:')) {
+          if (result?.errorMessage?.includes('1010:')) {
             errorMessage = `${result.errorMessage}.\nYou must have minimum balance of 500 $IMBUE`;
+          } else {
+            errorMessage = `Something went wrong.\n\n ${result.errorMessage}`;
           }
           setError({ message: errorMessage });
           application.status_id = OffchainProjectState.PendingReview;

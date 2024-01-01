@@ -1,28 +1,41 @@
 import ArrowIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from "react";
 
 import { Brief } from "@/model";
 import { getAllBriefs } from "@/redux/services/briefService";
 
-const SimilarProjects = () => {
+type SimilarBriefsType = {
+    exclude_id?: number;
+}
+
+const SimilarProjects = ({ exclude_id }: SimilarBriefsType) => {
     const [showSimilarBrief, setShowSimilarBrief] = useState<boolean>(false);
     const [similarBriefs, setSimilarBriefs] = useState<Brief[]>([]);
 
     const router = useRouter()
 
     useEffect(() => {
-        const setUpBriefs = async () => {
+        const fetchBriefs = async () => {
             const briefs_all: any = await getAllBriefs(4, 1);
-            setSimilarBriefs(briefs_all?.currentData);
-        };
-        setUpBriefs();
-    }, []);
+
+            if (exclude_id && briefs_all?.currentData?.length) {
+                const filteredBrief = briefs_all?.currentData.filter((brief: Brief) => brief.id != exclude_id)
+                setSimilarBriefs(filteredBrief);
+            } else {
+                setSimilarBriefs(briefs_all?.currentData);
+            }
+        }
+        fetchBriefs()
+    }, [exclude_id])
 
     return (
         <div
-            className={`transparent-conatainer !bg-imbue-light-purple-three relative ${showSimilarBrief ? '!pb-[3rem]' : ''
+            className={`transparent-conatainer cursor-pointer !bg-imbue-light-purple-three relative ${showSimilarBrief ? '!pb-[3rem]' : ''
                 } `}
+
+            onClick={() => setShowSimilarBrief(!showSimilarBrief)}
         >
             <div className='flex justify-between w-full lg:px-[4rem] px-[1rem]'>
                 <h3 className='text-imbue-purple-dark'>Similar projects on Imbue</h3>
@@ -31,7 +44,6 @@ const SimilarProjects = () => {
                         } cursor-pointer`}
                 >
                     <ArrowIcon
-                        onClick={() => setShowSimilarBrief(!showSimilarBrief)}
                         className='scale-150'
                         sx={{
                             color: '#03116A',
@@ -42,8 +54,6 @@ const SimilarProjects = () => {
 
             <div className={`${!showSimilarBrief && 'hidden'} my-6`}>
                 <hr className='h-[1.5px] bg-[rgba(3, 17, 106, 0.12)] w-full mb-[0.5rem]' />
-                {/* TODO: Need an object for the list of similar projects */}
-                {/* FIXME: replace dummy array with similar projects data*/}
                 {similarBriefs.map((brief, index) => (
                     <div
                         key={`${index}-sim-brief`}
@@ -60,10 +70,11 @@ const SimilarProjects = () => {
                             </span>
                         </div>
                         <button
-                            onClick={() => router.push(`/briefs/${brief?.id}`)}
                             className='primary-btn in-dark w-button max-width-750px:!px-[9px] max-width-750px:mr-0'
                         >
-                            View Brief
+                            <Link href={`/briefs/${brief?.id}`}>
+                                View Brief
+                            </Link>
                         </button>
                     </div>
                 ))}
