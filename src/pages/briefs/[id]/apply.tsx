@@ -3,14 +3,14 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Tooltip } from '@mui/material';
 import { WalletAccount } from '@talismn/connect-wallets';
-import WalletConnectProvider from '@walletconnect/web3-provider'
+import WalletConnectProvider from '@walletconnect/web3-provider';
 import Filter from 'bad-words';
-import { ethers } from 'ethers'
+import { ethers } from 'ethers';
 import { useRouter } from 'next/router';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
-import Web3Modal from 'web3modal'
+import Web3Modal from 'web3modal';
 
 import { sendNotification } from '@/utils';
 import {
@@ -74,7 +74,7 @@ export const SubmitProposal = (): JSX.Element => {
 
   const router = useRouter();
   const briefId: any = router?.query?.id || 0;
-  const { profileView } = useContext(AppContext) as AppContextType
+  const { profileView } = useContext(AppContext) as AppContextType;
 
   const [applicationId, setapplicationId] = useState();
   const [error, setError] = useState<any>();
@@ -111,22 +111,23 @@ export const SubmitProposal = (): JSX.Element => {
           package: WalletConnectProvider,
         },
       },
-    })
-    return web3Modal
-  }
+    });
+    return web3Modal;
+  };
   const connect = async () => {
     try {
       const web3Modal = await getWeb3Modal();
       const connection = await web3Modal.connect();
       const provider = new ethers.BrowserProvider(connection);
-      const accounts = (await provider.listAccounts()).map(jsonProvider => jsonProvider.address);
+      const accounts = (await provider.listAccounts()).map(
+        (jsonProvider) => jsonProvider.address
+      );
       setPaymentAddress(accounts[0]);
-      setAccounts(accounts)
+      setAccounts(accounts);
     } catch (err) {
-      console.log('error:', err)
+      console.log('error:', err);
     }
-  }
-
+  };
 
   useEffect(() => {
     router?.isReady && getCurrentUserBrief();
@@ -269,7 +270,7 @@ export const SubmitProposal = (): JSX.Element => {
           [brief.user_id],
           'breif.test.applied',
           `You have a new brief application for brief ${brief.headline}`,
-          `Submit a proposal`,
+          `<h3>Dear, ${brief.owner_name}</h3> <br/> <br/>  <h4>You have a new applicant for your  ${brief.headline} . Take a moment to review their application and consider their suitability for the role.</h4>`,
           briefId,
           applicationId
         );
@@ -309,7 +310,6 @@ export const SubmitProposal = (): JSX.Element => {
   };
 
   // const milestoneAmountsAndNamesHaveValue = allAmountAndNamesHaveValue();
-
 
   if (loadingUser || loading) <FullScreenLoader />;
 
@@ -493,7 +493,8 @@ export const SubmitProposal = (): JSX.Element => {
               </div>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-purple-dark font-normal'>
-              {Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} ${Currency[currencyId]}
+              {Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} $
+              {Currency[currencyId]}
             </div>
           </div>
 
@@ -511,7 +512,8 @@ export const SubmitProposal = (): JSX.Element => {
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-purple-dark font-normal'>
-              {Number(imbueFee.toFixed(2)).toLocaleString()} ${Currency[currencyId]}
+              {Number(imbueFee.toFixed(2)).toLocaleString()} $
+              {Currency[currencyId]}
             </div>
           </div>
 
@@ -522,7 +524,8 @@ export const SubmitProposal = (): JSX.Element => {
               </h3>
             </div>
             <div className='budget-value text-[1.25rem] text-imbue-light-purple-two font-normal'>
-              {Number(totalCostMinusFee.toFixed(2)).toLocaleString()} ${Currency[currencyId]}
+              {Number(totalCostMinusFee.toFixed(2)).toLocaleString()} $
+              {Currency[currencyId]}
             </div>
           </div>
         </div>
@@ -585,7 +588,12 @@ export const SubmitProposal = (): JSX.Element => {
               <p className='text-lg text-content m-0 p-0'>Payment Address:</p>
               <div>
                 {accounts.length == 0 ? (
-                  <button className='primary-btn in-dark w-button' onClick={connect}>Connect</button>
+                  <button
+                    className='primary-btn in-dark w-button'
+                    onClick={connect}
+                  >
+                    Connect
+                  </button>
                 ) : (
                   <select
                     name='paymentAddress'
@@ -620,8 +628,9 @@ export const SubmitProposal = (): JSX.Element => {
             title={disableSubmit && 'Please fill all the required input fields'}
           >
             <button
-              className={`primary-btn in-dark w-button ${disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
-                }`}
+              className={`primary-btn in-dark w-button ${
+                disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
+              }`}
               onClick={() => !disableSubmit && handleSubmit()}
             >
               Submit
@@ -681,12 +690,7 @@ export const SubmitProposal = (): JSX.Element => {
         </div>
       </ErrorScreen>
 
-      {
-        profileView === 'client' && (
-          <SwitchToFreelancer />
-        )
-      }
-
+      {profileView === 'client' && <SwitchToFreelancer />}
     </div>
   );
 };

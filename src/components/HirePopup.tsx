@@ -8,7 +8,7 @@ import Fade from '@mui/material/Fade';
 import Modal from '@mui/material/Modal';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { WalletAccount } from '@talismn/connect-wallets';
-import { ethers } from 'ethers'
+import { ethers } from 'ethers';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -20,7 +20,11 @@ import { ERC_20_ABI, getBalance, getEVMContract } from '@/utils/helper';
 import { Currency, OffchainProjectState } from '@/model';
 import { changeBriefApplicationStatus } from '@/redux/services/briefService';
 import ChainService from '@/redux/services/chainService';
-import { getOffchainEscrowAddress, getOffchainEscrowBalance, mintTokens } from '@/redux/services/projectServices';
+import {
+  getOffchainEscrowAddress,
+  getOffchainEscrowBalance,
+  mintTokens,
+} from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
 import AccountChoice from './AccountChoice';
@@ -52,9 +56,9 @@ export const HirePopup = ({
   const [escrowAddress, setEscrowAddress] = useState<string>('');
   const [escrowBalance, setEscrowBalance] = useState<number>(0);
   const router = useRouter();
-  const [freelancerImbueBalance, setFreelancerImbueBalance] = useState<number | string>(
-    0
-  );
+  const [freelancerImbueBalance, setFreelancerImbueBalance] = useState<
+    number | string
+  >(0);
 
   const { user } = useSelector((state: RootState) => state.userState);
 
@@ -73,20 +77,20 @@ export const HirePopup = ({
     zIndex: 1,
   };
 
-
   const updateEscrowInfo = async () => {
     try {
       const escrowAddress = await getOffchainEscrowAddress(application.id);
 
-      if (escrowAddress?.status !== "Failed")
-        setEscrowAddress(escrowAddress);
+      if (escrowAddress?.status !== 'Failed') setEscrowAddress(escrowAddress);
 
       const allBalances = await getOffchainEscrowBalance(application.id);
-      const currency = Currency[application.currency_id].toString().toLowerCase();
+      const currency = Currency[application.currency_id]
+        .toString()
+        .toLowerCase();
       const escrowBalance = Number(allBalances[currency]) || 0;
       setEscrowBalance(escrowBalance);
     } catch (error) {
-      setError({ message: "Failed to load payment info" })
+      setError({ message: 'Failed to load payment info' });
     }
   };
 
@@ -96,7 +100,7 @@ export const HirePopup = ({
       const balance = await getBalance(
         Currency.IMBU,
         user,
-        freelancer.web3_address,
+        freelancer.web3_address
       );
 
       setFreelancerImbueBalance(balance);
@@ -144,11 +148,12 @@ export const HirePopup = ({
             application.id,
             OffchainProjectState.Accepted
           );
+
           await sendNotification(
             [application.user_id],
             'application.accepted.testing',
             'Congratulations your application has been accepted',
-            `has accepted you as their freelancer best of luck`,
+            ` <h3> Dear, ${freelancer.display_name} </h3> <br/> <br/> <h4>You're in! Your application for the  ${brief.headline}  has been accepted. Let's get started!</h4>`,
             brief.id,
             application.id
           );
@@ -202,8 +207,8 @@ export const HirePopup = ({
                   <div className='lg:flex gap-1 lg:items-center rounded-2xl bg-primary px-3 py-1 text-sm text-black'>
                     <CheckCircleOutlineIcon className='h-4 w-4 inline' />
                     <p className='inline'>
-                      Freelancer currently has the necessary deposit balance (500
-                      $IMBU) to start the work
+                      Freelancer currently has the necessary deposit balance
+                      (500 $IMBU) to start the work
                     </p>
                   </div>
                 )}
@@ -228,8 +233,12 @@ export const HirePopup = ({
                 <p className='mr-3 lg:mr-9 text-lg'>{index + 1}.</p>
                 <div className='flex justify-between w-full'>
                   <div>
-                    <p className='text-lg mb-1 text-content break-words'>{m.name.substring(0, 70) + " ..."}</p>
-                    <p className='text-base'>{m.description.substring(0, 90) + "..."}</p>
+                    <p className='text-lg mb-1 text-content break-words'>
+                      {m.name.substring(0, 70) + ' ...'}
+                    </p>
+                    <p className='text-base'>
+                      {m.description.substring(0, 90) + '...'}
+                    </p>
                   </div>
                   <div className='budget-wrapper text-end'>
                     <p className='text-lg mb-1 text-content'>Amount</p>
@@ -252,7 +261,8 @@ export const HirePopup = ({
               </div>
             </div>
             <div className='budget-value'>
-              {Number?.(totalCostWithoutFee?.toFixed?.(2))?.toLocaleString()} ${Currency[application.currencyId]}
+              {Number?.(totalCostWithoutFee?.toFixed?.(2))?.toLocaleString()} $
+              {Currency[application.currencyId]}
             </div>
           </div>
           <div className={`${styles.budgetInfo} mx-5`}>
@@ -260,7 +270,8 @@ export const HirePopup = ({
               <p className='text-lg'>Imbue Service Fee 5%</p>
             </div>
             <div className='budget-value'>
-              {Number?.(imbueFee?.toFixed?.(2))?.toLocaleString?.()} ${Currency[application.currencyId]}
+              {Number?.(imbueFee?.toFixed?.(2))?.toLocaleString?.()} $
+              {Currency[application.currencyId]}
             </div>
           </div>
           <div className={`${styles.budgetInfo} mx-5 !mb-3`}>
@@ -268,7 +279,8 @@ export const HirePopup = ({
               <p className='text-lg'>Amount Received</p>
             </div>
             <div className='budget-value'>
-              {Number?.(amountDue?.toFixed?.(2))?.toLocaleString?.()} ${Currency[application.currencyId]}
+              {Number?.(amountDue?.toFixed?.(2))?.toLocaleString?.()} $
+              {Currency[application.currencyId]}
             </div>
           </div>
         </div>
@@ -294,12 +306,20 @@ export const HirePopup = ({
           const ethBalance = Number(ethers.formatEther(ethBalanceInWei));
 
           if (ethBalance < transferAmount) {
-            setError({ message: `Insufficient $${Currency[application.currency_id]} balance in ${signer.address}` });
+            setError({
+              message: `Insufficient $${
+                Currency[application.currency_id]
+              } balance in ${signer.address}`,
+            });
             break;
-          }
-          else {
-            const transferAmountInWei = ethers.parseEther((transferAmount).toPrecision(5).toString());
-            const depositTx = await signer.sendTransaction({ to: escrowAddress, value: transferAmountInWei });
+          } else {
+            const transferAmountInWei = ethers.parseEther(
+              transferAmount.toPrecision(5).toString()
+            );
+            const depositTx = await signer.sendTransaction({
+              to: escrowAddress,
+              value: transferAmountInWei,
+            });
             setDepositSuccess(true);
             await provider.waitForTransaction(depositTx.hash, 1, 150000);
             setDepositCompleted(true);
@@ -312,17 +332,35 @@ export const HirePopup = ({
           const signer = await provider.getSigner();
           const contract = await getEVMContract(application.currency_id);
           if (!contract) {
-            setError({ message: "Contract address not found" });
+            setError({ message: 'Contract address not found' });
             break;
           }
-          const token = new ethers.Contract(contract.address, ERC_20_ABI, signer);
-          const usdtBalance = Number(ethers.formatUnits(await token.balanceOf(signer.address), await token.decimals()));
+          const token = new ethers.Contract(
+            contract.address,
+            ERC_20_ABI,
+            signer
+          );
+          const usdtBalance = Number(
+            ethers.formatUnits(
+              await token.balanceOf(signer.address),
+              await token.decimals()
+            )
+          );
           if (usdtBalance < transferAmount) {
-            setError({ message: `Insufficient $${Currency[application.currency_id]} balance in ${signer.address}` });
+            setError({
+              message: `Insufficient $${
+                Currency[application.currency_id]
+              } balance in ${signer.address}`,
+            });
           } else {
-            const transferAmountInWei = ethers.parseUnits((transferAmount).toPrecision(5).toString(), contract.decimals);
-            const depositTx = await token
-              .transfer(escrowAddress, transferAmountInWei);
+            const transferAmountInWei = ethers.parseUnits(
+              transferAmount.toPrecision(5).toString(),
+              contract.decimals
+            );
+            const depositTx = await token.transfer(
+              escrowAddress,
+              transferAmountInWei
+            );
             setDepositSuccess(true);
             await provider.waitForTransaction(depositTx.hash, 1, 150000);
             setDepositCompleted(true);
@@ -331,8 +369,7 @@ export const HirePopup = ({
           }
         }
       }
-
-    }
+    };
 
     if (application.currency_id < 100) {
       return (
@@ -341,8 +378,8 @@ export const HirePopup = ({
             Deposit Funds
           </p>
           <p className='text-center w-full text-lg lg:text-xl my-4'>
-            Deposit the funds required for the project, these funds will be taken
-            from your account once the freelancer starts the project.
+            Deposit the funds required for the project, these funds will be
+            taken from your account once the freelancer starts the project.
           </p>
           <p className='text-center w-full text-lg lg:text-xl my-4'>
             The funds are then paid to the freelancer in stages only when you
@@ -373,7 +410,8 @@ export const HirePopup = ({
             Deposit Funds
           </p>
           <p className='text-center w-full text-lg lg:text-xl my-4'>
-            To Hire {freelancer.display_name}, please deposit the funds required for the project.
+            To Hire {freelancer.display_name}, please deposit the funds required
+            for the project.
           </p>
           <p className='text-center w-full text-lg lg:text-xl my-4'>
             The funds are then paid to the freelancer in stages only when you
@@ -387,9 +425,7 @@ export const HirePopup = ({
           </p>
           <p className='mb-10'>
             <span>Escrow Address:</span>
-            <span
-              className='text-lg lg:text-xl text-imbue-lemon ml-1 font-mono'
-            >
+            <span className='text-lg lg:text-xl text-imbue-lemon ml-1 font-mono'>
               <CopyToClipboardToast
                 title='Payment address'
                 link={escrowAddress}
@@ -405,7 +441,7 @@ export const HirePopup = ({
             </span>
             ${Currency[application.currency_id]}
           </p>
-          {escrowBalance < (totalCostWithoutFee) ? (
+          {escrowBalance < totalCostWithoutFee ? (
             <button
               onClick={() => depositIntoEscrow()}
               className='primary-btn in-dark w-button lg:w-1/3 lg:mx-16 disabled'
@@ -415,22 +451,18 @@ export const HirePopup = ({
             </button>
           ) : (
             <button
-              onClick={
-                () => {
-                  setstage(2);
-                }
-              }
+              onClick={() => {
+                setstage(2);
+              }}
               className='primary-btn in-dark w-button lg:w-1/3 lg:mx-16 disabled'
               style={{ textAlign: 'center' }}
             >
               Hire
             </button>
-          )
-          }
-        </div >
+          )}
+        </div>
       );
     }
-
   };
 
   if (popupStage === 2 && openHirePopup)
@@ -501,7 +533,6 @@ export const HirePopup = ({
         </div>
       </SuccessScreen>
 
-
       <SuccessScreen
         title={`Your transfer has been sent.
 
@@ -512,12 +543,15 @@ export const HirePopup = ({
         <div className='flex flex-col gap-4 w-1/2'>
           <button
             disabled={!depositCompleted}
-            onClick={() => { setDepositSuccess(false); setstage(0) }}
+            onClick={() => {
+              setDepositSuccess(false);
+              setstage(0);
+            }}
             className='primary-btn in-dark w-button w-full !m-0'
           >
-
-
-            {depositCompleted ? "Continue" : "Waiting for deposit confirmation......."}
+            {depositCompleted
+              ? 'Continue'
+              : 'Waiting for deposit confirmation.......'}
           </button>
         </div>
       </SuccessScreen>
