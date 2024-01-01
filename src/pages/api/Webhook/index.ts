@@ -31,7 +31,7 @@ export default function handler(req: any, res: any) {
             from: 'info@imbue.network', // Use the email address or domain you verified above
             subject: 'You have an unread message',
             text: 'imbue@Network.com',
-            html: `<h2> Dear, ${user.display_name} </h2 
+            html: `<h2> Dear, ${user.display_name} </h2 <br/> <br/> 
             ${
               sender?.name || 'someone'
             } has sent you a message and waiting for your reply </strong>`,
