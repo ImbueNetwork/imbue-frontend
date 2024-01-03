@@ -160,7 +160,6 @@ export default function ClientDashboard() {
     slidesToShow: 3,
     slidesToScroll: 3,
     dotsClass: 'dashboard_slider',
-    variableWidth: true,
     responsive: [
       {
         breakpoint: 1024,
@@ -168,6 +167,7 @@ export default function ClientDashboard() {
           slidesToShow: 1,
           slidesToScroll: 1,
           dots: true,
+          variableWidth: true,
         }
       },
     ]
@@ -179,7 +179,7 @@ export default function ClientDashboard() {
     <div className='bg-white  mt-2 py-7 px-5 rounded-3xl'>
       <div className='flex justify-between items-center'>
         <div>
-          <p className='text-black text-[27px]'>
+          <p className='text-black text-xl lg:text-[27px]'>
             Welcome, {user?.display_name?.split(' ')[0]} 👋
           </p>
           <p className='text-text-aux-colour text-sm'>
@@ -188,10 +188,10 @@ export default function ClientDashboard() {
         </div>
         <button
           onClick={() => router.push('/briefs/new')}
-          className='text-imbue-purple flex items-center gap-1 py-2 text-sm px-7 border border-imbue-purple rounded-full'
+          className='text-imbue-purple flex items-center gap-2 py-2 text-xs lg:text-sm px-4 lg:px-7 border border-imbue-purple rounded-full'
         >
           Post Brief
-          <VscNewFile size={18} />
+          <VscNewFile className='text-sm lg:text-lg' />
         </button>
       </div>
       {/* starting of the box sections */}
@@ -268,7 +268,7 @@ export default function ClientDashboard() {
                 {options.map((option, index) => (
                   <div
                     key={index}
-                    className={`flex items-center gap-2 p-2 cursor-pointer ${option.status_id === filterGrantoptions.status_id ? 'bg-imbue-light-purple': "bg-white"}`}
+                    className={`flex items-center gap-2 p-2 cursor-pointer ${option.status_id === filterGrantoptions.status_id ? 'bg-imbue-light-purple' : "bg-white"}`}
                     onClick={() => {
                       setFilterGrantoptions(option);
                       setOpenedOption(false);

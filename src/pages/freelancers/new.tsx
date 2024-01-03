@@ -122,7 +122,7 @@ const Freelancer = (): JSX.Element => {
 
   const FreelanceExperience = (
     <div className={styles.freelanceXpContainer}>
-      <div className={styles.contentTextSmallFlex}>
+      <div className={styles.contentTextSmall}>
         {stepData[step].content
           .split('\n')
           .map((line: string, index: number) => (
@@ -150,7 +150,7 @@ const Freelancer = (): JSX.Element => {
 
   const FreelancerHourPerRate = (
     <div className={styles.freelanceXpContainer}>
-      <div className={styles.contentTextSmallFlex}>
+      <div className={styles.contentTextSmall}>
         {stepData[step].content.split('\n').map((line, index) => (
           <p key={index}>{line}</p>
         ))}
@@ -178,7 +178,7 @@ const Freelancer = (): JSX.Element => {
 
   const FreelancingGoal = (
     <div className={styles.freelanceXpContainer}>
-      <div className={styles.contentTextSmallFlex}>
+      <div className={styles.contentTextSmall}>
         {stepData[step].content.split('\n').map((line, index) => (
           <p key={index}>{line}</p>
         ))}
@@ -203,7 +203,7 @@ const Freelancer = (): JSX.Element => {
   // const ImportResume = (
   //   // TODO:
   //   <div className={styles.freelanceXpContainer}>
-  //     <div className={styles.contentTextSmallFlex}>
+  //     <div className={styles.contentTextSmall}>
   //       {stepData[step].content.split('\n').map((line, index) => (
   //         <p key={index}>{line}</p>
   //       ))}
@@ -226,7 +226,7 @@ const Freelancer = (): JSX.Element => {
 
   const TitlePanel = (
     <div className={styles.freelanceXpContainer}>
-      <div className={styles.contentTextSmallFlex}>
+      <div className={styles.contentTextSmall}>
         {stepData[step].content.split('\n').map((line, index) => (
           <p key={index}>{line}</p>
         ))}
@@ -247,7 +247,7 @@ const Freelancer = (): JSX.Element => {
 
   // const ExperiencePanel = (
   //   <div className={styles.freelanceXpContainer}>
-  //     <div className={styles.contentTextSmallFlex}>
+  //     <div className={styles.contentTextSmall}>
   //       {stepData[step].content.split('\n').map((line, index) => (
   //         <p key={index}>{line}</p>
   //       ))}
@@ -257,7 +257,7 @@ const Freelancer = (): JSX.Element => {
 
   const EducationPanel = (
     <div className={styles.freelanceXpContainer}>
-      <div className={styles.contentTextSmallFlex}>
+      <div className={styles.contentTextSmall}>
         {stepData[step].content.split('\n').map((line, index) => (
           <p key={index}>{line}</p>
         ))}
@@ -282,7 +282,7 @@ const Freelancer = (): JSX.Element => {
 
   const LanguagePanel = (
     <div className={styles.freelanceXpContainer}>
-      <div className={styles.contentTextSmallFlex}>
+      <div className={styles.contentTextSmall}>
         {stepData[step].content.split('\n').map((line, index) => (
           <p key={index}>{line}</p>
         ))}
@@ -313,7 +313,7 @@ const Freelancer = (): JSX.Element => {
 
   const SkillsPanel = (
     <div className={styles.freelanceXpContainer}>
-      <div className={styles.contentTextSmallFlex}>
+      <div className={styles.contentTextSmall}>
         {stepData[step].content.split('\n').map((line, index) => (
           <p key={index}>{line}</p>
         ))}
@@ -349,7 +349,7 @@ const Freelancer = (): JSX.Element => {
 
   const BioPanel = (
     <div className={styles.freelanceXpContainer}>
-      <div className={styles.contentTextSmallFlex}>
+      <div className={styles.contentTextSmall}>
         {stepData[step].content.split('\n').map((line, index) => (
           <p key={index}>{line}</p>
         ))}
@@ -375,7 +375,7 @@ const Freelancer = (): JSX.Element => {
 
   const ServicesPanel = (
     <div className={styles.freelanceXpContainer}>
-      <div className={styles.contentTextSmallFlex}>
+      <div className={styles.contentTextSmall}>
         {stepData[step].content.split('\n').map((line, index) => (
           <p key={index}>{line}</p>
         ))}
@@ -532,9 +532,9 @@ const Freelancer = (): JSX.Element => {
       <div className={styles.mainPanel}>
         <div className='h-full w-full flex flex-col justify-between'>
           <div className={styles.freelancerContents}>
-            <h2 data-testid='heading' className='text-theme-secondary'>
+            <p data-testid='heading' className='text-2xl lg:text-4xl text-[#282D34]'>
               {stepData[step].heading.replace('{name}', displayName)}
-            </h2>
+            </p>
             {panels[step] ?? <></>}
           </div>
           <div className={step === 0 ? styles.buttonLeft : styles.buttonRight}>
@@ -549,7 +549,7 @@ const Freelancer = (): JSX.Element => {
 
             {step === 0 ? (
               <button
-                className='primary-btn in-dark w-button mr-auto mt-6'
+                className='primary-btn in-dark w-button mr-auto mt-8'
                 onClick={() => setStep(1)}
                 data-testid='get-started-button'
               >
