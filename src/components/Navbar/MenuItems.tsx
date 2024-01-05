@@ -194,7 +194,7 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
         >
           <div className='flex gap-3 items-start px-4 pb-5 border-b'>
             <Link
-              href={linkItems[5].link}
+              href={`/profile/${user?.username}/`}
             >
               <Image
                 src={user?.profile_photo ?? defaultProfile}

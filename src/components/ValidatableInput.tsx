@@ -45,7 +45,9 @@ const ValidatableInput = (props: any) => {
         {...props}
         inputProps={{
           maxLength,
+          className: "text-sm md:text-base"
         }}
+        InputProps={{ className: "p-2 md:p-4" }}
         onChange={(e) => handleInput(e)}
         className={'w-full !mb-0'}
         multiline
