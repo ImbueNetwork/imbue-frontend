@@ -7,6 +7,7 @@ import LoadingBar from 'react-top-loading-bar';
 
 import { Providers } from '@/redux/providers/userProviders';
 
+import ErrorScreen from './ErrorScreen';
 import LoginPopup from './LoginPopup/LoginPopup';
 import NewNavbar from './Navbar/NewNavBar';
 
@@ -19,28 +20,29 @@ export interface LoginPopupStateType {
   redirectURL?: string;
 }
 
-type ProfileMode = 'client' | 'freelancer';
+// export interface LoginPopupContextType {
+//   showLoginPopUp?: LoginPopupStateType;
+//   setShowLoginPopup: (_value: LoginPopupStateType) => void;
+// }
 
-export interface LoginPopupContextType {
-  showLoginPopUp?: LoginPopupStateType;
-  setShowLoginPopup: (_value: LoginPopupStateType) => void;
-}
+// export const LoginPopupContext = createContext<LoginPopupContextType | null>(
+//   null
+// );
+
+type ProfileMode = 'client' | 'freelancer';
 
 export interface AppContextType {
   profileView?: ProfileMode;
-  // setProfileView: (_value: ProfileMode) => void;
   setProfileMode: (_mode: ProfileMode) => void;
+  setError: (_error: any) => void;
+  showLoginPopUp?: LoginPopupStateType;
+  setShowLoginPopup: (_value: LoginPopupStateType) => void;
 }
-
-export const LoginPopupContext = createContext<LoginPopupContextType | null>(
-  null
-);
 
 // TODO: Include screens to this context
 export const AppContext = createContext<AppContextType | null>(
   null
 );
-
 
 function Layout({ children }: LayoutProps) {
   const [progress, setProgress] = useState(0);
@@ -74,6 +76,8 @@ function Layout({ children }: LayoutProps) {
 
   // Profile switching 
   const [profileView, setProfileView] = useState<ProfileMode>('client');
+  const [error, setError] = useState<any>();
+
 
   useEffect(() => {
     const profileView = localStorage.getItem('profileView') as ProfileMode;
@@ -102,8 +106,10 @@ function Layout({ children }: LayoutProps) {
             <AppContext.Provider
               value={{
                 profileView,
-                // setProfileView,
-                setProfileMode
+                setProfileMode,
+                setError,
+                setShowLoginPopup,
+                showLoginPopUp
               }}
             >
               {!(
@@ -116,17 +122,29 @@ function Layout({ children }: LayoutProps) {
                 className={`padded lg:!px-[var(--hq-layout-padding)] !pt-[111px]`}
                 id='main-content'
               >
-                <LoginPopupContext.Provider
-                  value={{ showLoginPopUp, setShowLoginPopup }}
-                >
-                  {children}
-                </LoginPopupContext.Provider>
+                {children}
               </main>
               <LoginPopup
                 visible={showLoginPopUp?.open}
                 setVisible={setShowLoginPopup}
                 redirectUrl={showLoginPopUp.redirectURL}
               />
+              <ErrorScreen {...{ error, setError }}>
+                <div className='flex flex-col gap-4 w-1/2'>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className='primary-btn in-dark w-button w-full !m-0'
+                  >
+                    Try Again
+                  </button>
+                  <button
+                    onClick={() => router.push(`/dashboard`)}
+                    className='underline text-xs lg:text-base font-bold'
+                  >
+                    Go to Dashboard
+                  </button>
+                </div>
+              </ErrorScreen>
             </AppContext.Provider>
           </Providers>
         </React.Fragment>

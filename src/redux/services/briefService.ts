@@ -155,9 +155,11 @@ export const getUserBriefs = async (user_id: string | number) => {
   }
 };
 
-export const getBriefApplications = async (brifId: string | number) => {
+export const getBriefApplications = async (briefId: string | number) => {
   const resp = await fetch(
-    checkEnvironment().concat(`${config.apiBase}briefs/${brifId}/applications`),
+    checkEnvironment().concat(
+      `${config.apiBase}briefs/${briefId}/applications`
+    ),
     {
       headers: postAPIHeaders,
       method: 'get',
@@ -167,7 +169,10 @@ export const getBriefApplications = async (brifId: string | number) => {
   if (resp.ok) {
     return await resp.json();
   } else {
-    return resp
+    console.error(resp);
+    throw new Error(
+      `Error occured while handling request. Status : ${resp.status}. Text: ${resp.statusText}`
+    );
   }
 };
 

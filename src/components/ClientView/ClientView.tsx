@@ -1,22 +1,24 @@
 import ArrowBackIcon from '@mui/icons-material/ChevronLeft';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 
 import { Freelancer, Project } from '@/model';
 
 import Applications from './Applications/Applications';
+// const Applications = lazy(() => import('./Applications/Applications'))
 import Grants from './Grants/Grants';
 import Projects from './Projects/Projects';
+import ApplicationSkeleton from '../Briefs/ApplicationSkeleton';
 
 interface ClientViewProps {
   GoBack: () => void;
   briefId: string | string[] | undefined;
   briefs: any;
   handleMessageBoxClick: (_userId: number, _freelander: Freelancer) => void;
-  // redirectToBriefApplications: (_applicationId: string) => void;
-  briefApplications: Project[];
   ongoingGrants: Project[];
-  loadingApplications: boolean;
+  // redirectToBriefApplications: (_applicationId: string) => void;
+  // briefApplications: Project[];
+  // loadingApplications: boolean;
 }
 
 export default function ClientView({
@@ -24,10 +26,10 @@ export default function ClientView({
   briefId,
   briefs,
   handleMessageBoxClick,
-  // redirectToBriefApplications,
-  briefApplications,
   ongoingGrants,
-  loadingApplications,
+  // redirectToBriefApplications,
+  // briefApplications,
+  // loadingApplications,
 }: ClientViewProps) {
   const [switcher, setSwitcher] = useState('application');
   const router = useRouter();
@@ -102,15 +104,17 @@ export default function ClientView({
       {/* <Divider className='mb-5' /> */}
 
       {switcher === 'application' && (
-        <Applications
-          briefId={briefId}
-          goBack={GoBack}
-          briefs={briefs}
-          briefApplications={briefApplications}
-          loadingApplications={loadingApplications}
-          handleMessageBoxClick={handleMessageBoxClick}
+        <Suspense fallback={<ApplicationSkeleton />}>
+          <Applications
+            briefId={briefId}
+            goBack={GoBack}
+            briefs={briefs}
+            handleMessageBoxClick={handleMessageBoxClick}
+          // briefApplications={briefApplications}
+          // loadingApplications={loadingApplications}
           // redirectToBriefApplications={redirectToBriefApplications}
-        />
+          />
+        </Suspense>
       )}
       {switcher === 'projects' && <Projects briefs={briefs} />}
       {switcher === 'grants' && <Grants ongoingGrants={ongoingGrants} />}

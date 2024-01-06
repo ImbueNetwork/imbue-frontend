@@ -10,7 +10,7 @@ import BioInsights from '@/components/Briefs/BioInsights';
 import BioPanel from '@/components/Briefs/BioPanel';
 import ClientsHistory from '@/components/Briefs/ClientHistory';
 import ErrorScreen from '@/components/ErrorScreen';
-import { LoginPopupContext, LoginPopupContextType } from '@/components/Layout';
+import { AppContext, AppContextType } from '@/components/Layout';
 import SuccessScreen from '@/components/SuccessScreen';
 
 import { Brief, Freelancer, User } from '@/model';
@@ -72,8 +72,8 @@ const BriefDetails = (): JSX.Element => {
 
   // const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
   const { setShowLoginPopup } = useContext(
-    LoginPopupContext
-  ) as LoginPopupContextType;
+    AppContext
+  ) as AppContextType;
   const isOwnerOfBrief = browsingUser && browsingUser.id == brief.user_id;
   const [error, setError] = useState<any>();
 
@@ -169,7 +169,7 @@ const BriefDetails = (): JSX.Element => {
 
   type SimilarBriefsType = {
     similarBriefs: Brief[];
-}
+  }
 
 
   const SimilarProjects = ({ similarBriefs }: SimilarBriefsType) => {
@@ -177,16 +177,14 @@ const BriefDetails = (): JSX.Element => {
 
     return (
       <div
-        className={`transparent-conatainer !bg-imbue-light-purple-three relative ${
-          showSimilarBrief ? '!pb-[3rem]' : ''
-        } `}
+        className={`transparent-conatainer !bg-imbue-light-purple-three relative ${showSimilarBrief ? '!pb-[3rem]' : ''
+          } `}
       >
         <div className='flex justify-between w-full lg:px-[4rem] px-[1rem]'>
           <h3 className='text-imbue-purple-dark'>Similar projects on Imbue</h3>
           <div
-            className={`transition transform ease-in-out duration-600 ${
-              showSimilarBrief && 'rotate-180'
-            } cursor-pointer`}
+            className={`transition transform ease-in-out duration-600 ${showSimilarBrief && 'rotate-180'
+              } cursor-pointer`}
           >
             <ArrowIcon
               onClick={() => setShowSimilarBrief(!showSimilarBrief)}
@@ -263,7 +261,7 @@ const BriefDetails = (): JSX.Element => {
           targetUser={targetUser}
           browsingUser={browsingUser}
           canSubmitProposal={brief.verified_only ? freelancer?.verified : true}
-          allClientBriefs = {allClientBriefs}
+          allClientBriefs={allClientBriefs}
         />
       </div>
       <ClientsHistory briefId={id} client={targetUser} allClientBriefs={allClientBriefs} />

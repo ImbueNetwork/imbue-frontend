@@ -28,8 +28,7 @@ import * as utils from '@/utils';
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
 import RefundScreen from '@/components/Grant/Refund';
-import { LoginPopupContext } from '@/components/Layout';
-import { LoginPopupContextType } from '@/components/Layout';
+import { AppContext, AppContextType } from '@/components/Layout';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 import { MilestoneProgressBar } from '@/components/MilestoneProgressBar/MilestoneProgressBar';
 import ProjectApprovers from '@/components/Project/ProjectApprovers';
@@ -75,7 +74,6 @@ TimeAgo.addDefaultLocale(en);
 function Project() {
   const router = useRouter();
   const [project, setProject] = useState<Project | any>({});
-  console.log("🚀 ~ file: [id].tsx:77 ~ Project ~ project:", project)
   const [targetUser, setTargetUser] = useState<any>({});
   // const [projectHasAttachments, setProjectHasAttachments] = useState<boolean>(false);
 
@@ -352,8 +350,9 @@ function Project() {
     useState<WalletAccount | null>(null);
 
   const { setShowLoginPopup } = useContext(
-    LoginPopupContext
-  ) as LoginPopupContextType;
+    AppContext
+  ) as AppContextType;
+  
   const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
 
   const handleMessageBoxClick = () => {
