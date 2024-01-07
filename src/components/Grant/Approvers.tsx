@@ -51,6 +51,7 @@ const Approvers = ({ setApprovers, approvers, user }: ApproverProps) => {
   };
 
   const handleClose = () => {
+    console.log("object");
     setOpen(false);
   };
 

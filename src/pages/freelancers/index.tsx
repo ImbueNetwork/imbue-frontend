@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable react-hooks/exhaustive-deps */
 import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
 import Grid from '@mui/material/Grid';
 const TextField = dynamic(() => import("@mui/material/TextField"), {
@@ -15,12 +13,12 @@ const ClearIcon = dynamic(() => import("@mui/icons-material/Clear"), {
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { strToIntRange } from '@/utils/helper';
 
-import ErrorScreen from '@/components/ErrorScreen';
 import FilterModal from '@/components/Filter/FilterModal';
+import { AppContext, AppContextType } from '@/components/Layout';
 
 import {
   chevLeftIcon,
@@ -44,8 +42,6 @@ import {
 } from '../../redux/services/freelancerService';
 import { FreelancerFilterOption } from '../../types/freelancerTypes';
 
-
-
 const Freelancers = (): JSX.Element => {
   const [freelancers, setFreelancers] = useState<
     Freelancer[] | undefined | any
@@ -62,8 +58,9 @@ const Freelancers = (): JSX.Element => {
   const [pageInput, setPageInput] = useState<number>(1);
 
   const [selectedFilterIds, setSlectedFilterIds] = useState<Array<string>>([]);
-  const [error, setError] = useState<any>()
   const router = useRouter();
+
+  const { setError } = useContext(AppContext) as AppContextType
 
   const {
     skillsRangeProps,
@@ -468,7 +465,7 @@ const Freelancers = (): JSX.Element => {
         <div
           className={`${styles.freelancersView} max-width-750px:!w-full max-width-750px:px-5`}
         >
-          <div className='bg-white py-[1.5rem] px-6 lg:px-[3.88rem] rounded-[1.25rem]'>
+          <div className='bg-white py-[1.5rem] px-6 lg:px-8 rounded-[1.25rem]'>
             <div className='flex justify-between lg:flex-row flex-col items-start'>
               <div>
                 <div className='flex items-center'>
@@ -499,7 +496,7 @@ const Freelancers = (): JSX.Element => {
                     }
                   /> */}
 
-                  <div className="px-[6px] text-[0.875rem] border border-[#BCBCBC] focus-within:border-imbue-purple flex items-center !w-[20rem] !h-[2.875rem] rounded-lg !rounded-r-none">
+                  <div className="px-[6px] text-[0.875rem] border border-[#BCBCBC] focus-within:border-imbue-purple flex items-center md:!w-[20rem] !h-[2.875rem] rounded-lg !rounded-r-none">
                     <input
                       id='search-input'
                       autoComplete='off'
@@ -652,7 +649,7 @@ const Freelancers = (): JSX.Element => {
                 )}
           </Grid>
 
-          <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center justify-between  max-width-868px:w-[90%] self-center'>
+          <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex flex-col md:flex-row gap-5 md:items-center justify-between self-center'>
             <div className='flex items-center'>
               <button
                 onClick={() => {
@@ -734,22 +731,6 @@ const Freelancers = (): JSX.Element => {
           </div>
         </div>
       </div>
-      <ErrorScreen {...{ error, setError }}>
-        <div className='flex flex-col gap-4 w-1/2'>
-          <button
-            onClick={() => setError(null)}
-            className='primary-btn in-dark w-button w-full !m-0'
-          >
-            Try Again
-          </button>
-          <button
-            onClick={() => router.push(`/dashboard`)}
-            className='underline text-xs lg:text-base font-bold'
-          >
-            Go to Dashboard
-          </button>
-        </div>
-      </ErrorScreen>
     </div>
   );
 };

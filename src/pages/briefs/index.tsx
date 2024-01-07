@@ -15,15 +15,15 @@ import en from 'javascript-time-ago/locale/en';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { IoTrashBin } from 'react-icons/io5';
 import { useSelector } from 'react-redux';
 
 import { Project } from '@/lib/models';
 import { strToIntRange } from '@/utils/helper';
 
-import ErrorScreen from '@/components/ErrorScreen';
 import FilterModal from '@/components/Filter/FilterModal';
+import { AppContext, AppContextType } from '@/components/Layout';
 import BackDropLoader from '@/components/LoadingScreen/BackDropLoader';
 
 import {
@@ -76,7 +76,8 @@ const Briefs = (): JSX.Element => {
 
   const [skills, setSkills] = useState<Item[]>([{ name: '', id: 0 }]);
   const [myApplications, _setMyApplications] = useState<Project[]>();
-  const [error, setError] = useState<any>();
+
+  const { setError } = useContext(AppContext) as AppContextType
 
   const {
     expRange,
@@ -763,7 +764,7 @@ const Briefs = (): JSX.Element => {
                     }
                   /> */}
 
-                  <div className="px-[6px] text-[0.875rem] border border-[#BCBCBC] focus-within:border-imbue-purple flex items-center !w-[20rem] !h-[2.875rem] rounded-lg !rounded-r-none">
+                  <div className="px-[6px] text-[0.875rem] border border-[#BCBCBC] focus-within:border-imbue-purple flex items-center w-full md:!w-[20rem] !h-[2.875rem] rounded-lg !rounded-r-none">
                     <input
                       id='search-input'
                       autoComplete='off'
@@ -944,26 +945,9 @@ const Briefs = (): JSX.Element => {
           </div>
         </div>
 
-        <ErrorScreen {...{ error, setError }}>
-          <div className='flex flex-col gap-4 w-1/2'>
-            <button
-              onClick={() => setError(null)}
-              className='primary-btn in-dark w-button w-full !m-0'
-            >
-              Try Again
-            </button>
-            <button
-              onClick={() => router.push(`/dashboard`)}
-              className='underline text-xs lg:text-base font-bold'
-            >
-              Go to Dashboard
-            </button>
-          </div>
-        </ErrorScreen>
-
         <BackDropLoader open={loading} />
       </div>
-      <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex items-center justify-between max-width-868px:w-[90%] self-center'>
+      <div className='mt-[0.5rem] mb-[0.5rem] bg-white rounded-[0.5rem] w-full p-[1rem] flex flex-col md:flex-row gap-3 md:items-center justify-between max-width-868px:w-[90%] self-center'>
         <div className='flex items-center'>
           <button
             onClick={() => previousPage()}

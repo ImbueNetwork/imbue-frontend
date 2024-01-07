@@ -247,7 +247,7 @@ const MenuItems = ({ user, isFreelancer, setLoginModal, handleClose }: any) => {
               <Link
                 href={item.link}
                 key={index}
-                className={`${!item.desktopView && "lg:hidden"}`}
+                className={`${!item.desktopView && "xl:hidden"}`}
               >
                 <MenuItem
                   className={`px-4 py-2 flex items-center`}
