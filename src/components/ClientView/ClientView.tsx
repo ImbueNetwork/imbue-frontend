@@ -48,19 +48,19 @@ export default function ClientView({
         <div className='mx-2 border w-full justify-between rounded-3xl flex cursor-pointer'>
           <p
             onClick={() => setSwitcher('application')}
-            className='text-2xl text-black py-5 border-r text-center w-full  '
+            className='text-base lg:text-2xl text-black py-3 lg:py-5 border-r text-center w-full  '
           >
             Briefs ({briefs?.briefsUnderReview?.length || 0})
           </p>
           <p
             onClick={() => setSwitcher('projects')}
-            className='text-2xl text-black py-5 border-r text-center w-full'
+            className='text-base lg:text-2xl text-black py-3 lg:py-5 border-r text-center w-full'
           >
             Projects({briefs?.acceptedBriefs?.length || 0})
           </p>
           <p
             onClick={() => setSwitcher('grants')}
-            className='text-2xl text-black border-r py-5 text-center w-full'
+            className='text-base lg:text-2xl text-black py-3 lg:py-5 text-center w-full'
           >
             Grants({ongoingGrants?.length || 0})
           </p>

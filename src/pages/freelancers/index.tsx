@@ -454,9 +454,10 @@ const Freelancers = (): JSX.Element => {
   }
 
   if (loading) return <LoadingFreelancers />;
+  
   return (
     <div>
-      <div className={`${styles.freelancersContainer} max-width-1100px:!m-0`}>
+      <div className={`${styles.freelancersContainer} !mt-2 lg:!m-0`}>
         <FilterModal open={filterVisble} handleClose={() => toggleFilter()}
           {
           ...{ selectedFilterIds, handleSetId, cancelFilters, customDropdownConfigs, onSearch }
