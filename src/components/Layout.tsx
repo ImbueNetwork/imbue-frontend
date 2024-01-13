@@ -119,7 +119,7 @@ function Layout({ children }: LayoutProps) {
               ) && <NewNavbar />}
 
               <main
-                className={`padded lg:!px-[var(--hq-layout-padding)] !pt-[111px]`}
+                className={`padded lg:!px-[var(--hq-layout-padding)] !pt-[120px]`}
                 id='main-content'
               >
                 {children}

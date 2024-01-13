@@ -368,29 +368,29 @@ function Project() {
   const canReview = oneMielstoneApproved && !userReviewed && (isApprover || (projectType === 'brief' && isProjectOwner))
 
   return (
-    <div className='max-lg:p-[var(--hq-layout-padding)] relative'>
+    <div className='p-2 lg:p-0 relative'>
       <div
         onClick={() => router.back()}
-        className='border border-content group hover:bg-content rounded-full flex items-center justify-center cursor-pointer absolute left-5 top-5'
+        className='border border-content group hover:bg-content rounded-full flex items-center justify-center cursor-pointer absolute lg:left-5 lg:top-5 left-6 top-7'
       >
         <ArrowBackIcon
-          className='h-7 w-7 group-hover:text-white'
+          className='h-5 w-5 lg:h-7 lg:w-7 group-hover:text-white'
           color='secondary'
         />
       </div>
 
-      <div className='w-full grid grid-cols-12 bg-white py-5 px-7 rounded-2xl'>
-        <div className='col-start-1 col-end-10'>
+      <div className='w-full grid grid-cols-12 bg-white py-5 px-4 lg:px-7 rounded-2xl'>
+        <div className='col-start-1 col-end-13 lg:col-end-10'>
           <p className='text-black capitalize ml-8'>
             {projectType} information
           </p>
           {/* starting of project section */}
           <div className='border-inherit mt-5 border rounded-xl py-4 px-5'>
-            <div className='flex mb-4 items-center justify-between'>
-              <p className='text-sm text-[#747474]'>Project Description</p>
-              <div className='flex items-center gap-2'>
+            <div className='flex flex-wrap gap-4 mb-4 items-center justify-between'>
+              <p className='text-sm text-[#747474] w-full'>Project Description</p>
+              <div className='flex flex-wrap items-center gap-2'>
                 {project?.project_in_voting_of_no_confidence && (
-                  <button className='px-3 flex items-center gap-2  py-1.5 rounded-full border border-[#EBEAE2] text-sm text-imbue-coral bg-[#FFEBEA] cursor-pointer'>
+                  <button className='px-2 flex items-center gap-1 lg:gap-2 py-1.5 rounded-full border border-[#EBEAE2] text-xs lg:text-sm text-imbue-coral bg-[#FFEBEA] cursor-pointer'>
                     <Image
                       src={require('@/assets/svgs/info-circle-red.svg')}
                       alt=''
@@ -399,7 +399,7 @@ function Project() {
                   </button>
                 )}
                 <button
-                  className='px-3 flex items-center  py-1.5 rounded-full border border-inherit text-sm text-black cursor-pointer'
+                  className='px-2 flex items-center py-1.5 rounded-full border border-inherit text-xs lg:text-sm text-black cursor-pointer'
                   onClick={() => setExpandProjectDesc((prev) => !prev)}
                 >
                   {expandProjectDesc ? 'Hide' : 'View'} full Description
@@ -415,11 +415,11 @@ function Project() {
             </p>
 
             <div className='grid grid-cols-12 gap-3 mt-5'>
-              <div className='bg-[#F2F0FF] justify-between py-2 px-3 flex flex-col col-span-4 xl:col-span-2 rounded-md'>
+              <div className='bg-[#F2F0FF] justify-between py-2 px-3 flex flex-col col-span-12 xl:col-span-2 rounded-md'>
                 <p className='text-imbue-purple text-sm'>Posted</p>
                 <p className='text-imbue-purple-dark text-sm'>{timePosted}</p>
               </div>
-              <div className='bg-[#FFEBEA] flex flex-col justify-between rounded-md py-2 px-3 col-span-8 xl:col-span-3'>
+              <div className='bg-[#FFEBEA] flex flex-col justify-between rounded-md py-2 px-3 col-span-12 xl:col-span-3'>
                 <div className='flex justify-between items-center'>
                   <p className='text-sm text-[#8A5C5A]'>
                     {user.id === projectOwner?.id && projectType === 'brief'
@@ -496,7 +496,7 @@ function Project() {
           </div>
           {/* Starting of milestone section */}
           <div className='bg-light-grey text-[#747474] py-5 px-[10px] mt-5 rounded-xl'>
-            <div className='flex items-center justify-between mx-6'>
+            <div className='flex items-center justify-between mx-2 lg:mx-6'>
               <p className='text-[#747474] text-sm'>Project Milestones</p>
 
               {projectType === 'grant' && isApprover && (
@@ -519,7 +519,7 @@ function Project() {
               )}
             </div>
 
-            <div className='grid grid-cols-12 gap-5 mt-10 ml-6'>
+            <div className='lg:grid grid-cols-12 gap-5 mt-10 ml-6 hidden'>
               <p className='col-start-1 col-end-7'>Title</p>
               <p className='col-start-7 col-end-9 mr-10 '>Milestone Funding</p>
               <p className='col-start-9 col-end-11'>Milestone ends</p>
@@ -555,7 +555,7 @@ function Project() {
         </div>
         {/* Ending of milestone section */}
         {/* starting side bar for project details */}
-        <div className='col-start-10 ml-5 row-start-1 row-end-4 col-end-13'>
+        <div className='col-start-1 col-end-13 lg:col-start-10 lg:col-end-13 lg:ml-5 lg:row-start-1 lg:row-end-4'>
           <div className='bg-light-grey mt-11 py-3 px-2 rounded-xl'>
             <p className='text-[#747474] text-sm mb-5'>Project Overview</p>
             <div className='space-y-2'>
@@ -785,7 +785,7 @@ function Project() {
         </div>
       </SuccessScreen>
 
-      <RefundScreen open={refunded} setOpen={setSuccess} />
+      <RefundScreen open={false} setOpen={setSuccess} />
 
       <WaitingScreen title={waitMessage} open={wait} setOpen={setWait}>
         <div className='flex flex-col gap-4 w-1/2'>

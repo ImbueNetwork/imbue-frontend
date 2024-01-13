@@ -365,7 +365,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
 
       <Accordion className='shadow-none mt-5 before:h-0 !rounded-xl py-5'>
         <AccordionSummary aria-controls='panel1a-content' id='panel1a-header'>
-          <Typography className='grid grid-cols-12 gap-5 w-full'>
+          <Typography className='flex flex-col lg:grid grid-cols-12 gap-5 w-full'>
             <div className='col-start-1 col-end-7  flex items-center'>
               <div className='bg-[#2400FF] rounded-md relative  w-5 h-6  flex justify-center items-center text-white'>
                 <span className='relative text-sm z-10'>{index + 1}</span>
@@ -375,10 +375,12 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
                 {milestone?.name}
               </p>
             </div>
-            <p className='col-start-7 col-end-9 text-lg mr-10 ml-4'>
+            <p className='col-start-7 col-end-9 text-lg lg:mr-10 lg:ml-4'>
+              <span className='lg:hidden'>Milestone Funding: </span>
               {milestone.amount} ${Currency[project.currency_id]}
             </p>
-            <p className='col-start-9 text-lg col-end-11 ml-4'>
+            <p className='col-start-9 text-lg col-end-11 lg:ml-4'>
+            <span className='lg:hidden'>Milestone ends: </span>
               {moment(milestone.modified).format('MMM Do YY')}
             </p>
 
@@ -392,7 +394,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
             {project.first_pending_milestone === milestone.milestone_index &&
               project.project_in_milestone_voting ? (
               <p
-                className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ml-auto h-fit ${milestone.is_approved
+                className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 lg:ml-auto w-fit h-fit ${milestone.is_approved
                   ? 'bg-lime-100 text-lime-600'
                   : 'bg-red-100 text-red-500'
                   }`}
@@ -401,7 +403,7 @@ const ExpandableMilestone = (props: ExpandableMilestonProps) => {
               </p>
             ) : (
               <p
-                className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 ml-auto h-fit ${milestone.is_approved
+                className={`px-4 py-1.5 rounded-full col-start-11 justify-self-start col-end-13 lg:ml-auto w-fit h-fit ${milestone.is_approved
                   ? 'bg-lime-100 text-lime-600'
                   : 'bg-[#EBEAE2] text-[#949494]'
                   }`}

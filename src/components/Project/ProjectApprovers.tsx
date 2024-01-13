@@ -146,7 +146,7 @@ const ProjectApprovers = (props: ProjectApproversType) => {
                     {approversPreview?.slice(0, 4).map((approver: any, index: number) => (
                         <div
                             key={index}
-                            className={`col-span-3 flex text-content px-2 py-2 rounded-xl gap-2 items-center ${approver?.display_name && 'cursor-pointer'} ${approver.id === user?.id && "bg-[#FFDAD8]"}`}
+                            className={`col-span-12 lg:col-span-3 flex text-content px-2 py-2 rounded-xl gap-2 items-center ${approver?.display_name && 'cursor-pointer'} ${approver.id === user?.id && "bg-[#FFDAD8]"}`}
                             onClick={() =>
                                 approver.display_name &&
                                 router.push(`/profile/${approver.username}`)
@@ -170,9 +170,9 @@ const ProjectApprovers = (props: ProjectApproversType) => {
                                     }
                                 </span>
                                 <p className='text-xs break-all text-imbue-purple-dark text-opacity-40'>
-                                    {approver?.web3_address?.substring(0, 4) +
+                                    {approver?.web3_address?.substring(0, 6) +
                                         '...' +
-                                        approver?.web3_address?.substring(44)}
+                                        approver?.web3_address?.substring(42)}
                                 </p>
                             </div>
                         </div>

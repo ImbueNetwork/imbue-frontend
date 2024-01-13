@@ -899,11 +899,11 @@ const Briefs = (): JSX.Element => {
                   <div className='brief-time-info'>
                     {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
                   </div>
-                  <div className='brief-description lg:w-10/12'>
+                  <p className='text-black !text-sm lg:text-base !leading-6'>
                     {item.description.length > 500
                       ? `${item.description.substring(0, 500)}...`
                       : item.description}
-                  </div>
+                  </p>
 
                   <div className='brief-tags !flex-wrap'>
                     {item.skills.map((skill: any, skillIndex: any) => (
@@ -925,7 +925,7 @@ const Briefs = (): JSX.Element => {
                     </div>
                   )}
 
-                  <div className='flex justify-between lg:flex-row flex-col lg:w-[400px] lg:items-center'>
+                  <div className='flex justify-between lg:flex-row flex-col lg:items-center'>
                     <div className='brief-proposals'>
                       <span className='proposals-heading'>
                         Proposals Submitted:{' '}
@@ -935,7 +935,7 @@ const Briefs = (): JSX.Element => {
                       </span>
                     </div>
 
-                    <div className='leading-none text-black mt-3 lg:mt-0'>
+                    <div className='leading-none text-sm text-black mt-3 lg:mt-0'>
                       {timeAgo.format(new Date(item?.created))}
                     </div>
                   </div>
