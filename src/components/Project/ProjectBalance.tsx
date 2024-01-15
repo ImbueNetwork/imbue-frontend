@@ -1,19 +1,19 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Menu, MenuItem } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { getBalance } from '@/utils/helper';
 
-import { Currency, OffchainProjectState, Project, User } from '@/model';
+import { Currency, Project, User } from '@/model';
 
 type ProjectBalanceType = {
     balance: number | undefined;
     project: Project;
     user: User;
     handlePopUpForUser: () => void;
-    setBalance: (_balance: number) => void;
     setBalanceLoading: (_loading: boolean) => void;
     balanceLoading: boolean;
+    setBalance: (_balance: number) => void;
 }
 
 const Currencies = [
@@ -42,58 +42,43 @@ const Currencies = [
 ]
 
 const ProjectBalance = (props: ProjectBalanceType) => {
-    const { balance, project, user, handlePopUpForUser, setBalance, balanceLoading, setBalanceLoading } = props;
-    const [currency_id, setCurrency_id] = useState<number>();
-    const [firstLoad, setFirstLoad] = useState<boolean>(true);
+    const { balance, project, user, balanceLoading, setBalanceLoading, setBalance } = props;
+    const [currency_id, setCurrency_id] = useState<number>(project.currency_id || 0);
+    // const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const showOptions = Boolean(anchorEl);
 
-    useEffect(() => {
-        const getAndSetBalace = async () => {
-            if (balanceLoading && !firstLoad) return;
+    const getAndSetBalace = async (currencyID: number) => {
+        if (!project?.escrow_address) return;
 
-            if (
-                currency_id === undefined
-            ) return
+        setBalanceLoading(true)
 
-            setBalanceLoading(true)
+        try {
 
-            try {
-                const balance = await getBalance(
-                    currency_id,
-                    user,
-                    project.currency_id < 100 ? project?.escrow_address : undefined,
-                    Number(project.id)
-                );
-                if (!balance && project.status_id !== OffchainProjectState.Completed) {
-                    handlePopUpForUser();
-                }
+            // if (!balance && project.status_id !== OffchainProjectState.Completed) {
+            //     handlePopUpForUser();
+            // }
 
-                setBalance(balance || 0);
-                if (firstLoad)
-                    setFirstLoad(false)
+            const newBalance = await getBalance(
+                currencyID,
+                user,
+                currencyID < 100 ? project?.escrow_address : undefined,
+                Number(project.id)
+            );
 
-            } catch (error) {
-                // eslint-disable-next-line no-console
-                console.error(error);
-            } finally {
-                setBalanceLoading(false)
-            }
+            setBalance(newBalance || 0)
+
+            // if (firstLoad)
+            //     setFirstLoad(false)
+
+        } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error(error);
+        } finally {
+            setBalanceLoading(false)
         }
-
-        // getAndSetBalace();
-        if (currency_id == undefined) {
-            setCurrency_id(project.currency_id);
-        }
-
-        const timer = setInterval(() => {
-            getAndSetBalace();
-        }, 10000);
-        return () => clearInterval(timer);
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currency_id, project?.escrow_address, project.status_id, user.id, firstLoad, balanceLoading])
+    }
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
@@ -101,14 +86,15 @@ const ProjectBalance = (props: ProjectBalanceType) => {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const selectCurrency = (currencyID: number) => {
+    const selectCurrency = async (currencyID: number) => {
         setCurrency_id(currencyID)
         setAnchorEl(null);
+        await getAndSetBalace(currencyID);
     };
 
     return (
         <div className='text-sm text-[#868686] mt-2'>
-            {balanceLoading && firstLoad
+            {balanceLoading
                 ? (
                     <p className='text-xs font-semibold'> Loading Balance...</p>)
                 : (

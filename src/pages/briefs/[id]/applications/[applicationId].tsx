@@ -148,6 +148,8 @@ const ApplicationPreview = (): JSX.Element => {
           freelancerUser?.username
         );
 
+
+
         if (!user?.id) return router.push('/auth/sign-in')
         else if (user.id !== brief?.user_id && user.id !== applicationResponse?.user_id) return router.push('/dashboard')
 
@@ -173,6 +175,7 @@ const ApplicationPreview = (): JSX.Element => {
     async function setup() {
       if (brief) {
         // setLoading(true);
+
         const briefOwner: User = await fetchUser(brief?.user_id);
         // setLoading(false);
         setBriefOwner(briefOwner);
@@ -203,6 +206,7 @@ const ApplicationPreview = (): JSX.Element => {
   );
 
   useEffect(() => {
+
     setMilestones(applicationMilestones);
   }, [application]);
 
@@ -416,7 +420,7 @@ const ApplicationPreview = (): JSX.Element => {
                 application,
                 setLoading,
                 updateProject: handleUpdateProject,
-                user,
+                user
               }}
             />
           </div>

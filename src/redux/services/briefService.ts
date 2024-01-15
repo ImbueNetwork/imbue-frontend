@@ -258,6 +258,25 @@ export const updateBriefById = async (params: BriefInfo) => {
   }
 };
 
+export const deleteBriefById = async (brief_id: number | string) => {
+  try {
+    const resp = await fetch(`${config.apiBase}/briefs/${brief_id}`, {
+      headers: postAPIHeaders,
+      method: 'delete',
+    });
+
+    if (resp.ok) {
+      return await resp.json();
+    } else {
+      return resp;
+    }
+  } catch (error) {
+    // FIXME: error handling
+    console.log(error);
+    return { status: 'Failed', message: 'Failed to load request. ' + error };
+  }
+};
+
 export const setUserAnalytics = async (
   user_id: number,
   freelancer_id: number

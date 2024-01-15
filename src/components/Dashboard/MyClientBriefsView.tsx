@@ -1,13 +1,11 @@
 /* eslint-disable no-console */
 //import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Freelancer, Project } from '@/model';
-import {
-  getUserBriefs,
-} from '@/redux/services/briefService';
+import { getUserBriefs } from '@/redux/services/briefService';
 import { getUsersOngoingGrants } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
@@ -29,14 +27,14 @@ const MyClientBriefsView = (props: ClientViewProps) => {
   const { user, loading } = useSelector((state: RootState) => state.userState);
   const router = useRouter();
 
-  const [briefs, _setBriefs] = useState<any>();
+  const [briefs, setBriefs] = useState<any>();
   const [ongoingGrants, setOngoingGrants] = useState<Project[]>([]);
 
   useEffect(() => {
     const setUserBriefs = async () => {
-      if (!user.id) return router.push('/auth/sign-in')
+      if (!user.id) return router.push('/auth/sign-in');
 
-      _setBriefs(await getUserBriefs(user?.id));
+      setBriefs(await getUserBriefs(user?.id));
 
       if (user?.web3_address)
         setOngoingGrants(await getUsersOngoingGrants(user?.web3_address));

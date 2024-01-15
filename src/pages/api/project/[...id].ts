@@ -10,6 +10,7 @@ import { initPolkadotJSAPI } from '@/utils/polkadot';
 import db from '@/db';
 import { OffchainProjectState } from '@/model';
 import ChainService from '@/redux/services/chainService';
+import { syncMilestoneVotes } from '@/redux/services/syncServices';
 
 import { authenticate, verifyUserIdFromJwt } from '../auth/common';
 
@@ -226,11 +227,14 @@ const syncProject = async (project: any, tx: any) => {
     const onChainProjectRes = await chainService.convertToOnChainProject(
       project
     );
+
     if (onChainProjectRes) {
       onChainProjectRes.milestones.map((milestone, index) => {
-        project.milestones[index].is_approved = milestone.is_approved;
+        if (project.milestones[index].is_approved !== milestone.is_approved) {
+          project.milestones[index].is_approved = milestone.is_approved;
+          milestonesRequiresSync = true;
+        }
       });
-      milestonesRequiresSync = true;
     }
 
     if (onChainProjectRes?.id && project?.id) {
@@ -238,6 +242,22 @@ const syncProject = async (project: any, tx: any) => {
         await chainService.findFirstPendingMilestone(
           onChainProjectRes.milestones
         );
+
+      // Syncing milestone votes if necessary
+      await syncMilestoneVotes(
+        onChainProjectRes,
+        project,
+        firstPendingMilestoneChain,
+        tx
+      );
+     
+      // Syncing no confidence votes if necessary
+      // await syncMilestoneVotes(
+      //   onChainProjectRes,
+      //   project,
+      //   firstPendingMilestoneChain,
+      //   tx
+      // );
 
       if (
         firstPendingMilestoneChain === project.first_pending_milestone &&
@@ -270,23 +290,10 @@ const syncProject = async (project: any, tx: any) => {
         projectId,
         newProject
       )(tx);
+
       if (!updatedProject.id) {
         return new Error('Cannot update milestones: `project_id` missing.');
       }
-
-      // // drop then recreate
-      // await models.deleteMilestones(projectId)(tx);
-
-      // //filtering milestones in back-end
-      // const filterdMileStone = project.milestones.map((item: any) => {
-      //   return {
-      //     ...item,
-      //     name: filter.clean(item.name),
-      //     description: filter.clean(item.description),
-      //   };
-      // });
-
-      // await models.insertMilestones(filterdMileStone, project.id)(tx);
 
       const pkg: ProjectPkg = {
         ...updatedProject,
@@ -316,8 +323,8 @@ const syncProject = async (project: any, tx: any) => {
       return project;
     }
   } catch (error) {
-    console.log('**** error is ');
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     return project;
   }
 };

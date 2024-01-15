@@ -66,19 +66,19 @@ export default function ChannelListItem({
         />
       </div>
       <div className='w-full'>
-        <div className='text-black items-center flex justify-between'>
+        <div className='text-black line-clamp-1 items-center break-normal flex justify-between'>
           <p>
-            {targetUser?.name?.length && targetUser?.name?.length < 15
+            {targetUser?.name?.length && targetUser?.name?.length < 10
               ? targetUser?.name
-              : targetUser?.name?.substring(0, 15) + '...'}
+              : targetUser?.name?.substring(0, 10) + '...'}
           </p>
-          <p className='text-text-aux-colour text-sm'>
+          <p className='text-text-aux-colour line-clamp-1 text-xs min-width-868px:text-sm '>
             {channel?.lastMessage()?.created_at &&
               timeAgo.format(new Date(channel?.lastMessage()?.created_at))}
           </p>
         </div>
         <div className='flex items-end justify-between'>
-          <p className='text-text-aux-colour '>
+          <p className='text-text-aux-colour line-clamp-1 '>
             {channel?.lastMessage()?.text?.substring(0, 60)}
           </p>
           {channel.countUnread() > 0 && (

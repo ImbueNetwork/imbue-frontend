@@ -20,7 +20,7 @@ const BackButton = (props: JSX.IntrinsicAttributes & React.ClassAttributes<HTMLD
                     onClick={() => router.back()}
                     className='border border-transparent hover:border-content rounded-full flex items-center justify-center cursor-pointer'
                 >
-                    <ArrowBackIcon className='h-7 w-7 group-hover:text-white' color='secondary' />
+                    <ArrowBackIcon className='h-full w-full max-w-[28px] group-hover:text-white' color='secondary' />
                 </div>
             </Tooltip>
         </div>

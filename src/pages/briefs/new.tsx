@@ -52,11 +52,6 @@ const NewBrief = (): JSX.Element => {
 
   const { user } = useSelector((state: RootState) => state.userState);
 
-  useEffect(() => {
-    fetchSuggestedSkills();
-    fetchSuggestedIndustries();
-  }, []);
-
   const fetchSuggestedSkills = async () => {
     const skillsRes = await searchSkills('');
     if (skillsRes) {
@@ -72,6 +67,11 @@ const NewBrief = (): JSX.Element => {
       );
     }
   };
+
+  useEffect(() => {
+    fetchSuggestedSkills();
+    fetchSuggestedIndustries();
+  }, []);
 
   const searchSkill = async (name: string) => {
     const skillRes = await searchSkills(name);
@@ -316,8 +316,8 @@ const NewBrief = (): JSX.Element => {
     </div>
   );
 
-  const preventChange = (e:any) =>{
-        e.target.blur()
+  const preventChange = (e: any) => {
+    e.target.blur()
   }
 
   const BudgetPanel = (
@@ -339,8 +339,8 @@ const NewBrief = (): JSX.Element => {
               Number(e.target.value) > 1000000000
             ) {
               e.preventDefault();
-            } 
-           
+            }
+
             else {
               setBudget(Number(e.target.value));
             }
@@ -357,10 +357,10 @@ const NewBrief = (): JSX.Element => {
           We recommend a minimum budget of $10 for a brief.
         </div>
       )}
-      {!Number.isInteger(Number(budget)) && 
+      {!Number.isInteger(Number(budget)) &&
         <div className={`${styles.budgetDescription} !my-5 !text-red-600`}>
-        Please use rounded numbers
-       </div>}
+          Please use rounded numbers
+        </div>}
     </div>
   );
 

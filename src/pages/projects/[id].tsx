@@ -24,6 +24,7 @@ import { useSelector } from 'react-redux';
 import { NoConfidenceVoter } from '@/lib/queryServices/projectQueries';
 import { ReviewBody } from '@/lib/queryServices/reviewQueries';
 import * as utils from '@/utils';
+import { getBalance } from '@/utils/helper';
 
 import ChatPopup from '@/components/ChatPopup';
 import ErrorScreen from '@/components/ErrorScreen';
@@ -157,7 +158,6 @@ function Project() {
   const getChainProject = async (project: Project, freelancer: any) => {
     // project = await chainService.syncOffChainDb(project, onChainProjectRes);
     if (project?.chain_project_id && project?.id) {
-
       const noConfidenceResp: NoConfidenceVoter[] = await getProjectNoConfidenceVoters(
         project.id
       );
@@ -241,6 +241,26 @@ function Project() {
     }
   };
 
+  const updateBalanceInfo = async (currency_id: number, escrow_address: string) => {
+    if (!escrow_address) return;
+
+    setBalanceLoading(true)
+    try {
+      const balance = await getBalance(
+        currency_id,
+        user,
+        currency_id < 100 ? escrow_address : undefined,
+        Number(project.id)
+      );
+      setBalance(balance);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log(error);
+    } finally {
+      setBalanceLoading(false)
+    }
+  }
+
   const getProject = async () => {
     if (!projectId) return;
 
@@ -252,6 +272,8 @@ function Project() {
         setLoading(false);
         // router.push('/error');
       }
+
+      updateBalanceInfo(projectRes.currency_id, projectRes.escrow_address);
 
       // showing owner profile if the current user if the applicant freelancer
       let owner;
@@ -605,12 +627,13 @@ function Project() {
                 <ProjectBalance
                   {...{
                     balance,
+                    setBalance,
                     project,
                     user,
                     handlePopUpForUser,
-                    setBalance,
                     balanceLoading,
-                    setBalanceLoading
+                    setBalanceLoading,
+                    updateBalanceInfo
                   }}
                 />
                 <div className='flex justify-between mt-2'>

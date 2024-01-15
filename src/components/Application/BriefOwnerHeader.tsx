@@ -70,8 +70,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
   } = props;
 
   const [balance, setBalance] = useState<number | undefined>();
-  const [imbueBalance, setImbueBalance] = useState<number | undefined>();
-  const [loadingWallet, setLoadingWallet] = useState<string>('loading');
+  const [loadingWallet, setLoadingWallet] = useState<string>('');
   const [error, setError] = useState<any>();
 
   const [openPopup, setOpenPopup] = useState<boolean>(false);
@@ -117,11 +116,16 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
   useEffect(() => {
     const showBalance = async () => {
 
-      if (loadingWallet === 'loading' && !firstLoad) return;
+      // if (loadingWallet === 'loading' && !firstLoad) return;
+      if (loadingWallet === 'loading' || !user.web3_address || !application.id) return;
+
+      setLoadingWallet('loading')
+
+      console.log("hit");
 
       try {
-        if (firstLoad)
-          setLoadingWallet('loading');
+        // if (firstLoad)
+        //   setLoadingWallet('loading');
 
         const balance = await getBalance(
           application?.currency_id ?? Currency.IMBU,
@@ -130,14 +134,7 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
           application.id
         );
 
-        const imbueBalance = await getBalance(
-          Currency.IMBU,
-          user,
-          user?.web3_address
-        );
-
         setBalance(Number(balance) || 0);
-        setImbueBalance(Number(imbueBalance) || 0);
       } catch (error) {
         setError({ message: error });
       } finally {
@@ -146,14 +143,15 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
           setFirstLoad(false)
       }
     };
-    // user?.web3_address && showBalance();
 
-    const timer = setInterval(() => {
-      user?.web3_address && showBalance();
-    }, 5000);
-    return () => clearInterval(timer);
+    user?.web3_address && showBalance();
 
-  }, [user?.web3_address, application.currency_id, user, loadingWallet, firstLoad]);
+    // const timer = setInterval(() => {
+    //   user?.web3_address && showBalance();
+    // }, 5000);
+    // return () => clearInterval(timer);
+
+  }, [user?.web3_address, application?.currency_id]);
 
   const mobileView = useMediaQuery('(max-width:480px)');
 
@@ -339,25 +337,14 @@ const BriefOwnerHeader = (props: BriefOwnerHeaderProps) => {
 
         <div className='flex flex-col gap-1 mt-5 justify-center lg:items-end'>
           <p className='text-content'>Escrow Balance</p>
-          {application?.currency_id !== Currency.IMBU ? (
-            <p className='text-sm text-imbue-purple'>
-              {loadingWallet === 'loading' && 'Loading Wallet...'}
-              {loadingWallet === 'connecting' && 'Connecting Wallet...'}
-              {loadingWallet !== 'loading' &&
-                (balance === undefined
-                  ? 'No wallet found'
-                  : `$${Currency[application?.currency_id ?? 0]}: ${balance}`)}
-            </p>
-          ) : (
-            <p className='text-sm lg:text-base text-imbue-purple'>
-              {loadingWallet === 'loading' && 'Loading Wallet...'}
-              {loadingWallet === 'connecting' && 'Connecting Wallet...'}
-              {!loadingWallet &&
-                (balance === undefined
-                  ? 'No wallet found'
-                  : `$${Currency[Currency.IMBU]}: ${imbueBalance}`)}
-            </p>
-          )}
+          <p className='text-sm text-imbue-purple'>
+            {loadingWallet === 'loading' && 'Loading Wallet...'}
+            {loadingWallet === 'connecting' && 'Connecting Wallet...'}
+            {loadingWallet !== 'loading' &&
+              (balance === undefined
+                ? 'No wallet found'
+                : `$${Currency[application?.currency_id ?? 0]}: ${balance}`)}
+          </p>
         </div>
       </div>
 

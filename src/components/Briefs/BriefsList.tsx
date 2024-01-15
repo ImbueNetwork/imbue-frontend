@@ -1,7 +1,7 @@
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { ProgressBar } from '../ProgressBar';
 TimeAgo.addLocale(en);
@@ -60,11 +60,15 @@ export const BriefLists = ({
         {briefs?.map(
           (brief, index) =>
             index <
-            Math.min(Math.max(loadValue, openBriefLimit), briefs.length) && (
+              Math.min(Math.max(loadValue, openBriefLimit), briefs.length) && (
               <div
                 key={index}
                 onClick={() => handleItemClick(brief)}
-                className={`flex ${brief.project_id && "flex-col-reverse lg:flex-row"} cursor-pointer group hover:bg-imbue-light-purple-hover px-9 py-3 lg:px-10 lg:py-8 justify-between border-b border-b-imbue-light-purple ${briefs.length < 2 && 'last:border-b-0'}`}
+                className={`flex ${
+                  brief.project_id && 'flex-col-reverse lg:flex-row'
+                } cursor-pointer group hover:bg-imbue-light-purple-hover px-9 py-3 lg:px-10 lg:py-8 justify-between border-b border-b-imbue-light-purple ${
+                  briefs.length < 2 && 'last:border-b-0'
+                }`}
               >
                 <div className='flex flex-col gap-2 lg:gap-3 w-full lg:w-2/3'>
                   <span className='text-sm text-imbue-purple-dark lg:text-xl'>
@@ -84,8 +88,8 @@ export const BriefLists = ({
                     Created {timeAgo.format(new Date(brief.created))}
                   </p>
                 </div>
-                {brief.project_id
-                  ? (<div className='flex flex-col lg:items-center lg:w-1/4'>
+                {brief.project_id ? (
+                  <div className='flex flex-col lg:items-center lg:w-1/4'>
                     <div className='text-sm lg:text-xl text-imbue-purple-dark flex items-center lg:justify-center gap-2'>
                       Milestones{' '}
                       <span className='text-imbue-lemon font-semibold'>
@@ -135,17 +139,17 @@ export const BriefLists = ({
                         }
                       />
                     </div>
-                  </div>)
-                  : (
-                    <div className='flex flex-col items-center gap-2 lg:gap-3 w-fit'>
-                      <h2 className='text-sm lg:text-lg text-imbue-purple-dark'>
-                        Proposals
-                      </h2>
-                      <h2 className='text-sm lg:text-xl text-imbue-lemon font-semibold'>
-                        {brief.number_of_applications}
-                      </h2>
-                    </div>
-                  )}
+                  </div>
+                ) : (
+                  <div className='flex flex-col items-center gap-2 lg:gap-3 w-fit'>
+                    <h2 className='text-sm lg:text-lg text-imbue-purple-dark'>
+                      Proposals
+                    </h2>
+                    <h2 className='text-sm lg:text-xl text-imbue-lemon font-semibold'>
+                      {brief.number_of_applications}
+                    </h2>
+                  </div>
+                )}
               </div>
             )
         )}
@@ -181,6 +185,7 @@ export const BriefLists = ({
             </div>
           </div>
         )}
+        {/* </Link> */}
       </div>
     </>
   );

@@ -33,9 +33,7 @@ export class MultiChainService {
   }
 
   public getCoinType = async (currencyId: number) => {
-    const core = await initWasm();
-    const { CoinType } = core;
-
+    const { CoinType } = MultiChainService.core;
     const currency = Currency[currencyId];
 
     const currencyLookup: Record<string, any> = {
@@ -51,8 +49,9 @@ export class MultiChainService {
 
 
   public getBalance = async (projectId: number) => {
-    return await db.transaction(async (tx: any) => {
-      try {
+    try {
+      return await db.transaction(async (tx: any) => {
+
         const project = await fetchProjectById(Number(projectId))(tx);
         if (!project) {
           throw new Error(`Project id ${projectId} not found`);
@@ -118,13 +117,10 @@ export class MultiChainService {
               return
           }
         }
-
-      } catch (e) {
-        throw new Error(`Failed to retreive balance for project id ${projectId}. ${e}`);
-      }
-    });
-
-
+      });
+    } catch (e) {
+      throw new Error(`Failed to retreive balance for project id ${projectId}. ${e}`);
+    }
   };
 
   public generateAddress = async (projectId: number, currencyId: number) => {
@@ -158,7 +154,7 @@ export class MultiChainService {
         if (currencyBalance == 0) {
           throw new Error("Cannot deposit funds onchain, escrow balance is empty");
         }
-        const currency = currencyId < 100 ? currencyId : { ForeignAsset: Number(currencyId) };
+        const currency = currencyId < 100 ? currencyId : { ForeignAsset: Currency[currencyId] };
         const mintAmount = BigInt(project.total_cost_without_fee! * 1e12);
         let transactionState: BasicTxResponse = {} as BasicTxResponse;
         transactionState.status = false;

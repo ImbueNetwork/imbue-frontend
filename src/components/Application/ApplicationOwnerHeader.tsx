@@ -38,6 +38,7 @@ type ApplicationOwnerProps = {
     _escrow_address?: string
   ) => Promise<void>;
   user: User | any;
+  // imbueBalance: string;
 };
 
 const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
@@ -49,33 +50,35 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
     setLoading,
     updateProject,
     user,
+    // imbueBalance,
   } = props;
 
   const [openPopup, setOpenPopup] = useState(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<any>();
   const [loadingWallet, setLoadingWallet] = useState<string>('loading');
-  const [imbueBalance, setImbueBalance] = useState<string>();
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
+  const [imbueBalance, setImbueBalance] = useState<string>();
 
   const router = useRouter();
 
   useEffect(() => {
     const showBalance = async () => {
-
       if (loadingWallet === 'loading' && !firstLoad) return;
 
       try {
-
-        if (firstLoad)
-          setLoadingWallet('loading');
 
         const balance = await getBalance(
           Currency.IMBU,
           user,
           user?.web3_address
         );
+
         setImbueBalance(balance.toLocaleString());
+
+        if (firstLoad)
+          setLoadingWallet('loading');
+
       } catch (error) {
         setError({ message: error });
       } finally {
@@ -84,12 +87,12 @@ const ApplicationOwnerHeader = (props: ApplicationOwnerProps) => {
           setFirstLoad(false)
       }
     };
-    // user?.web3_address && showBalance();
+    user?.web3_address && showBalance();
 
-    const timer = setInterval(() => {
-      user?.web3_address && showBalance();
-    }, 5000);
-    return () => clearInterval(timer);
+    // const timer = setInterval(() => {
+    //   user?.web3_address && showBalance();
+    // }, 5000);
+    // return () => clearInterval(timer);
 
   }, [user?.web3_address, application.currency_id, user, loadingWallet, firstLoad]);
 
