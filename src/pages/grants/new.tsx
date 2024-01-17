@@ -2,10 +2,10 @@ import { Alert, Dialog, IconButton, Tooltip } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import WalletIcon from '@svgs/wallet.svg';
 import { WalletAccount } from '@talismn/connect-wallets';
-import WalletConnectProvider from '@walletconnect/web3-provider'
+import WalletConnectProvider from '@walletconnect/web3-provider';
 // import ChainService from '@/redux/services/chainService';
 import Filter from 'bad-words';
-import { ethers } from 'ethers'
+import { ethers } from 'ethers';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -13,7 +13,7 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import { FaRegCopy } from 'react-icons/fa';
 import { FiPlusCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
-import Web3Modal from 'web3modal'
+import Web3Modal from 'web3modal';
 
 import { sendNotification } from '@/utils';
 import { showErrorMessage } from '@/utils/errorMessages';
@@ -119,7 +119,6 @@ const GrantApplication = (): JSX.Element => {
     ]);
   };
 
-
   const getWeb3Modal = async () => {
     const web3Modal = new Web3Modal({
       cacheProvider: false,
@@ -128,22 +127,24 @@ const GrantApplication = (): JSX.Element => {
           package: WalletConnectProvider,
         },
       },
-    })
-    return web3Modal
-  }
+    });
+    return web3Modal;
+  };
 
   const connect = async () => {
     try {
       const web3Modal = await getWeb3Modal();
       const connection = await web3Modal.connect();
       const provider = new ethers.BrowserProvider(connection);
-      const accounts = (await provider.listAccounts()).map(jsonProvider => jsonProvider.address);
+      const accounts = (await provider.listAccounts()).map(
+        (jsonProvider) => jsonProvider.address
+      );
       setPaymentAddress(accounts[0]);
-      setAccounts(accounts)
+      setAccounts(accounts);
     } catch (err) {
-      console.log('error:', err)
+      console.log('error:', err);
     }
-  }
+  };
 
   const onRemoveMilestone = (index: number) => {
     if (milestones.length <= 1) return;
@@ -202,7 +203,6 @@ const GrantApplication = (): JSX.Element => {
         message: 'Total cost must be Less than 100,000,000',
       });
 
-
     const imbueApi = await initImbueAPIInfo();
     const chainService = new ChainService(imbueApi, user);
     const balance: any = await chainService.getBalance(
@@ -246,7 +246,6 @@ const GrantApplication = (): JSX.Element => {
         approvers,
       };
 
-
       const grantMilestones = grant.milestones.map((m) => ({
         percentageToUnlock: m.percentage_to_unlock,
       }));
@@ -274,7 +273,6 @@ const GrantApplication = (): JSX.Element => {
       while (true) {
         if (result.status || result.txError) {
           if (result.status) {
-
             const resp = await fetch(`${config.apiBase}grants`, {
               headers: config.postAPIHeaders,
               method: 'post',
@@ -303,11 +301,12 @@ const GrantApplication = (): JSX.Element => {
               const { grant_id: grantId } = (await resp.json()) as any;
               setProjectId(grantId);
 
-
               if (currencyId < 100) {
                 setEscrowAddress(result?.eventData[5]);
               } else {
-                const offchainProjectAddress = await getProjectEscrowAddress(grantId);
+                const offchainProjectAddress = await getProjectEscrowAddress(
+                  grantId
+                );
                 setEscrowAddress(offchainProjectAddress);
               }
 
@@ -355,17 +354,21 @@ const GrantApplication = (): JSX.Element => {
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     milestoneIndex: number | undefined = undefined
   ) => {
-
-    const { titleRes, descriptionRes, milestonesRes, paymentAddressRes, errors } =
-      handleApplicationInput(
-        event,
-        milestoneIndex,
-        inputErrors,
-        milestones,
-        title,
-        description,
-        paymentAddress
-      );
+    const {
+      titleRes,
+      descriptionRes,
+      milestonesRes,
+      paymentAddressRes,
+      errors,
+    } = handleApplicationInput(
+      event,
+      milestoneIndex,
+      inputErrors,
+      milestones,
+      title,
+      description,
+      paymentAddress
+    );
     setTitle(titleRes);
     setDescription(descriptionRes);
     setPaymentAddress(paymentAddressRes);
@@ -470,11 +473,7 @@ const GrantApplication = (): JSX.Element => {
                       Ecosystem
                     </h3>
                     <div className='mt-2 text-content-primary'>
-                      {
-                        currencyId < 100
-                          ? "Kusama Treasury (KSM)"
-                          : "Ethereum"
-                      }
+                      {currencyId < 100 ? 'Kusama Treasury (KSM)' : 'Ethereum'}
                     </div>
                   </div>
                 </div>
@@ -613,7 +612,12 @@ const GrantApplication = (): JSX.Element => {
                 <p className='text-lg text-content m-0 p-0'>Payment Address:</p>
                 <div>
                   {accounts.length == 0 ? (
-                    <button className='primary-btn in-dark w-button' onClick={connect}>Connect</button>
+                    <button
+                      className='primary-btn in-dark w-button'
+                      onClick={connect}
+                    >
+                      Connect
+                    </button>
                   ) : (
                     <select
                       name='paymentAddress'
@@ -637,10 +641,9 @@ const GrantApplication = (): JSX.Element => {
                 </div>
               </div>
             )}
-
           </div>
         </div>
-        <div className='text-[20px] text-content lg:pl-12 py-5 border-b'>
+        <div className='text-[20px] text-content pl-6 lg:pl-12 py-5 border-b'>
           Milestones
         </div>
         <div className='flex flex-col px-6 lg:px-12 py-8'>
@@ -721,8 +724,9 @@ const GrantApplication = (): JSX.Element => {
                                   ''}
                               </p>
                               <div className='text-imbue-purple text-sm ml-auto text-right'>
-                                {`${milestones[index].description?.length || 0
-                                  }/5000`}
+                                {`${
+                                  milestones[index].description?.length || 0
+                                }/5000`}
                               </div>
                             </div>
                           </div>
@@ -788,51 +792,50 @@ const GrantApplication = (): JSX.Element => {
             Add milestone
           </div>
 
-          <div className='lg:mx-4 px-10 mt-10 bg-overlay py-8 rounded-xl mb-4'>
-            <div className='flex flex-row items-center mb-5'>
+          <div className='lg:mx-4 px-6 lg:px-10 mt-10 bg-overlay py-8 rounded-xl mb-4'>
+            <div className='flex flex-row items-center mb-5 text-sm lg:text-xl'>
               <div className='flex flex-col flex-grow'>
-                <p className='text-lg lg:text-xl text-content m-0 p-0'>
-                  Requested budget
-                </p>
+                <p className='text-content m-0 p-0'>Requested budget</p>
               </div>
               <div className='text-content-primary'>
-                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} $${Currency[currencyId]
-                  }`}
+                {`${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()} $${
+                  Currency[currencyId]
+                }`}
               </div>
             </div>
 
             <hr className='my-6 text-content' />
 
-            <div className='flex flex-row items-center mb-5'>
-              <div className='flex flex-col flex-grow'>
-                <p className='text-lg lg:text-xl text-content m-0 p-0 flex items-center'>
+            <div className='flex flex-row items-center mb-5 justify-between text-sm lg:text-xl'>
+              <div className='flex flex-col'>
+                <p className='text-content m-0 p-0 flex flex-col lg:flex-row lg:items-center gap-2'>
                   Imbue Service Fee 5% -
                   <a
                     href='https://www.imbue.network/faq'
                     target='_blank'
-                    className='hover:underline ml-2 text-sm cursor-pointer'
+                    className='hover:underline text-sm cursor-pointer'
                   >
                     Learn more about Imbue’s fees
                   </a>
                 </p>
               </div>
-              <div className='text-content-primary'>
-                {`${Number(imbueFee.toFixed(2)).toLocaleString()} $${Currency[currencyId]
-                  }`}
-              </div>
+              <p className='text-content-primary'>
+                {`${Number(imbueFee.toFixed(2)).toLocaleString()} $${
+                  Currency[currencyId]
+                }`}
+              </p>
             </div>
 
             <hr className='my-6 text-content' />
 
-            <div className='flex flex-row items-center mb-5'>
+            <div className='flex flex-row items-center text-sm lg:text-xl'>
               <div className='flex flex-col flex-grow'>
-                <p className='text-lg lg:text-xl text-content m-0 p-0'>Amount Received</p>
+                <p className='text-content m-0 p-0'>Amount Received</p>
               </div>
-              <div className='text-content-primary'>
-                {Number(amountDue.toFixed(2)).toLocaleString()} ${
-                  Currency[currencyId]
-                }
-              </div>
+              <p className='text-content-primary'>
+                {Number(amountDue.toFixed(2)).toLocaleString()} $
+                {Currency[currencyId]}
+              </p>
             </div>
           </div>
         </div>
@@ -846,8 +849,9 @@ const GrantApplication = (): JSX.Element => {
         >
           <button
             // disabled={!formDataValid}
-            className={`primary-btn in-dark w-button ${disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
-              }`}
+            className={`primary-btn in-dark w-button ${
+              disableSubmit && '!bg-gray-400 !text-white !cursor-not-allowed'
+            }`}
             onClick={() => !disableSubmit && handleSubmit()}
           >
             Submit
@@ -900,8 +904,9 @@ const GrantApplication = (): JSX.Element => {
           </button>
         </div>
         <Alert
-          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${copied ? 'flex' : 'hidden'
-            }`}
+          className={`absolute right-4 top-4 z-10 transform duration-300 transition-all ${
+            copied ? 'flex' : 'hidden'
+          }`}
           severity='success'
         >
           Grant Wallet Address Copied to clipboard
