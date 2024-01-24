@@ -33,7 +33,7 @@ const FilterModal = ({
         onClick={(e: any) => {
           e?.stopPropagation();
         }}
-        className='bg-white rounded-2xl md:px-12 px-8 md:py-10 py-5 h-[450px] min-width-1280px:w-[70%] w-[95vw] self-center relative'
+        className='bg-white rounded-2xl md:px-12 px-8 md:py-10 py-5 h-fit lg:h-[450px] min-width-1280px:w-[70%] w-[95vw] self-center relative'
       >
         <p className='font-normal text-base !text-imbue-purple-dark !mb-9'>
           Filter by:
@@ -72,7 +72,7 @@ const FilterModal = ({
                             )
                         })}
                 </div> */}
-        <div className='grid md:grid-cols-4 grid-cols-1 md:gap-10 gap-5'>
+        <div className='grid md:grid-cols-2 grid-cols-1 gap-5'>
           {customDropdownConfigs
             ?.filter(({ options }: any) => options && options.length > 0)
             ?.map(({ label, filterType, options }: any) => (
@@ -87,7 +87,7 @@ const FilterModal = ({
             ))}
         </div>
 
-        <div className='h-[39px] text-center gap-5 flex items-center absolute md:bottom-10 bottom-5 right-10'>
+        <div className='flex items-center justify-end gap-5 mt-auto'>
           <button
             onClick={cancelFilters}
             data-testid='Apply'

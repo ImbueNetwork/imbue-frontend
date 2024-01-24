@@ -45,15 +45,17 @@ const ValidatableInput = (props: any) => {
         {...props}
         inputProps={{
           maxLength,
+          className: "text-xs md:text-base"
         }}
+        InputProps={{ className: "p-2 md:p-4" }}
         onChange={(e) => handleInput(e)}
         className={'w-full !mb-0'}
         multiline
         color='secondary'
         autoComplete='off'
       />
-      <div className='flex justify-between items-center'>
-        <p className='mt-2 text-imbue-coral text-sm text-right capitalize-first'>
+      <div className='flex justify-between items-center gap-2'>
+        <p className='mt-2 text-imbue-coral text-sm text-left lg:text-right capitalize-first'>
           {error}
         </p>
         {!hideLimit && (

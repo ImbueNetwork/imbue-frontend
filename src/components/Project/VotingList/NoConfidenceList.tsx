@@ -1,4 +1,4 @@
-import { BottomNavigation, BottomNavigationAction, Dialog, DialogTitle } from '@mui/material';
+import { BottomNavigation, BottomNavigationAction, Dialog, DialogTitle, useMediaQuery } from '@mui/material';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -79,6 +79,7 @@ const NoConfidenceList = (props: VotingListProps) => {
 
     }, [value, votes])
 
+    const mobileView = useMediaQuery('(max-width:480px)');
 
     return (
         <Dialog
@@ -86,7 +87,7 @@ const NoConfidenceList = (props: VotingListProps) => {
             onClose={() => setOpenNoRefundList(false)}
             aria-labelledby='alert-dialog-title'
             aria-describedby='alert-dialog-description'
-            className='p-14 errorDialogue'
+            className='p-2 lg:p-14 errorDialogue'
         >
             {
                 (loading || userLoading)
@@ -124,10 +125,20 @@ const NoConfidenceList = (props: VotingListProps) => {
                                                     approver?.display_name &&
                                                     <p className='text-content'>{approver.display_name}</p>
                                                 }
-                                                <p className='text-content text-xs'>{approver?.web3_address || approver?.approver}</p>
+                                                <p className='text-content text-xs'>
+                                                    {
+                                                        !mobileView
+                                                            ? approver?.web3_address
+                                                            : (
+                                                                approver?.web3_address?.substring(0, 8) +
+                                                                '...' +
+                                                                approver?.web3_address?.substring(39)
+                                                            )
+                                                    }
+                                                </p>
                                             </div>
                                         </div>
-                                        <p className='text-content-primary font-semibold'>
+                                        <p className='text-content-primary font-semibold text-sm lg:text-base'>
                                             {value === 0 && "Yes"}
                                             {value === 1 && "No"}
                                             {value === 2 && "Pending"}

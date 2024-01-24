@@ -60,7 +60,7 @@ const OngoingProject: React.FC<OngoingProjectProps> = ({ projects }) => {
                 // onClick={() => redirectToApplication(project)}
                 className=' hover:bg-imbue-light-purple cursor-pointer px-9 text-imbue-purple'
               >
-                <div className='flex flex-col pt-7 gap-y-5 '>
+                <div className='flex flex-col lg:pt-7 gap-y-5 '>
                   <div className='flex gap-x-3 items-center'>
                     {project.milestones && (
                       <>

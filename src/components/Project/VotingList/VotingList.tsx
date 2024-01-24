@@ -1,4 +1,4 @@
-import { BottomNavigation, BottomNavigationAction, Dialog, DialogTitle } from '@mui/material';
+import { BottomNavigation, BottomNavigationAction, Dialog, DialogTitle, useMediaQuery } from '@mui/material';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 
@@ -30,92 +30,6 @@ const VotingList = (props: VotingListProps) => {
     const { setOpenVotingList, open, votes, loading } = props
     const [value, setValue] = React.useState(0);
     const [list, setList] = useState<any[]>([]);
-    // const [votes, setVotes] = useState<any>([])
-    // const { user, loading: userLoading } = useSelector(
-    //     (state: RootState) => state.userState
-    // );
-    // const [loading, setLoading] = useState(false);
-
-    // const firstPendingMilestone = props?.firstPendingMilestone >= 0 ? props?.firstPendingMilestone : project?.milestones?.length - 1
-
-    // useEffect(() => {
-    //     const syncVotes = async () => {
-    //         if (!chainProjectId || !projectId || firstPendingMilestone === undefined) return
-
-    //         const imbueApi = await initImbueAPIInfo();
-    //         const chainService = new ChainService(imbueApi, user);
-    //         const milestoneVotes: any = await chainService.getMilestoneVotes(
-    //             chainProjectId,
-    //             firstPendingMilestone
-    //         );
-
-    //         const votesArray = Object.keys(milestoneVotes)
-
-    //         if (votesArray.length > 0) {
-    //             const votes: MilestoneVotes[] = votesArray?.map((key: any) => ({
-    //                 voterAddress: key,
-    //                 vote: milestoneVotes[key],
-    //             })) || [];
-
-    //             const promises = votes.map(async (v) => await voteOnMilestone(null, v.voterAddress, firstPendingMilestone, v.vote, projectId))
-    //             await Promise.all(promises)
-    //             const voteResp = await getMillestoneVotes(projectId, firstPendingMilestone)
-    //             setVotes(voteResp)
-    //             setMilestoneVotes(voteResp?.allVoters)
-    //             // const resp = await syncProjectVotes(projectId, firstPendingMilestone, votes)
-    //         }
-    //     }
-
-    //     const setVotingList = async () => {
-    //         if (!projectId || firstPendingMilestone === undefined) return
-
-    //         setLoading(true)
-    //         try {
-    //             const voteResp = await getMillestoneVotes(projectId, firstPendingMilestone)
-    //             setVotes(voteResp)
-    //             setMilestoneVotes(voteResp?.allVoters)
-    //             // const votersAddressed = voteResp?.map((voter: any) => voter.web3_address)
-    //             syncVotes();
-    //         } catch (error) {
-    //             // eslint-disable-next-line no-console
-    //             console.error(error);
-    //         } finally {
-    //             setLoading(false)
-    //         }
-    //     }
-
-    //     setVotingList()
-    // }, [user, firstPendingMilestone, setMilestoneVotes, projectId, approvers, chainProjectId])
-
-    // useEffect(() => {
-    //     const votedYes: User[] = []
-    //     const votedNo: User[] = []
-    //     const pendingVote: User[] = []
-
-    //     approvers?.length && approvers?.forEach((approver) => {
-    //         const match = votes.find((voter) => voter?.voterAddress === approver.web3_address)
-    //         if (!approver.web3_address) return
-
-    //         if (match) {
-    //             if (match?.vote) votedYes.push(approver)
-    //             else if (!match?.vote) votedNo.push(approver)
-    //         }
-    //         else pendingVote.push(approver)
-    //     })
-
-    //     switch (value) {
-    //         case 0:
-    //             setList(votedYes)
-    //             break;
-    //         case 1:
-    //             setList(votedNo)
-    //             break;
-    //         case 2:
-    //             setList(pendingVote)
-    //             break;
-    //     }
-
-    // }, [value, approvers, user, chainProjectId, firstPendingMilestone, votes])
 
     useEffect(() => {
         switch (value) {
@@ -132,6 +46,7 @@ const VotingList = (props: VotingListProps) => {
 
     }, [value, votes])
 
+    const mobileView = useMediaQuery('(max-width:480px)');
 
     return (
         <Dialog
@@ -139,7 +54,7 @@ const VotingList = (props: VotingListProps) => {
             onClose={() => setOpenVotingList(false)}
             aria-labelledby='alert-dialog-title'
             aria-describedby='alert-dialog-description'
-            className='p-14 errorDialogue'
+            className='px-2 lg:p-14 errorDialogue'
         >
             {
                 (loading)
@@ -177,10 +92,20 @@ const VotingList = (props: VotingListProps) => {
                                                     approver?.display_name &&
                                                     <p className='text-content'>{approver.display_name}</p>
                                                 }
-                                                <p className='text-content text-xs'>{approver?.web3_address || approver?.approver}</p>
+                                                <p className='text-content text-xs'>
+                                                    {
+                                                        !mobileView
+                                                            ? approver?.web3_address
+                                                            : (
+                                                                approver?.web3_address?.substring(0, 8) +
+                                                                '...' +
+                                                                approver?.web3_address?.substring(39)
+                                                            )
+                                                    }
+                                                </p>
                                             </div>
                                         </div>
-                                        <p className='text-content-primary font-semibold'>
+                                        <p className='text-content-primary font-semibold text-sm lg:text-base'>
                                             {value === 0 && "Yes"}
                                             {value === 1 && "No"}
                                             {value === 2 && "Pending"}

@@ -17,10 +17,11 @@
 .freelancerDetailsContainer {
   display: flex;
   flex-direction: row;
-  min-height: 650px;
-  width: 50%;
-  margin-left: auto;
-  margin-right: auto;
+  min-height: 450px;
+  width: fit-content;
+  max-width: 60%;
+  margin: auto;
+  margin-top: 1.15rem;
   border-radius: 20px;
 }
 
@@ -69,15 +70,16 @@
 
 .contentTextSmall {
   width: 90%;
-  color: var(--theme-imbue-purple);
-  font-size: 23px;
+  color: #2c2c2c;
+  font-size: 18px;
   text-align: left;
-  padding-top: 5%;
+  padding-top: 16px;
 }
 
 .helloPanel {
   display: flex;
   flex-direction: row;
+  margin-top: 1rem;
 }
 
 .freelanceXpContainer {
@@ -87,8 +89,8 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 16px;
-  margin-bottom: 16px;
+  margin-top: 24px;
+  margin-bottom: 24px;
 }
 
 .freelanceXpItem {
@@ -130,20 +132,23 @@
     /* max-width: 800px; */
     min-height: 480px;
     height: 90%;
-    width: 100%;
+    max-width: 100%;
     padding: 0 30px;
   }
-
+  .freelanceXpItem{
+    font-size: 14px;
+  }
+  .helloPanel {
+    margin-top: 0.5rem;
+  }
   .mainPanel {
     height: fit-content;
     margin: auto;
     padding: 30px 30px;
   }
 
-  .contentTextSmall {
+  .contentTextSmall, .contentTextSmallFlex {
     width: 100%;
-    font-size: 16px;
+    font-size: 14px;
   }
-
-  
 }

@@ -98,7 +98,7 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setLoading, s
                 onClose={handleClose}
                 aria-labelledby='alert-dialog-title'
                 aria-describedby='alert-dialog-description'
-                className='p-14 errorDialogue min-h-fit'
+                className='px-2 lg:p-14 errorDialogue'
             >
                 <div className='flex flex-col gap-3 p-8 text-content'>
                     <p className='text-center text-lg lg:text-2xl font-bold text-content-primary'>
@@ -147,9 +147,9 @@ const ReviewFormModal = ({ targetUser, project, setShowLoginPopup, setLoading, s
                             value={title || ""}
                         /> */}
 
-                        <p className='mt-5 mb-3'>Project Title: {action === 'post' ? project?.name : review?.title}</p>
+                        <p className='mt-5 mb-3 text-xs lg:text-base leading-6'>Project Title: {action === 'post' ? project?.name : review?.title}</p>
 
-                        <p className='mb-2'>Description (optional)</p>
+                        <p className='mb-3 text-xs lg:text-base'>Description (optional)</p>
                         {/* <TextAreaOutlined
                             props={{
                                 onChange: (e) => setDescription(e.target.value)

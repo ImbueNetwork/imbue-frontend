@@ -1,7 +1,7 @@
-/* eslint-disable react/display-name */
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { InputAdornment, TextField } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { useClickAway } from 'react-use';
 
 import BriefFilter from './BriefFilter';
 
@@ -57,26 +57,19 @@ const CustomDropDown = ({
     setOptions(newOptions);
   };
 
-  return (
-    <div className='relative md:mb-8 mb-4'>
-      {/* <div
-          onClick={handleToggle}
-          typeof='button'
-          data-testid={name}
-          className='h-[39px] w-full border border-black rounded-xl flex justify-between items-center text-imbue-purple-dark font-normal text-sm p-3 cursor-pointer'
-          >
-          {name}
-          <Image
-          src={chevDownIcon}
-          alt={'filter-icon'}
-          className='h-[12px] w-[12px]'
-          />
-        </div> */}
+  // to close the dropdown when clicked outside
+  const dropdownRef = useRef(null);
 
+  useClickAway(dropdownRef, () => {
+    setIsOpen(false)
+  });
+
+  return (
+    <div ref={dropdownRef} className='relative mb-0 custom-scroll'>
       <TextField
         onChange={handleChange}
         onFocus={() => setIsOpen(true)}
-        className=' min-w-[13.3rem] w-full'
+        className='min-w-[13.3rem] w-full'
         label={name}
         color='secondary'
         autoComplete='off'
@@ -85,7 +78,10 @@ const CustomDropDown = ({
             <InputAdornment position='end'>
               <ArrowDropDownIcon
                 className={`cursor-pointer ${isOpen && 'rotate-180'}`}
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsOpen(!isOpen)
+                }}
               />
             </InputAdornment>
           ),
@@ -94,7 +90,7 @@ const CustomDropDown = ({
       {isOpen && (
         <div
           data-testid='filterOptions'
-          className={`w-full -mt-6 bg-white rounded-[10px] rounded-t-none absolute transition-all duration-300 ease-in-out shadow-sm shadow-slate-300 overflow-y-auto max-h-[170px]`}
+          className={`w-full -mt-6 bg-white border border-imbue-light-purple rounded-[10px] rounded-t-none absolute transition-all duration-300 ease-in-out shadow-sm shadow-slate-300 overflow-y-auto max-h-[170px]`}
           style={{ zIndex: 20 - filterType }}
         >
           <BriefFilter

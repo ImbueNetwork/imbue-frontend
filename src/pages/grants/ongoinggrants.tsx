@@ -46,7 +46,7 @@ export default function Ongoinggrants() {
           color='secondary'
         />
       </div>
-      <div className=' mx-2 border px-7 py-5 rounded-3xl'>
+      <div className='mx-2 border px-7 py-5 rounded-3xl'>
         <p className='text-2xl text-black ml-10'>
           {applicationStatusId[Number(status_id)]} Grants
         </p>

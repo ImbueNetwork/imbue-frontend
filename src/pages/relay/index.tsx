@@ -228,7 +228,7 @@ const Relay = () => {
             color='secondary'
           />
         </div>
-        <h1 className='fund-h1 ml-3'>My funds</h1>
+        <h1 className='text-3xl lg:text-5xl ml-3'>My funds</h1>
       </div>
 
       <p className='my-5 text-content'>Transfer KSM to Imbue Network</p>

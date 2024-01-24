@@ -22,7 +22,7 @@ const ErrorScreen = (props: ErrorScreenProps) => {
       onClose={handleClose}
       aria-labelledby='alert-dialog-title'
       aria-describedby='alert-dialog-description'
-      className='p-14 errorDialogue'
+      className='p-2 lg:p-14 errorDialogue'
     >
       <div className='my-auto flex flex-col gap-3 items-center p-8 text-content'>
         <div className='f-modal-icon f-modal-error animate'>
