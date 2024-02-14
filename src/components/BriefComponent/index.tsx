@@ -37,13 +37,13 @@ export default function BriefComponent({ brief }: { brief: any }) {
   }, [brief]);
 
   return (
-    <div className='flex border-b hover:bg-imbue-light-purple-three cursor-pointer last:border-b-0'>
+    <div className='flex flex-col lg:flex-row border-b hover:bg-imbue-light-purple-three cursor-pointer last:border-b-0'>
       <div
         onClick={() => router.push(`/briefs/${brief.id}`)}
-        className='py-9 px-7 max-w-[70%] w-full break-words'
+        className='py-9 px-7 lg:max-w-[70%] w-full break-words'
       >
         <p className='text-2xl text-imbue-purple-dark'>{brief.headline}</p>
-        <div className='flex text-sm text-imbue-dark-coral gap-5 mt-5'>
+        <div className='flex flex-wrap text-sm text-imbue-dark-coral gap-5 mt-5'>
           <p className='px-3 flex items-center gap-1 rounded-xl py-1 bg-imbue-light-coral '>
             <TbNorthStar size={18} />
             {brief.experience_level}
@@ -93,7 +93,7 @@ export default function BriefComponent({ brief }: { brief: any }) {
           )}
         </div>
       </div>
-      <div className='max-w-[30%] w-full py-7 border-l'>
+      <div className='lg:max-w-[30%] w-full py-7 border-l'>
         <div className='px-7 flex gap-2 pb-4 border-b'>
           <Image
             className='w-9 h-9 rounded-full'

@@ -1,12 +1,15 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import { Badge } from '@mui/material';
 import { useRouter } from 'next/router';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { BiChevronDown, BiRightArrowAlt } from 'react-icons/bi';
 import { MdOutlineAttachMoney } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
+import Slider from 'react-slick';
 import { Channel, DefaultGenerics } from 'stream-chat';
 import 'stream-chat-react/dist/css/v2/index.css';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 import { fetchUser } from '@/utils';
 
@@ -26,7 +29,6 @@ import {
 } from '@/redux/services/freelancerService';
 import { setUnreadMessage } from '@/redux/slices/userSlice';
 import { RootState } from '@/redux/store/store';
-
 export type DashboardProps = {
   user: User;
   isAuthenticated: boolean;
@@ -244,6 +246,29 @@ const FreelancerDashboard = (): JSX.Element => {
     if (user?.id) getProjects();
   }, [selectedOption.status_id, user?.id]);
 
+  const sliderRef = useRef<Slider | null>(null);
+
+  const settings = {
+    dots: true,
+    infinite: false,
+    arrows: false,
+    slidesToShow: 3,
+    slidesToScroll: 3,
+    dotsClass: 'dashboard_slider',
+    responsive: [
+      {
+        breakpoint: 860,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          dots: true,
+          variableWidth: true,
+        }
+      },
+    ]
+  }
+
+
   if (loadingStreamChat || loadingUser) return <FullScreenLoader />;
 
   return client ? (
@@ -257,63 +282,66 @@ const FreelancerDashboard = (): JSX.Element => {
         </p>
       </>
       {/* starting of the box sections */}
-      <div className='flex text-text-grey gap-7 mt-9'>
-        <div className=' py-5 px-5 rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full'>
-          <div className='flex justify-between'>
-            <p>Projects</p>
 
-            <p
-              className='bg-imbue-purple px-7 py-2 text-white text-sm rounded-full cursor-pointer'
-              onClick={() => router.push('/projects/myprojects')}
-            >
-              View all
-            </p>
-          </div>
-          <div className='mt-5'>
-            <div className='flex items-center gap-2'>
-              <div className='w-1.5 h-1  rounded-full bg-imbue-coral' />
-              <p className='text-sm min-w-fit '>Completed Projects</p>
-              <hr className='w-full border-dashed mt-3  border-imbue-coral ' />
-              <p className='text-[22px] font-semibold text-black'>
-                {completedProjects?.length || 0}
+      <Slider className='w-full text-text-grey mt-9' ref={sliderRef} {...settings}>
+        <div className='pr-7'>
+          <div className='py-5 px-5 rounded-[18px] bg-imbue-light-grey w-[250px] lg:w-full'>
+            <div className='flex justify-between items-center'>
+              <p>Projects</p>
+              <p
+                className='bg-imbue-purple px-7 py-2 text-white text-sm rounded-full cursor-pointer'
+                onClick={() => router.push('/projects/myprojects')}
+              >
+                View all
               </p>
             </div>
-          </div>
-          <div className='mt-0.5'>
-            <div className='flex items-center gap-2'>
-              <div className='w-1.5 h-1 rounded-full bg-imbue-purple' />
-              <p className='text-sm min-w-fit '>Active Projects</p>
-              <hr className='w-full border-dashed mt-3  border-imbue-purple ' />
-              <p className='text-[22px] font-semibold text-black'>
-                {activeProjects?.length || 0}
-              </p>
+            <div className='mt-5'>
+              <div className='flex items-center gap-2'>
+                <div className='w-1.5 h-1  rounded-full bg-imbue-coral' />
+                <p className='text-sm min-w-fit '>Completed Projects</p>
+                <hr className='w-full border-dashed mt-3  border-imbue-coral ' />
+                <p className='text-[22px] font-semibold text-black'>
+                  {completedProjects?.length || 0}
+                </p>
+              </div>
             </div>
-          </div>
-          <div className='mt-0.5'>
-            <div className='flex items-center gap-2'>
-              <div className='w-1.5 h-1 rounded-full bg-imbue-coral' />
-              <p className='text-sm min-w-fit'>Pending Projects</p>
-              <hr className='w-full border-dashed mt-3  border-t-imbue-coral ' />
-              <p className='text-[22px] font-semibold text-black'>
-                {pendingProjects?.length || 0}
-              </p>
+            <div className='mt-0.5'>
+              <div className='flex items-center gap-2'>
+                <div className='w-1.5 h-1 rounded-full bg-imbue-purple' />
+                <p className='text-sm min-w-fit '>Active Projects</p>
+                <hr className='w-full border-dashed mt-3  border-imbue-purple ' />
+                <p className='text-[22px] font-semibold text-black'>
+                  {activeProjects?.length || 0}
+                </p>
+              </div>
             </div>
-          </div>
-          <div className='mt-0.5'>
-            <div className='flex items-center gap-2'>
-              <div className='w-1.5 h-1 rounded-full bg-imbue-lemon' />
-              <p className='text-sm min-w-fit '>Grants</p>
-              <hr className='w-full border-dashed mt-3  border-imbue-lemon ' />
-              <p className='text-[22px] font-semibold text-black'>
-                {grants?.length || 0}
-              </p>
+            <div className='mt-0.5'>
+              <div className='flex items-center gap-2'>
+                <div className='w-1.5 h-1 rounded-full bg-imbue-coral' />
+                <p className='text-sm min-w-fit'>Pending Projects</p>
+                <hr className='w-full border-dashed mt-3  border-t-imbue-coral ' />
+                <p className='text-[22px] font-semibold text-black'>
+                  {pendingProjects?.length || 0}
+                </p>
+              </div>
+            </div>
+            <div className='mt-0.5'>
+              <div className='flex items-center gap-2'>
+                <div className='w-1.5 h-1 rounded-full bg-imbue-lemon' />
+                <p className='text-sm min-w-fit '>Grants</p>
+                <hr className='w-full border-dashed mt-3  border-imbue-lemon ' />
+                <p className='text-[22px] font-semibold text-black'>
+                  {grants?.length || 0}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-        <div className='py-5 px-5 flex flex-col justify-between rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full '>
-          <div className='flex justify-between'>
+
+        <div className='py-5 px-5 !flex flex-col justify-between rounded-[18px] bg-imbue-light-grey h-full  w-full text-text-grey min-h-[210px]'>
+          <div className='flex justify-between items-center gap-3'>
             <p>Briefs</p>
-            <div className='relative w-44 select-none'>
+            <div className='relative lg:w-44 select-none'>
               <div
                 className='flex bg-white p-2 rounded-md gap-1.5 items-center cursor-pointer'
                 onClick={() => setOpenedOption((prev) => !prev)}
@@ -328,14 +356,13 @@ const FreelancerDashboard = (): JSX.Element => {
               </div>
 
               <div
-                className={`${
-                  !openedOption && 'hidden'
-                } bg-white absolute w-full rounded-md`}
+                className={`${!openedOption && 'hidden'
+                  } absolute z-[1] w-full rounded-md`}
               >
                 {options.map((option, index) => (
                   <div
                     key={index}
-                    className='flex items-center gap-2 p-2 cursor-pointer hover:bg-imbue-light-purple'
+                    className={`flex items-center gap-2 p-2 cursor-pointer ${option.status_id === selectedOption.status_id ? 'bg-imbue-light-purple': "bg-white"}`}
                     onClick={() => {
                       setSelectedOption(option);
                       setOpenedOption(false);
@@ -351,10 +378,10 @@ const FreelancerDashboard = (): JSX.Element => {
           <div>
             <div className='mb-2 flex'>
               <p className='text-4xl font-semibold text-black'>
-                {filteredApplications?.length}
+                {filteredApplications?.length || 0}
               </p>
             </div>
-            <div className='flex  justify-between'>
+            <div className='flex gap-4 items-center justify-between'>
               <p>{selectedOption.name} brief</p>
               <div
                 className='px-3 py-0.5 border text-black border-text-aux-colour rounded-full cursor-pointer'
@@ -369,34 +396,38 @@ const FreelancerDashboard = (): JSX.Element => {
             </div>
           </div>
         </div>
-        <div className=' py-5 px-5 flex flex-col rounded-[18px] min-h-[10.625rem] bg-imbue-light-grey  w-full '>
-          <div className='flex justify-between'>
-            <p>Total Earnings</p>
-            <div
-              onClick={() => router.push('/relay')}
-              className='px-3 py-0.5 border cursor-pointer text-black border-text-aux-colour rounded-full'
-            >
-              <BiRightArrowAlt size={22} className='-rotate-45' />
+
+        <div className='pl-7'>
+          <div className='py-5 px-5 flex flex-col rounded-[18px] tegr bg-imbue-light-grey  w-full min-h-[234px]'>
+            <div className='flex justify-between'>
+              <p>Total Earnings</p>
+              <div
+                onClick={() => router.push('/relay')}
+                className='px-3 ml-3 py-0.5 border cursor-pointer text-black border-text-aux-colour rounded-full'
+              >
+                <BiRightArrowAlt size={22} className='-rotate-45' />
+              </div>
             </div>
-          </div>
-          <div className='text-black mt-auto'>
-            <div className='flex'>
-              <MdOutlineAttachMoney size={23} />
-              <p className='text-4xl font-semibold'>{totalEarnings}</p>
+            <div className='text-black mt-auto'>
+              <div className='flex items-center'>
+                <MdOutlineAttachMoney size={23} />
+                <p className='text-4xl font-semibold'>{totalEarnings}</p>
+              </div>
+              <p className='text-text-grey'>Payout Accounts</p>
             </div>
-            <p className='text-text-grey'>Payout Accounts</p>
           </div>
         </div>
-      </div>
+      </Slider>
       {/* ending of the box sections */}
-      <div className='mt-9 flex w-full gap-7'>
+
+      <div className='mt-9 flex flex-col-reverse lg:flex-row w-full gap-7'>
         <BriefsView
           {...{
             setError,
             currentUser: user,
           }}
         />
-        <div className='max-w-[25%] w-full rounded-md  '>
+        <div className='lg:max-w-[25%] w-full rounded-md'>
           {/* Starting of graph */}
           <div className='bg-imbue-light-grey px-0.5 rounded-3xl pb-0.5 '>
             <div className='flex justify-between items-center py-7 px-7'>

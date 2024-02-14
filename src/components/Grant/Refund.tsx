@@ -19,7 +19,7 @@ const RefundScreen = (props: RefunScreenProps) => {
             open={open}
             aria-labelledby='alert-dialog-title'
             aria-describedby='alert-dialog-description'
-            className='p-14 errorDialogue'
+            className='p-2 lg:p-14 errorDialogue'
         >
             <div className='my-auto flex flex-col gap-3 items-center p-8 text-content'>
                 <Image src={refundIcon} width={100} height={100} alt="refund icon" />

@@ -14,7 +14,6 @@ import '@/styles/stream-chat.css';
 import '@/styles/animation.css';
 const Layout = dynamic(() => import("@/components/Layout"));
 
-
 export default function App({ Component, pageProps }: AppProps) {
 
   return (
@@ -22,9 +21,9 @@ export default function App({ Component, pageProps }: AppProps) {
       <Head>
         <title>Imbue</title>
       </Head>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
     </>
   );
 }

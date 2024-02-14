@@ -30,7 +30,7 @@ export default function FreelancerCard({
   }, [freelancer]);
 
   return (
-    <div className='border min-w-[28.75rem]  px-5 py-5 rounded-2xl '>
+    <div className='border px-5 py-5 rounded-2xl'>
       <div className='flex items-center gap-2'>
         <Image
           className='w-14 h-14 object-cover rounded-full'

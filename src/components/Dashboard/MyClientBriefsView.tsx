@@ -1,14 +1,11 @@
 /* eslint-disable no-console */
 //import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Freelancer, Project } from '@/model';
-import {
-  getBriefApplications,
-  getUserBriefs,
-} from '@/redux/services/briefService';
+import { getUserBriefs } from '@/redux/services/briefService';
 import { getUsersOngoingGrants } from '@/redux/services/projectServices';
 import { RootState } from '@/redux/store/store';
 
@@ -28,17 +25,14 @@ const MyClientBriefsView = (props: ClientViewProps) => {
   const { briefId, handleMessageBoxClick } = props;
 
   const { user, loading } = useSelector((state: RootState) => state.userState);
-
+  const router = useRouter();
 
   const [briefs, setBriefs] = useState<any>();
-  const [briefApplications, setBriefApplications] = useState<Project[]>([]);
   const [ongoingGrants, setOngoingGrants] = useState<Project[]>([]);
-  const [loadingApplications, setLoadingApplications] = useState<boolean>(true);
-  const router = useRouter();
 
   useEffect(() => {
     const setUserBriefs = async () => {
-      if (!user.id) return router.push('/auth/sign-in')
+      if (!user.id) return router.push('/auth/sign-in');
 
       setBriefs(await getUserBriefs(user?.id));
 
@@ -49,28 +43,6 @@ const MyClientBriefsView = (props: ClientViewProps) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.id, user?.web3_address, loading]);
-
-  useEffect(() => {
-    const getApplications = async () => {
-      if (!briefId || !user.id) return
-
-      try {
-        setLoadingApplications(true);
-        const resp = await getBriefApplications(String(briefId));
-
-        if (resp.status === 501)
-          return router.push('/dashboard');
-
-        setBriefApplications(resp);
-        setLoadingApplications(false);
-      } catch (error) {
-        console.log(error);
-        setLoadingApplications(false);
-      }
-    };
-
-    briefId && getApplications();
-  }, [briefId, loading, router, user.id]);
 
   const goBack = () => {
     router.query.briefId = [];
@@ -84,10 +56,10 @@ const MyClientBriefsView = (props: ClientViewProps) => {
         briefId={briefId}
         briefs={briefs}
         handleMessageBoxClick={handleMessageBoxClick}
-        // redirectToBriefApplications={redirectToBriefApplications}
-        briefApplications={briefApplications}
         ongoingGrants={ongoingGrants}
-        loadingApplications={loadingApplications}
+        // redirectToBriefApplications={redirectToBriefApplications}
+        // briefApplications={briefApplications}
+        // loadingApplications={loadingApplications}
       />
     </div>
   );

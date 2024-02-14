@@ -5,7 +5,7 @@ import { Alert, Skeleton, Tooltip } from '@mui/material';
 import moment from 'moment';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { FaRegShareSquare } from 'react-icons/fa';
 
 import { checkEnvironment } from '@/utils';
@@ -21,7 +21,7 @@ import {
   saveBriefData,
 } from '@/redux/services/briefService';
 
-import { LoginPopupContext, LoginPopupContextType } from '../Layout';
+import { AppContext, AppContextType } from '../Layout';
 import CountrySelector from '../Profile/CountrySelector';
 
 type BioInsightsProps = {
@@ -55,7 +55,7 @@ const BioInsights = ({
   setSuccess,
   setError,
   setSuccessTitle,
-  loadingMain
+  loadingMain,
 }: BioInsightsProps) => {
   const router = useRouter();
   const [copied, setCopied] = useState(false);
@@ -67,12 +67,9 @@ const BioInsights = ({
   const lastApplication: Project =
     briefApplications[briefApplications?.length - 1];
 
-  const pendingApplciations: Project[] =
-    !briefApplications?.length
-      ? []
-      : briefApplications?.filter(
-        (application) => application?.status_id === 1
-      );
+  const pendingApplciations: Project[] = !briefApplications?.length
+    ? []
+    : briefApplications?.filter((application) => application?.status_id === 1);
 
   let applicationCount = '0';
 
@@ -92,22 +89,26 @@ const BioInsights = ({
   else if (isOwnerOfBrief)
     hint = 'You are not allowed to submit proposal to your own brief';
 
-  const { setShowLoginPopup } = useContext(
-    LoginPopupContext
-  ) as LoginPopupContextType;
+  const { setShowLoginPopup } = useContext(AppContext) as AppContextType;
 
-  const acceptedBriefs = allClientBriefs?.acceptedBriefs || []
-  const briefsUnderReview = allClientBriefs?.briefsUnderReview || []
-  const clientBriefs = [...acceptedBriefs, ...briefsUnderReview]
+  const acceptedBriefs = allClientBriefs?.acceptedBriefs || [];
+  const briefsUnderReview = allClientBriefs?.briefsUnderReview || [];
+  const clientBriefs = [...acceptedBriefs, ...briefsUnderReview];
 
-  const briefWithApplications = allClientBriefs?.briefsUnderReview?.length ? allClientBriefs.briefsUnderReview.filter((brief: Brief) => brief.number_of_applications) : 0
-  const hiredCount = allClientBriefs?.acceptedBriefs?.length || 0
+  const briefWithApplications = allClientBriefs?.briefsUnderReview?.length
+    ? allClientBriefs.briefsUnderReview.filter(
+        (brief: Brief) => brief.number_of_applications
+      )
+    : 0;
+  const hiredCount = allClientBriefs?.acceptedBriefs?.length || 0;
 
-  const hireRate = Math.round((hiredCount / (briefWithApplications.length + hiredCount)) * 100)
+  const hireRate = Math.round(
+    (hiredCount / (briefWithApplications.length + hiredCount)) * 100
+  );
 
   useEffect(() => {
     const fetchSavedBriefs = async () => {
-      if (!brief?.id) return
+      if (!brief?.id) return;
 
       try {
         if (browsingUser?.id) {
@@ -119,14 +120,16 @@ const BioInsights = ({
         }
         setBriefApplications(await getBriefApplications(brief?.id));
       } catch (error) {
-        setError({ message: "Failed to get application data. Please try again. " + error })
+        setError({
+          message: 'Failed to get application data. Please try again.',
+        });
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchSavedBriefs()
-  }, [brief?.id, browsingUser?.id, setError])
+    fetchSavedBriefs();
+  }, [brief?.id, browsingUser?.id, setError]);
 
   // useEffect(() => {
   //   const setUp = async () => {
@@ -171,7 +174,8 @@ const BioInsights = ({
   };
 
   const unsaveBrief = async () => {
-    if (!browsingUser?.id) return setError({ message: "No user information found." });
+    if (!browsingUser?.id)
+      return setError({ message: 'No user information found.' });
 
     await deleteSavedBrief(brief.id, browsingUser?.id);
     setIsSavedBrief(false);
@@ -179,31 +183,30 @@ const BioInsights = ({
     setSuccessTitle('Brief Unsaved Successfully');
   };
 
-  if (loading || loadingMain) return (
-    <div className='brief-insights py-6 px-6 lg:py-10 lg:px-10 mt-[2rem] lg:mt-0 w-full md:w-[35%] relative'>
-      <Skeleton variant="text" className='text-xl w-52' />
-      <div className='flex gap-2 w-full my-3'>
-        <Skeleton variant="text" className='text-xl w-28 h-10 rounded-full' />
-        <Skeleton variant="text" className='text-xl w-40 h-10 rounded-full' />
+  if (loading || loadingMain)
+    return (
+      <div className='brief-insights py-6 px-6 lg:py-10 lg:px-10 mt-[2rem] lg:mt-0 w-full md:w-[35%] relative'>
+        <Skeleton variant='text' className='text-xl w-52' />
+        <div className='flex gap-2 w-full my-3'>
+          <Skeleton variant='text' className='text-xl w-28 h-10 rounded-full' />
+          <Skeleton variant='text' className='text-xl w-40 h-10 rounded-full' />
+        </div>
+
+        <Skeleton variant='text' className='text-base w-52 mb-3' />
+        <Skeleton variant='text' className='text-base w-52 mb-3' />
+        <Skeleton variant='text' className='text-base w-52 mb-3' />
+
+        <Skeleton variant='text' className='text-base w-52 mt-6' />
+        <Skeleton variant='rounded' className='mt-4 w-full' height={180} />
+
+        <Skeleton variant='text' className='text-base w-52 mt-5' />
+        <Skeleton variant='text' className='text-base w-52 mt-2' />
+        <Skeleton variant='rounded' className='mt-4 w-full' height={30} />
       </div>
-
-      <Skeleton variant="text" className='text-base w-52 mb-3' />
-      <Skeleton variant="text" className='text-base w-52 mb-3' />
-      <Skeleton variant="text" className='text-base w-52 mb-3' />
-
-      <Skeleton variant="text" className='text-base w-52 mt-6' />
-      <Skeleton variant="rounded" className='mt-4 w-full' height={180} />
-
-      <Skeleton variant="text" className='text-base w-52 mt-5' />
-      <Skeleton variant="text" className='text-base w-52 mt-2' />
-      <Skeleton variant="rounded" className='mt-4 w-full' height={30} />
-    </div>
-  )
+    );
 
   return (
-    <div
-      className='brief-insights py-6 px-6 lg:py-10 lg:px-10 mt-[2rem] lg:mt-0 w-full md:w-[35%] relative'
-    >
+    <div className='brief-insights py-6 px-6 lg:py-10 lg:px-10 mt-[2rem] lg:mt-0 w-full md:w-[35%] relative'>
       <div>
         <h3 className='text-imbue-purple-dark !font-normal'>
           Activities on this job
@@ -213,10 +216,11 @@ const BioInsights = ({
           <div className='flex gap-3 lg:items-center mt-4 flex-wrap'>
             <button
               onClick={() => (isSavedBrief ? unsaveBrief?.() : saveBrief?.())}
-              className={` ${isSavedBrief
-                ? 'bg-imbue-coral text-white border-imbue-coral'
-                : 'bg-transparent text-content border border-content'
-                } rounded-3xl h-[2.48rem] text-base font-normal px-5 max-width-1100px:w-full max-width-500px:w-auto `}
+              className={` ${
+                isSavedBrief
+                  ? 'bg-imbue-coral text-white border-imbue-coral'
+                  : 'bg-transparent text-content border border-content'
+              } rounded-3xl h-[2.48rem] text-base font-normal px-5 max-width-1100px:w-full max-width-500px:w-auto `}
             >
               {isSavedBrief ? 'Unsave' : 'Save'}
             </button>
@@ -238,9 +242,10 @@ const BioInsights = ({
               gap-2
               !m-0
               !px-4
-              ${(!canSubmitProposal || isOwnerOfBrief) &&
-                  '!bg-gray-300 !text-gray-400 !cursor-not-allowed'
-                  }
+              ${
+                (!canSubmitProposal || isOwnerOfBrief) &&
+                '!bg-gray-300 !text-gray-400 !cursor-not-allowed'
+              }
               `}
                 onClick={() =>
                   canSubmitProposal && !isOwnerOfBrief && redirectToApply()
@@ -256,7 +261,11 @@ const BioInsights = ({
       <div className='subsection !mb-[0.75rem]'>
         {brief.verified_only && (
           <p className='text-imbue-purple flex items-center mb-4'>
-            <VerifiedIcon className='mr-2' fontSize='small' htmlColor='#38e894' />
+            <VerifiedIcon
+              className='mr-2'
+              fontSize='small'
+              htmlColor='#38e894'
+            />
             Only verified freelancer can apply
           </p>
         )}
@@ -358,7 +367,9 @@ const BioInsights = ({
               </div>
             </div>
             <p className='mt-2 text-imbue-purple text-[1rem]'>
-              {hireRate > 0 && <span className='mr-1'>{hireRate}% hire rate,</span>}
+              {hireRate > 0 && (
+                <span className='mr-1'>{hireRate}% hire rate,</span>
+              )}
               {allClientBriefs?.briefsUnderReview?.length || 0} open job
             </p>
           </div>
@@ -448,8 +459,9 @@ const BioInsights = ({
       </div>
 
       <Alert
-        className={`fixed top-28 z-10 transform duration-300 transition-all ${copied ? 'right-5' : '-right-full'
-          }`}
+        className={`fixed top-28 z-10 transform duration-300 transition-all ${
+          copied ? 'right-5' : '-right-full'
+        }`}
         severity='success'
       >
         {`Brief link copied to clipboard`}

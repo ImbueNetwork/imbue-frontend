@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
-
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { useContext, useEffect, useState } from 'react';
@@ -16,15 +13,15 @@ const LoginPopup = dynamic(() => import('@/components/LoginPopup/LoginPopup'));
 import { Modal } from '@mui/material';
 
 import { AppContext, AppContextType } from '@/components/Layout';
-import WelcomForNewUser from '@/components/WelcomeModalContent/WelcomeForNewUser';
 
 import { Project, User } from '@/model';
 import { Brief } from '@/model';
 import { setUnreadMessage } from '@/redux/slices/userSlice';
 import { RootState } from '@/redux/store/store';
 
-import ClientDashboard from './ClientDashboard';
-import FreelancerDashboard from './new';
+import ClientDashboard from './components/ClientDashboard';
+import FreelancerDashboard from './components/FreelancerDashboard';
+import WelcomForNewUser from './components/WelcomeForNewUser';
 
 export type DashboardProps = {
   user: User;
@@ -68,7 +65,7 @@ const Dashboard = (): JSX.Element => {
       }
     };
     setupStreamChat();
-  }, [user]);
+  }, [loadingUser, router, user?.username]);
 
   useEffect(() => {
     if (client && user?.username && !loadingStreamChat) {

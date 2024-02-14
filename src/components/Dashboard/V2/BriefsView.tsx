@@ -579,7 +579,7 @@ const BriefsView = (props: BriefsViewProps) => {
   };
 
   return (
-    <div className='border-2 text-text-aux-colour max-w-[75%] rounded-2xl w-full border-imbue-light-grey'>
+    <div className='border-2 text-text-aux-colour lg:max-w-[75%] rounded-2xl w-full border-imbue-light-grey'>
       <div className='justify-between py-2 border-b b items-center flex px-7'>
         <p className='text-[#747474]'>Recomended Briefs</p>
         <div className='flex gap-5 items-center'>

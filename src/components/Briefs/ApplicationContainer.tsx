@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -8,8 +7,8 @@ import { ApplicationContainerProps, applicationStatusId } from '@/model';
 
 export const ApplicationContainer = ({
   application,
-  // redirectToApplication,
   handleMessageBoxClick,
+  // redirectToApplication,
 }: ApplicationContainerProps) => {
   return (
     <div className='flex flex-col px-5 py-5 lg:px-[60px] lg:py-[35px] border-b border-b-imbue-light-purple last:border-b-0 hover:bg-imbue-light-purple-hover cursor-pointer'>

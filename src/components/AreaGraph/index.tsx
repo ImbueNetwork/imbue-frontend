@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 
-import { userAnalyticsType } from '@/pages/dashboard/new';
+import { userAnalyticsType } from '@/pages/dashboard/components/FreelancerDashboard';
 
 const Chart = dynamic(() => import('react-apexcharts'), {
   ssr: false,

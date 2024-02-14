@@ -2,22 +2,18 @@
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import { useRouter } from 'next/router';
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import BioInsights from '@/components/Briefs/BioInsights';
 import BioPanel from '@/components/Briefs/BioPanel';
 import ClientsHistory from '@/components/Briefs/ClientHistory';
 import SimilarProjects from '@/components/Briefs/SimilarBriefs';
-import ErrorScreen from '@/components/ErrorScreen';
-import { LoginPopupContext, LoginPopupContextType } from '@/components/Layout';
+import { AppContext, AppContextType } from '@/components/Layout';
 import SuccessScreen from '@/components/SuccessScreen';
 
 import { Brief, Freelancer, User } from '@/model';
-import {
-  getBrief,
-  getUserBriefs,
-} from '@/redux/services/briefService';
+import { getBrief, getUserBriefs } from '@/redux/services/briefService';
 import { getFreelancerProfile } from '@/redux/services/freelancerService';
 import { RootState } from '@/redux/store/store';
 
@@ -66,11 +62,10 @@ const BriefDetails = (): JSX.Element => {
   const [allClientBriefs, setAllClientBriefs] = useState<any>();
 
   // const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
-  const { setShowLoginPopup } = useContext(
-    LoginPopupContext
-  ) as LoginPopupContextType;
+  const { setShowLoginPopup, setError } = useContext(
+    AppContext
+  ) as AppContextType;
   const isOwnerOfBrief = browsingUser && browsingUser.id == brief.user_id;
-  const [error, setError] = useState<any>();
 
   const projectCategories = brief?.industries?.map?.((item) => item?.name);
 
@@ -79,7 +74,7 @@ const BriefDetails = (): JSX.Element => {
   const id: number = Number(query?.id) || 0;
 
   const fetchData = async () => {
-    if (!id) return
+    if (!id) return;
 
     try {
       const briefData: Brief | Error | undefined = await getBrief(id);
@@ -87,12 +82,10 @@ const BriefDetails = (): JSX.Element => {
         const targetUserRes = await fetchUser(briefData.user_id);
         setTargetUser(targetUserRes);
         setBrief(briefData);
-        const freelancer = await getFreelancerProfile(
-          browsingUser?.username
-        );
+        const freelancer = await getFreelancerProfile(browsingUser?.username);
 
         const allClientBriefsRes = await getUserBriefs(briefData.user_id);
-        setAllClientBriefs(allClientBriefsRes)
+        setAllClientBriefs(allClientBriefsRes);
 
         setFreelancer(freelancer);
       } else {
@@ -102,7 +95,7 @@ const BriefDetails = (): JSX.Element => {
     } catch (error) {
       setError({ message: error });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -158,24 +151,12 @@ const BriefDetails = (): JSX.Element => {
           loadingMain={loading}
         />
       </div>
-      <ClientsHistory briefId={id} client={targetUser} allClientBriefs={allClientBriefs} />
+      <ClientsHistory
+        briefId={id}
+        client={targetUser}
+        allClientBriefs={allClientBriefs}
+      />
       <SimilarProjects exclude_id={id} />
-      <ErrorScreen {...{ error, setError }}>
-        <div className='flex flex-col gap-4 w-1/2'>
-          <button
-            onClick={() => router.push('/briefs')}
-            className='primary-btn in-dark w-button w-full !m-0'
-          >
-            Seach Brief
-          </button>
-          <button
-            onClick={() => router.push(`/dashboard`)}
-            className='underline text-xs lg:text-base font-bold'
-          >
-            Go to Dashboard
-          </button>
-        </div>
-      </ErrorScreen>
 
       <SuccessScreen title={successTitle} open={success} setOpen={setSuccess}>
         <div className='flex flex-col gap-4 w-1/2'>
@@ -189,12 +170,6 @@ const BriefDetails = (): JSX.Element => {
           </button>
         </div>
       </SuccessScreen>
-
-      {/* <LoginPopup
-        visible={showLoginPopup}
-        setVisible={setShowLoginPopup}
-        redirectUrl={`/briefs/${id}`}
-      /> */}
     </div>
   );
 };
