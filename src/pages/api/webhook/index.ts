@@ -50,29 +50,8 @@ export default async function handler(req: any, res: any) {
       }
     }
 
-    const msg = {
-      to: 'riyad.ahmed1886@gmail.com',
-      from: 'info@imbue.network', // Use the email address or domain you verified above
-      subject: 'You have an unread message',
-      text: 'imbue@Network.com',
-      html: `<h2> Dear, send </h2 <br/> <br/> 
-    ${'someone'} has sent you a message and waiting for your reply </strong>`,
-    };
-
-    await sgMail.send(msg);
-
     res.status(200).json({ text: 'ok' });
   } catch (error: any) {
-    const msg = {
-      to: 'riyad.ahmed1886@gmail.com',
-      from: 'info@imbue.network', // Use the email address or domain you verified above
-      subject: 'You have an unread message',
-      text: error.message,
-      html: `<h2> Dear, send </h2 <br/> <br/> 
-    ${'someone'} has sent you a message and waiting for your reply </strong>`,
-    };
-
-    await sgMail.send(msg);
     res.status(501).send('error sending message: ');
   }
 }
