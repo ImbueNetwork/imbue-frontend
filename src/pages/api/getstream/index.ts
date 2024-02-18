@@ -4,12 +4,16 @@ import nextConnect from 'next-connect';
 import passport from 'passport';
 
 import * as models from '@/lib/models';
-import { fetchUserByList } from '@/lib/queryServices/userQueries';
+import {
+  fetchUserByIdList,
+  fetchUserByList,
+} from '@/lib/queryServices/userQueries';
 import { isValidAddressPolkadotAddress } from '@/utils/helper';
 
 import db from '@/db';
 
 import { authenticate } from '../auth/common';
+import { sendMail } from '../webhook';
 
 export default nextConnect()
   .use(passport.initialize())
@@ -34,7 +38,7 @@ export default nextConnect()
             return res.status(404).end();
           }
           const activity = {
-            actor: 'User:' + userAuth.id,
+            actor: 'User:' + user.id,
             verb: 'pin',
             object: type,
             data: {
@@ -49,21 +53,48 @@ export default nextConnect()
               applicationId,
             },
           };
-          let userIdList;
+          let userIdList: { id: string; email: string }[];
           if (isValidAddressPolkadotAddress(target[0])) {
             const response = (await fetchUserByList(target)(
               tx
             )) as models.User[];
-            userIdList = response.map((user: models.User) => user.id);
-          } else userIdList = target;
+            userIdList = response.map((user: models.User) => {
+              return {
+                id: String(user.id),
+                email: user.email,
+                name: user.display_name,
+              };
+            });
+          } else {
+            const response = (await fetchUserByIdList(target)(
+              tx
+            )) as models.User[];
+            userIdList = response.map((user: models.User) => {
+              return {
+                id: String(user.id),
+                email: user.email,
+                name: user.display_name,
+              };
+            });
+          }
 
-          userIdList.map(async (id: string) => {
+          userIdList.map(async ({ id, email }) => {
             const userId = client.user(String(id));
             const targetUser = client.feed(
               'user',
               String(userId.id),
               userId.token
             );
+
+            const msg = {
+              to: email,
+              from: 'info@imbue.network', // Use the email address or domain you verified above
+              subject: title,
+              text: 'imbue@Network.com',
+              html: text,
+            };
+            await sendMail.send(msg);
+
             await targetUser.addActivity(activity);
           });
         } catch (err) {
