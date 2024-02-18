@@ -13,7 +13,7 @@ import { isValidAddressPolkadotAddress } from '@/utils/helper';
 import db from '@/db';
 
 import { authenticate } from '../auth/common';
-import { sendMail } from '../Webhook';
+import { sendMail } from '../webhook';
 
 export default nextConnect()
   .use(passport.initialize())
